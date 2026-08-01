@@ -2122,6 +2122,26 @@ export function buildWorld() {
     brow.position.set(0, 3.98, 0.5);
     fig.add(brow);
     core.add(fig);
+
+    // THE SECOND FIGURE (#53): after the embrace, the model's beach holds TWO — the
+    // keeper's cyan speck and a warm amber one beside it, standing together, neither
+    // searching. Visible only on the model, only once W.flags.carried (puzzles _apply).
+    // Warm where he is cold: your lamp, next to his.
+    const comp = new THREE.Group();
+    comp.name = 'tinyCompanion';
+    comp.visible = false;
+    const cy2 = heightAt(SPOTS.beach.x + 1.4, SPOTS.beach.y + 1.1);
+    comp.position.set(SPOTS.beach.x + 1.4, cy2, SPOTS.beach.y + 1.1);
+    const cb = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.8, 3.0, 6),
+      new THREE.MeshStandardMaterial({ color: 0x5c4a30, emissive: 0xffb454, emissiveIntensity: 1.5, flatShading: true }));
+    cb.position.y = 1.5;
+    comp.add(cb);
+    const ch = new THREE.Mesh(new THREE.SphereGeometry(0.5, 6, 5),
+      new THREE.MeshStandardMaterial({ color: 0xd9c9a8, emissive: 0xffe2a8, emissiveIntensity: 1.0, flatShading: true }));
+    ch.position.y = 3.5;
+    comp.add(ch);
+    comp.rotation.y = Math.atan2(fig.position.x - comp.position.x, fig.position.z - comp.position.z);   // facing him
+    core.add(comp);
   }
 
   // =================== THE WATCHER (grief given form) =======================
@@ -2883,6 +2903,7 @@ const NAMES = [
   'poolWater', 'poolPhial', 'poolGlint', 'phialDesk', 'hallGlyphs',       // #49: the high-pool round trip + the beam turned to the deep
   'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain',   // #54: the lampblack micro-marks
   'tideGauge', 'gaugeTop',                                                 // #52: the tide gauge — the descent's waterlines made monumental
+  'tinyCompanion',                                                         // #53: the second figure on the model's beach, once carried
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];

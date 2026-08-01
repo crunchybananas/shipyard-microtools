@@ -188,6 +188,17 @@ export const LORE = {
     ],
     journal: 'The dried note from the phial is a letter to the SEA, sealed against the day it rose high enough to take it. He asked it one thing: that whoever fishes the phial from the risen water be let back up — carried to the surface “the way you carry everything else you finally return.”',
   },
+  // on the MODEL's own chart table (#53) — a margin the width of a fingernail, read only by
+  // someone bent over a model with a glass: which is exactly what HE was when he wrote it.
+  // The recursion speaks to the next hand down.
+  model_margin: {
+    kind: 'inscription', hand: 'keeper', title: 'The model’s margin, under the glass',
+    pages: [
+      '(the glass, pressed close over the model’s little chart table — a margin the width of a fingernail, and on it, his smallest hand) You are bent over a model with a glass in your hand. That is what I was when I wrote this. That is what whoever reads the margin below this one will be. It does not end. I have stopped needing it to.',
+      'To the next hand down, whichever of us you are: the sea in your model is rising too. Hold the day as long as you can bear to. Then let the model hold it instead. That is all a model is for — a place to set a day down, so your two hands are free.',
+    ],
+    journal: 'On the MODEL’s chart table, under the glass: a margin the width of a fingernail, written in his smallest hand — a letter to the next hand down. “It does not end. I have stopped needing it to.”',
+  },
   // folded into the music box on the study shelf — ties the box/bird puzzle (the fourth note he
   // bends DOWN where the bird bends it UP) to his grief: the thing he could never do, that you do.
   music_note: {
@@ -303,6 +314,11 @@ export const SKETCHES = [
   ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
   ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
   ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
+  // #53 — the model's micro-finds (lean all the way in).
+  ['a letter to the next hand down', S('<rect x="26" y="10" width="44" height="22" rx="1" opacity=".6"/><rect x="36" y="15" width="24" height="12" rx="1" opacity=".8"/><rect x="42" y="18" width="12" height="6" rx="0.5"/><circle cx="76" cy="28" r="6"/><path d="M80 32l8 6" opacity=".8"/>')],
+  ['The invitation goes all the way down', S('<g transform="rotate(-8 40 24)"><path d="M36 30V18q0-3 3-4v-3h3v3q3 1 3 4v12z"/></g><g transform="rotate(-8 62 27) scale(0.55) translate(50 20)"><path d="M36 30V18q0-3 3-4v-3h3v3q3 1 3 4v12z" opacity=".7"/></g><path d="M14 34h68" opacity=".4"/><circle cx="22" cy="14" r="5" opacity=".5"/>')],
+  ['a sea the size of a dinner tray', S('<ellipse cx="48" cy="26" rx="26" ry="8" opacity=".5"/><path d="M60 26V10"/><ellipse cx="60" cy="22" rx="3" ry="1"/><ellipse cx="60" cy="18" rx="3" ry="1"/><ellipse cx="60" cy="14" rx="3" ry="1" opacity=".45"/><circle cx="30" cy="24" r="4" opacity=".6"/>')],
+  ['two figures on the model’s beach', S('<path d="M40 32c0-6 2-9 4-9s4 3 4 9" opacity=".85"/><circle cx="44" cy="19" r="2.6" opacity=".85"/><path d="M52 32c0-5 2-8 4-8s4 3 4 8" opacity=".85"/><circle cx="56" cy="21" r="2.4" opacity=".85"/><path d="M20 34h56" opacity=".4"/><path d="M14 12q6 3 12 0M70 12q6 3 12 0" opacity=".3"/>')],
   // #124 — the plate refuses the unmeasured deep.
   ['The plate would not take me deeper', S('<circle cx="30" cy="26" rx="0" r="11" opacity=".85"/><ellipse cx="30" cy="26" rx="11" ry="4" opacity=".5"/><path d="M52 12l8 6-6 5 9 7-5 6" opacity=".8"/><path d="M50 34h32" opacity=".4"/>')],
   // #52 — the tide gauge landmark.

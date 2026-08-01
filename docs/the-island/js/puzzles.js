@@ -252,6 +252,46 @@ export class Game {
       },
     });
 
+    // ---- the model's micro-finds (#53): the game's signature object finally holds its
+    // own secrets. Lean ALL the way in — three need the reading glass (at 1:240 nothing
+    // reads without it); the fourth appears only once you have carried him up.
+    const marginProxy = proxy(LH.x - 1.4, LH.y + 1.2, LH.z, 2.2);
+    I.add({
+      id: 'modelMargin', targets: [marginProxy], label: 'the model’s chart margin', maxDist: 2.6, noGlint: true,
+      when: () => W.flags.readGlass,
+      onClick: () => UI.openReader('model_margin'),
+    });
+    const mBottleProxy = proxy(6.5, 1.2, -101, 2.0);
+    I.add({
+      id: 'modelBottle', targets: [mBottleProxy], label: 'a bottle, grain-of-rice small', maxDist: 2.6, noGlint: true,
+      when: () => W.flags.readGlass,
+      onClick: () => {
+        A.pluck(1567.98, 0, 0.1, 1.4);
+        UI.whisper('On the model’s beach, a bottle the size of a grain of rice — corked, and holding, presumably, its own small letter. And on ITS beach, presumably, another.');
+        this.once('modelBottle', () => UI.addJournal('Leaning into the model with the glass I found the bottle on its little beach — rice-grain small, corked, a curl of paper inside. Somewhere on that beach’s own model there is another. The invitation goes all the way down.', '', 'self'));
+      },
+    });
+    const mGaugeProxy = proxy(-64, 2.5, -93, 2.2);
+    I.add({
+      id: 'modelGauge', targets: [mGaugeProxy], label: 'a staff the height of an eyelash', maxDist: 2.6, noGlint: true,
+      when: () => W.flags.readGlass,
+      onClick: () => {
+        A.crankTick();
+        UI.whisper('Even here: a staff the height of an eyelash, five rings, the topmost pale. He measured the model’s sea too.');
+        this.once('modelGauge', () => UI.addJournal('The model has its own tide gauge — an eyelash of a staff off the little shore, five rings, the top one pale. He surveyed the rising of a sea the size of a dinner tray. Thoroughness, or dread. Both, I think.', '', 'self'));
+      },
+    });
+    const mPairProxy = proxy(SPOTS.beach.x + 0.7, 1.8, SPOTS.beach.y + 0.5, 2.4);
+    I.add({
+      id: 'modelPair', targets: [mPairProxy], label: 'two small figures', maxDist: 2.8, noGlint: true,
+      when: () => W.flags.carried,
+      onClick: () => {
+        A.chime();
+        UI.whisper('Two figures stand on the model’s beach now. Neither is searching. They stand the way people stand when the searching is over.');
+        this.once('modelPair', () => UI.addJournal('There are two figures on the model’s beach now, where there was one bent low — one cold light and one warm, facing each other, neither looking for anything. That is how I know which day the model is holding now. Ours.', '', 'self'));
+      },
+    });
+
     // vault lens item
     I.add({
       id: 'lensItem', targets: [R.lensItem], label: 'the first lens',
@@ -1244,7 +1284,9 @@ export class Game {
     if (R.bell) R.bell.rotation.z = Math.sin(elapsed * 0.9) * 0.022 * Math.min(Math.max(0, W.level - 1), 4);
     if (R.tinyFigure) {
       const fig = R.tinyFigure;
-      fig.visible = W.level >= 2 && isModel;
+      // #53: once CARRIED, the pair stands on the model's beach at every depth — the
+      // keeper no longer vanishes at the surface; the reunion is what the model holds now
+      fig.visible = (W.level >= 2 || F.carried) && isModel;
       if (fig.visible) {
         const look = this._keeperLook;
         const rise = this._keeperRise;   // the twist: it climbs up to meet your eye at the bottom
@@ -1262,6 +1304,9 @@ export class Game {
         if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look + 1.6 * rise;
       }
     }
+
+    // #53: the second figure — warm beside his cold — exists only once carried
+    if (R.tinyCompanion) R.tinyCompanion.visible = isModel && F.carried;
 
     // The Room That Disagrees (#18 live ghostState): the model on its table always
     // shows the OPPOSITE of the world — its sea floods as you drain the real one,

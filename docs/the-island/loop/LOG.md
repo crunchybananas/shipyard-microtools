@@ -12,6 +12,35 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 17 — 2026-08-01 — THE FIELD REPORT (debug-together) · #53 the model's own secrets
+
+**Shipped (owner request, same morning):** debug-together. **⚑ field report** — the chip at
+the debug panel's brow, or F8 from anywhere: one click captures the exact pose, mode, full
+save payload, perf numbers, UA, an optional one-line note, and a screenshot — copied to the
+clipboard as a lean paste-to-chat blob, downloaded as JSON (screenshot inside), and kept in
+a localStorage ring (`abyme-reports`, last 10) an agent driving the same browser can read
+directly. The other half: `ABYME.applyReport(blob)` restores the save AND stands you at the
+reporter's exact position and gaze — paste a report, see what they saw. Round-tripped in
+verification: report → teleport away → applyReport → back within 0.5m.
+
+**Shipped (#53):** the game's signature object finally holds its own secrets — four
+model-only finds, three needing the glass (nothing reads at 1:240 without it):
+- **the model's margin** — a fingernail-wide chart margin on the model's own table, in his
+  smallest hand: a letter to the next hand down ("It does not end. I have stopped needing
+  it to.") — a full reader fragment.
+- **the grain-of-rice bottle** on the model's beach — corked, its own curl of paper, "and
+  on ITS beach, presumably, another. The invitation goes all the way down."
+- **the eyelash tide gauge** — he surveyed the rising of a sea the size of a dinner tray.
+- **the second figure** (post-carry, no glass — it glows): a warm amber speck beside the
+  keeper's cold one on the model's beach, neither searching. The keeper figure no longer
+  vanishes at the surface once carried — the pair is what the model holds now. Ours.
+
+**Evidence:** glass gates hold (nothing clickable without it); reader opens + readKeys;
+all three onces fire exactly once; pair gated on carried with the island-side companion
+hidden; 67/67 sketch coverage; walk 28/28. **Closes #53.**
+
+---
+
 ## loop-fire 16 — 2026-08-01 — #124 the plate refuses the unmeasured deep · #61 UX micro-pass
 
 **Shipped (#124):** the ruler-conditional L3 strand is closed at the root: the L2→L3 dive
