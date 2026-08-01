@@ -1738,10 +1738,12 @@ function buildDebugPanel() {
   if (hideBtn) hideBtn.addEventListener('click', () => { el.style.display = 'none'; });
   addEventListener('keydown', (e) => {
     if (e.code === 'Backquote') { e.preventDefault(); el.style.display = (el.style.display === 'none') ? '' : 'none'; }
-    // the field report works from ANYWHERE, panel open or not (debug-together)
-    if (e.code === 'F8') { e.preventDefault(); A.report(prompt('field report — what did you see? (one line)') || ''); }
+    // the field report works from ANYWHERE, panel open or not (debug-together).
+    // NO prompt(): embedded browser panes block modal dialogs silently, which ate the
+    // whole click handler before report() ever ran — the note travels by chat instead.
+    if (e.code === 'F8') { e.preventDefault(); A.report(''); }
   });
-  el.querySelector('#dbg-report')?.addEventListener('click', () => A.report(prompt('field report — what did you see? (one line)') || ''));
+  el.querySelector('#dbg-report')?.addEventListener('click', () => A.report(''));
   const tslider = el.querySelector('#dbg-time'); tslider.value = W.time;
   tslider.addEventListener('input', () => { W.time = parseFloat(tslider.value); });
   const dslider = el.querySelector('#dbg-tide'); dslider.value = W.tide;
