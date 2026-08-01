@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=184';
-import { missions } from './missions.js?realm=184';
+} from './state.js?realm=185';
+import { missions } from './missions.js?realm=185';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=184';
+} from './save-schema.js?realm=185';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,7 +22,7 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=184';
+} from './citizen-ownership.js?realm=185';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization
@@ -96,7 +96,7 @@ const ALLOWED_GAME_KEYS = new Set([
   '_raidStolen', '_raidWarningGiven', '_refreshPanelFor', '_renderAlpha',
   '_renderDeltaMs', '_scenarioWon',
   '_undoStack', 'acorns', 'activeEvent', 'animals', 'armyStance', 'avatar',
-  'balloons', 'bats', 'bigSnow', 'birds', 'boats', 'bolts', 'buildingGrid',
+  'bats', 'bigSnow', 'birds', 'boats', 'bolts', 'buildingGrid',
   'buildings', 'bunnies', 'camStart', 'camera', 'cameraShake', 'caravans',
   'carts', 'chronicle', 'citizens', 'clouds', 'crabs', 'currentResearch', 'day',
   'dayLength', 'dayPhase', 'deathMarkers', 'debug', 'defense', 'difficulty',

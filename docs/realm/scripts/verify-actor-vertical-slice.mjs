@@ -165,10 +165,10 @@ try {
     const centerX = 32;
     const centerY = 32;
     const ownership = await import(
-      './js/citizen-ownership.js?realm=184'
+      './js/citizen-ownership.js?realm=185'
     );
     const renderCache = await import(
-      './js/citizen-render-cache.js?realm=184'
+      './js/citizen-render-cache.js?realm=185'
     );
     const citizen = game.citizens[0];
     const barracks = {
