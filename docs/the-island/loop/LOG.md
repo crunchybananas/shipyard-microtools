@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 10 — 2026-07-31 — #57 labels + THE FULL-GAME WALK — and the batch push
+
+**Shipped (#57):** the ~30 authored hotspot labels finally render — rest the iris on a
+hotspot ~700ms and its name surfaces in the whisper's own hand beside the cursor (a
+`#hotlabel` DOM caption riding the iris transform; function labels resolve at show time,
+so per-depth names are one change away). Drag hotspots are distinguished at HOVER now:
+amber chevrons flank the iris (‹ ›) before you ever press — the crank and the lamp
+housing read as "turn", the valve as "touch". Caption yields on click/drag/unhover.
+
+**Shipped (the release gate):** walk.mjs — the FULL-GAME regression walk, 28 assertions,
+real mechanics end-to-end: fresh wipe → intro → the whole surface chain by its own
+hotspots (valve/chest/ruler/crack/box/stones/lens/beam/shimmer/dials/plumb/hook, stems
+1-5) → the REAL plate two-touch and 21s dive → L2 kelp slate + Tide-Figure resolved by
+its real 2.6s regard → L3 Watcher by real regard → L4 pool phial + the keeper twist by
+real proximity (held beat, release) → THE EMBRACE (plate two-touch → carried) → a real
+28s ascent → instant climbs out → returned + the phial dries and reads → the OAR terminal
+(finale shown) → save-restore → the BELL terminal (finale shown) → zero console errors.
+**28/28 green.** This runs before every future push.
+
+**Evidence:** hover simulation through the live frame loop (drag spot → chevrons + dwell
+caption "the model lamp housing"; click spot → no chevrons + "the brass valve"); the walk
+above. **Closes #57.**
+
+**PUSH (fires 6-10):** submodule main → origin/main, parent → origin/main (the every-5th
+boundary). #49 #52 #54 #57 #64 all land on the deployed site together.
+
+**Next tick suggestion:** #60 touch input — the biggest remaining release gap (phones).
+
+---
+
 ## loop-fire 9 — 2026-07-31 — #52 complete: the tide gauge — the descent's waterlines, surveyed
 
 **Shipped:** region4's missing landmark, and the whole SEA-STRATA mechanic in one prop: a

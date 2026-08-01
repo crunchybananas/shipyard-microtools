@@ -72,6 +72,36 @@ html, body {
 }
 #iris.drag .iris-ring { transform: scale(0.3); opacity: 0.4; }
 #iris.gone { opacity: 0; }
+/* drag affordance (#57): chevrons flank the iris over drag hotspots — turn, don't tap */
+#iris::before, #iris::after {
+  position: absolute; top: -13px;
+  font: italic 18px/22px Georgia, serif;
+  color: var(--amber);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+}
+#iris::before { content: '‹'; left: -26px; transform: translateX(4px); }
+#iris::after  { content: '›'; left: 19px;  transform: translateX(-4px); }
+#iris.draggable::before, #iris.draggable::after, #iris.drag::before, #iris.drag::after {
+  opacity: 0.9;
+  transform: translateX(0);
+}
+/* the dwell caption (#57): the hotspot's name in the whisper's own hand, beside the iris */
+#hotlabel {
+  position: fixed; left: 0; top: 0; z-index: 29;
+  margin: 14px 0 0 22px;
+  pointer-events: none;
+  font-style: italic;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: rgba(232, 224, 207, 0.92);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  white-space: nowrap;
+}
+#hotlabel.show { opacity: 0.88; }
 
 /* ---------- title ---------- */
 #title-screen {

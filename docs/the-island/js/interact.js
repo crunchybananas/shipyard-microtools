@@ -24,12 +24,17 @@ export class Interactions {
     this._glinted = new Map(); // material → original emissive intensity
 
     this.iris = document.getElementById('iris');
+    // the dwell caption (#57): rest on a hotspot ~700ms and its authored label surfaces
+    // in the whisper's own hand, riding beside the iris. Cleared on unhover/click/drag.
+    this.labelEl = document.getElementById('hotlabel');
+    this._labelTimer = null;
 
     dom.addEventListener('pointermove', (e) => {
       this.mousePx.x = e.clientX; this.mousePx.y = e.clientY;
       this.mouse.x = (e.clientX / innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / innerHeight) * 2 + 1;
       this.iris.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+      if (this.labelEl) this.labelEl.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
       if (this.activeDrag) {
         this.activeDrag.spot.onDrag?.(e.movementX, e.movementY);
       }
@@ -37,6 +42,7 @@ export class Interactions {
 
     dom.addEventListener('pointerdown', (e) => {
       if (!this.enabled) return;
+      this._hideLabel();   // the hand is acting now; the caption yields
       if (this.hovered && this.hovered.type === 'drag') {
         this.activeDrag = { spot: this.hovered };
         this.player.dragCaptured = true;
@@ -143,6 +149,12 @@ export class Interactions {
     this._setHover(best);
   }
 
+  _hideLabel() {
+    clearTimeout(this._labelTimer);
+    this._labelTimer = null;
+    if (this.labelEl) this.labelEl.classList.remove('show');
+  }
+
   _setHover(spot) {
     if (spot === this.hovered) return;
     // restore old glint: both the emissive color and its intensity
@@ -153,6 +165,17 @@ export class Interactions {
     this._glinted.clear();
     this.hovered = spot;
     this.iris.classList.toggle('hot', !!spot);
+    // drag affordance (#57): chevrons flank the iris over a drag hotspot — turn, not tap
+    this.iris.classList.toggle('draggable', !!spot && spot.type === 'drag');
+    // the dwell caption (#57): 700ms of rest surfaces the label (a function label may
+    // depend on state — per-depth names — so it resolves at show time)
+    this._hideLabel();
+    if (spot && spot.label && this.labelEl) {
+      this._labelTimer = setTimeout(() => {
+        this.labelEl.textContent = typeof spot.label === 'function' ? spot.label() : spot.label;
+        this.labelEl.classList.add('show');
+      }, 700);
+    }
     if (spot && !spot.noGlint) {
       for (const t of spot.targets) {
         t.traverse((o) => {
