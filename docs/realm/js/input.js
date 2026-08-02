@@ -2,14 +2,14 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=186';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=186';
-import { canAfford } from './economy.js?realm=186';
-import { dispatch } from './commands.js?realm=186';
-import { notify } from './notifications.js?realm=186';
-import { initAudio } from './audio.js?realm=186';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=186';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=186';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=187';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=187';
+import { canAfford } from './economy.js?realm=187';
+import { dispatch } from './commands.js?realm=187';
+import { notify } from './notifications.js?realm=187';
+import { initAudio } from './audio.js?realm=187';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=187';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=187';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -103,12 +103,16 @@ function showCitizenPanel(c) {
   const job = assigned
     ? `${assigned.purpose === 'temporary' ? 'Helping' : 'Assigned'}: ${assigned.building.complete ? jobName : `build ${jobName}`}`
     : 'Unassigned';
+  const management = assigned?.reason === 'player-command'
+    ? '👑 Crown order'
+    : assigned ? 'AI assigned' : 'AI available';
   const carrying = c.carrying ? `${c.carryAmount} ${c.carrying}` : 'Nothing';
   const safe = {
     name: escapeHtml(c.identity.name),
     state: escapeHtml(state),
     profession: escapeHtml(c.profession.kind),
     job: escapeHtml(job),
+    management: escapeHtml(management),
     reason: escapeHtml(c.activity.reason),
     carrying: escapeHtml(carrying),
   };
@@ -121,13 +125,14 @@ function showCitizenPanel(c) {
     <div class="ip-desc">${safe.state}</div>
     <div class="ip-row"><span class="ip-label">Vocation</span><span class="ip-val">${safe.profession}</span></div>
     <div class="ip-row"><span class="ip-label">Assignment</span><span class="ip-val">${safe.job}</span></div>
+    <div class="ip-row"><span class="ip-label">Work order</span><span class="ip-val">${safe.management}</span></div>
     <div class="ip-row"><span class="ip-label">Activity</span><span class="ip-val">${safe.state} · ${safe.reason}</span></div>
     <div class="ip-row"><span class="ip-label">Carrying</span><span class="ip-val">${safe.carrying}</span></div>
     <div class="ip-row"><span class="ip-label">Hunger</span><span class="ip-val">${Math.round(c.hunger)}%</span></div>
     <div class="ip-row"><span class="ip-label">Energy</span><span class="ip-val">${Math.round(c.rest ?? 100)}%</span></div>
     <div class="ip-row"><span class="ip-label">Joy</span><span class="ip-val">${Math.round(c.needs.joy)}%</span></div>
     <div class="ip-row"><span class="ip-label">Faith</span><span class="ip-val">${Math.round(c.needs.faith)}%</span></div>
-    <div class="ip-hint">Citizens auto-assign to buildings that need workers.</div>
+    <div class="ip-hint">Open Population to issue a work order or return this citizen to the AI.</div>
   `;
   panel.dataset.citizenActorId = String(c.actorId);
   panel.style.display = 'block';

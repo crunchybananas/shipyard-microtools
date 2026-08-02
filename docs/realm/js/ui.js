@@ -2,22 +2,23 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=186';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=186';
-import { getWonderReport } from './wonder.js?realm=186';
-import { panCameraTo } from './render.js?realm=186';
-import { dispatch } from './commands.js?realm=186';
-import { missions } from './missions.js?realm=186';
-import { getActiveScenario } from './scenarios.js?realm=186';
-import { saveGame, loadGame } from './save.js?realm=186';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=186';
-import { notify } from './notifications.js?realm=186';
-import { TRADE_PARTNERS } from './trade.js?realm=186';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=187';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=187';
+import { getWonderReport } from './wonder.js?realm=187';
+import { panCameraTo } from './render.js?realm=187';
+import { dispatch } from './commands.js?realm=187';
+import { missions } from './missions.js?realm=187';
+import { getActiveScenario } from './scenarios.js?realm=187';
+import { saveGame, loadGame } from './save.js?realm=187';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=187';
+import { notify } from './notifications.js?realm=187';
+import { TRADE_PARTNERS } from './trade.js?realm=187';
 import {
   citizenStaffingCapacity,
+  onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=186';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=186';
+} from './citizen-ownership.js?realm=187';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=187';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -246,8 +247,8 @@ export function updateUI() {
     // and at cap the tooltip prompts the next step.
     const atCap = G.population >= G.maxPop;
     popEl.title = atCap
-      ? `${G.population} settlers filling all ${G.maxPop} housing slots — build a House (+4) to grow. Click to view citizens.`
-      : `${G.population} settlers · ${G.maxPop} housing slot${G.maxPop === 1 ? '' : 's'} (room for ${G.maxPop - G.population} more). Click to view citizens.`;
+      ? `${G.population} settlers filling all ${G.maxPop} housing slots — build a House (+4) to grow. Click to manage citizens and work orders.`
+      : `${G.population} settlers · ${G.maxPop} housing slot${G.maxPop === 1 ? '' : 's'} (room for ${G.maxPop - G.population} more). Click to manage citizens and work orders.`;
   }
   const maxSoldiers = G.buildings.filter(b => b.type === 'barracks').length * 4 + G.buildings.filter(b => b.type === 'archery').length * 3;
   const soldierEl = $('soldier-count');
@@ -793,6 +794,16 @@ export function showInfoPanel(b) {
     const staffed = staffingCount(b);
     const workerDots = '●'.repeat(staffed) + '○'.repeat(workerCount - staffed);
     html += `<div class="ip-row"><span class="ip-label">Workers</span><span class="ip-val">${workerDots} ${staffed}/${workerCount}</span></div>`;
+    const crew = buildCurrentCitizenPresentations().filter(citizen => (
+      citizen.assignment?.building.x === b.x
+      && citizen.assignment.building.y === b.y
+    ));
+    if (crew.length > 0) {
+      const crewNames = crew.map(worker => (
+        `${worker.assignment.reason === 'player-command' ? '👑 ' : ''}${escapeHtml(worker.identity.name)}`
+      )).join(', ');
+      html += `<div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">${crewNames}</span></div>`;
+    }
   }
 
   // Wonder stage card: bill bars, delivery pace, next housing gate (wonder.js)
@@ -1173,7 +1184,7 @@ const TUTORIAL_STEPS = [
   },
   {
     id: 'place_farm',
-    text: '🌾 Click on a green grass tile to place your farm. Workers will auto-assign!',
+    text: '🌾 Click on a green grass tile to place your farm. Workers auto-assign; open Population to issue work orders.',
     action: 'Click a grass tile on the island',
     check: () => G.buildings.some(b => b.type === 'farm'),
   },
@@ -1333,7 +1344,7 @@ function renderPopPanel() {
   // Column header
   const hdr = document.createElement('div');
   hdr.className = 'pop-row pop-header';
-  hdr.innerHTML = `<span>Name</span><span>Vocation</span><span>Current task</span><span>Hunger</span><span></span>`;
+  hdr.innerHTML = `<span>Name</span><span>Vocation</span><span>Current task</span><span>Hunger</span><span>Work order</span>`;
   el.appendChild(hdr);
 
   const understaffed = G.buildings.filter(b => {
@@ -1341,8 +1352,6 @@ function renderPopPanel() {
     const capacity = citizenStaffingCapacity(b);
     return def && capacity > 0 && staffingCount(b) < capacity;
   });
-  const hasUnderstaffed = understaffed.length > 0;
-
   let lastGroup = -1;
   for (const c of sorted) {
     const group = getGroup(c);
@@ -1365,13 +1374,26 @@ function renderPopPanel() {
     const buildingName = assignment ? (buildingDef?.name || assignment.building.type) : null;
     const state = stateLabel[c.activity.kind] || c.activity.kind;
     const task = assignment
-      ? `${assignment.purpose === 'temporary' ? 'Helping' : 'Assigned'}: ${assignment.building.complete ? buildingName : `build ${buildingName}`} · ${state}`
+      ? `${assignment.reason === 'player-command' ? 'Ordered' : 'AI'}: ${assignment.building.complete ? buildingName : `build ${buildingName}`} · ${state}`
       : state;
     const activityTitle = assignment
       ? `${assignment.purpose} · ${assignment.duty} · ${assignment.reason}`
       : c.activity.reason;
     const hungerBar = Math.round(c.hunger);
     const stateColor = group === 0 ? 'var(--food)' : group === 2 ? 'var(--danger)' : 'var(--gold)';
+    const manualOrder = assignment?.reason === 'player-command';
+    const alternativeCount = understaffed.filter(building => (
+      building.x !== assignment?.building.x || building.y !== assignment?.building.y
+    )).length;
+    const orderMode = manualOrder
+      ? '<span class="pop-order-mode pop-order-manual" title="You chose this workplace. The citizen still handles food, rest, delivery, and danger.">👑 Crown order</span>'
+      : `<span class="pop-order-mode pop-order-ai" title="The citizen AI chose this workplace and may adapt during a food crisis.">✦ ${assignment ? 'AI assigned' : 'AI available'}</span>`;
+    const orderSelect = alternativeCount > 0
+      ? `<select class="pop-assign" aria-label="${assignment ? 'Reassign' : 'Assign'} ${escapeHtml(c.identity.name)}"><option value="">${assignment ? 'Change job…' : 'Assign job…'}</option></select>`
+      : '<span class="pop-no-open">No open jobs</span>';
+    const returnToAI = manualOrder
+      ? '<button class="pop-auto" type="button" title="Release this order and let the citizen AI choose again">Return to AI</button>'
+      : '';
     const div = document.createElement('div');
     div.className = 'pop-row';
     div.style.borderLeft = `3px solid ${stateColor}`;
@@ -1382,37 +1404,58 @@ function renderPopPanel() {
       <span class="pop-hunger" title="Hunger ${hungerBar}%">
         <span class="pop-hunger-bar" style="width:${hungerBar}%;background:${hungerBar>70?'var(--danger)':hungerBar>40?'var(--gold)':'var(--food)'}"></span>
       </span>
-      ${assignment ? `<button class="pop-unassign" title="Release assignment" data-actor-id="${c.actorId}">✕</button>` : '<span></span>'}
-      ${!assignment && hasUnderstaffed ? `<select class="pop-assign" data-actor-id="${c.actorId}"><option value="">Assign to...</option></select>` : ''}`;
+      <div class="pop-work-control${manualOrder ? ' is-manual' : ''}" data-actor-id="${c.actorId}">
+        ${orderMode}
+        ${orderSelect}
+        ${returnToAI}
+      </div>`;
     el.appendChild(div);
   }
 
-  // Unassign buttons
-  el.querySelectorAll('.pop-unassign').forEach(btn => {
+  // A Crown order remains authoritative until the player explicitly returns
+  // the citizen to the automatic job market or the workplace becomes invalid.
+  el.querySelectorAll('.pop-auto').forEach(btn => {
     btn.onclick = () => {
-      const actorId = Number(btn.dataset.actorId);
+      const control = btn.closest('.pop-work-control');
+      const actorId = Number(control?.dataset.actorId);
+      const citizen = snapshots.find(value => value.actorId === actorId);
       const result = dispatch({ type: 'RELEASE_CITIZEN', actorId });
-      if (!result.ok) notify('That citizen assignment could not be released.', 'danger', { chronicle: false });
+      if (result.ok) notify(`✦ ${citizen?.identity.name || 'Citizen'} returned to automatic work.`, 'info', { chronicle: false });
+      else notify('That work order could not be released.', 'danger', { chronicle: false });
       renderPopPanel();
     };
   });
 
-  // Assignment dropdowns — populate with understaffed buildings
+  // Work-order dropdowns remain available for employed citizens so a player
+  // can move one person directly without racing the automatic job market.
   el.querySelectorAll('.pop-assign').forEach(sel => {
+    const control = sel.closest('.pop-work-control');
+    const actorId = Number(control?.dataset.actorId);
+    const citizen = snapshots.find(value => value.actorId === actorId);
     for (const b of understaffed) {
+      if (
+        citizen?.assignment?.building.x === b.x
+        && citizen.assignment.building.y === b.y
+      ) continue;
       const def = BUILDINGS[b.type];
       const opt = document.createElement('option');
       opt.value = `${b.x},${b.y}`;
       const capacity = citizenStaffingCapacity(b);
-      opt.textContent = `${def.icon} ${b.buildProgress < 1 ? `Help build ${def.name}` : def.name} (${staffingCount(b)}/${capacity})`;
+      opt.textContent = `${def.icon} ${b.buildProgress < 1 ? `Help build ${def.name}` : `Work at ${def.name}`} (${staffingCount(b)}/${capacity})`;
       sel.appendChild(opt);
     }
     sel.onchange = () => {
       if (!sel.value) return;
-      const actorId = Number(sel.dataset.actorId);
       const [x, y] = sel.value.split(',').map(Number);
+      const building = G.buildings.find(value => value.x === x && value.y === y);
       const result = dispatch({ type: 'ASSIGN_CITIZEN', actorId, x, y });
-      if (!result.ok) notify('That work assignment is no longer available.', 'danger', { chronicle: false });
+      if (result.ok) {
+        const name = citizen?.identity.name || 'Citizen';
+        const workplace = BUILDINGS[building?.type]?.name || 'the selected workplace';
+        notify(`👑 ${name} ordered to ${workplace}.`, 'event', { chronicle: false });
+      } else {
+        notify('That workplace is no longer available.', 'danger', { chronicle: false });
+      }
       renderPopPanel();
     };
   });
@@ -1433,6 +1476,18 @@ function renderPopPanel() {
     el.appendChild(sec);
   }
 }
+
+let popRefreshQueued = false;
+onCitizenTransition(event => {
+  if (event.field !== 'assignment' || typeof document === 'undefined') return;
+  const panel = document.getElementById('pop-panel');
+  if (!panel || panel.style.display === 'none' || popRefreshQueued) return;
+  popRefreshQueued = true;
+  requestAnimationFrame(() => {
+    popRefreshQueued = false;
+    if (panel.style.display !== 'none') renderPopPanel();
+  });
+});
 
 export function setupSaveButtons() {
   document.getElementById('btn-save')?.addEventListener('click', saveGame);

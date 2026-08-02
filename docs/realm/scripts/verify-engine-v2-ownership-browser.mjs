@@ -13,7 +13,7 @@ import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
 const REVISION = contract.moduleRevision;
-assert.equal(REVISION, 186, 'Update this gate together with current browser module URLs');
+assert.equal(REVISION, 187, 'Update this gate together with current browser module URLs');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -40,10 +40,10 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const ownership = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=186');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=186');
-    const presentation = await import('./js/citizen-presentation.js?realm=186');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=186');
+    const economy = await import('./js/economy.js?realm=187');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=187');
+    const presentation = await import('./js/citizen-presentation.js?realm=187');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=187');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -186,8 +186,8 @@ try {
     // Byte equality here is therefore at least as strict as the RFC's
     // authoritative-state equality requirement. The hash makes the exact
     // evidence compact enough to report without returning the full graph.
-    const saveState = await import('./js/save-state.js?realm=186');
-    const stateModule = await import('./js/state.js?realm=186');
+    const saveState = await import('./js/save-state.js?realm=187');
+    const stateModule = await import('./js/state.js?realm=187');
     const hashText = async text => {
       const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
       return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
@@ -285,9 +285,10 @@ try {
   const populationUi = await page.evaluate(actorId => {
     const rows = [...document.querySelectorAll('#pop-content .pop-row')];
     const row = rows.find(candidate => (
-      candidate.querySelector(`.pop-unassign[data-actor-id="${actorId}"]`)
+      candidate.querySelector(`.pop-work-control[data-actor-id="${actorId}"]`)
     ));
     const state = row?.querySelector('.pop-state');
+    const control = row?.querySelector('.pop-work-control');
     return {
       panelDisplay: document.getElementById('pop-panel')?.style.display,
       header: document.querySelector('#pop-content .pop-header')?.textContent || '',
@@ -296,6 +297,7 @@ try {
       profession: row?.querySelector('.pop-job')?.textContent || '',
       task: state?.textContent || '',
       taskTitle: state?.getAttribute('title') || '',
+      workOrder: control?.textContent || '',
       duplicateNameRows: [...document.querySelectorAll('#pop-content .pop-name')]
         .filter(node => node.textContent === 'Twin Browser Citizen').length,
     };
@@ -307,15 +309,16 @@ try {
   assert.equal(populationUi.rowFound, true);
   assert.equal(populationUi.name, 'Twin Browser Citizen');
   assert.equal(populationUi.profession, 'Farmer');
-  assert.match(populationUi.task, /Helping:\s*Market/);
+  assert.match(populationUi.task, /Ordered:\s*Market/);
   assert.match(populationUi.task, /Going to work/);
   assert.match(populationUi.taskTitle, /temporary/);
   assert.match(populationUi.taskTitle, /market/);
+  assert.match(populationUi.workOrder, /Crown order/i);
   assert.equal(populationUi.duplicateNameRows, 2);
 
   // Use the normal population button, not a direct state write, to prove that
   // actor-ID release remains unambiguous with duplicate display names.
-  await page.locator(`.pop-unassign[data-actor-id="${ownership.actorId}"]`).click();
+  await page.locator(`.pop-work-control[data-actor-id="${ownership.actorId}"] .pop-auto`).click();
   const released = await page.evaluate(({ actorId, duplicateActorId }) => {
     const citizen = window.G.citizens.find(value => value.actorId === actorId);
     const duplicate = window.G.citizens.find(value => value.actorId === duplicateActorId);
@@ -334,8 +337,8 @@ try {
   assert.equal(released.duplicateProfession, 'settler');
 
   const removal = await page.evaluate(async ({ actorId }) => {
-    const economy = await import('./js/economy.js?realm=186');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=186');
+    const economy = await import('./js/economy.js?realm=187');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=187');
     const g = window.G;
     const events = [];
     const off = ownershipModule.onCitizenTransition(event => events.push(event));
@@ -396,9 +399,9 @@ try {
   assert.ok(removal.causalReasons.includes('activity:building-removed'));
 
   const actorCacheLifecycle = await page.evaluate(async ({ victimActorId }) => {
-    const combat = await import('./js/combat.js?realm=186');
-    const economy = await import('./js/economy.js?realm=186');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=186');
+    const combat = await import('./js/combat.js?realm=187');
+    const economy = await import('./js/economy.js?realm=187');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=187');
     const g = window.G;
     const requireCondition = (condition, message) => {
       if (!condition) throw new Error(message);
@@ -497,9 +500,9 @@ try {
   assert.ok(actorCacheLifecycle.cacheSize <= actorCacheLifecycle.population);
 
   const midpoint = await page.evaluate(async ({ actorId, farm }) => {
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=186');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=186');
-    const save = await import('./js/save.js?realm=186');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=187');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=187');
+    const save = await import('./js/save.js?realm=187');
     const g = window.G;
     const result = g.debug.dispatch({ type: 'ASSIGN_CITIZEN', actorId, x: farm.x, y: farm.y });
     if (!result.ok) throw new Error(`Midpoint assignment failed: ${result.reason}`);
@@ -557,9 +560,9 @@ try {
   assert.equal(midpoint.saveHasWorkerAuthority, false);
 
   const inGameLoadLedger = await page.evaluate(async ({ actorId, savedName }) => {
-    const inspector = await import('./js/citizen-inspector.js?realm=186');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=186');
-    const save = await import('./js/save.js?realm=186');
+    const inspector = await import('./js/citizen-inspector.js?realm=187');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=187');
+    const save = await import('./js/save.js?realm=187');
     window.realmNpcDebug.enable(true);
     inspector.resetCitizenTransitionLedger();
     const citizen = window.G.citizens.find(value => value.actorId === actorId);
@@ -585,7 +588,7 @@ try {
   await page.waitForFunction(() => typeof window.loadAndStart === 'function');
 
   const continued = await page.evaluate(async ({ actorId }) => {
-    const renderCache = await import('./js/citizen-render-cache.js?realm=186');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=187');
     const staleActorId = Number.MAX_SAFE_INTEGER - 2;
     renderCache.citizenRenderRecord(staleActorId).animationKey = 'continue-reset-browser-probe';
     const cacheBeforeLoad = renderCache.citizenRenderCacheSize();
@@ -640,9 +643,9 @@ try {
   assert.equal(continued.noBuildingWorkers, true);
 
   const reset = await page.evaluate(async () => {
-    const inspector = await import('./js/citizen-inspector.js?realm=186');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=186');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=186');
+    const inspector = await import('./js/citizen-inspector.js?realm=187');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=187');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=187');
     window.realmNpcDebug.enable(true);
     inspector.resetCitizenTransitionLedger();
     ownershipModule.renameCitizen(window.G.citizens[0], 'New Game Ledger Sentinel', 'player-rename');
@@ -677,7 +680,7 @@ try {
 
   console.log(`✓ real New Game created stable citizen IDs ${ownership.initialActorIds.join(', ')}; duplicate names remained actor-ID distinct`);
   console.log('✓ settler → farmer vocation happened once; construction and market mismatch stayed temporary without role morph');
-  console.log('✓ population UI showed Farmer + Helping: Market + current activity, and actor-ID release selected the correct duplicate');
+  console.log('✓ population UI showed Farmer + Crown-ordered Market + current activity, and Return to AI selected the correct duplicate');
   console.log(`✓ construction completion and ${removal.locator.type} removal emitted causal cleanup and left zero derived staff`);
   console.log(`✓ three full renders preserved ${ownership.renderPurity.bytes.toLocaleString()} current-runtime bytes and SHA-256 ${ownership.renderPurity.hashBefore.slice(0, 20)}…`);
   console.log(`✓ combat death pruned actor #${actorCacheLifecycle.victimActorId}; immigration spawned fresh actor #${actorCacheLifecycle.spawnedActorId} with isolated cache continuity`);

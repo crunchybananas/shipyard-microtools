@@ -2,12 +2,12 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=186';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=186';
-import { getCitizenSpeedMult } from './events.js?realm=186';
-import { buildingCapacity } from './building-lifecycle.js?realm=186';
-import { revealAround } from './world.js?realm=186';
-import { visualJitter } from './fx.js?realm=186';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=187';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=187';
+import { getCitizenSpeedMult } from './events.js?realm=187';
+import { buildingCapacity } from './building-lifecycle.js?realm=187';
+import { revealAround } from './world.js?realm=187';
+import { visualJitter } from './fx.js?realm=187';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -17,7 +17,7 @@ import {
   staffingCount,
   transitionCitizenActivity,
   vocationForBuilding,
-} from './citizen-ownership.js?realm=186';
+} from './citizen-ownership.js?realm=187';
 
 const DEFAULT_ACTIVITY_REASON = Object.freeze({
   idle: 'idle-wait',
@@ -840,6 +840,11 @@ export function updateCitizens() {
       const currentAssignment = assignedBuilding(c);
       if (foodDaysLeft() < 2
           && currentAssignment && !FOOD_JOBS.has(currentAssignment.type)
+          // A direct work order is player strategy, not another suggestion for
+          // the utility scorer to silently undo. Ordered citizens still eat,
+          // sleep, deliver cargo, flee danger, and recover from unreachable
+          // routes; only automatic labor is eligible for crisis reallocation.
+          && c.assignment.reason !== 'player-command'
           && (c.activity.kind === 'working' || c.activity.kind === 'walk_to_work')
           && rng() < 0.04) {
         releaseCitizenAssignment(c, 'food-crisis');

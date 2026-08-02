@@ -10,7 +10,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ensureServer } from './_serve.mjs';
-import runtimeContract from '../runtime-contract.json?realm=186' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=187' with { type: 'json' };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -42,8 +42,8 @@ try {
   await page.waitForTimeout(600);
 
   await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=186');
-    const ui = await import('./js/ui.js?realm=186');
+    const economy = await import('./js/economy.js?realm=187');
+    const ui = await import('./js/ui.js?realm=187');
     const g = window.G;
     g.speed = 0;
     g.debug.disableEvents = true;
@@ -138,7 +138,7 @@ try {
     const originalPhase = await page.evaluate(() => window.G.dayPhase);
     for (const [name, fraction] of [['dawn', 0.20], ['day', 0.50], ['dusk', 0.76], ['night', 0.93]]) {
       await page.evaluate(async value => {
-        const ui = await import('./js/ui.js?realm=186');
+        const ui = await import('./js/ui.js?realm=187');
         window.G.dayPhase = Math.round(window.G.dayLength * value);
         ui.updateUI();
         window.forceRender();
