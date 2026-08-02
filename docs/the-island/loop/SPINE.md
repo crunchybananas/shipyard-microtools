@@ -219,3 +219,34 @@ What it MEANS: the recursion was never a puzzle, it was the shape of a search. D
 - SHOW THE CARTOGRAPHER vs KEEP THE LONELY PURITY — a glimpsed figure (silhouette in the warm window, the standing nestedGlint, the player's own coat) raises the emotional ceiling enormously but breaks the 'lonely island' framing and is the hardest zero-asset synthesis yet (a human form). In or out is unresolved among the personas.
 - WHO IS THE PLAYER — stranger who washed up, the maker returning, or the next reader of the journal? The room-that-disagrees, the coat-reveal, and the ascent all hinge on this and the personas assume different answers. The story cannot have stakes until it is chosen, but the choice is genuinely open.
 - PAUSE GRAPHICS vs KEEP POLISHING — multiple personas demand 2-3 story-only ticks and a MISSION.md rule that can REJECT a graphics tick for not advancing the thesis. This directly tensions against the owner's standing power-efficiency directive and the loop's proven habit of shipping easy graphics wins. Both pressures are legitimate; the resolution is the process issue, not a silent override.
+
+---
+
+## THE FORESHADOW LEDGER (#11 — every artifact bound to its named payoff; closed 2026-08-01)
+
+Every promise the world makes, and where it is kept. An artifact with no row here is set
+dressing and must stay honest about it; a NEW artifact must add its row or its payoff.
+
+| Artifact (the promise) | The payoff (kept where) |
+|---|---|
+| The beached dory + one oar | The LEAVE terminal (#22/#24): armed by the full descent+return, the look-back finale |
+| The keeper's coat on its hook | Yours-as-the-mourned (the twist); slumps per level (#13); "salt and lamp oil, still" |
+| The bottle on the wake-up beach | Its BACK, read from below (deepFrom 2): "the someone was always you" |
+| The music box's wrong fourth note | The bird's correction (main chain) · the L4 missing note (#51) · the fallen B accepting HIS version (#49) |
+| The five standing stones | The vault + lens (main chain) · the sixth fallen stone's silence → B (#49) |
+| The nested glint (model-in-model light) | "Far down, a light is still lit" — the recursion's floor never goes dark |
+| The tiny figure on the model beach | THE TWIST: it turns and rises to meet you; post-carry, the PAIR stands there (#53) |
+| The chart tally strokes | One per level dived; stays full after the return — the fingerprint you went |
+| The drain's carved line | The lampblack answer beside it (#54) · the inspector's ledger the flood countersigns (#55) |
+| The plumb bob "knows the depth" | The plate's one-way descent; the bottom turns it into the only door up |
+| The high dry pool's glint | Floats free only at L4; dries and reads at the surface — the letter to the SEA (#49) |
+| The tide gauge's fresh fifth ring | The L5 that does not exist yet (ERA_CASTS' unreachable mood) — measured, not yet met |
+| The bell-buoy in the channel | L3 sound-nav + the channel the bridge alone crosses (#124's gate names it) |
+| The drowned colonnade off the beach | Rises at L3 to catch the beam's four figures — the cot journal's promise kept (#49) |
+| The keeper's reading glass | The lampblack economy: 2 LORE marks + 9 micro-marks (#54) + the model's own margin (#53) |
+| The foreshadow ring from the gallery | The next tide's exact waterline — the gauge confirms it ring by ring |
+| The jetty lantern "kept lit" | The lampblack on its post: "lately I light it so the water has something to hold" (#54) |
+| The Watcher / Tide-Figure | Regard/stillness as integration rehearsals for the embrace — the same verb, practiced |
+
+*Remaining unbound seeds (honest set dressing until claimed): the second study's inverted
+model (#18 — payoff is the unease itself), the wrack line, the crows.*

@@ -26,6 +26,51 @@ const GLSL_NOISE = /* glsl */`
   }
 `;
 
+// #31: the water burned ~32 hash21 calls per pixel in fbm2 on the largest surface on
+// screen. Bake the same 4-octave value-noise character ONCE into a 256² RG tile (two
+// independent fields — the ripple pair decorrelates even better than two samples of
+// one field) and fetch twice. Octave frequencies are integer cells per tile (4/8/16/32)
+// so it wraps seamlessly; gain 0.5 matches fbm2's amplitude ladder (range ~0..0.9375).
+function makeFbmTexture(size = 256) {
+  const data = new Uint8Array(size * size * 2);
+  let seed = 0x9e3779b9;
+  const rand = () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let ch = 0; ch < 2; ch++) {
+    // wrapped lattices per octave: freq cells of random values, smoothstep-bilinear sampled
+    const octs = [4, 8, 16, 32].map((f) => {
+      const g = new Float32Array(f * f);
+      for (let i = 0; i < g.length; i++) g[i] = rand();
+      return { f, g };
+    });
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        let s = 0, a = 0.5;
+        for (const { f, g } of octs) {
+          const fx = (x / size) * f, fy = (y / size) * f;
+          const ix = Math.floor(fx), iy = Math.floor(fy);
+          const tx = fx - ix, ty = fy - iy;
+          const ux = tx * tx * (3 - 2 * tx), uy = ty * ty * (3 - 2 * ty);
+          const i00 = g[(iy % f) * f + (ix % f)], i10 = g[(iy % f) * f + ((ix + 1) % f)];
+          const i01 = g[((iy + 1) % f) * f + (ix % f)], i11 = g[((iy + 1) % f) * f + ((ix + 1) % f)];
+          s += a * ((i00 * (1 - ux) + i10 * ux) * (1 - uy) + (i01 * (1 - ux) + i11 * ux) * uy);
+          a *= 0.5;
+        }
+        data[(y * size + x) * 2 + ch] = Math.min(255, Math.round(s * 255));
+      }
+    }
+  }
+  const tex = new THREE.DataTexture(data, size, size, THREE.RGFormat, THREE.UnsignedByteType);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.magFilter = tex.minFilter = THREE.LinearFilter;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 // ---------------------------------------------------------------- water -----
 export function makeWaterMaterial(heightTex, domain) {
   const mat = new THREE.ShaderMaterial({
@@ -48,6 +93,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uNight: { value: 0 },
       uCaustic: { value: getTexture('water_ripple') },   // scrolling dapple for the sunlit shallows
       uFoam: { value: getTexture('foam') },              // lacy structure for the shoreline foam band
+      uFbm: { value: makeFbmTexture() },                 // #31: the baked ripple-noise tile (two fields, RG)
     },
     vertexShader: /* glsl */`
       uniform float uTime;
@@ -85,6 +131,7 @@ export function makeWaterMaterial(heightTex, domain) {
     `,
     fragmentShader: /* glsl */`
       uniform sampler2D uHeightTex;
+      uniform sampler2D uFbm;
       uniform float uDomain;
       uniform float uTime;
       uniform vec3 uSunDir;
@@ -123,10 +170,13 @@ export function makeWaterMaterial(heightTex, domain) {
         // ring from 280 to 438m (#37). The 1:240 model keeps its square sheet (mini).
         if (mini < 0.5 && dot(vLocal.xz, vLocal.xz) > 96100.0) discard;
 
-        // ripple normal detail — gentled at 1:240 where it reads as chalk
+        // ripple normal detail — gentled at 1:240 where it reads as chalk.
+        // #31: the two fbm2 calls (~32 hashes/px) are two fetches of a baked RG tile now
+        // (independent fields per channel; 4 world-units per repeat matches the old base
+        // octave; ×0.9375 restores fbm2's amplitude ladder range).
         vec2 rp = vLocal.xz * 0.35 + vec2(uTime * 0.07, -uTime * 0.05);
-        float r1 = fbm2(rp);
-        float r2 = fbm2(rp * 1.7 + 19.0 + vec2(-uTime * 0.06, uTime * 0.04));
+        float r1 = texture2D(uFbm, rp * 0.25).r * 0.9375;
+        float r2 = texture2D(uFbm, (rp * 1.7 + 19.0 + vec2(-uTime * 0.06, uTime * 0.04)) * 0.25).g * 0.9375;
         vec3 N = normalize(vNorm + vec3(r1 - 0.5, 0.0, r2 - 0.5) * 0.45 * mix(1.0, 0.55, mini));
 
         vec3 V = normalize(cameraPosition - vWorld);

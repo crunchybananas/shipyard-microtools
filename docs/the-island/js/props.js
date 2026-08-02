@@ -1462,8 +1462,10 @@ export function buildWorld() {
     // (+1 draw); own rng so the world scatter is byte-identical; flat lumpy clumps laid on the wet sand
     // (naturally flat — no card artifact). Canon: the sea leaves wrack on a shore no one tends.
     {
-      const wrackMat = new THREE.MeshStandardMaterial({ color: 0x3a4a2e, roughness: 0.92, flatShading: true });
-      const wrackInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.34, 0), wrackMat, 18);
+      // #48: the clumps were flat dark polygons — a subdivided dome + WET specular (the
+      // tide just left them) makes them read as heaped weed, not spilled paint
+      const wrackMat = new THREE.MeshStandardMaterial({ color: 0x3a4a2e, roughness: 0.32, metalness: 0.0, flatShading: true });
+      const wrackInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.34, 1), wrackMat, 18);
       const rngK = mulberry32(SEED ^ 0x5eac);
       const km = new THREE.Matrix4(), kq = new THREE.Quaternion(), ke = new THREE.Euler(), kc = new THREE.Color();
       let kn = 0;
@@ -2697,7 +2699,10 @@ function buildVegetation(core, r) {
   };
 
   const G_MAIN = 3800, G_ISLET = 650;   // fewer instances — each is now a full 5-blade tuft, not one blade
-  const grass = new THREE.InstancedMesh(bladeGeo, grassMat, G_MAIN + G_ISLET);
+  // #30: one island-spanning InstancedMesh could never frustum-cull — every view paid all
+  // ~4,450 animated tufts. BUFFER the placements (the r() call order is untouched, so the
+  // scatter stays byte-identical), then bucket into spatial CHUNKS that cull independently.
+  const gPlaced = [];
   let gi = 0;
   const gcol = new THREE.Color();
   const plant = (x, h, z) => {
@@ -2706,14 +2711,13 @@ function buildVegetation(core, r) {
       new THREE.Vector3(x, h - 0.06, z),
       q.setFromEuler(e.set(0, r() * TAU, (r() - 0.5) * 0.25)),
       new THREE.Vector3(s, s * (0.7 + r() * 0.7), s));
-    grass.setMatrixAt(gi, m4);
     // per-tuft tone (loop #144): the old hue was locked to gold (.14-.21) → one flat dry dune. Widen
     // toward green with a gv² skew so MOST tufts stay sun-bleached gold but some are lush olive-green,
     // plus more value range — a living coastal meadow, not uniform dead brush. (× the 0xc2a75f base;
     // lifted with the up-normal relight so the meadow reads sunlit, not scorched.)
     const gv = r();
     gcol.setHSL(0.13 + gv * gv * 0.18, 0.36 + r() * 0.26, 0.33 + r() * 0.22);
-    grass.setColorAt(gi, gcol);
+    gPlaced.push({ m: m4.clone(), c: gcol.clone(), x, z });
     gi++;
   };
   for (let i = 0; i < G_MAIN * 4 && gi < G_MAIN; i++) {
@@ -2737,8 +2741,24 @@ function buildVegetation(core, r) {
     if (!open(x, z) || grade(x, z) > 1.0) continue;
     plant(x, h, z);
   }
-  grass.count = gi;
+  // bucket into a 150m grid (~5 non-empty chunks), each its own culling volume; the
+  // group keeps the 'grass' name so refs / the L4 strip / the model cap see one thing
+  const grass = new THREE.Group();
   grass.name = 'grass';
+  {
+    const buckets = new Map();
+    for (const p of gPlaced) {
+      const k = Math.floor((p.x + 225) / 150) * 8 + Math.floor((p.z + 225) / 150);
+      if (!buckets.has(k)) buckets.set(k, []);
+      buckets.get(k).push(p);
+    }
+    for (const list of buckets.values()) {
+      const chunk = new THREE.InstancedMesh(bladeGeo, grassMat, list.length);
+      list.forEach((p, i) => { chunk.setMatrixAt(i, p.m); chunk.setColorAt(i, p.c); });
+      chunk.computeBoundingSphere();
+      grass.add(chunk);
+    }
+  }
   core.add(grass);
 
   // --- shore rocks: irregular weathered boulders, not regular faceted balls (loop #128) ---
@@ -2770,18 +2790,18 @@ function buildVegetation(core, r) {
   // (granite / basalt / limestone), each its own albedo + derived relief. The per-instance random
   // rotation already hides UV-orientation repeat, so distinct albedos read as natural variety (+2 draws).
   const rockDefs = [
-    { id: 'rock', color: 0xd6ccb8 },       // weathered granite (lightened so the albedo reads as stone)
-    { id: 'basalt', color: 0xb8bcc4 },     // dark volcanic
-    { id: 'limestone', color: 0xe6ddc8 },  // pale eroded
+    { id: 'rock', color: 0xa89e8c },       // weathered granite — quieter, carried by the relief now
+    { id: 'basalt', color: 0x8a8f98 },     // dark volcanic
+    { id: 'limestone', color: 0xc7bda6 },  // pale eroded
   ];
   const rockMeshes = rockDefs.map((d, idx) => {
     const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: false, roughness: 0.95 });
-    // DEEPER crack relief (loop #153, owner "depth on meshes"): the shore boulders are prominent
-    // natural features but had the weakest relief of any prop (0.6/2.2) — their granite/basalt cracks
-    // read nearly flat up close. Push the derived-normal so the fractures actually catch light. Still
-    // a normal-map perturbation on the flat-shaded low-poly boulder → +0 draws/tris, keeps the chunky
-    // silhouette. (normalScale 0.6→0.95, Sobel strength 2.2→3.1.)
-    applyRelief(mat, d.id, { normalScale: 0.95, strength: 3.1 });
+    // #48: RELIEF-ONLY stone — the tiled albedo pixelated at arm's length and read as
+    // cracked mud (screenshot 08-dory-shore). The derived normal keeps every fracture
+    // catching light; the colour is a quiet flat base; texels enlarged (repeat 0.6) so
+    // features read as geology up close, not texture grid. (The Bender house rule made
+    // material: normal maps yes, tiled colour never.)
+    applyRelief(mat, d.id, { normalScale: 0.95, strength: 3.1, colorMap: false, repeat: [0.6, 0.6] });
     const im = new THREE.InstancedMesh(rockVariants[idx], mat, 70);
     im.castShadow = true; im.name = 'rocks';
     return im;
@@ -2878,7 +2898,12 @@ export function instantiateModel(core, modelAnchor) {
   // stays spread across the island) and drop the rest: ~-115k triangles nobody could ever see.
   // (collectRefs still finds 'grass'; the L4 strip in puzzles _apply null-guards + drives both.)
   const modelGrass = modelRoot.getObjectByName('grass');
-  if (modelGrass) modelGrass.count = Math.min(modelGrass.count, 600);
+  if (modelGrass) {
+    // #30: grass is a group of chunks — cap the clone's total speckle across them
+    const chunks = modelGrass.isInstancedMesh ? [modelGrass] : modelGrass.children.filter((c) => c.isInstancedMesh);
+    const per = Math.max(60, Math.ceil(600 / Math.max(chunks.length, 1)));
+    for (const c of chunks) c.count = Math.min(c.count, per);
+  }
   // the model's own model: a speck impostor on its chart table
   const nestedAnchor = modelRoot.getObjectByName('modelAnchor');
   if (nestedAnchor) {

@@ -267,7 +267,7 @@ export function applyRelief(material, id, opts = {}) {
   const ns = opts.normalScale ?? 0.7;
   material.normalScale = new THREE.Vector2(ns, ns);
   if (opts.roughness != null) material.roughness = opts.roughness;
-  material.map = getTexture(id, (t) => {
+  const tex = getTexture(id, (t) => {
     material.needsUpdate = true;
     if (!t.image) return;
     let nt = _normCache.get(id);
@@ -275,12 +275,17 @@ export function applyRelief(material, id, opts = {}) {
       nt = buildNormalFromImage(t.image, opts.strength ?? 2.0);
       const a = MANIFEST[id];
       if (a?.repeat) nt.repeat.set(a.repeat[0], a.repeat[1]);
+      if (opts.repeat) nt.repeat.set(opts.repeat[0], opts.repeat[1]);   // per-material texel override (#48)
       if (a?.anisotropy) nt.anisotropy = a.anisotropy;
       _normCache.set(id, nt);
     }
     material.normalMap = nt;
     material.needsUpdate = true;
   });
+  // #48: `colorMap: false` = RELIEF-ONLY — the derived normal carries the surface and the
+  // base colour stays flat (the house position: normal maps yes, tiled colour never — a
+  // tiled albedo is what pixelates at arm's length and reads as cracked mud).
+  if (opts.colorMap !== false) material.map = tex;
   material.needsUpdate = true;
   return material;
 }

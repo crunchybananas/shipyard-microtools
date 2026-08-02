@@ -12,6 +12,35 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 22 — 2026-08-01 — the CLOSE-AND-MERGE sweep: #30 #31 #32 #48 #11 #23
+
+**Owner's ask: "as much as we can closed and merged."** Six more, each verified:
+- **#32** — the black-composer check is a one-shot deterministic probe at boot (a bright
+  quad through a throwaway composer, read once) — the old in-loop self-test double-rendered
+  with a readPixels stall for up to 200 frames on dark starts. Probe passes on this GPU.
+- **#30** — the grass chunks: placements buffered (r() order untouched — scatter
+  byte-identical, 4,450 tufts exactly), bucketed into a 150m grid of 9 culling
+  InstancedMeshes under one 'grass' group; sway/L4-strip/model-cap consumers taught the
+  group shape. Bench triangles **421k → 336k (-20%)** from culling alone.
+- **#48** — RELIEF-ONLY shore stone (the house rule made material: normal maps yes, tiled
+  colour never): quiet flat bases + enlarged texels — the arm's-length boulder reads as
+  weathered geology now, not cracked mud. The wrack clumps got a subdivided dome + wet
+  specular (roughness 0.32): heaped weed, not spilled paint.
+- **#31** — the water's ~32 hash calls/px baked into a 256² RG tile (two independent
+  4-octave fields, integer-period octaves so it wraps seamlessly; ×0.9375 restores the
+  amplitude ladder). Judged at the worst angle — grazing close-up, noon + golden: no
+  tiling, no seams, glitter path intact. **Bench GPU median 9.54 → 4.88ms.** Combined
+  with fire 19 the frame is down ~59% from the morning's 11.89ms.
+- **#11** — THE FORESHADOW LEDGER written into SPINE.md: eighteen artifacts bound to their
+  kept payoffs (the campaign paid most of them), the unbound seeds named honestly.
+- **#23** — the adversarial-review cadence is institutionalized (MISSION story-first,
+  CRITIQUES.md, the 134-finding audit, the story passes) — closed as adopted; the next
+  panel is an owner-callable ritual, not an open ticket.
+
+**Gate:** walk 28/28 · coverage 69/69 · zero errors. **PUSH: fires 21-22 → both mains.**
+
+---
+
 ## loop-fire 21 — 2026-08-01 — #44 graphics micro-pass (+ the field-report prompt fix, + a glint catch)
 
 **Shipped (the owner's live bug, first):** the ⚑ field report read as dead — embedded

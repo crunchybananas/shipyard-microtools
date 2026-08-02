@@ -126,7 +126,41 @@ composer.addPass(new OutputPass());
 // NO js error. `?safe` forces a direct (no-bloom) render; the loop also SELF-TESTS this once
 // (below) and auto-falls-back if the composer comes back black, so the game is never stuck black.
 if (new URLSearchParams(location.search).has('safe')) { bloomPass.enabled = false; bloomPass.dead = true; }   // dead: settings (#59) must never re-enable it
-let bloomSelfTested = false, bloomTestN = 0;
+
+// #32: the black-composer check is a ONE-SHOT deterministic probe at boot now — a bright
+// synthetic quad through a throwaway composer with the same bloom recipe, read once. The
+// old in-loop self-test double-rendered the scene with a readPixels stall for up to 200
+// frames on dark starts (a night-save Continue opened with ~3.3s of jank). The title
+// overlay covers the canvas at boot, so the probe frame is never seen.
+function probeBloomOnce() {
+  if (bloomPass.dead) return;                       // ?safe already decided
+  try {
+    const ps = new THREE.Scene();
+    const pq = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    ps.add(pq);
+    const pc = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const tc = new EffectComposer(renderer);
+    tc.addPass(new RenderPass(ps, pc));
+    tc.addPass(new UnrealBloomPass(new THREE.Vector2(32, 32), 0.68, 0.68, 1.05));
+    tc.addPass(new OutputPass());
+    tc.render();
+    const gl2 = renderer.getContext();
+    const px = new Uint8Array(4);
+    gl2.readPixels(renderer.domElement.width >> 1, renderer.domElement.height >> 1, 1, 1, gl2.RGBA, gl2.UNSIGNED_BYTE, px);
+    tc.dispose();
+    pq.geometry.dispose(); pq.material.dispose();
+    if (px[0] + px[1] + px[2] < 60) {               // a white quad came back dark: no half-float composer here
+      bloomPass.enabled = false;
+      bloomPass.dead = true;
+      console.warn('[ABYME] post-processing probe returned a dark frame — bloom disabled, rendering direct.');
+    }
+  } catch (e) {
+    bloomPass.enabled = false;
+    bloomPass.dead = true;
+    console.warn('[ABYME] post-processing probe failed — bloom disabled, rendering direct.', e);
+  }
+}
+probeBloomOnce();
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -1021,7 +1055,8 @@ const _shadowSun = new THREE.Vector3(0, 1, 0);
 let _shadowHatch = null, _shadowLevel = null, _shadowTop = null;
 const MOONLIGHT = new THREE.Color(0x9fb8d9);
 const swayMats = ['grass', 'canopies']
-  .map((n) => core.children.find((o) => o.name === n)?.material)
+  // #30: grass is a GROUP of culling chunks now — the shared material lives on its children
+  .map((n) => { const o = core.children.find((c) => c.name === n); return o?.material || o?.children?.[0]?.material; })
   .concat(core.getObjectByName('kelp')?.material)   // kelp lives in region2 (pruned from clone, so unique)
   .filter(Boolean);
 let flash = 0, prevEl = sunElevation(W.time);
@@ -1910,25 +1945,6 @@ renderer.setAnimationLoop((tMs) => {
   if (MODE === 'play' && !game.atBrink()) {
     saveTimer += dt;
     if (saveTimer > 12) { saveTimer = 0; save(player); }
-  }
-
-  // one-time post-processing self-test (see the note at the composer setup): on the first BRIGHT
-  // frame, compare a direct render against the composed one — if the composer came back black while
-  // the direct frame was bright, this device can't do the bloom buffers, so fall back to direct.
-  if (!bloomSelfTested && bloomPass.enabled && (MODE === 'intro' || MODE === 'play')) {
-    if (++bloomTestN > 200) bloomSelfTested = true;   // give up on a persistently dark scene; keep bloom
-    const gl2 = renderer.getContext(), _p = new Uint8Array(4);
-    const mid = () => { gl2.readPixels(renderer.domElement.width >> 1, renderer.domElement.height >> 1, 1, 1, gl2.RGBA, gl2.UNSIGNED_BYTE, _p); return _p[0] + _p[1] + _p[2]; };
-    renderer.render(scene, camera);
-    if (mid() > 60) {                                 // a bright frame to judge against
-      composer.render();
-      bloomSelfTested = true;
-      if (mid() < 8) {                                // composer returned black while direct was bright
-        bloomPass.enabled = false;
-        bloomPass.dead = true;                        // settings (#59) must never re-enable a broken composer
-        console.warn('[ABYME] post-processing returned a black frame on this device — bloom disabled, rendering direct.');
-      }
-    }
   }
 
   if (gpuTimer) gpuTimer.beginFrame();
