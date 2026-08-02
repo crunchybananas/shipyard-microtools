@@ -39,6 +39,7 @@ const checks = [
   ['shell isolation', 'verify-shell-isolation.mjs'],
   ['browser save shell', 'verify-browser-save-shell.mjs'],
   ['responsive phone build mode', 'verify-responsive-build-mode.mjs'],
+  ['browser citizen work orders', 'verify-citizen-work-orders-browser.mjs'],
   ['browser citizen lifecycle', 'verify-engine-v2-citizen-lifecycle-browser.mjs'],
   ['browser citizen ownership', 'verify-engine-v2-ownership-browser.mjs'],
   ['browser road rendering', 'verify-road-rendering.mjs'],

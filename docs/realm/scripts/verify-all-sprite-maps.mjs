@@ -19,7 +19,7 @@ import {
   FRAMES,
   ROLES,
   actorRowKey,
-} from '../js/sprite-source-contract.js?realm=186';
+} from '../js/sprite-source-contract.js?realm=187';
 import { ensureServer } from './_serve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

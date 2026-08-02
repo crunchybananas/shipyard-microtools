@@ -46,11 +46,11 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const ownership = await import('./js/citizen-ownership.js?realm=186');
-    const presentation = await import('./js/citizen-presentation.js?realm=186');
-    const render = await import('./js/render.js?realm=186');
-    const state = await import('./js/state.js?realm=186');
-    const ui = await import('./js/ui.js?realm=186');
+    const ownership = await import('./js/citizen-ownership.js?realm=187');
+    const presentation = await import('./js/citizen-presentation.js?realm=187');
+    const render = await import('./js/render.js?realm=187');
+    const state = await import('./js/state.js?realm=187');
+    const ui = await import('./js/ui.js?realm=187');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -274,9 +274,13 @@ try {
       );
       phase('path-recovered-work');
 
-      // A deterministic real heartbeat releases non-food work during a food
-      // crisis. The ordinary job market then claims an open farm as temporary
-      // cover without retraining the miner.
+      // Return the recovered command assignment to automatic ownership. A
+      // deterministic real heartbeat may then release non-food AI work during
+      // a food crisis and claim an open farm as temporary cover without
+      // retraining the miner. Crown orders have their own focused preservation
+      // proof in verify-citizen-work-orders-browser.mjs.
+      ownership.releaseCitizenAssignment(target, 'player-command');
+      ownership.claimCitizenAssignment(target, mine, { reason: 'job-market' });
       const farm = placeComplete('farm', 44, 45);
       dispatch({ type: 'RELEASE_CITIZEN', actorId: helper.actorId });
       park(helper, 39, 46);

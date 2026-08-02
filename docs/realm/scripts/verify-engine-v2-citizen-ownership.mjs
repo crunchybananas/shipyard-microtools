@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=186';
-import { makeCitizen } from '../js/world.js?realm=186';
-import { dispatch } from '../js/commands.js?realm=186';
+import { G, getSeed, setSeed } from '../js/state.js?realm=187';
+import { makeCitizen } from '../js/world.js?realm=187';
+import { dispatch } from '../js/commands.js?realm=187';
 import {
   claimCitizenAssignment,
   commandAssignCitizen,
@@ -18,7 +18,7 @@ import {
   transitionCitizenActivity,
   validateCitizenOwnership,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=186';
+} from '../js/citizen-ownership.js?realm=187';
 
 function reset() {
   G.gameTick = 0;
@@ -52,6 +52,7 @@ const mine = building('mine', 10, 11);
 assert.equal(commandAssignCitizen(ada.actorId, 10, 11).ok, true);
 assert.equal(ada.profession.kind, 'miner');
 assert.equal(ada.assignment.purpose, 'vocation');
+assert.equal(ada.assignment.reason, 'player-command');
 assert.equal(staffingCount(mine), 1);
 assert.deepEqual(workersForBuilding(mine).map(value => value.actorId), [1]);
 
@@ -66,6 +67,15 @@ assert.throws(() => {
   const third = citizen('Celia Field');
   claimCitizenAssignment(third, mine);
 }, /fully staffed/);
+
+const lumber = building('lumber', 11, 12);
+assert.equal(commandAssignCitizen(ada.actorId, lumber.x, lumber.y).ok, true);
+assert.equal(ada.assignment.building, lumber, 'player could not move an employed citizen directly');
+assert.equal(ada.assignment.reason, 'player-command');
+assert.equal(ada.assignment.purpose, 'temporary', 'cross-vocation work must remain temporary');
+assert.equal(ada.profession.kind, 'miner', 'manual workplace change erased established vocation');
+assert.equal(staffingCount(mine), 1, 'direct reassignment did not release the old staffing slot');
+assert.equal(staffingCount(lumber), 1, 'direct reassignment did not claim the new staffing slot');
 
 const site = building('farm', 12, 11, 0.5);
 assert.equal(claimCitizenAssignment(ada, site), true);

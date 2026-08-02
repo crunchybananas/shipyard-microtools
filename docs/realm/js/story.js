@@ -3,7 +3,7 @@
 // diary of the realm. Persists to save.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=186';
+import { G } from './state.js?realm=187';
 
 // G.chronicle: [{ day, season, text, tag }]
 // tag in: 'milestone','event','character','raid','season','death','birth','victory','misc'
@@ -20,8 +20,8 @@ import { G } from './state.js?realm=186';
 // even if that means the buffer sits slightly over 300.
 // Chronicle writes and initialization are owned by log.js (core tier —
 // ENGINE.md rule 4). Story consumes that API directly.
-import { announce, chronicle, initChronicle, sfx } from './log.js?realm=186';
-import { renameCitizen } from './citizen-ownership.js?realm=186';
+import { announce, chronicle, initChronicle, sfx } from './log.js?realm=187';
+import { renameCitizen } from './citizen-ownership.js?realm=187';
 
 
 export function hasFlag(key) { initChronicle(); return !!G.storyFlags[key]; }

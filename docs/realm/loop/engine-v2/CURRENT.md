@@ -2,17 +2,20 @@
 
 Date: 2026-07-19
 
-## 2026-08-01 focus overlay
+## 2026-08-02 focus overlay
 
-The live module revision is now Realm `186`; the Realm 165 figures below remain
+The live module revision is now Realm `187`; the Realm 165 figures below remain
 the last formal engine performance and traffic baseline, not the current module
 revision. Graphics work from 166–184 did not replace the gameplay kernel or
 close the deliberately red crowd/navigation controls. Subsequent movement work
 already present in the current tree now makes both strict traffic gates pass on
 Realm 185 with zero known fixture defects; reproduce and add a fixture for any
 remaining live crowd failure instead of treating the historical red list as
-current behavior. Realm 186 changes only responsive touch build-mode input and
-its explicit Cancel affordance; it does not change engine ownership or traffic.
+current behavior. Realm 187 exposes player-owned work orders through the existing
+assignment authority and preserves them against automatic food-crisis labor
+reallocation. It adds no citizen field, save migration, navigation change, or
+alternate ownership path; `assignment.reason === 'player-command'` remains the
+single saved and validated provenance for a direct order.
 
 The owner has paused production art and returned focus to gameplay, responsive
 UX, movement, and cleanup. Begin with
