@@ -2382,6 +2382,106 @@ export function buildWorld() {
     a.add(mk);
   }
 
+  // =================== THE OTHER HANDS (#50) ==========================================
+  // Three written presences the keeper's own text promised: the CLIMBERS' five scratch
+  // marks down the descent's spine (glass-revealed, like all small true things), the
+  // CONGREGATION's three carved lines on the drowned hall (physical, monumental — you
+  // can SEE the bands; reading them needs L3's risen capitals + the glass across the
+  // water), and the INSPECTOR's two further papers (the ambiguity engine: real, or the
+  // keeper's invented witness — every artifact must survive both readings).
+  {
+    const scratchMat = () => new THREE.MeshBasicMaterial({ color: 0x8f8676, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+    const scratch = (name, w, h) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), scratchMat());
+      m.name = name;
+      return m;
+    };
+    // cmTallies — under the hair-fine letters on stone4 (exactly where the deep page says)
+    const s4 = core.getObjectByName('stone4');
+    if (s4) {
+      const t = scratch('cmTallies', 0.4, 0.16);
+      t.position.set(0, 0.92, 0.385);
+      s4.add(t);
+    }
+    // cmFormal — low on the tower wall behind the stair foot (the descent's threshold)
+    {
+      const aa = 200 * Math.PI / 180;
+      const t = scratch('cmFormal', 0.5, 0.12);
+      t.position.set(LH.x + Math.sin(aa) * 2.72, LH.y + 0.55, LH.z + Math.cos(aa) * 2.72);
+      t.rotation.y = aa + Math.PI;   // facing back into the room
+      core.add(t);
+    }
+    // cmPlain — a half-buried slate near the kelp slate (region2: exists only at L2)
+    {
+      const px = 10.5, pz = -99.5;
+      const base = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.3, 0.5),
+        new THREE.MeshStandardMaterial({ color: 0x4c5350, roughness: 1, flatShading: true }));
+      base.position.set(px, (Number.isFinite(heightAt(px, pz)) ? heightAt(px, pz) : 0) + 0.1, pz);
+      base.rotation.y = 0.7;
+      region2.add(base);
+      const t = scratch('cmPlain', 0.42, 0.12);
+      t.position.set(0, 0.17, 0.0);
+      t.rotation.x = -Math.PI / 2;
+      base.add(t);
+    }
+    // cmUnfinished — low against the cairn on the L3 bluff (region3)
+    {
+      const t = scratch('cmUnfinished', 0.46, 0.12);
+      const cy = Number.isFinite(heightAt(92.2, 31.9)) ? heightAt(92.2, 31.9) : 0;
+      t.position.set(92.2, cy + 0.34, 31.9);
+      t.rotation.y = Math.atan2(92.2 - 91.5, 31.9 - 31.5);   // facing away from the cairn's heart
+      region3.add(t);
+    }
+    // cmChild — small letters close to the cold floor of the source, near his last note (region4)
+    {
+      const t = scratch('cmChild', 0.34, 0.12);
+      const cy = Number.isFinite(heightAt(-84.6, -42.7)) ? heightAt(-84.6, -42.7) : 13.5;
+      t.position.set(-84.6, cy + 0.02, -42.7);
+      t.rotation.x = -Math.PI / 2;
+      t.rotation.z = 0.4;
+      region4.add(t);
+    }
+    // the congregation's three carved bands — physical, always visible, on the capitals'
+    // north faces (toward the ridge a reader stands on at L3); children of the gallery so
+    // they rise with it and prune from the model with it
+    {
+      const gallery = core.getObjectByName('drownedGallery');
+      if (gallery) {
+        const bandMat = new THREE.MeshBasicMaterial({ color: 0x232a30, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide });
+        const sites = [['cgRoof', 0, -108], ['cgCount', 8, -111.5], ['cgLight', 0, -115]];
+        for (const [nm, bx, bz] of sites) {
+          const band = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 0.32), bandMat.clone());
+          band.position.set(bx, 1.45, bz + 0.97);
+          band.name = nm;
+          gallery.add(band);
+        }
+      }
+    }
+    // the inspector's carbon, kept by the cot (quarters: opens one level down, like the room)
+    {
+      const q = core.getObjectByName('quarters');
+      if (q) {
+        const sheet = new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.32),
+          new THREE.MeshStandardMaterial({ color: 0xd9d2bc, roughness: 0.95, side: THREE.DoubleSide }));
+        sheet.rotation.x = -Math.PI / 2 + 0.06;
+        sheet.rotation.z = 0.3;
+        sheet.position.set(-0.35, 0.44, 1.05);
+        sheet.name = 'commendPaper';
+        q.add(sheet);
+      }
+    }
+    // the notice of review, folded small and wedged under the chart table's rim — seen
+    // every day, obeyed never
+    {
+      const fold = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0xcfc7ae, roughness: 0.95 }));
+      fold.position.set(LH.x + 1.45, LH.y + 0.90, LH.z - 1.35);
+      fold.rotation.y = 0.35;
+      fold.name = 'closureNotice';
+      core.add(fold);
+    }
+  }
+
   return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, l3motes, vaultDrips };
 }
 
@@ -2975,6 +3075,8 @@ const NAMES = [
   'tideGauge', 'gaugeTop',                                                 // #52: the tide gauge — the descent's waterlines made monumental
   'tinyCompanion',                                                         // #53: the second figure on the model's beach, once carried
   'drainLedger',                                                           // #55: the inspector's tide ledger, wedged in the drain
+  'cmTallies', 'cmFormal', 'cmPlain', 'cmUnfinished', 'cmChild',           // #50-B: the climbers' five hands down the descent
+  'cgRoof', 'cgCount', 'cgLight', 'commendPaper', 'closureNotice',         // #50-C the congregation's lines · #50-A the inspector's papers
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];

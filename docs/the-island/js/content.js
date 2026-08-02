@@ -205,6 +205,35 @@ export const LORE = {
     journal: 'A tide ledger, water-swollen, wedged where the drain wall meets the floor — the district’s official record of the rising sea. The printed tables never changed; his figures did. “One of these is a record; the other is a habit.”',
     journalDeep: 'The ledger’s last leaf, read from the deep, drops the official hand: they would close the station before reprinting the tables — when the water reaches the archive, the district will agree with him all at once, and by drowning. He left it where the tide could countersign it. “What you file, it finds sooner.”',
   },
+  // #50-A: the inspector's second fragment. The AMBIGUITY ENGINE is canon (lens_mark_study's
+  // deep page negates him), so every inspector artifact must survive two readings: a real
+  // official, or the keeper writing in an invented hand to feel witnessed.
+  commendation_copy: {
+    kind: 'letter', hand: 'inspector', title: 'A carbon copy, kept',
+    pages: [
+      'CARBON RETAINED — RECOMMENDATION FOR COMMENDATION. To the District Board: I write concerning the keeper of the island light. His returns are exact where exactness costs sleep. His lens-work is the finest in the district, and the light has never once stood dark on his watch. I am aware the Board does not commend stations scheduled for review. I recommend him anyway. Some records exist to be filed. This one exists to be true.',
+    ],
+    deepFrom: 3,
+    deep: [
+      '(read again from below, the sheet gives up its trouble: the carbon is the top copy. There is no pressed original beneath it — and a carbon without an original is not a copy of anything; it is a letter never sent, in a hand very like a man praising himself in the only voice he could bear to hear it in. Or it is exactly what it claims, and the original went to a Board that never answered. The glass cannot settle it. Neither can I.)',
+    ],
+    journal: 'A carbon copy kept by the cot: the inspector recommending him for commendation — “some records exist to be filed; this one exists to be true.” He kept the copy. Of course he kept the copy.',
+    journalDeep: 'Read from below, the carbon gives up its trouble: there is no pressed original — praise in a hand very like his own, a copy of nothing; or exactly what it claims, sent to a Board that never answered. The glass cannot settle which. I have stopped needing it to.',
+  },
+  // #50-A: the inspector's third fragment — the end of keeping, drafted. deepFrom 4: the
+  // bottom alone can read what the notice actually is.
+  closure_notice: {
+    kind: 'letter', hand: 'inspector', title: 'A notice of review, folded small',
+    pages: [
+      'NOTICE OF REVIEW — DISTRICT OF LIGHTS. The Board, having considered the returns of the island station, finds the cost of its keeping to exceed the traffic served. The light is to be extinguished and the station struck from the list, effective the turn of the quarter. The keeper will present himself at the mainland office with the log, the instruments, and the great lens.',
+    ],
+    deepFrom: 4,
+    deep: [
+      '(from the bottom, the notice reads otherwise. The date is blank. The quarter is never named. An order to extinguish a light that never says WHEN is not an order — it is a fear, drafted in officialese: the day the keeping ends, written down to see whether it could be survived on paper first. He did not obey it. There may have been nothing to obey. Either way the light is still lit. Go up and see.)',
+    ],
+    journal: 'Folded small under the chart table’s rim: a notice of review — the light to be extinguished, the station struck from the list, “effective the turn of the quarter.” He wedged it where he would see it every day, and did not obey it.',
+    journalDeep: 'From the bottom, the notice comes apart: the date is blank, the quarter never named. Not an order — a fear drafted in officialese, the end of keeping written down to see whether it could be survived on paper first. Either way: the light is still lit. Go up and see.',
+  },
   // on the MODEL's own chart table (#53) — a margin the width of a fingernail, read only by
   // someone bent over a model with a glass: which is exactly what HE was when he wrote it.
   // The recursion speaks to the next hand down.
@@ -233,6 +262,54 @@ export const LORE = {
   },
 };
 
+// ---- THE CLIMBERS (#50-B: the worn way down) -----------------------------------------
+// lens_mark_stone's deep page promised them: "count the scratches under this one — each
+// is someone who stood here, went down, and came back up far enough to add a mark."
+// Five marks in five visibly different hands, one per depth along the descent's spine.
+// Written hands only; none of them knows the player — the keeper stays the only I/you.
+export const CLIMBERS = [
+  { id: 'cmTallies',
+    whisper: 'Under the hair-fine letters, just as they said: tally strokes — dozens, in fists of five — and one place where a hand rested so many times the stone has gone smooth.',
+    journal: 'Scratched under the glass — the tallies beneath the standing stone: dozens of strokes in fists of five, and a palm-hollow worn smooth where each of them must have leaned. Not a message. Attendance.' },
+  { id: 'cmFormal',
+    whisper: 'An old formal hand, every letter ruled straight: “I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.”',
+    journal: 'Scratched under the glass — an old formal hand low on the tower wall, ruled straight as a return: “I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.” Dignity, kept to the last inch of it.' },
+  { id: 'cmPlain',
+    whisper: 'A plain hand on the stone: “went down for my brother. came up with the weather.”',
+    journal: 'Scratched under the glass — a plain hand on a stone in the kelp: “went down for my brother. came up with the weather.” It does not say whether he found him. The weather says.' },
+  { id: 'cmUnfinished',
+    whisper: 'A hurried hand, low on the cairn: “day nine below. the lamp is” — and it stops.',
+    journal: 'Scratched under the glass — low on the cairn, a hurried hand: “day nine below. the lamp is”. It stops there. Either the light went out, or it did not and there was nothing further worth carving. I have decided to believe the second.' },
+  { id: 'cmChild',
+    whisper: 'Small letters, close to the cold floor, in a hand still learning its letters: “im not lost. dont come down.”',
+    journal: 'Scratched under the glass — small letters close to the floor of the source, in a hand still learning its letters: “im not lost. dont come down.” The bravest lie on the island. Somebody’s whole descent, in six words.' },
+];
+export const CLIMBERS_CLOSE = {
+  whisper: 'Five hands, five descents. The way down is worn smooth — you have been reading the wear.',
+  journal: 'I have found five climbers’ hands now, one at every depth: the counter, the dignified, the brother, the day-niner, the child. None of them made it into any log. The way down is worn smooth by every hand that climbed it back — and the stone under my palm is smooth, so most of them did. I am one of the hands now.',
+};
+
+// ---- THE CONGREGATION (#50-C: the WE in the stone) -----------------------------------
+// The jetty stone's founding plural ("WE WHO WENT DOWN / LEFT THE LIGHT / FOR WHOEVER
+// WASHES UP") finally accounted for: three monumental lines carved on the drowned hall,
+// readable only at L3 when the capitals break the surface — across the water, through
+// the glass. Liturgical, pre-keeper, no I and no you.
+export const CONGREGATION = [
+  { id: 'cgRoof',
+    line: 'WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH',
+    journal: 'Carved on the drowned hall, read across the water: “WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH.” The water stands above the roofline now. They measured a sea that kept its word for a while.' },
+  { id: 'cgCount',
+    line: 'WE COUNTED OURSELVES EACH WINTER — …',
+    journal: 'Carved on the drowned hall, read across the water: “WE COUNTED OURSELVES EACH WINTER —” and then the number, effaced by the sea. A census kept until the counting stopped mattering, or the counters did.' },
+  { id: 'cgLight',
+    line: 'WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT',
+    journal: 'Carved on the drowned hall: “WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT.” So the light is older than its keeper. They built it climbing OUT — the lighthouse is what a congregation of the drowning made of their own ascent. He has been keeping their promise, not only his.' },
+];
+export const CONGREGATION_CLOSE = {
+  whisper: 'Three lines, one WE. The stone at the jetty finally has its congregation.',
+  journal: 'The drowned hall has given up its three carved lines, and the WE of the jetty stone has faces now — a congregation that raised roofs against the tide, counted its winters, and when the water came anyway, went up the hill and built the light. Whoever washes up is who went down. They wrote it first. Everyone since has only been keeping it lit.',
+};
+
 // ---- THE LAMPBLACK MARKS (#54: the reading-glass payoff) -----------------------------
 // The glass promised "writing everywhere" and gated exactly two planes. Now nine more
 // micro-marks hide on the working things of the keeper's life — one line each, found in
@@ -256,9 +333,9 @@ export const LAMPBLACK = [
 // (Other fragments with deepFrom pages — the bottle, the coat, the lens marks — stay
 // BONUS reads outside the arc, acknowledged but untallied, as shipped.)
 export const DEEP_SETS = {
-  2: ['stone_inscription'],                                  // the tide bares the stone
-  3: ['keeper_logbook', 'quarters_journal', 'drain_ledger'], // the hands turn colder (+#55)
-  4: ['music_note'],                                         // the fold gives up its inside
+  2: ['stone_inscription'],                                                     // the tide bares the stone
+  3: ['keeper_logbook', 'quarters_journal', 'drain_ledger', 'commendation_copy'], // the hands turn colder (+#55, +#50-A)
+  4: ['music_note', 'closure_notice'],                                          // the fold gives up its inside; the notice comes apart
 };
 export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 
@@ -337,6 +414,16 @@ export const SKETCHES = [
   ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
   ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
   ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
+  // #50 — the three new hands: the climbers (shared + close), the congregation (shared +
+  // close), and the inspector's two further fragments.
+  ['Scratched under the glass —', S('<circle cx="26" cy="17" r="8"/><path d="M32 23l10 8"/><path d="M52 12l4 10M58 12l4 10M64 12l4 10M70 12l4 10" opacity=".6"/><path d="M54 30h24" opacity=".3"/>')],
+  ['I am one of the hands now', S('<path d="M20 32c0-8 3-12 6-12s6 4 6 12M36 32c0-7 2-10 5-10s5 3 5 10M50 32c0-8 3-12 6-12s6 4 6 12M66 32c0-6 2-9 4-9s4 3 4 9" opacity=".7"/><path d="M12 34h72" opacity=".4"/><path d="M78 14q3-3 6 0" opacity=".5"/>')],
+  ['Carved on the drowned hall', S('<path d="M24 30V16M36 30V13M48 30V15M60 30V13M72 30V16" opacity=".8"/><path d="M20 15h56" opacity=".6"/><path d="M28 20h8M40 18h8M52 20h8" opacity=".3"/><path d="M10 30q10 4 20 0t20 0t20 0t14 0" opacity=".5"/>')],
+  ['They wrote it first', S('<path d="M30 34V20l6-8 6 8v14" opacity=".4"/><path d="M48 34V14l5-6 5 6v20" opacity=".85"/><path d="M53 14h0M48 22h10" opacity=".5"/><path d="M14 36h68" opacity=".35"/><path d="M68 10q4-3 8 0" opacity=".4"/>')],
+  ['A carbon copy kept by the cot', S('<rect x="30" y="10" width="30" height="22" rx="1" opacity=".85"/><rect x="35" y="14" width="30" height="22" rx="1" opacity=".35"/><path d="M35 17h18M35 22h20M35 27h14" opacity=".45"/><path d="M14 36h30" opacity=".4"/>')],
+  ['the carbon gives up its trouble', S('<rect x="34" y="12" width="30" height="22" rx="1" opacity=".85"/><path d="M39 17h18M39 22h20M39 27h14" opacity=".4"/><path d="M24 30l8-8M24 22l8 8" opacity=".6"/><circle cx="74" cy="16" r="5" opacity=".5"/><path d="M78 20l6 5" opacity=".5"/>')],
+  ['notice of review', S('<rect x="32" y="8" width="32" height="26" rx="1" opacity=".85"/><path d="M37 14h22M37 19h22M37 24h16" opacity=".45"/><path d="M37 29h9" opacity=".2"/><path d="M60 27l6 6M66 27l-6 6" opacity=".7"/>')],
+  ['survived on paper', S('<rect x="30" y="10" width="30" height="24" rx="1" opacity=".7"/><path d="M35 16h20M35 21h20" opacity=".4"/><path d="M35 27h12" opacity=".15"/><path d="M64 30V12l4-5 4 5v18" opacity=".85"/><path d="M68 12h0M64 18h8" opacity=".45"/>')],
   // #55 — the inspector's tide ledger.
   ['tide ledger, water-swollen', S('<path d="M28 30l24-5 2 8-24 5z" opacity=".85"/><path d="M52 25l-5 1 1.5 7" opacity=".6"/><path d="M33 29l14-3M34 33l11-2" opacity=".35"/><path d="M60 14h16M60 18h12M60 22h16" opacity=".3"/><path d="M12 36q10 4 20 0t20 0t20 0" opacity=".45"/>')],
   ['the tide could countersign', S('<path d="M26 12h36v18H26z" opacity=".7"/><path d="M30 17h20M30 21h26" opacity=".35"/><path d="M32 26q6-4 10 0t10 0" opacity=".85"/><path d="M12 36q10 4 20 0t20 0t20 0" opacity=".5"/>')],

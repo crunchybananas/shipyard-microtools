@@ -12,6 +12,45 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 23 — 2026-08-01 — #50: THE OTHER HANDS — climbers, congregation, inspector
+
+**Owner green-lit the expanded design. Three written presences the keeper's own text
+promised, ~150 lines, all canon-locked (written hands only; no hand knows the player;
+the keeper stays the game's only speaking I/you):**
+
+**B — the climbers (the worn way down):** five scratch marks in five visibly different
+hands, one per depth: the TALLIES under the standing stone's hair-fine letters (fists of
+five + a palm-hollow worn smooth — "Not a message. Attendance."), the OLD FORMAL hand at
+the tower's threshold ("I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE
+PARLOUR."), the PLAIN hand in the L2 kelp ("went down for my brother. came up with the
+weather."), the UNFINISHED hand on the L3 cairn ("day nine below. the lamp is"), and the
+CHILD-PLAIN hand by the source note ("im not lost. dont come down."). All five close:
+"I am one of the hands now."
+
+**C — the congregation (the WE in the stone):** three monumental lines carved on the
+drowned hall's capitals — physical bands you can SEE from the L3 ridge, readable only
+across the water through the glass: the roof raised above the spring tide's reach, the
+winters counted (the number effaced), and the keystone — "WHEN THE WATER CAME WE WENT UP
+THE HILL AND BUILT A LIGHT." The light is older than its keeper; the jetty stone's WE
+finally has faces; the beam-to-the-deep chain has its why.
+
+**A — the inspector (the ambiguity engine):** two further papers joining #55's ledger,
+each surviving both readings (real official / the keeper's invented witness): the CARBON
+COPY kept by the cot ("some records exist to be filed; this one exists to be true" — and
+from below: there is no pressed original), and the NOTICE OF REVIEW folded under the
+chart table's rim — whose deep page (L4 only) finds the date blank, the quarter never
+named: "not an order — a fear, drafted in officialese." Both join the deep-read codex,
+which now closes at SEVEN fragments (DEEP_SETS took them without a count change — #76's
+whole point, twice proven in one week).
+
+**Evidence:** ten refs; every gate exact (glassless → nothing; plain L2-only, unfinished
+L3-only, congregation L3-only, child L4+); 5/5 + 3/3 closes fire once each; both readers
+open and their deep pages tally; the seven-fragment codex integrates; 83/83 journal↔sketch
+coverage; congregation bands verified visible from the ridge; walk 28/28; zero errors.
+**Closes #50 — and with it, every story issue ever filed against ABYME.**
+
+---
+
 ## loop-fire 22 — 2026-08-01 — the CLOSE-AND-MERGE sweep: #30 #31 #32 #48 #11 #23
 
 **Owner's ask: "as much as we can closed and merged."** Six more, each verified:

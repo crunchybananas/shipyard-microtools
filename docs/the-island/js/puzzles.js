@@ -10,7 +10,7 @@ import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
 import { clamp, lerp, lerpAngle, TAU } from './util.js';
-import { KEEPER, LAMPBLACK } from './content.js';
+import { KEEPER, LAMPBLACK, CLIMBERS, CLIMBERS_CLOSE, CONGREGATION, CONGREGATION_CLOSE } from './content.js';
 
 const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
@@ -632,6 +632,73 @@ export class Game {
       onClick: () => UI.openReader('pool_phial'),
     });
 
+    // ---- THE OTHER HANDS (#50) ----
+    // B: the climbers' five scratch marks — glass-revealed, one per depth. Re-clickable
+    // (the whisper always answers); only the first read tallies; all five close the arc.
+    const CM_GATES = {
+      cmPlain: () => W.level === 2,
+      cmUnfinished: () => W.level === 3,
+      cmChild: () => W.level >= 4,
+    };
+    for (const c of CLIMBERS) {
+      if (!R[c.id]) continue;
+      const gate = CM_GATES[c.id];
+      I.add({
+        id: c.id, targets: [R[c.id]], label: 'scratches, in another hand', maxDist: c.id === 'cmTallies' ? 4.5 : 3.2,
+        when: () => W.flags.readGlass && (!gate || gate()),
+        onClick: () => {
+          A.pluck(1174.7, 0, 0.12, 1.2);
+          UI.whisper(c.whisper);
+          const key = 'cm_' + c.id;
+          if (W.readKeys.includes(key)) return;
+          W.readKeys.push(key);
+          UI.addJournal(c.journal, '', 'self');
+          if (CLIMBERS.every((x) => W.readKeys.includes('cm_' + x.id))) {
+            this.once('climbersAll', () => {
+              UI.whisper(CLIMBERS_CLOSE.whisper);
+              UI.addJournal(CLIMBERS_CLOSE.journal, '', 'self');
+            });
+          }
+          save(this.player);
+        },
+      });
+    }
+    // C: the congregation's three carved lines — physical bands on the drowned hall,
+    // readable only at L3 (the capitals risen) across the water, through the glass.
+    for (const c of CONGREGATION) {
+      if (!R[c.id]) continue;
+      I.add({
+        id: c.id, targets: [R[c.id]], label: 'a carved line, across the water', maxDist: 38, noGlint: true,
+        when: () => W.level === 3 && W.flags.readGlass,
+        onClick: () => {
+          A.pluck(659.26, 0, 0.14, 2.2);
+          UI.whisper(`Through the glass, the carved line resolves: “${c.line}”`);
+          const key = 'cg_' + c.id;
+          if (W.readKeys.includes(key)) return;
+          W.readKeys.push(key);
+          UI.addJournal(c.journal, '', 'self');
+          if (CONGREGATION.every((x) => W.readKeys.includes('cg_' + x.id))) {
+            this.once('congregationAll', () => {
+              UI.whisper(CONGREGATION_CLOSE.whisper);
+              UI.addJournal(CONGREGATION_CLOSE.journal, '', 'self');
+            });
+          }
+          save(this.player);
+        },
+      });
+    }
+    // A: the inspector's further papers — reader fragments; the quarters gate matches the
+    // room they live in, the notice sits in plain sight under the rim he worked over.
+    if (R.commendPaper) I.add({
+      id: 'commendPaper', targets: [R.commendPaper], label: 'a carbon copy, kept', maxDist: 2.6,
+      when: () => W.level >= 2 || W.flags.returned,
+      onClick: () => UI.openReader('commendation_copy'),
+    });
+    if (R.closureNotice) I.add({
+      id: 'closureNotice', targets: [R.closureNotice], label: 'a paper, folded small', maxDist: 2.8,
+      onClick: () => UI.openReader('closure_notice'),
+    });
+
     // ---- the found-lens reveal: take the keeper's reading glass and his lampblack marks appear ----
     if (R.readGlass) I.add({
       id: 'readGlass', targets: [R.readGlass], label: 'a brass reading glass', maxDist: 3.4,
@@ -1196,7 +1263,8 @@ export class Game {
     // real island; the marks become readable hotspots once visible.
     if (R.readGlass) { R.readGlass.visible = !F.readGlass; R.readGlass.rotation.y = 0.4 + elapsed * 0.5; }
     for (const id of ['lensMarkStudy', 'lensMarkStone',
-      'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain']) {   // #54: the nine micro-marks fade with the two LORE marks
+      'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain',     // #54: the nine micro-marks fade with the two LORE marks
+      'cmTallies', 'cmFormal', 'cmPlain', 'cmUnfinished', 'cmChild']) {                                  // #50: the climbers' scratches surface the same way
       const mk = R[id];
       if (!mk) continue;
       if (!isModel) {
