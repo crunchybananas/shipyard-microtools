@@ -15,16 +15,16 @@
 //   NOT commands.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, rngRange } from './state.js?realm=187';
-import { placeBuilding, upgradeBuilding } from './economy.js?realm=187';
-import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=187';
-import { startResearch } from './tech.js?realm=187';
-import { executeTrade } from './trade.js?realm=187';
-import { avatarMove, avatarGoto } from './avatar.js?realm=187';
+import { G, BUILDINGS, rngRange } from './state.js?realm=188';
+import { placeBuilding, upgradeBuilding } from './economy.js?realm=188';
+import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=188';
+import { startResearch } from './tech.js?realm=188';
+import { executeTrade } from './trade.js?realm=188';
+import { avatarMove, avatarGoto } from './avatar.js?realm=188';
 import {
   commandAssignCitizen,
   commandReleaseCitizen,
-} from './citizen-ownership.js?realm=187';
+} from './citizen-ownership.js?realm=188';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;

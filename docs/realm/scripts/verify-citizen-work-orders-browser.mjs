@@ -15,7 +15,7 @@ import { ensureServer } from './_serve.mjs';
 const realmRoot = fileURLToPath(new URL('..', import.meta.url));
 const proofDir = join(realmRoot, 'tmp', 'citizen-work-orders');
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 187, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 188, 'Update this gate together with current browser module URLs');
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
@@ -41,8 +41,8 @@ try {
   });
 
   const fixture = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=187');
-    const ownership = await import('./js/citizen-ownership.js?realm=187');
+    const economy = await import('./js/economy.js?realm=188');
+    const ownership = await import('./js/citizen-ownership.js?realm=188');
     const g = window.G;
     Object.assign(g.resources, {
       wood: 10_000, stone: 10_000, food: 100, gold: 10_000, iron: 10_000,
@@ -158,8 +158,8 @@ try {
   await page.setViewportSize({ width: 1280, height: 800 });
 
   const crisis = await page.evaluate(async ({ orderedId, adaptiveId, farm, lumber, market }) => {
-    const ownership = await import('./js/citizen-ownership.js?realm=187');
-    const state = await import('./js/state.js?realm=187');
+    const ownership = await import('./js/citizen-ownership.js?realm=188');
+    const state = await import('./js/state.js?realm=188');
     const g = window.G;
     const ordered = g.citizens.find(value => value.actorId === orderedId);
     const adaptive = g.citizens.find(value => value.actorId === adaptiveId);

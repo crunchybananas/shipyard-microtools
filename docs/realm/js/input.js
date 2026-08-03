@@ -2,14 +2,14 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=187';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=187';
-import { canAfford } from './economy.js?realm=187';
-import { dispatch } from './commands.js?realm=187';
-import { notify } from './notifications.js?realm=187';
-import { initAudio } from './audio.js?realm=187';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=187';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=187';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=188';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=188';
+import { canAfford } from './economy.js?realm=188';
+import { dispatch } from './commands.js?realm=188';
+import { notify } from './notifications.js?realm=188';
+import { initAudio } from './audio.js?realm=188';
+import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=188';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=188';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -144,6 +144,7 @@ function tryPlaceAt(tx, ty) {
     renderBuildBar();
     renderMissions();
     updateUI();
+    updateTutorialTip();
     return true;
   }
   // Placement failed — surface the reason (throttled so we don't spam)
@@ -392,7 +393,7 @@ export function setupInput(canvas) {
 
   // Keyboard
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { G.selectedBuild = null; G.selectedBuilding = null; hideInfoPanel(); renderBuildBar(); }
+    if (e.key === 'Escape') cancelBuildMode();
     if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       if (dispatch({ type: 'UNDO' }).ok) { renderBuildBar(); updateUI(); }

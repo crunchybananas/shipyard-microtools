@@ -1,36 +1,36 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=187';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=187';
-import { coreTick } from '../js/sim.js?realm=187';
-import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=187';
-import { missions } from '../js/missions.js?realm=187';
-import { initChronicle } from '../js/log.js?realm=187';
+import { G, getSeed, setSeed } from '../js/state.js?realm=188';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=188';
+import { coreTick } from '../js/sim.js?realm=188';
+import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=188';
+import { missions } from '../js/missions.js?realm=188';
+import { initChronicle } from '../js/log.js?realm=188';
 import {
   commitGameLoad,
   commitGameLoadForTest,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=187';
-import { hasSave, loadGame, saveGame } from '../js/save.js?realm=187';
-import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=187';
+} from '../js/save-state.js?realm=188';
+import { hasSave, loadGame, saveGame } from '../js/save.js?realm=188';
+import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=188';
 import {
   claimCitizenAssignment,
   renameCitizen,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=187';
+} from '../js/citizen-ownership.js?realm=188';
 import {
   citizenRenderCacheSize,
   citizenRenderRecord,
   resetCitizenRenderCache,
-} from '../js/citizen-render-cache.js?realm=187';
+} from '../js/citizen-render-cache.js?realm=188';
 import {
   getCitizenTransitionLedger,
   initCitizenInspector,
   resetCitizenTransitionLedger,
-} from '../js/citizen-inspector.js?realm=187';
+} from '../js/citizen-inspector.js?realm=188';
 
 function clone(value) {
   return structuredClone(value);
