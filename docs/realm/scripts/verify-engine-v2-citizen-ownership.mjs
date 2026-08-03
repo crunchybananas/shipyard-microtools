@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=187';
-import { makeCitizen } from '../js/world.js?realm=187';
-import { dispatch } from '../js/commands.js?realm=187';
+import { G, getSeed, setSeed } from '../js/state.js?realm=188';
+import { makeCitizen } from '../js/world.js?realm=188';
+import { dispatch } from '../js/commands.js?realm=188';
 import {
   claimCitizenAssignment,
   commandAssignCitizen,
@@ -18,7 +18,7 @@ import {
   transitionCitizenActivity,
   validateCitizenOwnership,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=187';
+} from '../js/citizen-ownership.js?realm=188';
 
 function reset() {
   G.gameTick = 0;

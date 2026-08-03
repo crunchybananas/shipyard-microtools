@@ -2,7 +2,7 @@
 // WebGL Post-Processing — bloom, color grading, film grain
 // ════════════════════════════════════════════════════════════
 
-import { postFXPixelRatio } from './render-resolution.js?realm=187';
+import { postFXPixelRatio } from './render-resolution.js?realm=188';
 
 let gl, program, vao, texture, enabled = false;
 let postCanvas;

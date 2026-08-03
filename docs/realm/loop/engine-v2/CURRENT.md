@@ -4,7 +4,7 @@ Date: 2026-07-19
 
 ## 2026-08-02 focus overlay
 
-The live module revision is now Realm `187`; the Realm 165 figures below remain
+The live module revision is now Realm `188`; the Realm 165 figures below remain
 the last formal engine performance and traffic baseline, not the current module
 revision. Graphics work from 166–184 did not replace the gameplay kernel or
 close the deliberately red crowd/navigation controls. Subsequent movement work
@@ -16,6 +16,11 @@ assignment authority and preserves them against automatic food-crisis labor
 reallocation. It adds no citizen field, save migration, navigation change, or
 alternate ownership path; `assignment.reason === 'player-command'` remains the
 single saved and validated provenance for a direct order.
+
+Realm 188 changes only opening shell/UI behavior: truthful tutorial guidance,
+reversible build-mode presentation, title-fade input ownership, and tutorial
+reset. It does not change deterministic simulation order, save/schema versions,
+citizen assignment ownership, navigation, or renderer architecture.
 
 The owner has paused production art and returned focus to gameplay, responsive
 UX, movement, and cleanup. Begin with

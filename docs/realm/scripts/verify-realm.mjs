@@ -38,6 +38,7 @@ const checks = [
   ['mixed ground traffic', 'verify-phase0c-traffic-baseline.mjs', '--require-correct'],
   ['shell isolation', 'verify-shell-isolation.mjs'],
   ['browser save shell', 'verify-browser-save-shell.mjs'],
+  ['opening build tutorial', 'verify-opening-build-tutorial-browser.mjs'],
   ['responsive phone build mode', 'verify-responsive-build-mode.mjs'],
   ['browser citizen work orders', 'verify-citizen-work-orders-browser.mjs'],
   ['browser citizen lifecycle', 'verify-engine-v2-citizen-lifecycle-browser.mjs'],

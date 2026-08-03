@@ -2,7 +2,7 @@
 
 Date updated: 2026-08-02
 
-Current live checkpoint: Realm `187`
+Current live checkpoint: Realm `188`
 
 Production graphics are intentionally paused at
 [`../graphics/PAUSE_AND_RESUME.md`](../graphics/PAUSE_AND_RESUME.md). The active
@@ -62,6 +62,22 @@ Continue through the existing assignment provenance field, so the save schema
 and versions do not change. See
 [`rounds/003-citizen-work-orders.md`](rounds/003-citizen-work-orders.md).
 
+## Completed Opening-Flow Slice: Truthful Farm Build State
+
+Round 004 repairs the first playable instruction. The tutorial's Farm target
+used the same gold halo as an active build, so it looked selected while the
+authoritative build selection was empty and a grass click did nothing. Tutorial
+targets now use a teal dashed **Select** ribbon; actual build mode remains the
+gold lifted card, carries `aria-pressed`, and exposes Cancel.
+
+The welcome no longer advances on a hidden timer while claiming to await a
+click. A deliberate **Start building** action begins the tutorial, Cancel and
+Escape return an unplaced Farm to the selection instruction, the same number
+hotkey no longer silently exits build mode, and in-page New Game resets the
+tutorial shell. The fading title is immediately inert so it cannot swallow a
+fast first phone tap. See
+[`rounds/004-opening-build-truth.md`](rounds/004-opening-build-truth.md).
+
 ## Ranked Work Now
 
 1. **Workforce intelligence continuation.** Add building-side staffing controls,
@@ -72,12 +88,13 @@ and versions do not change. See
    interrupt execution without silently rewriting valid player strategy.
 2. **Responsive UX continuation.** Remove the invisible advisor hit target that
    can block phone title actions after the tip fades. Then restore ordinary
-   keyboard focus by retiring the global Tab interception, correct the tutorial
-   step contracts, make tablet HUD overflow legible, resolve phone minimap/build
-   bar overlap, and raise the remaining undersized touch targets. Keep shipping
-   one reproduced surface at a time from the Round 002 queue.
+   keyboard focus by retiring the global Tab interception, correct the Research
+   and completion tutorial contracts, make tablet HUD overflow legible, resolve
+   phone minimap/build-bar overlap, and raise the remaining undersized touch
+   targets. Keep shipping one reproduced surface at a time from the Round 002
+   queue.
 3. **Crowd-safe NPC movement.** Reproduce remaining player-visible miner or
-   town-crowd failures before changing the kernel. On Realm 187, both strict
+   town-crowd failures before changing the kernel. On Realm 188, both strict
    navigation gates are green with zero known fixture defects: weighted route
    cost, dynamic-obstacle invalidation, head-on/doorway separation,
    intersection capacity, and mixed-actor separation all pass. Extend the
@@ -106,7 +123,7 @@ node scripts/verify-realm.mjs
 ```
 
 The traffic fixtures remain the promotion gates for movement changes. Their
-strict modes both pass on Realm 187, while the Realm 165 measurements remain
+strict modes both pass on Realm 188, while the Realm 165 measurements remain
 the last formal performance baseline. Read `../engine-v2/CURRENT.md` before
 changing ownership, save, or navigation surfaces.
 

@@ -2,23 +2,23 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=187';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=187';
-import { getWonderReport } from './wonder.js?realm=187';
-import { panCameraTo } from './render.js?realm=187';
-import { dispatch } from './commands.js?realm=187';
-import { missions } from './missions.js?realm=187';
-import { getActiveScenario } from './scenarios.js?realm=187';
-import { saveGame, loadGame } from './save.js?realm=187';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=187';
-import { notify } from './notifications.js?realm=187';
-import { TRADE_PARTNERS } from './trade.js?realm=187';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=188';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=188';
+import { getWonderReport } from './wonder.js?realm=188';
+import { panCameraTo } from './render.js?realm=188';
+import { dispatch } from './commands.js?realm=188';
+import { missions } from './missions.js?realm=188';
+import { getActiveScenario } from './scenarios.js?realm=188';
+import { saveGame, loadGame } from './save.js?realm=188';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=188';
+import { notify } from './notifications.js?realm=188';
+import { TRADE_PARTNERS } from './trade.js?realm=188';
 import {
   citizenStaffingCapacity,
   onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=187';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=187';
+} from './citizen-ownership.js?realm=188';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=188';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -391,11 +391,7 @@ export function renderBuildBar() {
     cancel.type = 'button';
     cancel.setAttribute('aria-label', 'Cancel building placement');
     cancel.innerHTML = '<span class="build-cancel-icon" aria-hidden="true">✕</span><span>Cancel</span>';
-    cancel.onclick = () => {
-      G.selectedBuild = null;
-      G._lastPaintTile = null;
-      renderBuildBar();
-    };
+    cancel.onclick = cancelBuildMode;
     bar.appendChild(cancel);
   }
   const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
@@ -415,6 +411,7 @@ export function renderBuildBar() {
       const btn = document.createElement('button');
       btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
       btn.dataset.buildKey = key;
+      btn.setAttribute('aria-pressed', String(G.selectedBuild === key));
       // Affordance gradient: red when short, amber when close (have >= 60% of cost
       // but below), normal when flush. Gives the player at-a-glance "close to
       // affording" tension rather than a binary can/can't.
@@ -447,10 +444,7 @@ export function renderBuildBar() {
         // after placing a building, since selectedBuild was still 'house'). The
         // explicit Cancel control is the touch-visible way out of build mode;
         // Escape remains the keyboard equivalent.
-        G.selectedBuild = key;
-        G.selectedBuilding = null;
-        hideInfoPanel();
-        renderBuildBar();
+        activateBuildMode(key);
       };
       btn.onmouseenter = () => showTooltip(btn, key, def);
       btn.onmouseleave = hideTooltip;
@@ -476,10 +470,26 @@ if (typeof window !== 'undefined' && !window._buildBarHotkeyBound) {
     if (idx >= _visibleBuildKeys.length) return;
     e.stopPropagation();
     const pick = _visibleBuildKeys[idx];
-    G.selectedBuild = G.selectedBuild === pick ? null : pick;
-    G.selectedBuilding = null;
-    renderBuildBar();
+    activateBuildMode(pick);
   }, { capture: true });
+}
+
+function activateBuildMode(key) {
+  G.selectedBuild = key;
+  G.selectedBuilding = null;
+  G._lastPaintTile = null;
+  hideInfoPanel();
+  renderBuildBar();
+  updateTutorialTip();
+}
+
+export function cancelBuildMode() {
+  G.selectedBuild = null;
+  G.selectedBuilding = null;
+  G._lastPaintTile = null;
+  hideInfoPanel();
+  renderBuildBar();
+  updateTutorialTip();
 }
 
 export function renderResearchPanel() {
@@ -1168,8 +1178,9 @@ const TUTORIAL_STEPS = [
   {
     id: 'welcome',
     text: '👋 Welcome to Realm! You have 3 settlers on an island. Let\'s build a settlement.',
-    action: 'Click anywhere to continue',
-    check: () => G.gameTick > 30,
+    action: 'Choose Start building when you are ready.',
+    continueLabel: 'Start building',
+    check: () => tutorialWelcomeAcknowledged,
   },
   {
     id: 'build_farm',
@@ -1181,6 +1192,7 @@ const TUTORIAL_STEPS = [
     // pulsing tutorial highlight was landing on the wrong card and actively
     // misdirecting new players ("select Farm" with the House button glowing).
     highlight: '[data-build-key="farm"]',
+    hint: 'Select',
   },
   {
     id: 'place_farm',
@@ -1194,6 +1206,7 @@ const TUTORIAL_STEPS = [
     action: 'Select Lumber Mill from the build bar ↓',
     check: () => G.selectedBuild === 'lumber' || G.buildings.some(b => b.type === 'lumber'),
     highlight: '[data-build-key="lumber"]',
+    hint: 'Select',
   },
   {
     id: 'place_lumber',
@@ -1213,6 +1226,7 @@ const TUTORIAL_STEPS = [
     action: 'Open the Research panel',
     check: () => G.researchedTechs.size > 2,
     highlight: '.hud-btn',
+    hint: 'Open',
   },
   {
     id: 'build_house',
@@ -1220,6 +1234,8 @@ const TUTORIAL_STEPS = [
     action: 'Select House and place on grass',
     check: () => G.buildings.some(b => b.type === 'house'),
     highlight: '[data-build-key="house"]',
+    hint: 'Select',
+    highlightWhen: () => G.selectedBuild !== 'house',
   },
   {
     id: 'tip_hotkeys',
@@ -1237,8 +1253,17 @@ const TUTORIAL_STEPS = [
 
 let tutorialStep = 0;
 let tutorialDismissed = false;
+let tutorialWelcomeAcknowledged = false;
+
+function reconcileOpeningTutorial() {
+  const hasFarm = G.buildings.some(building => building.type === 'farm');
+  const hasLumber = G.buildings.some(building => building.type === 'lumber');
+  if (tutorialStep === 2 && !hasFarm && G.selectedBuild !== 'farm') tutorialStep = 1;
+  if (tutorialStep === 4 && hasFarm && !hasLumber && G.selectedBuild !== 'lumber') tutorialStep = 3;
+}
 
 export function updateTutorialTip() {
+  reconcileOpeningTutorial();
   // Auto-dismiss if player is already past the tutorial.
   // Loop 49 (render S4): added day and population thresholds. Earlier
   // dismissal was ONLY buildings>=4, so a player with 11 citizens,
@@ -1276,22 +1301,49 @@ export function updateTutorialTip() {
   tipEl.innerHTML = `
     <div class="tut-text">${current.text}</div>
     ${current.action ? `<div class="tut-action">${current.action}</div>` : ''}
+    ${current.continueLabel ? `<button class="tut-next" type="button">${current.continueLabel}</button>` : ''}
     <div class="tut-progress">Step ${tutorialStep + 1} of ${TUTORIAL_STEPS.length}</div>
     <button class="tut-skip" onclick="dismissTutorial()">Skip tutorial</button>
   `;
   tipEl.style.display = 'block';
 
+  tipEl.querySelector('.tut-next')?.addEventListener('click', () => {
+    tutorialWelcomeAcknowledged = true;
+    updateTutorialTip();
+  });
+
   // Highlight relevant UI element
-  document.querySelectorAll('.tut-highlight').forEach(e => e.classList.remove('tut-highlight'));
-  if (current.highlight) {
+  document.querySelectorAll('.tut-highlight').forEach(e => {
+    e.classList.remove('tut-highlight');
+    e.removeAttribute('data-tutorial-hint');
+  });
+  if (current.highlight && (!current.highlightWhen || current.highlightWhen())) {
     const el = document.querySelector(current.highlight);
-    if (el) el.classList.add('tut-highlight');
+    if (el) {
+      el.classList.add('tut-highlight');
+      el.dataset.tutorialHint = current.hint || 'Next';
+    }
   }
+}
+
+export function resetTutorial() {
+  tutorialStep = 0;
+  tutorialDismissed = false;
+  tutorialWelcomeAcknowledged = false;
+  document.querySelectorAll('.tut-highlight').forEach(element => {
+    element.classList.remove('tut-highlight');
+    element.removeAttribute('data-tutorial-hint');
+  });
+  const tipEl = document.getElementById('tutorial-tip');
+  if (tipEl) tipEl.style.display = 'none';
 }
 
 export function dismissTutorial() {
   tutorialDismissed = true;
-  document.querySelectorAll('.tut-highlight').forEach(e => e.classList.remove('tut-highlight'));
+  document.querySelectorAll('.tut-highlight').forEach(e => {
+    e.classList.remove('tut-highlight');
+    e.removeAttribute('data-tutorial-hint');
+  });
   const tipEl = document.getElementById('tutorial-tip');
   if (tipEl) tipEl.style.display = 'none';
 }
