@@ -12,6 +12,30 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 27 — 2026-08-06 — the AAA plan: the strata are eras
+
+**Shipped:** loop/AAA_PLAN.md — the honest story diagnosis (D1 the middle is a
+reading list, D2 the keeper is prose never presence, D3 no second force, D4 nothing
+is ever lost, D5 endings close without reopening), the one big swing that answers all
+five (**the strata are not depths — they are ERAS of the keeper's tenancy**; depth
+becomes time, diving becomes remembering), five story systems on that spine (era
+events, His Rounds + echo tableaux, the Inspection made playable FILE-or-KEEP, the
+Shrinking Shore, read-back ending codas), and the art/audio/tech/CI/release/
+accessibility pillars phased BEHIND the story per the owner's steer. Filed as three
+epics + 15 acceptance-criteria children under the new `aaa` label.
+
+**Evidence:** EPIC AAA-A #144 (children #129-#134), AAA-B #145 (#135-#138), AAA-C
+#146 (#139-#143); every child names its walk-gate assertion; canon locks restated in
+the epic bodies (INTEGRATION, all-metaphor, keeper-only I/you, twist beats, power).
+
+**Debt:** none — planning fire; the empty board is now a full board with a spine.
+
+**Next tick suggestion:** #129 era re-keying — it is the reframe everything else
+stands on, it is mostly a content.T + LEVELS pass, and A2's staged beats can start
+the moment it lands.
+
+---
+
 ## loop-fire 26 — 2026-08-06 — the architecture cluster falls: #77 #70 #73 #72 #69 #75 #71
 
 **Shipped:** the entire remaining board — seven architecture issues — in one verified
