@@ -12,6 +12,37 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 33 — 2026-08-07 — #134: endings that re-open — EPIC AAA-A COMPLETE
+
+**Shipped:** both terminals now end THIS player's game, not any player's. A pure
+assembler (content.finaleCoda — node-testable, no imports) reads the walk's three
+persisted sources — the rounds kept, the record's dispositions, the shore losses
+named — and surfaces a quiet coda on the finale card ~5-7s after the terminal's own
+line has had its beat. Leaving: 'his rounds went with me, kept whole · the record —
+1 filed for the office, 1 left with him · the oar passes over the arm, the bench,
+the skiff — named, and held' (and the look-back shot already holds the drowned
+pieces at oar-height by geometry — no camera change needed). Staying: '…the shore
+in the model is smaller than the chart — what it was for is here with me.' A walk
+that left nothing behind degrades to one constant line — silence, never filler.
+
+**Evidence:** WALK PASS **42/42** (+2: the oar coda against the walk's full state,
+the bell coda against the restored 3-round snapshot); the assembler unit-tested for
+three play-shapes (none/some/all) in node. Coverage 103/103 (codas are card text,
+not journal). CSS fade honors the card's register (0.82rem, 2.4s ease).
+
+**EPIC AAA-A IS COMPLETE.** The story overhaul shipped whole in five fires: the
+strata are eras (#129), each stratum arrives as its era (#130), the keeper is
+staged (#131), the middle act asks its question (#132), the world enacts loss
+(#133), and the endings mirror the walk (#134). D1-D5 all answered.
+
+**Debt:** the drowned bench read (from #133) remains the one visual polish note.
+
+**Next tick suggestion:** Phase B opens — #135 the four vista moments (feeds CI
+goldens + the trailer) or #136 the era color script (cheapest, pure parameters,
+instantly visible at every arrival A2 just built).
+
+---
+
 ## loop-fire 32 — 2026-08-07 — #133: the Shrinking Shore — loss becomes the grammar (AAA-A5)
 
 **Shipped:** the world finally enacts the thesis instead of describing it. Three new

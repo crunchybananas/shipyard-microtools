@@ -459,6 +459,18 @@ html, body {
   color: var(--ink-dim);
   font-size: 1rem;
 }
+/* #134: the read-back coda — this player's walk, surfacing late and quiet */
+.fin-coda {
+  margin-top: 1.3rem;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  color: var(--ink-dim);
+  font-size: 0.82rem;
+  line-height: 1.9;
+  opacity: 0;
+  transition: opacity 2.4s ease;
+}
+.fin-coda.show { opacity: 0.85; }
 #finale h1 {
   margin: 1.6rem 0;
   font-weight: 400;

@@ -634,3 +634,30 @@ export const T = {
   three_things_the_island: 'Three things the island gave up while I was down in the years: the jetty’s furthest arm, the bench at the shallows, the skiff off its blocks. The chart in the study will say the shore moved. What moved is everything the shore was for. And I understand the tide gauge’s fifth ring now — the fresh-cut one, above all the others. It was never a measurement. It was a forecast.',
   field_report_taken_copied: 'Field report taken — copied, downloaded, and remembered.',
 };
+
+// ---- the finale codas (#134, AAA-A6): the ending re-reads THIS player's walk ------
+// Pure assembly — no imports, node-testable. state = { rounds: 0..4, filed, kept,
+// lossesNamed: 0..3 }. Returns short lines for the finale card; empty array if the
+// walk left nothing behind (the codas degrade to silence, never to filler).
+export function finaleCoda(kind, s) {
+  const lines = [];
+  if (s.rounds > 0) {
+    lines.push(s.rounds === 4
+      ? (kind === 'oar' ? 'his rounds went with me, kept whole' : 'his rounds are the shape of my day now')
+      : `${['one', 'two', 'three'][s.rounds - 1]} of his rounds, kept`);
+  }
+  if (s.filed + s.kept > 0) {
+    const parts = [];
+    if (s.filed) parts.push(`${s.filed} filed for the office`);
+    if (s.kept) parts.push(`${s.kept} left with him`);
+    lines.push('the record — ' + parts.join(', '));
+  }
+  if (kind === 'oar') {
+    lines.push(s.lossesNamed === 3
+      ? 'the oar passes over the arm, the bench, the skiff — named, and held'
+      : 'the oar passes over what the water holds now');
+  } else {
+    lines.push('the shore in the model is smaller than the chart — what it was for is here with me');
+  }
+  return lines;
+}

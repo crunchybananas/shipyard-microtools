@@ -13,7 +13,7 @@ import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
 import { UI } from './ui.js';
-import { KEEPER, T } from './content.js';
+import { KEEPER, T, finaleCoda } from './content.js';
 import A from './audio.js';
 import { Baker, mergeGeometries, clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED, addDrive, runDrives } from './util.js';
 
@@ -941,6 +941,22 @@ function startClimb(up) {
   }, 850);
 }
 
+
+// #134: assemble THIS player's walk for the ending's read-back coda, then let it
+// surface late and quiet (after the terminal's own line has had its beat)
+function revealFinaleCoda(kind, delayMs) {
+  const s = {
+    rounds: ['roundMoor', 'roundLog', 'roundLight', 'roundWind'].filter((k) => W.flags[k]).length,
+    filed: Object.values(W.recDisp || {}).filter((d) => d === 'filed').length,
+    kept: Object.values(W.recDisp || {}).filter((d) => d === 'kept').length,
+    lossesNamed: ['loss_arm', 'loss_bench', 'loss_skiff'].filter((k) => W.onceKeys?.includes(k)).length,
+  };
+  const el = document.querySelector('#finale .fin-coda');
+  if (!el) return;
+  el.innerHTML = finaleCoda(kind, s).map((l) => `<div>${l}</div>`).join('');
+  setTimeout(() => el.classList.add('show'), delayMs);
+}
+
 // ---------------- the finale ----------------
 function startFinale() {
   MODE = 'finale';
@@ -959,6 +975,7 @@ function startFinale() {
   const line1 = document.querySelector('#finale .fin-line1');
   if (line1) line1.textContent = deep ? 'you keep the light now' : 'the tide brought you back';
   finale = { kind: 'bell', t: 0, deep, camStart: camera.position.clone(), quatStart: camera.quaternion.clone() };
+  revealFinaleCoda('bell', 5200);
 }
 
 // ---------------- the oar — the integration terminal (#22, owner fork: choice + The Oar) ----
@@ -1014,6 +1031,7 @@ function startOarFinale() {
   setTimeout(() => { if (finale && finale.kind === 'oar') UI.whisper(T.the_way_out_was); }, 4400);
   // one warm bell-partial as the island becomes a model (the withheld, leitmotif-warm toll)
   setTimeout(() => { if (finale && finale.kind === 'oar') A.bellToll(true); }, 9500);
+  revealFinaleCoda('oar', 7000);   // #134: the look-back reads back this player's walk
 }
 
 function tickOarFinale(dt) {
