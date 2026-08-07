@@ -4,10 +4,54 @@
 // (exact salts preserved from the buildWorld blocks — the scatter is byte-identical).
 // New L2 content takes its own fresh salt; never touch another site's stream.
 import * as THREE from 'three';
-import { mulberry32, SEED, TAU } from '../util.js';
+import { mulberry32, SEED, TAU, addDrive } from '../util.js';
 import { heightAt } from '../terrain.js';
+import { defineProp } from '../props.js';
 
 export function build({ region2 }) {
+  // ERA EVENT L2 (#130, AAA-A2): a climber's rope on the wade-line, tied off by a hand
+  // that meant to come back — and STILL SWINGING when you arrive. Motion where nothing
+  // should move: the arrival years have not finished happening. The swing decays over
+  // ~a minute of being watched and never resets to full; it is never explained.
+  {
+    const post = new THREE.Group();
+    post.name = 'climberRope';
+    const wood = new THREE.MeshStandardMaterial({ color: 0x4a3a26, roughness: 1 });
+    const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.075, 2.4, 6), wood);
+    stake.position.y = 1.2; stake.castShadow = true; post.add(stake);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.7, 6), wood);
+    arm.rotation.z = Math.PI / 2; arm.position.set(0.32, 2.28, 0); arm.castShadow = true; post.add(arm);
+    // the rope: five chained segments under a pivot at the arm's tip, tip kissing the
+    // L2 waterline (~+1.47) so the swing writes rings on the surface
+    const pivot = new THREE.Group();
+    pivot.position.set(0.62, 2.26, 0);
+    const ropeMat = new THREE.MeshStandardMaterial({ color: 0x8a7a58, roughness: 1 });
+    let py = 0;
+    for (let si = 0; si < 5; si++) {
+      const seg = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.02, 0.26, 5), ropeMat);
+      seg.position.set(Math.sin(si * 0.5) * 0.015, py - 0.13, 0);
+      pivot.add(seg);
+      py -= 0.25;
+    }
+    const knot = new THREE.Mesh(new THREE.SphereGeometry(0.045, 6, 5), ropeMat);
+    knot.position.y = py; pivot.add(knot);
+    post.add(pivot);
+    const rx = 6.5, rz = -97.5;
+    post.position.set(rx, Number.isFinite(heightAt(rx, rz)) ? heightAt(rx, rz) : 0, rz);
+    post.rotation.y = -0.4;
+    defineProp('climberRope');
+    region2.add(post);
+    // the swing, registered beside what it drives (#73 scheduler): pendulum with a slow
+    // decay clock that only runs while the player is IN the arrival years
+    let watched = 0;
+    addDrive((w) => w.level === 2, (dt, elapsed) => {
+      watched += dt;
+      const amp = 0.5 * Math.exp(-watched / 45) + 0.02;   // never fully still — the era idles
+      pivot.rotation.x = amp * Math.sin(elapsed * 1.85);
+      pivot.rotation.z = amp * 0.35 * Math.cos(elapsed * 1.31);
+    });
+  }
+
   // SEA-STRATA L2 "shallows" (loop #119): a kelp forest along the sunk causeway + south-shore
   // shallows — submerged at the raised L2 tide, so diving here wades a drowned kelp avenue, not the
   // dry beach. One InstancedMesh (1 draw), swaying on the wave clock (main.js drives uTime on the

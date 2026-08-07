@@ -348,6 +348,9 @@ export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 // live together as content.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
 export const SKETCHES = [
+  ['still swinging', S('<path d="M48 6v4"/><path d="M48 10c-6 8-9 14-10 22" opacity=".4"/><path d="M48 10c6 8 9 14 10 22" opacity=".4"/><path d="M48 10c2 9 3 15 3 22"/><circle cx="51" cy="34" r="1.6"/>')],
+  ['give the capitals back', S('<path d="M10 26h76" opacity=".7"/><path d="M24 26v-6h8v6M44 26v-8h8v8M64 26v-5h8v5"/><path d="M26 20h4M46 18h4M66 21h4" opacity=".6"/><path d="M20 30q6 3 12 0t12 0t12 0t12 0" opacity=".35"/>')],
+  ['stopped performing', S('<circle cx="48" cy="22" r="14" opacity=".5"/><path d="M48 22L34 12M48 22l14-10" opacity=".8"/><path d="M48 22l10 12" opacity=".3"/><path d="M14 36h68" opacity=".4"/>')],
   ['it drowns in order', S('<path d="M30 14c5-7 20-9 26-9s15 4 17 9"/><path d="M40 8l5-5 5 5" opacity=".7"/><path d="M10 16h76" opacity=".85"/><path d="M15 24h66" opacity=".55"/><path d="M20 32h56" opacity=".3"/>')],
   ['living model of the island', S('<path d="M14 30h68M22 30v6M74 30v6"/><path d="M24 30c4-8 14-10 24-10s20 2 24 10" opacity=".5"/><path d="M40 20l6-7 6 7"/><path d="M30 26q6-3 12 0t12 0t12 0" opacity=".6"/>')],
   ['A valve beside the chart table', S('<circle cx="48" cy="18" r="11"/><path d="M40 10l16 16M56 10L40 26M48 29v7"/><path d="M30 34q4-3 8 0" opacity=".5"/>')],
@@ -571,5 +574,11 @@ export const T = {
   already_at_the_bottom: 'Already at the bottom.',
   everything_down_here_is: 'Everything down here is younger than the day I left on the surface.',
   the_water_is_higher: 'The water is higher, and yet everything under it is younger — the kelp where he first went down, a climber’s mark still sharp at its edges, his hand on the wax steadier than any page I read upstairs. I thought I was diving under the island. I am diving under the years. The island does not drown all at once; it drowns in order, and the order is his.',
+  the_rope_is_still: 'The rope is still moving. Nothing down here should still be moving.',
+  a_climber_s_rope: 'A climber’s rope on the wade-line, tied off by a hand that meant to come back — and still swinging, as if that hand let go the moment I looked away. The arrival years have not finished happening. Down here, nothing has finished happening.',
+  the_water_over_the: 'The water over the hall is moving. Something is coming up.',
+  i_watched_the_sea: 'I watched the sea open over the drowned hall and give the capitals back — three carved crowns breaching slow, like something surfacing for air. It is the only time I have seen the water return a thing. It was not mercy. It was the inspection years rising to be read.',
+  the_light_passes_under: 'The light passes under the water — once, all the way around.',
+  at_the_bottom_of: 'At the bottom of the years the beam made one full pass beneath the sea — the whole island swept once, shore to shore, like a hand feeling along a wall in a dark room. Then it went out. Not failed — finished. The island has stopped performing for me. What is left down here is only the true things.',
   field_report_taken_copied: 'Field report taken — copied, downloaded, and remembered.',
 };

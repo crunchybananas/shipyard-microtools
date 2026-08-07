@@ -572,6 +572,15 @@ export class Game {
       when: () => W.level === 2,               // exists only in the L2 shallows (region2)
       onClick: () => UI.openReader('kelp_slate'),
     });
+    // #130 era event L2: the climbers' rope, still swinging — a look-read, no reader
+    if (R.climberRope) I.add({
+      id: 'climberRope', targets: [R.climberRope], label: 'a rope, still swinging', maxDist: 6,
+      when: () => W.level === 2,
+      onClick: () => this.once('climberRope', () => {
+        UI.whisper(T.the_rope_is_still);
+        UI.addJournal(T.a_climber_s_rope, '', 'self');
+      }),
+    });
     if (R.bluffCairn) I.add({
       id: 'bluffCairn', targets: [R.bluffCairn], label: 'a cairn, a mark scratched in the stone', maxDist: 3.2,
       when: () => W.level === 3,               // exists only on the L3 bluff (region3)
@@ -845,6 +854,49 @@ export class Game {
       });
     }
 
+    // #130 era event L3: the CAPITALS BREACH — the only time the sea gives something
+    // back. On first arrival the drowned hall's crowns push up through the waterline
+    // over ~9s (gallery y animated in _apply while _breachT runs); water rushes, then
+    // the journal keeps it.
+    if (W.level === 3 && this._breachT == null && !W.onceKeys?.includes('capitalsBreached')) {
+      this.once('capitalsBreach', () => { UI.whisper(T.the_water_over_the); A.valveRush(true); });
+      this._breachT = 0;
+    }
+    if (this._breachT != null) {
+      if (W.level !== 3) { this._breachT = null; A.valveRush(false); }   // dove away mid-breach
+      else {
+        this._breachT += dt;
+        if (this._breachT > 2.6) A.valveRush(false);
+        if (this._breachT > 9) {
+          this.once('capitalsBreached', () => UI.addJournal(T.i_watched_the_sea, '', 'self'));
+          this._breachT = null;
+        }
+      }
+    }
+
+    // #130 era event L4: the BEAM'S FAREWELL — the first time the lit beam shows itself
+    // at the bottom, it makes ONE full pass beneath the sea, shore to shore, and goes
+    // out for the rest of the stratum (the lampLit derivation carries the exception).
+    // The island stops performing; what is left down here is only the true things.
+    if (W.level === 4 && W.lampLit && this._farewellT == null && !W.flags.beamFarewell) {
+      this.once('beamFarewell', () => UI.whisper(T.the_light_passes_under));
+      this._farewellT = 0;
+      this._farewellA0 = W.beamAngle;
+    }
+    if (this._farewellT != null) {
+      this._farewellT += dt;
+      const ft = Math.min(this._farewellT / 12, 1);
+      W.beamAngle = this._farewellA0 + TAU * (ft * ft * (3 - 2 * ft));   // one smooth full turn
+      if (ft >= 1) {
+        W.beamAngle = this._farewellA0;
+        W.flags.beamFarewell = true;                     // douses the lamp below (derived off this)
+        A.pluck(82.4, 0, 0.4, 6);                        // low E — the theme's root, last thing heard
+        this.once('beamFarewell2', () => UI.addJournal(T.at_the_bottom_of, '', 'self'));
+        this._farewellT = null;
+        save(this.player);
+      }
+    }
+
     // tide easing + valve sound
     const dTide = W.tideTarget - W.tide;
     if (Math.abs(dTide) > 0.0004) {
@@ -868,7 +920,10 @@ export class Game {
     ease('innerDoor', (W.level >= 2 || W.flags.returned) ? 1 : 0, 1.0);   // stays open once returned
 
     // lamp + beam
-    W.lampLit = W.lensPlaced && isNight();
+    // #130: after the beam's farewell pass the light stays out for the rest of the
+    // stratum — the island has stopped performing. The exception lives HERE, in the
+    // derivation, so nothing can fight it; climbing out of L4 restores the derivation.
+    W.lampLit = W.lensPlaced && isNight() && !(W.flags.beamFarewell && W.level === 4);
     if (W.lampLit && !this._lampLitOnce) {
       this._lampLitOnce = true;
       this.once('lamplit', () => {
@@ -1261,7 +1316,16 @@ export class Game {
     if (R.region4) R.region4.visible = W.level === 4;
     // L3 'midwater': the drowned colonnade rises ~2.6m so its capitals + upper columns break the
     // raised surface (a drowned cathedral); at L1 it sits low (only capitals breaking high tide).
-    if (R.drownedGallery) R.drownedGallery.position.y = (W.level === 3 ? 2.6 : 0);
+    if (R.drownedGallery) {
+      let gy = (W.level === 3 ? 2.6 : 0);
+      // #130: during the breach event the crowns push up through the waterline —
+      // ease the last 1.7m over ~9s (island instance only; the model is surface-only)
+      if (!isModel && W.level === 3 && this._breachT != null) {
+        const bt = Math.min(this._breachT / 9, 1);
+        gy = 0.9 + 1.7 * (bt * bt * (3 - 2 * bt));
+      }
+      R.drownedGallery.position.y = gy;
+    }
     // L4 'source': strip the surface forest + grass on the REAL island (a cold bare floor at the
     // bottom of the recursion) — the 1:240 chart-table CLONE keeps them (it's the surface island model).
     if (!isModel) {

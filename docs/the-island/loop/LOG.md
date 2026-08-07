@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 29 — 2026-08-06 — #130: era events — each stratum ARRIVES as its era (AAA-A2)
+
+**Shipped:** three authored, unmissable threshold beats on existing props — the slack
+middle now re-aims the player at every arrival. **L2, the rope:** a climber's rope on
+the wade-line, tied off by a hand that meant to come back — STILL SWINGING when you
+arrive (pendulum drive registered beside the build in regions/l2_shallows.js, decay
+~45s, never fully still: the era idles). A look-read keeps it: "the arrival years
+have not finished happening." **L3, the breach:** on first arrival the sea opens over
+the drowned hall and gives the capitals back — the crowns push up through the
+waterline over 9s (gallery y eased in _apply while the timer runs; water rush at the
+start), the only time the water returns a thing. **L4, the farewell:** the first time
+the lit beam shows itself at the bottom it makes ONE full smooth pass beneath the sea
+(W.beamAngle driven through 2π over 12s), then goes out for the rest of the stratum —
+the exception lives IN the lampLit derivation, so nothing can fight it, and climbing
+out restores it. A low E — the theme's root — is the last thing heard. "The island
+has stopped performing for me. What is left down here is only the true things."
+
+**Evidence:** WALK PASS **32/32** — three new assertions, each testing the real
+mechanism: rope present+hotspot+journal at L2; breach mid-rise (y 0.95-2.55 at 3.5s)
+then at rest 2.6 with journal kept by 10.5s; farewell full-pass + lamp doused via
+derivation + journal, under forced night. Coverage **93/93** (three new sketches:
+the pendulum arcs, the three crowns over the waterline, the swept circle gone dark).
+Power: the farewell REDUCES L4 load (beam off for the stratum); rope is ~40 tris.
+
+**Debt:** none added. The breach uses valveRush as its water-voice — a dedicated
+swell/groan one-shot would be richer (B3's rounds instruments can supply it).
+
+**Next tick suggestion:** #131 His Rounds — the keeper staged. The rounds reuse the
+crank/lamp/logbook/bell props and the era events just proved the tableau grammar
+(timed staging + once-keys + walk assertions). Biggest of Phase A; start with the
+find-the-round hinting.
+
+---
+
 ## loop-fire 28 — 2026-08-06 — #129: the strata are eras (AAA-A1)
 
 **Shipped:** the reframe everything else in the AAA campaign stands on. LEVELS rows
