@@ -1710,7 +1710,7 @@ function buildDebugPanel() {
     // Power & Reset
     bench: () => { W.time = 12; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); },
     replayCine: () => { W.onceKeys.length = 0; },
-    markLore: () => { W.readKeys = ['keeper_logbook', 'coat_letter', 'stone_inscription', 'music_note', 'bottle_note', 'quarters_journal', 'lens_mark_study', 'lens_mark_stone', 'kelp_slate', 'bluff_cairn', 'source_note', 'pool_phial', 'model_margin', 'drain_ledger', 'commendation_copy', 'closure_notice']; },
+    markLore: () => { W.readKeys = ['keeper_logbook', 'coat_letter', 'stone_inscription', 'music_note', 'bottle_note', 'quarters_journal', 'lens_mark_study', 'lens_mark_stone', 'kelp_slate', 'bluff_cairn', 'source_note', 'pool_phial', 'model_margin', 'drain_ledger', 'commendation_copy', 'closure_notice', 'field_slip', 'transfer_offer']; },
     clearLore: () => { W.readKeys.length = 0; },
     readLog: () => UI.openReader('keeper_logbook'), readQ: () => UI.openReader('quarters_journal'),
     fragAdd: () => { W.regions.fragmentsFound.push('test-' + W.regions.fragmentsFound.length); },

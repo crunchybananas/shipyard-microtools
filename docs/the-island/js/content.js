@@ -192,7 +192,7 @@ export const LORE = {
   // the rising sea, its official hand cracking. A written artifact, not a speaking voice
   // (the keeper stays the game's only I/you); it countersigns his instruments from outside:
   // the gauge's rings, the logbook's third step, the buoy's channel.
-  drain_ledger: { era: 'inspection',
+  drain_ledger: { record: true, era: 'inspection',
     kind: 'book', hand: 'inspector', title: 'A tide ledger, water-swollen',
     pages: [
       'DISTRICT OF LIGHTS — QUARTERLY RETURN. Station: the island. Keeper: [the ink has run]. Mean high water: RISEN — see appendix. Appendix: missing. Remarks: the keeper’s figures disagree with the printed tables. The keeper’s figures are carefully made. The printed tables are reprinted each year unchanged. One of these is a record; the other is a habit.',
@@ -208,7 +208,7 @@ export const LORE = {
   // #50-A: the inspector's second fragment. The AMBIGUITY ENGINE is canon (lens_mark_study's
   // deep page negates him), so every inspector artifact must survive two readings: a real
   // official, or the keeper writing in an invented hand to feel witnessed.
-  commendation_copy: { era: 'inspection',
+  commendation_copy: { record: true, era: 'inspection',
     kind: 'letter', hand: 'inspector', title: 'A carbon copy, kept',
     place: { parent: 'quarters', pos: [-0.35, 0.44, 1.05], rx: -Math.PI / 2 + 0.06, rz: 0.3, prop: 'sheet', label: 'a carbon copy, kept', maxDist: 2.6, gate: 'quarters' },
     pages: [
@@ -223,7 +223,7 @@ export const LORE = {
   },
   // #50-A: the inspector's third fragment — the end of keeping, drafted. deepFrom 4: the
   // bottom alone can read what the notice actually is.
-  closure_notice: { era: 'lastwinter',
+  closure_notice: { record: true, era: 'lastwinter',
     kind: 'letter', hand: 'inspector', title: 'A notice of review, folded small',
     place: { pos: [-83.55, 14.40, -41.35], ry: 0.35, prop: 'fold', label: 'a paper, folded small', maxDist: 2.8 },
     pages: [
@@ -239,6 +239,30 @@ export const LORE = {
   // on the MODEL's own chart table (#53) — a margin the width of a fingernail, read only by
   // someone bent over a model with a glass: which is exactly what HE was when he wrote it.
   // The recursion speaks to the next hand down.
+  field_slip: { record: true, era: 'inspection',
+    kind: 'letter', hand: 'inspector', title: 'A field slip, pinched under the cairn',
+    place: { parent: 'bluffCairn', pos: [0.18, 0.62, 0.14], rx: -Math.PI / 2 + 0.2, rz: -0.4, prop: 'sheet', label: 'a field slip, pinched under stone', maxDist: 2.8, gate: 'l3' },
+    pages: [
+      'FIELD SLIP — station: the island. Wind SW, moderate. Glass falling. Ascent to the north bluff: twenty-two minutes against the guide’s estimate of fifteen. The keeper walks it daily. Note: the cairn at the crest is not on the survey. Note: the keeper did not explain it, and I did not ask. Some structures are load-bearing without touching any wall.',
+    ],
+    deepFrom: 3,
+    deep: [
+      '(pencil, on the reverse, the hand less certain of its columns) Measured this day: the tower to the inch. The stair, tread by tread. Mean high water, risen. The oil in store, sufficient. Not measured: how long a man can keep a light alone before he becomes the thing it is lit against. Distance from the light to the keeper: not recorded. No instrument on the requisition reads it.',
+    ],
+    journal: 'An inspector’s field slip, pinched under the cairn’s top stone — the bluff climbed, the minutes counted, the cairn itself marked NOT ON THE SURVEY. He measured everything and asked nothing. On the reverse, in pencil, a second list: the things measured, and then the things not measured — and one line that ends it: no instrument on the requisition reads it.',
+  },
+  transfer_offer: { record: true, era: 'lastwinter',
+    kind: 'letter', hand: 'inspector', title: 'An offer of transfer, never burnt',
+    place: { parent: 'quarters', pos: [0.95, 0.02, 1.35], ry: 0.7, prop: 'fold', label: 'a letter, wedged behind the stove', maxDist: 2.6, gate: 'quarters' },
+    pages: [
+      'DISTRICT OF LIGHTS — NOTICE OF VACANCY. The Board advises the keeper that the mainland station at [the name is worn away] stands vacant from the spring quarter, and that his tenure and record qualify him for transfer upon application. Housing with the post. Two assistants. The Board notes the island station’s hardship classification and is disposed to regard an application favourably.',
+    ],
+    deepFrom: 4,
+    deep: [
+      '(drafted on the back, in his hand, unsent) To the Board — I am sensible of the kindness, which I did not expect from an office. I must decline. You will want a reason for the file. Write: the keeper is needed where he is. Do not write: that no one else would wind it, or trim it, or mark the line, or wait. Do not write: who would keep it. There is no room on the form for who would keep it.',
+    ],
+    journal: 'An offer of transfer, wedged behind the cold stove — the mainland, housing, two assistants, a Board disposed to say yes. A way off the island, kept close enough to burn for a whole winter and never burnt. On the back, a reply drafted and never sent. It gives the office its reason and keeps the true one: there is no room on the form for who would keep it.',
+  },
   model_margin: { era: 'lastwinter',
     kind: 'inscription', hand: 'keeper', title: 'The model’s margin, under the glass',
     pages: [
@@ -336,8 +360,8 @@ export const LAMPBLACK = [
 // BONUS reads outside the arc, acknowledged but untallied, as shipped.)
 export const DEEP_SETS = {
   2: ['stone_inscription'],                                                     // the tide bares the stone
-  3: ['keeper_logbook', 'quarters_journal', 'drain_ledger', 'commendation_copy'], // the hands turn colder (+#55, +#50-A)
-  4: ['music_note', 'closure_notice'],                                          // the fold gives up its inside; the notice comes apart
+  3: ['keeper_logbook', 'quarters_journal', 'drain_ledger', 'commendation_copy', 'field_slip'], // the hands turn colder (+#55, +#50-A, +#132)
+  4: ['music_note', 'closure_notice', 'transfer_offer'],                                          // the fold gives up its inside; the notice comes apart
 };
 export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 
@@ -348,6 +372,10 @@ export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 // live together as content.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
 export const SKETCHES = [
+  ['no instrument on the requisition reads', S('<rect x="32" y="6" width="32" height="28" rx="1" opacity=".55"/><path d="M37 12h22M37 17h22M37 22h12" opacity=".4"/><path d="M37 28h22" opacity=".8"/><path d="M70 10l6 6M76 10l-6 6" opacity=".5"/>')],
+  ['no room on the form for who', S('<rect x="30" y="8" width="36" height="24" rx="1" opacity=".55"/><path d="M35 14h26M35 19h26" opacity=".4"/><path d="M35 25h10" opacity=".4"/><path d="M48 25q6 4 12 0" opacity=".9"/><path d="M20 14q-6 8 0 16" opacity=".3"/>')],
+  ['filed his record', S('<rect x="34" y="10" width="28" height="22" rx="1" opacity=".7"/><path d="M34 17h28" opacity=".5"/><path d="M40 14h8" opacity=".8"/><path d="M38 22h20M38 26h20" opacity=".3"/>')],
+  ['left it with him at the source', S('<path d="M30 30h36" opacity=".4"/><path d="M44 30l4-6l4 6" opacity=".8"/><circle cx="48" cy="20" r="1.6"/><path d="M24 12q24 -8 48 0" opacity=".25"/>')],
   ['made his line fast', S('<path d="M48 12v14"/><path d="M34 18h28"/><path d="M40 22a9 5 0 1 0 16 0a9 5 0 1 0 -16 0" opacity=".6"/><path d="M42 26a7 4 0 1 0 12 0" opacity=".4"/><path d="M62 18q10 -4 18 2" opacity=".5"/>')],
   ['signed the day’s return', S('<rect x="30" y="8" width="36" height="26" rx="1" opacity=".6"/><path d="M35 15h26M35 20h26M35 25h14" opacity=".4"/><path d="M52 27q4 -3 7 0t7 -1"/>')],
   ['lit his small lamp', S('<path d="M42 34h12M44 34v-3h8v3" opacity=".6"/><circle cx="48" cy="24" r="6" opacity=".5"/><path d="M48 27c-2-2-2-5 0-7c2 2 2 5 0 7z"/><path d="M48 13v-3" opacity=".4"/><path d="M80 12l-3 3M79 20h-4" opacity=".35"/>')],
@@ -594,5 +622,10 @@ export const T = {
   wound_the_way_he: 'Wound, the way he wound it — once more than it needed.',
   i_wound_the_music: 'I wound the music box on the last day the way he wound it on every day — once more than it needed, for someone not there to hear it. The bird came to the sill and listened all five notes out, head tilted at the fourth, and did not correct it. Some rounds are kept for no one. Those were the ones he kept most faithfully.',
   four_rounds_kept_the: 'Four rounds, kept: the line made fast, the return signed, the small lamp lit, the box wound. A day of his, performed whole across all the years of him at once. The island did not need any of it done. I did.',
+  folded_into_my_coat: 'Folded into my coat. Paper remembers being carried.',
+  the_drawer_takes_it: 'The drawer takes it. The record is where records go.',
+  left_with_him_at: 'Left with him, at the bottom of the years.',
+  i_filed_his_record: 'I filed his record in the cabinet by the cot — returns, findings, notices, squared away and shut in the drawer where the District could always have come and found them. A life added up, for the office that asked. Both things are true at once: the record is complete, and the record is not the life.',
+  i_did_not_file: 'I did not file it. I carried it down through all the years of him and left it with him at the source, where the water keeps what matters from the office that asked. Some records exist to be filed. This one existed to be witnessed.',
   field_report_taken_copied: 'Field report taken — copied, downloaded, and remembered.',
 };

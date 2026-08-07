@@ -10,6 +10,10 @@ import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
 import { clamp, lerp, lerpAngle, TAU } from './util.js';
+
+// #132: the inspector's record — every LORE entry flagged record:true participates
+// in the FILE-or-KEEP economy (read → take → cabinet or source).
+const REC_IDS = Object.keys(LORE).filter((id) => LORE[id].record);
 import { KEEPER, LAMPBLACK, CLIMBERS, CLIMBERS_CLOSE, CONGREGATION, CONGREGATION_CLOSE, LORE, T } from './content.js';
 
 const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
@@ -509,8 +513,17 @@ export class Game {
     // DISTRICT's voice, its official hand cracking; it drowns as you descend (the
     // drainFlood rises past its shelf — filed to a cabinet that floods).
     if (R.drainLedger) I.add({
-      id: 'drainLedger', targets: [R.drainLedger], label: 'a water-swollen ledger', maxDist: 2.6,
-      onClick: () => UI.openReader('drain_ledger'),
+      id: 'drainLedger', targets: [R.drainLedger],
+      label: () => (W.readKeys.includes('drain_ledger') ? 'a water-swollen ledger — take it' : 'a water-swollen ledger'),
+      maxDist: 2.6,
+      when: () => !W.recDisp.drain_ledger,       // #132: a record — gone once carried
+      onClick: () => {
+        if (W.readKeys.includes('drain_ledger')) {
+          W.recDisp.drain_ledger = 'carried';
+          UI.whisper(T.folded_into_my_coat);
+          save(this.player);
+        } else UI.openReader('drain_ledger');
+      },
     });
 
     // the bell — the END at the bottom (descent / accept the loop). Struck below, it
@@ -739,17 +752,53 @@ export class Game {
     }
     // #69: FACTORY fragments — every LORE entry carrying `place` gets its reader
     // hotspot here automatically; a new readable is a content.js entry, nothing else.
-    const LORE_GATES = { quarters: () => W.level >= 2 || W.flags.returned };
+    const LORE_GATES = { quarters: () => W.level >= 2 || W.flags.returned, l3: () => W.level === 3 };
     for (const [id, lore] of Object.entries(LORE)) {
       const pl = lore.place;
       if (!pl || !R['lore_' + id]) continue;
+      const gate = pl.gate ? LORE_GATES[pl.gate] : null;
       I.add({
-        id: 'lore_' + id, targets: [R['lore_' + id]], label: pl.label || lore.title,
+        id: 'lore_' + id, targets: [R['lore_' + id]],
+        // #132: a record artifact grows a second phase — read it, then TAKE it
+        label: lore.record
+          ? () => (W.readKeys.includes(id) ? (pl.label || lore.title) + ' — take it' : pl.label || lore.title)
+          : pl.label || lore.title,
         maxDist: pl.maxDist ?? 2.8,
-        when: pl.gate ? LORE_GATES[pl.gate] : undefined,
-        onClick: () => UI.openReader(id),
+        when: () => (!gate || gate()) && !W.recDisp[id],
+        onClick: () => {
+          if (lore.record && W.readKeys.includes(id)) {
+            W.recDisp[id] = 'carried';
+            UI.whisper(T.folded_into_my_coat);
+            save(this.player);
+          } else UI.openReader(id);
+        },
       });
     }
+    // #132 THE INSPECTION, PLAYABLE: what the player does with the record of a life.
+    // FILE it — the cabinet by the cot, the drawer the District could always have
+    // opened — or KEEP it: carry it down and leave it with him at the source.
+    // Neither is scored; both are read back (codex header + the A6 codas).
+    const recCarried = () => REC_IDS.filter((rid) => W.recDisp[rid] === 'carried');
+    if (R.recordCabinet) I.add({
+      id: 'recordCabinet', targets: [R.recordCabinet], label: 'the records cabinet — file what I carry', maxDist: 2.8,
+      when: () => (W.level >= 2 || W.flags.returned) && recCarried().length > 0,
+      onClick: () => {
+        for (const rid of recCarried()) W.recDisp[rid] = 'filed';
+        UI.whisper(T.the_drawer_takes_it);
+        this.once('firstFile', () => UI.addJournal(T.i_filed_his_record, '', 'self'));
+        save(this.player);
+      },
+    });
+    if (R.sourceRest) I.add({
+      id: 'sourceRest', targets: [R.sourceRest], label: 'the slab by his note — leave what I carry', maxDist: 2.8,
+      when: () => W.level === 4 && recCarried().length > 0,
+      onClick: () => {
+        for (const rid of recCarried()) W.recDisp[rid] = 'kept';
+        UI.whisper(T.left_with_him_at);
+        this.once('firstKeep', () => UI.addJournal(T.i_did_not_file, '', 'self'));
+        save(this.player);
+      },
+    });
 
     // ---- the found-lens reveal: take the keeper's reading glass and his lampblack marks appear ----
     if (R.readGlass) I.add({
@@ -1529,6 +1578,20 @@ export class Game {
     if (R.cotLantern && this._tabLight == null) {
       const lg = R.cotLantern.getObjectByName('cotLanternGlass');
       if (lg) lg.material.emissiveIntensity = W.flags.roundLight ? 1.05 : 0;
+    }
+    // #132: the record's dispositions — a carried artifact leaves the world; the
+    // cabinet's filed stack and the source's kept pile grow with their counts
+    for (const rid of REC_IDS) {
+      const rm = R['lore_' + rid] || (rid === 'drain_ledger' ? R.drainLedger : null);
+      if (rm) rm.visible = !W.recDisp[rid];
+    }
+    {
+      const filedN = REC_IDS.filter((rid) => W.recDisp[rid] === 'filed').length;
+      const keptN = REC_IDS.filter((rid) => W.recDisp[rid] === 'kept').length;
+      const cst = R.recordCabinet?.getObjectByName('cabinetStack');
+      if (cst) { cst.visible = filedN > 0; cst.scale.y = Math.max(filedN, 0.001); }
+      const spl = R.sourceRest?.getObjectByName('sourceRestPile');
+      if (spl) { spl.visible = keptN > 0; spl.scale.y = Math.max(keptN, 0.001); }
     }
     // the keeper's coat fades with the descent (#13): on its hook at level 2,
     // slumped to the floor at level 3, gone below — the keeper more absent the

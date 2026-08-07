@@ -12,6 +12,43 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 31 — 2026-08-07 — #132: the Inspection, playable — FILE or KEEP (AAA-A4)
+
+**Shipped:** the middle act's running question, asked entirely with existing verbs.
+Every inspector artifact — the tide ledger, the carbon copy, the closure notice, and
+TWO NEW hands of his cold pencil — can now be taken after reading (the label grows
+'— take it'), then FILED in the records cabinet by the cot (the drawer the District
+could always have opened; the filed stack grows inside) or KEPT: carried down through
+the years and left on a slab beside his last note at the source (the kept pile grows
+there). Neither is scored. Both are read back — the codex header now carries 'the
+record: N filed · M kept', and the A6 codas will carry the rest. The new artifacts
+hold the ambiguity line: **the field slip** (pinched under the cairn's top stone —
+the bluff climbed, the minutes counted, and on the reverse a pencil list of what was
+NOT measured: 'distance from the light to the keeper: not recorded. No instrument on
+the requisition reads it') and **the offer of transfer** (wedged behind the cold
+stove — a way off the island kept close enough to burn for a whole winter and never
+burnt; on the back, the reply drafted and never sent: 'there is no room on the form
+for who would keep it'). Both survive real-or-invented. DEEP_SETS grows to NINE
+(slip bares at L3 with the inspection hands, the refusal at L4 with the last winter).
+
+**Evidence:** F132 all-green (factory refs, boot assert silent, label two-phase,
+carried→mesh hidden, filed→stack scales, l3 gate, kept→pile, codex header '1 filed ·
+1 kept', zero errors); WALK PASS **38/38** (+2: full FILE flow at L2, full KEEP flow
+at L4); coverage **102/102**. recDisp persisted via a new save-schema row
+(merge-into-defaults like flags). Harness note: headless Chrome died between turns —
+relaunched WITHOUT --disable-gpu (that flag kills WebGL in new headless; 'Error
+creating WebGL context' is the tell) and widened the dive wait 23→30s for
+cold-profile first-compile.
+
+**Debt:** none. The sourceRest slab is the regions seam's first NEW content (#71
+proving out).
+
+**Next tick suggestion:** #133 the Shrinking Shore — three pre-staged surface losses
+at act boundaries. The last story system before the endings read-back (#134) can
+assemble all three sources.
+
+---
+
 ## loop-fire 30 — 2026-08-06 — #131: HIS ROUNDS — the keeper staged at last (AAA-A3)
 
 **Shipped:** the keeper stops being prose. Once the strata are understood as years

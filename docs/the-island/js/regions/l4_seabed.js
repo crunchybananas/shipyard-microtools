@@ -5,8 +5,31 @@
 // new L4 content takes its own mulberry32(SEED ^ salt); never touch another's stream.
 import * as THREE from 'three';
 import { heightAt } from '../terrain.js';
+import { defineProp } from '../props.js';
 
 export function build({ region4 }) {
+  // #132: the SOURCE REST — a flat slab beside his last note, where a carried record
+  // can be left WITH him instead of filed for the office. The kept pile grows on it
+  // (scaled in puzzles _apply by the kept count).
+  {
+    const rest = new THREE.Group();
+    rest.name = 'sourceRest';
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.07, 0.44),
+      new THREE.MeshStandardMaterial({ color: 0x474b4c, roughness: 1, flatShading: true }));
+    slab.position.y = 0.035; rest.add(slab);
+    const pile = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 0.22),
+      new THREE.MeshStandardMaterial({ color: 0xcfc7ae, roughness: 0.95 }));
+    pile.name = 'sourceRestPile';
+    pile.position.y = 0.08; pile.rotation.y = 0.2;
+    pile.visible = false;
+    rest.add(pile);
+    const rx = -84.35, rz = -41.55;
+    rest.position.set(rx, (Number.isFinite(heightAt(rx, rz)) ? heightAt(rx, rz) : 13.5) + 0.01, rz);
+    rest.rotation.y = 0.3;
+    defineProp('sourceRest');
+    region4.add(rest);
+  }
+
   // SEA-STRATA L4 'source' hidden fragment (loop #135): a folded note weighted with a stone, left
   // on the study floor by the chart table — the keeper's last instruction, a diegetic frame for the
   // look-back + carry-up. region4's FIRST content; region4-only → clone-pruned with parent; read at L4.

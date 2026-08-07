@@ -67,6 +67,7 @@ export const W = {
 
   stems: 0,              // musical layers earned (0..5)
   inventory: [],         // 'ruler' | 'lens' | 'plumb'
+  recDisp: {},          // #132: the inspector's record — per-artifact null | 'carried' | 'filed' | 'kept'
   journal: [],           // [{text, sketch}]
   onceKeys: [],          // one-time cinematics already played
   readKeys: [],          // lore fragment ids the player has READ (the unfolding story; saved)

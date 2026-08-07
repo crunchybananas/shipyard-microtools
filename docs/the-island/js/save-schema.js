@@ -53,6 +53,8 @@ export const SAVE_FIELDS = [
   { key: 'journal',    pack: (W) => W.journal,    apply: (W, v) => { W.journal = v || []; } },
   { key: 'level',      pack: (W) => W.level,      apply: (W, v) => { W.level = v ?? 1; } },
   { key: 'onceKeys',   pack: (W) => W.onceKeys,   apply: (W, v) => { W.onceKeys = v || []; } },
+  // #132: the record's dispositions — merge INTO defaults like flags
+  { key: 'recDisp',    pack: (W) => W.recDisp,    apply: (W, v) => { W.recDisp = v || {}; } },
   { key: 'readKeys',   pack: (W) => W.readKeys,   apply: (W, v) => { W.readKeys = v || []; } },
   { key: 'dials',      pack: (W) => W.dials,      apply: (W, v) => { W.dials = Array.isArray(v) && v.length === 4 ? v : [0, 0, 0, 0]; } },
   // merge keeps defaults for region keys added after the save was written.

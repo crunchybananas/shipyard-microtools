@@ -2105,6 +2105,31 @@ export function buildWorld() {
     }
     const q = core.getObjectByName('quarters');
     if (q) {
+      // #132: the records cabinet — a squat iron drawer-chest by the cot's foot, where
+      // the District could always have come and found a life added up. FILED artifacts
+      // stack inside (the stack mesh scales with the count, driven in puzzles _apply).
+      const cab = new THREE.Group();
+      cab.name = 'recordCabinet';
+      const ironc = new THREE.MeshStandardMaterial({ color: 0x2e3236, roughness: 0.75, metalness: 0.35, flatShading: true });
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.5, 0.42), ironc);
+      body.position.y = 0.25; cab.add(body);
+      const drawer = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.15, 0.4), ironc);
+      drawer.position.set(0, 0.33, 0.06);   // the top drawer, pulled a hand's width open
+      cab.add(drawer);
+      const pull = new THREE.Mesh(new THREE.TorusGeometry(0.032, 0.007, 5, 10),
+        new THREE.MeshStandardMaterial({ color: 0x7a6a3c, roughness: 0.5, metalness: 0.4 }));
+      pull.position.set(0, 0.33, 0.27); cab.add(pull);
+      const stack = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.02, 0.3),
+        new THREE.MeshStandardMaterial({ color: 0xd6cdb2, roughness: 0.95 }));
+      stack.name = 'cabinetStack';
+      stack.position.set(0, 0.42, 0.06);
+      stack.visible = false;
+      cab.add(stack);
+      cab.position.set(0.1, 0, 1.62);        // by the cot's foot, against the far wall
+      cab.rotation.y = -0.15;
+      defineProp('recordCabinet');
+      q.add(cab);
+
       const lant = new THREE.Group();
       lant.name = 'cotLantern';
       const tin = new THREE.MeshStandardMaterial({ color: 0x3b3f44, roughness: 0.7, metalness: 0.3, flatShading: true });
