@@ -834,6 +834,17 @@ export class Game {
     const an = this.anim;
     const F = W.flags;
 
+    // #129: the era threshold — the reframe said out loud exactly ONCE in the game,
+    // in the first minute of the first descent (8s after splashdown, so the keeper's
+    // arrival line has had its beat). Depth becomes time from here on.
+    if (W.level === 2 && !W.onceKeys?.includes('eraThreshold')) {
+      this._eraLineT = (this._eraLineT || 0) + dt;
+      if (this._eraLineT > 8) this.once('eraThreshold', () => {
+        UI.whisper(T.everything_down_here_is);
+        UI.addJournal(T.the_water_is_higher, '', 'self');
+      });
+    }
+
     // tide easing + valve sound
     const dTide = W.tideTarget - W.tide;
     if (Math.abs(dTide) > 0.0004) {

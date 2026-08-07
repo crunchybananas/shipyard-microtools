@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 28 — 2026-08-06 — #129: the strata are eras (AAA-A1)
+
+**Shipped:** the reframe everything else in the AAA campaign stands on. LEVELS rows
+carry `era` now (lastday / arrival / inspection / lastwinter — ERA_CASTS' comments
+aligned; the code's color system had been calling them eras all along). All 16 LORE
+entries tagged `era`/`eraDeep` (the hand's writing-time vs the era its cold page
+bares at). loop/ERAS.md is the era bible: the full audit table — every hand,
+artifact, and encounter mapped and grounded — plus the two-histories rule (each era
+owns what the water uncovered of the deeper past during it: the founders' stone at
+L2, the capitals at L3). SPINE.md carries the canon block. And the game says it out
+loud exactly ONCE: 8s after first splashdown at L2, whisper + journal — "I thought I
+was diving under the island. I am diving under the years. The island does not drown
+all at once; it drowns in order, and the order is his." New sketch (island profile,
+three descending waterlines) on the matcher 'it drowns in order'.
+
+**Evidence:** audit found ZERO contradictions — the corpus was latently coherent
+(the private journal exists BECAUSE of the inspector; the kelp slate records the
+FIRST descent; the closure notice's blank date IS the last winter). Walk gate grew
+its 29th assertion (once-key + journal text + LEVELS[2].era.key === 'arrival'):
+**WALK PASS 29/29**. Coverage grew ui.js literal scanning: **90/90**.
+
+**Debt:** ui.js still holds ~4 inline journal/whisper literals (#75 ran on
+puzzles/main only) — covered by the coverage tool now; extract in a hygiene pass.
+
+**Next tick suggestion:** #130 era events — A1's reframe is stated once; A2 makes
+each stratum ARRIVE as its era (the swinging rope, the breaching capitals, the beam
+that goes dark). The rope is the cheapest and lands first.
+
+---
+
 ## loop-fire 27 — 2026-08-06 — the AAA plan: the strata are eras
 
 **Shipped:** loop/AAA_PLAN.md — the honest story diagnosis (D1 the middle is a

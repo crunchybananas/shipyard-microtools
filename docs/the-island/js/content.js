@@ -41,7 +41,7 @@ export const KEEPER = {
 // All metaphor: the lensmaker who keeps a light for someone out on the water, the rising sea,
 // the model built to hold one day back. Reading marks W.readKeys (the Codex + the endgame book).
 export const LORE = {
-  keeper_logbook: {
+  keeper_logbook: { era: 'spanning', eraDeep: 'inspection',
     kind: 'book', hand: 'keeper', title: 'The Keeper’s Logbook',
     pages: [
       'I keep the light. That is the whole of it, set down plainly, the way you are taught to set it down. Wind from the south-west. The lamp trimmed. The glass clear. A keeper’s hand should be dull on the page. Mine wants to say more, and must not.',
@@ -58,7 +58,7 @@ export const LORE = {
     journal: 'Found the keeper’s logbook on the chart table. He ground lenses to keep a light for someone out on the water — and when the sea began to rise, he started building the island again, small, to hold one whole day back.',
     journalDeep: 'Read again from the deep, the logbook’s last page turns colder, the hand no longer steady: there is no bottom — he has looked. Each room built to be safe becomes the next room he is afraid in. You do not drown all at once; you drown a little, and call it keeping busy.',
   },
-  coat_letter: {
+  coat_letter: { era: 'spanning', eraDeep: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A letter, folded small',
     pages: [
       'I write this and I will not send it, because to send it is to admit you are far enough away to need a letter.',
@@ -72,7 +72,7 @@ export const LORE = {
     journal: 'A letter in the coat pocket, never sent. The kettle has been on a long time.',
     journalDeep: 'Read again from deeper down, the unsent letter gives up its smaller hand: the kettle was never for someone else. It is on for the part of him still out on the water — kept warm for the soaked, ashamed, years-too-late self, so that when he finally rows up to the door, something waits that does not ask where he has been.',
   },
-  stone_inscription: {
+  stone_inscription: { era: 'founding',
     kind: 'inscription', hand: 'keeper', title: 'Cut into the standing stone',
     pages: [
       'WE WHO WENT DOWN\nLEFT THE LIGHT FOR\nWHOEVER WASHES UP\n\n— turn it, and turn it',
@@ -85,7 +85,7 @@ export const LORE = {
     journalDeep: 'The tide has been over the standing stone, and below the worn cut a fainter line is bared — set lower than any dry hand would reach: “and whoever washes up is who went down. there was only ever one.”',
   },
   // washed up at the wake-up beach — the FIRST fragment most players meet, an invitation.
-  bottle_note: {
+  bottle_note: { era: 'lastday',
     kind: 'letter', hand: 'keeper', title: 'A note in a bottle, washed up',
     pages: [
       'To whoever finds this — and someone always does; the sea is a poor keeper of secrets — the light you can see from here is mine.',
@@ -101,7 +101,7 @@ export const LORE = {
   // SEA-STRATA L2: a wax slate hidden in the kelp (loop #132) — the keeper's FIRST shallow
   // descent, and a diegetic hint for the Tide-Figure that stands in this same water. Lives in
   // region2, so it is reachable (and readable) only at L2 — a depth-specific hidden fragment.
-  kelp_slate: {
+  kelp_slate: { era: 'arrival',
     kind: 'inscription', hand: 'keeper', title: 'A wax slate, tangled in the kelp',
     pages: [
       'I went down the first time only as far as the kelp — no deeper. I told myself I was checking the mooring. A keeper is allowed his small lies; they are the ballast that lets a man sink slowly enough to bear it.',
@@ -112,7 +112,7 @@ export const LORE = {
   // SEA-STRATA L3: a cairn on the bluff (loop #134), the keeper's note from deeper in the descent
   // — the high dry vantage over the drowned hall, and a diegetic hint for the Watcher (don't run,
   // don't look away — hold its gaze and it lets go). Lives in region3, readable only at L3.
-  bluff_cairn: {
+  bluff_cairn: { era: 'inspection',
     kind: 'inscription', hand: 'keeper', title: 'A cairn on the bluff, scratched in the top stone',
     pages: [
       'I stacked these stones where the water has not yet reached, to mark the last dry place I know. From here you can see it: the drowned hall, the tops of the columns breaking the surface like a hand going under. I built those rooms, every one, to be safe in. I am also the sea that took them. Both. At once. That is the thing no one tells you.',
@@ -123,7 +123,7 @@ export const LORE = {
   // SEA-STRATA L4 'source': a note left at the bottom (loop #135), the keeper's last instruction —
   // a diegetic frame for the chart-table look-back + carry-up (the integration). Lives in region4,
   // readable only at L4. Completes the per-level hint set (L2 Tide-Figure, L3 Watcher, L4 keeper).
-  source_note: {
+  source_note: { era: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A note left at the bottom, weighted with a stone',
     pages: [
       'If you have come all the way down to the source, then there is only the one errand left, and I will set it down plainly so you cannot pretend you did not understand. Go to the chart table. Lean over the model — over the smallest island, the one with the grain-of-light lamp.',
@@ -134,7 +134,7 @@ export const LORE = {
   // the keeper's PRIVATE bedside journal, in the quarters behind the inner door (revealed one
   // level down). The intimate counterpart to the public logbook; its deep page turns toward the
   // descent — he begins to suspect the one he keeps the light for went DOWN, not out to sea.
-  quarters_journal: {
+  quarters_journal: { era: 'inspection', eraDeep: 'lastwinter',
     kind: 'book', hand: 'keeper', title: 'A journal kept by the cot',
     pages: [
       'The public log is for the inspector. This one is for me, and I keep it where no inspector goes — under the pillow, against my own ear. Here I am allowed to say it plainly: I am afraid. Not of the sea. Of being the last one awake when it comes.',
@@ -150,7 +150,7 @@ export const LORE = {
   },
   // legible ONLY once you hold the keeper's reading glass — lampblack written too small for the
   // naked eye. The found-lens reveal (puzzles.js): these marks fade in when W.flags.readGlass.
-  lens_mark_study: {
+  lens_mark_study: { era: 'inspection',
     kind: 'inscription', hand: 'keeper', title: 'Lampblack, too small to read by eye',
     pages: [
       '(the glass makes it legible) I write the true things small, in lampblack, where only a patient hand with a glass will ever find them. The inspector reads the big log and goes home satisfied.',
@@ -163,7 +163,7 @@ export const LORE = {
     journal: 'Through the keeper’s reading glass, lampblack on the chart too small for the eye: he keeps the light not for ships — there are none — but so that when he goes down, something stays lit above him to climb back toward.',
     journalDeep: 'The smallest lampblack line, read with the glass from the deep: there is no inspector, no ship, no other light — only one hand grinding one lens to read one true line by which to climb back up. “You are the patient hand. You always were. Put the glass down, and climb.”',
   },
-  lens_mark_stone: {
+  lens_mark_stone: { era: 'inspection',
     kind: 'inscription', hand: 'keeper', title: 'Scratched into the stone, hair-fine',
     pages: [
       '(only the glass shows it) Whoever you are, holding this glass: you are not the first to read these. You will not be the last.',
@@ -180,7 +180,7 @@ export const LORE = {
   // surface, floated free only at the bottom (the risen sea reaches the basin at last), dried
   // and read back at the surface study. A letter addressed to the SEA itself: the reader's
   // arrival condition (water this high = the bottom) is baked into the fiction.
-  pool_phial: {
+  pool_phial: { era: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A note sealed in a phial, dried and unrolled',
     pages: [
       'To the sea — because you will arrive; everything I keep comes to you in the end. I found this pool already old when I came: your work, from some year when you stood higher than anyone now believes. Then you drew back and left it to the gulls, the way you leave everything you take. I am sealing this against the day you climb back up for it.',
@@ -192,7 +192,7 @@ export const LORE = {
   // the rising sea, its official hand cracking. A written artifact, not a speaking voice
   // (the keeper stays the game's only I/you); it countersigns his instruments from outside:
   // the gauge's rings, the logbook's third step, the buoy's channel.
-  drain_ledger: {
+  drain_ledger: { era: 'inspection',
     kind: 'book', hand: 'inspector', title: 'A tide ledger, water-swollen',
     pages: [
       'DISTRICT OF LIGHTS — QUARTERLY RETURN. Station: the island. Keeper: [the ink has run]. Mean high water: RISEN — see appendix. Appendix: missing. Remarks: the keeper’s figures disagree with the printed tables. The keeper’s figures are carefully made. The printed tables are reprinted each year unchanged. One of these is a record; the other is a habit.',
@@ -208,7 +208,7 @@ export const LORE = {
   // #50-A: the inspector's second fragment. The AMBIGUITY ENGINE is canon (lens_mark_study's
   // deep page negates him), so every inspector artifact must survive two readings: a real
   // official, or the keeper writing in an invented hand to feel witnessed.
-  commendation_copy: {
+  commendation_copy: { era: 'inspection',
     kind: 'letter', hand: 'inspector', title: 'A carbon copy, kept',
     place: { parent: 'quarters', pos: [-0.35, 0.44, 1.05], rx: -Math.PI / 2 + 0.06, rz: 0.3, prop: 'sheet', label: 'a carbon copy, kept', maxDist: 2.6, gate: 'quarters' },
     pages: [
@@ -223,7 +223,7 @@ export const LORE = {
   },
   // #50-A: the inspector's third fragment — the end of keeping, drafted. deepFrom 4: the
   // bottom alone can read what the notice actually is.
-  closure_notice: {
+  closure_notice: { era: 'lastwinter',
     kind: 'letter', hand: 'inspector', title: 'A notice of review, folded small',
     place: { pos: [-83.55, 14.40, -41.35], ry: 0.35, prop: 'fold', label: 'a paper, folded small', maxDist: 2.8 },
     pages: [
@@ -239,7 +239,7 @@ export const LORE = {
   // on the MODEL's own chart table (#53) — a margin the width of a fingernail, read only by
   // someone bent over a model with a glass: which is exactly what HE was when he wrote it.
   // The recursion speaks to the next hand down.
-  model_margin: {
+  model_margin: { era: 'lastwinter',
     kind: 'inscription', hand: 'keeper', title: 'The model’s margin, under the glass',
     pages: [
       '(the glass, pressed close over the model’s little chart table — a margin the width of a fingernail, and on it, his smallest hand) You are bent over a model with a glass in your hand. That is what I was when I wrote this. That is what whoever reads the margin below this one will be. It does not end. I have stopped needing it to.',
@@ -249,7 +249,7 @@ export const LORE = {
   },
   // folded into the music box on the study shelf — ties the box/bird puzzle (the fourth note he
   // bends DOWN where the bird bends it UP) to his grief: the thing he could never do, that you do.
-  music_note: {
+  music_note: { era: 'spanning', eraDeep: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A note folded into the music box',
     pages: [
       'I wind it more than I should. Five notes — E, G, A, D, C — and then I wind it again. The fourth note is wrong; I have always known it is wrong; I bend it down where it ought to bend up, and I cannot make my hands do otherwise. A man plays the song he can play, not the song he means.',
@@ -348,6 +348,7 @@ export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 // live together as content.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
 export const SKETCHES = [
+  ['it drowns in order', S('<path d="M30 14c5-7 20-9 26-9s15 4 17 9"/><path d="M40 8l5-5 5 5" opacity=".7"/><path d="M10 16h76" opacity=".85"/><path d="M15 24h66" opacity=".55"/><path d="M20 32h56" opacity=".3"/>')],
   ['living model of the island', S('<path d="M14 30h68M22 30v6M74 30v6"/><path d="M24 30c4-8 14-10 24-10s20 2 24 10" opacity=".5"/><path d="M40 20l6-7 6 7"/><path d="M30 26q6-3 12 0t12 0t12 0" opacity=".6"/>')],
   ['A valve beside the chart table', S('<circle cx="48" cy="18" r="11"/><path d="M40 10l16 16M56 10L40 26M48 29v7"/><path d="M30 34q4-3 8 0" opacity=".5"/>')],
   ['crank turns the orrery lamp', S('<path d="M20 30a30 30 0 0 1 56 0" opacity=".6"/><circle cx="76" cy="14" r="4"/><path d="M76 6v-3M84 14h3M82 7l2-2" opacity=".6"/><path d="M20 30l-4 4M16 34h7" />')],
@@ -568,5 +569,7 @@ export const T = {
   a_mark_has_appeared: 'A mark has appeared on the model where I stand — a little light that moves when I move. I have bent over this map for days, trusting it to show me the island truly. It was showing me ON it the whole time. You can study a place a long while before you notice you are also a figure in it.',
   the_ground_gives_you: 'The ground gives you back.',
   already_at_the_bottom: 'Already at the bottom.',
+  everything_down_here_is: 'Everything down here is younger than the day I left on the surface.',
+  the_water_is_higher: 'The water is higher, and yet everything under it is younger — the kelp where he first went down, a climber’s mark still sharp at its edges, his hand on the wax steadier than any page I read upstairs. I thought I was diving under the island. I am diving under the years. The island does not drown all at once; it drowns in order, and the order is his.',
   field_report_taken_copied: 'Field report taken — copied, downloaded, and remembered.',
 };

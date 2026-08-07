@@ -63,6 +63,16 @@ one search" must read explicit) so it never slides into the forbidden WATCHED-LO
 came down for you" with his exhaustion ("You're faster than I was") so the love is COSTLY, not
 flattering. Strictly all-metaphor — no biography. This SUPERSEDES the old coat-as-successor reveal.
 
+## ★ THE ERAS — the strata are time (AAA-A1, canon 2026-08-06)
+
+The drowned strata are ERAS of the keeper's tenancy — L1 the last day, L2 the
+arrival years, L3 the inspection years, L4 the last winter. Depth becomes time;
+diving becomes remembering. Each era also owns what the water uncovered of the
+deeper past during it (the founders' stone at L2, the congregation's capitals at
+L3). Stated out loud exactly once, 8s into the first L2 descent. The full audit —
+every hand, artifact, and encounter mapped to its era — lives in `loop/ERAS.md`;
+the machine key is `LEVELS[n].era` (world.js). All AAA-A systems build on this.
+
 ## What this game is — candidate loglines
 
 - A first-person mystery where a lighthouse keeper's grief became architecture: you wash up on an island whose living 1:240 model controls the world, and as you solve the keeper's puzzle-chain you realize you are walking a dead person's mourning ritual — and choosing, at the bottom, whether to descend into it forever or climb out and leave the light on for someone who will never return.

@@ -168,10 +168,10 @@ const _grade = G(0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // scratch, mutated in place
 // (sodium green, jaundice gold) draining into cold isolation, then a dead violet
 // floor. Depth itself is supplied by the dark multiplier, not by muddy casts.
 const ERA_CASTS = [
-  null,                       // L1 — surface, no cast
-  new THREE.Color(0x8aa830), // L2 — sodium streetlight green-yellow (false comfort)
-  new THREE.Color(0xc29a1c), // L3 — sickly jaundice / fluorescent gold
-  new THREE.Color(0x2f6cc8), // L4 — cold isolation blue
+  null,                       // L1 — the last day: surface, no cast
+  new THREE.Color(0x8aa830), // L2 — the arrival years: sodium green-yellow (false comfort)
+  new THREE.Color(0xc29a1c), // L3 — the inspection years: sickly jaundice / fluorescent gold
+  new THREE.Color(0x2f6cc8), // L4 — the last winter: cold isolation blue
   new THREE.Color(0x573a72), // L5+ — dead violet, the keeper's near-dark floor
 ];
 // ---- SEA-STRATA level-areas (loop #117): the canonical per-level descriptor table ----
@@ -182,12 +182,17 @@ const ERA_CASTS = [
 //   tide > 1 RAISES the sea ABOVE high-water (waterY = -TIDE_DROP*(1-tide), so tide 1.35
 //   ≈ +1.5m). The spawn-override + tide-raise are wired with each level's content; this
 //   table is the data they read. Indexed by W.level (1..MAX_DEPTH); [0] unused.
+// The strata are not depths — they are ERAS of the keeper's tenancy (AAA-A1, #129):
+// diving is remembering; the island drowns in order, and the order is his. Each era
+// also owns what the water UNCOVERED of the deeper past during it (the founders'
+// stone at L2, the congregation's capitals at L3). Story/art/audio systems key off
+// era.key; era.name is the designers' shared vocabulary (never shown raw in UI).
 export const LEVELS = [
   null,
-  { id: 'surface',  region: null,       spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.0,  encounter: 'songbird' },
-  { id: 'shallows', region: 'region2',  spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.35, encounter: 'tideFigure' },
-  { id: 'midwater', region: 'region3',  spawn: { pos: [90, 0, 30],       yaw: 3.7,  pitch: -0.05 }, tide: 1.65, encounter: 'watcher' },
-  { id: 'source',   region: 'region4',  spawn: { pos: [-82.8, 0, -41.4], yaw: 2.19, pitch: 0.02 },  tide: 1.9,  encounter: 'keeper' },
+  { id: 'surface',  era: { key: 'lastday',    name: 'the last day' },        region: null,       spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.0,  encounter: 'songbird' },
+  { id: 'shallows', era: { key: 'arrival',    name: 'the arrival years' },   region: 'region2',  spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.35, encounter: 'tideFigure' },
+  { id: 'midwater', era: { key: 'inspection', name: 'the inspection years' }, region: 'region3', spawn: { pos: [90, 0, 30],       yaw: 3.7,  pitch: -0.05 }, tide: 1.65, encounter: 'watcher' },
+  { id: 'source',   era: { key: 'lastwinter', name: 'the last winter' },     region: 'region4',  spawn: { pos: [-82.8, 0, -41.4], yaw: 2.19, pitch: 0.02 },  tide: 1.9,  encounter: 'keeper' },
 ];
 
 const _BIAS_KEYS = ['skyTop', 'skyHorizon', 'sunCol', 'hemiSky', 'hemiGnd', 'fog', 'water', 'waterShallow'];
