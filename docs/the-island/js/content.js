@@ -372,6 +372,7 @@ export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 // live together as content.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
 export const SKETCHES = [
+  ['gave up while I was down', S('<path d="M10 18h76" opacity=".7"/><path d="M34 12c4-5 16-6 22-3" opacity=".5"/><path d="M20 24l4 4M24 24l-4 4" opacity=".6"/><path d="M46 26l4 4M50 26l-4 4" opacity=".6"/><path d="M70 23l4 4M74 23l-4 4" opacity=".6"/><path d="M14 32q8 3 16 0t16 0t16 0t16 0" opacity=".25"/>')],
   ['no instrument on the requisition reads', S('<rect x="32" y="6" width="32" height="28" rx="1" opacity=".55"/><path d="M37 12h22M37 17h22M37 22h12" opacity=".4"/><path d="M37 28h22" opacity=".8"/><path d="M70 10l6 6M76 10l-6 6" opacity=".5"/>')],
   ['no room on the form for who', S('<rect x="30" y="8" width="36" height="24" rx="1" opacity=".55"/><path d="M35 14h26M35 19h26" opacity=".4"/><path d="M35 25h10" opacity=".4"/><path d="M48 25q6 4 12 0" opacity=".9"/><path d="M20 14q-6 8 0 16" opacity=".3"/>')],
   ['filed his record', S('<rect x="34" y="10" width="28" height="22" rx="1" opacity=".7"/><path d="M34 17h28" opacity=".5"/><path d="M40 14h8" opacity=".8"/><path d="M38 22h20M38 26h20" opacity=".3"/>')],
@@ -627,5 +628,9 @@ export const T = {
   left_with_him_at: 'Left with him, at the bottom of the years.',
   i_filed_his_record: 'I filed his record in the cabinet by the cot — returns, findings, notices, squared away and shut in the drawer where the District could always have come and found them. A life added up, for the office that asked. Both things are true at once: the record is complete, and the record is not the life.',
   i_did_not_file: 'I did not file it. I carried it down through all the years of him and left it with him at the source, where the water keeps what matters from the office that asked. Some records exist to be filed. This one existed to be witnessed.',
+  the_jetty_s_outer: 'The jetty’s outer arm is a shadow under green glass. I walked it the morning I came. The water holds it now.',
+  the_bench_faces_the: 'The bench faces the sea from inside it now. The seat goes awash with every third wave. The water holds it now.',
+  the_skiff_is_off: 'The skiff is off its blocks and rides at the old anchor, half a gunwale under. The water holds it now.',
+  three_things_the_island: 'Three things the island gave up while I was down in the years: the jetty’s furthest arm, the bench at the shallows, the skiff off its blocks. The chart in the study will say the shore moved. What moved is everything the shore was for. And I understand the tide gauge’s fifth ring now — the fresh-cut one, above all the others. It was never a measurement. It was a forecast.',
   field_report_taken_copied: 'Field report taken — copied, downloaded, and remembered.',
 };

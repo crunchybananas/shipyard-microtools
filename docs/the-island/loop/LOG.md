@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 32 — 2026-08-07 — #133: the Shrinking Shore — loss becomes the grammar (AAA-A5)
+
+**Shipped:** the world finally enacts the thesis instead of describing it. Three new
+shore pieces built in their pre-loss poses — the jetty's OUTER ARM (two boards,
+three posts, continuing the pier seaward), the SOUTH-SHALLOWS BENCH (stump legs,
+plank seat, facing the water), the SKIFF on its blocks (the other boat, overturned
+past the tideline) — and three descent milestones that take them: first dive → the
+arm settles into a shadow under green glass; L3 → the bench stands in the sea it
+faced, seat awash; L4 → the skiff floats off its blocks and rides half a gunwale
+under at the old anchor. Poses are hard-set every frame from persisted state
+(regions.l3seen/l4seen + flags.dove), so saves and the 1:240 model can never drift —
+and because the pieces are NOT model-pruned, **the study's model shows the shore
+shrinking while you are still below**. The walk home names each piece as you pass
+it ('The water holds it now') and the journal keeps the sum — which finally answers
+the tide gauge's fifth ring: 'It was never a measurement. It was a forecast.'
+
+**Evidence:** WALK PASS **40/40** (+2: all three drowned poses after L4; the three
+discovery whispers + sum journal on the returned shore walk). Coverage **103/103**.
+Screenshots: the skiff half-sunk with its whisper live in frame; the arm reading as
+a pale shadow under the green glass off the pier end. No colliders, no removed
+capability — loss is grammar, never penalty (the bereaved-player constraint).
+
+**Debt:** the drowned bench reads as a floating plank more than a drowned bench at
+some angles — B1's vista/polish pass should tune its depth or lean. Harness: walk
+boot now POLLS for ABYME (fixed waits died on cold profiles).
+
+**Next tick suggestion:** #134 endings that re-open — all three read-back sources
+now exist (rounds flags, recDisp, loss keys). The codas assemble what THIS player's
+walk left behind. Closing it completes EPIC AAA-A: the whole story overhaul.
+
+---
+
 ## loop-fire 31 — 2026-08-07 — #132: the Inspection, playable — FILE or KEEP (AAA-A4)
 
 **Shipped:** the middle act's running question, asked entirely with existing verbs.

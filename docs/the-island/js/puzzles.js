@@ -987,6 +987,19 @@ export class Game {
       }
     }
 
+    // #133: the walk home names what the water holds now — one whisper per drowned
+    // piece as you pass it, and the journal keeps the sum once all three are seen.
+    if (W.flags.returned) {
+      const P = this.player.pos;
+      const near = (x, z, r) => Math.hypot(P.x - x, P.z - z) < r;
+      if (near(-18, -119.4, 13)) this.once('loss_arm', () => UI.whisper(T.the_jetty_s_outer));
+      if (near(24, -103.4, 12)) this.once('loss_bench', () => UI.whisper(T.the_bench_faces_the));
+      if (near(-45, -112, 13)) this.once('loss_skiff', () => UI.whisper(T.the_skiff_is_off));
+      if (['loss_arm', 'loss_bench', 'loss_skiff'].every((k) => W.onceKeys?.includes(k))) {
+        this.once('lossAll', () => UI.addJournal(T.three_things_the_island, '', 'self'));
+      }
+    }
+
     // #131 HIS ROUNDS tableaux — brief non-verbal stagings; figures act, never speak.
     // Each clock runs once after its round; meshes borrowed are restored exactly.
     const RF = this.refs;
@@ -1578,6 +1591,27 @@ export class Game {
     if (R.cotLantern && this._tabLight == null) {
       const lg = R.cotLantern.getObjectByName('cotLanternGlass');
       if (lg) lg.material.emissiveIntensity = W.flags.roundLight ? 1.05 : 0;
+    }
+    // #133 THE SHRINKING SHORE: three pieces in pre-loss or drowned pose, keyed to the
+    // descent's milestones (dove → the arm, L3 → the bench, L4 → the skiff). Hard-set
+    // each frame from persisted state, so saves and the model clone can never drift.
+    {
+      const lost = W.regions.l4seen ? 3 : W.regions.l3seen ? 2 : W.flags.dove ? 1 : 0;
+      const pose = (m, isLost, y, rx, rz, px, pz, ry) => {
+        if (!m) return;
+        if (!m.userData.pre) m.userData.pre = { p: m.position.clone(), rx: m.rotation.x, ry: m.rotation.y, rz: m.rotation.z };
+        const pre = m.userData.pre;
+        if (isLost) {
+          m.position.set(px ?? pre.p.x, y, pz ?? pre.p.z);
+          m.rotation.set(rx, ry ?? pre.ry, rz);
+        } else {
+          m.position.copy(pre.p);
+          m.rotation.set(pre.rx, pre.ry, pre.rz);
+        }
+      };
+      pose(R.jettyArm, lost >= 1, -1.35, 0.12, 0.06);
+      pose(R.shoreBench, lost >= 2, -0.42, -0.06, 0.04, 24, -103.4, Math.PI + 0.15);
+      pose(R.shoreSkiff, lost >= 3, -0.28, 0.02, 0.18, -45, -112, 1.2);
     }
     // #132: the record's dispositions — a carried artifact leaves the world; the
     // cabinet's filed stack and the source's kept pile grow with their counts

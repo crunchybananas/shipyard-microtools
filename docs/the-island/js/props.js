@@ -2067,6 +2067,70 @@ export function buildWorld() {
     core.add(phial);
   }
 
+  // =================== THE SHRINKING SHORE (#133, AAA-A5) =============================
+  // Three pieces of shore the island gives up while you are down in the years — built
+  // here in their PRE-LOSS poses; puzzles _apply moves each to its drowned pose as the
+  // descent's milestones pass (dove → the jetty's outer arm, L3 → the bench, L4 → the
+  // skiff). Decorative, no colliders — loss is the game's grammar, never its penalty.
+  // NOT model-pruned: the study's 1:240 model shows the shore shrinking while you are
+  // still below, which is how the island tells you before the walk home does.
+  {
+    const silvered = new THREE.MeshStandardMaterial({ color: 0xa2937c, roughness: 0.95, flatShading: true });
+    // the jetty's outer arm — a further reach of the pier, two boards and three posts
+    {
+      const arm = new THREE.Group();
+      arm.name = 'jettyArm';
+      const deck = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.13, 5.4), silvered);
+      deck.position.set(0, 1.03, 0); deck.castShadow = true; arm.add(deck);
+      for (const [px, pz] of [[-0.8, -2.3], [0.8, -2.3], [0, 2.4]]) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 3.1, 6), silvered);
+        post.position.set(px, -0.5, pz); arm.add(post);
+      }
+      arm.position.set(-18, 0, -119.4);  // continues the pier seaward (the pier's jx = -18)
+      defineProp('jettyArm');
+      core.add(arm);
+    }
+    // the south-shallows bench — two stump legs and a plank, facing the water
+    {
+      const bench = new THREE.Group();
+      bench.name = 'shoreBench';
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.09, 0.42), silvered);
+      seat.position.y = 0.46; seat.castShadow = true; bench.add(seat);
+      for (const lx of [-0.62, 0.62]) {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 0.44, 6), silvered);
+        leg.position.set(lx, 0.22, 0); bench.add(leg);
+      }
+      const bh = heightAt(24, -99);
+      bench.position.set(24, Number.isFinite(bh) ? bh : 0.4, -99);
+      bench.rotation.y = Math.PI;        // facing the sea
+      defineProp('shoreBench');
+      core.add(bench);
+    }
+    // the skiff on its blocks — the OTHER boat, hauled past the tideline long ago
+    {
+      const skiff = new THREE.Group();
+      skiff.name = 'shoreSkiff';
+      const hull = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.36, 2.3, 1, 1, 3), silvered);
+      const hp = hull.geometry.attributes.position;
+      for (let vi = 0; vi < hp.count; vi++) {           // pinch the ends into a hull
+        const z = hp.getZ(vi), k = 1 - Math.min(Math.abs(z) / 1.15, 1) * 0.42;
+        hp.setX(vi, hp.getX(vi) * k);
+      }
+      hull.geometry.computeVertexNormals();
+      hull.position.y = 0.34; hull.rotation.z = Math.PI; // overturned
+      hull.castShadow = true; skiff.add(hull);
+      for (const bz of [-0.7, 0.7]) {
+        const block = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.2), silvered);
+        block.position.set(0, 0.09, bz); skiff.add(block);
+      }
+      const sh = heightAt(-40, -99.5);
+      skiff.position.set(-40, Number.isFinite(sh) ? sh : 0.5, -99.5);
+      skiff.rotation.y = 0.5;
+      defineProp('shoreSkiff');
+      core.add(skiff);
+    }
+  }
+
   // =================== HIS ROUNDS (#131, AAA-A3) ======================================
   // The furniture of the keeper's day, findable and performable — one act per era.
   // The acts themselves are wired in puzzles (hotspots + tableaux); these are the
