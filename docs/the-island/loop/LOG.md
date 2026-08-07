@@ -12,6 +12,46 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 26 — 2026-08-06 — the architecture cluster falls: #77 #70 #73 #72 #69 #75 #71
+
+**Shipped:** the entire remaining board — seven architecture issues — in one verified
+sweep, and the codebase the sequels will be built on. **#77** terrain is a pure leaf
+again (a GATES snapshot + syncGates(W) at frame top; no world import). **#70** props
+registers every named ref through defineProp() and main boot-asserts the registry —
+a missing island ref is now a console error at startup, not a silent null three files
+later. **#73** a tiny drive scheduler (addDrive/runDrives) replaces the applyAtmosphere
+grab-bag; the foreshadow ring, fish-shadows, and jetty night-halo migrated to it, each
+declared beside what it drives. **#72** the Watcher and Tide-Figure now run on ONE
+data-driven encounter engine (static ENCOUNTERS specs — approach/regard, evade/still —
+all shipped tuning preserved digit-for-digit), and both encounters leave a rare echo
+behind after resolution. **#69** written fragments are data: LORE entries carry `place`
+metadata and a factory builds the prop, registers it, and wires the reader hotspot —
+the two inspector papers moved over, bespoke builds deleted. **#75** every inline
+whisper/journal line (122 call sites) extracted to content.T with readable slug keys —
+the island's entire voice now lives in ONE file, byte-identical (120/120 vs HEAD; the
+2 diffs are this session's new echo lines). **#71** SEA-STRATA region content moved to
+js/regions/l2_shallows|l3_gallery|l4_seabed.js, each build(ctx) on its own SEED^salt
+stream — the seam new level-areas land in (tide gauge stays core-side: it is the
+surface's quiet mystery).
+
+**Evidence:** F77 bridge -8.5→18.45 with ruler + annexOpen at L2 + fresh-false gates;
+boot assert silent with zero unresolved NAMES; F73 jetty halo 0.98 night / 0.12 day;
+F72 `{tideSeen, watcherSeen, watcherHidden, echoTimerArmed, errs:0}`; F69 factory refs
+parented (quarters), gated (L1 false / L2 true), both readers open; coverage 88/88
+journal↔sketch; F71 region2=[kelp 420 @ checksum -26559.83, fishShadows 7, tideFigure
+hidden, kelpSlate] region3=[bluffCairn y23.53, bellBuoy (52,2.5,12)] region4=[sourceNote
+13.52] cloneClean; **walk 28/28 after every one of the seven**, zero console errors.
+
+**Debt:** none added. props.js 3148→2939 lines and buildWorld no longer owns region
+content; puzzles/main no longer own prose. The board is EMPTY — every open issue is
+closed with this push.
+
+**Next tick suggestion:** the AAA plan — the story is the axis that still trails the
+craft (owner: "I think the story still needs work"). Diagnose, then an epic with real
+child issues.
+
+---
+
 ## loop-fire 25 — 2026-08-01 — #6: distant trees learn to be cheap — and epic #8 CLOSES
 
 **Shipped:** the last child of the perf epic. The canopies live in near/far instanced

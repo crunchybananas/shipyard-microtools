@@ -3,7 +3,16 @@
 
 import * as THREE from 'three';
 import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
-import { W } from './world.js';
+// #77: terrain is a DETERMINISTIC LEAF again — no live world import. The four pieces of
+// world state collision depends on arrive through GATES, synced once per frame by main
+// (syncGates). Headless probes drive GATES directly; nothing here reads W.
+export const GATES = { atTop: false, bridgeUp: false, hatchOpen: false, annexOpen: false };
+export function syncGates(W) {
+  GATES.atTop = !!W.atTop;
+  GATES.bridgeUp = !!W.flags.rulerPlaced;
+  GATES.hatchOpen = !!W.flags.hatchOpen;
+  GATES.annexOpen = W.level >= 2 || !!W.flags.returned;
+}
 import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
@@ -156,7 +165,7 @@ const JETTY = { x: -18, z: -110.5, hx: 1.3, hz: 6.1, y: 1.16 };
 
 export function walkableY(x, z) {
   // the lamp-room gallery: while up top, the lighthouse footprint IS the balcony floor (the climb)
-  if (W.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 3.3) return GALLERY_H;
+  if (GATES.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 3.3) return GALLERY_H;
 
   // the jetty deck: a real surface over the water (was a fall-through)
   if (Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz) return JETTY.y;
@@ -167,7 +176,7 @@ export function walkableY(x, z) {
   if (Math.hypot(x - ANX, z - ANZ) < 2.8) return LIGHTHOUSE_H;   // annex floor (meets the drum disc at r5.4)
 
   // ruler bridge across the chasm
-  if (W.flags.rulerPlaced) {
+  if (GATES.bridgeUp) {
     const bz = SPOTS.chasmBridgeZ;
     if (Math.abs(z - bz) < 2.1 && x > 34 && x < 60) {
       return BRIDGE_DECK; // deck height, rim-to-rim
@@ -175,7 +184,7 @@ export function walkableY(x, z) {
   }
 
   // the vault under the bluff: enter THROUGH the open hole, stairs run south
-  if (W.flags.hatchOpen) {
+  if (GATES.hatchOpen) {
     const hx = SPOTS.hatch.x, hz = SPOTS.hatch.y;
     const lx = x - hx, lz = z - hz;
     // stair ramp: top inside the hole's north half, descending southward
@@ -237,14 +246,14 @@ const LH_GAPS = [[deg(160), deg(170)], [deg(5), deg(25)]];
 
 export function wallBlocked(x0, z0, x1, z1) {
   // up on the lamp-room gallery: the only wall is the balcony rail (keeps you from the 20m drop)
-  if (W.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > 3.0;
+  if (GATES.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > 3.0;
 
   // lighthouse wall: the beach door + the annex doorway
   if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;
   // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2 —
   // and it STAYS open once you have returned from the bottom ("the door, the coat — all as
   // you left them"): the surface after the descent keeps the quarters walkable.
-  if (W.level >= 2 || W.flags.returned) {
+  if (GATES.annexOpen) {
     if (ringBlocked(x0, z0, x1, z1, ANX, ANZ, 2.65, deg(185), deg(212))) return true;
   } else if (Math.hypot(x1 - ANX, z1 - ANZ) < 2.65) {
     return true;

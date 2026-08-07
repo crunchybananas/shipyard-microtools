@@ -9,7 +9,9 @@ import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, sm
 import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
+import { buildRegions } from './regions/index.js';
 import { applyRelief, getTexture } from './assets.js';
+import { LORE } from './content.js';
 
 export const GLYPHS = 8;
 export const GLYPH_CODE = [3, 7, 1, 5];
@@ -178,221 +180,11 @@ export function buildWorld() {
   // island only). Named so collectRefs() finds them on the island instance.
   const region2 = new THREE.Group(); region2.name = 'region2'; region2.visible = false; core.add(region2);
   const region3 = new THREE.Group(); region3.name = 'region3'; region3.visible = false; core.add(region3);
-  // SEA-STRATA L3 hidden fragment (loop #134): a small cairn on the bluff (90,30) — the keeper's
-  // high dry vantage over the drowned hall, and a diegetic hint for the Watcher (don't run, don't
-  // look away). region3's FIRST content; region3-only → clone-pruned with its parent; read at L3.
-  {
-    const cairn = new THREE.Group();
-    cairn.name = 'bluffCairn';
-    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6a6e70, roughness: 0.95, flatShading: true });
-    const sizes = [[0.7, 0.28], [0.55, 0.24], [0.4, 0.2]];   // [radius, height], stacked bottom→top
-    let yy = 0;
-    for (let si = 0; si < sizes.length; si++) {
-      const [rad, h] = sizes[si];
-      const st = new THREE.Mesh(new THREE.CylinderGeometry(rad * 0.82, rad, h, 7), stoneMat);
-      st.position.set(si % 2 ? 0.06 : -0.05, yy + h / 2, si % 2 ? -0.04 : 0.05);
-      st.rotation.y = si * 0.9; st.scale.y = 0.82 + si * 0.05;
-      st.castShadow = true; cairn.add(st);
-      yy += h * 0.86;
-    }
-    // a faint cold ring scratched into the top stone — the keeper's sign, just bright enough to
-    // find in the deep dark (kept dim, well under the 0.85 bloom threshold)
-    const mark = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.018, 6, 12),
-      new THREE.MeshStandardMaterial({ color: 0x9fcfe0, emissive: 0x2a5a66, emissiveIntensity: 0.5, roughness: 1 }));
-    mark.position.set(0, yy + 0.02, 0.1); mark.rotation.x = -1.15;
-    cairn.add(mark);
-    const cx = 91.5, cz = 31.5;
-    cairn.position.set(cx, (Number.isFinite(heightAt(cx, cz)) ? heightAt(cx, cz) : 0), cz);
-    cairn.receiveShadow = false;
-    region3.add(cairn);
-  }
-  // SEA-STRATA L3 bell-buoy (#52): region3's open-water LANDMARK — an iron channel
-  // marker listing in the flooded gap between the bluff and the island, visible from the
-  // L3 bluff spawn and passed on the ramp descent. It tolls untended on the swell
-  // (puzzles _tickBuoy: damped, distance-faded — L3's sound-led nav) and lands a journal
-  // beat when first approached. The channel it marked is under all of this now.
-  {
-    const buoy = new THREE.Group();
-    buoy.name = 'bellBuoy';
-    const rust = new THREE.MeshStandardMaterial({ color: 0x8a4b32, roughness: 0.92, flatShading: true });
-    const iron = new THREE.MeshStandardMaterial({ color: 0x2e3134, roughness: 0.85, flatShading: true });
-    const bronze = new THREE.MeshStandardMaterial({ color: 0x7a6a3c, roughness: 0.6, metalness: 0.35, flatShading: true });
-    const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.78, 0.52, 8), rust);
-    const skirt = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.5, 0.4, 8), iron);   // the waterline underbody
-    skirt.position.y = -0.42;
-    const cage = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.05, 4, 1, true), iron);    // 4-sided open frame tower
-    cage.position.y = 0.75;
-    const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 0.22, 8), bronze);
-    bell.position.y = 0.62;
-    buoy.add(skirt, hull, cage, bell);
-    buoy.rotation.set(0.07, 0.6, 0.30);            // listing — long untended
-    // floats at the L3 waterline (+2.73; region3 only shows at L3), half-sunk by the list
-    buoy.position.set(52, 2.5, 12);
-    region3.add(buoy);
-  }
   const region4 = new THREE.Group(); region4.name = 'region4'; region4.visible = false; core.add(region4);
-  // SEA-STRATA L4 'source' hidden fragment (loop #135): a folded note weighted with a stone, left
-  // on the study floor by the chart table — the keeper's last instruction, a diegetic frame for the
-  // look-back + carry-up. region4's FIRST content; region4-only → clone-pruned with parent; read at L4.
-  {
-    const note = new THREE.Group();
-    note.name = 'sourceNote';
-    const paperMat = new THREE.MeshStandardMaterial({ color: 0xd8cca8, roughness: 0.9, side: THREE.DoubleSide, emissive: 0x1a1408, emissiveIntensity: 0.15 });
-    const paper = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.46), paperMat);
-    paper.rotation.set(-Math.PI / 2 + 0.16, 0.3, 0); paper.position.y = 0.012;
-    const curl = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.16), paperMat);   // a half-curled top edge
-    curl.rotation.set(-Math.PI / 2 - 0.5, 0.3, 0); curl.position.set(0.0, 0.06, -0.2);
-    const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(0.08, 0),
-      new THREE.MeshStandardMaterial({ color: 0x3a3d3e, roughness: 1, flatShading: true }));
-    stone.position.set(0.03, 0.05, 0.05); stone.scale.set(1, 0.7, 1.15);
-    note.add(paper, curl, stone);
-    note.children.forEach((c) => { c.castShadow = true; });
-    const nx = -83.8, nz = -41.8;
-    note.position.set(nx, (Number.isFinite(heightAt(nx, nz)) ? heightAt(nx, nz) : 0) + 0.02, nz);
-    note.rotation.y = 0.5;
-    region4.add(note);
-  }
-
-  // SEA-STRATA L2 "shallows" (loop #119): a kelp forest along the sunk causeway + south-shore
-  // shallows — submerged at the raised L2 tide, so diving here wades a drowned kelp avenue, not the
-  // dry beach. One InstancedMesh (1 draw), swaying on the wave clock via swayMats. region2-only
-  // (pruned from the clone). Own rng so it never shifts the world scatter.
-  {
-    const kr = mulberry32(SEED ^ 0x4e19);
-    const frond = new THREE.PlaneGeometry(0.55, 4.2, 1, 5);
-    frond.translate(0, 2.1, 0);                       // base at y=0, rises up
-    const kelpMat = new THREE.MeshStandardMaterial({ color: 0x3c5a3e, roughness: 0.8, side: THREE.DoubleSide });
-    kelpMat.onBeforeCompile = (sh) => {
-      sh.uniforms.uTime = { value: 0 };
-      kelpMat.userData.shader = sh;
-      sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
-        #include <begin_vertex>
-        #ifdef USE_INSTANCING
-          float kw = instanceMatrix[3].x * 0.21 + instanceMatrix[3].z * 0.17;   // per-frond phase
-          float kh = pow(max(position.y, 0.0), 1.6);                            // tips sway most
-          transformed.x += sin(uTime * 0.7 + kw) * 0.55 * kh;                   // slow languid underwater drift
-          transformed.z += cos(uTime * 0.55 + kw * 1.3) * 0.4 * kh;
-        #endif
-      `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
-    };
-    const KN = 420;
-    const kelp = new THREE.InstancedMesh(frond, kelpMat, KN);
-    kelp.name = 'kelp'; kelp.castShadow = false; kelp.receiveShadow = false;
-    const km = new THREE.Matrix4(), kq = new THREE.Quaternion(), ke = new THREE.Euler(), kc = new THREE.Color();
-    let ki = 0;
-    const plantKelp = (x, z) => {
-      const h = heightAt(x, z);
-      if (!Number.isFinite(h) || h > 1.6) return;     // only the low shore zone that the L2 tide floods
-      const s = 0.7 + kr() * 0.9;
-      km.compose(new THREE.Vector3(x, h, z),
-        kq.setFromEuler(ke.set((kr() - 0.5) * 0.22, kr() * TAU, (kr() - 0.5) * 0.22)),
-        new THREE.Vector3(s, s * (0.8 + kr() * 0.85), s));
-      kelp.setMatrixAt(ki, km);
-      kc.setHSL(0.32 + kr() * 0.07, 0.32 + kr() * 0.18, 0.2 + kr() * 0.13);
-      kelp.setColorAt(ki, kc); ki++;
-    };
-    for (let i = 0; i < KN * 5 && ki < KN; i++) {
-      let x, z;
-      if (kr() < 0.6) { x = -38 + kr() * 96; z = -98 - kr() * 16; }                 // south-shore shallows band
-      else { const t = kr(); x = 48 + 64 * t + (kr() - 0.5) * 10; z = -78 - 54 * t + (kr() - 0.5) * 10; }  // sunk causeway A→B
-      plantKelp(x, z);
-    }
-    kelp.count = ki; kelp.instanceMatrix.needsUpdate = true;
-    if (kelp.instanceColor) kelp.instanceColor.needsUpdate = true;
-    region2.add(kelp);
-  }
-
-  // SEA-STRATA L2 LIFE (loop #143): a few fish-shadows gliding over the kelp floor — dark, flat,
-  // unlit silhouettes that drift in slow circles (driven in main.js updateEnv by elapsed). region2
-  // only → pruned from the clone. Power: 7 tiny transparent meshes sharing one geo+mat, no shadow.
-  {
-    const fishShadows = new THREE.Group();
-    fishShadows.name = 'fishShadows';
-    // a flat fish silhouette, baked flat in XZ with the nose toward +x (so per-fish needs only a Y-heading)
-    const fs = new THREE.Shape();
-    fs.moveTo(0.52, 0);
-    fs.quadraticCurveTo(0.0, 0.17, -0.44, 0.12);
-    fs.lineTo(-0.72, 0.24);
-    fs.lineTo(-0.58, 0);
-    fs.lineTo(-0.72, -0.24);
-    fs.lineTo(-0.44, -0.12);
-    fs.quadraticCurveTo(0.0, -0.17, 0.52, 0);
-    const fishGeo = new THREE.ShapeGeometry(fs);   // VERTICAL body (XY plane, nose +x): a fish swims upright,
-    // so its broad side profile reads from the wading player's eye-level view; only rotation.y (heading) is set.
-    const fishMat = new THREE.MeshBasicMaterial({ color: 0x0a1a1c, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false });
-    const fr = mulberry32(SEED ^ 0xf15a);
-    let placed = 0;
-    for (let i = 0; i < 90 && placed < 7; i++) {
-      const cx = 2 + fr() * 26, cz = -113 + fr() * 13;     // over the FLOODED south-shore kelp shelf (z -113..-100), near spawn
-      const h = heightAt(cx, cz);
-      if (!Number.isFinite(h) || h > 0.3) continue;          // only the genuinely-drowned floor, so fish sit ABOVE it
-      const fish = new THREE.Mesh(fishGeo, fishMat);
-      fish.scale.setScalar(0.9 + fr() * 0.8);
-      // suspend them in the UPPER water — above the kelp (so they read as dark silhouettes, not lost
-      // on the floor) yet always under the L2 surface (~+1.47).
-      const baseY = 0.7 + fr() * 0.45;
-      fish.userData = { cx, cz, r: 1.8 + fr() * 3.0, y: baseY, spd: 0.12 + fr() * 0.16, ph: fr() * TAU };
-      fish.position.set(cx, baseY, cz);
-      fishShadows.add(fish);
-      placed++;
-    }
-    region2.add(fishShadows);
-  }
-
-  // SEA-STRATA L2 encounter: the TIDE-FIGURE — a soft dark humanoid waist-deep in the kelp.
-  // It disperses when you wade for it; it settles when you stand still and watch. Driven in
-  // puzzles _tickTideFigure. region2-only (pruned from the clone). Starts hidden + inactive.
-  {
-    const tf = new THREE.Group();
-    tf.name = 'tideFigure'; tf.visible = false;
-    const tmat = new THREE.MeshStandardMaterial({ color: 0x182a2c, emissive: 0x081416, emissiveIntensity: 0.45,
-      transparent: true, opacity: 0.8, roughness: 1, flatShading: true });
-    tf.userData.mats = [tmat];
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.62, 1.7, 7), tmat);
-    body.position.y = 0.85; tf.add(body);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), tmat);
-    head.position.y = 1.78; head.scale.set(1, 1.12, 1); tf.add(head);
-    const tfx = 12, tfz = -100;
-    tf.position.set(tfx, Number.isFinite(heightAt(tfx, tfz)) ? heightAt(tfx, tfz) : 0, tfz);
-    tf.castShadow = false; tf.receiveShadow = false;
-    region2.add(tf);
-  }
-
-  // SEA-STRATA L2 hidden fragment (loop #132): a wax slate tangled in the kelp — the keeper's
-  // note from his FIRST shallow descent, and a diegetic hint for the Tide-Figure (wade at it and
-  // it scatters; be still and it resolves). Placed on the wade-line between the L2 spawn (4,-104)
-  // and the figure (12,-100), so you find the hint, then look up and see what it describes.
-  // region2-only → pruned from the clone with its parent; read only at L2 (puzzles when-guard).
-  {
-    const slate = new THREE.Group();
-    slate.name = 'kelpSlate';
-    // a driftwood stake driven into the kelp bed — so the slate breaks the raised L2 surface
-    // (water sits ~+1.5 here; a floor-level note would drown). A marker, where he first went down.
-    const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.055, 1.7, 6),
-      new THREE.MeshStandardMaterial({ color: 0x4a3a26, roughness: 1 }));
-    stake.position.y = 0.85; stake.castShadow = true; slate.add(stake);
-    // the slate mounted near the top, leaning, face toward the one wading out
-    const head = new THREE.Group();
-    head.position.y = 1.5; head.rotation.set(-0.16, 2.4, 0.1);
-    const board = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.54, 0.04),
-      new THREE.MeshStandardMaterial({ color: 0x5c4a30, roughness: 0.95 }));        // driftwood backing
-    board.castShadow = true;
-    const wax = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.44, 0.05),
-      new THREE.MeshStandardMaterial({ color: 0x241f18, roughness: 0.85 }));        // dark wax face
-    wax.position.z = 0.02; head.add(board, wax);
-    // a few hair-fine incised lines, paler where the stylus cut the wax (close-up detail)
-    const inkMat = new THREE.MeshStandardMaterial({ color: 0x9a8f72, roughness: 1, emissive: 0x14110b, emissiveIntensity: 0.2 });
-    for (let li = 0; li < 4; li++) {
-      const line = new THREE.Mesh(new THREE.BoxGeometry(0.22 - (li % 2) * 0.05, 0.012, 0.01), inkMat);
-      line.position.set(-0.02 + (li % 2) * 0.02, 0.14 - li * 0.09, 0.055);
-      head.add(line);
-    }
-    slate.add(head);
-    const sx = 8, sz = -101;
-    slate.position.set(sx, (Number.isFinite(heightAt(sx, sz)) ? heightAt(sx, sz) : 0), sz);
-    slate.receiveShadow = false;
-    region2.add(slate);
-  }
+  // SEA-STRATA region content lives in js/regions/ (#71): one build(ctx) module per
+  // drowned level-area, each on its own SEED^salt rng stream so no region can shift
+  // the world scatter (or another region). The seam new level-area content lands in.
+  buildRegions({ region2, region3, region4 });
 
   const waterMat = makeWaterMaterial(heightTex, DOMAIN);
   // 96 segments (was 120): the longest wave in the vertex shader is ~63m, so a 6.5m grid
@@ -2466,28 +2258,31 @@ export function buildWorld() {
         }
       }
     }
-    // the inspector's carbon, kept by the cot (quarters: opens one level down, like the room)
-    {
-      const q = core.getObjectByName('quarters');
-      if (q) {
-        const sheet = new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.32),
-          new THREE.MeshStandardMaterial({ color: 0xd9d2bc, roughness: 0.95, side: THREE.DoubleSide }));
-        sheet.rotation.x = -Math.PI / 2 + 0.06;
-        sheet.rotation.z = 0.3;
-        sheet.position.set(-0.35, 0.44, 1.05);
-        sheet.name = 'commendPaper';
-        q.add(sheet);
-      }
-    }
-    // the notice of review, folded small and wedged under the chart table's rim — seen
-    // every day, obeyed never
-    {
-      const fold = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.14),
-        new THREE.MeshStandardMaterial({ color: 0xcfc7ae, roughness: 0.95 }));
-      fold.position.set(LH.x + 1.45, LH.y + 0.90, LH.z - 1.35);
-      fold.rotation.y = 0.35;
-      fold.name = 'closureNotice';
-      core.add(fold);
+    // (the inspector's two papers build through the #69 fragment factory below)
+  }
+
+  // #69: THE FRAGMENT FACTORY — a LORE entry carrying `place` becomes a world object
+  // here and a reader hotspot in puzzles with NO further engineering: content is
+  // writing again, not plumbing. Stock props by style; names register through the
+  // #70 seam so the boot assert covers them.
+  {
+    const STOCK = {
+      sheet: () => new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0xd9d2bc, roughness: 0.95, side: THREE.DoubleSide })),
+      fold: () => new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0xcfc7ae, roughness: 0.95 })),
+    };
+    for (const [id, lore] of Object.entries(LORE)) {
+      const pl = lore.place;
+      if (!pl) continue;
+      const mesh = (STOCK[pl.prop] || STOCK.sheet)();
+      mesh.position.set(pl.pos[0], pl.pos[1], pl.pos[2]);
+      if (pl.rx) mesh.rotation.x = pl.rx;
+      if (pl.ry) mesh.rotation.y = pl.ry;
+      if (pl.rz) mesh.rotation.z = pl.rz;
+      mesh.name = 'lore_' + id;
+      defineProp('lore_' + id);
+      ((pl.parent && core.getObjectByName(pl.parent)) || core).add(mesh);
     }
   }
 
@@ -3094,8 +2889,16 @@ export function instantiateModel(core, modelAnchor) {
   return modelRoot;
 }
 
+// #70: the registration seam — new state-driven props register here (name + whether the
+// 1:240 clone prunes them) instead of hand-editing two lists; the legacy NAMES entries
+// below keep working unchanged. main.js asserts every name resolves at boot.
+export function defineProp(name, { prune = false } = {}) {
+  if (!NAMES.includes(name)) NAMES.push(name);
+  if (prune) MODEL_PRUNE.add(name);
+}
+
 // Collect state-driven object refs by name, for one island instance.
-const NAMES = [
+export const NAMES = [
   'water', 'lampLens', 'beamPivot', 'beamCone', 'shaftBeam', 'valveWheel',
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
@@ -3116,7 +2919,7 @@ const NAMES = [
   'tinyCompanion',                                                         // #53: the second figure on the model's beach, once carried
   'drainLedger',                                                           // #55: the inspector's tide ledger, wedged in the drain
   'cmTallies', 'cmFormal', 'cmPlain', 'cmUnfinished', 'cmChild',           // #50-B: the climbers' five hands down the descent
-  'cgRoof', 'cgCount', 'cgLight', 'commendPaper', 'closureNotice',         // #50-C the congregation's lines · #50-A the inspector's papers
+  'cgRoof', 'cgCount', 'cgLight',                                          // #50-C the congregation's carved lines (#50-A's papers register via the #69 factory)
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'canopiesFar', 'canopiesFar2', 'grass',   // SEA-STRATA L4 strip (loop #129); near+far LOD pairs (#6)
 ];

@@ -249,3 +249,14 @@ export function vary(color, r, dh = 0.015, ds = 0.06, dl = 0.05) {
   );
   return c;
 }
+
+
+// ---------------------------------------------------------------------------
+// #73: the minimal update scheduler. Per-entity animation kept accreting into
+// applyAtmosphere/Game.tick; content now registers a drive BESIDE its build code
+// and self-gates via when(W). main runs the list once per frame.
+export const DRIVES = [];
+export function addDrive(when, update) { DRIVES.push({ when, update }); }
+export function runDrives(W, dt, elapsed, ctx) {
+  for (const d of DRIVES) if (!d.when || d.when(W)) d.update(dt, elapsed, ctx);
+}

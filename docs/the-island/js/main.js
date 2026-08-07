@@ -6,16 +6,16 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP } from './world.js';
-import { SPOTS, heightAt, walkableY } from './terrain.js';
-import { buildWorld, instantiateModel, collectRefs } from './props.js';
+import { SPOTS, heightAt, walkableY, syncGates } from './terrain.js';
+import { buildWorld, instantiateModel, collectRefs, NAMES } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
 import { UI } from './ui.js';
-import { KEEPER } from './content.js';
+import { KEEPER, T } from './content.js';
 import A from './audio.js';
-import { Baker, mergeGeometries, clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED } from './util.js';
+import { Baker, mergeGeometries, clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED, addDrive, runDrives } from './util.js';
 
 const canvas = document.getElementById('scene');
 const DEBUG = new URLSearchParams(location.search).has('debug');
@@ -189,6 +189,44 @@ const COAT_POS = (() => {
 })();
 const refs = collectRefs(core);
 const modelRefs = collectRefs(modelRoot);
+// #70: the registry assert — every NAMES entry must resolve on the ISLAND instance at
+// boot (the model legitimately prunes). collectRefs backfills typos with silent nulls;
+// this makes them loud, in the console and (via ?diag) on-screen.
+{
+  const missing = NAMES.filter((n) => !refs[n]);
+  if (missing.length) console.error('[ABYME] prop-registry assert: unresolved island refs → ' + missing.join(', '));
+}
+// #73: per-entity drives register HERE, beside the wiring, and self-gate on W —
+// applyAtmosphere goes back to being about atmosphere. The scheduler runs them each frame.
+addDrive((w) => w.atTop, (dt, elapsed) => {
+  // the foreshadow ring — the NEXT level's waterline, breathing like a premonition
+  const nextTide = LEVELS[Math.min(W.level + 1, MAX_DEPTH)].tide;
+  foreshadow.position.y = -TIDE_DROP * (1 - nextTide) + 0.06;
+  foreshadow.material.opacity = 0.30 + Math.sin(elapsed * 0.9) * 0.08;
+});
+addDrive(null, () => { foreshadow.visible = W.atTop; });
+addDrive((w) => w.level === 2 && !!refs.fishShadows, (dt, elapsed) => {
+  // L2 fish-shadows: dark silhouettes gliding over the kelp floor in slow circles (#143)
+  for (const f of refs.fishShadows.children) {
+    const u = f.userData;
+    const a = elapsed * u.spd + u.ph;
+    f.position.x = u.cx + Math.cos(a) * u.r;
+    f.position.z = u.cz + Math.sin(a) * u.r;
+    f.position.y = u.y + Math.sin(elapsed * 0.5 + u.ph) * 0.12;
+    f.rotation.y = Math.atan2(-Math.cos(a), -Math.sin(a));
+  }
+});
+addDrive(null, (dt, elapsed) => {
+  // the jetty globe blooms as night falls — a light left for a return that may never come (#24)
+  const night = clamp((-sunElevation(W.time) - 0.02) / 0.18, 0, 1);
+  const flick = 1 + 0.10 * Math.sin(elapsed * 4.7) + 0.05 * Math.sin(elapsed * 11.3);
+  if (refs.jettyHalo) {
+    refs.jettyHalo.material.opacity = lerp(0.12, 0.92, night) * flick;
+    refs.jettyHalo.scale.setScalar(lerp(1.2, 2.5, night) * flick);
+  }
+  if (refs.jettyLantern) refs.jettyLantern.material.emissiveIntensity = lerp(1.0, 2.8, night) * flick;
+});
+
 // terrain material (shared by island + model clone) — its aerial-haze uniform
 // tracks the active grade's fog colour each frame (set in applyAtmosphere)
 const terrainMat = core.getObjectByName('terrain')?.material;
@@ -620,7 +658,7 @@ function beginIntro(instant = false) {
   // instantly; a first-time viewer still gets a 1.5s guard against an accidental tap
   setTimeout(() => canvas.addEventListener('pointerdown', skip), instant ? 0 : 1500);
   // #61: the skip was undiscoverable — say it once, early, in the whisper voice
-  setTimeout(() => { if (intro && intro.t < intro.dur - 4) UI.whisper('Click, and the sea will hurry.'); }, 4000);
+  setTimeout(() => { if (intro && intro.t < intro.dur - 4) UI.whisper(T.click_and_the_sea); }, 4000);
 }
 
 function endIntro() {
@@ -631,7 +669,7 @@ function endIntro() {
   player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); // == the flight's final frame: no cut
   player.locked = false;
   interact.enabled = true;
-  UI.whisper('The tide brought you back.');
+  UI.whisper(T.the_tide_brought_you);
   UI.showHint();
   W.flags.introDone = true;
   save(player);
@@ -666,7 +704,7 @@ function startDive() {
     startQuat: camera.quaternion.clone(),
     snapDone: false,
   };
-  UI.whisper('Down is the only direction left.');
+  UI.whisper(T.down_is_the_only);
 }
 
 function tickDive(dt) {
@@ -720,7 +758,7 @@ function tickDive(dt) {
       3: 'The same sand — the colour going out of it.',
       4: 'The same room, gone cold and far. Below it, a light still burns.',
     }[W.level] || 'Down, and down.');
-    if (W.level === 2) setTimeout(() => UI.whisper('Somewhere above, a door stands open now.'), 6000);
+    if (W.level === 2) setTimeout(() => UI.whisper(T.somewhere_above_a_door), 6000);
     // from level 3 down, the keeper answers your arrival — the first 'I' in the
     // game: a drowned voice under the floor, his words in quotes (#14)
     if (W.level >= 3) setTimeout(() => {
@@ -746,7 +784,7 @@ let ascent = null;
 let keeperFarewell = false;   // transient: the arrival names the keeper's silence (#12 stage 3)
 let keeperCarried = false;    // transient: the arrival names that he rose WITH you (the twist, #item4)
 function startAscent(instant = false) {
-  if (W.level <= 1) { if (!instant) UI.whisper('There is no level above the surface. Not yet.'); return false; }
+  if (W.level <= 1) { if (!instant) UI.whisper(T.there_is_no_level); return false; }
   if (instant) { landAscent(); return true; } // debug/verify: skip the cinematic AND the mode-gate
   if (MODE !== 'play') return false;
   MODE = 'ascend';
@@ -765,7 +803,7 @@ function startAscent(instant = false) {
   // a surrender (you fall); the ascent is an EFFORT (you heave the world up by inches).
   // Panel #4 gap #3 — give the climb weight, so it isn't the dive with the sign flipped.
   ascent = { t: 0, dur: 28, pivot, startQuat: camera.quaternion.clone(), snapDone: false, fading: false };
-  UI.whisper('You run the mechanism backward. It fights you — the world comes up by inches.');
+  UI.whisper(T.you_run_the_mechanism);
   return true;
 }
 function landAscent() {
@@ -782,16 +820,16 @@ function landAscent() {
     if (!W.flags.returned) {
       W.flags.returned = true;
       if (W.flags.carried) {
-        UI.whisper('Back at the surface — and you did not come up alone. The door, the coat, the jetty, all as you left them. You are not.');
-        UI.addJournal('I have been all the way down and all the way back, and I did not come up empty-handed. The hand that writes this is mine again — both of them mine. The light is lit, below and above, and nothing is left burning alone. There is the dory on the beach, and an oar I have never used. The only thing left undone is to go.', '', 'self');
+        UI.whisper(T.back_at_the_surface_2);
+        UI.addJournal(T.i_have_been_all, '', 'self');
       } else {
-        UI.whisper('Back at the surface. The door, the coat, the jetty — all as you left them. Only you are different.');
-        UI.addJournal('I have been all the way down and all the way back. The same beach, the same light — but the hand that writes this is mine again, and I left his still burning below. I did not put it out. I did not stay. There is the dory on the beach, and an oar — the one thing here I have never used. The light is lit; the only thing left undone is to go.', '', 'self');
+        UI.whisper(T.back_at_the_surface_3);
+        UI.addJournal(T.i_have_been_all_2, '', 'self');
       }
       // POINT THE WAY OUT: the climb-out terminal (#22) is the dory, ~80 m south on the wake-up
       // beach. Name it, or a player re-dives / rings the bell and never finds the choice the
       // whole fork exists to offer. (The oar also glints on hover once armed; this draws them to it.)
-      setTimeout(() => { if (W.level <= 1 && MODE === 'play') UI.whisper('Down on the beach, the beached dory waits — and its oar, the last thing here you have not touched.'); }, 6800);
+      setTimeout(() => { if (W.level <= 1 && MODE === 'play') UI.whisper(T.down_on_the_beach); }, 6800);
     }
   }
   // the keeper falls silent behind you (#12 stage 3): the first time you turn back from the
@@ -805,13 +843,13 @@ function landAscent() {
       // BELOW you but at your shoulder. No farewell; he is not left behind. (Wordless: the held
       // breath of two climbing as one — the arrival names it.)
       keeperCarried = true;
-      UI.addJournal('I did not leave him. I turned him around at the bottom and we started up together — the lost thing I came all this way to find was the one still carrying the lamp. Two lights now, lit at both ends of the same stair, and both of them climbing.', '', 'self');
+      UI.addJournal(T.i_did_not_leave, '', 'self');
     } else {
       // the climb-out without the embrace: he stays below, tending the light; you leave it BURNING
       A.say('keeper_farewell', 'resigned');
       UI.whisper(KEEPER.farewell);
       keeperFarewell = true;
-      UI.addJournal('I went all the way down — to the smallest room, the coldest light — and found him still there, still tending it. I could not bring myself to put it out. So I have started back up the stairs, and I am carrying what I found at the bottom. The light is still burning behind me. Let it.', '', 'self');
+      UI.addJournal(T.i_went_all_the, '', 'self');
     }
   }
   // SEA-STRATA: arriving a level shallower, the sea recedes to that level's tide (surface = 1)
@@ -864,10 +902,10 @@ function tickAscent(dt) {
     // name it, the once it happens — the integration beat
     if (keeperCarried) {
       keeperCarried = false;
-      setTimeout(() => UI.whisper('His voice is beside you now, not below. You did not put the light out — you carried it up.'), 5200);
+      setTimeout(() => UI.whisper(T.his_voice_is_beside), 5200);
     } else if (keeperFarewell) {
       keeperFarewell = false;
-      setTimeout(() => UI.whisper('Below you, the voice has stopped. The light still burns — you did not put it out.'), 5200);
+      setTimeout(() => UI.whisper(T.below_you_the_voice), 5200);
     }
   }
 }
@@ -973,7 +1011,7 @@ function startOarFinale() {
   if (line1) line1.textContent = 'you left the light on';
   // the rower's own realization, at peace, fades in as you pull away — NOT the keeper (no
   // keeper styling, no leading ellipsis, so it doesn't re-read as his voice after his silence)
-  setTimeout(() => { if (finale && finale.kind === 'oar') UI.whisper('The way out was the way in. It always was.'); }, 4400);
+  setTimeout(() => { if (finale && finale.kind === 'oar') UI.whisper(T.the_way_out_was); }, 4400);
   // one warm bell-partial as the island becomes a model (the withheld, leitmotif-warm toll)
   setTimeout(() => { if (finale && finale.kind === 'oar') A.bellToll(true); }, 9500);
 }
@@ -1163,7 +1201,7 @@ function applyAtmosphere(elapsed, dt) {
   // the coat remembers its keeper — one quiet line, up close, once
   if (MODE === 'play' && game && W.level >= 2) {
     if (camera.position.distanceTo(COAT_POS) < 1.7) {
-      game.once('coatScent', () => UI.whisper('Salt and lamp oil, still.'));
+      game.once('coatScent', () => UI.whisper(T.salt_and_lamp_oil));
     }
   }
 
@@ -1175,7 +1213,7 @@ function applyAtmosphere(elapsed, dt) {
     if (nf && MODE === 'play' && game) {
       nestedGlint.getWorldPosition(_glintV);
       if (camera.position.distanceTo(_glintV) < 1.5) {
-        game.once('nestedLight', () => UI.whisper('Far down, a light is still lit.'));
+        game.once('nestedLight', () => UI.whisper(T.far_down_a_light));
       }
     }
   }
@@ -1194,10 +1232,10 @@ function applyAtmosphere(elapsed, dt) {
         youMarker.getWorldPosition(_youV);
         if (camera.position.distanceTo(_youV) < 2.2) {
           game.once('youOnModel', () => {
-            UI.whisper('There you are — a speck on your own map.');
+            UI.whisper(T.there_you_are_a);
             // the discovery lands in the journal, not just the air — and names the abyme
             // without naming who you are (fork-neutral: self-recognition, not identity).
-            UI.addJournal('A mark has appeared on the model where I stand — a little light that moves when I move. I have bent over this map for days, trusting it to show me the island truly. It was showing me ON it the whole time. You can study a place a long while before you notice you are also a figure in it.', '', 'self');
+            UI.addJournal(T.a_mark_has_appeared, '', 'self');
           });
         }
       }
@@ -1231,14 +1269,7 @@ function applyAtmosphere(elapsed, dt) {
   // farSea shares the water material's uniform objects — the wu.* writes above drive it
   farSea.position.y = waterY() - 0.15;
 
-  // the foreshadow ring — only while up on the gallery; sits at the NEXT level's waterline (the
-  // line the rising tide means to reach), faint and slowly breathing so it reads as a premonition.
-  foreshadow.visible = W.atTop;
-  if (W.atTop) {
-    const nextTide = LEVELS[Math.min(W.level + 1, MAX_DEPTH)].tide;
-    foreshadow.position.y = -TIDE_DROP * (1 - nextTide) + 0.06;
-    foreshadow.material.opacity = 0.30 + Math.sin(elapsed * 0.9) * 0.08;
-  }
+  // (the foreshadow ring is a #73 drive now, registered beside the wiring)
 
   // the drain's flood rises with the depth you carry (Phase C, flood-per-depth): below the chamber
   // floor (4.0) at the surface, drowning the room by the bottom. The floor stays walkable throughout.
@@ -1284,16 +1315,6 @@ function applyAtmosphere(elapsed, dt) {
   keeperLamp.intensity = ((W.level >= 2 || W.flags.returned) ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
   // the jetty beacon: a low warm glow by day, a real beacon by night
   jettyLamp.intensity = lerp(3, 20, night) * (1 + 0.07 * Math.sin(elapsed * 4.7));
-  // the globe blooms a soft halo and burns brighter as night falls — a light
-  // left for a return that may never come (the Threshold, #24)
-  {
-    const flick = 1 + 0.10 * Math.sin(elapsed * 4.7) + 0.05 * Math.sin(elapsed * 11.3);
-    if (refs.jettyHalo) {
-      refs.jettyHalo.material.opacity = lerp(0.12, 0.92, night) * flick;
-      refs.jettyHalo.scale.setScalar(lerp(1.2, 2.5, night) * flick);
-    }
-    if (refs.jettyLantern) refs.jettyLantern.material.emissiveIntensity = lerp(1.0, 2.8, night) * flick;
-  }
 
   // #27: lights leave the shader entirely while dark (see POINT_LIGHTS note)
   for (const L of POINT_LIGHTS) L.visible = L.intensity > 0.01;
@@ -1368,18 +1389,6 @@ function applyAtmosphere(elapsed, dt) {
     tu.uSunUp.value = clamp((_sunV.y + 0.02) / 0.14, 0, 1);
   }
 
-  // L2 fish-shadows: dark silhouettes gliding over the kelp floor in slow circles (#143).
-  // Driven from elapsed (no accumulation); only at L2, where region2 shows them.
-  if (refs.fishShadows && W.level === 2) {
-    for (const f of refs.fishShadows.children) {
-      const u = f.userData;
-      const a = elapsed * u.spd + u.ph;
-      f.position.x = u.cx + Math.cos(a) * u.r;
-      f.position.z = u.cz + Math.sin(a) * u.r;
-      f.position.y = u.y + Math.sin(elapsed * 0.5 + u.ph) * 0.12;   // gentle rise and fall
-      f.rotation.y = Math.atan2(-Math.cos(a), -Math.sin(a));        // face the direction of travel
-    }
-  }
 
   // sky follows the camera
   sky.position.set(camera.position.x, 0, camera.position.z);
@@ -1479,7 +1488,7 @@ function tickPerched(elapsed, dt) {
 }
 
 // ---------------- footsteps ----------------
-player.onRescue = () => UI.whisper('The ground gives you back.');
+player.onRescue = () => UI.whisper(T.the_ground_gives_you);
 player.onFootstep = (kind, pos) => {
   A.footstep(kind);
   // wet seabed sparkles underfoot
@@ -1532,7 +1541,7 @@ player.onFootstep = (kind, pos) => {
       return { level: n, id: L.id, region: L.region, tide: L.tide, encounter: L.encounter };
     },
     dive: (instant = false) => {                       // the missing counterpart to ascend()
-      if (W.level >= MAX_DEPTH) { UI.whisper('Already at the bottom.'); return false; }
+      if (W.level >= MAX_DEPTH) { UI.whisper(T.already_at_the_bottom); return false; }
       W.flags.plumbHung = true;                         // arm the plate so the mechanic is valid
       if (instant) return window.ABYME.goLevel(Math.min(W.level + 1, MAX_DEPTH));
       if (MODE !== 'play') return false;
@@ -1594,7 +1603,7 @@ player.onFootstep = (kind, pos) => {
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 4000);
       } catch (e) {}
-      UI.whisper('Field report taken — copied, downloaded, and remembered.');
+      UI.whisper(T.field_report_taken_copied);
       return rep;
     },
     applyReport: (rep) => {                              // stand where the reporter stood
@@ -1885,6 +1894,8 @@ renderer.setAnimationLoop((tMs) => {
   elapsed += dt;
   fps = lerp(fps, 1 / Math.max(dt, 1e-4), 0.05);
 
+  // #77: collision reads GATES, not W — one unmissable sync at the top of the frame
+  syncGates(W);
   // idle drift of the sun — barely perceptible, but the island lives
   if (MODE === 'play') W.time = (W.time + W.timeDrift * dt) % 24;
   if (MODE === 'play') A.musicTo(W.level);   // the era music bed follows the descent (crossfades by level)
@@ -1922,6 +1933,7 @@ renderer.setAnimationLoop((tMs) => {
 
   if (!W.reading) player.update(dt);   // a fragment is open: the world holds still while you read
   game.tick(dt, elapsed);
+  runDrives(W, dt, elapsed);   // #73: the self-gating per-entity drives
   tickModelGate(dt);
   // #6: re-aim the tree LOD at the player every ~0.35s (hysteresis lives in the partition)
   treeLodTimer -= dt;
