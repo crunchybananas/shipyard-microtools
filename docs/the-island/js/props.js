@@ -2067,6 +2067,64 @@ export function buildWorld() {
     core.add(phial);
   }
 
+  // =================== HIS ROUNDS (#131, AAA-A3) ======================================
+  // The furniture of the keeper's day, findable and performable — one act per era.
+  // The acts themselves are wired in puzzles (hotspots + tableaux); these are the
+  // three props that did not exist yet: the mooring cleat (the first thing he ever
+  // did here), the day's return unsigned (the inspection years' daily line), and
+  // the cot lantern (the small light he lit when the great one was done).
+  {
+    const dory = core.getObjectByName('dory');
+    if (dory) {
+      const cleat = new THREE.Group();
+      cleat.name = 'mooringCleat';
+      const iron = new THREE.MeshStandardMaterial({ color: 0x2a2d31, roughness: 0.8, metalness: 0.35, flatShading: true });
+      const hemp = new THREE.MeshStandardMaterial({ color: 0x9a8a62, roughness: 1 });
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.055, 0.16, 6), iron);
+      post.position.y = 0.08; cleat.add(post);
+      const horn = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.34, 6), iron);
+      horn.rotation.z = Math.PI / 2; horn.position.y = 0.15; cleat.add(horn);
+      // the coiled line, figure-eighted over the horns — his turns, still holding
+      for (let ci = 0; ci < 3; ci++) {
+        const coil = new THREE.Mesh(new THREE.TorusGeometry(0.085 - ci * 0.012, 0.016, 5, 10), hemp);
+        coil.rotation.x = Math.PI / 2 + 0.12; coil.position.y = 0.16 + ci * 0.026; cleat.add(coil);
+      }
+      cleat.position.set(0.42, 0.32, 1.35);
+      defineProp('mooringCleat');
+      dory.add(cleat);
+    }
+    const book = core.getObjectByName('logbook');
+    if (book) {
+      const sheet = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.34),
+        new THREE.MeshStandardMaterial({ color: 0xd6cdb2, roughness: 0.95, side: THREE.DoubleSide }));
+      sheet.rotation.x = -Math.PI / 2; sheet.rotation.z = -0.25;
+      sheet.position.set(0.4, 0.03, 0.08);
+      sheet.name = 'returnSheet';
+      defineProp('returnSheet');
+      book.add(sheet);
+    }
+    const q = core.getObjectByName('quarters');
+    if (q) {
+      const lant = new THREE.Group();
+      lant.name = 'cotLantern';
+      const tin = new THREE.MeshStandardMaterial({ color: 0x3b3f44, roughness: 0.7, metalness: 0.3, flatShading: true });
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.085, 0.05, 8), tin);
+      base.position.y = 0.025; lant.add(base);
+      const glass = new THREE.Mesh(new THREE.SphereGeometry(0.062, 8, 6),
+        new THREE.MeshStandardMaterial({ color: 0xcfd8d2, roughness: 0.35, transparent: true, opacity: 0.5,
+          emissive: 0xffb45a, emissiveIntensity: 0.0 }));
+      glass.name = 'cotLanternGlass';
+      glass.position.y = 0.1; glass.scale.y = 1.25; lant.add(glass);
+      const cap = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.05, 8), tin);
+      cap.position.y = 0.2; lant.add(cap);
+      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.008, 5, 10), tin);
+      handle.position.y = 0.23; handle.rotation.x = 0.2; lant.add(handle);
+      lant.position.set(-1.7, 0, 1.62);   // the floor by the cot's head, where his hand could find it in the dark
+      defineProp('cotLantern');
+      q.add(lant);
+    }
+  }
+
   // =================== THE TIDE GAUGE (#52: region4's landmark) =======================
   // A graduated staff on the lower foreshore, ringed at the EXACT absolute waterlines of
   // the descent — 0 (L1 high water), +1.47 (L2), +2.73 (L3), +3.78 (L4) — and one ring

@@ -12,6 +12,42 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 30 — 2026-08-06 — #131: HIS ROUNDS — the keeper staged at last (AAA-A3)
+
+**Shipped:** the keeper stops being prose. Once the strata are understood as years
+(the era threshold), the furniture of his day becomes findable and performable — one
+act per era, each a hotspot on a prop that now exists for it: **MOOR** (L2, the
+arrival years — a cleat and his coiled turns at the dory; take them and, out past
+the pier, the one who waited stands waist-deep in the water and watches it done),
+**LOG** (L3, the inspection years — the day's return unsigned beside the logbook;
+sign it and something is at the door exactly as long as you don't look), **LIGHT**
+(L4, the last winter — his cot lantern; light it and across the island the model's
+little lighthouse wakes, holds, and settles: one light remembering another — and the
+lantern STAYS lit for the rest of the game), **WIND** (the last day — the music box
+itself becomes the round when wound back on the surface; the bird comes to the sill,
+listens all five notes, tilts at the fourth, and does not correct it). All four =
+once('roundsAll'): "A day of his, performed whole across all the years of him at
+once. The island did not need any of it done. I did." Tableaux are non-verbal,
+figures act and never speak, ghosts only appear if their encounter was already
+integrated, every borrowed mesh is restored exactly. The model's lens material is
+CLONED before the tableau pulses it (it shares the island lens mat otherwise — the
+trap that would have pulsed the real lamp).
+
+**Evidence:** WALK PASS **36/36** — four new assertions (unlock gating, flags,
+journal keeps, and the lantern's persistent lit state through the 10s tableau).
+Coverage **98/98** after teaching it that round journals travel as _doRound args.
+No new lights (the 9-light rule holds; the lantern is emissive-only). W.flags.round*
+persisted for the A6 ending read-back.
+
+**Debt:** none. The A6 codas now have all three read-back sources shipped or
+specified (rounds ✓, inspection record #132, shore #133).
+
+**Next tick suggestion:** #132 the Inspection playable — FILE or KEEP. The rounds
+proved the verb grammar; the cabinet and the carry-down are next, and the codex
+drawer gives the middle act its running question.
+
+---
+
 ## loop-fire 29 — 2026-08-06 — #130: era events — each stratum ARRIVES as its era (AAA-A2)
 
 **Shipped:** three authored, unmissable threshold beats on existing props — the slack

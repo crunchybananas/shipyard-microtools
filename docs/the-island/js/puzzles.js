@@ -79,6 +79,20 @@ export class Game {
     fn();
   }
 
+  // #131: perform one of HIS ROUNDS — flag it, keep it, stage its tableau (tick owns
+  // the timers). kind ∈ Moor|Log|Light|Wind; the Wind round rides the music box.
+  _doRound(kind, whisper, journal) {
+    if (W.flags['round' + kind]) return;
+    W.flags['round' + kind] = true;
+    UI.whisper(whisper);
+    UI.addJournal(journal, '', 'self');
+    this['_tab' + kind] = 0;                   // arm the tableau clock
+    save(this.player);
+    if (W.flags.roundMoor && W.flags.roundLog && W.flags.roundLight && W.flags.roundWind) {
+      this.once('roundsAll', () => UI.addJournal(T.four_rounds_kept_the, '', 'self'));
+    }
+  }
+
   // ---------------------------------------------------------------- hotspots
   _buildHotspots(modelAnchor) {
     const I = this.interact;
@@ -144,6 +158,11 @@ export class Game {
         if (depth) this.once('boxDeep', () => UI.whisper(T.the_song_comes_up));
         if (this.flag('heardBox')) {
           UI.addJournal(T.the_music_box_turns);
+        }
+        // #131 the WIND round rides the box: at the surface, once the strata are years,
+        // winding it IS one of his rounds — once more than needed, for no one there
+        if (W.level === 1 && W.onceKeys?.includes('eraThreshold') && !W.flags.roundWind) {
+          this._doRound('Wind', T.wound_the_way_he, T.i_wound_the_music);
         }
       },
     });
@@ -581,6 +600,28 @@ export class Game {
         UI.addJournal(T.a_climber_s_rope, '', 'self');
       }),
     });
+
+    // #131 HIS ROUNDS (AAA-A3): the keeper's day, findable and performable — one act
+    // per era, unlocked once the strata are understood as years (the era threshold).
+    // Each performance sets its flag, keeps a journal line, and arms a short NON-VERBAL
+    // tableau in tick (figures act, never speak). Completing all four is read back by
+    // the endings (A6).
+    const roundsOn = () => W.onceKeys?.includes('eraThreshold');
+    if (R.mooringCleat) I.add({
+      id: 'roundMoor', targets: [R.mooringCleat], label: 'his line, made fast — take the turns', maxDist: 3.2,
+      when: () => roundsOn() && W.level === 2 && !W.flags.roundMoor,
+      onClick: () => this._doRound('Moor', T.the_line_takes_the, T.i_made_his_line),
+    });
+    if (R.returnSheet) I.add({
+      id: 'roundLog', targets: [R.returnSheet], label: 'the day’s return, unsigned', maxDist: 2.6,
+      when: () => roundsOn() && W.level === 3 && !W.flags.roundLog,
+      onClick: () => this._doRound('Log', T.one_true_line_signed, T.i_signed_the_day),
+    });
+    if (R.cotLantern) I.add({
+      id: 'roundLight', targets: [R.cotLantern], label: 'his small lamp, cold', maxDist: 2.6,
+      when: () => roundsOn() && W.level === 4 && !W.flags.roundLight,
+      onClick: () => this._doRound('Light', T.the_small_flame_takes, T.i_lit_his_small),
+    });
     if (R.bluffCairn) I.add({
       id: 'bluffCairn', targets: [R.bluffCairn], label: 'a cairn, a mark scratched in the stone', maxDist: 3.2,
       when: () => W.level === 3,               // exists only on the L3 bluff (region3)
@@ -895,6 +936,48 @@ export class Game {
         this._farewellT = null;
         save(this.player);
       }
+    }
+
+    // #131 HIS ROUNDS tableaux — brief non-verbal stagings; figures act, never speak.
+    // Each clock runs once after its round; meshes borrowed are restored exactly.
+    const RF = this.refs;
+    if (this._tabMoor != null) {           // the one who waited, at the tideline (8s)
+      const t = (this._tabMoor += dt), tf = RF.tideFigure;
+      if (tf && F.tideFigureSeen) {
+        if (!this._tabMoorSaved) { this._tabMoorSaved = { pos: tf.position.clone(), rot: tf.rotation.y, vis: tf.visible, op: tf.userData.mats[0].opacity }; }
+        tf.position.set(-19, waterY() - 1.1, -111);      // off the jetty's end, waist-deep
+        tf.rotation.y = 2.8;                             // facing in, toward the pier
+        tf.visible = true;
+        tf.userData.mats.forEach((m) => { m.opacity = 0.38 * Math.sin(Math.min(t / 8, 1) * Math.PI); });
+        if (t >= 8) { const s = this._tabMoorSaved; tf.position.copy(s.pos); tf.rotation.y = s.rot; tf.visible = s.vis; tf.userData.mats.forEach((m) => { m.opacity = s.op; }); this._tabMoorSaved = null; }
+      }
+      if (t >= 8) this._tabMoor = null;
+    }
+    if (this._tabLog != null) {            // the reader of returns, at the threshold (6s)
+      const t = (this._tabLog += dt), wa = RF.watcher;
+      if (wa && F.watcherSeen && RF.innerDoor) {
+        if (!this._tabLogSaved) { this._tabLogSaved = { pos: wa.position.clone(), vis: wa.visible }; RF.innerDoor.getWorldPosition(this._tabLogP = this._tabLogP || new THREE.Vector3()); }
+        wa.position.set(this._tabLogP.x, this._tabLogP.y - 1.0, this._tabLogP.z);
+        wa.visible = t > 0.8 && t < 5.2;                 // there when you glance, gone when you look
+        if (t >= 6) { const s = this._tabLogSaved; wa.position.copy(s.pos); wa.visible = s.vis; this._tabLogSaved = null; }
+      }
+      if (t >= 6) this._tabLog = null;
+    }
+    if (this._tabLight != null) {          // one light remembering another (10s)
+      const t = (this._tabLight += dt);
+      const glass = RF.cotLantern?.getObjectByName('cotLanternGlass');
+      if (glass) glass.material.emissiveIntensity = 1.15 * Math.min(t / 1.5, 1) * (1 + 0.06 * Math.sin(elapsed * 7));
+      const ml = this.modelRefs?.lampLens;
+      if (ml) {
+        if (!this._mlOwnMat) { ml.material = ml.material.clone(); this._mlOwnMat = true; }   // island lens shares the mat otherwise
+        ml.material.emissiveIntensity = 0.25 + 2.0 * Math.sin(Math.min(t / 10, 1) * Math.PI);
+      }
+      if (t >= 10) { if (ml) ml.material.emissiveIntensity = 0.25; this._tabLight = null; }  // lantern STAYS lit — see _apply
+    }
+    if (this._tabWind != null) {           // the bird comes to listen (10s; visibility override in _apply)
+      const t = (this._tabWind += dt);
+      if (t > 4 && !this._tabWindChirped) { this._tabWindChirped = true; A.chirp(1318.5, 0, 0.3); }
+      if (t >= 10) { this._tabWind = null; this._tabWindChirped = false; }
     }
 
     // tide easing + valve sound
@@ -1441,7 +1524,12 @@ export class Game {
     if (R.plumbHung) R.plumbHung.visible = F.plumbHung;
     if (R.plumbBob) R.plumbBob.visible = !F.plumbTaken;
 
-    if (R.songBird) R.songBird.visible = isDawn();
+    if (R.songBird) R.songBird.visible = isDawn() || (!isModel && this._tabWind != null);   // #131: the bird comes to listen
+    // #131: once lit, his small lamp STAYS lit (the tableau owns it while its clock runs)
+    if (R.cotLantern && this._tabLight == null) {
+      const lg = R.cotLantern.getObjectByName('cotLanternGlass');
+      if (lg) lg.material.emissiveIntensity = W.flags.roundLight ? 1.05 : 0;
+    }
     // the keeper's coat fades with the descent (#13): on its hook at level 2,
     // slumped to the floor at level 3, gone below — the keeper more absent the
     // deeper you go (translation-only, so the stitched marginalia stays with it)

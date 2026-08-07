@@ -348,6 +348,11 @@ export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 // live together as content.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
 export const SKETCHES = [
+  ['made his line fast', S('<path d="M48 12v14"/><path d="M34 18h28"/><path d="M40 22a9 5 0 1 0 16 0a9 5 0 1 0 -16 0" opacity=".6"/><path d="M42 26a7 4 0 1 0 12 0" opacity=".4"/><path d="M62 18q10 -4 18 2" opacity=".5"/>')],
+  ['signed the day’s return', S('<rect x="30" y="8" width="36" height="26" rx="1" opacity=".6"/><path d="M35 15h26M35 20h26M35 25h14" opacity=".4"/><path d="M52 27q4 -3 7 0t7 -1"/>')],
+  ['lit his small lamp', S('<path d="M42 34h12M44 34v-3h8v3" opacity=".6"/><circle cx="48" cy="24" r="6" opacity=".5"/><path d="M48 27c-2-2-2-5 0-7c2 2 2 5 0 7z"/><path d="M48 13v-3" opacity=".4"/><path d="M80 12l-3 3M79 20h-4" opacity=".35"/>')],
+  ['wound the music box', S('<rect x="30" y="22" width="22" height="11" rx="2"/><path d="M52 22l4-5" opacity=".6"/><path d="M60 14a4 4 0 1 1 4 4" opacity=".7"/><path d="M70 24q3 -6 8 -6t7 5" opacity=".5"/><circle cx="79" cy="17" r="1.5"/>')],
+  ['Four rounds, kept', S('<path d="M30 22h8M42 22h8M54 22h8M66 22h8"/><path d="M28 28q20 8 40 0" opacity=".35"/><circle cx="48" cy="14" r="3" opacity=".6"/>')],
   ['still swinging', S('<path d="M48 6v4"/><path d="M48 10c-6 8-9 14-10 22" opacity=".4"/><path d="M48 10c6 8 9 14 10 22" opacity=".4"/><path d="M48 10c2 9 3 15 3 22"/><circle cx="51" cy="34" r="1.6"/>')],
   ['give the capitals back', S('<path d="M10 26h76" opacity=".7"/><path d="M24 26v-6h8v6M44 26v-8h8v8M64 26v-5h8v5"/><path d="M26 20h4M46 18h4M66 21h4" opacity=".6"/><path d="M20 30q6 3 12 0t12 0t12 0t12 0" opacity=".35"/>')],
   ['stopped performing', S('<circle cx="48" cy="22" r="14" opacity=".5"/><path d="M48 22L34 12M48 22l14-10" opacity=".8"/><path d="M48 22l10 12" opacity=".3"/><path d="M14 36h68" opacity=".4"/>')],
@@ -580,5 +585,14 @@ export const T = {
   i_watched_the_sea: 'I watched the sea open over the drowned hall and give the capitals back — three carved crowns breaching slow, like something surfacing for air. It is the only time I have seen the water return a thing. It was not mercy. It was the inspection years rising to be read.',
   the_light_passes_under: 'The light passes under the water — once, all the way around.',
   at_the_bottom_of: 'At the bottom of the years the beam made one full pass beneath the sea — the whole island swept once, shore to shore, like a hand feeling along a wall in a dark room. Then it went out. Not failed — finished. The island has stopped performing for me. What is left down here is only the true things.',
+  the_line_takes_the: 'The line takes the cleat the way it always has. My hands knew the turns.',
+  i_made_his_line: 'I made his line fast at the dory — took the turns his hands took at the start of every day of the arrival years, the first act of every day he ever kept here. For a moment the mooring was not mine to tie but his, and the boat it held was every boat that ever came in. Out past the pier, someone stood in the water and watched it done, the way the waited-for watch the faithful. The rounds are still here. The island remembers being kept.',
+  one_true_line_signed: 'One true line, signed under all his true lines.',
+  i_signed_the_day: 'I signed the day’s return at the chart table — mean high water: risen — the way he signed it through all the inspection years, exact where exactness was asked of him. Something stood at the door while I wrote, the way being watched stands at a door, and was gone when I looked up from the line. The record is complete now, for whoever records are kept for.',
+  the_small_flame_takes: 'The small flame takes. The dark backs off by one cot’s width.',
+  i_lit_his_small: 'I lit his small lamp by the cot — the one he lit when the great light was done for the night, the last winter’s only warmth. Across the island the model answered: its little lighthouse woke, held a while, and settled, one light remembering another. He never let both of them be dark at once. Now neither will I.',
+  wound_the_way_he: 'Wound, the way he wound it — once more than it needed.',
+  i_wound_the_music: 'I wound the music box on the last day the way he wound it on every day — once more than it needed, for someone not there to hear it. The bird came to the sill and listened all five notes out, head tilted at the fourth, and did not correct it. Some rounds are kept for no one. Those were the ones he kept most faithfully.',
+  four_rounds_kept_the: 'Four rounds, kept: the line made fast, the return signed, the small lamp lit, the box wound. A day of his, performed whole across all the years of him at once. The island did not need any of it done. I did.',
   field_report_taken_copied: 'Field report taken — copied, downloaded, and remembered.',
 };
