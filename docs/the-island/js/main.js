@@ -1866,6 +1866,7 @@ let mistCur = 0;
 // (or immediately on a mode change) — no sqrt, no per-frame work.
 const MODEL_GATE_R2 = 30 * 30;
 let modelGateTimer = 0, modelGateMode = null;
+let treeLodTimer = 0;   // #6: the distant-tree repartition clock
 function tickModelGate(dt) {
   modelGateTimer -= dt;
   if (modelGateTimer > 0 && MODE === modelGateMode) return;
@@ -1922,6 +1923,12 @@ renderer.setAnimationLoop((tMs) => {
   if (!W.reading) player.update(dt);   // a fragment is open: the world holds still while you read
   game.tick(dt, elapsed);
   tickModelGate(dt);
+  // #6: re-aim the tree LOD at the player every ~0.35s (hysteresis lives in the partition)
+  treeLodTimer -= dt;
+  if (treeLodTimer <= 0 && core.userData.treeLod) {
+    treeLodTimer = 0.35;
+    core.userData.treeLod(player.pos.x, player.pos.z);
+  }
   interact.update();
   applyAtmosphere(elapsed, dt);
   tickGulls(elapsed, dt);

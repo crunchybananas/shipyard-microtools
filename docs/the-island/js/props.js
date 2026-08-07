@@ -2529,13 +2529,13 @@ function buildVegetation(core, r) {
   // flat facets), SMOOTH normals, and baked per-vertex shading — dark toward the trunk, bright at
   // the frond tips — so each tier has interior depth before the foliage texture even lands.
   // (Tree POSITIONS are untouched: the scatter draws from the shared r() stream, not jr().)
-  const makeCanopy = ({ n, baseR, taperK, tierH, spacing, lean, jag, droop, seedXor }) => {
+  const makeCanopy = ({ n, baseR, taperK, tierH, spacing, lean, jag, droop, seedXor, seg = 16, hseg = 2 }) => {
     const jr = mulberry32(SEED ^ seedXor);
     const parts = [];
     for (let i = 0; i < n; i++) {
       const t = i / (n - 1);
       const radius = baseR * (1 - t * taperK);              // wide skirt → narrow crown
-      const cone = new THREE.ConeGeometry(radius, tierH, 16, 2, true);   // openEnded (DoubleSide mat)
+      const cone = new THREE.ConeGeometry(radius, tierH, seg, hseg, true);   // openEnded (DoubleSide mat)
       const p = cone.attributes.position;
       const shade = new Float32Array(p.count * 3);
       for (let v = 0; v < p.count; v++) {
@@ -2569,6 +2569,11 @@ function buildVegetation(core, r) {
   // trees don't move). B: a slimmer, taller spruce — narrower skirt, tighter taper, one more tier.
   const canopyGeoA = makeCanopy({ n: 5, baseR: 1.75, taperK: 0.82, tierH: 1.55, spacing: 0.86, lean: 0.26, jag: 0.5, droop: 0.4, seedXor: 0x7a3c });
   const canopyGeoB = makeCanopy({ n: 6, baseR: 1.28, taperK: 0.9, tierH: 1.5, spacing: 0.96, lean: 0.16, jag: 0.42, droop: 0.34, seedXor: 0x3b71 });
+  // #6: the FAR silhouettes — same builder, same tier stack, 6 radials × 1 ring (~63%
+  // fewer canopy verts). The swap lives at 120-130m, inside the haze melt (120→300m),
+  // where a facet is a dozen hazed pixels — the silhouette carries, the cost doesn't.
+  const canopyFarGeoA = makeCanopy({ n: 5, baseR: 1.75, taperK: 0.82, tierH: 1.55, spacing: 0.86, lean: 0.26, jag: 0.5, droop: 0.4, seedXor: 0x7a3c, seg: 6, hseg: 1 });
+  const canopyFarGeoB = makeCanopy({ n: 6, baseR: 1.28, taperK: 0.9, tierH: 1.5, spacing: 0.96, lean: 0.16, jag: 0.42, droop: 0.34, seedXor: 0x3b71, seg: 6, hseg: 1 });
 
   const spots = [];
   for (let i = 0; i < 600 && spots.length < 130; i++) {
@@ -2640,11 +2645,17 @@ function buildVegetation(core, r) {
   const br = mulberry32(SEED ^ 0xba24);   // per-trunk bark tone (loop #141): separate rng so the shared r() (positions + canopy tones) stays byte-unchanged
   const variant = spots.map(() => (vr() < 0.55 ? 0 : 1));
   const nA = variant.reduce((s, v) => s + (v === 0 ? 1 : 0), 0);
+  // #6 LOD: near/far instanced PAIRS per variant, all four on the one swaying canopyMat.
+  // Each pair is allocated at full capacity; a 0.35s repartition (main.js) moves trees
+  // between them by camera distance with hysteresis. The TREES records buffer the same
+  // r()-stream data the old direct fill consumed — positions/tones byte-identical.
   const canopiesA = new THREE.InstancedMesh(canopyGeoA, canopyMat, nA);
   const canopiesB = new THREE.InstancedMesh(canopyGeoB, canopyMat, spots.length - nA);
+  const canopiesFarA = new THREE.InstancedMesh(canopyFarGeoA, canopyMat, nA);
+  const canopiesFarB = new THREE.InstancedMesh(canopyFarGeoB, canopyMat, spots.length - nA);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
   const col = new THREE.Color(), bark = new THREE.Color();
-  let ia = 0, ib = 0;
+  const TREES = [];
   for (let i = 0; i < spots.length; i++) {
     const [x, y, z] = spots[i];
     const s = 0.8 + r() * 0.8;
@@ -2665,18 +2676,38 @@ function buildVegetation(core, r) {
       0.30 + r() * 0.26,                          // dusty → vivid
       0.24 + tv * tv * 0.30                        // tv² skews most trees darker, a few crowns bright
     );
-    const cm = variant[i] === 0 ? canopiesA : canopiesB;
-    const ci = variant[i] === 0 ? ia++ : ib++;
-    cm.setMatrixAt(ci, m4);
-    cm.setColorAt(ci, col);
+    TREES.push({ x, z, v: variant[i], m: m4.clone(), c: col.clone(), far: false });
   }
+  // the repartition: enter-near under 120m, leave over 130m (hysteresis inside the haze
+  // melt, so a swap is a dozen hazed pixels). Counts shrink to the live split each call.
+  const treePartition = (px, pz) => {
+    let ia = 0, ib = 0, fa = 0, fb = 0;
+    for (const t of TREES) {
+      const d2 = (t.x - px) * (t.x - px) + (t.z - pz) * (t.z - pz);
+      t.far = t.far ? d2 > 14400 : d2 > 16900;
+      const mesh = t.v === 0 ? (t.far ? canopiesFarA : canopiesA) : (t.far ? canopiesFarB : canopiesB);
+      const idx = t.v === 0 ? (t.far ? fa++ : ia++) : (t.far ? fb++ : ib++);
+      mesh.setMatrixAt(idx, t.m);
+      mesh.setColorAt(idx, t.c);
+    }
+    canopiesA.count = ia; canopiesFarA.count = fa;
+    canopiesB.count = ib; canopiesFarB.count = fb;
+    for (const m of [canopiesA, canopiesB, canopiesFarA, canopiesFarB]) {
+      m.instanceMatrix.needsUpdate = true;
+      if (m.instanceColor) m.instanceColor.needsUpdate = true;
+      m.computeBoundingSphere();
+    }
+  };
+  treePartition(4, -104);   // boot split from the wake-up beach; main re-aims it at the player
+  core.userData.treeLod = treePartition;
   trunks.castShadow = true;
   canopiesA.castShadow = true;
   canopiesB.castShadow = true;
-  // 'canopies' is the name swayMats (main.js) finds to drive uTime on the SHARED canopyMat → both
-  // meshes sway. The L4 surface-strip (_apply) hides both via R.canopies + R.canopies2.
+  // 'canopies' is the name swayMats (main.js) finds to drive uTime on the SHARED canopyMat → all
+  // four sway. The L4 surface-strip (_apply) hides near AND far via R.canopies*/canopiesFar*.
   trunks.name = 'trunks'; canopiesA.name = 'canopies'; canopiesB.name = 'canopies2';
-  core.add(trunks, canopiesA, canopiesB);
+  canopiesFarA.name = 'canopiesFar'; canopiesFarB.name = 'canopiesFar2';
+  core.add(trunks, canopiesA, canopiesB, canopiesFarA, canopiesFarB);
 
   // FOREST-FLOOR detail: fallen logs + cut stumps among the trees — the bare tree-line given a real
   // woodland floor (the world rang flat). Two InstancedMeshes (+2 draws); own rng so the world scatter
@@ -3087,7 +3118,7 @@ const NAMES = [
   'cmTallies', 'cmFormal', 'cmPlain', 'cmUnfinished', 'cmChild',           // #50-B: the climbers' five hands down the descent
   'cgRoof', 'cgCount', 'cgLight', 'commendPaper', 'closureNotice',         // #50-C the congregation's lines · #50-A the inspector's papers
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
-  'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
+  'trunks', 'canopies', 'canopies2', 'canopiesFar', 'canopiesFar2', 'grass',   // SEA-STRATA L4 strip (loop #129); near+far LOD pairs (#6)
 ];
 
 export function collectRefs(root) {

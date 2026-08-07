@@ -12,6 +12,25 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 25 — 2026-08-01 — #6: distant trees learn to be cheap — and epic #8 CLOSES
+
+**Shipped:** the last child of the perf epic. The canopies live in near/far instanced
+PAIRS per silhouette now, all four on the one swaying material: full 16-radial×2-row
+geometry inside 120m, a 6-radial×1-row build of the SAME tier stack beyond (~63% fewer
+canopy verts), repartitioned every 0.35s by camera distance with hysteresis (enter 120m,
+leave 130m) — the swap lives inside the haze melt (120→300m), where a facet is a dozen
+hazed pixels. Positions/tones byte-identical (the r() stream untouched); the L4 strip
+hides all four; trunks stay global (cheap, and a floating far canopy would show).
+
+**Evidence:** beach pose splits 36 near / 98 far of 134 trees — tris 336k → **314k
+(-22k)**; walk into the woods and the split follows (108/26); the golden-hour treeline
+screenshot cannot tell the sets apart; L4 strips everything; walk 28/28; zero errors.
+**Closes #6 — and with it EPIC #8: the entire performance / voiced-layer / polish epic
+is complete.** The whole remaining ABYME board is the architecture cluster
+(#69-73, #75, #77).
+
+---
+
 ## loop-fire 24 — 2026-08-01 — #34: regional Bakers — the built world learns to cull
 
 **Shipped:** the grass-chunking pattern applied at the root: Baker records each add()'s
