@@ -12,6 +12,23 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 24 — 2026-08-01 — #34: regional Bakers — the built world learns to cull
+
+**Shipped:** the grass-chunking pattern applied at the root: Baker records each add()'s
+vertex range + world anchor, and `buildChunks(120)` slices the SAME bake (byte-identical
+vertices) into per-cell geometries — the island's built world lands in 3 stone + 1 brass
+culling meshes sharing their materials, exactly the "3-4 Baker pairs" the audit priced.
+staticStone/staticBrass are groups now; nothing referenced them externally.
+
+**Honest numbers:** the full statics are ~9.4k tris, and the A/B (frustumCulled on/off at
+two directed poses) shows exactly that culling away when the built world is behind you
+(+3 draws worst case, seaward 266.7k→257.7k). This is an architecture-correctness win —
+every world system now culls — plus the same win in the shadow pass, plus the
+per-landmark seam #34 wanted for future SEA-STRATA toggles. Not a headline frame cut,
+and the LOG says so. Walk 28/28; zero errors. **Closes #34 — epic #8's last child is #6.**
+
+---
+
 ## loop-fire 23 — 2026-08-01 — #50: THE OTHER HANDS — climbers, congregation, inspector
 
 **Owner green-lit the expanded design. Three written presences the keeper's own text

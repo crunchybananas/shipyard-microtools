@@ -2317,15 +2317,24 @@ export function buildWorld() {
   }
 
   // ---------- merge static bakers ----------
-  const stoneMesh = new THREE.Mesh(stone.build(), matStone);
-  stoneMesh.castShadow = true;
-  stoneMesh.receiveShadow = true;
-  stoneMesh.name = 'staticStone';
-  core.add(stoneMesh);
-  const brassMesh = new THREE.Mesh(brass.build(), matBrass);
-  brassMesh.castShadow = true;
-  brassMesh.name = 'staticBrass';
-  core.add(brassMesh);
+  // #34: REGIONAL bakes — one island-spanning mesh could never frustum-cull, so every
+  // viewpoint drew (and shadow-passed) the whole built world. buildChunks buckets the
+  // same bake by each piece's anchor into 120m cells: byte-identical vertices, a handful
+  // of meshes sharing the one material, each culling on its own bounds.
+  const mkStatic = (baker, mat, name, receive) => {
+    const grp = new THREE.Group();
+    grp.name = name;
+    for (const g of baker.buildChunks(120)) {
+      const m = new THREE.Mesh(g, mat);
+      m.castShadow = true;
+      m.receiveShadow = receive;
+      grp.add(m);
+    }
+    core.add(grp);
+    return grp;
+  };
+  mkStatic(stone, matStone, 'staticStone', true);
+  mkStatic(brass, matBrass, 'staticBrass', false);
 
   // =================== glow particles (NOT cloned into the model) ===========
   // bioluminescent pools along the drowned causeway
