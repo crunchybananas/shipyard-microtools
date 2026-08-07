@@ -12,6 +12,32 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 34 — 2026-08-07 — #136: the color script — every era wears its own light (AAA-B2)
+
+**Shipped:** Phase B opens. The old linear depth formulas (tint 0.18d, desat 0.12d,
+dark 1-0.12d) are replaced by ERA_GRADES — four art-directed rows the same pipeline
+reads, one per era: the arrival years are hue-rich warm green, barely desaturated
+(wonder, not sickness — the L2 cast recolored 0x8aa830 sodium → 0x74a83e living
+green); the inspection years go STEEL (cast 0xc29a1c jaundice → 0x8f9aa6 grey-blue,
+desat 0.34 doing the talking); the last winter lands near-monochrome in the
+thickest air (desat 0.55, fogMul 1.80). Dark values deliberately spread
+(0.93/0.80/0.66) so the eras separate in pure grayscale luminance too.
+
+**Evidence:** same-pose era sheet captured L1-L4 (era_L*.png): L2 reads saturated
+green wonder with the kelp avenue alive in frame; L3 unmistakably steel-grey; L4 a
+pale airless milk — winter light, instantly distinct from both. Pure parameter
+change, zero new passes — GPU 4.0/5.0/7.7ms across the three shots, all under
+budget. WALK PASS **42/42** unchanged.
+
+**Debt:** none. (The L4 read came out palest rather than darkest — the fog does the
+final darkening emotionally; kept deliberately, it reads MORE like last winter.)
+
+**Next tick suggestion:** #135 the four vista moments — the color script gives each
+arrival its light; the vistas give each arrival its FRAME (and CI its goldens, and
+the trailer its shots).
+
+---
+
 ## loop-fire 33 — 2026-08-07 — #134: endings that re-open — EPIC AAA-A COMPLETE
 
 **Shipped:** both terminals now end THIS player's game, not any player's. A pure

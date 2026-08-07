@@ -170,8 +170,8 @@ const _grade = G(0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // scratch, mutated in place
 // floor. Depth itself is supplied by the dark multiplier, not by muddy casts.
 const ERA_CASTS = [
   null,                       // L1 — the last day: surface, no cast
-  new THREE.Color(0x8aa830), // L2 — the arrival years: sodium green-yellow (false comfort)
-  new THREE.Color(0xc29a1c), // L3 — the inspection years: sickly jaundice / fluorescent gold
+  new THREE.Color(0x74a83e), // L2 — the arrival years: living warm green (wonder, not sickness)
+  new THREE.Color(0x8f9aa6), // L3 — the inspection years: steel grey-blue (measurement)
   new THREE.Color(0x2f6cc8), // L4 — the last winter: cold isolation blue
   new THREE.Color(0x573a72), // L5+ — dead violet, the keeper's near-dark floor
 ];
@@ -199,6 +199,21 @@ export const LEVELS = [
 const _BIAS_KEYS = ['skyTop', 'skyHorizon', 'sunCol', 'hemiSky', 'hemiGnd', 'fog', 'water', 'waterShallow'];
 const _LUM_FLOOR = 0.045; // no channel crushes to unresolvable black (night × depth)
 
+// The COLOR SCRIPT (#136, AAA-B2): per-era grading rows replacing the old linear
+// depth formulas — the same pipeline, art-directed per era. Read with loop/ERAS.md:
+//   arrival    — warm-green WONDER: hue-rich, barely desaturated, gently dim
+//   inspection — steel-grey MEASUREMENT: the desat does the talking, cast goes cold
+//   lastwinter — near-MONOCHROME cold: heaviest desat, darkest, thickest air
+// dark values are deliberately spread (0.93/0.80/0.66) so the eras stay separable
+// in pure grayscale luminance too (the colorblind-safe requirement).
+const ERA_GRADES = [
+  null, null,                                              // [0] unused, L1 identity
+  { tint: 0.22, desat: 0.07, dark: 0.93, fogMul: 1.22 },   // L2 — the arrival years
+  { tint: 0.30, desat: 0.34, dark: 0.80, fogMul: 1.50 },   // L3 — the inspection years
+  { tint: 0.28, desat: 0.55, dark: 0.66, fogMul: 1.80 },   // L4 — the last winter
+  { tint: 0.55, desat: 0.50, dark: 0.50, fogMul: 2.05 },   // L5+ — the near-dark floor
+];
+
 function gradeBias(g, level) {
   const d = Math.max(0, (level | 0) - 1);
   if (d === 0) return g;                                   // surface: untouched
@@ -207,9 +222,10 @@ function gradeBias(g, level) {
   // so the hue actually shifts, THEN desaturate the tinted result toward grey,
   // THEN darken. (The old order desaturated first and killed the hue before the
   // cast could speak — a neutral wall landed one 8-bit value off pure grey.)
-  const tint = Math.min(0.18 * d, 0.6);
-  const desat = Math.min(0.12 * d, 0.5);
-  const dark = Math.max(1 - 0.12 * d, 0.4);
+  const row = ERA_GRADES[Math.min(d + 1, ERA_GRADES.length - 1)];
+  const tint = row.tint;
+  const desat = row.desat;
+  const dark = row.dark;
   for (const key of _BIAS_KEYS) {
     const c = g[key];
     let r = lerp(c.r, cast.r, tint), gg = lerp(c.g, cast.g, tint), b = lerp(c.b, cast.b, tint);
@@ -224,7 +240,7 @@ function gradeBias(g, level) {
     c.r = r; c.g = gg; c.b = b;
   }
   g.sunInt *= dark;
-  g.fogDen *= 1 + 0.26 * d;                                // claustrophobia deepens
+  g.fogDen *= row.fogMul;                                  // claustrophobia, per era
   return g;
 }
 
