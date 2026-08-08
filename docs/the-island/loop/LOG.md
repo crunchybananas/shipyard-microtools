@@ -12,6 +12,35 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 38 — 2026-08-07 — #139: the gate moves into the repo — CI guards everything now (AAA-C1)
+
+**Shipped:** the scratchpad stopped being load-bearing. tools/harness/ now holds the
+whole release gate — run.sh (one command: server + headless Chrome + coverage + the
+walk, env-tunable ports, Chrome autodetect, and the hard-won rules baked in: never
+--disable-gpu, poll for boot, wide first-compile margins), walk.mjs (**45
+assertions** now — the power budget joined: one composer frame at the surface must
+stay under 340 draws / 460k tris), coverage.mjs (path-relative now), cdp.mjs (with
+the error-catch that a swallowed throw taught us), serve.py, and a README that
+carries every gotcha this campaign paid for. `.github/workflows/island-walk.yml`
+runs it on every push touching docs/the-island/**. The walk gets ONE retry — flake
+armor for cold-profile shader hitches, not forgiveness: a real regression fails
+both passes.
+
+**Evidence:** the repo runner proven end-to-end from its new home — two consecutive
+cold-profile runs green (45/45, exit 0); then a SEEDED regression (the era-threshold
+journal suppressed) failed exactly its own assertion on BOTH passes and exited 1;
+reverted and verified intact. Goldens ride as CI artifacts for human eyes — headless
+GL rasterization differs per OS, so pixel hard-fails would lie (README says so).
+
+**Debt:** the CI workflow is committed but its first green run happens on GitHub's
+runners — watch the first push's Actions tab (browser-actions/setup-chrome is the
+only new dependency).
+
+**Next tick suggestion:** #140 saves — fixture + migration tests riding the same
+harness, now that it has a permanent address.
+
+---
+
 ## loop-fire 37 — 2026-08-07 — #137: the leitmotif learns the eras — EPIC AAA-B COMPLETE
 
 **Shipped:** the music box's five notes now know they are the game's theme. The era
