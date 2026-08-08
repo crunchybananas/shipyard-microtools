@@ -560,3 +560,10 @@ html, body {
 @media (max-height: 480px) {
   #debug-panel { max-height: 88vh; }   /* landscape phones: keep the panel reachable */
 }
+
+/* #143 accessibility: letter size scales the read surfaces (whisper, reader, journal) */
+#whisper { font-size: calc(1.25rem * var(--text-scale, 1)); }
+.reader-body { font-size: calc(1.02rem * var(--text-scale, 1)); }
+#journal-entries .entry { font-size: calc(0.95rem * var(--text-scale, 1)); }
+/* calm the flashes: the white curtain never snaps, even on its fast path */
+.calm-flash #curtain, .calm-flash #curtain.fast { transition-duration: 1.4s; }

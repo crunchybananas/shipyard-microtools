@@ -145,6 +145,9 @@ export const UI = {
   },
 
   // ---- whisper: one quiet italic line at a time ----
+  // #143: reading pace — settings scale every whisper's hold (1 / 1.5 / 2)
+  _readPace: 1,
+  setReadPace(p) { this._readPace = p || 1; },
   whisper(text, holdMs = 4200) {
     if (this.whisperEl.textContent === text && this.whisperEl.classList.contains('show')) return;
     if (this._whisperQueue.some((w) => w.text === text)) return;
@@ -160,7 +163,7 @@ export const UI = {
     this._whisperTimer = setTimeout(() => {
       this.whisperEl.classList.remove('show');
       this._whisperTimer = setTimeout(() => this._nextWhisper(), 1500);
-    }, next.holdMs);
+    }, next.holdMs * this._readPace);
   },
 
   // ---- curtain ----

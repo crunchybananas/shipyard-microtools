@@ -543,7 +543,7 @@ UI.init();
 // old machines. Persisted as one JSON blob; applied on boot and on every change.
 {
   const KEY = 'abyme-settings';
-  const defs = { sens: 1, invertY: false, vol: 1, drift: false };
+  const defs = { sens: 1, invertY: false, vol: 1, drift: false, pace: 1, textScale: 1, calmFlash: false };   // #143: reading pace, letter size, calm flashes
   let cfg = defs;
   try { cfg = { ...defs, ...(JSON.parse(localStorage.getItem(KEY)) || {}) }; } catch (_) {}
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (_) {} };
@@ -552,6 +552,11 @@ UI.init();
     player.invertY = !!cfg.invertY;
     A.setVolume(cfg.vol);
     bloomPass.enabled = !cfg.drift && !bloomPass.dead;               // driftwood: render direct (never resurrect a dead composer)
+    // #143 accessibility: whispers hold longer, letters grow, bright moments soften
+    UI.setReadPace(cfg.pace || 1);
+    document.documentElement.style.setProperty('--text-scale', String(cfg.textScale || 1));
+    document.documentElement.classList.toggle('calm-flash', !!cfg.calmFlash);
+    bloomPass.strength = cfg.calmFlash ? 0.42 : 0.68;
     renderer.setPixelRatio(cfg.drift ? Math.min(BASE_DPR, 1.0) : BASE_DPR);
     composer.setPixelRatio(cfg.drift ? Math.min(BASE_DPR, 1.0) : BASE_DPR);
     composer.setSize(innerWidth, innerHeight);
@@ -564,13 +569,20 @@ UI.init();
   const inv = document.getElementById('set-invert');
   const vol = document.getElementById('set-vol');
   const drift = document.getElementById('set-drift');
+  const pace = document.getElementById('set-pace');
+  const txt = document.getElementById('set-text');
+  const calm = document.getElementById('set-calm');
   if (tab && panel) {
     sens.value = cfg.sens; inv.checked = !!cfg.invertY; vol.value = cfg.vol; drift.checked = !!cfg.drift;
+    pace.value = cfg.pace; txt.value = cfg.textScale; calm.checked = !!cfg.calmFlash;
     tab.addEventListener('click', () => panel.classList.toggle('hidden'));
     sens.addEventListener('input', () => { cfg.sens = +sens.value; apply(); persist(); });
     inv.addEventListener('change', () => { cfg.invertY = inv.checked; apply(); persist(); });
     vol.addEventListener('input', () => { cfg.vol = +vol.value; apply(); persist(); });
     drift.addEventListener('change', () => { cfg.drift = drift.checked; apply(); persist(); });
+    pace.addEventListener('input', () => { cfg.pace = +pace.value; apply(); persist(); });
+    txt.addEventListener('input', () => { cfg.textScale = +txt.value; apply(); persist(); });
+    calm.addEventListener('change', () => { cfg.calmFlash = calm.checked; apply(); persist(); });
   }
   apply();
   window.ABYME_SETTINGS = { get: () => ({ ...cfg }), set: (k, v) => { cfg[k] = v; apply(); persist(); } };

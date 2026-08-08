@@ -12,6 +12,35 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 40 — 2026-08-07 — #143: the island adjusts to its reader (AAA-C5)
+
+**Shipped:** three new instruments beside the existing four — **reading pace**
+(×1/×1.5/×2 on every whisper's hold, via a UI.setReadPace hook at the queue's single
+consumption point), **letter size** (three steps through a --text-scale CSS var on
+the whisper, the reading surface, and the journal — relative layout, nothing clips),
+and **calm the flashes** (bloom strength 0.68→0.42 + the white curtain's transition
+floor-limited to 1.4s even on its fast dive path). All persist in the same
+abyme-settings blob, device-side, never in the save. Plus loop/ACCESS.md — the
+photosensitivity audit (six bright moments tabled: NO strobe or repeated-flash
+exists anywhere; worst case is one white fade, slower under calm-flash), the
+colorblind pass (every glint luminance-based, every glyph shape-coded, the era
+grades already grayscale-separable by design), and the NO-TIMER GUARANTEE written
+down as a standing rule: nothing in ABYME is ever timed against the player.
+
+**Evidence:** F143 eight-for-eight (pace hook live, --text-scale computed and
+applied — whisper 20px→26px, bloom capped, calm class + curtain duration ≥1.3s,
+clean revert, persistence round-trip). WALK PASS **45/45** with settings untouched
+defaults. CI note: the runner fix (--no-sandbox + swiftshader) is past the old
+crash point mid-run as this lands.
+
+**Debt:** none.
+
+**Next tick suggestion:** the release pair — #141 (itch page + Tauri wrap prep,
+owner publishes) and #142 (the trailer script, owner signs the shot list). Both
+are prepare-in-repo, gate-on-owner.
+
+---
+
 ## loop-fire 39 — 2026-08-07 — #140: saves under contract (AAA-C2)
 
 **Shipped:** the save schema has a spec now — tools/harness/saves.spec.mjs, pure
