@@ -34,6 +34,7 @@ EXTRA_FLAGS=""
 # shellcheck disable=SC2086
 "$CHROME_BIN" --headless=new --remote-debugging-port="$CDP_PORT" \
   --autoplay-policy=no-user-gesture-required --mute-audio \
+  --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows \
   --window-size=1280,800 --user-data-dir="$WORK/profile" $EXTRA_FLAGS about:blank \
   > "$WORK/chrome.log" 2>&1 & CHROME_PID=$!
 

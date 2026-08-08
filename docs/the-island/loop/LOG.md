@@ -12,6 +12,42 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 41 — 2026-08-07 — #142: the trailer, shot by the harness (AAA-C4)
+
+**Shipped:** tools/trailer/ — a 90-second draft master CAPTURED BY THE GATE ITSELF.
+trailer.mjs frame-steps the world deterministically (tick 1/24 + composer.render +
+screenshot per frame — the dolly never misses a mark, and the whole cut re-renders
+identically from the script): nine shots — golden beach open, the standing stones,
+the gauge at dawn, the kelp arrival wade, the swinging rope, the steel channel, THE
+BREACH filmed from the south beach ridge (the capitals shouldering out of pale water
+17m from the lens — the best frame this game has produced), the keeper's warm
+quarters mid-round, and the night beam cutting through cloud between the pines.
+assemble.sh (ffmpeg): 24fps clips → 1080p → concat + the game's own title card
+(fade in/out) + a quiet era-stem score with an end fade. **85 seconds, ~88MB
+master.** Every frame HUD-free (the panel id was 'debug-panel' — the first pass
+shot the whole cut with the debug panel burned in; the goldens had it too and were
+recaptured clean).
+
+**Canon note for the shot-list gate:** the issue named 'the oar-out' as a closing
+shot — that is ENDING imagery, so the draft closes on the night beam instead. The
+owner's sign-off decides. No twist, no endings, no model-recursion in the cut.
+
+**Evidence:** master at tools/trailer/out/master.mp4 (delivered to the owner;
+frames/ + out/ gitignored — the repo carries the SCRIPT, which IS the trailer).
+Spot frames verified clean at 5s/45s/55s/62s/71s/83s. Title card renders from the
+game's own title screen. CI note: the runner's software-GL throttles rAF, so
+real-time cinematics crawled (33/45 twice — every timing assertion, exactly);
+the unthrottle flag trio rides this commit.
+
+**Debt:** the score is a legacy ACE-Step stem, not the B3 leitmotif arrangements —
+scoring the master with the in-engine theme needs an audio-capture pass (owner may
+prefer to score it by hand anyway).
+
+**Next tick suggestion:** #141 release prep (the last child before epic AAA-C
+closes on owner gates).
+
+---
+
 ## loop-fire 40 — 2026-08-07 — #143: the island adjusts to its reader (AAA-C5)
 
 **Shipped:** three new instruments beside the existing four — **reading pace**
