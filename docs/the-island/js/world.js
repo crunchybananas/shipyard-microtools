@@ -300,13 +300,19 @@ export function save(player) {
 }
 
 export function load() {
+  let raw = null;
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return false;
     applySave(W, JSON.parse(raw)); // migrates old payloads, applies the field table
     W.playerPos = W.playerPos ? new THREE.Vector3(...W.playerPos) : null;
     return true;
-  } catch (_) { return false; }
+  } catch (_) {
+    // #140: a corrupt save fails safe to a fresh start — but the payload is
+    // PRESERVED (the first autosave would otherwise clobber the evidence ~12s in)
+    try { if (raw !== null) localStorage.setItem(SAVE_KEY + '-corrupt', raw); } catch (_2) { /* private mode */ }
+    return false;
+  }
 }
 
 export const hasSave = () => {

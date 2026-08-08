@@ -12,6 +12,35 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 39 — 2026-08-07 — #140: saves under contract (AAA-C2)
+
+**Shipped:** the save schema has a spec now — tools/harness/saves.spec.mjs, pure
+node (save-schema.js is dependency-free by design): every migration step proven
+(v1's chestOpen inference, its no-ruler negative, v2's no-re-inference), a REAL
+captured full-progress fixture (fixtures/v3-full.json — the walk's own end-state,
+11KB: returned + three rounds + filed/kept record + 20+ journal entries + the era
+threshold), forward-compat (unknown future fields ignored, partial payloads keep
+defaults), five corrupt-payload shapes (no throw, defaults hold), and the
+pack→apply round trip (flags/recDisp/journal stable). **23/23**, wired into run.sh
+before the walk. And the storage boundary got its missing safety: a corrupt save
+now fails safe to a fresh start with the payload PRESERVED in an
+'abyme-save-v1-corrupt' stash — before this, the first autosave clobbered the
+evidence ~12s in. Browser-proven: corrupt blob → Continue click → playable fresh
+game, empty journal, stash intact.
+
+**Evidence:** SAVES 23/23; F140 {playable, freshJournal, preserved} all true;
+WALK PASS 45/45 (the restore branch is the live load-and-finish proof for
+current-version saves). The canonical fixture regenerates from any full walk.
+
+**Debt:** hasSave() stays a cheap null-check, so a corrupt save still SHOWS
+Continue (clicking it fresh-starts safely). Honest title-screen validation would
+parse on boot — cheap, but a UX decision; noted, not snuck in.
+
+**Next tick suggestion:** #143 accessibility (settings work, quick and real),
+then the release pair #141/#142 with their owner gates.
+
+---
+
 ## loop-fire 38 — 2026-08-07 — #139: the gate moves into the repo — CI guards everything now (AAA-C1)
 
 **Shipped:** the scratchpad stopped being load-bearing. tools/harness/ now holds the

@@ -39,6 +39,8 @@ done
 curl -sf "http://127.0.0.1:$CDP_PORT/json/version" > /dev/null || { echo "chrome CDP never came up"; exit 2; }
 curl -sf "http://127.0.0.1:$SERVE_PORT/the-island/" > /dev/null || { echo "server never came up"; exit 2; }
 
+echo "== saves schema =="
+node "$HERE/saves.spec.mjs" || exit 1
 echo "== coverage =="
 node "$HERE/coverage.mjs" || exit 1
 echo "== the walk =="
