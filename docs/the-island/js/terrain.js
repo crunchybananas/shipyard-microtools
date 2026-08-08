@@ -426,9 +426,11 @@ export function buildTerrain() {
         float roll = vnoise(vLXZ * 1.1) - 0.5;               // soft ~0.9m undulation
         float Hb   = rip1 * 0.5 + rip2 * 0.22 + roll * 0.5;
         // #138: ORGANIC ripples (Bender heightmap, world-XZ sample — no UV, no seams)
-        // supplant the synthetic sines on the sand once decoded; same Mikkelsen path.
+        // supplant the synthetic sines on the BEACH BAND only (vTerH < ~3m); higher
+        // ground keeps the old soft roll — dunes belong to the shore, not the meadow.
         float texH = texture2D(uSandH, vWPos.xz * 0.16).r - 0.5;
-        Hb = mix(Hb, texH * 2.4 + roll * 0.35, uSandOn);
+        float sandW = 1.0 - smoothstep(2.2, 3.4, vTerH);
+        Hb = mix(Hb, texH * 2.0 + roll * 0.35, uSandOn * sandW);
         float bDist = 1.0 - smoothstep(45.0, 130.0, length(vViewPosition));
         // SLOPE-AWARE ROCK RELIEF (#36): above ~0.5 baked slope the bump SWAPS (never
         // stacks — same one evaluation) from wind-ripple sand to a cliff language:

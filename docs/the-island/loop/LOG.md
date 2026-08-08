@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 36 — 2026-08-07 — #135: the vistas — every arrival gets its frame (AAA-B1)
+
+**Shipped:** a stratum's first sighting is now a composed, HELD frame: cinematic
+bars + locked control for 2.4s, any input skips, exactly once per stratum
+(once-keys vista2/3/4; L1's vista is the intro itself). The spawn pose IS the
+composition, so LEVELS rows now carry directorial intent: **L2** moved two meters
+seaward so the kelp fronds FRAME the distant lighthouse down the drowned avenue
+instead of walling it; **L3** turned around entirely — you now arrive facing the
+flooded channel (the buoy's water, the far light, the capitals' spires on the steel
+horizon — exactly where the breach is about to happen), and the cairn is found on
+the turn, which is better fragment staging anyway; **L4** was already the shot (the
+model table under the lamp shaft — untouched). Goldens for all four checked into
+loop/goldens/ (the CI diff set #139 will consume).
+
+**Refinements en route (the #138 surfaces under direction):** the sand heightmap's
+fine grain read as a moiré carpet at grazing mid-distance — REBLURRED (gaussian
+2.6 at 512²; the ~0.6m dunes survive, the sub-5cm grain dies, 219KB→45KB); and the
+dunes are now GATED to the beach band (vTerH < ~3m smoothstep) — the meadows and
+bluff-tops keep the old soft roll. Dunes belong to the shore, not the moor.
+
+**Evidence:** golden_L2 (fronds framing the light), golden_L3 (steel horizon with
+the far group), golden_L4 (the chart room), beach check (organic ripple field at
+raking dawn, GPU 3.7ms settled). Vista states verified live (locked mid-hold,
+released after, once-keys persisted). WALK PASS **44/44** (new: vista held+released
+across the real dive). No control theft beyond 2.4s; skippable by any input.
+
+**Debt:** goldens carry the era light at fixed times — the CI diff (#139) must pin
+W.time exactly as the capture script does.
+
+**Next tick suggestion:** #137 the leitmotif — the last B child I can run solo;
+then Phase C opens with the harness moving into the repo (#139).
+
+---
+
 ## loop-fire 35 — 2026-08-07 — #138: TRUE relief from Bender — and the beach figure that shouldn't have been there (AAA-B4)
 
 **Shipped:** the normal-relief pass, generated on Bender and wired end-to-end. Three

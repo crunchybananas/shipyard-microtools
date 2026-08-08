@@ -752,6 +752,7 @@ function tickDive(dt) {
     UI.cinematic(false);
     UI.fadeIn(false);
     setTimeout(() => document.getElementById('curtain').classList.remove('white'), 800);
+    beginVista(W.level);   // #135: the first sighting holds (re-locks briefly; skippable)
     // the same island, more drowned each time — the sameness is the wound
     UI.whisper({
       2: 'The same sand. The same sky.',
@@ -956,6 +957,31 @@ function revealFinaleCoda(kind, delayMs) {
   el.innerHTML = finaleCoda(kind, s).map((l) => `<div>${l}</div>`).join('');
   setTimeout(() => el.classList.add('show'), delayMs);
 }
+
+// #135 (AAA-B1): the VISTA — a stratum's first sighting is a composed, HELD frame:
+// cinematic bars + locked control for 2.4s (any input skips), so the arrival lands
+// before movement does. The spawn pose IS the composition (LEVELS rows carry it);
+// this holds the shot exactly once per stratum. L1's vista is the intro itself.
+let vistaT = null;
+function releaseVista() {
+  if (vistaT == null) return;
+  vistaT = null;
+  player.locked = false;
+  interact.enabled = true;
+  UI.cinematic(false);
+}
+function beginVista(lv) {
+  if (lv < 2 || MODE !== 'play' || W.onceKeys?.includes('vista' + lv)) return;
+  (W.onceKeys = W.onceKeys || []).push('vista' + lv);
+  save(player);
+  player.locked = true;
+  interact.enabled = false;
+  UI.cinematic(true);
+  vistaT = 0;
+  addEventListener('pointerdown', releaseVista, { once: true });
+  addEventListener('keydown', releaseVista, { once: true });
+}
+addDrive(() => vistaT != null, (dt) => { vistaT += dt; if (vistaT > 2.4) releaseVista(); });
 
 // ---------------- the finale ----------------
 function startFinale() {
@@ -1556,6 +1582,7 @@ player.onFootstep = (kind, pos) => {
       if (n >= 4) W.regions.l4seen = true;
       player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
       save(player);
+      beginVista(n);   // #135: instant jumps get the held first-sighting too (once)
       return { level: n, id: L.id, region: L.region, tide: L.tide, encounter: L.encounter };
     },
     dive: (instant = false) => {                       // the missing counterpart to ascend()
