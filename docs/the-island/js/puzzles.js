@@ -1651,7 +1651,10 @@ export class Game {
       const fig = R.tinyFigure;
       // #53: once CARRIED, the pair stands on the model's beach at every depth — the
       // keeper no longer vanishes at the surface; the reunion is what the model holds now
-      fig.visible = (W.level >= 2 || F.carried) && isModel;
+      // STRICT boolean (fire 35 bugfix): `(false || undefined) && x` leaks undefined,
+      // and three.js only culls on visible === false — the island-scale figure stood
+      // glowing on the wake-up beach for every fresh save since #53. Never again.
+      fig.visible = !!((W.level >= 2 || F.carried) && isModel);
       if (fig.visible) {
         const look = this._keeperLook;
         const rise = this._keeperRise;   // the twist: it climbs up to meet your eye at the bottom
@@ -1671,7 +1674,7 @@ export class Game {
     }
 
     // #53: the second figure — warm beside his cold — exists only once carried
-    if (R.tinyCompanion) R.tinyCompanion.visible = isModel && F.carried;
+    if (R.tinyCompanion) R.tinyCompanion.visible = !!(isModel && F.carried);   // same undefined-leak: the companion showed on the model PRE-carry (twist spoiler)
 
     // The Room That Disagrees (#18 live ghostState): the model on its table always
     // shows the OPPOSITE of the world — its sea floods as you drain the real one,

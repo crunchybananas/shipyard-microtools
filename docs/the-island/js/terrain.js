@@ -379,6 +379,12 @@ export function buildTerrain() {
     sh.uniforms.uTime = { value: 0 };
     sh.uniforms.uSunUp = { value: 1 };                       // daylight gate for the caustics
     sh.uniforms.uCaustic = { value: getTexture('water_ripple') };
+    // #138 (AAA-B4): the Bender sand heightmap — organic wind-ripple relief for the
+    // Mikkelsen bump below. uSandOn flips 0→1 when the image decodes; until then the
+    // synthetic sine ripples carry the surface (seamless fallback, no pop risk: the
+    // swap is a height-source change inside the same derivative path).
+    sh.uniforms.uSandOn = { value: 0 };
+    sh.uniforms.uSandH = { value: getTexture('sand_height', () => { sh.uniforms.uSandOn.value = 1; }) };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
     // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. Those
     // textures are no longer sampled here and nothing else loads them, so we drop the dead getTexture
@@ -396,6 +402,7 @@ export function buildTerrain() {
         uniform vec3 uHaze; uniform float uTexAmt;
         uniform float uWaterY; uniform float uTime; uniform float uSunUp;
         uniform sampler2D uCaustic;
+        uniform sampler2D uSandH; uniform float uSandOn;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
@@ -418,6 +425,10 @@ export function buildTerrain() {
         float rip2 = sin(dot(vLXZ, vec2(-0.35, 0.94)) * 4.1 + vnoise(vLXZ * 0.38) * 6.2831); // ~1.5m cross-set, weaker
         float roll = vnoise(vLXZ * 1.1) - 0.5;               // soft ~0.9m undulation
         float Hb   = rip1 * 0.5 + rip2 * 0.22 + roll * 0.5;
+        // #138: ORGANIC ripples (Bender heightmap, world-XZ sample — no UV, no seams)
+        // supplant the synthetic sines on the sand once decoded; same Mikkelsen path.
+        float texH = texture2D(uSandH, vWPos.xz * 0.16).r - 0.5;
+        Hb = mix(Hb, texH * 2.4 + roll * 0.35, uSandOn);
         float bDist = 1.0 - smoothstep(45.0, 130.0, length(vViewPosition));
         // SLOPE-AWARE ROCK RELIEF (#36): above ~0.5 baked slope the bump SWAPS (never
         // stacks — same one evaluation) from wind-ripple sand to a cliff language:

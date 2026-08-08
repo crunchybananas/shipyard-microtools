@@ -21,6 +21,27 @@ const BASE = 'assets/';
 //            generation prompt — see ASSETS.md).
 //   texture rows carry their sampler settings (wrap/repeat/colorSpace/anisotropy).
 export const MANIFEST = {
+  // #138 (AAA-B4): TRUE relief heightmaps — grayscale height, not albedo. The Sobel
+  // in buildNormalFromImage reads luminance, so feeding it real height yields real
+  // geometric normals (ripples/strata/furrows) instead of color-edge guesses.
+  sand_height: {
+    kind: 'texture', file: 'sand_height.png', bytes: 224256,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell (asset.texture.generate, seed 21)',
+    prompt: 'macro photograph of wind-rippled beach sand from directly above, parallel ripples, overcast diffuse light',
+    wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
+  },
+  rock_height: {
+    kind: 'texture', file: 'rock_height.png', bytes: 212992,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell (asset.texture.generate, seed 11)',
+    prompt: 'seamless tileable grayscale height map of weathered layered rock, strata bedding, cracks',
+    wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
+  },
+  bark_height: {
+    kind: 'texture', file: 'bark_height.png', bytes: 197632,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell (asset.texture.generate, seed 5)',
+    prompt: 'seamless tileable grayscale height map of pine bark, deep vertical furrows, ridged plates',
+    wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
+  },
   driftwood: {
     kind: 'texture', file: 'driftwood.jpg', bytes: 58012,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
@@ -267,27 +288,41 @@ export function applyRelief(material, id, opts = {}) {
   const ns = opts.normalScale ?? 0.7;
   material.normalScale = new THREE.Vector2(ns, ns);
   if (opts.roughness != null) material.roughness = opts.roughness;
-  const tex = getTexture(id, (t) => {
-    material.needsUpdate = true;
+  // #138: when a TRUE heightmap asset exists, derive the normal from IT instead of
+  // the albedo's color-luminance (opts.normalFrom = the height asset id). The albedo
+  // (if any) still comes from `id`; only the relief source changes.
+  const nid = opts.normalFrom || id;
+  getTexture(nid, (t) => {
     if (!t.image) return;
-    let nt = _normCache.get(id);
+    let nt = _normCache.get(nid);
     if (!nt) {
       nt = buildNormalFromImage(t.image, opts.strength ?? 2.0);
-      const a = MANIFEST[id];
+      const a = MANIFEST[nid];
       if (a?.repeat) nt.repeat.set(a.repeat[0], a.repeat[1]);
-      if (opts.repeat) nt.repeat.set(opts.repeat[0], opts.repeat[1]);   // per-material texel override (#48)
-      if (a?.anisotropy) nt.anisotropy = a.anisotropy;
-      _normCache.set(id, nt);
+      _normCache.set(nid, nt);
     }
+    if (opts.repeat) { nt = nt.clone(); nt.repeat.set(opts.repeat[0], opts.repeat[1]); nt.needsUpdate = true; }   // per-material texel override (#48)
     material.normalMap = nt;
     material.needsUpdate = true;
   });
+  const tex = getTexture(id, () => { material.needsUpdate = true; });
   // #48: `colorMap: false` = RELIEF-ONLY — the derived normal carries the surface and the
   // base colour stays flat (the house position: normal maps yes, tiled colour never — a
   // tiled albedo is what pixelates at arm's length and reads as cracked mud).
   if (opts.colorMap !== false) material.map = tex;
   material.needsUpdate = true;
   return material;
+}
+
+// #138: derived-normal access for custom shaders (the terrain) — decode the height
+// asset, Sobel it once (shared cache), and hand the DataTexture to the callback.
+export function getDerivedNormal(id, strength, cb) {
+  getTexture(id, (t) => {
+    if (!t.image) return;
+    let nt = _normCache.get(id);
+    if (!nt) { nt = buildNormalFromImage(t.image, strength); _normCache.set(id, nt); }
+    cb(nt);
+  });
 }
 
 // Decode an audio asset (voice/music) to an AudioBuffer via the given AudioContext.

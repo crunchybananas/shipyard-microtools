@@ -58,11 +58,19 @@ export const W = {
     hatchOpen: false,
     plumbTaken: false,
     plumbHung: false,
+    carried: false,       // the twist's embrace happened (the pair exists; #53 figures key off this)
     dove: false,          // level 2: one recursion down
     climbing: false,      // one-way ascent mode: reached the bottom, now rising back up (#12)
     keeperSilenced: false,// the keeper's last words spoken on the first ascent; then silence (#12)
     returned: false,      // climbed all the way back to the surface: the return left its mark (#12)
     bellRung: false,
+    // fire 35: EVERY flag the code reads gets a default. An absent flag in a boolean
+    // chain leaks undefined — `(a || undefined) && b` — and three.js renders
+    // visible:undefined (it only culls on === false). The beach figure taught us.
+    readGlass: false, phialTaken: false, phialDried: false, keeperSong: false,
+    tideFigureSeen: false, watcherSeen: false, keeperRose: false, beamDeepSeen: false,
+    beamFarewell: false, roundMoor: false, roundLog: false, roundLight: false,
+    roundWind: false,
   },
 
   stems: 0,              // musical layers earned (0..5)

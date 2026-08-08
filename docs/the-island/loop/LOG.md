@@ -12,6 +12,45 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 35 — 2026-08-07 — #138: TRUE relief from Bender — and the beach figure that shouldn't have been there (AAA-B4)
+
+**Shipped:** the normal-relief pass, generated on Bender and wired end-to-end. Three
+tileable grayscale HEIGHTMAPS via Peel's asset.texture.generate (FLUX.1-schnell on
+Bender, ~55s each): wind-rippled sand (the first attempt returned flat noise — the
+fix was prompting a macro PHOTOGRAPH under overcast light, not a 'height map'),
+layered rock strata, pine-bark furrows. Post-processed with PIL (512², cross-blend
+tileability fix — resize-then-blend order matters — autocontrast) into assets/*.png
+with full provenance in the MANIFEST. Wiring: applyRelief grew `normalFrom` — derive
+the normal from a TRUE height asset while the albedo stays put — used by the
+boulders (rock_height, normalScale 0.8 after the 0.95 cut read zebra at grazing
+gold) and every trunk (bark_height); the TERRAIN feeds the sand heightmap into the
+existing Mikkelsen derivative bump (world-XZ sample, no UVs, no seams possible),
+supplanting the synthetic sine ripples the moment the image decodes. House rule
+held: normal maps yes, tiled color never.
+
+**AND THE BUG:** the verification pass caught a glowing island-scale figure standing
+on the wake-up beach of every fresh save — shipped since fire 17. Root cause:
+`(W.level >= 2 || F.carried) && isModel` with `carried` UNDEFAULTED leaks
+`undefined` into `.visible`, and three.js only culls on `=== false`. Worse, the
+model's companion leaked visible PRE-carry — a quiet twist spoiler. Fixed at the
+root: every flag the code reads now has a default (13 added), both drivers are
+strict booleans, and the walk gate asserts the fresh-save hidden state forever.
+
+**Evidence:** boulder A/B at identical golden pose: leopard-spot color-noise →
+coherent strata bedding wrapping the form; sand ripples read as organic dune bands
+under raking dawn light; 2×2 tile previews seamless. Steady-state GPU 3.5-4.6ms at
+the beach/treeline panels (60fps), same class as before — the heights replace
+same-size derived normals. WALK PASS **43/43** (new: P0.noBeachFigure), coverage
+103/103. Bark verified via the shared normalFrom path; its close-up is
+canopy-occluded from every angle tried — an honest note, not a doubt.
+
+**Debt:** harness gpuMs()/renderer.info misread under back-to-back composer renders
+(accumulates without reset) — read the panel after real frames instead.
+
+**Next tick suggestion:** #135 vistas — the surfaces finally deserve the frames.
+
+---
+
 ## loop-fire 34 — 2026-08-07 — #136: the color script — every era wears its own light (AAA-B2)
 
 **Shipped:** Phase B opens. The old linear depth formulas (tint 0.18d, desat 0.12d,

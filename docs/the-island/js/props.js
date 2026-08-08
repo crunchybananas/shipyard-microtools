@@ -2536,7 +2536,7 @@ function buildVegetation(core, r) {
   }
 
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6b48, flatShading: false, roughness: 0.9 }); // base lightened so the bark albedo multiplies to bark, not mud
-  applyRelief(trunkMat, 'bark', { normalScale: 0.8, strength: 2.4, roughness: 0.95 });   // grooved bark + derived normal on every trunk + the model clone (shared)
+  applyRelief(trunkMat, 'bark', { normalScale: 0.85, strength: 2.0, roughness: 0.95, normalFrom: 'bark_height' });   // #138: TRUE furrow relief (Bender heightmap), bark albedo unchanged
   // smooth-shaded + vertexColors: the baked tier shading (dark core → bright frond tips)
   // multiplies under the per-instance HSL tone and the foliage-texture dapple
   const canopyMat = new THREE.MeshStandardMaterial({ flatShading: false, roughness: 0.85, vertexColors: true, side: THREE.DoubleSide });
@@ -2883,7 +2883,7 @@ function buildVegetation(core, r) {
     // catching light; the colour is a quiet flat base; texels enlarged (repeat 0.6) so
     // features read as geology up close, not texture grid. (The Bender house rule made
     // material: normal maps yes, tiled colour never.)
-    applyRelief(mat, d.id, { normalScale: 0.95, strength: 3.1, colorMap: false, repeat: [0.6, 0.6] });
+    applyRelief(mat, d.id, { normalScale: 0.8, strength: 2.6, colorMap: false, repeat: [0.6, 0.6], normalFrom: 'rock_height' });   // #138: strata bedding relief (Bender heightmap; 0.8 keeps it geology, not zebra, at grazing light)
     const im = new THREE.InstancedMesh(rockVariants[idx], mat, 70);
     im.castShadow = true; im.name = 'rocks';
     return im;
