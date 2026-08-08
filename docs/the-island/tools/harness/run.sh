@@ -27,9 +27,14 @@ cleanup() { kill "${SRV_PID:-}" "${CHROME_PID:-}" 2>/dev/null; wait 2>/dev/null;
 trap cleanup EXIT
 
 python3 "$HERE/serve.py" & SRV_PID=$!
+# CI runners (containers) crash chrome without --no-sandbox; keep local runs sandboxed.
+# --use-angle=swiftshader guarantees software WebGL where the runner has no GPU.
+EXTRA_FLAGS=""
+[ "${CI:-}" = "true" ] && EXTRA_FLAGS="--no-sandbox --disable-dev-shm-usage --use-angle=swiftshader"
+# shellcheck disable=SC2086
 "$CHROME_BIN" --headless=new --remote-debugging-port="$CDP_PORT" \
   --autoplay-policy=no-user-gesture-required --mute-audio \
-  --window-size=1280,800 --user-data-dir="$WORK/profile" about:blank \
+  --window-size=1280,800 --user-data-dir="$WORK/profile" $EXTRA_FLAGS about:blank \
   > "$WORK/chrome.log" 2>&1 & CHROME_PID=$!
 
 for i in $(seq 1 30); do
