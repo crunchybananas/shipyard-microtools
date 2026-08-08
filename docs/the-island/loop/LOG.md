@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 42 — 2026-08-07 — #141: the door, prepared — EPIC AAA-C lands on its owner gates
+
+**Shipped:** release/ — everything the world-facing steps need, each gate one
+click. The itch path: the game IS the static build, so README.md carries the exact
+zip line (tools/loop/release excluded), upload settings (1280×800, fullscreen,
+mobile ON — touch shipped in #60), the CAPSULE (630×500 cut of the night-beam
+frame), a 1080p breach screenshot, and itch_page.md — canon-safe store copy that
+sells the drowned-island-as-time premise, the hands, the rounds, the record, and
+the shrinking shore without touching the twist, the endings, or biography.
+manifest.webmanifest ships linked (installable identity; NO service worker by
+design — Pages stays cache-honest; offline arrives with the wrap). The Tauri path:
+tauri/tauri.conf.json5 + build notes — a thin shell over the same files, owner-run
+(Rust toolchain + signing), acceptance = the walk green against the wrapped origin
+on macOS/Windows.
+
+**Evidence:** WALK PASS **45/45** with the manifest linked. Store copy audited
+against the canon rules (they're written INTO release/README.md so future edits
+inherit them).
+
+**EPIC AAA-C: all five children done** — #139 CI (harness in-repo; runner
+hardening in flight), #140 saves, #143 accessibility, #142 trailer (master with
+the owner), #141 release prep. What remains across the whole AAA campaign is
+OWNER-GATED by design: play the story overhaul, listen to the audio, sign the
+trailer shot list, click publish on itch, run the Tauri builds, and fire the next
+Bender texture round at will.
+
+**Debt:** CI's third hardening iteration (rAF unthrottle trio) rides fire 41's
+push — confirm the Actions tab goes green once.
+
+**Next tick suggestion:** owner playthrough. The board is empty again — and this
+time the game on it is the AAA plan's game.
+
+---
+
 ## loop-fire 41 — 2026-08-07 — #142: the trailer, shot by the harness (AAA-C4)
 
 **Shipped:** tools/trailer/ — a 90-second draft master CAPTURED BY THE GATE ITSELF.
