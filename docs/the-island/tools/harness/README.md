@@ -30,4 +30,8 @@ gate that has guarded every fire since the walk was born:
   human eyes instead of hard-failing on pixels.
 
 CI: `.github/workflows/island-walk.yml` runs this on every push touching
-`docs/the-island/**`.
+`docs/the-island/**`. **CI is the logic gate**: on the runner's software GL,
+20-second real-time cinematics cannot hit wall-clock, so CI requires the 33 pumped
+assertions green AND the failure list to equal exactly the whitelisted realtime
+set (any other failure is red). The full 45/45 — cinematics, endings, both
+terminals in real time — is the LOCAL pre-push bar.
