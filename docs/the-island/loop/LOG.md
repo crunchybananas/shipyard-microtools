@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 37 — 2026-08-07 — #137: the leitmotif learns the eras — EPIC AAA-B COMPLETE
+
+**Shipped:** the music box's five notes now know they are the game's theme. The era
+beds (fire 5's one persistent graph) gained per-era ARRANGEMENTS of the same figure:
+the last day STATES it (all five, in order, the box's own voice); the arrival years
+RISE (upward figures with a reach, an octave up, quicker); the inspection years are
+MEASURED (clipped exact pairs, zero jitter — quantized like a return); the last
+winter SINKS (downward fragments at the longest spacing — and the fourth note, by
+the shipped canon, never comes at all, so some phrases are one note long: the last
+winter barely speaks). And each of HIS ROUNDS voices the theme on its own
+instrument — low dory-hull wood for the mooring, dry pen-ticks for the return, warm
+long glass for the small lamp; the WIND round plays nothing extra because the box
+itself IS its instrument. The fourth bends down in the rounds' hands too.
+
+**Evidence:** structural verify on a RUNNING audio context — per-era arrangements
+distinct ({stated:01234, rising:0124, measured pairs, sinking with the fourth
+withheld}), three round instruments schedule all five notes, Wind is a no-op;
+mute honored; re-muted after. WALK PASS **44/44**. Zero new assets (0 bytes — pure
+WebAudio); voice remains text, per the owner gate.
+
+**EPIC AAA-B IS COMPLETE:** #135 vistas · #136 color script · #137 leitmotif ·
+#138 Bender normals. The frame is on. **The owner's ears are still the final
+gate on all audio** — the beds and arrangements are verified structurally, not
+aesthetically.
+
+**Debt:** none new.
+
+**Next tick suggestion:** Phase C opens — #139 first (the harness moves into the
+repo and CI starts guarding all of this), then #140 saves, #143 accessibility,
+#141/#142 release prep with owner gates.
+
+---
+
 ## loop-fire 36 — 2026-08-07 — #135: the vistas — every arrival gets its frame (AAA-B1)
 
 **Shipped:** a stratum's first sighting is now a composed, HELD frame: cinematic

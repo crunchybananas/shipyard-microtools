@@ -90,6 +90,7 @@ export class Game {
     W.flags['round' + kind] = true;
     UI.whisper(whisper);
     UI.addJournal(journal, '', 'self');
+    A.themeRound(kind);                        // #137: the round's instrument states the theme
     this['_tab' + kind] = 0;                   // arm the tableau clock
     save(this.player);
     if (W.flags.roundMoor && W.flags.roundLog && W.flags.roundLight && W.flags.roundWind) {
