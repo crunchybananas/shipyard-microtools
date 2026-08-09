@@ -1,36 +1,37 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=188';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=188';
-import { coreTick } from '../js/sim.js?realm=188';
-import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=188';
-import { missions } from '../js/missions.js?realm=188';
-import { initChronicle } from '../js/log.js?realm=188';
+import { G, getSeed, setSeed } from '../js/state.js?realm=191';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=191';
+import { coreTick } from '../js/sim.js?realm=191';
+import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=191';
+import { missions } from '../js/missions.js?realm=191';
+import { initChronicle } from '../js/log.js?realm=191';
 import {
   commitGameLoad,
   commitGameLoadForTest,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=188';
-import { hasSave, loadGame, saveGame } from '../js/save.js?realm=188';
-import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=188';
+} from '../js/save-state.js?realm=191';
+import { hasSave, loadGame, saveGame } from '../js/save.js?realm=191';
+import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=191';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=191';
 import {
   claimCitizenAssignment,
   renameCitizen,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=188';
+} from '../js/citizen-ownership.js?realm=191';
 import {
   citizenRenderCacheSize,
   citizenRenderRecord,
   resetCitizenRenderCache,
-} from '../js/citizen-render-cache.js?realm=188';
+} from '../js/citizen-render-cache.js?realm=191';
 import {
   getCitizenTransitionLedger,
   initCitizenInspector,
   resetCitizenTransitionLedger,
-} from '../js/citizen-inspector.js?realm=188';
+} from '../js/citizen-inspector.js?realm=191';
 
 function clone(value) {
   return structuredClone(value);
@@ -144,6 +145,7 @@ const building = {
 };
 G.buildings.push(building);
 G.buildingGrid[building.y][building.x] = building;
+establishFounderStockpile();
 assert.equal(claimCitizenAssignment(citizen, building, { reason: 'job-market' }), true);
 assert.deepEqual(workersForBuilding(building), [citizen]);
 assert.equal(Object.hasOwn(building, 'workers'), false);
@@ -154,7 +156,7 @@ citizen.path = sharedPath;
 citizen.pathIdx = 1;
 G.avatar.path = sharedPath;
 G.avatar.pathIdx = 1;
-G._undoStack = [{ b: building, flagsSnapshot: {}, chronicleLen: 0 }];
+G._undoStack = [{ b: building, flagsSnapshot: { physicalFoodInventory: true }, chronicleLen: 0 }];
 missions[0].done = true;
 missions[0]._celebratedTick = 42;
 
@@ -550,14 +552,14 @@ G.selectedBuilding = removedBuilding;
 G._refreshPanelFor = removedBuilding;
 G._patrolPosts = [removedBuilding];
 G._patrolPostsBuildingCount = G.buildings.length;
-G.storyFlags = { marker: 'after-builds' };
+G.storyFlags = { marker: 'after-builds', physicalFoodInventory: true };
 G.chronicle = [
   { day: G.day, season: G.season, tick: G.gameTick, text: 'before retained', tag: 'misc' },
   { day: G.day, season: G.season, tick: G.gameTick, text: 'after retained', tag: 'misc' },
 ];
 G._undoStack = [
-  { b: retainedBuilding, flagsSnapshot: { marker: 'before-retained' }, chronicleLen: 1 },
-  { b: removedBuilding, flagsSnapshot: { marker: 'before-removed' }, chronicleLen: 2 },
+  { b: retainedBuilding, flagsSnapshot: { marker: 'before-retained', physicalFoodInventory: true }, chronicleLen: 1 },
+  { b: removedBuilding, flagsSnapshot: { marker: 'before-removed', physicalFoodInventory: true }, chronicleLen: 2 },
 ];
 removeBuilding(removedBuilding, { cause: 'manual' });
 assert.equal(G.buildings.includes(removedBuilding), false);
@@ -582,7 +584,7 @@ assert.equal(G._undoStack.length, 1);
 assert.equal(G._undoStack[0].b, retainedBuilding, 'destruction should remove only its own stale undo entry');
 assert.equal(undoLastBuildingPlacement(), true, 'UNDO after demolition should reach the newest still-live build');
 assert.equal(G.buildings.includes(retainedBuilding), false);
-assert.deepEqual(G.storyFlags, { marker: 'before-retained' });
+assert.deepEqual(G.storyFlags, { marker: 'before-retained', physicalFoodInventory: true });
 assert.equal(G.chronicle.length, 1);
 const immediatePostDemolition = serializeGame();
 assert.equal(prepareSave(immediatePostDemolition).ok, true, 'immediate post-demolition save must be valid');

@@ -1,7 +1,8 @@
-import { G, BUILDINGS, rngRange, resourceEmoji, getDayPeriod } from './state.js?realm=188';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=188';
-import { getWonderReport } from './wonder.js?realm=188';
-import { resolveGroundTraffic } from './ground-traffic.js?realm=188';
+import { G, BUILDINGS, rngRange, resourceEmoji, getDayPeriod } from './state.js?realm=191';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=191';
+import { getWonderReport } from './wonder.js?realm=191';
+import { resolveGroundTraffic } from './ground-traffic.js?realm=191';
+import { isBuildingOperational } from './building-operation.js?realm=191';
 
 export function updateWalkers() {
   // Spawn walkers from service buildings periodically — but not at night
@@ -12,6 +13,7 @@ export function updateWalkers() {
       const def = BUILDINGS[b.type];
       if (!def) continue; // guard against unknown building types
       if (!def.radius) continue; // walkerTypes below already limits spawns to church/tavern/well/market
+      if (!isBuildingOperational(b)) continue;
       // Don't spawn if we already have a walker from this building
       if (G.walkers.some(w => w.home === b)) continue;
       const walkerTypes = {

@@ -1,28 +1,30 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, BUILDINGS, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=188';
-import { generateWorld } from '../js/world.js?realm=188';
-import { placeBuilding, updateFires } from '../js/economy.js?realm=188';
-import { buildingCapacity } from '../js/building-lifecycle.js?realm=188';
-import { dispatch } from '../js/commands.js?realm=188';
-import { updateEnemies } from '../js/combat.js?realm=188';
-import { initChronicle } from '../js/log.js?realm=188';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=188';
+import { G, BUILDINGS, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=191';
+import { generateWorld } from '../js/world.js?realm=191';
+import { placeBuilding, updateFires } from '../js/economy.js?realm=191';
+import { buildingCapacity } from '../js/building-lifecycle.js?realm=191';
+import { dispatch } from '../js/commands.js?realm=191';
+import { updateEnemies } from '../js/combat.js?realm=191';
+import { initChronicle } from '../js/log.js?realm=191';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=191';
 import {
   claimCitizenAssignment,
   onCitizenTransition,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=188';
+} from '../js/citizen-ownership.js?realm=191';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=191';
 
 setSeed(424242);
 generateWorld();
 initChronicle();
 G.resources = createResourceStock({
-  wood: 10000, stone: 10000, food: 10000, gold: 10000,
+  wood: 10000, stone: 10000, food: 120, gold: 10000,
   iron: 10000, wheat: 10000, flour: 10000, planks: 10000, tools: 10000,
 });
+establishFounderStockpile();
 G._undoStack = [];
 G.notificationLog = [];
 G.particles = [];
@@ -51,12 +53,16 @@ function place(type) {
   return building;
 }
 
-function attachReferenceSurface(building) {
+function attachReferenceSurface(building, { completed = false } = {}) {
   const citizen = G.citizens[0];
   assert.equal(Object.hasOwn(building, 'workers'), false, 'building must not own a worker array');
-  assert.equal(building.buildProgress < 1, true, 'reference fixture expects a construction assignment');
-  assert.equal(claimCitizenAssignment(citizen, building, { reason: 'construction' }), true);
-  assert.deepEqual(workersForBuilding(building), [citizen], 'derived staffing did not see the claim');
+  if (completed) {
+    assert.equal(building.buildProgress >= 1, true, 'completed reference fixture expects a commissioned building');
+  } else {
+    assert.equal(building.buildProgress < 1, true, 'reference fixture expects a construction assignment');
+    assert.equal(claimCitizenAssignment(citizen, building, { reason: 'construction' }), true);
+    assert.deepEqual(workersForBuilding(building), [citizen], 'derived staffing did not see the claim');
+  }
   building.caravanOut = true;
   citizen.home = building;
   citizen.workTarget = { x: building.x, y: building.y };
@@ -184,13 +190,13 @@ function assertDetached(building, label) {
 // Fire regression #1: an evolved house must remove its tier capacity.
 {
   const building = place('house');
-  const placedCapacity = buildingCapacity(building);
   building.level = 3;
-  G.maxPop += buildingCapacity(building) - placedCapacity;
+  building.buildProgress = 1;
+  G.maxPop += buildingCapacity(building);
   const maxPopBefore = G.maxPop;
   const resourcesBefore = structuredClone(G.resources);
   const lostBefore = G.stats.buildingsLost;
-  attachReferenceSurface(building);
+  attachReferenceSurface(building, { completed: true });
   building.hp = 0.25;
   building.onFire = true;
   G.gameTick = 1;
@@ -207,9 +213,11 @@ function assertDetached(building, label) {
 // Fire regression #2: burning a defensive structure must remove defense.
 {
   const building = place('tower');
+  building.buildProgress = 1;
+  G.defense += BUILDINGS.tower.defense;
   const defenseBefore = G.defense;
   const lostBefore = G.stats.buildingsLost;
-  attachReferenceSurface(building);
+  attachReferenceSurface(building, { completed: true });
   building.hp = 0.25;
   building.onFire = true;
   G.gameTick = 1;
@@ -223,10 +231,12 @@ function assertDetached(building, label) {
 // Raid integration: exercise the combat hit, not the lifecycle API directly.
 {
   const building = place('tower');
+  building.buildProgress = 1;
+  G.defense += BUILDINGS.tower.defense;
   const defenseBefore = G.defense;
   const lostBefore = G.stats.buildingsLost;
   const resourcesBefore = structuredClone(G.resources);
-  attachReferenceSurface(building);
+  attachReferenceSurface(building, { completed: true });
   building.hp = 1;
   G.enemies = [{
     x: building.x, y: building.y, tx: building.x, ty: building.y,
@@ -245,7 +255,7 @@ function assertDetached(building, label) {
 
 // Undo integration: full refund plus story/capacity/defense rollback.
 {
-  G.storyFlags = { beforePlacement: true };
+  G.storyFlags = { beforePlacement: true, physicalFoodInventory: true };
   G.chronicle = [{ day: G.day, season: G.season, tick: G.gameTick, text: 'before', tag: 'misc' }];
   const resourcesBefore = structuredClone(G.resources);
   const maxPopBefore = G.maxPop;
@@ -258,7 +268,7 @@ function assertDetached(building, label) {
   assert.deepEqual(G.resources, resourcesBefore, 'undo: full resource refund');
   assert.equal(G.maxPop, maxPopBefore, 'undo: castle capacity');
   assert.equal(G.defense, defenseBefore, 'undo: castle defense');
-  assert.deepEqual(G.storyFlags, { beforePlacement: true }, 'undo: story flags');
+  assert.deepEqual(G.storyFlags, { beforePlacement: true, physicalFoodInventory: true }, 'undo: story flags');
   assert.equal(G.chronicle.length, 1, 'undo: chronicle rollback');
   assertDetached(building, 'undo');
 }

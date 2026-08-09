@@ -1,0 +1,31 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-madder-teal",
+  "generated_at": "2026-08-08",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-963c853f-7f75-411a-94e0-4aee064017ff.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/identity-factor-keyed.png",
+      "sha256": "06cd793ce522581e0a4d44f5abd9e73f1c43d78ba3899a531cc16fc6b4ce3d59",
+      "purpose": "A16 identity scale and body fit"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage-keyed.png",
+      "sha256": "4d71daa26207b095336f9579aee2722601eca58a1f2e87b4a34e27e36f9d9311",
+      "purpose": "separated hollow-component layout only; rejected as garment identity"
+    }
+  ],
+  "prompt": "Create a modular painted raster GARMENT source board for the same mature woman traveling factor/bookkeeper shown in input image 1. Input image 2 is only a component-layout and hollow-garment reference. Garment identity: deep madder-red knee-length merchant coat with structured lapels, fitted waist, peacock-teal diagonal sash, narrow brass trim, dark umber leather belt with a small ledger satchel, soft charcoal felt merchant cap with a short asymmetric brim, practical dark trousers, and sturdy oxblood road boots. No person, face, skin, hair, hands, body fill, tools, cargo, scale, counter, or armor may be painted into the garment. All neck/face openings, sleeve/cuff openings, waist/leg openings, and the interior under the cap must be genuine flat #ff00ff holes so the separate identity layer remains visible. Art direction: compact painterly pixel-art source components, crisp clusters, warm upper-left lighting, classic strategy-game readability, same approximate scale as input identity. One large board with generously separated directional components for front/down, rear/up, left profile and right profile: cap/headgear, coat/tunic, sleeves, teal sash/belt/satchel, trousers, and boots; consistent garment identity across every view; every piece fully visible and uncropped. Perfectly flat solid #ff00ff chroma-key background, no gradient, floor, shadow, labels, borders, text, UI, scenery, mannequin, other characters, detached debris, watermark, or duplicate props.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"],
+    "key_color_detected": "#e904ea"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a16-source/garment-madder-teal-keyed.png",
+  "keyed_sha256": "a0c9b886e1d3a68a251f53187dd6f3540fb1a68a3f2174b7c772497e434b9511",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a16-source/garment-madder-teal.png",
+  "alpha_sha256": "55b3df1ef3f3a7f44d7cb3094a497490048bfe2110acbf80838184817dd8ba8b"
+}

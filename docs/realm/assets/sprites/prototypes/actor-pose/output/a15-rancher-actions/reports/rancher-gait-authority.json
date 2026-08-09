@@ -1,0 +1,218 @@
+{
+  "authority": "stockman-heavy-roll-v1",
+  "directions": {
+    "down": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "f1cc9a78a5275d77650327895c195611fd3e86e4016d081e3c9c1940a9bd3faf"
+    },
+    "left": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "407d794b7431715d511cd534240244e44bad60eb05567f40e00a55a23ba667d5"
+    },
+    "right": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "f1fff6f7831391f35f251059e05686576200429fd30952576e9223289f67c91d"
+    },
+    "up": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "cf29c9682ceca41f7277ab6d2c8de8315d858cfa2313d029b0a90ec371dfdef4"
+    }
+  },
+  "distinct_direction_trajectories": 4,
+  "failures": [],
+  "mechanical_passed": true,
+  "schema": "realm.actor-pose.a15-rancher-gait-authority.v1",
+  "shared_a5_walk_pose": false
+}

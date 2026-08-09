@@ -2,23 +2,36 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=188';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=188';
-import { getWonderReport } from './wonder.js?realm=188';
-import { panCameraTo } from './render.js?realm=188';
-import { dispatch } from './commands.js?realm=188';
-import { missions } from './missions.js?realm=188';
-import { getActiveScenario } from './scenarios.js?realm=188';
-import { saveGame, loadGame } from './save.js?realm=188';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=188';
-import { notify } from './notifications.js?realm=188';
-import { TRADE_PARTNERS } from './trade.js?realm=188';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=191';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=191';
+import { getWonderReport } from './wonder.js?realm=191';
+import { panCameraTo } from './render.js?realm=191';
+import { dispatch } from './commands.js?realm=191';
+import { missions } from './missions.js?realm=191';
+import { getActiveScenario } from './scenarios.js?realm=191';
+import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=191';
+import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=191';
+import { saveGame, loadGame } from './save.js?realm=191';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=191';
+import { notify } from './notifications.js?realm=191';
+import { TRADE_PARTNERS } from './trade.js?realm=191';
 import {
   citizenStaffingCapacity,
   onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=188';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=188';
+} from './citizen-ownership.js?realm=191';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=191';
+import { residentsForHouse } from './residences.js?realm=191';
+import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=191';
+import {
+  authoredBuildingCount,
+  foodCapacity,
+  foodStores,
+  isFoodStore,
+  storedFood,
+} from './building-inventory.js?realm=191';
+import { recruitmentStatus } from './military.js?realm=191';
+import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=191';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -30,6 +43,28 @@ const escapeHtml = value => String(value).replace(
     "'": '&#39;',
   })[character],
 );
+
+const WORKFORCE_POLICY_META = Object.freeze({
+  high: Object.freeze({ icon: '⬆', label: 'High', detail: 'Pull automatic workers here first.' }),
+  normal: Object.freeze({ icon: '●', label: 'Normal', detail: 'Balance against other normal jobs.' }),
+  low: Object.freeze({ icon: '⬇', label: 'Low', detail: 'Fill after stronger jobs.' }),
+  off: Object.freeze({ icon: '⏸', label: 'Off', detail: 'Release AI crew; Crown orders remain.' }),
+});
+
+function workforcePolicyControls(building) {
+  if (citizenStaffingCapacity(building) < 1) return '';
+  const snapshot = workforcePolicySnapshot(building);
+  const meta = WORKFORCE_POLICY_META[snapshot.priority];
+  const buttons = WORKFORCE_PRIORITIES.map(priority => {
+    const option = WORKFORCE_POLICY_META[priority];
+    const pressed = priority === snapshot.priority;
+    return `<button type="button" class="workforce-priority-btn${pressed ? ' active' : ''}" aria-pressed="${pressed}" title="${escapeHtml(option.detail)}" onclick="window.setSelectedWorkforcePriority&&window.setSelectedWorkforcePriority('${priority}')"><span aria-hidden="true">${option.icon}</span>${option.label}</button>`;
+  }).join('');
+  const crewNote = snapshot.crownWorkers > 0
+    ? ` · ${snapshot.crownWorkers} Crown order${snapshot.crownWorkers === 1 ? '' : 's'} protected`
+    : '';
+  return `<div class="workforce-policy"><div class="workforce-policy-head"><span class="ip-label">Labor priority</span><span class="workforce-policy-current workforce-${snapshot.priority}">${meta.icon} ${meta.label}</span></div><div class="workforce-priority-grid">${buttons}</div><div class="ip-hint workforce-policy-detail">${escapeHtml(meta.detail)}${crewNote}</div></div>`;
+}
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -57,7 +92,7 @@ function buildAtlasIcon(type) {
 
 function _triggerFoodWarning() {
   // Loop 077: {chronicle:false} (076 MEDIUM) — live UI prompt, not realm memory
-  notify('⚠️ Food running low! Build more farms!', 'danger', { chronicle: false });
+  notify('⚠️ Stored food running low! Keep a House pantry, Granary, or Storehouse stocked.', 'danger', { chronicle: false });
 }
 
 function rateStr(val, tooltip) {
@@ -69,6 +104,89 @@ function rateStr(val, tooltip) {
 }
 
 if (typeof window !== 'undefined') {
+  const focusBuildingOrBuild = (type, { requireComplete = false } = {}) => {
+    const building = G.buildings.find(candidate => (
+      candidate.type === type && (!requireComplete || candidate.buildProgress >= 1)
+    ));
+    if (!building) {
+      activateBuildMode(type);
+      return;
+    }
+    cancelBuildMode();
+    G.selectedBuilding = building;
+    panCameraTo(building.x, building.y, 500);
+    showInfoPanel(building);
+  };
+  window.runFirstMusterAction = focus => {
+    if (focus === 'build-food') {
+      const foodType = ['farm', 'fisherman', 'chickencoop', 'cowpen', 'bakery']
+        .find(type => G.buildings.some(building => building.type === type));
+      focusBuildingOrBuild(foodType || 'farm');
+    } else if (focus === 'build-house') {
+      focusBuildingOrBuild('house');
+    } else if (focus === 'build-barracks') {
+      focusBuildingOrBuild('barracks');
+    } else if (focus === 'barracks') {
+      focusBuildingOrBuild('barracks', { requireComplete: true });
+    } else if (focus === 'founder') {
+      if (!G._followAvatar) window.toggleFounderFollow?.();
+    } else if (focus === 'rally') {
+      window.setArmyStance?.('rally');
+    } else if (focus === 'food-workplace') {
+      const foodTypes = new Set(['farm', 'fisherman', 'chickencoop', 'cowpen', 'bakery']);
+      const workplace = G.buildings.find(building => (
+        foodTypes.has(building.type)
+        && building.buildProgress >= 1
+        && !isBuildingOperational(building)
+      )) || G.buildings.find(building => (
+        foodTypes.has(building.type) && building.buildProgress < 1
+      ));
+      if (workplace) {
+        cancelBuildMode();
+        G.selectedBuilding = workplace;
+        panCameraTo(workplace.x, workplace.y, 500);
+        showInfoPanel(workplace);
+      } else {
+        activateBuildMode('farm');
+      }
+    } else if (focus === 'defensive-building') {
+      activateBuildMode('wall');
+    }
+    updateUI();
+  };
+  window.choosePostRaidDoctrine = doctrine => {
+    const result = dispatch({ type: 'CHOOSE_RECOVERY_DOCTRINE', doctrine });
+    if (result.ok) {
+      const chosen = result.report.choices.find(choice => choice.id === doctrine);
+      notify(`⚔ ${chosen.title}: ${chosen.summary}`, 'mission', { chronicle: false });
+    } else {
+      notify('That recovery order is no longer available.', 'warn', { chronicle: false });
+    }
+    renderMissions();
+    updateUI();
+  };
+  window.setSelectedWorkforcePriority = priority => {
+    const building = G.selectedBuilding;
+    if (!building) return;
+    const result = dispatch({
+      type: 'SET_WORKFORCE_PRIORITY',
+      x: building.x,
+      y: building.y,
+      priority,
+    });
+    if (result.ok) {
+      const meta = WORKFORCE_POLICY_META[result.priority];
+      const moved = (result.reassigned || 0) > 0
+        ? ` ${result.reassigned} worker${result.reassigned === 1 ? '' : 's'} reassigned now.`
+        : '';
+      const released = (result.released || 0) > 0
+        ? ` ${result.released} automatic worker${result.released === 1 ? '' : 's'} released.`
+        : '';
+      notify(`${meta.icon} ${BUILDINGS[building.type]?.name || building.type} labor set to ${meta.label}.${moved}${released}`, 'info', { chronicle: false });
+    }
+    showInfoPanel(building);
+    updateUI();
+  };
   window.garrisonTower = () => {
     const b = G.selectedBuilding;
     if (!b || b.type !== 'tower') return;
@@ -85,11 +203,38 @@ if (typeof window !== 'undefined') {
   };
   window.setArmyStance = (stance) => {
     if (stance === 'rally' && !G.rallyPoint) {
-      notify('Plant a rally flag first: shift + right-click on the map.', 'warn');
+      cancelBuildMode();
+      G._placingRally = true;
+      notify('🚩 Rally order ready — tap open ground to plant the flag.', 'info', { chronicle: false });
       return;
     }
+    G._placingRally = false;
     dispatch({ type: 'SET_STANCE', stance });
     notify(`Army stance: ${stance === 'defend' ? '🛡️ Defend' : stance === 'rally' ? '🚩 Rally' : '🧱 Patrol'}`, 'info');
+    updateUI();
+  };
+  window.recruitSelectedUnit = () => {
+    const b = G.selectedBuilding;
+    if (!b) return;
+    const result = dispatch({ type: 'RECRUIT_UNIT', x: b.x, y: b.y });
+    if (result.ok) {
+      const source = result.candidate?.workplace
+        ? ` leaves the ${BUILDINGS[result.candidate.workplace.type]?.name || result.candidate.workplace.type}`
+        : ' leaves civilian life';
+      notify(`📯 ${result.name}${source} and enters drill. The realm has one fewer worker.`, 'info');
+    }
+    else {
+      const reason = {
+        'needs-workers': 'The training yard needs its full staff first.',
+        'queue-busy': 'This training yard already has a recruit in drill.',
+        'unit-cap': 'This training yard is at its unit cap.',
+        'no-candidate': 'No eligible civilian can enlist. Crown-ordered workers and protected characters will not be taken.',
+        'insufficient-resources': 'The realm cannot afford this recruit.',
+        'under-construction': 'Complete the training yard before mustering troops.',
+      }[result.reason] || 'That recruit cannot be mustered yet.';
+      notify(reason, 'warn', { chronicle: false });
+    }
+    showInfoPanel(b);
     updateUI();
   };
 }
@@ -148,14 +293,19 @@ export function updateUI() {
   };
   const wEl = $('r-wood'), sEl = $('r-stone'), fEl = $('r-food'), gEl = $('r-gold'), iEl = $('r-iron');
 
-  // Food rate tooltip: show consumption vs production context
+  // Food is a compatibility mirror of completed physical stores. Keep the HUD
+  // truthful about both the realm total and the places citizens actually use.
   const foodRate = G.resourceRates.food;
-  const foodConsumption = G.population; // ~1 per citizen per day (economy.js: pop * 1.0)
+  const physicalFoodStores = foodStores(G);
+  const physicalFoodCapacity = physicalFoodStores.reduce(
+    (total, building) => total + foodCapacity(building),
+    0,
+  );
   const foodTooltip = foodRate < 0
-    ? `Consuming ~${foodConsumption}/day. Build more farms!`
+    ? `Net ${foodRate}/day in physical stores. Citizens walk to a stocked pantry or store to eat.`
     : foodRate > 0
-      ? `Net +${foodRate}/day. ${Math.floor(G.resources.food / Math.abs(foodRate || 1))} days of surplus.`
-      : `Food is balanced. Consider more farms for safety.`;
+      ? `Net +${foodRate}/day in physical stores. Keep enough completed storage space for deliveries.`
+      : 'Food is physically stored. Citizens walk to a stocked House, Granary, or Storehouse to eat.';
 
   wEl.innerHTML = Math.floor(G.resources.wood) + rateStr(G.resourceRates.wood, G.resourceRates.wood < 0 ? 'Wood declining — build more lumber mills!' : null);
   sEl.innerHTML = Math.floor(G.resources.stone) + rateStr(G.resourceRates.stone);
@@ -192,8 +342,8 @@ export function updateUI() {
   // Dynamic tooltips: show context, not just "what is this resource"
   const foodResEl = fEl.closest('.res');
   if (foodResEl) {
-    const daysLeft = G.population > 0 ? Math.floor(G.resources.food / G.population) : 999;
-    foodResEl.title = `Food: ${Math.floor(G.resources.food)} — feeds ${G.population} settlers for ~${daysLeft} days`;
+    const storeLabel = `${physicalFoodStores.length} store${physicalFoodStores.length === 1 ? '' : 's'}`;
+    foodResEl.title = `Food: ${Math.floor(G.resources.food)}/${physicalFoodCapacity} physically stored across ${storeLabel}. Citizens walk there to eat.`;
   }
   const woodResEl = wEl.closest('.res');
   if (woodResEl) {
@@ -250,7 +400,18 @@ export function updateUI() {
       ? `${G.population} settlers filling all ${G.maxPop} housing slots — build a House (+4) to grow. Click to manage citizens and work orders.`
       : `${G.population} settlers · ${G.maxPop} housing slot${G.maxPop === 1 ? '' : 's'} (room for ${G.maxPop - G.population} more). Click to manage citizens and work orders.`;
   }
-  const maxSoldiers = G.buildings.filter(b => b.type === 'barracks').length * 4 + G.buildings.filter(b => b.type === 'archery').length * 3;
+  const founderButton = $('btn-founder');
+  if (founderButton) {
+    const finds = G.avatar?.scoutingFinds || 0;
+    founderButton.classList.toggle('active', !!G._followAvatar);
+    founderButton.textContent = G._followAvatar ? '🚶 Scouting' : `🚶 Founder${finds ? ` · ${finds}` : ''}`;
+    founderButton.title = G._followAvatar
+      ? `Founder selected — WASD or tap open ground to scout. ${G.avatar?.scoutedTiles || 0} new tiles charted.`
+      : `Select the Founder and scout beyond the known map. Finds: ${finds}.`;
+    founderButton.setAttribute('aria-pressed', G._followAvatar ? 'true' : 'false');
+  }
+  const maxSoldiers = G.buildings.filter(b => b.type === 'barracks' && b.buildProgress >= 1).length * 4
+    + G.buildings.filter(b => b.type === 'archery' && b.buildProgress >= 1).length * 3;
   const soldierEl = $('soldier-count');
   const armyVisible = maxSoldiers > 0 || (G.soldiers || []).length > 0;
   if (soldierEl) {
@@ -475,6 +636,7 @@ if (typeof window !== 'undefined' && !window._buildBarHotkeyBound) {
 }
 
 function activateBuildMode(key) {
+  G._placingRally = false;
   G.selectedBuild = key;
   G.selectedBuilding = null;
   G._lastPaintTile = null;
@@ -484,6 +646,7 @@ function activateBuildMode(key) {
 }
 
 export function cancelBuildMode() {
+  G._placingRally = false;
   G.selectedBuild = null;
   G.selectedBuilding = null;
   G._lastPaintTile = null;
@@ -733,6 +896,7 @@ export function showInfoPanel(b) {
         ? `<div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">${crew.length}/${capacity}${crewNames ? ' — ' + crewNames : ''}</span></div>`
         : '<div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">Realm-laid infrastructure</span></div>'}
       ${capacity > 0 && crew.length === 0 ? '<div class="ip-hint">Idle site — free citizens will take the builder job soon.</div>' : ''}
+      ${capacity > 0 ? workforcePolicyControls(b) : ''}
     `;
     panel.innerHTML = html + `<div class="ip-hint">Right-click to cancel and refund half.</div>`;
     panel.style.display = 'block';
@@ -743,6 +907,13 @@ export function showInfoPanel(b) {
   // Description
   if (def.desc) {
     html += `<div class="ip-desc">${def.desc}</div>`;
+  }
+  html += `<div class="ip-row"><span class="ip-label">Status</span><span class="ip-val">${escapeHtml(buildingOperationLabel(b))}</span></div>`;
+  if (isFoodStore(b)) {
+    const stockLabel = b.founderStockpile === true
+      ? 'Founder Stockpile'
+      : b.type === 'house' ? 'Pantry' : 'Food store';
+    html += `<div class="ip-row"><span class="ip-label">${stockLabel}</span><span class="ip-val">🍎 ${storedFood(b)}/${foodCapacity(b)}</span></div>`;
   }
   // Lore tooltip (flavor text)
   const LORE = {
@@ -814,6 +985,7 @@ export function showInfoPanel(b) {
       )).join(', ');
       html += `<div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">${crewNames}</span></div>`;
     }
+    html += workforcePolicyControls(b);
   }
 
   // Wonder stage card: bill bars, delivery pace, next housing gate (wonder.js)
@@ -843,7 +1015,7 @@ export function showInfoPanel(b) {
     const effectiveProd = Object.entries(def.prod)
       .map(([k, v]) => {
         const perCycle = Math.round(v * levelMult * 10) / 10;
-        const perDay = Math.round(perCycle * 4 * 10) / 10; // ~4 cycles per day
+        const perDay = Math.round(perCycle * 5 * 10) / 10; // five production pulses per day
         return `${perCycle} ${k}<span class="ip-perday"> (${perDay}/day)</span>`;
       }).join(', ');
     html += `<div class="ip-row"><span class="ip-label">Produces</span><span class="ip-val">${effectiveProd}</span></div>`;
@@ -884,6 +1056,39 @@ export function showInfoPanel(b) {
     html += `<div class="ip-row"><span class="ip-label">Defense</span><span class="ip-val ip-defense">🛡 +${def.defense}</span></div>`;
   }
 
+  // Military training is an explicit order. The building supplies capacity
+  // and a staffed drill yard; it never spends from the realm by itself.
+  if (b.type === 'barracks' || b.type === 'archery') {
+    const enlist = recruitmentStatus(b);
+    const spec = enlist.spec;
+    const queued = b.recruitType && spec;
+    const cost = spec ? Object.entries(spec.cost)
+      .map(([resource, amount]) => `${resourceEmoji(resource)} ${amount}`)
+      .join(' · ') : '';
+    html += `<div class="ip-row"><span class="ip-label">Company</span><span class="ip-val">${enlist.count || 0}/${spec?.cap || 0} mustered</span></div>`;
+    if (queued) {
+      const progress = Math.min(100, Math.round(((b.trainTimer || 0) / spec.duration) * 100));
+      const instructors = activeStaffingCount(b);
+      html += `<div class="ip-row"><span class="ip-label">In drill</span><span class="ip-val ip-happy">${escapeHtml(b.recruitName)} · ${progress}%</span></div>`;
+      html += `<div class="ip-row"><span class="ip-label">Instructor</span><span class="ip-val${instructors > 0 ? '' : ' ip-defense'}">${instructors > 0 ? `${instructors} on duty` : 'Training paused — none on duty'}</span></div>`;
+    } else if (spec) {
+      const disabled = enlist.ok ? '' : ' disabled';
+      const reason = enlist.reason === 'needs-workers' ? ' — full staff required'
+        : enlist.reason === 'unit-cap' ? ' — company full'
+          : enlist.reason === 'no-candidate' ? ' — no eligible civilian'
+          : enlist.reason === 'insufficient-resources' ? ' — resources short'
+            : enlist.reason === 'under-construction' ? ' — finish construction'
+              : '';
+      const candidate = enlist.candidate;
+      const candidateRole = candidate
+        ? candidate.workplace
+          ? `${candidate.profession} at ${BUILDINGS[candidate.workplace.type]?.name || candidate.workplace.type}`
+          : `unassigned ${candidate.profession}`
+        : 'No civilian available';
+      html += `<button class="upgrade-btn${disabled}" ${enlist.ok ? '' : 'disabled'} onclick="window.recruitSelectedUnit&&window.recruitSelectedUnit()">${spec.icon} ${candidate ? `Enlist ${escapeHtml(candidate.name)} → ${spec.label}` : `Muster ${spec.label}`}<br><small class="ip-hint">${escapeHtml(candidateRole)} leaves the workforce · ${cost}${reason}</small></button>`;
+    }
+  }
+
   // Tower garrison — selection-free military depth: a manned tower shoots
   // roughly twice as fast and a third further.
   if (b.type === 'tower' && buildProgress >= 1) {
@@ -901,7 +1106,15 @@ export function showInfoPanel(b) {
   // Housing
   if (b.type === 'house') {
     const report = getHouseTierReport(b);
+    const residents = residentsForHouse(b);
+    const atHome = residents.filter(citizen => ['sleep', 'sheltered'].includes(citizen.activity.kind)).length;
+    const sheltered = residents.filter(citizen => citizen.activity.kind === 'sheltered').length;
+    const residentNames = residents.length
+      ? residents.map(citizen => escapeHtml(citizen.identity.name)).join(', ')
+      : 'No residents assigned';
     html += `<div class="ip-row"><span class="ip-label">Tier</span><span class="ip-val">🏠 ${report.tier.name} — ${report.tierIdx + 1}/${HOUSE_TIERS.length} · houses ${report.tier.cap} · tax ×${report.tier.taxMult}</span></div>`;
+    html += `<div class="ip-row"><span class="ip-label">Residents</span><span class="ip-val">${residents.length}/${report.tier.cap} — ${residentNames}</span></div>`;
+    html += `<div class="ip-row"><span class="ip-label">Inside</span><span class="ip-val">${atHome}/${residents.length || 0}${sheltered ? ` · ${sheltered} sheltering` : atHome ? ' sleeping' : ''}</span></div>`;
     if (report.next) {
       const checks = report.nextReport.checks
         .map(c => `${c.ok ? '✓' : '✗'} ${c.label}`)
@@ -1061,12 +1274,13 @@ export function renderHappinessPanel() {
   factors.push({ label: '🏡 Base happiness', val: 50, category: 'base' });
 
   // Building bonuses — service buildings with radius only cover nearby houses
-  const houses = G.buildings.filter(b => BUILDINGS[b.type].pop);
+  const houses = G.buildings.filter(b => BUILDINGS[b.type].pop && b.buildProgress >= 1);
   const totalHouses = houses.length;
   const bContribs = {}; // type -> total happiness contribution
   for (const b of G.buildings) {
     const def = BUILDINGS[b.type];
     if (!def.happiness) continue;
+    if (!isBuildingOperational(b)) continue;
     let bonus;
     if (def.radius && totalHouses > 0) {
       // Count houses within radius; scale bonus by coverage fraction
@@ -1079,7 +1293,7 @@ export function renderHappinessPanel() {
   }
   for (const [type, contrib] of Object.entries(bContribs)) {
     const def = BUILDINGS[type];
-    const count = G.buildings.filter(b => b.type === type).length;
+    const count = G.buildings.filter(b => b.type === type && isBuildingOperational(b)).length;
     const rounded = Math.round(contrib * 10) / 10;
     factors.push({ label: `${def.icon} ${def.name} ×${count}`, val: rounded, category: 'building' });
   }
@@ -1245,7 +1459,7 @@ const TUTORIAL_STEPS = [
   },
   {
     id: 'done',
-    text: '🎉 You\'re on your own now! Build, research, trade, and survive. Raids come on Day 8. Open the 📖 Chronicle to read your story!',
+    text: '🎉 You\'re on your own now! Build, research, trade, and survive.',
     action: '',
     check: () => G.gameTick > 99999, // stays until dismissed
   },
@@ -1270,13 +1484,21 @@ export function updateTutorialTip() {
   // a barracks, and a house on Day 7 still saw "Select Farm from the
   // build bar ↓" — absurd.
   if (!tutorialDismissed) {
-    if (G.buildings.length >= 4) { dismissTutorial(); return; }
-    if (G.day >= 6 && G.buildings.length >= 2) { dismissTutorial(); return; }
+    if (authoredBuildingCount(G) >= 4) { dismissTutorial(); return; }
+    if (G.day >= 6 && authoredBuildingCount(G) >= 2) { dismissTutorial(); return; }
     if (G.population >= 8) { dismissTutorial(); return; }
   }
 
   const tipEl = document.getElementById('tutorial-tip');
   if (!tipEl) return;
+  // Rise of the Sword has its own sequential, action-backed First Muster
+  // chapter. Keep the truthful paused welcome, then hand guidance to that
+  // campaign instead of sending military players through the generic lumber
+  // and research tutorial in parallel.
+  if (G.scenario === 'military_rise' && tutorialWelcomeAcknowledged) {
+    tipEl.style.display = 'none';
+    return;
+  }
   if (tutorialDismissed || tutorialStep >= TUTORIAL_STEPS.length) {
     tipEl.style.display = 'none';
     return;
@@ -1298,8 +1520,11 @@ export function updateTutorialTip() {
   } catch {}
 
   const current = TUTORIAL_STEPS[Math.min(tutorialStep, TUTORIAL_STEPS.length - 1)];
+  const tutorialText = current.id === 'done'
+    ? `${current.text} The first raid is expected on Day ${getActiveScenario().raidStart}. Open the 📖 Chronicle to read your story!`
+    : current.text;
   tipEl.innerHTML = `
-    <div class="tut-text">${current.text}</div>
+    <div class="tut-text">${tutorialText}</div>
     ${current.action ? `<div class="tut-action">${current.action}</div>` : ''}
     ${current.continueLabel ? `<button class="tut-next" type="button">${current.continueLabel}</button>` : ''}
     <div class="tut-progress">Step ${tutorialStep + 1} of ${TUTORIAL_STEPS.length}</div>
@@ -1309,6 +1534,7 @@ export function updateTutorialTip() {
 
   tipEl.querySelector('.tut-next')?.addEventListener('click', () => {
     tutorialWelcomeAcknowledged = true;
+    if (G.speed === 0) setSpeed(1);
     updateTutorialTip();
   });
 
@@ -1339,6 +1565,7 @@ export function resetTutorial() {
 }
 
 export function dismissTutorial() {
+  if (!tutorialWelcomeAcknowledged && G.speed === 0) setSpeed(1);
   tutorialDismissed = true;
   document.querySelectorAll('.tut-highlight').forEach(e => {
     e.classList.remove('tut-highlight');
@@ -1363,8 +1590,10 @@ function renderPopPanel() {
   el.innerHTML = '';
   const stateLabel = { idle:'Idle', find_job:'Seeking work', walk_to_work:'Going to work',
     working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
-    needs_delivery:'Waiting for storage', foraging:'Foraging', eating:'Eating',
-    go_home:'Going home', sleep:'Sleeping', leisure:'At leisure' };
+    needs_delivery:'Waiting for storage', foraging:'Foraging',
+    walk_to_eat:'Going to eat', waiting_for_food:'Waiting for food', eating:'Eating',
+    go_home:'Going home', sleep:'Sleeping', leisure:'At leisure',
+    seek_shelter:'Running home', sheltered:'Sheltered at home', flee:'Fleeing the raid' };
   const snapshots = buildCurrentCitizenPresentations();
 
   // Classify citizens
@@ -1673,7 +1902,7 @@ export function showVictoryScreen() {
   }
   el.querySelector('.vic-day').textContent = `Day ${G.day}`;
   el.querySelector('.vic-pop').textContent = `${G.population} citizens`;
-  el.querySelector('.vic-buildings').textContent = `${G.buildings.length} buildings`;
+  el.querySelector('.vic-buildings').textContent = `${authoredBuildingCount(G)} buildings`;
   el.querySelector('.vic-resources').textContent = `${G.totalResourcesGathered || 0} total`;
   el.querySelector('.vic-techs').textContent = `${G.researchedTechs.size} technologies`;
   const ach = document.querySelectorAll ? document.querySelectorAll('.ach-item.done').length : 0;
@@ -1772,23 +2001,51 @@ export function renderMissions() {
 
   // Prepend scenario objectives at the top
   const scen = getActiveScenario();
+  const chapter = scen?.chapterId === FIRST_MUSTER_CHAPTER_ID
+    ? getFirstMusterReport(G)
+    : null;
+  const recovery = chapter?.complete ? getPostRaidRecoveryReport(G) : null;
   let firstActiveAssigned = false;
   if (scen) {
     const header = document.createElement('div');
     header.className = 'scenario-header';
-    const progress = scen.objectives.filter(o => o.check()).length;
-    header.innerHTML = `<div class="scen-name">${scen.name} <span class="scen-progress">${progress}/${scen.objectives.length}</span></div><div class="scen-desc">${scen.desc}</div>`;
+    const progress = chapter
+      ? chapter.currentIndex + (recovery?.complete ? 1 : 0)
+      : scen.objectives.filter(o => o.check()).length;
+    const objectiveCount = chapter
+      ? chapter.steps.length + (recovery ? 1 : 0)
+      : scen.objectives.length;
+    header.innerHTML = `<div class="scen-name">${scen.name} <span class="scen-progress">${progress}/${objectiveCount}</span></div><div class="scen-desc">${scen.desc}</div>`;
     list.appendChild(header);
-    for (const obj of scen.objectives) {
-      const done = obj.check();
+    if (chapter?.complete) {
+      const completeRow = document.createElement('div');
+      completeRow.className = 'mission done mission-chapter mission-chapter-complete';
+      completeRow.innerHTML = '<span class="check">✓</span><span>First Muster complete</span>';
+      list.appendChild(completeRow);
+    }
+    const objectives = chapter
+      ? chapter.complete
+        ? (recovery?.primary ? [recovery.primary] : [])
+        : [
+          ...chapter.steps.filter(step => step.status === 'completed').slice(-2),
+          ...(chapter.primary ? [chapter.primary] : []),
+        ]
+      : scen.objectives;
+    for (const obj of objectives) {
+      const chapterDone = chapter && obj.status === 'completed';
+      const chapterCurrent = chapter && obj.status === 'current';
+      const done = chapter ? chapterDone : obj.check();
       const row = document.createElement('div');
-      let cls = 'mission' + (done ? ' done' : '');
+      let cls = 'mission' + (done ? ' done' : '') + (chapter ? ' mission-chapter' : '');
       if (!done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
       else if (!done) cls += ' mission-later';
       row.className = cls;
       // Show progress like "3/10" when the objective has a numeric target and isn't done yet
       let progressText = '';
-      if (!done && typeof obj.progress === 'function') {
+      if (!done && chapterCurrent) {
+        const { current, target } = obj.progress;
+        progressText = ` <span class="mission-progress">(${current}/${target})</span>`;
+      } else if (!done && typeof obj.progress === 'function') {
         try {
           const [cur, target] = obj.progress();
           if (typeof cur === 'number' && typeof target === 'number') {
@@ -1796,8 +2053,41 @@ export function renderMissions() {
           }
         } catch (_e) { /* progress is optional; ignore errors */ }
       }
-      row.innerHTML = `<span class="check">${done ? '✓' : ''}</span>${obj.text}${progressText}`;
+      if (chapterCurrent) {
+        const actionLabels = {
+          'build-food': 'Place food source',
+          'build-house': 'Place House',
+          'build-barracks': 'Find or place Barracks',
+          barracks: 'Open Barracks',
+          founder: 'Select Founder',
+          rally: 'Plant rally flag',
+          'food-workplace': 'Open food workplace',
+          'defensive-building': 'Place Wall',
+        };
+        const actionLabel = actionLabels[obj.focus];
+        row.innerHTML = `<span class="check"></span><span class="mission-chapter-copy"><span class="mission-chapter-title">${escapeHtml(obj.text)}${progressText}</span><span class="mission-chapter-detail">${escapeHtml(obj.detail)}</span>${actionLabel ? `<button type="button" class="mission-chapter-action" onclick="window.runFirstMusterAction&&window.runFirstMusterAction('${escapeHtml(obj.focus)}')">${actionLabel}</button>` : ''}</span>`;
+      } else {
+        row.innerHTML = `<span class="check">${done ? '✓' : ''}</span><span>${escapeHtml(obj.text)}${progressText}</span>`;
+      }
       list.appendChild(row);
+    }
+    if (recovery?.canChoose) {
+      const prompt = document.createElement('div');
+      prompt.className = 'recovery-prompt';
+      prompt.innerHTML = `<div class="recovery-kicker">After the battle</div><div class="recovery-title">What does the realm do next?</div><div class="recovery-detail">Choose one commitment. The order cannot be changed and grants no free resources.</div>`;
+      list.appendChild(prompt);
+      const choices = document.createElement('div');
+      choices.className = 'recovery-choices';
+      for (const choice of recovery.choices) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `recovery-choice recovery-${choice.id}`;
+        button.disabled = !choice.enabled;
+        button.innerHTML = `<span class="recovery-choice-title">${escapeHtml(choice.title)}</span><span class="recovery-choice-summary">${escapeHtml(choice.summary)}</span><span class="recovery-choice-objective">${escapeHtml(choice.objective)}</span>`;
+        button.addEventListener('click', () => window.choosePostRaidDoctrine?.(choice.id));
+        choices.appendChild(button);
+      }
+      list.appendChild(choices);
     }
   }
 
@@ -1806,7 +2096,7 @@ export function renderMissions() {
   // appended in the same list with no break and make the scenario counter
   // ("0/3") look wrong — fresh-eyes reviewers read the full panel as one
   // mission group and wonder why only 3 count.
-  if (scen && missions.length > 0) {
+  if (scen && !chapter && missions.length > 0) {
     const divider = document.createElement('div');
     divider.className = 'mission-side-divider';
     divider.style.cssText = 'margin-top:0.9rem;padding:0.4rem 0 0.25rem;border-top:1px solid rgba(255,255,255,0.08);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.38);font-weight:600';
@@ -1818,6 +2108,7 @@ export function renderMissions() {
     firstActiveAssigned = true;
   }
 
+  if (chapter) return;
   for (const m of missions) {
     const div = document.createElement('div');
     let cls = 'mission' + (m.done ? ' done' : '');

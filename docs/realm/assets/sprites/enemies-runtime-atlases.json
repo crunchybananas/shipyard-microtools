@@ -1,0 +1,59 @@
+{
+  "actions": [
+    "idle",
+    "walk",
+    "attack",
+    "retreat"
+  ],
+  "atlases": [
+    {
+      "file": "enemies-atlas-native.png",
+      "frameHeight": 35,
+      "frameWidth": 27,
+      "height": 1680,
+      "key": "native",
+      "sha256": "09d50cdada91e16b4d85bc45135592457367b0420c532f670e1b07b7dd904fe8",
+      "width": 216
+    },
+    {
+      "file": "enemies-atlas-default.png",
+      "frameHeight": 46,
+      "frameWidth": 35,
+      "height": 2208,
+      "key": "default",
+      "sha256": "8814b9acef0838f22c9232be4d82086a020ce28a9b6336e68232f9943a5ae4af",
+      "width": 280
+    },
+    {
+      "file": "enemies-atlas-double.png",
+      "frameHeight": 70,
+      "frameWidth": 54,
+      "height": 3360,
+      "key": "double",
+      "sha256": "6c9381c1e294c55aa5c228b7e319452617071811e98dbb951d8034e02a749115",
+      "width": 432
+    },
+    {
+      "file": "enemies-atlas.png",
+      "frameHeight": 84,
+      "frameWidth": 64,
+      "height": 4032,
+      "key": "review",
+      "sha256": "07216045397bb10786211fbd2355ba8d6ef514d9f23908e54dc7919b94a00d71",
+      "width": 512
+    }
+  ],
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "frames": 8,
+  "schema": "realm.enemy-runtime-atlases.v1",
+  "variants": [
+    "ash-reaver",
+    "iron-lancer",
+    "bone-breaker"
+  ]
+}

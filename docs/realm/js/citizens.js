@@ -2,12 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=188';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=188';
-import { getCitizenSpeedMult } from './events.js?realm=188';
-import { buildingCapacity } from './building-lifecycle.js?realm=188';
-import { revealAround } from './world.js?realm=188';
-import { visualJitter } from './fx.js?realm=188';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, TILE } from './state.js?realm=191';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=191';
+import { getCitizenSpeedMult } from './events.js?realm=191';
+import { revealAround } from './world.js?realm=191';
+import { visualJitter } from './fx.js?realm=191';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -16,8 +15,33 @@ import {
   releaseCitizenAssignment,
   staffingCount,
   transitionCitizenActivity,
-  vocationForBuilding,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
+import {
+  assignCitizenResidence,
+  citizenAtResidencePortal,
+  citizenHasValidResidence,
+  citizenIsIndoors,
+  residencePortalForCitizen,
+  residentsForHouse,
+} from './residences.js?realm=191';
+import { isBuildingOperational } from './building-operation.js?realm=191';
+import {
+  canDepositFood,
+  depositFood,
+  findReachableFoodStore,
+  isFoodStore,
+  storedFood,
+  withdrawFood,
+} from './building-inventory.js?realm=191';
+import {
+  AUTO_REVIEW_INTERVAL_TICKS,
+  buildingAcceptsAutomaticWorkers,
+  isFoodWorkplace,
+  isWorkforceConstructionSite,
+  reviewAutomaticAssignment,
+  scoreCitizenJob,
+  workforceFoodDaysLeft,
+} from './workforce-policy.js?realm=191';
 
 const DEFAULT_ACTIVITY_REASON = Object.freeze({
   idle: 'idle-wait',
@@ -28,10 +52,15 @@ const DEFAULT_ACTIVITY_REASON = Object.freeze({
   needs_delivery: 'cargo-needs-storage',
   deliver: 'cargo-delivered',
   foraging: 'forage-started',
+  walk_to_eat: 'route-to-food',
+  waiting_for_food: 'food-shortage',
   eating: 'eat-food',
   go_home: 'route-home',
   sleep: 'sleep-rest',
   leisure: 'leisure-started',
+  seek_shelter: 'raid-shelter',
+  sheltered: 'shelter-entered',
+  flee: 'threat-response',
 });
 
 function setActivity(citizen, kind, {
@@ -100,8 +129,7 @@ function buildingsByType(c, types) {
 function deliveryTargets(c, resKey) {
   let primaryType = null;
   let storageTypes;
-  if (resKey === 'food') storageTypes = ['granary', 'storehouse', 'house'];
-  else if (resKey === 'wheat') { primaryType = 'windmill'; storageTypes = ['granary', 'storehouse', 'house']; }
+  if (resKey === 'wheat') { primaryType = 'windmill'; storageTypes = ['granary', 'storehouse', 'house']; }
   else if (resKey === 'flour') { primaryType = 'bakery'; storageTypes = ['granary', 'storehouse', 'house']; }
   else if (resKey === 'gold') { primaryType = 'market'; storageTypes = ['storehouse', 'house']; }
   else storageTypes = ['storehouse', 'granary', 'house'];
@@ -143,7 +171,7 @@ function citizenHash(c) {
 function targetCrowdPenalty(c, x, y) {
   let penalty = 0;
   for (const other of G.citizens || []) {
-    if (other === c) continue;
+    if (other === c || citizenIsIndoors(other)) continue;
     const dist = Math.hypot(other.x - x, other.y - y);
     if (dist < 0.72) penalty += 1.6;
     if (Math.round(other.tx ?? other.x) === x && Math.round(other.ty ?? other.y) === y) penalty += 1.1;
@@ -223,7 +251,9 @@ function releaseJob(c, { unreachable = false } = {}) {
 function watchProgress(c) {
   const goalActive = (c.path && c.pathIdx < c.path.length) ||
     c.activity.kind === 'walk_to_work' || c.activity.kind === 'walk_to_deliver' ||
-    c.activity.kind === 'needs_delivery' || c.activity.kind === 'foraging';
+    c.activity.kind === 'walk_to_eat' ||
+    c.activity.kind === 'needs_delivery' || c.activity.kind === 'foraging' ||
+    c.activity.kind === 'seek_shelter';
   if (!goalActive) { c._wdBest = null; c._wdTicks = 0; return; }
   const gx = c._requestedTx ?? c.tx ?? c.x;
   const gy = c._requestedTy ?? c.ty ?? c.y;
@@ -232,6 +262,22 @@ function watchProgress(c) {
   c._wdTicks = (c._wdTicks || 0) + 1;
   if (c._wdTicks > 120) {
     blacklistTarget(c, gx, gy);
+    if (c.activity.kind === 'seek_shelter') {
+      clearPath(c);
+      beginOpenRaidFlight(c, 'shelter-unreachable');
+      c._wdBest = null;
+      c._wdTicks = 0;
+      return;
+    }
+    if (c.activity.kind === 'walk_to_eat') {
+      if (c._foodTarget) blacklistTarget(c, c._foodTarget.x, c._foodTarget.y);
+      c._foodTarget = null;
+      clearPath(c);
+      beginFoodRoute(c, 'food-source-empty');
+      c._wdBest = null;
+      c._wdTicks = 0;
+      return;
+    }
     if (assignedBuilding(c) && c.activity.kind === 'walk_to_work') {
       releaseJob(c, { unreachable: true });
       G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: "Can't reach it!", alpha: 1.25, vy: -0.12, decay: 0.016, type: 'speech' });
@@ -244,10 +290,12 @@ function watchProgress(c) {
   }
 }
 
-function pathTo(c, tx, ty) {
+function pathTo(c, tx, ty, { exact = false } = {}) {
   c._requestedTx = tx;
   c._requestedTy = ty;
-  const target = chooseCrowdAwareTarget(c, tx, ty);
+  const target = exact
+    ? { x: Math.round(tx), y: Math.round(ty) }
+    : chooseCrowdAwareTarget(c, tx, ty);
   c._pathGoal = target;
   c.path = compressPath(findPath(Math.round(c.x), Math.round(c.y), target.x, target.y));
   c.pathIdx = 0;
@@ -270,6 +318,34 @@ function pathTo(c, tx, ty) {
 }
 
 function routeDelivery(c, resKey) {
+  if (resKey === 'food') {
+    const routes = new Map();
+    const dropoff = findReachableFoodStore(c, {
+      mode: 'deposit',
+      isReachable: building => {
+        // Do not strand public rations in a private pantry with nobody home to
+        // consume them. Occupied Houses remain valid provisioning targets.
+        if (
+          building.type === 'house'
+          && !residentsForHouse(building).some(resident => citizenHasValidResidence(resident))
+        ) return false;
+        const route = reachableFoodRoute(c, building);
+        if (route) routes.set(building, route);
+        return !!route;
+      },
+    });
+    if (!dropoff) {
+      c._deliveryTarget = null;
+      return false;
+    }
+    const route = routes.get(dropoff);
+    if (route && pathTo(c, route.approach.x, route.approach.y, { exact: true })) {
+      c._deliveryTarget = dropoff;
+      return true;
+    }
+    blacklistTarget(c, dropoff.x, dropoff.y);
+    return routeDelivery(c, resKey);
+  }
   for (const dropoff of deliveryTargets(c, resKey)) {
     if (isBlacklisted(c, dropoff.x, dropoff.y)) continue;
     if (pathTo(c, dropoff.x, dropoff.y)) {
@@ -285,7 +361,113 @@ function routeDelivery(c, resKey) {
 }
 
 function deliveryTargetStillValid(c) {
-  return !!c._deliveryTarget && G.buildings.includes(c._deliveryTarget);
+  return !!c._deliveryTarget
+    && G.buildings.includes(c._deliveryTarget)
+    && (c.carrying !== 'food' || canDepositFood(c._deliveryTarget, 1));
+}
+
+const MEAL_INTERRUPTIBLE_ACTIVITIES = new Set([
+  'idle', 'find_job', 'walk_to_work', 'working', 'leisure',
+]);
+const FOOD_RETRY_BASE_TICKS = 72;
+const FOOD_RETRY_SPREAD_TICKS = 37;
+
+function foodRetryTicks(c) {
+  return FOOD_RETRY_BASE_TICKS + (citizenHash(c) % FOOD_RETRY_SPREAD_TICKS);
+}
+
+function foodStoreApproach(c, building) {
+  if (!isFoodStore(building)) return null;
+  return nearestWalkableTile(
+    Math.round(building.x),
+    Math.round(building.y),
+    3,
+    Math.round(c.x),
+    Math.round(c.y),
+  );
+}
+
+function reachableFoodRoute(c, building) {
+  if (isBlacklisted(c, building.x, building.y)) return null;
+  const approach = foodStoreApproach(c, building);
+  if (!approach) return null;
+  const route = findPath(
+    Math.round(c.x),
+    Math.round(c.y),
+    approach.x,
+    approach.y,
+  );
+  return route ? { approach, route } : null;
+}
+
+function foodTargetStillValid(c) {
+  return !!c._foodTarget
+    && isFoodStore(c._foodTarget)
+    && storedFood(c._foodTarget) > 0;
+}
+
+function citizenAtFoodTarget(c, building = c._foodTarget) {
+  const approach = foodStoreApproach(c, building);
+  return !!approach && Math.hypot(c.x - approach.x, c.y - approach.y) <= 0.8;
+}
+
+function waitForFood(c, reason = 'food-shortage') {
+  const wasWaiting = c.activity.kind === 'waiting_for_food';
+  c._foodTarget = null;
+  clearPath(c);
+  setActivity(c, 'waiting_for_food', { reason, timer: foodRetryTicks(c) });
+  if (!wasWaiting) {
+    G.particles.push({
+      tx: c.x, ty: c.y, offsetY: -25,
+      text: reason === 'food-source-empty' ? 'Pantry empty' : 'Need reachable food',
+      alpha: 1.3, vy: -0.12, decay: 0.016, type: 'speech',
+    });
+  }
+  return true;
+}
+
+function beginFoodRoute(c, shortageReason = 'food-shortage') {
+  if (c.carrying && c.carryAmount > 0) return false;
+  const routes = new Map();
+  const store = findReachableFoodStore(c, {
+    mode: 'withdraw',
+    isReachable: building => {
+      // A House pantry belongs to its residents. Public Granaries and
+      // Storehouses serve the whole settlement, but a citizen must never eat
+      // through somebody else's home inventory merely because it is nearer.
+      if (
+        building.type === 'house'
+        && (c.home !== building || !citizenHasValidResidence(c))
+      ) return false;
+      const route = reachableFoodRoute(c, building);
+      if (route) routes.set(building, route);
+      return !!route;
+    },
+  });
+  if (!store) return waitForFood(c, shortageReason);
+
+  const route = routes.get(store);
+  c._foodTarget = store;
+  clearPath(c);
+  setActivity(c, 'walk_to_eat', { reason: 'route-to-food' });
+  // Reuse pathTo so all movement metadata, topology invalidation, and save
+  // continuity stay on the same route authority as work and deliveries.
+  if (route && pathTo(c, route.approach.x, route.approach.y, { exact: true })) return true;
+  blacklistTarget(c, store.x, store.y);
+  c._foodTarget = null;
+  return beginFoodRoute(c, shortageReason);
+}
+
+function resumeAfterMeal(c) {
+  c._foodTarget = null;
+  clearPath(c);
+  const workplace = assignedBuilding(c);
+  if (workplace && G.buildings.includes(workplace)) {
+    setActivity(c, 'walk_to_work', { reason: 'route-to-work' });
+    pathToWork(c);
+  } else {
+    setActivity(c, 'find_job', { reason: 'seek-work', timer: 5 });
+  }
 }
 
 // Deterministic right-of-way prevents crossing and opposing citizens from
@@ -355,7 +537,7 @@ function buildingEdgeWorkTarget(c, b, radius = 2) {
 
 function workTargetForBuilding(c, b) {
   if (!b) return { x: c.x, y: c.y };
-  if (isConstructionSite(b)) return buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
+  if (isWorkforceConstructionSite(b)) return buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
   if (b.type === 'lumber') return resourceWorkTarget(c, b, TILE.FOREST, 7) || buildingEdgeWorkTarget(c, b, 3) || { x: b.x, y: b.y };
   if (b.type === 'quarry') return resourceWorkTarget(c, b, TILE.STONE, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
   if (b.type === 'mine') return resourceWorkTarget(c, b, TILE.IRON, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
@@ -554,81 +736,126 @@ function replanToRequestedTarget(c) {
   pathTo(c, tx, ty);
 }
 
-// ── Job market (Phase 3c) ───────────────────────────────────────────
-// Greedy-nearest is replaced by utility scoring: distance, dynamic
-// priority (a thin larder surges food jobs), the wonder's pull, and a
-// hysteresis bonus for the current job so citizens don't thrash between
-// equidistant workplaces. Deterministic — ties break by building order.
-const FOOD_JOBS = new Set(['farm', 'fisherman', 'chickencoop', 'cowpen', 'bakery', 'windmill']);
-
-let _foodDaysTick = -1, _foodDaysVal = 99;
-function foodDaysLeft() {
-  if (_foodDaysTick !== G.gameTick) {
-    _foodDaysTick = G.gameTick;
-    const daily = Math.max(1, Math.ceil(G.population * getDifficulty().foodMult));
-    const stock = (G.resources.food || 0) + (G.resources.wheat || 0) + (G.resources.flour || 0);
-    _foodDaysVal = stock / daily;
-  }
-  return _foodDaysVal;
-}
-
-
-function isConstructionSite(b) {
-  return b.buildProgress < 1 && citizenStaffingCapacity(b) > 0;
-}
-
-function scoreJob(c, b) {
-  let score = -dist2(c.x, c.y, b.x, b.y);
-  const days = foodDaysLeft();
-  if (days < 3 && FOOD_JOBS.has(b.type)) score += (3 - days) * 14;
-  if (isConstructionSite(b)) score += 12; // fresh sites pull a crew fast
-  if (b.type === 'wonder') score += 6; // the great work draws hands
-  if (assignedBuilding(c) === b) score += 6; // hysteresis
-  if (!isConstructionSite(b) && c.profession.kind !== 'settler') {
-    score += vocationForBuilding(b) === c.profession.kind ? 18 : -8;
-  }
-  return score;
-}
-
 // ── Homes & schedule (Phase 3a) ─────────────────────────────────────
 // Citizens sleep in an assigned house at night. Assignment is lazy
 // (first nightfall, or when the old home is gone) and respects tier
-// capacity via buildingCapacity. Homeless citizens bed down near the
+// capacity via the residence policy. Homeless citizens bed down near the
 // settlement anchor — visible pressure to build housing.
 function assignHome(c) {
-  const counts = new Map();
-  for (const other of G.citizens) {
-    if (other.home) counts.set(other.home, (counts.get(other.home) || 0) + 1);
-  }
-  let best = null, bestD = Infinity;
-  for (const b of G.buildings) {
-    if (b.type !== 'house') continue;
-    if (b.buildProgress < 1) continue;
-    if ((counts.get(b) || 0) >= buildingCapacity(b)) continue;
-    const d = dist2(c.x, c.y, b.x, b.y);
-    if (d < bestD) { bestD = d; best = b; }
-  }
-  c.home = best;
-  return best;
+  return assignCitizenResidence(c);
 }
 
 function goHome(c) {
-  if (!c.home || !G.buildings.includes(c.home)) assignHome(c);
+  if (!citizenHasValidResidence(c)) assignHome(c);
   clearPath(c);
   setActivity(c, 'go_home');
   if (c.home) {
     const spot = nearestWalkableTile(Math.round(c.home.x), Math.round(c.home.y), 3) || { x: c.home.x, y: c.home.y };
-    pathTo(c, spot.x, spot.y);
+    if (!pathTo(c, spot.x, spot.y)) c.home = null;
   } else {
     const t = idleLoiterTarget(c);
     pathTo(c, t.x, t.y);
   }
 }
 
+const RAID_SHELTER_INTERRUPTIBLE = new Set([
+  'idle', 'find_job', 'walk_to_work', 'working', 'foraging', 'eating',
+  'walk_to_eat', 'waiting_for_food', 'go_home', 'sleep', 'leisure',
+  'seek_shelter', 'flee',
+]);
+const DELIVERY_OBLIGATION_ACTIVITIES = new Set([
+  'needs_delivery', 'walk_to_deliver', 'deliver',
+]);
+
+function hasDeliveryObligation(c) {
+  return !!(c.carrying && c.carryAmount > 0)
+    || DELIVERY_OBLIGATION_ACTIVITIES.has(c.activity.kind);
+}
+
+function nearestRaidEnemy(c) {
+  let nearest = null;
+  let bestDistance = Infinity;
+  for (const enemy of G.enemies) {
+    const distance = Math.hypot(c.x - enemy.x, c.y - enemy.y);
+    if (distance < bestDistance) {
+      nearest = enemy;
+      bestDistance = distance;
+    }
+  }
+  return nearest;
+}
+
+function beginOpenRaidFlight(c, reason = 'shelter-unreachable') {
+  const enemy = nearestRaidEnemy(c);
+  clearPath(c);
+  setActivity(c, 'flee', { reason, timer: 30 });
+  c._fleeing = true;
+  if (!enemy) {
+    c.tx = c.x;
+    c.ty = c.y;
+    return;
+  }
+  const dx = c.x - enemy.x;
+  const dy = c.y - enemy.y;
+  const length = Math.hypot(dx, dy) || 1;
+  c.tx = Math.max(1, Math.min(MAP_W - 2, c.x + (dx / length) * 6));
+  c.ty = Math.max(1, Math.min(MAP_H - 2, c.y + (dy / length) * 6));
+}
+
+function clearShelterInterruptedIntent(c) {
+  c.forageTarget = null;
+  c._foodTarget = null;
+  c._leisureTarget = null;
+  c.workTarget = null;
+  clearPath(c);
+}
+
+function enterRaidShelter(c) {
+  if (!citizenAtResidencePortal(c)) return false;
+  clearShelterInterruptedIntent(c);
+  c._fleeing = false;
+  setActivity(c, 'sheltered', { reason: 'shelter-entered', timer: 60 });
+  return true;
+}
+
+function seekRaidShelter(c) {
+  if (hasDeliveryObligation(c)) return false;
+  if (!RAID_SHELTER_INTERRUPTIBLE.has(c.activity.kind)) return false;
+  if (!citizenHasValidResidence(c) || isBlacklisted(c, c.home.x, c.home.y)) {
+    clearShelterInterruptedIntent(c);
+    beginOpenRaidFlight(c);
+    return true;
+  }
+  if (enterRaidShelter(c)) return true;
+
+  const portal = residencePortalForCitizen(c);
+  clearShelterInterruptedIntent(c);
+  setActivity(c, 'seek_shelter', { reason: 'raid-shelter' });
+  if (!portal || !pathTo(c, portal.x, portal.y, { exact: true })) {
+    blacklistTarget(c, c.home.x, c.home.y);
+    beginOpenRaidFlight(c);
+  }
+  return true;
+}
+
+function leaveRaidShelter(c) {
+  c._fleeing = false;
+  clearPath(c);
+  c.rest = Math.min(100, c.rest ?? 100);
+  if (getDayPeriod() === 'night' && citizenAtResidencePortal(c)) {
+    setActivity(c, 'sleep', { reason: 'raid-cleared', timer: 60 });
+  } else {
+    setActivity(c, 'find_job', { reason: 'raid-cleared', timer: rngInt(0, 40) });
+  }
+}
+
 // States that must not be interrupted by nightfall: carriers finish
 // their delivery first (goods in hand are an obligation), sleepers and
 // homeward walkers are already handled.
-const NIGHT_EXEMPT = new Set(['sleep', 'go_home', 'walk_to_deliver', 'deliver', 'needs_delivery']);
+const NIGHT_EXEMPT = new Set([
+  'sleep', 'go_home', 'walk_to_deliver', 'deliver', 'needs_delivery',
+  'walk_to_eat', 'eating',
+]);
 
 // Raid awareness for the schedule: a citizen with raiders nearby must
 // never be marched home into the fight (the flee response in combat.js
@@ -713,6 +940,7 @@ function applyCitizenSeparation() {
     const buckets = new Map();
     for (let index = 0; index < cs.length; index++) {
       const citizen = cs[index];
+      if (citizenIsIndoors(citizen)) continue;
       const key = Math.floor(citizen.y / bucketSize) * bucketStride
         + Math.floor(citizen.x / bucketSize);
       const bucket = buckets.get(key);
@@ -722,6 +950,7 @@ function applyCitizenSeparation() {
 
     for (let i = 0; i < cs.length; i++) {
       const a = cs[i];
+      if (citizenIsIndoors(a)) continue;
       const cellX = Math.floor(a.x / bucketSize);
       const cellY = Math.floor(a.y / bucketSize);
       for (let by = cellY - 2; by <= cellY + 2; by++) {
@@ -729,6 +958,7 @@ function applyCitizenSeparation() {
           for (const j of buckets.get(by * bucketStride + bx) || []) {
             if (j <= i) continue;
             const b = cs[j];
+            if (citizenIsIndoors(b)) continue;
             const dx = a.x - b.x;
             const dy = a.y - b.y;
             const d2 = dx * dx + dy * dy;
@@ -775,15 +1005,33 @@ function applyCitizenSeparation() {
 
 export function updateCitizens() {
   for (const c of G.citizens) {
+    const raidActive = G.enemies.length > 0;
+    if (c.activity.kind === 'sheltered') {
+      if (raidActive && citizenIsIndoors(c)) {
+        c._fleeing = false;
+        c.rest = Math.min(100, (c.rest ?? 100) + 0.15);
+        continue;
+      }
+      if (raidActive) beginOpenRaidFlight(c, 'shelter-unreachable');
+      else leaveRaidShelter(c);
+    } else if (!raidActive && (c.activity.kind === 'flee' || c.activity.kind === 'seek_shelter')) {
+      leaveRaidShelter(c);
+    }
+
     // ── Decision heartbeat (AI audit): obligations preempt from ANY state
     // on a short cadence — the brain no longer waits for the body to stop.
     if ((G.gameTick + (c._hb ?? (c._hb = citizenHash(c) % 12))) % 12 === 0) {
-      // Eat on the go: a quick bite from the realm stores keeps busy or
-      // stuck citizens from saturating at hunger 100 and crawling.
-      if (c.hunger > 75 && G.resources.food > 0 && c.activity.kind !== 'eating') {
-        G.resources.food--;
-        c.hunger = Math.max(0, c.hunger - 60);
-        G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: '🍞', alpha: 1.2, vy: -0.15, decay: 0.02, type: 'text' });
+      if (raidActive && seekRaidShelter(c)) continue;
+      // Hunger interrupts only safe exterior work. Cargo, sleep, and danger
+      // keep priority; Crown and AI assignments remain owned while the body
+      // walks to a physical pantry.
+      if (
+        c.hunger > 70
+        && !(c.carrying && c.carryAmount > 0)
+        && MEAL_INTERRUPTIBLE_ACTIVITIES.has(c.activity.kind)
+      ) {
+        beginFoodRoute(c);
+        continue;
       }
       // Idle carriers deliver immediately instead of waiting out the timer.
       if (c.activity.kind === 'idle' && c.carrying && c.carryAmount > 0) {
@@ -837,9 +1085,18 @@ export function updateCitizens() {
       // sends the unemployed after berries/game). Either way the colony
       // visibly reallocates labor under pressure and recovers its old
       // jobs once the granary refills.
+      // Automatic workers periodically reconsider materially better jobs.
+      // Assignment age supplies the cooldown, while Crown orders and need/
+      // danger activities remain outside this policy-owned decision.
+      if ((G.gameTick + citizenHash(c)) % AUTO_REVIEW_INTERVAL_TICKS === 0) {
+        reviewAutomaticAssignment(c, {
+          isBlocked: building => isBlacklisted(c, building.x, building.y),
+        });
+      }
+
       const currentAssignment = assignedBuilding(c);
-      if (foodDaysLeft() < 2
-          && currentAssignment && !FOOD_JOBS.has(currentAssignment.type)
+      if (workforceFoodDaysLeft() < 2
+          && currentAssignment && !isFoodWorkplace(currentAssignment)
           // A direct work order is player strategy, not another suggestion for
           // the utility scorer to silently undo. Ordered citizens still eat,
           // sleep, deliver cargo, flee danger, and recover from unreachable
@@ -861,13 +1118,16 @@ export function updateCitizens() {
       // that satisfies it — the town square fills in the evening. One
       // trip per day; night sends everyone home from the tavern.
       if (period === 'dusk' && !threatened && c._leisureDay !== G.day
-          && (c.activity.kind === 'idle' || c.activity.kind === 'find_job')
+          && ['idle', 'find_job', 'working', 'walk_to_work'].includes(c.activity.kind)
+          && !['tavern', 'church'].includes(currentAssignment?.type)
           && !(c.carrying && c.carryAmount > 0)) {
         const wantJoy = c.needs.joy < 45;
         const wantFaith = c.needs.faith < 45;
         if (wantJoy || wantFaith) {
           const kind = (wantJoy && (!wantFaith || c.needs.joy <= c.needs.faith)) ? 'tavern' : 'church';
-          const venue = nearestBuilding(c, kind) || nearestBuilding(c, kind === 'tavern' ? 'church' : 'tavern');
+          const venues = buildingsByType(c, [kind, kind === 'tavern' ? 'church' : 'tavern'])
+            .filter(isBuildingOperational);
+          const venue = venues[0] || null;
           if (venue && dist2(c.x, c.y, venue.x, venue.y) <= 25) {
             c._leisureDay = G.day;
             c._leisureTarget = { x: venue.x, y: venue.y, kind: venue.type };
@@ -882,6 +1142,12 @@ export function updateCitizens() {
     // ── Universal progress watchdog: no measurable progress toward the
     // active goal for ~120 ticks -> give up cleanly instead of orbiting.
     watchProgress(c);
+    if (c.activity.kind === 'walk_to_eat' && !foodTargetStillValid(c)) {
+      c._foodTarget = null;
+      clearPath(c);
+      beginFoodRoute(c, 'food-source-empty');
+      continue;
+    }
 
     if (evacuateBlockedCitizen(c)) continue;
 
@@ -1005,7 +1271,13 @@ export function updateCitizens() {
     }
 
     // No path or path complete — fallback straight-line for non-pathfound movement
-    if (!c.path && c.activity.kind !== 'walk_to_work' && c.activity.kind !== 'walk_to_deliver' && c.activity.kind !== 'foraging') {
+    if (
+      !c.path
+      && c.activity.kind !== 'walk_to_work'
+      && c.activity.kind !== 'walk_to_deliver'
+      && c.activity.kind !== 'walk_to_eat'
+      && c.activity.kind !== 'foraging'
+    ) {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.1) {
@@ -1056,13 +1328,11 @@ function runStateMachine(c) {
         clearPath(c);
         break;
       }
-      // Hungry? Eat first. Citizen eats when hunger > 70 and food is available.
-      if (c.hunger > 70 && G.resources.food > 0) {
-        G.resources.food--;
-        c.hunger = Math.max(0, c.hunger - 60);
-        setActivity(c, 'eating', { timer: 20 });
-        c.path = null;
-        return;
+      // Hunger resolves through a reachable physical pantry. The compatibility
+      // wallet is only a mirror and is never a remote meal source.
+      if (c.hunger > 70) {
+        beginFoodRoute(c);
+        break;
       }
 
       // Pick the best job by utility score (Phase 3c) — not merely the
@@ -1077,19 +1347,20 @@ function runStateMachine(c) {
           if (isBlacklisted(c, b.x, b.y)) continue;
           const def = BUILDINGS[b.type];
           if (!def) continue; // guard against unknown building types (corrupt save, etc.)
-          const site = isConstructionSite(b);
+          const site = isWorkforceConstructionSite(b);
           if (!site && !def.prod && !def.workers) continue;
+          if (!buildingAcceptsAutomaticWorkers(b)) continue;
           // A site under construction offers BUILDER slots regardless of the
           // finished building's staffing; production slots take over after.
           const needed = citizenStaffingCapacity(b);
           if (staffingCount(b) >= needed) continue;
-          const score = scoreJob(c, b);
+          const score = scoreCitizenJob(c, b);
           if (score > bestScore) { bestScore = score; bestB = b; }
         }
         if (bestB) {
-          const reason = isConstructionSite(bestB)
+          const reason = isWorkforceConstructionSite(bestB)
             ? 'construction'
-            : (foodDaysLeft() < 2 && FOOD_JOBS.has(bestB.type) ? 'food-crisis' : 'job-market');
+            : (workforceFoodDaysLeft() < 2 && isFoodWorkplace(bestB) ? 'food-crisis' : 'job-market');
           claimCitizenAssignment(c, bestB, {
             duty: assignmentDutyForBuilding(bestB),
             purpose: assignmentPurposeForCitizen(c, bestB),
@@ -1109,7 +1380,10 @@ function runStateMachine(c) {
           setActivity(c, 'idle', { reason: 'path-unreachable', timer: 25 + rngInt(0, 35) });
         }
       } else {
-        // No building job — forage from nearby resource tiles
+        // No building job — emergency food gathering is a safety valve, not
+        // a shadow economy. One lowest-ID unassigned citizen may forage when
+        // the larder is below three days; idle citizens never mint wood or
+        // stone while the player is reading the opening tutorial.
         const gx = Math.round(c.x), gy = Math.round(c.y);
         let forageTarget = null;
         let forageDist = Infinity;
@@ -1120,8 +1394,8 @@ function runStateMachine(c) {
             if (nx<0||nx>=MAP_W||ny<0||ny>=MAP_H) continue;
             if (!G.fog[ny][nx]) continue;
             const tile = G.map[ny][nx];
-            // Forage from forest, stone, or sand (berries)
-            if (tile === 3 || tile === 4 || tile === 1) {
+            // Forest berries and shoreline shellfish are emergency food.
+            if (tile === 3 || tile === 1) {
               const d = Math.abs(dx)+Math.abs(dy);
               if (d < forageDist && !G.buildingGrid[ny]?.[nx]) {
                 forageDist = d;
@@ -1131,8 +1405,16 @@ function runStateMachine(c) {
           }
         }
 
-        const needsFood = G.resources.food < Math.max(20, G.population * 6);
-        if (forageTarget && (needsFood || rng() < 0.25)) {
+        const reliefForager = G.citizens
+          .filter(other => !assignedBuilding(other))
+          .reduce((best, other) => !best || other.actorId < best.actorId ? other : best, null);
+        const needsFood = workforceFoodDaysLeft() < 3;
+        if (
+          forageTarget
+          && needsFood
+          && reliefForager === c
+          && G.gameTick >= (c._forageReadyAt || 0)
+        ) {
           setActivity(c, 'foraging');
           c.forageTarget = forageTarget;
           pathTo(c, forageTarget.x, forageTarget.y);
@@ -1208,12 +1490,18 @@ function runStateMachine(c) {
       if (workplace) {
         const def = BUILDINGS[workplace.type] || {};
         if ((def.prod || def.convert) && workplace.produced) {
-          // Pick up the goods
-          const [resKey, amount] = Object.entries(workplace.produced)[0] || [];
+          // Pick up one resource kind per trip. Mixed-output workplaces keep
+          // every other positive batch buffered so carrying food cannot erase
+          // the same Farm's wheat harvest.
+          const [resKey, amount] = Object.entries(workplace.produced)
+            .find(([, value]) => Number.isFinite(value) && value > 0) || [];
           if (resKey) {
             c.carrying = resKey;
             c.carryAmount = amount;
-            workplace.produced = null;
+            delete workplace.produced[resKey];
+            if (!Object.values(workplace.produced).some(value => Number.isFinite(value) && value > 0)) {
+              workplace.produced = null;
+            }
             setActivity(c, 'walk_to_deliver', { reason: 'cargo-ready' });
             // User-reported: citizens were walking to map midpoint (MAP_W/2, MAP_H/2)
             // because "town center" was an imaginary coordinate, not a building.
@@ -1283,20 +1571,42 @@ function runStateMachine(c) {
         break;
       }
       if (c.carrying && c.carryAmount > 0) {
-        G.totalResourcesGathered = (G.totalResourcesGathered || 0) + c.carryAmount;
-        G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
+        const resource = c.carrying;
+        const requested = c.carryAmount;
+        const foodDeposit = resource === 'food'
+          ? depositFood(c._deliveryTarget, requested)
+          : null;
+        const credited = foodDeposit ? foodDeposit.accepted : requested;
+        const remainder = foodDeposit ? foodDeposit.remainder : 0;
+        if (!foodDeposit) {
+          G.resources[resource] = (G.resources[resource] || 0) + credited;
+        }
+        G.totalResourcesGathered = (G.totalResourcesGathered || 0) + credited;
         // Resource number float
-        G.particles.push({
-          tx: c.x, ty: c.y, offsetY: 0,
-          text: `+${c.carryAmount} ${resEmoji(c.carrying)}`,
-          alpha: 1.5, vy: -0.3, type: 'text',
-        });
-        // Speech bubble
-        G.particles.push({
-          tx: c.x, ty: c.y, offsetY: -28,
-          text: 'Delivered!',
-          alpha: 1.2, vy: -0.12, decay: 0.018, type: 'speech',
-        });
+        if (credited > 0) {
+          G.particles.push({
+            tx: c.x, ty: c.y, offsetY: 0,
+            text: `+${credited} ${resEmoji(resource)}`,
+            alpha: 1.5, vy: -0.3, type: 'text',
+          });
+          // Speech bubble
+          G.particles.push({
+            tx: c.x, ty: c.y, offsetY: -28,
+            text: remainder > 0 ? `Stored ${credited}; finding room` : 'Delivered!',
+            alpha: 1.2, vy: -0.12, decay: 0.018, type: 'speech',
+          });
+        }
+        if (remainder > 0) {
+          c.carryAmount = remainder;
+          if (c._deliveryTarget) blacklistTarget(c, c._deliveryTarget.x, c._deliveryTarget.y);
+          c._deliveryTarget = null;
+          if (routeDelivery(c, resource)) {
+            setActivity(c, 'walk_to_deliver', { reason: 'route-to-delivery' });
+          } else {
+            requestDeliveryStorage(c);
+          }
+          break;
+        }
       }
       c.carrying = null;
       c.carryAmount = 0;
@@ -1316,34 +1626,113 @@ function runStateMachine(c) {
       }
       // Arrived at forage tile — gather a small amount
       if (c.forageTarget) {
-        const t = c.forageTarget.tile;
-        const res = t === 3 ? 'wood' : t === 4 ? 'stone' : 'food';
+        const res = 'food';
         const amount = 1;
-        G.resources[res] = (G.resources[res] || 0) + amount;
-        G.particles.push({
-          tx: c.x, ty: c.y, offsetY: 0,
-          text: `+${amount} ${resEmoji(res)}`,
-          alpha: 1.2, vy: -0.3, type: 'text',
-        });
-        // "Found!" bubble removed — the +resource text already communicates the event.
-        // Adding a separate speech bubble was redundant and confusing at a distance.
-        // resource already credited above — no phantom carry pose
-        c.carrying = null;
-        c.carryAmount = 0;
+        // Wild food becomes physical cargo. It is not realm-owned until this
+        // citizen reaches a pantry with room through the ordinary delivery
+        // contract.
+        c.carrying = res;
+        c.carryAmount = amount;
       }
       c.forageTarget = null;
-      setActivity(c, 'find_job', { reason: 'forage-complete' }); // immediately look for building jobs
+      // One emergency trip per day at most. A Farm/Fisherman still wins by a
+      // wide margin and is required to grow rather than merely delay hunger.
+      c._forageReadyAt = G.gameTick + G.dayLength;
+      setActivity(c, 'walk_to_deliver', { reason: 'forage-complete' });
+      if (!routeDelivery(c, 'food')) requestDeliveryStorage(c);
+      break;
+
+    case 'walk_to_eat': {
+      if (c.carrying && c.carryAmount > 0) {
+        c._foodTarget = null;
+        setActivity(c, 'needs_delivery', { reason: 'cargo-ready' });
+        clearPath(c);
+        break;
+      }
+      if (!foodTargetStillValid(c)) {
+        c._foodTarget = null;
+        beginFoodRoute(c, 'food-source-empty');
+        break;
+      }
+      if (c.path && c.pathIdx < c.path.length) break;
+      if (!citizenAtFoodTarget(c)) {
+        blacklistTarget(c, c._foodTarget.x, c._foodTarget.y);
+        c._foodTarget = null;
+        beginFoodRoute(c, 'food-source-empty');
+        break;
+      }
+      const meal = withdrawFood(c._foodTarget, 1);
+      if (meal.taken !== 1) {
+        c._foodTarget = null;
+        beginFoodRoute(c, 'food-source-empty');
+        break;
+      }
+      G._dailyFoodConsumed = (G._dailyFoodConsumed || 0) + meal.taken;
+      c.hunger = Math.max(0, c.hunger - 60);
+      setActivity(c, 'eating', { reason: 'eat-food', timer: 20 });
       clearPath(c);
+      G.particles.push({
+        tx: c.x, ty: c.y, offsetY: -26,
+        text: '🍞', alpha: 1.2, vy: -0.15, decay: 0.02, type: 'text',
+      });
+      break;
+    }
+
+    case 'waiting_for_food':
+      if (c.carrying && c.carryAmount > 0) {
+        c._foodTarget = null;
+        setActivity(c, 'needs_delivery', { reason: 'cargo-ready' });
+        clearPath(c);
+      } else if (c.hunger <= 70) {
+        resumeAfterMeal(c);
+      } else {
+        beginFoodRoute(c);
+      }
       break;
 
     case 'eating':
-      setActivity(c, 'find_job', { timer: 5 });
-      clearPath(c);
+      resumeAfterMeal(c);
+      break;
+
+    case 'seek_shelter': {
+      if (G.enemies.length === 0) {
+        leaveRaidShelter(c);
+        break;
+      }
+      if (!citizenHasValidResidence(c)) {
+        beginOpenRaidFlight(c);
+        break;
+      }
+      if (enterRaidShelter(c)) break;
+      const portal = residencePortalForCitizen(c);
+      if (!portal || !pathTo(c, portal.x, portal.y, { exact: true })) {
+        blacklistTarget(c, c.home.x, c.home.y);
+        beginOpenRaidFlight(c);
+      }
+      break;
+    }
+
+    case 'sheltered':
+      // Sheltered actors are normally consumed at the top of updateCitizens,
+      // before exterior movement and needs. This fallback keeps a direct
+      // state-machine call inert rather than exposing an indoor resident.
+      c.activityTimer = 60;
+      break;
+
+    case 'flee':
+      if (G.enemies.length === 0) leaveRaidShelter(c);
+      else beginOpenRaidFlight(c);
       break;
 
     case 'go_home':
       // Shared mover walks the path; when it's exhausted we're home.
       if (c.path && c.pathIdx < c.path.length) break;
+      // A failed route is not indoor sleep. Release the unreachable home so
+      // the citizen remains visible sleeping rough and retries next night.
+      if (c.home && (
+        !citizenHasValidResidence(c)
+        || dist2(c.x, c.y, c.home.x, c.home.y) > 10
+      )) c.home = null;
       setActivity(c, 'sleep', { timer: 60 });
       clearPath(c);
       break;

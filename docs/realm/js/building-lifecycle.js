@@ -6,13 +6,14 @@
 // statistics, and feedback; structural teardown is deliberately identical.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=188';
-import { nearestWalkableTile } from './pathfinding.js?realm=188';
-import { announce, chronicle, sfx } from './log.js?realm=188';
+import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=191';
+import { nearestWalkableTile } from './pathfinding.js?realm=191';
+import { announce, chronicle, sfx } from './log.js?realm=191';
 import {
   releaseAssignmentsForBuilding,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
+import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=191';
 
 const REMOVAL_CAUSES = new Set(['manual', 'fire', 'raid', 'undo']);
 const ASSIGNMENT_BOUND_ACTIVITIES = new Set(['idle', 'find_job', 'walk_to_work', 'working']);
@@ -39,6 +40,7 @@ function clearCitizenReference(citizen, building, assignmentReleased) {
   const activityBefore = citizen.activity.kind;
   const lostHome = citizen.home === building;
   const lostDelivery = citizen._deliveryTarget === building;
+  const lostFoodTarget = citizen._foodTarget === building;
   const lostLeisure = (
     citizen._leisureTarget?.x === building.x
     && citizen._leisureTarget?.y === building.y
@@ -54,6 +56,7 @@ function clearCitizenReference(citizen, building, assignmentReleased) {
     delete citizen._requestedTy;
     citizen._pathGoal = null;
   }
+  if (lostFoodTarget) citizen._foodTarget = null;
   if (lostLeisure) citizen._leisureTarget = null;
 
   let nextActivity = null;
@@ -63,6 +66,8 @@ function clearCitizenReference(citizen, building, assignmentReleased) {
     && citizen.carryAmount > 0
   ) {
     nextActivity = 'needs_delivery';
+  } else if (lostFoodTarget && (activityBefore === 'walk_to_eat' || activityBefore === 'eating')) {
+    nextActivity = 'waiting_for_food';
   } else if (lostHome && (activityBefore === 'sleep' || activityBefore === 'go_home')) {
     nextActivity = 'idle';
   } else if (lostLeisure && activityBefore === 'leisure') {
@@ -130,7 +135,7 @@ function clearBuildingReferences(building) {
 
 function applyCausePolicy(building, cause, undoEntry) {
   const def = BUILDINGS[building.type];
-  if (cause === 'manual' || cause === 'undo') {
+  if ((cause === 'manual' || cause === 'undo') && building.founderStockpile !== true) {
     const refundScale = cause === 'undo' ? 1 : 0.5;
     for (const [resource, cost] of Object.entries(def.cost)) {
       G.resources[resource] = (G.resources[resource] || 0) + Math.floor(cost * refundScale);
@@ -171,8 +176,15 @@ export function removeBuilding(building, { cause, undoEntry = null } = {}) {
     throw new Error('Only undo removal accepts an undo entry.');
   }
 
-  const capacity = buildingCapacity(building);
-  const defense = BUILDINGS[building.type].defense || 0;
+  const commissioned = building.buildProgress >= 1;
+  const capacity = commissioned ? buildingCapacity(building) : 0;
+  const defense = commissioned ? (BUILDINGS[building.type].defense || 0) : 0;
+
+  // A deliberate demolition tries to carry stock into another completed
+  // pantry first. Fire, raids, undo, and any overflow destroy it. Both paths
+  // debit the compatibility wallet exactly once before this store stops live.
+  if (cause === 'manual') relocateBuildingFood(building, G);
+  discardBuildingFood(building, G);
 
   clearBuildingReferences(building);
   G.buildings.splice(index, 1);

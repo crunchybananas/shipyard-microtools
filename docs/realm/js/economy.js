@@ -2,22 +2,25 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=188';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=188';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=188';
-import { revealAround, makeCitizen } from './world.js?realm=188';
-import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=188';
-import { spawnDust, visualJitter } from './fx.js?realm=188';
-import { emit } from './bus.js?realm=188';
-import { isBuildingUnlocked } from './tech.js?realm=188';
-import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=188';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=191';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=191';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=191';
+import { revealAround, makeCitizen } from './world.js?realm=191';
+import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=191';
+import { spawnDust, visualJitter } from './fx.js?realm=191';
+import { emit } from './bus.js?realm=191';
+import { isBuildingUnlocked } from './tech.js?realm=191';
+import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=191';
 import {
   citizenConstructionRequiresStaff,
   releaseCitizenAssignment,
   removeCitizenFromWorld,
   transitionCitizenActivity,
   workersForBuilding,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
+import { activeStaffingCount, isBuildingOperational } from './building-operation.js?realm=191';
+import { updateRecruitment } from './military.js?realm=191';
+import { isFirstMusterRaidReady } from './first-muster.js?realm=191';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -97,14 +100,9 @@ export function placeBuilding(type, tx, ty) {
   G.buildings.push(b);
   G.buildingGrid[ty][tx] = b;
   G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-  if (def.pop) {
-    const capacity = buildingCapacity(b);
-    G.maxPop += capacity;
-    trySpawnSettlers(capacity);
-  }
-  if (def.reveal) revealAround(tx, ty, def.reveal);
-  if (def.defense) G.defense += def.defense;
-  if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
+  // Foundations occupy land and attract builders, but their benefits begin
+  // only when construction completes. The world must agree with the ledger:
+  // an outline is not yet a home, watchtower, wall, or tavern.
   if (G.stats) G.stats.buildingsBuilt++;
   if (G.stats) {
     G.stats.everHadBuilding = G.stats.everHadBuilding || {};
@@ -132,16 +130,11 @@ export function placeBuilding(type, tx, ty) {
   G._buildRipples.push({ x: tx, y: ty, radius: 3, alpha: 0.8 });
   // Phase D: the castle is no longer the instant win — it anchors the
   // realm's defense and is the Wonder's prerequisite (tech.js gate).
-  if (type === 'castle' && !G.storyFlags?.castleStands) {
-    G.storyFlags = G.storyFlags || {};
-    G.storyFlags.castleStands = true;
-    notify('🏰 The Castle stands — the realm may now raise a Wonder', 'mission', { chronicle: false });
-  }
   if (type === 'wonder') {
     const first = !G.wonder;
     G.wonder = G.wonder || { stage: 0, delivered: {}, completeDay: null };
     G.wonder.placed = true;
-    notify('🕍 The Hall of Ages rises — deliver its bill of works', 'mission', first ? {} : { chronicle: false });
+    notify('🕍 The Hall of Ages foundation is laid.', 'mission', first ? {} : { chronicle: false });
   }
   return true;
 }
@@ -187,6 +180,28 @@ export function trySpawnSettlers(count) {
   }
 }
 
+function commissionBuilding(building) {
+  const def = BUILDINGS[building.type];
+  if (def.pop) {
+    const capacity = buildingCapacity(building);
+    G.maxPop += capacity;
+    // A completed home creates room; it does not conjure a full household.
+    // One newcomer marks the commissioning, then ordinary daily immigration
+    // and happiness determine whether the remaining beds fill.
+    trySpawnSettlers(1);
+  }
+  if (def.reveal) revealAround(building.x, building.y, def.reveal);
+  if (def.defense) G.defense += def.defense;
+  if (building.type === 'castle' && !G.storyFlags?.castleStands) {
+    G.storyFlags = G.storyFlags || {};
+    G.storyFlags.castleStands = true;
+    notify('🏰 The Castle stands — the realm may now raise a Wonder', 'mission', { chronicle: false });
+  }
+  if (building.type === 'wonder') {
+    notify('🕍 The Hall of Ages stands ready for its bill of works.', 'mission', { chronicle: false });
+  }
+}
+
 export function updateProduction() {
   for (const b of G.buildings) {
     // Construction (quality pass): structures are RAISED BY BUILDERS.
@@ -219,6 +234,7 @@ export function updateProduction() {
       }
       if (before < 1 && b.buildProgress >= 1) {
         b.completeTick = G.gameTick || 0;
+        commissionBuilding(b);
         G.particles.push({
           tx: b.x, ty: b.y, offsetY: -18,
           text: 'Complete', alpha: 1.4, vy: -0.18,
@@ -240,54 +256,16 @@ export function updateProduction() {
       if (b.buildProgress < 1) continue;
     }
 
-    // Archery range: train archers
-    if (b.type === 'archery' && workersForBuilding(b).length >= 1) {
-      b.trainTimer = (b.trainTimer || 0) + 1;
-      const cap = 3;
-      const current = G.soldiers.filter(s => s.homeBuilding === b).length;
-      if (b.trainTimer >= 800 && current < cap && G.resources.wood >= 2) {
-        b.trainTimer = 0;
-        G.resources.wood -= 2;
-        const muster = nearestWalkableTile(b.x, b.y, 3) || { x: b.x, y: b.y };
-        G.soldiers.push({
-          x: muster.x, y: muster.y,
-          tx: muster.x, ty: muster.y,
-          homeBuilding: b,
-          name: randomName(),
-          type: 'archer',
-          hp: 30, maxHp: 30,
-          state: 'patrol', stateTimer: 0,
-        });
-      }
-    }
-
-    // Barracks: train soldiers
-    if (b.type === 'barracks' && workersForBuilding(b).length >= 1) {
-      b.trainTimer = (b.trainTimer || 0) + 1;
-      const cap = 4; // max 4 soldiers per barracks
-      const current = G.soldiers.filter(s => s.homeBuilding === b).length;
-      if (b.trainTimer >= 600 && current < cap && G.resources.iron >= 1) {
-        b.trainTimer = 0;
-        G.resources.iron--;
-        const muster = nearestWalkableTile(b.x, b.y, 3) || { x: b.x, y: b.y };
-        G.soldiers.push({
-          x: muster.x, y: muster.y,
-          tx: muster.x, ty: muster.y,
-          homeBuilding: b,
-          name: randomName(),
-          type: 'swordsman',
-          hp: 75, maxHp: 75,
-          state: 'patrol',
-          stateTimer: 0,
-        });
-      }
-    }
+    // Military buildings train only after a player-authored muster order.
+    // Losing staff pauses the queue; it never spends again or starts another
+    // recruit without a new command.
+    if (b.type === 'archery' || b.type === 'barracks') updateRecruitment(b);
 
     const def = BUILDINGS[b.type];
     if (!def) continue; // guard against unknown building types
     if (!def.prod && !def.convert) continue;
     const needed = def.workers || 0;
-    if (workersForBuilding(b).length < needed) continue;
+    if (activeStaffingCount(b) < needed) continue;
 
     // Founder's inspiration (Phase 3d): production quickens near the
     // avatar — wandering your own town has a reason.
@@ -331,9 +309,11 @@ export function updateProduction() {
         }
       }
       if (!Object.values(adjustedProd).some(v => v > 0)) continue;
-      // If a worker is available to carry, set produced flag
+      // Food becomes realm-owned only after a citizen physically deposits it
+      // at a pantry/store. It must remain at the producer even if the worker
+      // who made it stops being available before collection.
       const carrier = workersForBuilding(b).find(w => w.activity.kind === 'working');
-      if (carrier) {
+      if (carrier || (adjustedProd.food || 0) > 0) {
         // Merge instead of overwrite: a frozen or slow carrier no longer
         // wipes the previous unpicked batch every production cycle.
         if (b.produced) {
@@ -374,20 +354,25 @@ export function updateProduction() {
     }
   }
 
-  // Hunger rises 5 times per day (+6 each time = +30/day total)
-  // Citizens eat individually when hunger > 70 (in citizens.js state machine)
-  if (G.gameTick % Math.floor(G.dayLength / 5) === 0) {
-    for (const c of G.citizens) c.hunger = Math.min(100, c.hunger + 6);
+  // One routed meal is one physical ration. A daily need of 60 on normal
+  // keeps that cadence legible while difficulty scales how quickly the need
+  // returns; no second aggregate food charge follows below.
+  if (G.gameTick % G.dayLength === 0) {
+    const winterGranary = G.season === 'winter'
+      && G.buildings.some(building => building.type === 'granary' && isBuildingOperational(building));
+    const dailyHunger = 60 * getDifficulty().foodMult * (winterGranary ? 0.5 : 1);
+    for (const c of G.citizens) c.hunger = Math.min(100, c.hunger + dailyHunger);
   }
 
   // Happiness (5 times per day)
   if (G.gameTick % Math.floor(G.dayLength / 5) === 0) {
-    const houses = G.buildings.filter(b => BUILDINGS[b.type].pop);
+    const houses = G.buildings.filter(b => BUILDINGS[b.type].pop && b.buildProgress >= 1);
     const totalHouses = houses.length;
     let hBonus = 0;
     for (const b of G.buildings) {
       const def = BUILDINGS[b.type];
       if (!def.happiness) continue;
+      if (!isBuildingOperational(b)) continue;
       if (def.radius && totalHouses > 0) {
         const covered = houses.filter(h => Math.hypot(h.x - b.x, h.y - b.y) <= def.radius).length;
         hBonus += def.happiness * (covered / totalHouses);
@@ -466,30 +451,14 @@ export function updateProduction() {
     }
   }
 
-  // Food consumption (once per day)
+  // Daily starvation consequences. Citizens themselves withdraw exactly one
+  // physical ration at the food store; this pass never spends a second ration.
   if (G.gameTick % G.dayLength === 0) {
     // Loop 230 (sustained-state #3 infrastructure): track whenever the
     // realm is below its maximum population. The next full-pop beat
     // (`full_pop_known`) gates on G.day - G.lastUnderpopDay >= 60.
     if (G.population < G.maxPop) G.lastUnderpopDay = G.day;
-    let foodNeeded = Math.ceil(G.population * 1.0 * getDifficulty().foodMult);
-    // Granaries halve food consumption in winter
-    if (G.season === 'winter') {
-      const granaries = G.buildings.filter(b => b.type === 'granary').length;
-      if (granaries > 0) foodNeeded = Math.ceil(foodNeeded * 0.5);
-    }
-    let unfed = foodNeeded;
-    const eatBread = Math.min(G.resources.food, unfed);
-    G.resources.food -= eatBread; unfed -= eatBread;
-    // No bread left: the realm eats raw wheat, then flour porridge, 1:1.
-    if (unfed > 0 && (G.resources.wheat || 0) > 0) {
-      const w = Math.min(G.resources.wheat, unfed);
-      G.resources.wheat -= w; unfed -= w;
-    }
-    if (unfed > 0 && (G.resources.flour || 0) > 0) {
-      const f = Math.min(G.resources.flour, unfed);
-      G.resources.flour -= f; unfed -= f;
-    }
+    const unfed = G.citizens.filter(citizen => (citizen.hunger || 0) >= 90).length;
     if (unfed > 0 && G.population > 1) {
       G.happiness = Math.max(0, G.happiness - 10);
       if (G.happiness < 20 && G.citizens.length > 1) {
@@ -497,7 +466,11 @@ export function updateProduction() {
         const sorted = [...G.citizens].sort((a, b) => b.hunger - a.hunger);
         const c = sorted[0];
         if (c.hunger >= 90) {
-          if (c.carrying && c.carryAmount > 0) G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
+          // Food in a dead carrier's hands was never part of the wallet.
+          // Other legacy resources retain their existing recovery semantics.
+          if (c.carrying && c.carrying !== 'food' && c.carryAmount > 0) {
+            G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
+          }
           removeCitizenFromWorld(c);
           if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;  // Loop 242 (241 parity-check discipline applied): starvation was missing the partner stat that lastDeathDay tracks against
           G.lastDeathDay = G.day;  // Loop 228 (sustained-state #2 infrastructure)
@@ -519,8 +492,8 @@ export function updateProduction() {
         }
       }
     }
-    // Track daily food consumption for rate display
-    G._dailyFoodConsumed = foodNeeded;
+    // Citizen arrival withdrawals increment this as meals actually happen.
+    G._dailyFoodConsumed = 0;
   }
 
   // ── Caravans ──────────────────────────────────────────────
@@ -539,6 +512,15 @@ export function updateProduction() {
 }
 
 export function checkRaids() {
+  // The military opening owns its first battle. Keep pushing the calendar
+  // forward until scouting and rally placement are latched, preserving two
+  // full warning dawns once the player is ready. Later raids use the normal
+  // schedule and all other scenarios remain unchanged.
+  if ((G.stats?.raidsFaced || 0) === 0 && !isFirstMusterRaidReady(G)) {
+    G.nextRaidDay = Math.max(G.nextRaidDay, G.day + 3);
+    G._raidWarningGiven = false;
+    return;
+  }
   // Warning: 2 days before raid
   // Loop 083 (the-fixer, 082 HIGH): {chronicle:false} on all pre-
   // raid and raid-spawn notifies. 082's fastForward audit found
@@ -549,8 +531,9 @@ export function checkRaids() {
   const daysUntilRaid = G.nextRaidDay - G.day;
   if (daysUntilRaid === 2 && G.dayPhase < 5) {
     // The warband comes as ONE force from ONE direction — rolled now so
-    // scouts can name it and the player can face their defenses.
-    G._raidSide = rngInt(0, 3);
+    // scouts can name it and the player can face their defenses. First Muster
+    // scouting may have charted the same approach earlier.
+    if (G._raidSide == null) G._raidSide = rngInt(0, 3);
     const dir = ['north', 'east', 'south', 'west'][G._raidSide];
     notify(`⚠️ Scouts report raiders massing to the ${dir}! Raid expected in 2 days.`, 'danger', { chronicle: false });
     playSound('raid');
@@ -693,13 +676,13 @@ export function checkRaids() {
     // hasDefense is computed above (line ~371) for raid-scaling; reuse.
     if (G.stats) {
       G.stats.raidsFaced = (G.stats.raidsFaced || 0) + 1;
-      if (hasDefense) G.stats.raidsSurvived++;
     }
   }
 }
 
 // Show raid countdown in HUD
 export function getRaidCountdown() {
+  if ((G.stats?.raidsFaced || 0) === 0 && !isFirstMusterRaidReady(G)) return null;
   const days = G.nextRaidDay - G.day;
   if (days <= 3 && days > 0) return days;
   return null;

@@ -2,34 +2,36 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, TH, createResourceStock, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, resetRuntimeTransientState, tintCurve, setSeed } from './state.js?realm=188';
-import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=188';
-import { generateWorld } from './world.js?realm=188';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=188';
-import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=188';
-import { dispatch } from './commands.js?realm=188';
-import { coreTick } from './sim.js?realm=188';
-import { on } from './bus.js?realm=188';
-import { updateParticles, updateSmokeEmitters } from './particles.js?realm=188';
-import { setupInput } from './input.js?realm=188';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, resetTutorial, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=188';
-import { ERAS } from './tech.js?realm=188';
-import { saveGame, loadGame, getSaveSummary, getLastLoadedSavedAt } from './save.js?realm=188';
-import { updateAmbient, toggleAmbient, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=188';
-import { toggleNotificationLog, notify, notifyTransient } from './notifications.js?realm=188';
-import { loadAchievements, checkAchievements, renderAchievementsPanel } from './achievements.js?realm=188';
-import { getActiveScenario, SCENARIOS } from './scenarios.js?realm=188';
-import { updateAnimals } from './animals.js?realm=188';
-import { checkAdvisor } from './advisor.js?realm=188';
-import { updateBoats, updateFlocks, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=188';
-import { chronicle, initChronicle } from './log.js?realm=188';
-import { realWorldDreamLens, setChronicleFilter, toggleChroniclePanel } from './story-ui.js?realm=188';
-import { initSpriteLab } from './sprite-lab.js?realm=188';
-import { initSpriteMuster } from './sprite-muster.js?realm=188';
-import { initCitizenInspector, resetCitizenTransitionLedger } from './citizen-inspector.js?realm=188';
-import { updatePresentationCues } from './presentation-cues.js?realm=188';
-import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=188';
-import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=188';
+import { G, MAP_W, MAP_H, TH, createResourceStock, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, resetRuntimeTransientState, tintCurve, setSeed } from './state.js?realm=191';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=191';
+import { generateWorld } from './world.js?realm=191';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=191';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=191';
+import { dispatch } from './commands.js?realm=191';
+import { coreTick } from './sim.js?realm=191';
+import { on } from './bus.js?realm=191';
+import { updateParticles, updateSmokeEmitters } from './particles.js?realm=191';
+import { setupInput } from './input.js?realm=191';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, resetTutorial, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=191';
+import { ERAS } from './tech.js?realm=191';
+import { saveGame, loadGame, getSaveSummary, getLastLoadedSavedAt } from './save.js?realm=191';
+import { updateAmbient, toggleAmbient, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=191';
+import { toggleNotificationLog, notify, notifyTransient } from './notifications.js?realm=191';
+import { loadAchievements, checkAchievements, renderAchievementsPanel } from './achievements.js?realm=191';
+import { getActiveScenario, SCENARIOS } from './scenarios.js?realm=191';
+import { missions } from './missions.js?realm=191';
+import { updateAnimals } from './animals.js?realm=191';
+import { checkAdvisor } from './advisor.js?realm=191';
+import { updateBoats, updateFlocks, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=191';
+import { chronicle, initChronicle } from './log.js?realm=191';
+import { realWorldDreamLens, setChronicleFilter, toggleChroniclePanel } from './story-ui.js?realm=191';
+import { initSpriteLab } from './sprite-lab.js?realm=191';
+import { initSpriteMuster } from './sprite-muster.js?realm=191';
+import { initCitizenInspector, resetCitizenTransitionLedger } from './citizen-inspector.js?realm=191';
+import { updatePresentationCues } from './presentation-cues.js?realm=191';
+import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=191';
+import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=191';
+import { authoredBuildingCount, establishFounderStockpile } from './building-inventory.js?realm=191';
 
 
 // ── Core → shell effect wiring (ENGINE.md rule 4) ───────────────────
@@ -37,6 +39,29 @@ import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=188';
 on('raid-started', ({ x, y }) => { try { panCameraTo(x, y, 800); } catch (_e) {} });
 on('victory', () => setTimeout(() => showVictoryScreen(), 700));
 on('realm-event', () => updateEventBanner());
+on('unit-mustered', ({ name, label, x, y }) => {
+  notify(`📯 ${name}, ${label}, reports for duty.`, 'event');
+  G.particles.push({
+    tx: x, ty: y, offsetY: -18,
+    text: '📯 Mustered', alpha: 1.5, vy: -0.15,
+    decay: 0.01, type: 'text',
+  });
+});
+on('scouting-find', ({ x, y, gold }) => {
+  notify(`🧭 The Founder charts new ground and finds ${gold} gold.`, 'event', { chronicle: false });
+  G.particles.push({
+    tx: x, ty: y, offsetY: -18,
+    text: `🪙 +${gold}`, alpha: 1.5, vy: -0.15,
+    decay: 0.01, type: 'text',
+  });
+});
+on('first-muster-advanced', ({ completed, next, currentIndex, total, approach }) => {
+  const intelligence = approach ? ` Scouts mark the ${approach} approach.` : '';
+  const follow = next ? ` Next: ${next.text}.` : ' The frontier has held.';
+  notify(`✅ First Muster ${currentIndex}/${total}: ${completed.text}.${intelligence}${follow}`, 'mission', { chronicle: false });
+  playSound('mission');
+  renderMissions();
+});
 on('era-advanced', ({ era }) => { if (!G.photoMode) showEraBanner(ERAS[era - 1]); });
 on('season-changed', ({ season }) => {
   const seasonEmojis = { spring:['🌱','🌸','🌿'], summer:['☀️','🌻','🌊'], autumn:['🍂','🍁','🌾'], winter:['❄️','⛄','🌨️'] };
@@ -278,6 +303,10 @@ function beginGame({ resume = false } = {}) {
   setTimeout(() => { titleEl.style.display = 'none'; }, 500);
 
   setupInput(canvas);
+  // A fresh realm waits for the player's explicit Start building action.
+  // The old live clock consumed days and auto-foraged resources underneath
+  // the welcome card while a first-time player was still reading it.
+  if (!resume) setSpeed(0);
   initChronicle();
   resetCitizenTransitionLedger();
   if (G.chronicle.length === 0) {
@@ -300,6 +329,7 @@ function beginGame({ resume = false } = {}) {
     if (mc && mc.style.display !== 'none') {
       mc.style.display = 'none';
       if (mt) mt.textContent = '▶';
+      document.getElementById('missions-heading')?.setAttribute('aria-expanded', 'false');
     }
   }
   gameLoop();
@@ -356,11 +386,19 @@ function seedFromKingdomName(kingdomName) {
 function resetRealmForNewGame({ kingdomName = G.kingdomName } = {}) {
   const normalizedName = String(kingdomName || '').trim().slice(0, 20) || 'Realm';
   const scen = getActiveScenario();
+  const startEra = scen.startEra || 1;
+  const eraStartDay = Object.fromEntries(
+    Array.from({ length: startEra }, (_, index) => [index + 1, 1]),
+  );
   const debug = G.debug;
 
   resetRuntimeTransientState(G);
   resetCitizenOwnershipRuntime();
   resetCitizenRenderCache();
+  for (const mission of missions) {
+    mission.done = false;
+    delete mission._celebratedTick;
+  }
 
   Object.assign(G, {
     map: [],
@@ -399,7 +437,7 @@ function resetRealmForNewGame({ kingdomName = G.kingdomName } = {}) {
     lastDeathDay: null,
     lastUnderpopDay: null,
     realmEnded: false,
-    researchedTechs: new Set(['agriculture', 'forestry']),
+    researchedTechs: new Set(scen.startResearch || ['agriculture', 'forestry']),
     currentResearch: null,
     activeEvent: null,
     eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0, speedMult: 1 },
@@ -408,8 +446,8 @@ function resetRealmForNewGame({ kingdomName = G.kingdomName } = {}) {
     rallyPoint: null,
     armyStance: 'defend',
     won: false,
-    era: 1,
-    eraStartDay: { 1: 1 },
+    era: startEra,
+    eraStartDay,
     wonder: null,
     tileWear: null,
     kingdomName: normalizedName,
@@ -450,6 +488,7 @@ function resetRealmForNewGame({ kingdomName = G.kingdomName } = {}) {
 
   setSeed(seedFromKingdomName(G.kingdomName));
   generateWorld();
+  establishFounderStockpile();
   resetCitizenTransitionLedger();
 }
 
@@ -527,6 +566,7 @@ window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
   resetTutorial();
   resetRealmForNewGame();
+  setSpeed(0);
   renderBuildBar(); renderMissions(); updateUI(); updateTutorialTip();
   notify('New game started!');
 };
@@ -567,10 +607,12 @@ window.setChronicleFilter = setChronicleFilter;  // 078: chip-click handler
 window.toggleMissions = () => {
   const c = document.getElementById('missions-content');
   const t = document.getElementById('missions-toggle');
+  const heading = document.getElementById('missions-heading');
   if (!c) return;
   const open = c.style.display !== 'none';
   c.style.display = open ? 'none' : 'block';
   if (t) t.textContent = open ? '▶' : '▼';
+  if (heading) heading.setAttribute('aria-expanded', open ? 'false' : 'true');
 };
 
 // (Welcome notification is fired from beginGame() — avoid duplicate at module load)
@@ -960,7 +1002,7 @@ function showScenarioVictory() {
   statsEl.innerHTML = `
     <div>Days lived: <strong>${G.stats?.daysLived || G.day}</strong></div>
     <div>Population: <strong>${G.population}</strong></div>
-    <div>Buildings: <strong>${G.buildings.length}</strong></div>
+    <div>Buildings: <strong>${authoredBuildingCount(G)}</strong></div>
     <div>Raids survived: <strong>${G.stats?.raidsSurvived || 0}</strong></div>
     <div>Gold earned: <strong>${G.stats?.goldEarned || 0}</strong></div>
   `;

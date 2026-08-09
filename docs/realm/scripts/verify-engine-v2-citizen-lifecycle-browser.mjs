@@ -46,11 +46,12 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const ownership = await import('./js/citizen-ownership.js?realm=188');
-    const presentation = await import('./js/citizen-presentation.js?realm=188');
-    const render = await import('./js/render.js?realm=188');
-    const state = await import('./js/state.js?realm=188');
-    const ui = await import('./js/ui.js?realm=188');
+    const ownership = await import('./js/citizen-ownership.js?realm=191');
+    const presentation = await import('./js/citizen-presentation.js?realm=191');
+    const inventory = await import('./js/building-inventory.js?realm=191');
+    const render = await import('./js/render.js?realm=191');
+    const state = await import('./js/state.js?realm=191');
+    const ui = await import('./js/ui.js?realm=191');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -133,7 +134,6 @@ try {
     Object.assign(g.resources, {
       wood: 10_000,
       stone: 10_000,
-      food: 10_000,
       gold: 10_000,
       iron: 10_000,
       wheat: 10_000,
@@ -219,7 +219,11 @@ try {
       g.debug.step(1);
       requireCondition(target.activity.kind === 'walk_to_deliver', 'Miner did not enter delivery route');
       requireCondition(target.carrying === 'iron' && target.carryAmount > 0, 'Miner did not pick up iron cargo');
-      requireCondition(target._deliveryTarget === storehouse, 'Iron did not route to the real storehouse');
+      const ironDeliveryStore = target._deliveryTarget;
+      requireCondition(
+        ironDeliveryStore?.type === 'storehouse' && g.buildings.includes(ironDeliveryStore),
+        'Iron did not route to a real completed storehouse',
+      );
       const carryAmount = target.carryAmount;
       const ironBeforeDelivery = g.resources.iron;
       phase('mine-carry');
@@ -285,7 +289,10 @@ try {
       dispatch({ type: 'RELEASE_CITIZEN', actorId: helper.actorId });
       park(helper, 39, 46);
       target.activityTimer = 10_000;
-      g.resources.food = 0;
+      for (const foodStore of inventory.foodStores(g, { withFood: true })) {
+        inventory.withdrawFood(foodStore, inventory.storedFood(foodStore), g);
+      }
+      requireCondition(g.resources.food === 0, 'Food-crisis fixture left physical food in storage');
       g.resources.wheat = 0;
       g.resources.flour = 0;
       state.setSeed(0);
@@ -297,10 +304,17 @@ try {
       phase('food-crisis-cover');
 
       // With productive jobs removed and the larder empty, the same miner
-      // enters and completes the real forage branch. Forage credits directly
-      // and must not leave phantom cargo behind.
+      // enters and completes the emergency forage branch. Relief forage buys
+      // food only and must not become a hidden wood/stone economy.
       dispatch({ type: 'DEMOLISH', x: farm.x, y: farm.y });
       dispatch({ type: 'DEMOLISH', x: mine.x, y: mine.y });
+      // The relief-forage policy chooses the lowest-ID unassigned citizen.
+      // Keep the two founders on full explicit work orders so this named
+      // lifecycle subject is the sole available relief worker.
+      const reliefPostA = placeComplete('market', 50, 45);
+      const reliefPostB = placeComplete('tavern', 51, 45);
+      dispatch({ type: 'ASSIGN_CITIZEN', actorId: bystander.actorId, x: reliefPostA.x, y: reliefPostA.y });
+      dispatch({ type: 'ASSIGN_CITIZEN', actorId: helper.actorId, x: reliefPostB.x, y: reliefPostB.y });
       setPosition(target, 36, 40);
       g.map[40][36] = state.TILE.FOREST;
       g.fog[40][36] = true;
@@ -309,30 +323,43 @@ try {
       ownership.transitionCitizenActivity(target, 'find_job', 'seek-work');
       target.activityTimer = 0;
       avoidHeartbeatNextTick(target);
-      const woodBeforeForage = g.resources.wood;
+      const foodBeforeForage = g.resources.food;
       g.debug.step(1);
       requireCondition(target.activity.kind === 'foraging', 'Empty-larder citizen did not enter foraging');
       requireCondition(target.assignment === null, 'Foraging retained a work assignment');
       phase('food-crisis-forage');
       const forageTicks = stepUntil(
-        'forage completion',
-        () => target.activity.kind === 'find_job' && target.activity.reason === 'forage-complete',
-        12,
+        'forage gathering',
+        () => target.activity.kind === 'walk_to_deliver' && target.carrying === 'food',
+        60,
       );
-      requireCondition(g.resources.wood === woodBeforeForage + 1, 'Forage did not credit one real resource');
-      requireCondition(target.carrying === null && target.carryAmount === 0, 'Forage left phantom cargo');
-      phase('food-crisis-forage-complete');
-
-      // Eat through the production state machine, avoiding the separate
-      // heartbeat snack path so the explicit eating activity is observable.
-      target.hunger = 80;
-      g.resources.food = 5;
+      requireCondition(g.resources.food === foodBeforeForage, 'Forage remotely minted food before storage arrival');
+      requireCondition(target.carryAmount === 1, 'Forage did not create one physical ration cargo');
+      stepUntil('foraged ration reaching a real pantry', () => target.activity.kind === 'deliver', 240);
       target.activityTimer = 0;
       avoidHeartbeatNextTick(target);
       g.debug.step(1);
-      requireCondition(target.activity.kind === 'eating', 'Hungry miner did not enter eating');
+      requireCondition(g.resources.food === foodBeforeForage + 1, 'Forage delivery did not credit one emergency food');
+      requireCondition(target.carrying === null && target.carryAmount === 0, 'Forage delivery left phantom cargo');
+      dispatch({ type: 'DEMOLISH', x: reliefPostA.x, y: reliefPostA.y });
+      dispatch({ type: 'DEMOLISH', x: reliefPostB.x, y: reliefPostB.y });
+      phase('food-crisis-forage-complete');
+
+      // Eat through a visible route to the physical ration just delivered.
+      // Neither hunger nor the food mirror changes before portal arrival.
+      target.hunger = 80;
+      target.activityTimer = 0;
+      avoidHeartbeatNextTick(target);
+      const foodBeforeMealRoute = g.resources.food;
+      g.debug.step(1);
+      requireCondition(target.activity.kind === 'walk_to_eat', 'Hungry miner did not enter a visible food route');
+      requireCondition(target.hunger === 80 && g.resources.food === foodBeforeMealRoute, 'Food changed before pantry arrival');
+      stepUntil('hungry miner reaching the pantry', () => target.activity.kind === 'eating', 240);
       requireCondition(target.activity.reason === 'eat-food', 'Eating lost its causal reason');
-      requireCondition(target.hunger === 20 && g.resources.food === 4, 'Eating did not consume one food and reduce hunger');
+      requireCondition(
+        target.hunger === 20 && g.resources.food === foodBeforeMealRoute - 1,
+        'Pantry arrival did not consume one food and reduce hunger',
+      );
       phase('eat');
 
       // The night schedule owns go-home and sleep. Sleep restores rest; dawn

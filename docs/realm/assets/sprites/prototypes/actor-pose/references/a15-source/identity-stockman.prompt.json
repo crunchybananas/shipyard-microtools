@@ -1,0 +1,29 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-stockman",
+  "generated_at": "2026-08-08",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-9c6bd48b-a90f-4d1e-92eb-93e9a4b7d5be.png"
+  },
+  "references": [],
+  "prompt": "Use case: stylized-concept. Asset type: Realm modular actor identity source board for offline skeletal sprite compilation. Create one stocky middle-aged East Asian ranch foreman with warm tan skin, a square weathered face, high cheekbones, dark eyes, a short salt-and-pepper moustache and chin beard, and black hair streaked gray in a high working knot. His build is compact, broad-backed, muscular from livestock work, and slightly bow-legged. Use a 1536x1024 source-parts layout: three isolated heads on top (front/down, back/up, and left profile), isolated arms and front/back/profile torsos in the middle, and front/back/profile leg sources below. Base clothing is a fitted charcoal short-sleeve undershirt, charcoal trousers, and worn brown work boots. Crisp hand-painted late-1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, warm upper-left light, clean joint cut zones, and a uniform flat #ff00ff chroma-key background. No hat, outer garment, tool, workstation, scenery, shadow, labels, text, watermark, merged parts, clipping, or magenta inside the subject.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#da0edf"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a15-source/identity-stockman-keyed.png",
+  "keyed_sha256": "9dfd59cce810cef4daa6b404a78b79983c4f8a8c774f59ac90cc9eef47618b86",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a15-source/identity-stockman.png",
+  "alpha_sha256": "f2d1399ef13a0861478bc107fc8d04b1a2debeab31060522a3661dc8e941669a"
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "trade-counter",
+  "generated_at": "2026-08-08",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-0827ad04-b108-477e-a7e3-ff5976bf2aff.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a15-source/feed-trough-keyed.png",
+      "sha256": "2733e8ad0c3cd030a48b73113831da97213a445a324acdd129dbde230663ae94",
+      "purpose": "grounded directional workstation-board layout only; rejected as trader workstation"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/garment-madder-teal-keyed.png",
+      "sha256": "a0c9b886e1d3a68a251f53187dd6f3540fb1a68a3f2174b7c772497e434b9511",
+      "purpose": "A16 palette and role-color compatibility"
+    }
+  ],
+  "prompt": "Create a modular painted raster WORKSTATION source board for one Realm merchant animation: a grounded folding trade counter used for weighing and recording goods. It must read clearly beside a 35x46 strategy-game actor. Design: stout dark-oak folding counter with two visible trestle legs, a low red-madder cloth runner edged in peacock teal, an open cream ledger with bold blank ruled pages, three chunky nested brass trade weights, one compact wooden abacus, and a shallow empty goods tray. Keep props attached to/on the counter as one coherent grounded workstation; no hand balance tool because that is a separate authority. No person, garment, hands, cargo crate, loose coins, merchandise pile, building, scenery, floor, or text. Art direction: compact painterly pixel-art source material with crisp clusters, warm upper-left lighting, restrained oak/brass/madder/teal palette, bold readable silhouettes, classic strategy-game readability. Arrange four large, generously separated directional views on one board: front/down three-quarter, rear/up three-quarter, left side, right side; consistent counter identity and scale; ledger and brass weights visible in every view where perspective allows; every view fully visible and uncropped, with feet/base aligned conceptually to a ground line. Use a perfectly flat solid #ff00ff chroma-key background with no gradient, cast shadow, labels, border, text, UI, watermark, duplicate fragments, or extra objects.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"],
+    "key_color_detected": "#f504ec"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a16-source/trade-counter-keyed.png",
+  "keyed_sha256": "8e2e5ba10e49761b8daec4e87c69ff7aae1af5400bfe850eefa032705da56421",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a16-source/trade-counter.png",
+  "alpha_sha256": "7b388a3647241c08d7e467652664d3b06b591bceaa9775b89f7558d7ada659bf"
+}

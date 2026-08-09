@@ -2,24 +2,25 @@
 // Missions — goals and progression
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=188';
-import { sfx as playSound, announce } from './log.js?realm=188';
-import { visualJitter } from './fx.js?realm=188';
+import { G, MAP_W, MAP_H } from './state.js?realm=191';
+import { sfx as playSound, announce } from './log.js?realm=191';
+import { visualJitter } from './fx.js?realm=191';
+import { depositFoodAcrossStores } from './building-inventory.js?realm=191';
 
 export const missions = [
-  { id:'farm1',   text:'Build a farm',                  check:()=>G.buildings.some(b=>b.type==='farm'),      done:false, reward:{wood:20} },
-  { id:'lumber1', text:'Build a lumber mill',            check:()=>G.buildings.some(b=>b.type==='lumber'),    done:false, reward:{stone:15} },
-  { id:'house1',  text:'Build a house to grow population', check:()=>G.buildings.some(b=>b.type==='house'),  done:false, reward:{food:20} },
+  { id:'farm1',   text:'Complete a farm',                  check:()=>G.buildings.some(b=>b.type==='farm' && b.buildProgress>=1),      done:false, reward:{food:4} },
+  { id:'lumber1', text:'Complete a lumber mill',            check:()=>G.buildings.some(b=>b.type==='lumber' && b.buildProgress>=1),    done:false, reward:{wood:5} },
+  { id:'house1',  text:'Complete a house to grow population', check:()=>G.buildings.some(b=>b.type==='house' && b.buildProgress>=1),  done:false, reward:{food:3} },
   { id:'pop10',   text:'Reach 10 population',           check:()=>G.population>=10,                          done:false, reward:{gold:15} },
-  { id:'market1', text:'Build a market',                 check:()=>G.buildings.some(b=>b.type==='market'),    done:false, reward:{gold:25} },
-  { id:'defense', text:'Build barracks or tower',        check:()=>G.buildings.some(b=>b.type==='barracks'||b.type==='tower'), done:false, reward:{iron:5} },
+  { id:'market1', text:'Complete a market',                 check:()=>G.buildings.some(b=>b.type==='market' && b.buildProgress>=1),    done:false, reward:{gold:25} },
+  { id:'defense', text:'Complete barracks or tower',        check:()=>G.buildings.some(b=>(b.type==='barracks'||b.type==='tower') && b.buildProgress>=1), done:false, reward:{iron:5} },
   { id:'pop25',   text:'Reach 25 population',           check:()=>G.population>=25,                          done:false, reward:{iron:10,gold:20} },
   { id:'survive', text:'Survive the first raid',         check:()=> (G.stats?.raidsFaced || 0) >= 1 && G.enemies.length === 0, done:false, reward:{gold:30} },
-  { id:'tavern1', text:'Build a tavern',                 check:()=>G.buildings.some(b=>b.type==='tavern'),    done:false, reward:{gold:15} },
+  { id:'tavern1', text:'Complete a tavern',                 check:()=>G.buildings.some(b=>b.type==='tavern' && b.buildProgress>=1),    done:false, reward:{gold:15} },
   { id:'pop50',   text:'Reach 50 population',           check:()=>G.population>=50,                          done:false, reward:{gold:50} },
-  { id:'iron1',   text:'Build an iron mine',             check:()=>G.buildings.some(b=>b.type==='mine'),      done:false, reward:{gold:20} },
-  { id:'walls5',  text:'Build 5 wall segments',          check:()=>G.buildings.filter(b=>b.type==='wall').length>=5, done:false, reward:{stone:30} },
-  { id:'roads10', text:'Build 10 roads',                 check:()=>G.buildings.filter(b=>b.type==='road').length>=10, done:false, reward:{gold:20} },
+  { id:'iron1',   text:'Complete an iron mine',             check:()=>G.buildings.some(b=>b.type==='mine' && b.buildProgress>=1),      done:false, reward:{gold:20} },
+  { id:'walls5',  text:'Complete 5 wall segments',          check:()=>G.buildings.filter(b=>b.type==='wall' && b.buildProgress>=1).length>=5, done:false, reward:{stone:30} },
+  { id:'roads10', text:'Complete 10 roads',                 check:()=>G.buildings.filter(b=>b.type==='road' && b.buildProgress>=1).length>=10, done:false, reward:{gold:20} },
   { id:'pop75',   text:'Reach 75 population',           check:()=>G.population>=75,                          done:false, reward:{gold:100} },
   { id:'happy90', text:'Reach 90% happiness',            check:()=>G.happiness>=90,                           done:false, reward:{gold:40} },
 ];
@@ -119,16 +120,25 @@ export function checkMissions() {
       const focal = missionFocalPoint(m);
       celebrateMission(focal.x, focal.y);
       if (m.reward) {
+        const actualReward = {};
         for (const [k,v] of Object.entries(m.reward)) {
-          G.resources[k] = (G.resources[k]||0) + v;
+          if (k === 'food') {
+            const stored = depositFoodAcrossStores(v, { origin: focal, state: G });
+            if (stored.accepted > 0) actualReward.food = stored.accepted;
+          } else {
+            G.resources[k] = (G.resources[k]||0) + v;
+            actualReward[k] = v;
+          }
         }
-        const parts = Object.entries(m.reward).map(([k,v]) => `+${v} ${k}`).join(' ');
+        const parts = Object.entries(actualReward).map(([k,v]) => `+${v} ${k}`).join(' ');
         // Rewards text rides the ribbon — anchored to the same focal point
-        G.particles.push({
-          tx: focal.x, ty: focal.y, offsetY: -22,
-          text: parts, alpha: 2, vy: -0.14, decay: 0.009, type: 'text',
-          color: '#ffe08a',
-        });
+        if (parts) {
+          G.particles.push({
+            tx: focal.x, ty: focal.y, offsetY: -22,
+            text: parts, alpha: 2, vy: -0.14, decay: 0.009, type: 'text',
+            color: '#ffe08a',
+          });
+        }
       }
       playSound('mission');
       announce(`✨ Mission complete: ${m.text}`, 'mission', { chronicle: false });

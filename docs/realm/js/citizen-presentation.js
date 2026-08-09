@@ -5,13 +5,14 @@
 // temporary work cannot be mistaken for identity and drawing cannot mutate the
 // simulation graph.
 
-import { G, RESOURCE_KEYS } from './state.js?realm=188';
+import { G, RESOURCE_KEYS } from './state.js?realm=191';
 import {
   CITIZEN_ACTIVITIES,
   CITIZEN_APPEARANCE_IDS,
   getAssignmentRevision,
   validateCitizenOwnership,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
+import { citizenIsIndoors } from './residences.js?realm=191';
 
 const CITIZEN_ACTIVITY_SET = new Set(CITIZEN_ACTIVITIES);
 const CITIZEN_APPEARANCE_ID_SET = new Set(CITIZEN_APPEARANCE_IDS);
@@ -247,6 +248,14 @@ export function buildCitizenPresentation(citizen, {
     name: citizen.identity.name,
     appearanceId: citizen.identity.appearanceId,
   });
+  const home = citizen.home
+    ? Object.freeze({
+        type: citizen.home.type,
+        x: citizen.home.x,
+        y: citizen.home.y,
+        complete: citizen.home.buildProgress >= 1,
+      })
+    : null;
 
   return Object.freeze({
     presentationKind: 'citizen',
@@ -254,6 +263,8 @@ export function buildCitizenPresentation(citizen, {
     identity,
     profession,
     assignment: assignmentSummary(citizen.assignment),
+    home,
+    indoors: citizenIsIndoors(citizen, [...buildings]),
     activity,
     variant: presentationVariantForIdentity(identity.appearanceId, profession.kind),
     x: citizen.x,

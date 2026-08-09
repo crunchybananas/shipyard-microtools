@@ -1,0 +1,62 @@
+{
+  "schema": "realm.imagegen-source-family.v1",
+  "created": "2026-08-08",
+  "generator": "OpenAI imagegen built-in tool",
+  "backgroundRemoval": {
+    "script": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--tolerance", "82", "--spill-cleanup"],
+    "runtimeAlpha": "binary"
+  },
+  "sources": [
+    {
+      "key": "raider-identity",
+      "prompt": "Create one painted modular character identity authority board for the Realm strategy game's enemy raider family. Follow the attached reference board's exact component-sheet logic and approximate layout: three separate head views across the top (front, back, right profile); detached bare/undershirt arms at far left and far right; front, back, and right-profile fitted undershirt torsos across the middle; front, back, and right-profile legs across the bottom. New identity: a compact, brutal frontier raider in his late 30s, scarred square face, broken nose, close-cropped dark hair with shaved sides, heavy jaw and stubble, muscular but plausible human build, weathered medium-brown skin, hostile disciplined expression. Clothing on this identity board must be only a very dark neutral fitted undershirt and trousers because separate armor boards will overlay it. Painterly high-detail game asset rendering matching the reference, clear silhouettes, no labels, no text, no grid lines, no shadows cast onto the background. Every component must be fully separated from every other component with generous background space. Use a single perfectly flat uniform #ff00ff magenta background across the entire image; no gradient, texture, floor, border, halo, or transparency. Do not depict a complete assembled character and do not include armor, headgear, weapons, shields, extra limbs, or duplicate views. Landscape 3:2 component sheet.",
+      "generatedOriginal": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-436ff77c-2dc2-453e-b13a-5dd22c323c11.png",
+      "keyedPath": "assets/sprites/enemies-source/references/raider-identity-keyed.png",
+      "keyedSha256": "691ba323745f3c7e05760de719da46cdbae9ccaaa5d2382427ecc8e2bc9a675a",
+      "alphaPath": "assets/sprites/enemies-source/references/raider-identity.png",
+      "alphaSha256": "345fa860a897d97a9e29ac4beaf831844f84f8a9d1027aaf4f894be28b937b98",
+      "reference": {"path": "assets/sprites/prototypes/actor-pose/references/a15-source/identity-stockman-keyed.png", "sha256": "9dfd59cce810cef4daa6b404a78b79983c4f8a8c774f59ac90cc9eef47618b86"}
+    },
+    {
+      "key": "ash-reaver-garment",
+      "prompt": "Create one painted modular garment authority board for the Realm strategy game's ASH REAVER raider variant. Follow the attached garment reference board's exact component-sheet logic and approximate layout: separate headgear front/back/right-profile across the top; separate sleeves at far left and far right; hollow tunic or armor front/back/right-profile across the middle; hollow belts front/back/right-profile beneath; hollow boots/greaves and leg armor front/back/right-profile across the bottom. Distinct identity: fast axe skirmisher in soot-black leather and oxblood quilted cloth, ragged wolf-fur shoulder, iron half-helm with one bent cheek guard, red sash, strapped dark greaves. Menacing grounded Stronghold/Warcraft-II-inspired medieval frontier raider, no fantasy monster anatomy. Painterly high-detail game asset rendering matching the reference, readable dark values with rust-red accents, clear chunky silhouette. All garment pieces must be hollow where the wearer should show through and fully separated from every other component. No person, skin, face, hands, complete assembled body, weapons, shields, labels, text, grid lines, or cast shadows. Use a single perfectly flat uniform #ff00ff magenta background across the entire image; no gradient, texture, floor, border, halo, or transparency. Landscape 3:2 component sheet.",
+      "generatedOriginal": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-ca86217d-6afd-43cb-bb5e-0da736bd33a0.png",
+      "keyedPath": "assets/sprites/enemies-source/references/ash-reaver-garment-keyed.png",
+      "keyedSha256": "cbd25afd3663ec147e25788d318098780417f8a20c98fb1c982f14fc4c23d947",
+      "alphaPath": "assets/sprites/enemies-source/references/ash-reaver-garment.png",
+      "alphaSha256": "59ad9f0dc55df88aad1a35773a1cbbc884fad81323f239482a6c0b7e02e5747a",
+      "reference": {"path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage-keyed.png", "sha256": "4d71daa26207b095336f9579aee2722601eca58a1f2e87b4a34e27e36f9d9311"}
+    },
+    {
+      "key": "iron-lancer-garment",
+      "prompt": "Create one painted modular garment authority board for the Realm strategy game's IRON LANCER raider variant. Follow the attached garment reference board's exact component-sheet logic and approximate layout: separate headgear front/back/right-profile across the top; separate sleeves at far left and far right; hollow tunic or armor front/back/right-profile across the middle; hollow belts front/back/right-profile beneath; hollow boots/greaves and leg armor front/back/right-profile across the bottom. Distinct identity: disciplined spear raider in cold blue-black lamellar, faded indigo cloth, narrow nasal helm with a short dark horsehair crest, iron scale shoulder guards, gray rope belt, tall plated greaves. Menacing grounded Stronghold/Warcraft-II-inspired medieval frontier raider, no fantasy monster anatomy. Painterly high-detail game asset rendering matching the reference, cool steel values with indigo accents, clear tall silhouette. All garment pieces must be hollow where the wearer should show through and fully separated from every other component. No person, skin, face, hands, complete assembled body, weapons, shields, labels, text, grid lines, or cast shadows. Use a single perfectly flat uniform #ff00ff magenta background across the entire image; no gradient, texture, floor, border, halo, or transparency. Landscape 3:2 component sheet.",
+      "generatedOriginal": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-7c7b72f5-6c82-44a1-a9bb-99fae51477fc.png",
+      "keyedPath": "assets/sprites/enemies-source/references/iron-lancer-garment-keyed.png",
+      "keyedSha256": "2b6ef140db2cc97fa16b94c5411bf0ac7a03ba0b7b1814c33b1da00988fec453",
+      "alphaPath": "assets/sprites/enemies-source/references/iron-lancer-garment.png",
+      "alphaSha256": "b11238322d3316c2f757360cc06c33d4a9b11c112cd8ed0eb36af173a4ef3d0c",
+      "reference": {"path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage-keyed.png", "sha256": "4d71daa26207b095336f9579aee2722601eca58a1f2e87b4a34e27e36f9d9311"}
+    },
+    {
+      "key": "bone-breaker-garment",
+      "prompt": "Create one painted modular garment authority board for the Realm strategy game's BONE BREAKER raider variant. Follow the attached garment reference board's exact component-sheet logic and approximate layout: separate headgear front/back/right-profile across the top; separate sleeves at far left and far right; hollow tunic or armor front/back/right-profile across the middle; hollow belts front/back/right-profile beneath; hollow boots/greaves and leg armor front/back/right-profile across the bottom. Distinct identity: heavy club marauder in earth-brown hide and charcoal mail, pale bone talismans, broad battered iron skullcap with two short blunt horn stubs, asymmetrical hide shoulder mantle, wide brass-buckled belt, thick wrapped boots. Menacing grounded Stronghold/Warcraft-II-inspired medieval frontier raider, no fantasy monster anatomy. Painterly high-detail game asset rendering matching the reference, warm hide values with bone accents, clear broad silhouette. All garment pieces must be hollow where the wearer should show through and fully separated from every other component. No person, skin, face, hands, complete assembled body, weapons, shields, labels, text, grid lines, or cast shadows. Use a single perfectly flat uniform #ff00ff magenta background across the entire image; no gradient, texture, floor, border, halo, or transparency. Landscape 3:2 component sheet.",
+      "generatedOriginal": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-59f01256-417f-4499-a9ae-45dea651bed1.png",
+      "keyedPath": "assets/sprites/enemies-source/references/bone-breaker-garment-keyed.png",
+      "keyedSha256": "c8a8bad984f94a9e05b581e57b3253d347757edebb9b8be9bd381d00cce082e7",
+      "alphaPath": "assets/sprites/enemies-source/references/bone-breaker-garment.png",
+      "alphaSha256": "ca7a9f748d678689fd62c79b648be24528e3b7670526cc6a579b24af2740b446",
+      "reference": {"path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage-keyed.png", "sha256": "4d71daa26207b095336f9579aee2722601eca58a1f2e87b4a34e27e36f9d9311"}
+    },
+    {
+      "key": "raider-weapons",
+      "prompt": "Create one painted modular weapon authority board for three Realm raider variants, using the attached sword board only as the rendering-style and chroma-background reference. Arrange exactly three widely separated vertical weapon groups from left to right: (1) a brutal one-handed bearded raider axe shown front, back, and thin side view; (2) a long iron-tipped raider spear shown front, back, and thin side view; (3) a heavy knotwood-and-iron war club shown front, back, and thin side view. Within each group, keep all views separated. Every weapon points straight upward with grip at bottom and working tip at top. Grounded medieval tools, battle-worn materials, readable chunky shapes, painterly high-detail game asset rendering, no blood. No people, hands, arms, shields, complete characters, labels, text, grid lines, borders, or cast shadows. Use a single perfectly flat uniform #ff00ff magenta background across the entire image; no gradient, texture, floor, halo, or transparency. Landscape 3:2 component sheet.",
+      "generatedOriginal": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-19faaab8-1672-4535-a4ac-d61004bc0894.png",
+      "keyedPath": "assets/sprites/enemies-source/references/raider-weapons-keyed.png",
+      "keyedSha256": "79e281d54dfc116667fd5a920695cdbf45b9f9d82d297208d0060df7df568b2f",
+      "alphaPath": "assets/sprites/enemies-source/references/raider-weapons.png",
+      "alphaSha256": "c32c83e4397ffaa6c0e5d3a1ce5c8734f5170fc3cf770ca5e4372ddf9f392216",
+      "reference": {"path": "assets/sprites/prototypes/actor-pose/references/a5-source/guard-short-sword-keyed.png", "sha256": "aaf0b9e51fa6a12bca349c8176a5dea86fc8c81ab6924e788e8d3cd05a543b8d"}
+    }
+  ]
+}

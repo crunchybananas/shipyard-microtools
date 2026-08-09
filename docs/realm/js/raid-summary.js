@@ -3,8 +3,8 @@
 // and changed the chronicle. The core owns the counters; the bus-backed log
 // functions keep presentation in the shell.
 
-import { G } from './state.js?realm=188';
-import { announce, chronicle } from './log.js?realm=188';
+import { G } from './state.js?realm=191';
+import { announce, chronicle } from './log.js?realm=191';
 
 const RAID_PROSE = Object.freeze({
   razed: Object.freeze([
@@ -67,6 +67,13 @@ export function updateRaidSummary() {
     const kills = (G.stats.enemiesKilled || 0) - active.killsStart;
     const losses = (G.stats.citizensDied || 0) - active.deathsStart;
     const populationAlive = G.citizens.length;
+    // A raid is survived only when the fight actually resolves with people
+    // left in the realm. Owning a defensive foundation at spawn time is not
+    // a victory, and this resolution point is naturally idempotent because
+    // the active raid record is cleared below.
+    if (populationAlive > 0) {
+      G.stats.raidsSurvived = (G.stats.raidsSurvived || 0) + 1;
+    }
     const message = pickRaidProse(active.day, kills, losses, populationAlive);
     chronicle(message, 'raid');
     announce(message, populationAlive === 0 ? 'danger' : 'event', { chronicle: false });

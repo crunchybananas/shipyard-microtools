@@ -15,7 +15,7 @@ import { ensureServer } from './_serve.mjs';
 const realmRoot = fileURLToPath(new URL('..', import.meta.url));
 const proofDir = join(realmRoot, 'tmp', 'opening-build-tutorial');
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 188, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 191, 'Update this gate together with current browser module URLs');
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 
@@ -53,7 +53,8 @@ async function openingState(page) {
     const farmStyle = farm ? getComputedStyle(farm) : null;
     return {
       selectedBuild: window.G.selectedBuild,
-      buildings: window.G.buildings.length,
+      buildings: window.G.buildings.filter(building => building.founderStockpile !== true).length,
+      founderStockpiles: window.G.buildings.filter(building => building.founderStockpile === true).length,
       farmActive: farm?.classList.contains('active') || false,
       farmGuided: farm?.classList.contains('tut-highlight') || false,
       farmPressed: farm?.getAttribute('aria-pressed'),
@@ -86,13 +87,14 @@ async function startFresh(page, name, touch = false) {
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(async () => {
     window.setSpeed(0);
-    const ui = await import('./js/ui.js?realm=188');
+    const ui = await import('./js/ui.js?realm=191');
     ui.updateTutorialTip();
   });
   const welcome = await openingState(page);
   assert.equal(welcome.titlePointerEvents, 'none', 'fading title still intercepts the first game interaction');
   assert.equal(welcome.titleInert, true, 'fading title remains keyboard-interactive');
   assert.equal(welcome.selectedBuild, null);
+  assert.equal(welcome.founderStockpiles, 1, 'fresh realm lacked its physical founder food store');
   assert.equal(welcome.farmActive, false);
   assert.equal(welcome.farmGuided, false);
   assert.match(welcome.tutorialText, /Start building/);

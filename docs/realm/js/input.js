@@ -2,14 +2,14 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=188';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=188';
-import { canAfford } from './economy.js?realm=188';
-import { dispatch } from './commands.js?realm=188';
-import { notify } from './notifications.js?realm=188';
-import { initAudio } from './audio.js?realm=188';
-import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=188';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=188';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=191';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=191';
+import { canAfford } from './economy.js?realm=191';
+import { dispatch } from './commands.js?realm=191';
+import { notify } from './notifications.js?realm=191';
+import { initAudio } from './audio.js?realm=191';
+import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=191';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=191';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -70,6 +70,10 @@ function findCitizenAtClick(clientX, clientY) {
 
   let best = null, bestDist = Infinity;
   for (const c of buildCurrentCitizenPresentations()) {
+    // The world renderer omits residents who have physically entered a House.
+    // The hit-test must consume the same presentation fact or an invisible
+    // sheltered actor can steal the House click from beneath the roof.
+    if (c.indoors) continue;
     const cs = toScreen(c.x, c.y);
     const dx = wx - cs.x;
     const dy = wy - (cs.y - 8); // citizen visual center is ~8px above tile
@@ -94,8 +98,10 @@ function showCitizenPanel(c) {
   const stateLabels = {
     idle:'Idle', find_job:'Looking for work', walk_to_work:'Walking to work',
     working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
-    foraging:'Foraging', eating:'Eating',
+    foraging:'Foraging', walk_to_eat:'Going to eat',
+    waiting_for_food:'Waiting for food', eating:'Eating',
     go_home:'Heading home', sleep:'Sleeping', leisure:'Off to unwind',
+    seek_shelter:'Running home', sheltered:'Sheltered at home', flee:'Fleeing the raid',
   };
   const state = stateLabels[c.activity.kind] || c.activity.kind;
   const assigned = c.assignment;
@@ -107,6 +113,8 @@ function showCitizenPanel(c) {
     ? '👑 Crown order'
     : assigned ? 'AI assigned' : 'AI available';
   const carrying = c.carrying ? `${c.carryAmount} ${c.carrying}` : 'Nothing';
+  const home = c.home ? `House at ${c.home.x}, ${c.home.y}` : 'No home';
+  const whereabouts = c.indoors ? 'Inside at home' : state;
   const safe = {
     name: escapeHtml(c.identity.name),
     state: escapeHtml(state),
@@ -115,6 +123,8 @@ function showCitizenPanel(c) {
     management: escapeHtml(management),
     reason: escapeHtml(c.activity.reason),
     carrying: escapeHtml(carrying),
+    home: escapeHtml(home),
+    whereabouts: escapeHtml(whereabouts),
   };
 
   panel.innerHTML = `
@@ -127,6 +137,8 @@ function showCitizenPanel(c) {
     <div class="ip-row"><span class="ip-label">Assignment</span><span class="ip-val">${safe.job}</span></div>
     <div class="ip-row"><span class="ip-label">Work order</span><span class="ip-val">${safe.management}</span></div>
     <div class="ip-row"><span class="ip-label">Activity</span><span class="ip-val">${safe.state} · ${safe.reason}</span></div>
+    <div class="ip-row"><span class="ip-label">Home</span><span class="ip-val">${safe.home}</span></div>
+    <div class="ip-row"><span class="ip-label">Whereabouts</span><span class="ip-val">${safe.whereabouts}</span></div>
     <div class="ip-row"><span class="ip-label">Carrying</span><span class="ip-val">${safe.carrying}</span></div>
     <div class="ip-row"><span class="ip-label">Hunger</span><span class="ip-val">${Math.round(c.hunger)}%</span></div>
     <div class="ip-row"><span class="ip-label">Energy</span><span class="ip-val">${Math.round(c.rest ?? 100)}%</span></div>
@@ -187,7 +199,34 @@ export function setupInput(canvas) {
 
   C.addEventListener('contextmenu', e => e.preventDefault());
 
+  function toggleFounderFollow() {
+    if (!G.avatar) return;
+    const follow = !G._followAvatar;
+    if (follow) cancelBuildMode();
+    G._followAvatar = follow;
+    if (!G._followAvatar) dispatch({ type: 'AVATAR_MOVE', dx: 0, dy: 0 });
+    notify(G._followAvatar
+      ? '🚶 Founder selected — WASD or tap open ground to scout. Press F to release.'
+      : 'Founder released; camera controls restored.', 'info', { chronicle: false });
+    updateUI();
+  }
+  window.toggleFounderFollow = toggleFounderFollow;
+
   function handlePrimaryTap(clientX, clientY) {
+    if (G._placingRally) {
+      const t = pickTile(clientX, clientY);
+      if (!t) return true;
+      dispatch({ type: 'SET_RALLY', x: t.x, y: t.y });
+      G._placingRally = false;
+      G.particles.push({
+        tx: t.x, ty: t.y, offsetY: -10,
+        text: '🚩 Rally', alpha: 1.5, vy: -0.15,
+        decay: 0.01, type: 'text',
+      });
+      notify('🚩 Rally point planted. The army is moving.', 'info', { chronicle: false });
+      updateUI();
+      return true;
+    }
     if (G.selectedBuild) {
       const t = pickTile(clientX, clientY);
       if (!t) return true;
@@ -238,10 +277,12 @@ export function setupInput(canvas) {
       // army back to defend — one gesture places, the same gesture clears.
       if (G.rallyPoint && Math.hypot(t.x - G.rallyPoint.x, t.y - G.rallyPoint.y) <= 1.5) {
         dispatch({ type: 'SET_RALLY', x: null, y: null });
+        G._placingRally = false;
         G.particles.push({ tx: t.x, ty: t.y, offsetY: -10, text: '🚩 removed', alpha: 1.4, vy: -0.15, decay: 0.012, type: 'text' });
         return;
       }
       dispatch({ type: 'SET_RALLY', x: t.x, y: t.y });
+      G._placingRally = false;
       G.particles.push({
         tx: t.x, ty: t.y, offsetY: -10,
         text: '🚩 Rally', alpha: 1.5, vy: -0.15, decay: 0.01, type: 'text',
@@ -479,11 +520,7 @@ export function setupInput(canvas) {
     // Phase 3d: F follows the founder — WASD then steers THEM, not the
     // camera; click-to-walk on open ground; F again to release.
     if (e.key === 'f' && !e.ctrlKey && !e.metaKey) {
-      G._followAvatar = !G._followAvatar;
-      if (!G._followAvatar) dispatch({ type: 'AVATAR_MOVE', dx: 0, dy: 0 });
-      notify(G._followAvatar
-        ? '🚶 Following the Founder — WASD to walk, click ground to travel, F to release.'
-        : 'Camera released.', 'info', { chronicle: false });
+      toggleFounderFollow();
       return;
     }
     if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {

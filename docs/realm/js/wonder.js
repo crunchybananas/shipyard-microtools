@@ -9,12 +9,13 @@
 // building) so raiders can level the site without erasing the work.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=188';
-import { chronicle } from './log.js?realm=188';
-import { announce as notify } from './log.js?realm=188';
-import { sfx as playSound } from './log.js?realm=188';
-import { emit } from './bus.js?realm=188';
-import { staffingCount } from './citizen-ownership.js?realm=188';
+import { G } from './state.js?realm=191';
+import { chronicle } from './log.js?realm=191';
+import { announce as notify } from './log.js?realm=191';
+import { sfx as playSound } from './log.js?realm=191';
+import { emit } from './bus.js?realm=191';
+import { staffingCount } from './citizen-ownership.js?realm=191';
+import { withdrawFoodFromStores } from './building-inventory.js?realm=191';
 
 export const WONDER_STAGES = [
   { name: 'The Foundations',  bill: { stone: 200, wood: 100 } },
@@ -84,7 +85,12 @@ export function updateWonder() {
     const spare = Math.floor((G.resources[res] || 0) - (RESERVE[res] || 0));
     const take = Math.max(0, Math.min(budget, remaining, spare));
     if (take > 0) {
-      G.resources[res] -= take;
+      if (res === 'food') {
+        const paid = withdrawFoodFromStores(take, { origin: site, state: G });
+        if (paid.taken !== take) throw new Error('Wonder food wallet disagrees with physical stores.');
+      } else {
+        G.resources[res] -= take;
+      }
       w.delivered[res] = (w.delivered[res] || 0) + take;
       budget -= take;
       moved += take;

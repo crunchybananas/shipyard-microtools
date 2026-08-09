@@ -11,9 +11,12 @@
 // shell owns the follow-camera and key handling.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=188';
-import { findPath, stepEntityToward } from './pathfinding.js?realm=188';
-import { revealAround } from './world.js?realm=188';
+import { G, MAP_W, MAP_H } from './state.js?realm=191';
+import { findPath, stepEntityToward } from './pathfinding.js?realm=191';
+import { revealAround } from './world.js?realm=191';
+import { emit } from './bus.js?realm=191';
+
+const SCOUT_TILES_PER_FIND = 24;
 
 export function makeAvatar(x, y) {
   // Citizen-shaped on purpose: the renderer's citizen sprite path
@@ -25,6 +28,8 @@ export function makeAvatar(x, y) {
     speed: 0.05, // brisk — faster than citizens (0.02–0.03)
     name: 'The Founder',
     state: 'idle',
+    scoutedTiles: 0,
+    scoutingFinds: 0,
     faceX: 0, faceZ: 1, _movedAt: 0,
   };
 }
@@ -96,6 +101,18 @@ export function updateAvatar() {
   a.y = Math.max(0.5, Math.min(MAP_H - 1.5, a.y));
   // Exploration: walking IS scouting — the founder reveals the world.
   if (G.gameTick % 15 === 0) {
-    revealAround(Math.round(a.x), Math.round(a.y), 3);
+    const newlyRevealed = revealAround(Math.round(a.x), Math.round(a.y), 3);
+    if (newlyRevealed > 0) {
+      const findsBefore = Math.floor(a.scoutedTiles / SCOUT_TILES_PER_FIND);
+      a.scoutedTiles += newlyRevealed;
+      const findsAfter = Math.floor(a.scoutedTiles / SCOUT_TILES_PER_FIND);
+      const finds = findsAfter - findsBefore;
+      if (finds > 0) {
+        a.scoutingFinds += finds;
+        G.resources.gold += finds;
+        G.totalResourcesGathered += finds;
+        emit('scouting-find', { x: a.x, y: a.y, gold: finds, total: a.scoutingFinds });
+      }
+    }
   }
 }

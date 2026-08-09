@@ -15,16 +15,19 @@
 //   NOT commands.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, rngRange } from './state.js?realm=188';
-import { placeBuilding, upgradeBuilding } from './economy.js?realm=188';
-import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=188';
-import { startResearch } from './tech.js?realm=188';
-import { executeTrade } from './trade.js?realm=188';
-import { avatarMove, avatarGoto } from './avatar.js?realm=188';
+import { G, BUILDINGS, rngRange } from './state.js?realm=191';
+import { placeBuilding, upgradeBuilding } from './economy.js?realm=191';
+import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=191';
+import { startResearch } from './tech.js?realm=191';
+import { executeTrade } from './trade.js?realm=191';
+import { avatarMove, avatarGoto } from './avatar.js?realm=191';
+import { queueRecruit } from './military.js?realm=191';
+import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=191';
+import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=191';
 import {
   commandAssignCitizen,
   commandReleaseCitizen,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;
@@ -94,6 +97,24 @@ const HANDLERS = {
     } catch (error) {
       return { ok: false, reason: error instanceof RangeError ? 'release-rejected' : 'invalid-release-command' };
     }
+  },
+
+  SET_WORKFORCE_PRIORITY({ x, y, priority }) {
+    const building = buildingAt(x, y);
+    if (!building) return { ok: false, reason: 'no-building' };
+    try {
+      return setBuildingWorkforcePriority(building, priority);
+    } catch (_error) {
+      return { ok: false, reason: 'invalid-workforce-policy' };
+    }
+  },
+
+  RECRUIT_UNIT({ x, y }) {
+    return queueRecruit(buildingAt(x, y));
+  },
+
+  CHOOSE_RECOVERY_DOCTRINE({ doctrine }) {
+    return choosePostRaidDoctrine(doctrine, G);
   },
 
   SET_RALLY({ x, y }) {
@@ -213,6 +234,16 @@ const COMMAND_SCHEMAS = Object.freeze({
     ['y', FIELD.safeInteger],
   ),
   RELEASE_CITIZEN: schema(['actorId', FIELD.positiveSafeInteger]),
+  SET_WORKFORCE_PRIORITY: schema(
+    ['x', FIELD.safeInteger],
+    ['y', FIELD.safeInteger],
+    ['priority', FIELD.string],
+  ),
+  RECRUIT_UNIT: schema(
+    ['x', FIELD.safeInteger],
+    ['y', FIELD.safeInteger],
+  ),
+  CHOOSE_RECOVERY_DOCTRINE: schema(['doctrine', FIELD.string]),
   SET_RALLY: schema(
     ['x', FIELD.nullableSafeInteger],
     ['y', FIELD.nullableSafeInteger],

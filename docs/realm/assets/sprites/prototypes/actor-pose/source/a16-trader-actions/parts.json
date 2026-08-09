@@ -1,0 +1,236 @@
+{
+  "schema": "realm.actor-pose.a16-trader-actions.v1",
+  "stage": "trader-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "factor",
+    "path": "assets/sprites/prototypes/actor-pose/references/a16-source/identity-factor.png",
+    "sha256": "1eb30307baf854379b06e8e0e80db63ea8eaa438b58dc3ba6a9317557399cb2c",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/identity-factor-keyed.png",
+      "sha256": "06cd793ce522581e0a4d44f5abd9e73f1c43d78ba3899a531cc16fc6b4ce3d59"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a16-source/identity-factor.prompt.json",
+    "parts": {
+      "down": {
+        "head": [300, 8, 480, 232],
+        "torso": [315, 220, 650, 575],
+        "arm_screen_left": [145, 242, 292, 620],
+        "arm_screen_right": [1210, 242, 1370, 620],
+        "leg": [330, 570, 620, 1015]
+      },
+      "up": {
+        "head": [570, 8, 755, 232],
+        "torso": [630, 235, 955, 575],
+        "arm_screen_left": [1210, 242, 1370, 620],
+        "arm_screen_right": [1210, 242, 1370, 620],
+        "leg": [640, 570, 935, 1015]
+      },
+      "left": {
+        "head": [790, 8, 995, 238],
+        "torso": [945, 242, 1160, 558],
+        "arm": [1210, 242, 1370, 620],
+        "leg": [945, 570, 1145, 1015]
+      },
+      "right": {
+        "head": [790, 8, 995, 238],
+        "torso": [945, 242, 1160, 558],
+        "arm": [1210, 242, 1370, 620],
+        "leg": [945, 570, 1145, 1015]
+      }
+    }
+  },
+  "garment": {
+    "key": "madder-teal",
+    "path": "assets/sprites/prototypes/actor-pose/references/a16-source/garment-madder-teal.png",
+    "sha256": "55b3df1ef3f3a7f44d7cb3094a497490048bfe2110acbf80838184817dd8ba8b",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/garment-madder-teal-keyed.png",
+      "sha256": "a0c9b886e1d3a68a251f53187dd6f3540fb1a68a3f2174b7c772497e434b9511"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a16-source/garment-madder-teal.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [295, 5, 510, 166],
+        "tunic": [255, 165, 570, 566],
+        "sleeve_screen_left": [1220, 150, 1425, 515],
+        "sleeve_screen_right": [1245, 170, 1405, 482],
+        "belt": [270, 570, 600, 690],
+        "boot": [275, 675, 590, 1022]
+      },
+      "up": {
+        "headgear": [555, 5, 770, 166],
+        "tunic": [600, 165, 925, 566],
+        "sleeve_screen_left": [1220, 150, 1425, 515],
+        "sleeve_screen_right": [1245, 170, 1405, 482],
+        "belt": [595, 570, 940, 690],
+        "boot": [600, 675, 940, 1022]
+      },
+      "left": {
+        "headgear": [775, 5, 990, 166],
+        "tunic": [925, 150, 1200, 580],
+        "sleeve": [1245, 170, 1405, 482],
+        "belt": [925, 570, 1200, 690],
+        "boot": [925, 700, 1180, 1022]
+      },
+      "right": {
+        "headgear": [775, 5, 990, 166],
+        "tunic": [925, 150, 1200, 580],
+        "sleeve": [1245, 170, 1405, 482],
+        "belt": [925, 570, 1200, 690],
+        "boot": [925, 700, 1180, 1022]
+      }
+    },
+    "crop_margin_exception": {
+      "parts": [
+        "down/belt",
+        "up/belt",
+        "left/belt",
+        "right/belt",
+        "down/boot",
+        "up/boot",
+        "left/boot",
+        "right/boot"
+      ],
+      "minimum_transparent_pixels": 0,
+      "reason": "the generated garment board uses clean semantic waist/ankle cut zones at the component boundary; hollow neck, cap, coat, cuff, and leg cavities are enforced separately"
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "up": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "left": {"size": [14, 15], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "right": {"size": [14, 15], "offset": [0, 1], "transform": "flip-x", "occlusion": "far-hand < cargo < near-hand"}
+    }
+  },
+  "tool": {
+    "key": "merchant-steelyard",
+    "path": "assets/sprites/prototypes/actor-pose/references/a16-source/merchant-steelyard.png",
+    "sha256": "575370d96920a106c5d1ca1bd5fe666fba9bac9acf9c6a7fd2b0e68d3a36085d",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/merchant-steelyard-keyed.png",
+      "sha256": "09941490f1b9428a3bb52a000af01ad2b62cc2a8a81109cda11210c992fc3fc4"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a16-source/merchant-steelyard.prompt.json",
+    "parts": {
+      "down": [64, 72, 760, 540],
+      "up": [775, 72, 1475, 540],
+      "left": [120, 545, 740, 960],
+      "right": [795, 545, 1455, 960]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "beam horizontal with wrapped grip below its balance point and pan hanging from the outer end",
+      "grip_fraction_from_left": 0.48,
+      "grip_fraction_from_top": 0.40,
+      "render_width": 30,
+      "occlusion": "body < steelyard < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "folding-trade-counter",
+    "path": "assets/sprites/prototypes/actor-pose/references/a16-source/trade-counter.png",
+    "sha256": "7b388a3647241c08d7e467652664d3b06b591bceaa9775b89f7558d7ada659bf",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/trade-counter-keyed.png",
+      "sha256": "8e2e5ba10e49761b8daec4e87c69ff7aae1af5400bfe850eefa032705da56421"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a16-source/trade-counter.prompt.json",
+    "parts": {
+      "down": [45, 70, 770, 510],
+      "up": [775, 70, 1490, 510],
+      "left": [245, 515, 690, 970],
+      "right": [850, 515, 1290, 970]
+    },
+    "render": {
+      "down": {"size": [31, 19], "center": [33, 69], "occlusion": "body < counter < steelyard < near hand"},
+      "up": {"size": [31, 19], "center": [18, 68], "occlusion": "counter < body < steelyard < near hand"},
+      "left": {"size": [25, 21], "center": [16, 68], "occlusion": "body < counter < steelyard < near hand"},
+      "right": {"size": [25, 21], "center": [48, 68], "occlusion": "body < counter < steelyard < near hand"}
+    },
+    "authority": {
+      "ground_y": 79,
+      "work_socket": "ledger_socket",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "brisk road-step authored in joint space over the grounded A2 contact chronology with a ledger-satchel counterweight",
+      "left": "joint-space x reflection of the custom road-step rendered from independently selected left-facing components; no finished row mirroring",
+      "down": "front-view narrow stride with decisive boot lift, sash-side shoulder rhythm, and satchel counterweight",
+      "up": "back-view narrow stride with decisive boot lift, sash-side shoulder rhythm, and satchel counterweight"
+    },
+    "gait_authority": {
+      "key": "factor-brisk-step-v1",
+      "shared_a5_walk_pose": false,
+      "contact_chronology": ["near-contact", "near-down", "near-pass", "near-up", "far-contact", "far-down", "far-pass", "far-up"],
+      "traits": ["decisive road stride", "sash-side shoulder rhythm", "high unloaded boot clearance", "ledger-satchel counterweight"]
+    }
+  },
+  "render_profile": {
+    "key": "factor",
+    "build": "lean mature traveling factor with a narrow angular silhouette, fitted long coat, and grounded road boots",
+    "identity_leg_far_width": 5.5,
+    "identity_leg_near_width": 6.3,
+    "garment_leg_far_width": 6.8,
+    "garment_leg_near_width": 7.6,
+    "upper_arm_far_width": 4.9,
+    "upper_arm_near_width": 5.8,
+    "forearm_far_width": 4.6,
+    "forearm_near_width": 5.2,
+    "identity_torso_size": [22, 32],
+    "garment_tunic_size": [29, 37],
+    "garment_belt_size": [29, 7],
+    "identity_head_size": [20, 24],
+    "garment_headgear_size": [27, 16]
+  },
+  "actions": {
+    "idle": {"equipment": "off", "motion": "planted factor breathing with a restrained sash-side weight shift", "contacts": "both boots remain planted"},
+    "walk": {"equipment": "off", "motion": "factor-brisk-step-v1 with grounded A2 contact order", "contacts": "contact, down, pass, up with no flight frames"},
+    "work": {"equipment": ["merchant-steelyard", "folding-trade-counter"], "motion": "ready, set sample, balance, slide weight, read, tally, close ledger, recover", "contacts": "both boots remain planted", "handedness": "steelyard remains at the right-hand socket while its pan stays above the grounded counter"},
+    "carry": {"equipment": "cargo-crate", "motion": "shared A3 carry load sockets on the factor body", "contacts": "contact, down, pass, up with no flight frames"}
+  },
+  "scope": {
+    "role": "trader",
+    "identity": "factor",
+    "garment": "madder-teal",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "four independent hash-locked ImageGen authorities: distinct factor identity, hollow merchant garment, brass steelyard, and grounded trade counter; cargo is the independent shared A3 crate",
+    "rejected_identity_authority": "all prior trader rows are settler-derived palette transfers and remain cadence evidence only",
+    "animation_unit": "one 512x84 eight-frame row per action and direction; the 16-row role family promotes atomically",
+    "runtime": "flattened, palette-bounded exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and separately selected source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "35x46 default and 64x84 review walk strips, body/equipment planes, source provenance, gait delta, and all 16 action-direction rows are gated before promotion"
+  }
+}

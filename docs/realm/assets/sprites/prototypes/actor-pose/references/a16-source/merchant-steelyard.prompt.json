@@ -1,0 +1,26 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "merchant-steelyard",
+  "generated_at": "2026-08-08",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-c9181a2e-4b05-42ff-ab8a-17e845993a09.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a15-source/ranch-feed-fork-keyed.png",
+      "sha256": "a8e7c4f341536484bd8dd62f0bcc25128bbfcefd17e3c4b7c828f51009c3a5d9",
+      "purpose": "directional equipment-board layout only; rejected as trader equipment"
+    }
+  ],
+  "prompt": "Create a modular painted raster EQUIPMENT source board for one Realm merchant animation: a sturdy hand-held brass STEELYARD BALANCE designed to remain readable when reduced to a 35x46 strategy-game actor frame. The tool has a thick horizontal brass beam, one compact hanging weighing pan on short dark chains, a chunky sliding counterweight, a wrapped dark-leather hand grip near the balance point, and a small notched tally marker. No person, hands, garment, table, cargo, goods, coins, sacks, scenery, or text. Art direction: compact painterly pixel-art source material with crisp bold clusters, warm upper-left lighting, dark outlines/edge contrast, restrained brass/umber palette, silhouette clarity over tiny detail, classic 1990s strategy-game readability. Arrange four very large, generously separated views on one board: front/down, rear/up, left-facing side, right-facing side; consistent tool identity, handedness, scale, chain length, and pan size; handle/grip clearly identifiable; every view fully visible and uncropped. Use a perfectly flat solid #ff00ff chroma-key background with no gradient, floor, shadow, labels, border, text, UI, watermark, duplicate loose fragments, or extra objects.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "18", "--opaque-threshold", "220", "--despill"],
+    "key_color_detected": "#f809ea"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a16-source/merchant-steelyard-keyed.png",
+  "keyed_sha256": "09941490f1b9428a3bb52a000af01ad2b62cc2a8a81109cda11210c992fc3fc4",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a16-source/merchant-steelyard.png",
+  "alpha_sha256": "575370d96920a106c5d1ca1bd5fe666fba9bac9acf9c6a7fd2b0e68d3a36085d"
+}

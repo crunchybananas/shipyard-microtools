@@ -2,7 +2,13 @@
 // Trade — Named foreign partners and resource exchange
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=188';
+import { G } from './state.js?realm=191';
+import {
+  depositFoodAcrossStores,
+  foodSpace,
+  foodStores,
+  withdrawFoodFromStores,
+} from './building-inventory.js?realm=191';
 
 export const TRADE_PARTNERS = [
   { id: 'albion',   name: '🏰 Albion',   import: 'wood',  export: 'gold', rate: 2   },  // 1 wood → 2 gold
@@ -15,14 +21,29 @@ export function executeTrade(partnerId, resourceKey, amount) {
   const p = TRADE_PARTNERS.find(x => x.id === partnerId);
   if (!p) return false;
   if (resourceKey !== p.import) return false;
+  if (!Number.isSafeInteger(amount) || amount <= 0) return false;
   if ((G.resources[resourceKey] || 0) < amount) return false;
-  G.resources[resourceKey] -= amount;
   // Loop 102 (the-fixer, 101 sibling): named merchant gives +5% trade
   // return. Mirrors 101's teacher research-bonus pattern. Graduates
   // 034's merchant intro from decoration to mechanic. No UI indicator —
   // player will notice larger haul across many trades if they track it.
   const merchantMult = G.namedCharacters?.merchant ? 1.05 : 1;
   const received = Math.round(amount * p.rate * merchantMult);
-  G.resources[p.export] = (G.resources[p.export] || 0) + received;
+  if (p.export === 'food') {
+    const space = foodStores(G).reduce((sum, building) => sum + foodSpace(building, G), 0);
+    if (space < received) return false;
+  }
+  if (resourceKey === 'food') {
+    const paid = withdrawFoodFromStores(amount, { state: G });
+    if (paid.taken !== amount) throw new Error('Trade food wallet disagrees with physical stores.');
+  } else {
+    G.resources[resourceKey] -= amount;
+  }
+  if (p.export === 'food') {
+    const stored = depositFoodAcrossStores(received, { state: G });
+    if (stored.accepted !== received) throw new Error('Reserved trade food capacity changed during execution.');
+  } else {
+    G.resources[p.export] = (G.resources[p.export] || 0) + received;
+  }
   return { given: amount, received, export: p.export };
 }

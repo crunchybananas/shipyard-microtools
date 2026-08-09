@@ -4,8 +4,8 @@
 // profession, assignment, and activity. Buildings never own worker arrays;
 // staffing is a deterministic derived view of citizen assignments.
 
-import { G, BUILDINGS } from './state.js?realm=188';
-import { emit, off, on } from './bus.js?realm=188';
+import { G, BUILDINGS } from './state.js?realm=191';
+import { emit, off, on } from './bus.js?realm=191';
 
 export const CONSTRUCTION_STAFF_LIMIT = 2;
 
@@ -16,8 +16,9 @@ export const CITIZEN_PROFESSIONS = Object.freeze([
 
 export const CITIZEN_ACTIVITIES = Object.freeze([
   'idle', 'find_job', 'walk_to_work', 'working', 'walk_to_deliver',
-  'needs_delivery', 'deliver', 'foraging', 'eating', 'go_home', 'sleep',
-  'leisure',
+  'needs_delivery', 'deliver', 'foraging', 'walk_to_eat',
+  'waiting_for_food', 'eating', 'go_home', 'sleep', 'leisure',
+  'seek_shelter', 'sheltered', 'flee',
 ]);
 
 export const CITIZEN_APPEARANCE_IDS = Object.freeze([
@@ -34,22 +35,26 @@ export const PROFESSION_REASONS = Object.freeze([
 
 export const ASSIGNMENT_CLAIM_REASONS = Object.freeze([
   'job-market', 'player-command', 'construction', 'food-crisis',
+  'workforce-policy',
 ]);
 
 export const ASSIGNMENT_RELEASE_REASONS = Object.freeze([
   'player-command', 'food-crisis', 'construction-complete',
   'building-removed', 'path-unreachable', 'citizen-removed',
-  'assignment-invalid',
+  'assignment-invalid', 'workforce-policy', 'military-recruitment',
 ]);
 
 export const ACTIVITY_REASONS = Object.freeze([
   'spawn-idle', 'idle-wait', 'seek-work', 'route-to-work', 'arrived-at-work',
   'work-cycle', 'cargo-ready', 'cargo-needs-storage', 'route-to-delivery',
-  'cargo-delivered', 'forage-started', 'forage-complete', 'eat-food',
+  'cargo-delivered', 'forage-started', 'forage-complete', 'route-to-food',
+  'food-shortage', 'food-source-empty', 'eat-food',
   'route-home', 'sleep-rest', 'wake-day', 'leisure-started',
   'leisure-complete', 'path-unreachable', 'building-removed',
   'construction-complete', 'food-crisis', 'threat-response',
   'combat-recovery', 'player-command', 'assignment-invalid',
+  'workforce-policy', 'raid-shelter', 'shelter-entered',
+  'shelter-unreachable', 'raid-cleared',
 ]);
 
 const PROFESSION_SET = new Set(CITIZEN_PROFESSIONS);
@@ -390,6 +395,9 @@ function prepareAssignment(citizen, building, { duty, purpose, reason }) {
   assertCitizen(citizen);
   assertLiveBuilding(building);
   assertReason(reason, ASSIGNMENT_CLAIM_REASON_SET, 'assignment claim');
+  if (building.workforcePriority === 'off' && reason !== 'player-command') {
+    throw new RangeError(`${building.type}@${building.x},${building.y} is closed to automatic staffing.`);
+  }
   if (!['vocation', 'temporary'].includes(purpose)) {
     throw new TypeError(`Unknown assignment purpose: ${purpose}`);
   }
@@ -497,6 +505,10 @@ export function removeCitizenFromWorld(citizen, reason = 'citizen-removed') {
       : `Citizen actorId ${citizen.actorId} is not live.`);
   }
   releaseCitizenAssignment(citizen, reason);
+  // Residence occupancy is derived from live citizen references. Clear the
+  // departing actor's reference as part of the same ownership transition so
+  // no caller can retain a removed citizen that still claims a realm home.
+  citizen.home = null;
   if (G.selectedCitizenId === citizen.actorId) G.selectedCitizenId = null;
   G.citizens.splice(matches[0].index, 1);
   G.population = G.citizens.length;

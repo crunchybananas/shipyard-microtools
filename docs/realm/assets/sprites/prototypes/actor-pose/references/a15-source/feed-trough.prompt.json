@@ -1,0 +1,29 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "feed-trough",
+  "generated_at": "2026-08-08",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-c76dd511-7d75-4b86-adc6-e6be62e55f1f.png"
+  },
+  "references": [],
+  "prompt": "Use case: stylized-concept. Asset type: Realm modular ranch workstation source board for offline sprite compilation. Create four isolated orthographic views of the same compact grounded split-log livestock feed trough: broad front/down, broad rear/up, left end, and independently authored right end. The trough is a hollowed honey-brown log held by two dark iron bands on short block feet, visibly filled with dry golden hay, sage leaves, and restrained fodder. The four views share exact construction, contents, proportions, materials, scale, and warm upper-left lighting. Crisp hand-painted late-1990s strategy-game sprite source art with controlled pixel clusters and a compact readable silhouette. Keep every trough grounded, fully separated, and uncropped on one uniform flat #ff00ff chroma-key background. No person, tool, animal, barn scene, floor, cast shadow, loose detached fodder, labels, text, watermark, clipping, or magenta inside the trough.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#e516db"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a15-source/feed-trough-keyed.png",
+  "keyed_sha256": "2733e8ad0c3cd030a48b73113831da97213a445a324acdd129dbde230663ae94",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a15-source/feed-trough.png",
+  "alpha_sha256": "c959b17daa41d21ea39c127c23076e2e07622ee0d4580986fbfa8904408eb4d9"
+}

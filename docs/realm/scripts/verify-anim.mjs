@@ -59,8 +59,8 @@ const explicitCapture = await page.evaluate(async () => {
 });
 
 const result = await page.evaluate(async () => {
-  const renderModule = await import('./js/render.js?realm=188');
-  const { ACTOR_REGISTRATION } = await import('./js/actor-registration.js?realm=188');
+  const renderModule = await import('./js/render.js?realm=191');
+  const { ACTOR_REGISTRATION } = await import('./js/actor-registration.js?realm=191');
   const atlasInfo = window.__realm?.actorAtlas?.();
   const img = new Image();
   img.decoding = 'async';
@@ -128,22 +128,27 @@ const result = await page.evaluate(async () => {
   });
 
   const animationProbe = {};
-  window.G.gameTick = 100;
+  // Sample cadence relative to the live authoritative clock. Rewinding to a
+  // hard-coded tick made citizen ownership timestamps appear to come from the
+  // future and produced a verifier-only page error.
+  const liveTick = window.G.gameTick;
+  window.G.gameTick = liveTick + 100;
   const idle0 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'idle');
-  window.G.gameTick = 122;
+  window.G.gameTick = liveTick + 122;
   const idle1 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'idle');
-  window.G.gameTick = 123;
+  window.G.gameTick = liveTick + 123;
   const walk0 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'walk', { isMoving: true });
-  window.G.gameTick = 130;
+  window.G.gameTick = liveTick + 130;
   const walk1 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'walk', { isMoving: true });
-  window.G.gameTick = 131;
+  window.G.gameTick = liveTick + 131;
   const carryHold0 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'carry');
-  window.G.gameTick = 200;
+  window.G.gameTick = liveTick + 200;
   const carryHold1 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'carry');
-  window.G.gameTick = 201;
+  window.G.gameTick = liveTick + 201;
   const carryMove0 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'carry', { isMoving: true });
-  window.G.gameTick = 208;
+  window.G.gameTick = liveTick + 208;
   const carryMove1 = renderModule.actorAnimationFrame(animationProbe, 'miner', 'carry', { isMoving: true });
+  window.G.gameTick = liveTick;
 
   return {
     atlasInfo,

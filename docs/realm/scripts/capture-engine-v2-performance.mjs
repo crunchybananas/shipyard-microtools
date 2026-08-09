@@ -12,7 +12,7 @@ import { cpus, platform, release } from 'node:os';
 import { performance as nodePerformance } from 'node:perf_hooks';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import runtimeContract from '../runtime-contract.json?realm=188' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=191' with { type: 'json' };
 import { ensureServer } from './_serve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -284,7 +284,7 @@ async function runTrial(browser, server, host, index) {
     });
 
     const setup = await page.evaluate(async () => {
-      const economy = await import('./js/economy.js?realm=188');
+      const economy = await import('./js/economy.js?realm=191');
       const g = window.G;
       g.speed = 0;
       g.debug.disableEvents = true;
@@ -368,7 +368,7 @@ async function runTrial(browser, server, host, index) {
       batchTicks,
       batchSamples,
     }) => {
-      const { coreTick } = await import('./js/sim.js?realm=188');
+      const { coreTick } = await import('./js/sim.js?realm=191');
       const g = window.G;
       for (let i = 0; i < warmupTicks; i++) coreTick();
       const durations = [];
@@ -399,7 +399,7 @@ async function runTrial(browser, server, host, index) {
     });
 
     const renderParticleStressProfile = await page.evaluate(async ({ samples }) => {
-      const render = await import('./js/render.js?realm=188');
+      const render = await import('./js/render.js?realm=191');
       render.setRenderProfiling(true);
       for (let i = 0; i < samples; i++) window.forceRender();
       const profile = render.getRenderProfile();
@@ -408,7 +408,7 @@ async function runTrial(browser, server, host, index) {
     }, { samples: PARTICLE_RENDER_SAMPLES });
 
     const renderSteadyProfile = await page.evaluate(async ({ samples }) => {
-      const render = await import('./js/render.js?realm=188');
+      const render = await import('./js/render.js?realm=191');
       window.G.particles.length = 0;
       for (let i = 0; i < 10; i++) window.forceRender();
       render.setRenderProfiling(true);
@@ -454,7 +454,7 @@ async function runTrial(browser, server, host, index) {
     }, DRAW_COUNT_SAMPLES);
 
     const actualRenderCache = await page.evaluate(async () => {
-      const cache = await import('./js/citizen-render-cache.js?realm=188');
+      const cache = await import('./js/citizen-render-cache.js?realm=191');
       window.forceRender();
       const records = cache.inspectCitizenRenderCache();
       const live = new Set(window.G.citizens.map(citizen => citizen.actorId));
@@ -468,7 +468,7 @@ async function runTrial(browser, server, host, index) {
     });
 
     const save = await page.evaluate(async ({ samples }) => {
-      const { serializeGame } = await import('./js/save-state.js?realm=188');
+      const { serializeGame } = await import('./js/save-state.js?realm=191');
       const durations = [];
       let bytes = 0;
       for (let i = 0; i < samples; i++) {
@@ -527,8 +527,8 @@ async function runTrial(browser, server, host, index) {
         warmupSamples,
         samples,
       }) => {
-        const presentation = await import('./js/citizen-presentation.js?realm=188');
-        const cache = await import('./js/citizen-render-cache.js?realm=188');
+        const presentation = await import('./js/citizen-presentation.js?realm=191');
+        const cache = await import('./js/citizen-render-cache.js?realm=191');
         const source = window.G.citizens;
         if (!source.length) throw new Error('Snapshot probe requires live citizens.');
         const inputs = Array.from({ length: count }, (_, index) => {
@@ -606,7 +606,7 @@ async function runTrial(browser, server, host, index) {
       const cleanup = await page.evaluate(async ({
         actorCount: count,
       }) => {
-        const cache = await import('./js/citizen-render-cache.js?realm=188');
+        const cache = await import('./js/citizen-render-cache.js?realm=191');
         const liveHalf = Array.from({ length: Math.floor(count / 2) }, (_, index) => index + 1);
         const afterPrune = cache.pruneCitizenRenderCache(liveHalf);
         const expectedAfterPrune = liveHalf.length;

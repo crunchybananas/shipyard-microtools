@@ -3,20 +3,21 @@
 // transaction rewrites these literals together with the browser graph.
 
 import { createHash } from 'node:crypto';
-import runtimeContract from '../runtime-contract.json?realm=188' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=191' with { type: 'json' };
 import {
   AUTHORITATIVE_SIMULATION_EXCLUDED_G_KEYS,
   G,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS,
   getSeed,
   setSeed,
-} from '../js/state.js?realm=188';
-import { generateWorld } from '../js/world.js?realm=188';
-import { CORE_SYSTEM_ORDER, coreStateIdentity, coreTick } from '../js/sim.js?realm=188';
-import { commandStateIdentity, dispatch } from '../js/commands.js?realm=188';
-import { canPlace } from '../js/economy.js?realm=188';
-import { initChronicle } from '../js/log.js?realm=188';
-import { missions } from '../js/missions.js?realm=188';
+} from '../js/state.js?realm=191';
+import { generateWorld } from '../js/world.js?realm=191';
+import { CORE_SYSTEM_ORDER, coreStateIdentity, coreTick } from '../js/sim.js?realm=191';
+import { commandStateIdentity, dispatch } from '../js/commands.js?realm=191';
+import { canPlace } from '../js/economy.js?realm=191';
+import { initChronicle } from '../js/log.js?realm=191';
+import { missions } from '../js/missions.js?realm=191';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=191';
 
 export { CORE_SYSTEM_ORDER, G, runtimeContract };
 
@@ -318,9 +319,10 @@ export function runDeterminismScenario({
   generateWorld();
   initChronicle();
   G.resources = {
-    wood: 500, stone: 500, food: 500, gold: 500, iron: 50,
+    wood: 500, stone: 500, food: 120, gold: 500, iron: 50,
     wheat: 0, flour: 0, planks: 0, tools: 0,
   };
+  establishFounderStockpile();
   if (hostileParticleSchedule) {
     G.particles = Array.from({ length: 500 }, (_, index) => ({ type: 'shell-probe', index }));
   }
@@ -356,7 +358,10 @@ export function runDeterminismScenario({
     }
     coreTick();
     if (tick === 1 && G.gameTick !== 1) throw new Error('coreTick() did not advance root G');
-    if (tick === 10 && ((G._commandLog || []).length !== 1 || G.buildings.length !== 1)) {
+    if (tick === 10 && (
+      (G._commandLog || []).length !== 1
+      || G.buildings.filter(building => building.founderStockpile !== true).length !== 1
+    )) {
       throw new Error('dispatch() did not commit its accepted building to root G');
     }
     if (tick === 21600) {

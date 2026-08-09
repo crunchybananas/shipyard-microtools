@@ -2,35 +2,34 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=188';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=191';
+import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=191';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
 // Wells still auto-douse (economy.updateFires), so placement matters.
 const RAID_FLAMMABLE = new Set(['house', 'tavern', 'bakery', 'lumber', 'windmill', 'farm', 'granary', 'storehouse']);
 
-// Shared sack logic: every building strike pockets stores (gold first,
-// then food, then wood) and counts toward the raider's plunder goal, so
-// a warband stalled at the walls still fills its bags and LEAVES instead
-// of besieging forever. Slain raiders drop their bags (see death block).
-function stealFrom(e, dmg) {
-  e.plundered = (e.plundered || 0) + dmg;
-  let stole = 0;
-  for (const k of ['gold', 'food', 'wood']) {
-    if (stole >= 2) break;
-    const take = Math.min(2 - stole, Math.floor(G.resources[k] || 0));
-    if (take > 0) {
-      G.resources[k] -= take;
-      stole += take;
-      e.loot = e.loot || {};
-      e.loot[k] = (e.loot[k] || 0) + take;
-      G._raidStolen = G._raidStolen || {};
-      G._raidStolen[k] = (G._raidStolen[k] || 0) + take;
-    }
+// A raider sacks only the physical food inside the structure being struck.
+// Empty walls no longer conjure abstract gold/wood from the realm wallet, and
+// plunder progress advances only for goods that actually enter the loot bag.
+export function plunderBuildingFood(e, building, requested = 2) {
+  if (!e || !Number.isSafeInteger(requested) || requested < 0) {
+    throw new TypeError('Raider plunder requires an enemy and a non-negative safe integer amount.');
+  }
+  const result = withdrawFood(building, requested, G);
+  const stole = result.taken;
+  if (stole > 0) {
+    e.plundered = (e.plundered || 0) + stole;
+    e.loot = e.loot || {};
+    e.loot.food = (e.loot.food || 0) + stole;
+    G._raidStolen = G._raidStolen || {};
+    G._raidStolen.food = (G._raidStolen.food || 0) + stole;
   }
   if (stole > 0 && visualJitter(e.x, e.y, 301) < 0.35) {
     G.particles.push({ tx: e.x, ty: e.y, offsetY: -18, text: '💰', alpha: 1.1, vy: -0.14, decay: 0.02, type: 'text' });
   }
+  return stole;
 }
 function maybeIgnite(b, notifyFn) {
   if (b.onFire || !RAID_FLAMMABLE.has(b.type)) return;
@@ -42,21 +41,41 @@ function maybeIgnite(b, notifyFn) {
     notifyFn(`🔥 Raiders set the ${BUILDINGS[b.type]?.name || b.type} ablaze!`, 'danger');
   }
 }
-import { stepEntityToward } from './pathfinding.js?realm=188';
-import { spawnClashFX, visualJitter } from './fx.js?realm=188';
+
+function closeRaidStolenLedger(outcome) {
+  if (G.enemies.length > 0 || !G._raidStolen) return false;
+  const parts = Object.entries(G._raidStolen)
+    .filter(([, amount]) => amount > 0)
+    .map(([resource, amount]) => `${amount} ${resource}`)
+    .join(', ');
+  if (parts) {
+    const message = outcome === 'escape'
+      ? `💰 The raiders escaped with ${parts}.`
+      : `💰 The raid cost the realm ${parts}; it was carried off or could not all be stored.`;
+    notify(message, 'danger');
+  }
+  G._raidStolen = null;
+  return true;
+}
+import { stepEntityToward } from './pathfinding.js?realm=191';
+import { spawnClashFX, visualJitter } from './fx.js?realm=191';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=188';
-import { removeBuilding } from './building-lifecycle.js?realm=188';
-import { announce as notify } from './log.js?realm=188';
-import { chronicle } from './log.js?realm=188';
-import { recordDeathMarker } from './death-markers.js?realm=188';
+import { sfx as playSound } from './log.js?realm=191';
+import { removeBuilding } from './building-lifecycle.js?realm=191';
+import { announce as notify } from './log.js?realm=191';
+import { chronicle } from './log.js?realm=191';
+import { recordDeathMarker } from './death-markers.js?realm=191';
 import {
   removeCitizenFromWorld,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
+import {
+  citizenHasValidResidence,
+  citizenIsIndoors,
+} from './residences.js?realm=191';
 
 function detachProjectileTargets(enemy) {
   let snapshot = null;
@@ -67,7 +86,56 @@ function detachProjectileTargets(enemy) {
   }
 }
 
+function resolveEnemyDeathAt(index) {
+  const e = G.enemies[index];
+  if (!e || e.hp > 0) return false;
+  detachProjectileTargets(e);
+  G.enemies.splice(index, 1);
+  if (G.stats) G.stats.enemiesKilled++;
+  // Loop 209 (the-fixer, 206 filed): rival's symmetric +reward arm.
+  // A named rival makes raids larger and every slain raider worth 5 gold.
+  if (G.namedCharacters?.rival) {
+    G.resources.gold += 5;
+  }
+  // Slain raiders recover only as much food as still fits in a live store.
+  // Overflow remains lost; it never reappears in the compatibility wallet.
+  if (e.loot) {
+    let dropped = 0;
+    for (const [k, v] of Object.entries(e.loot)) {
+      const recovered = k === 'food'
+        ? depositFoodAcrossStores(v, { origin: e, state: G }).accepted
+        : v;
+      if (k !== 'food') G.resources[k] = (G.resources[k] || 0) + recovered;
+      if (G._raidStolen?.[k]) G._raidStolen[k] = Math.max(0, G._raidStolen[k] - recovered);
+      dropped += recovered;
+    }
+    if (dropped > 0) {
+      G.particles.push({ tx: e.x, ty: e.y, offsetY: -14, text: `+${dropped} recovered`, alpha: 1.3, vy: -0.15, decay: 0.014, type: 'text' });
+    }
+  }
+  closeRaidStolenLedger('death');
+  playSound('demolish');
+  // Death particles — dramatic blood splat effect.
+  for (let p = 0; p < 8; p++) {
+    const unit = channel => visualJitter(e.x, e.y, 400 + p * 5 + channel);
+    G.particles.push({
+      tx: e.x + (unit(1)-0.5)*0.3, ty: e.y + (unit(2)-0.5)*0.3,
+      offsetY: -5 - unit(3)*10,
+      text: p < 2 ? '💀' : '•',
+      alpha: 1.5, vy: -0.15 - unit(4)*0.15, decay: 0.03,
+      type: 'text',
+      color: '#8a1a1a',
+    });
+  }
+  return true;
+}
+
 export function updateEnemies() {
+  // Soldiers act before enemies in the core contract. Resolve their lethal
+  // blows before morale, engagement, movement, or civilian harm so a dead
+  // raider can neither take a turn nor remain in the fighting count.
+  for (let i = G.enemies.length - 1; i >= 0; i--) resolveEnemyDeathAt(i);
+
   // Morale break: when a raid has lost more than 60% of its fighters, the
   // survivors break and flee — raids resolve with drama instead of a grind.
   if (G._raidSpawnCount && G.gameTick % 60 === 0) {
@@ -122,7 +190,7 @@ export function updateEnemies() {
       // Attack wall instead of passing through
       wall.hp -= 0.35;
       maybeIgnite(wall, notify);
-      if (G.gameTick % 40 === 0) stealFrom(e, 2); // breaching counts toward the goal
+      if (G.gameTick % 40 === 0) plunderBuildingFood(e, wall, 2);
       if (G.gameTick % 30 === 0) {
         G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (visualJitter(wall.x, wall.y, 302)-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
       }
@@ -159,7 +227,7 @@ export function updateEnemies() {
         if (blocker && blocker.hp > 0) {
           blocker.hp -= 0.35;
           maybeIgnite(blocker, notify);
-          if (G.gameTick % 40 === 0) stealFrom(e, 2);
+          if (G.gameTick % 40 === 0) plunderBuildingFood(e, blocker, 2);
           if (G.gameTick % 30 === 0) {
             G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (visualJitter(blocker.x, blocker.y, 303)-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
           }
@@ -174,11 +242,7 @@ export function updateEnemies() {
       // Reached the retreat edge — gone, with whatever they carried.
       detachProjectileTargets(e);
       G.enemies.splice(i, 1);
-      if (G.enemies.length === 0 && G._raidStolen && Object.values(G._raidStolen).some(v => v > 0)) {
-        const parts = Object.entries(G._raidStolen).filter(([, v]) => v > 0).map(([k, v]) => `${v} ${k}`).join(', ');
-        notify(`💰 The raiders escaped with ${parts}.`, 'danger');
-        G._raidStolen = null;
-      }
+      closeRaidStolenLedger('escape');
       continue;
     } else {
       // Arrived at town center — attack nearest building
@@ -194,10 +258,9 @@ export function updateEnemies() {
         const dmg = e.damage || 7;
         target.b.hp -= dmg;
         maybeIgnite(target.b, notify);
-        stealFrom(e, dmg);
+        plunderBuildingFood(e, target.b, 2);
         if (target.b.hp <= 0) {
           removeBuilding(target.b, { cause: 'raid' });
-          e.plundered = e.plunderGoal || e.plundered;
         }
         if ((e.plundered || 0) >= (e.plunderGoal || 35)) {
           e.retreating = true;
@@ -233,6 +296,9 @@ export function updateEnemies() {
     }
     // Enemies harm nearby citizens — citizens flee and can die if caught
     for (const c of G.citizens) {
+      // A resident becomes untargetable only after the citizen state machine
+      // has physically delivered them to their own valid House portal.
+      if (citizenIsIndoors(c)) continue;
       const dx = c.x - e.x, dy = c.y - e.y;
       const d = Math.hypot(dx, dy);
       if (d > 2.5) continue;
@@ -249,73 +315,34 @@ export function updateEnemies() {
       }
       if (!c._fleeing || G.gameTick % 20 === 0) {
         c._fleeing = true;
-        // Shelter instinct: run for the nearest house; open flight only
-        // when no roof is close enough.
-        let shelter = null, sd = Infinity;
-        for (const hb of G.buildings) {
-          if (hb.type !== 'house') continue;
-          const hd = Math.abs(hb.x - c.x) + Math.abs(hb.y - c.y);
-          if (hd < sd) { sd = hd; shelter = hb; }
+        const deliveryObligation = !!(c.carrying && c.carryAmount > 0)
+          || ['needs_delivery', 'walk_to_deliver', 'deliver'].includes(c.activity.kind);
+        if (deliveryObligation || c.activity.kind === 'seek_shelter') {
+          // Cargo routes and an established own-home shelter route survive a
+          // hit. The panic sprint flag makes both obligations urgent without
+          // silently deleting goods or redirecting residents to another roof.
+          continue;
         }
-        if (shelter && sd < 14) {
-          c.tx = Math.max(1, Math.min(MAP_W - 2, shelter.x + (dx / (d || 1))));
-          c.ty = Math.max(1, Math.min(MAP_H - 2, shelter.y + (dy / (d || 1))));
-        } else {
-          c.tx = Math.max(1, Math.min(MAP_W - 2, c.x + (dx / (d || 1)) * 5));
-          c.ty = Math.max(1, Math.min(MAP_H - 2, c.y + (dy / (d || 1)) * 5));
+        if (c.activity.kind !== 'flee' && citizenHasValidResidence(c)) {
+          transitionCitizenActivity(c, 'seek_shelter', 'raid-shelter');
+          c.activityTimer = 0;
+          c.path = null;
+          c.pathIdx = 0;
+          continue;
         }
-        transitionCitizenActivity(c, 'idle', 'combat-recovery');
-        c.activityTimer = 0;
+
+        // Homeless citizens and residents whose portal route failed remain
+        // exterior actors. They run away from the nearest threat and can
+        // still be caught; no House proximity grants immunity.
+        c.tx = Math.max(1, Math.min(MAP_W - 2, c.x + (dx / (d || 1)) * 5));
+        c.ty = Math.max(1, Math.min(MAP_H - 2, c.y + (dy / (d || 1)) * 5));
+        transitionCitizenActivity(c, 'flee', 'shelter-unreachable');
+        c.activityTimer = 30;
         c.path = null;
         c.pathIdx = 0;
       }
     }
 
-    // Die if hp drops to 0
-    if (e.hp <= 0) {
-      detachProjectileTargets(e);
-      G.enemies.splice(i, 1);
-      if (G.stats) G.stats.enemiesKilled++;
-      // Loop 209 (the-fixer, 206 filed): rival's symmetric +reward arm.
-      // 206 shipped the difficulty bump (rivalMult ×1.10 raider count);
-      // 209 ships the cooperative-arm pair: +5 gold per raider slain
-      // when rival is named. Per 105 filing's "might include +reward
-      // for successful defense" clause. Adversarial-AND-rewarding shape:
-      // the rival sends more raiders AND each one is worth more when
-      // killed. Net balance: realm faces ~+10% raider count for ~+50
-      // gold per typical late-game raid (10 raiders × 5 gold). Silent
-      // — no toast/chronicle (matches 034 named-character invariant
-      // + 206 silent-mechanic discipline). 6 named-cast mechanics now
-      // shipped fully; only mayor structural-unlock remains.
-      if (G.namedCharacters?.rival) {
-        G.resources.gold += 5;
-      }
-      // Slain raiders drop their loot bag where they fall.
-      if (e.loot) {
-        let dropped = 0;
-        for (const [k, v] of Object.entries(e.loot)) {
-          G.resources[k] = (G.resources[k] || 0) + v;
-          if (G._raidStolen?.[k]) G._raidStolen[k] = Math.max(0, G._raidStolen[k] - v);
-          dropped += v;
-        }
-        if (dropped > 0) {
-          G.particles.push({ tx: e.x, ty: e.y, offsetY: -14, text: `+${dropped} recovered`, alpha: 1.3, vy: -0.15, decay: 0.014, type: 'text' });
-        }
-      }
-      playSound('demolish');
-      // Death particles — dramatic blood splat effect
-      for (let p = 0; p < 8; p++) {
-        const unit = channel => visualJitter(e.x, e.y, 400 + p * 5 + channel);
-        G.particles.push({
-          tx: e.x + (unit(1)-0.5)*0.3, ty: e.y + (unit(2)-0.5)*0.3,
-          offsetY: -5 - unit(3)*10,
-          text: p < 2 ? '💀' : '•',
-          alpha: 1.5, vy: -0.15 - unit(4)*0.15, decay: 0.03,
-          type: 'text',
-          color: '#8a1a1a',
-        });
-      }
-    }
   }
 
   // Remove citizens that were killed by enemies (hp <= 0 from combat damage)
@@ -323,7 +350,9 @@ export function updateEnemies() {
   for (let i = G.citizens.length - 1; i >= 0; i--) {
     const c = G.citizens[i];
     if (c.hp === undefined || c.hp > 0) continue;
-    if (c.carrying && c.carryAmount > 0) G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
+    if (c.carrying && c.carrying !== 'food' && c.carryAmount > 0) {
+      G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
+    }
     removeCitizenFromWorld(c);
     if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
     G.lastDeathDay = G.day;  // Loop 228 (sustained-state #2 infrastructure)

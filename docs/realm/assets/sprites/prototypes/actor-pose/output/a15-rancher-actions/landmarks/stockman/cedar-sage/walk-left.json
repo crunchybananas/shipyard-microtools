@@ -1,0 +1,1068 @@
+{
+  "frames": [
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          32,
+          41
+        ],
+        "near": [
+          32,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          40,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          43,
+          79
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          39,
+          64
+        ],
+        "sole_run": [
+          38,
+          43
+        ],
+        "toe": [
+          38,
+          79
+        ]
+      },
+      "frame": 0,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          30,
+          49
+        ],
+        "near": [
+          34,
+          49
+        ]
+      },
+      "head": [
+        31,
+        16
+      ],
+      "near": {
+        "ankle": [
+          24,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          25,
+          79
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          24,
+          64
+        ],
+        "sole_run": [
+          19,
+          25
+        ],
+        "toe": [
+          19,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        53
+      ],
+      "phase": "near-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          34,
+          33
+        ],
+        "near": [
+          30,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          51
+        ],
+        "left_hand": [
+          30,
+          49
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          34,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          31,
+          45
+        ],
+        "near": [
+          33,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          34,
+          42
+        ],
+        "near": [
+          32,
+          42
+        ]
+      },
+      "far": {
+        "ankle": [
+          39,
+          73
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          43,
+          75
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          32,
+          66
+        ],
+        "sole_run": null,
+        "toe": [
+          37,
+          75
+        ]
+      },
+      "frame": 1,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          34,
+          50
+        ],
+        "near": [
+          32,
+          50
+        ]
+      },
+      "head": [
+        32,
+        17
+      ],
+      "near": {
+        "ankle": [
+          25,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          28,
+          79
+        ],
+        "hip": [
+          30,
+          54
+        ],
+        "knee": [
+          22,
+          65
+        ],
+        "sole_run": [
+          22,
+          28
+        ],
+        "toe": [
+          22,
+          79
+        ]
+      },
+      "pelvis": [
+        33,
+        54
+      ],
+      "phase": "near-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          35,
+          33
+        ],
+        "near": [
+          31,
+          34
+        ]
+      },
+      "sockets": {
+        "belt": [
+          33,
+          52
+        ],
+        "left_hand": [
+          34,
+          50
+        ],
+        "load": [
+          33,
+          53
+        ],
+        "right_hand": [
+          32,
+          50
+        ]
+      },
+      "wrists": {
+        "far": [
+          34,
+          46
+        ],
+        "near": [
+          32,
+          46
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          36,
+          41
+        ],
+        "near": [
+          30,
+          41
+        ]
+      },
+      "far": {
+        "ankle": [
+          25,
+          71
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          26,
+          73
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          22,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          21,
+          73
+        ]
+      },
+      "frame": 2,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          38,
+          50
+        ],
+        "near": [
+          28,
+          49
+        ]
+      },
+      "head": [
+        32,
+        16
+      ],
+      "near": {
+        "ankle": [
+          30,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          33,
+          79
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          27,
+          65
+        ],
+        "sole_run": [
+          28,
+          33
+        ],
+        "toe": [
+          28,
+          79
+        ]
+      },
+      "pelvis": [
+        33,
+        53
+      ],
+      "phase": "near-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          35,
+          32
+        ],
+        "near": [
+          31,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          33,
+          51
+        ],
+        "left_hand": [
+          38,
+          50
+        ],
+        "load": [
+          33,
+          52
+        ],
+        "right_hand": [
+          28,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          37,
+          46
+        ],
+        "near": [
+          29,
+          45
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          37,
+          40
+        ],
+        "near": [
+          27,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          24,
+          67
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          23,
+          70
+        ],
+        "hip": [
+          34,
+          51
+        ],
+        "knee": [
+          22,
+          58
+        ],
+        "sole_run": null,
+        "toe": [
+          18,
+          70
+        ]
+      },
+      "frame": 3,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          40,
+          48
+        ],
+        "near": [
+          24,
+          48
+        ]
+      },
+      "head": [
+        31,
+        15
+      ],
+      "near": {
+        "ankle": [
+          36,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          40,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          34,
+          65
+        ],
+        "sole_run": [
+          34,
+          40
+        ],
+        "toe": [
+          34,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        52
+      ],
+      "phase": "near-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          34,
+          32
+        ],
+        "near": [
+          30,
+          31
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          50
+        ],
+        "left_hand": [
+          40,
+          48
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          24,
+          48
+        ]
+      },
+      "wrists": {
+        "far": [
+          38,
+          44
+        ],
+        "near": [
+          26,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          37,
+          41
+        ],
+        "near": [
+          27,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          24,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          24,
+          79
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          28,
+          64
+        ],
+        "sole_run": [
+          19,
+          24
+        ],
+        "toe": [
+          19,
+          79
+        ]
+      },
+      "frame": 4,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          40,
+          49
+        ],
+        "near": [
+          24,
+          49
+        ]
+      },
+      "head": [
+        31,
+        16
+      ],
+      "near": {
+        "ankle": [
+          40,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          43,
+          79
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          34,
+          65
+        ],
+        "sole_run": [
+          39,
+          43
+        ],
+        "toe": [
+          39,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        53
+      ],
+      "phase": "far-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          34,
+          33
+        ],
+        "near": [
+          30,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          51
+        ],
+        "left_hand": [
+          40,
+          49
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          24,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          38,
+          45
+        ],
+        "near": [
+          26,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          34,
+          42
+        ],
+        "near": [
+          28,
+          41
+        ]
+      },
+      "far": {
+        "ankle": [
+          24,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          26,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          29,
+          65
+        ],
+        "sole_run": [
+          21,
+          26
+        ],
+        "toe": [
+          21,
+          79
+        ]
+      },
+      "frame": 5,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          36,
+          50
+        ],
+        "near": [
+          26,
+          50
+        ]
+      },
+      "head": [
+        30,
+        17
+      ],
+      "near": {
+        "ankle": [
+          36,
+          73
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          41,
+          75
+        ],
+        "hip": [
+          30,
+          54
+        ],
+        "knee": [
+          28,
+          67
+        ],
+        "sole_run": null,
+        "toe": [
+          35,
+          75
+        ]
+      },
+      "pelvis": [
+        31,
+        54
+      ],
+      "phase": "far-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          33,
+          35
+        ],
+        "near": [
+          29,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          31,
+          52
+        ],
+        "left_hand": [
+          36,
+          50
+        ],
+        "load": [
+          31,
+          53
+        ],
+        "right_hand": [
+          26,
+          50
+        ]
+      },
+      "wrists": {
+        "far": [
+          35,
+          46
+        ],
+        "near": [
+          27,
+          46
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "far"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          32,
+          42
+        ],
+        "near": [
+          30,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          30,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          33,
+          79
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          32,
+          65
+        ],
+        "sole_run": [
+          28,
+          33
+        ],
+        "toe": [
+          28,
+          79
+        ]
+      },
+      "frame": 6,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          32,
+          50
+        ],
+        "near": [
+          30,
+          49
+        ]
+      },
+      "head": [
+        30,
+        16
+      ],
+      "near": {
+        "ankle": [
+          24,
+          71
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          25,
+          73
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          19,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          19,
+          73
+        ]
+      },
+      "pelvis": [
+        31,
+        53
+      ],
+      "phase": "far-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          33,
+          34
+        ],
+        "near": [
+          29,
+          31
+        ]
+      },
+      "sockets": {
+        "belt": [
+          31,
+          51
+        ],
+        "left_hand": [
+          32,
+          50
+        ],
+        "load": [
+          31,
+          52
+        ],
+        "right_hand": [
+          30,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          32,
+          46
+        ],
+        "near": [
+          30,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "left",
+      "elbows": {
+        "far": [
+          32,
+          40
+        ],
+        "near": [
+          32,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          36,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          39,
+          79
+        ],
+        "hip": [
+          34,
+          51
+        ],
+        "knee": [
+          37,
+          64
+        ],
+        "sole_run": [
+          34,
+          39
+        ],
+        "toe": [
+          34,
+          79
+        ]
+      },
+      "frame": 7,
+      "gait_authority": "stockman-heavy-roll-v1",
+      "hands": {
+        "far": [
+          30,
+          48
+        ],
+        "near": [
+          34,
+          48
+        ]
+      },
+      "head": [
+        31,
+        15
+      ],
+      "near": {
+        "ankle": [
+          21,
+          67
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          21,
+          70
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          18,
+          59
+        ],
+        "sole_run": null,
+        "toe": [
+          16,
+          70
+        ]
+      },
+      "pelvis": [
+        32,
+        52
+      ],
+      "phase": "far-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          34,
+          32
+        ],
+        "near": [
+          30,
+          31
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          50
+        ],
+        "left_hand": [
+          30,
+          48
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          34,
+          48
+        ]
+      },
+      "wrists": {
+        "far": [
+          31,
+          44
+        ],
+        "near": [
+          33,
+          44
+        ]
+      }
+    }
+  ],
+  "schema": "realm.actor-pose.a15-landmarks.v1",
+  "scope": {
+    "action": "walk",
+    "direction": "left",
+    "garment": "cedar-sage",
+    "identity": "stockman",
+    "role": "rancher"
+  }
+}

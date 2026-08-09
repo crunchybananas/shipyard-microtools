@@ -2,12 +2,13 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=188';
-import { sfx as playSound } from './log.js?realm=188';
-import { emit } from './bus.js?realm=188';
-import { staffingCount } from './citizen-ownership.js?realm=188';
-import { chronicle } from './log.js?realm=188';
-import { announce as notify } from './log.js?realm=188';
+import { G, BUILDINGS } from './state.js?realm=191';
+import { withdrawFoodFromStores } from './building-inventory.js?realm=191';
+import { sfx as playSound } from './log.js?realm=191';
+import { emit } from './bus.js?realm=191';
+import { staffingCount } from './citizen-ownership.js?realm=191';
+import { chronicle } from './log.js?realm=191';
+import { announce as notify } from './log.js?realm=191';
 
 export const TECHS = {
   agriculture: {
@@ -210,7 +211,14 @@ export function canResearch(techId) {
 export function startResearch(techId) {
   if (!canResearch(techId)) return false;
   const tech = TECHS[techId];
-  for (const [k, v] of Object.entries(tech.cost)) G.resources[k] -= v;
+  for (const [k, v] of Object.entries(tech.cost)) {
+    if (k === 'food') {
+      const paid = withdrawFoodFromStores(v, { state: G });
+      if (paid.taken !== v) throw new Error('Research food wallet disagrees with physical stores.');
+    } else {
+      G.resources[k] -= v;
+    }
+  }
   G.currentResearch = { techId, progress: 0, total: tech.time };
   playSound('click');
   return true;

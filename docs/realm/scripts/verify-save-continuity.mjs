@@ -20,19 +20,20 @@ if (process.env.REALM_SAVE_CONTINUITY_CHILD) {
   const mode = process.env.REALM_SAVE_CONTINUITY_CHILD;
   const output = process.env.REALM_SAVE_CONTINUITY_OUTPUT;
   const input = process.env.REALM_SAVE_CONTINUITY_INPUT;
-  const { G, setSeed } = await import('../js/state.js?realm=188');
-  const { generateWorld } = await import('../js/world.js?realm=188');
-  const { coreTick } = await import('../js/sim.js?realm=188');
-  const { dispatch } = await import('../js/commands.js?realm=188');
-  const { canPlace } = await import('../js/economy.js?realm=188');
-  const { initChronicle } = await import('../js/log.js?realm=188');
-  const { serializeGame, prepareSave, commitGameLoad } = await import('../js/save-state.js?realm=188');
+  const { G, setSeed } = await import('../js/state.js?realm=191');
+  const { generateWorld } = await import('../js/world.js?realm=191');
+  const { establishFounderStockpile } = await import('../js/building-inventory.js?realm=191');
+  const { coreTick } = await import('../js/sim.js?realm=191');
+  const { dispatch } = await import('../js/commands.js?realm=191');
+  const { canPlace } = await import('../js/economy.js?realm=191');
+  const { initChronicle } = await import('../js/log.js?realm=191');
+  const { serializeGame, prepareSave, commitGameLoad } = await import('../js/save-state.js?realm=191');
   const {
     claimCitizenAssignment,
     releaseAssignmentsForBuilding,
     renameCitizen,
     transitionCitizenActivity,
-  } = await import('../js/citizen-ownership.js?realm=188');
+  } = await import('../js/citizen-ownership.js?realm=191');
 
   function findSpot(type) {
     for (let radius = 0; radius < 25; radius++) {
@@ -195,7 +196,8 @@ if (process.env.REALM_SAVE_CONTINUITY_CHILD) {
     setSeed(12345);
     generateWorld();
     initChronicle();
-    G.resources = { wood: 500, stone: 500, food: 500, gold: 500, iron: 50, wheat: 0, flour: 0, planks: 0, tools: 0 };
+    G.resources = { wood: 500, stone: 500, food: 120, gold: 500, iron: 50, wheat: 0, flour: 0, planks: 0, tools: 0 };
+    establishFounderStockpile();
   }
 
   function advanceTo(targetTick, captures) {

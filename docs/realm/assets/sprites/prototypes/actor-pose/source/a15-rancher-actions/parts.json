@@ -1,0 +1,225 @@
+{
+  "schema": "realm.actor-pose.a15-rancher-actions.v1",
+  "stage": "rancher-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "stockman",
+    "path": "assets/sprites/prototypes/actor-pose/references/a15-source/identity-stockman.png",
+    "sha256": "f2d1399ef13a0861478bc107fc8d04b1a2debeab31060522a3661dc8e941669a",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a15-source/identity-stockman-keyed.png",
+      "sha256": "9dfd59cce810cef4daa6b404a78b79983c4f8a8c774f59ac90cc9eef47618b86"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a15-source/identity-stockman.prompt.json",
+    "parts": {
+      "down": {
+        "head": [320, 8, 475, 244],
+        "torso": [278, 271, 585, 570],
+        "arm_screen_left": [112, 270, 240, 619],
+        "arm_screen_right": [1200, 270, 1335, 620],
+        "leg": [260, 598, 540, 1006]
+      },
+      "up": {
+        "head": [616, 8, 782, 246],
+        "torso": [612, 271, 917, 570],
+        "arm_screen_left": [112, 270, 240, 619],
+        "arm_screen_right": [1200, 270, 1335, 620],
+        "leg": [608, 595, 898, 1007]
+      },
+      "left": {
+        "head": [861, 8, 1026, 248],
+        "torso": [945, 270, 1139, 570],
+        "arm": [1200, 270, 1335, 620],
+        "leg": [947, 596, 1107, 1007]
+      },
+      "right": {
+        "head": [861, 8, 1026, 248],
+        "torso": [945, 270, 1139, 570],
+        "arm": [1200, 270, 1335, 620],
+        "leg": [947, 596, 1107, 1007]
+      }
+    }
+  },
+  "garment": {
+    "key": "cedar-sage",
+    "path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage.png",
+    "sha256": "cc0cb447b23b38d10ededc14f738dfd3b3b4675ae66c1cd11cf993ac2439cc72",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage-keyed.png",
+      "sha256": "4d71daa26207b095336f9579aee2722601eca58a1f2e87b4a34e27e36f9d9311"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [278, 8, 550, 183],
+        "tunic": [276, 216, 600, 534],
+        "sleeve_screen_left": [136, 247, 280, 493],
+        "sleeve_screen_right": [1195, 248, 1330, 493],
+        "belt": [300, 550, 570, 670],
+        "boot": [282, 663, 570, 1009]
+      },
+      "up": {
+        "headgear": [603, 8, 880, 183],
+        "tunic": [600, 220, 913, 533],
+        "sleeve_screen_left": [136, 247, 280, 493],
+        "sleeve_screen_right": [1195, 248, 1330, 493],
+        "belt": [630, 550, 875, 670],
+        "boot": [615, 663, 875, 1009]
+      },
+      "left": {
+        "headgear": [913, 8, 1178, 190],
+        "tunic": [940, 217, 1140, 533],
+        "sleeve": [1195, 248, 1330, 493],
+        "belt": [935, 550, 1135, 670],
+        "boot": [930, 663, 1135, 1009]
+      },
+      "right": {
+        "headgear": [913, 8, 1178, 190],
+        "tunic": [940, 217, 1140, 533],
+        "sleeve": [1195, 248, 1330, 493],
+        "belt": [935, 550, 1135, 670],
+        "boot": [930, 663, 1135, 1009]
+      }
+    },
+    "crop_margin_exception": {
+      "parts": ["down/tunic", "up/tunic"],
+      "minimum_transparent_pixels": 2,
+      "reason": "the independently generated front and rear tunic sources retain a clean but narrow 2-3px transparent lane; every other identity, garment, tool, and workstation crop keeps at least 8px"
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "up": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "left": {"size": [14, 15], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "right": {"size": [14, 15], "offset": [0, 1], "transform": "flip-x", "occlusion": "far-hand < cargo < near-hand"}
+    }
+  },
+  "tool": {
+    "key": "ranch-feed-fork",
+    "path": "assets/sprites/prototypes/actor-pose/references/a15-source/ranch-feed-fork.png",
+    "sha256": "f2c483c23932e3c2aa5b5f4e4a5954c3461c98432c05680fe168aac814255341",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a15-source/ranch-feed-fork-keyed.png",
+      "sha256": "a8e7c4f341536484bd8dd62f0bcc25128bbfcefd17e3c4b7c828f51009c3a5d9"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a15-source/ranch-feed-fork.prompt.json",
+    "parts": {
+      "down": [160, 35, 350, 980],
+      "up": [495, 35, 690, 980],
+      "left": [892, 35, 1020, 980],
+      "right": [1210, 35, 1325, 980]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "handle butt at top, three feed tines at bottom",
+      "grip_fraction_from_top": 0.45,
+      "render_height": 39,
+      "occlusion": "body < feed fork < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "split-log-feed-trough",
+    "path": "assets/sprites/prototypes/actor-pose/references/a15-source/feed-trough.png",
+    "sha256": "c959b17daa41d21ea39c127c23076e2e07622ee0d4580986fbfa8904408eb4d9",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a15-source/feed-trough-keyed.png",
+      "sha256": "2733e8ad0c3cd030a48b73113831da97213a445a324acdd129dbde230663ae94"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a15-source/feed-trough.prompt.json",
+    "parts": {
+      "down": [12, 388, 412, 644],
+      "up": [430, 388, 824, 644],
+      "left": [870, 388, 1094, 644],
+      "right": [1205, 388, 1430, 644]
+    },
+    "render": {
+      "down": {"size": [28, 17], "center": [32, 70], "occlusion": "body < trough < feed fork < near hand"},
+      "up": {"size": [28, 17], "center": [18, 68], "occlusion": "trough < body < feed fork < near hand"},
+      "left": {"size": [20, 18], "center": [16, 69], "occlusion": "body < trough < feed fork < near hand"},
+      "right": {"size": [20, 18], "center": [48, 69], "occlusion": "body < trough < feed fork < near hand"}
+    },
+    "authority": {
+      "ground_y": 79,
+      "work_socket": "feed_socket",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "stocky ranch stride authored in joint space over the grounded A2 contact chronology",
+      "left": "joint-space x reflection of the ranch stride rendered from independent left-facing source components; no finished row mirroring",
+      "down": "front-view broad stance with authored stockman body roll, boot lift, and counter-swing",
+      "up": "back-view broad stance with authored stockman body roll, boot lift, and counter-swing"
+    },
+    "gait_authority": {
+      "key": "stockman-heavy-roll-v1",
+      "shared_a5_walk_pose": false,
+      "contact_chronology": ["near-contact", "near-down", "near-pass", "near-up", "far-contact", "far-down", "far-pass", "far-up"],
+      "traits": ["broad planted base", "two-beat shoulder roll", "high unloaded boot clearance", "asymmetric working-arm counter-swing"]
+    }
+  },
+  "render_profile": {
+    "key": "stockman",
+    "build": "compact broad-backed livestock worker with heavy boots and a stable low center of gravity",
+    "identity_leg_far_width": 7.0,
+    "identity_leg_near_width": 8.0,
+    "garment_leg_far_width": 8.2,
+    "garment_leg_near_width": 9.2,
+    "upper_arm_far_width": 6.2,
+    "upper_arm_near_width": 7.2,
+    "forearm_far_width": 5.6,
+    "forearm_near_width": 6.4,
+    "identity_torso_size": [26, 32],
+    "garment_tunic_size": [32, 35],
+    "garment_belt_size": [29, 6],
+    "identity_head_size": [22, 24],
+    "garment_headgear_size": [31, 19]
+  },
+  "actions": {
+    "idle": {"equipment": "off", "motion": "planted stockman breathing and two-beat weight roll", "contacts": "both boots remain planted"},
+    "walk": {"equipment": "off", "motion": "stockman-heavy-roll-v1 with grounded A2 contact order", "contacts": "contact, down, pass, up with no flight frames"},
+    "work": {"equipment": ["ranch-feed-fork", "split-log-feed-trough"], "motion": "ready, plant, scoop, lift, feed, tamp, settle, recover", "contacts": "both boots remain planted", "handedness": "feed fork remains at the right-hand socket and its tines enter the grounded trough"},
+    "carry": {"equipment": "cargo-crate", "motion": "shared carry load sockets on the stockman body", "contacts": "contact, down, pass, up with no flight frames"}
+  },
+  "scope": {
+    "role": "rancher",
+    "identity": "stockman",
+    "garment": "cedar-sage",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "four independent hash-locked imagegen authorities: identity, hollow garment, feed fork, and split-log trough; cargo remains an independent shared component",
+    "animation_unit": "one 512x84 eight-frame row per action and direction; the 16-row role family promotes atomically",
+    "runtime": "flattened, palette-bounded exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "35x46 default and 64x84 review walk strips, body/equipment planes, source provenance, gait delta, and all 16 action-direction rows are gated before promotion"
+  }
+}

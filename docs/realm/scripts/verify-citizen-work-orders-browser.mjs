@@ -15,7 +15,7 @@ import { ensureServer } from './_serve.mjs';
 const realmRoot = fileURLToPath(new URL('..', import.meta.url));
 const proofDir = join(realmRoot, 'tmp', 'citizen-work-orders');
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 188, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 191, 'Update this gate together with current browser module URLs');
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
@@ -41,11 +41,11 @@ try {
   });
 
   const fixture = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=188');
-    const ownership = await import('./js/citizen-ownership.js?realm=188');
+    const economy = await import('./js/economy.js?realm=191');
+    const ownership = await import('./js/citizen-ownership.js?realm=191');
     const g = window.G;
     Object.assign(g.resources, {
-      wood: 10_000, stone: 10_000, food: 100, gold: 10_000, iron: 10_000,
+      wood: 10_000, stone: 10_000, gold: 10_000, iron: 10_000,
       wheat: 100, flour: 100, planks: 100, tools: 100,
     });
     for (const row of g.fog) row.fill(true);
@@ -158,13 +158,17 @@ try {
   await page.setViewportSize({ width: 1280, height: 800 });
 
   const crisis = await page.evaluate(async ({ orderedId, adaptiveId, farm, lumber, market }) => {
-    const ownership = await import('./js/citizen-ownership.js?realm=188');
-    const state = await import('./js/state.js?realm=188');
+    const inventory = await import('./js/building-inventory.js?realm=191');
+    const ownership = await import('./js/citizen-ownership.js?realm=191');
+    const state = await import('./js/state.js?realm=191');
     const g = window.G;
     const ordered = g.citizens.find(value => value.actorId === orderedId);
     const adaptive = g.citizens.find(value => value.actorId === adaptiveId);
     const at = locator => g.buildingGrid[locator.y][locator.x];
-    Object.assign(g.resources, { food: 0, wheat: 0, flour: 0 });
+    for (const store of inventory.foodStores(g, { withFood: true })) {
+      inventory.withdrawFood(store, inventory.storedFood(store), g);
+    }
+    Object.assign(g.resources, { wheat: 0, flour: 0 });
     g.dayPhase = Math.floor(g.dayLength * 0.2);
     ordered.x = lumber.x;
     ordered.y = lumber.y;
@@ -224,8 +228,10 @@ try {
   assert.equal(crisis.farmStaff, 1, 'automatic AI did not fill the open food job');
 
   await page.locator('#btn-save').click();
+  await page.waitForFunction(saveKey => localStorage.getItem(saveKey) !== null, contract.saveKey);
   await page.reload();
   await page.waitForFunction(() => typeof window.loadAndStart === 'function' && window.G);
+  await page.locator('#title-load').waitFor({ state: 'visible' });
   await page.locator('#title-load').click();
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(() => window.setSpeed(0));
@@ -249,16 +255,22 @@ try {
   const returnToAI = continuedControl.locator('.pop-auto');
   assert.equal(await returnToAI.count(), 1, 'continued Crown order did not expose Return to AI');
   await returnToAI.click();
-  await page.evaluate(actorId => {
+  await page.evaluate(async actorId => {
+    const inventory = await import('./js/building-inventory.js?realm=191');
     const g = window.G;
     const citizen = g.citizens.find(value => value.actorId === actorId);
-    Object.assign(g.resources, { food: 100, wheat: 100, flour: 100 });
+    const store = inventory.foodStores(g, { withSpace: true })[0];
+    if (!store) throw new Error('No physical store remained available after Continue.');
+    inventory.depositFood(store, Math.min(100, inventory.foodSpace(store, g)), g);
+    Object.assign(g.resources, { wheat: 100, flour: 100 });
     g.dayPhase = Math.floor(g.dayLength * 0.2);
     citizen.hunger = 0;
     citizen.carrying = null;
     citizen.carryAmount = 0;
     citizen.activityTimer = 0;
-    g.debug.step(2);
+    for (let ticks = 0; ticks < 600 && !citizen.assignment; ticks++) {
+      g.debug.step(1);
+    }
   }, fixture.ordered.actorId);
   const automaticAgain = await page.evaluate(actorId => {
     const citizen = window.G.citizens.find(value => value.actorId === actorId);
@@ -268,10 +280,24 @@ try {
         reason: citizen.assignment.reason,
       },
       activity: citizen.activity.kind,
+      activityTimer: citizen.activityTimer,
+      hunger: citizen.hunger,
+      position: { x: citizen.x, y: citizen.y, tx: citizen.tx, ty: citizen.ty, path: citizen.path },
+      buildings: window.G.buildings.map(building => ({
+        type: building.type,
+        x: building.x,
+        y: building.y,
+        buildProgress: building.buildProgress,
+        priority: building.workforcePriority || 'normal',
+        workers: window.G.citizens.filter(value => value.assignment?.building === building).length,
+      })),
       toast: document.getElementById('toast')?.textContent || '',
     };
   }, fixture.ordered.actorId);
-  assert.ok(automaticAgain.assignment, 'Return to AI did not re-enter automatic staffing');
+  assert.ok(
+    automaticAgain.assignment,
+    `Return to AI did not re-enter automatic staffing: ${JSON.stringify(automaticAgain)}`,
+  );
   assert.notEqual(automaticAgain.assignment.reason, 'player-command');
   assert.match(automaticAgain.toast, /returned to automatic work/);
 

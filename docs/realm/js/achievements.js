@@ -2,8 +2,9 @@
 // Achievements — persistent milestones with toast notifications
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=188';
-import { playSound } from './audio.js?realm=188';
+import { G } from './state.js?realm=191';
+import { playSound } from './audio.js?realm=191';
+import { authoredBuildingCount } from './building-inventory.js?realm=191';
 
 const STORAGE_KEY = 'realm-achievements';
 
@@ -20,8 +21,8 @@ export const ACHIEVEMENTS = [
   { id:'fortified',       icon:'🛡️', name:'Fortified',          desc:'Build 3+ defense buildings',            check:()=>G.buildings.filter(b=>b.type==='barracks'||b.type==='tower'||b.type==='wall').length>=3 },
   { id:'merchant',        icon:'⛵', name:'Merchant Prince',    desc:'Build a trading post',                  check:()=>G.buildings.some(b=>b.type==='tradingpost') },
   { id:'happy90',         icon:'😊', name:'Utopia',             desc:'Reach 90% happiness',                   check:()=>G.happiness>=90 },
-  { id:'builder10',       icon:'🔨', name:'Master Builder',     desc:'Place 10 buildings',                    check:()=>G.buildings.length>=10 },
-  { id:'builder25',       icon:'🏗️', name:'Urban Planner',      desc:'Place 25 buildings',                    check:()=>G.buildings.length>=25 },
+  { id:'builder10',       icon:'🔨', name:'Master Builder',     desc:'Place 10 buildings',                    check:()=>authoredBuildingCount(G)>=10 },
+  { id:'builder25',       icon:'🏗️', name:'Urban Planner',      desc:'Place 25 buildings',                    check:()=>authoredBuildingCount(G)>=25 },
   { id:'day30',           icon:'📅', name:'First Month',        desc:'Survive 30 days',                       check:()=>G.day>=30 },
   { id:'day100',          icon:'📆', name:'Centurion',          desc:'Survive 100 days',                      check:()=>G.day>=100 },
   { id:'rich',            icon:'💰', name:'Golden Treasury',    desc:'Accumulate 100 gold',                   check:()=>G.resources.gold>=100 },
@@ -98,8 +99,8 @@ function getProgress(a) {
     if (a.id === 'day30') return Math.min(1, G.day / 30);
     if (a.id === 'day100') return Math.min(1, G.day / 100);
     // Builder milestones
-    if (a.id === 'builder10') return Math.min(1, G.buildings.length / 10);
-    if (a.id === 'builder25') return Math.min(1, G.buildings.length / 25);
+    if (a.id === 'builder10') return Math.min(1, authoredBuildingCount(G) / 10);
+    if (a.id === 'builder25') return Math.min(1, authoredBuildingCount(G) / 25);
     // Research
     if (a.id === 'first_research') return Math.min(1, G.researchedTechs.size / 3);
     if (a.id === 'all_techs') return Math.min(1, G.researchedTechs.size / 8);

@@ -7,10 +7,10 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { G, MAP_H, MAP_W, TILE, getSeed, setSeed } from '../js/state.js?realm=188';
-import { updateFires } from '../js/economy.js?realm=188';
-import { visualJitter } from '../js/fx.js?realm=188';
-import { updateWalkers } from '../js/walkers.js?realm=188';
+import { G, MAP_H, MAP_W, TILE, getSeed, setSeed } from '../js/state.js?realm=191';
+import { updateFires } from '../js/economy.js?realm=191';
+import { visualJitter } from '../js/fx.js?realm=191';
+import { updateWalkers } from '../js/walkers.js?realm=191';
 import { runDeterminismScenario } from './determinism-harness.mjs';
 
 const MODES = ['control', 'suppress', 'perturb'];
@@ -118,6 +118,11 @@ function runWonderHaulerTrial(mode) {
   G.buildingGrid[site.y][site.x] = site;
   G.buildingGrid[store.y][store.x] = store;
   G.buildings = [site, store];
+  G.citizens = Array.from({ length: 4 }, (_, index) => ({
+    actorId: index + 1,
+    assignment: { building: site },
+    activity: { kind: 'working' },
+  }));
   G.walkers = [];
   G.wonder = { placed: true, stage: 0, delivered: {} };
   G.particles = sink.queue;

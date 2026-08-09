@@ -25,12 +25,24 @@ The current art direction uses painted PNG assets as the source of truth:
 - `actors-runtime-atlases.json` as the dimensions, compiler settings,
   provenance, and SHA-256 contract for every actor runtime scale.
 - `ambient-atlas.png` compiled from `ambient/*.png` for the live renderer.
+- `enemies-source/` as the hash-locked painted raider identity, garment,
+  weapon, crop, image-generation provenance, deterministic compiler output,
+  row gates, and exact-tier proofs.
+- `enemies-atlas.png`, `enemies-atlas-native.png`,
+  `enemies-atlas-default.png`, and `enemies-atlas-double.png` as the compiled
+  `3 variants × 4 actions × 4 directions × 8 frames` raider family. The live
+  renderer derives those visual states only from existing enemy fields.
 
 Hard rule for motion sprites: do not edit a compiled role sheet or atlas as
-source art. Review and promote one `512x84` action/direction row at a time.
+source art. Review one `512x84` action/direction row at a time; promote a
+complete replacement family only through the atomic family transaction.
 Complete modular families compile those rows from separate identity, garment,
 equipment, pose, and attachment authorities. Ambient motion source art remains
 one PNG per prop under `ambient/`.
+Painted enemies follow the same source/compiled separation: never edit an
+`enemies-atlas*.png` file directly. Run
+`python3 scripts/build-enemy-sprites.py --verify` so all 48 raider rows pass
+before the four runtime atlases and their hash manifest promote together.
 
 ## Runtime Actor Resolution
 
@@ -92,7 +104,7 @@ This A3 output is retained as provenance for the first factorial source test.
 Its former single-row guard candidate and preview URL have been retired. The
 complete A5 guard, A7 farmer, A8 lumber, A9 builder, A10 blacksmith, A11
 miner, A12 stonecutter, A13 fisher, and A14 settler families supersede it in
-production.
+production, together with the A15 rancher family.
 
 ## Complete Modular Actor Families
 
@@ -128,14 +140,21 @@ production.
   shared directional cargo crate across all four actions and directions. Its
   source verifier also requires a substantial transparent hood opening so
   hollow garments cannot hide the identity layer.
+- A15 compiles the rancher from a distinct stocky middle-aged stockman
+  identity, hollow cedar-sage ranch clothing, a three-tine feed fork, a
+  separately authored grounded split-log feed trough, and the shared cargo
+  crate. Its `stockman-heavy-roll-v1` gait changes every joint-authority frame
+  from the shared A5 walk while preserving the approved grounded contact and
+  phase chronology. Exact `35x46` and `64x84` four-direction walk proofs are
+  manifest-locked before the 16 rows can promote atomically.
 - Each family emits 16 independent `512x84` rows, 128 frames, semantic and
   equipment planes, landmarks, body-only proofs, a family contact sheet, and
   four exact runtime tiers.
-- All nine compilers require binary runtime alpha, a shared 48-color family
+- All ten compilers require binary runtime alpha, a shared 48-color family
   palette, stable `76px` body height, ground row `79`, clear rows `80–83`,
   distinct directions, clean row-quality reports, and a byte-identical clean
   rebuild.
-- `guard/carry`, `farmer/carry`, `lumber/carry`, `builder/carry`,
+- `guard/carry`, `farmer/carry`, `rancher/carry`, `lumber/carry`, `builder/carry`,
   `blacksmith/carry`, `miner/carry`, `stonecutter/carry`, `fisher/carry`, and
   `settler/carry` own their baked containers. A6
   supplies the nine resource-specific payloads at the same tier, frame, and
@@ -161,6 +180,8 @@ python3 scripts/actor-pose-prototype/a13_fisher_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a13_fisher_actions.py
 python3 scripts/actor-pose-prototype/a14_settler_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a14_settler_actions.py
+python3 scripts/actor-pose-prototype/a15_rancher_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a15_rancher_actions.py
 scripts/sprite-row verify
 node scripts/verify-farmer-vertical-slice.mjs
 node scripts/verify-lumber-vertical-slice.mjs
@@ -170,6 +191,7 @@ node scripts/verify-miner-vertical-slice.mjs
 node scripts/verify-stonecutter-vertical-slice.mjs
 node scripts/verify-fisher-vertical-slice.mjs
 node scripts/verify-settler-vertical-slice.mjs
+node scripts/verify-rancher-world-browser.mjs
 node scripts/verify-guard-cargo-browser.mjs
 ```
 

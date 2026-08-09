@@ -1,0 +1,29 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-cedar-sage",
+  "generated_at": "2026-08-08",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-791db1bc-51ae-48ef-a954-c0f96013d487.png"
+  },
+  "references": [],
+  "prompt": "Use case: stylized-concept. Asset type: Realm modular actor garment source board for offline skeletal sprite compilation. Create one coherent cedar-sage ranch stockwear set fitted to a compact stocky worker: worn dark-brown broad-brim ranch hat; sage wool work shirt; cedar-brown sleeveless leather jerkin; rolled hollow sleeves; broad leather belt with feed pouch and coiled rope; charcoal reinforced trousers; oxblood riding boots. Use a 1536x1024 parts layout with three isolated empty hats on top, isolated sleeves and front/back/profile tunics in the middle, isolated belts below, and front/back/profile trouser-and-boot sources at the bottom. Every neck, hat, sleeve, cuff, waist, and boot cavity must be genuinely empty and filled only by the flat chroma background: no anatomy or mannequin. Crisp hand-painted late-1990s strategy-game sprite source art, pixel-cluster-friendly edges, clear leather/wool/material separation, warm upper-left ranch light, clean cut zones, uniform flat #ff00ff chroma-key background. No person, skin, face, hair, tool, workstation, livestock, scenery, shadows, labels, text, watermark, merged parts, clipping, or magenta inside the garments.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#dd0beb"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage-keyed.png",
+  "keyed_sha256": "4d71daa26207b095336f9579aee2722601eca58a1f2e87b4a34e27e36f9d9311",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a15-source/garment-cedar-sage.png",
+  "alpha_sha256": "cc0cb447b23b38d10ededc14f738dfd3b3b4675ae66c1cd11cf993ac2439cc72"
+}

@@ -6338,705 +6338,705 @@
     },
     "rancher/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:15Z",
-        "file": "rancher/carry-down.png",
-        "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/carry-down-42bf6bfcc82c.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 35.0,
             "medianColor": [
-              96.9,
-              68.45,
-              42.95
+              84.35,
+              63.1,
+              42.2
             ],
-            "paletteDelta": 11.74
+            "paletteDelta": 3.69
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.034,
+          "maxBodyCenterJump": 2.17,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.59,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.36,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            106.9,
-            74.6,
-            42.85
+            86.5,
+            61.8,
+            39.5
           ],
-          "medianColorCount": 526.0,
-          "medianShadingRatio": 0.5989,
+          "medianColorCount": 321.0,
+          "medianShadingRatio": 0.6671,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "b34760e67a1443de1dbf8974b2f28ca7bd7a3b4637cb8c79036258d01927a329",
+        "sha256": "42bf6bfcc82c50dec514b07330b6f27a185ab0a82f453b64cd8d4518e75c47bc",
         "status": "accepted"
       }
     },
     "rancher/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:16Z",
-        "file": "rancher/carry-left.png",
-        "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/carry-left-45e71eec57d8.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              99.35,
-              73.3,
-              42.85
+              84.35,
+              61.8,
+              39.5
             ],
-            "paletteDelta": 5.46
+            "paletteDelta": 3.0
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.087,
+          "maxBodyCenterJump": 2.15,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.88,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 4.14,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 35.0,
           "medianColor": [
-            96.85,
-            68.45,
-            42.95
+            84.45,
+            63.1,
+            42.2
           ],
-          "medianColorCount": 422.0,
-          "medianShadingRatio": 0.6379,
+          "medianColorCount": 304.0,
+          "medianShadingRatio": 0.6833,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "8e25a9162cfcb59a8198793bf6a1eea80e3da8da14e6dd0142416e36b8d9ae0b",
+        "sha256": "45e71eec57d83e3b6aa9df079c5f7142757d0523db2dcc457b2397ed0032cb31",
         "status": "accepted"
       }
     },
     "rancher/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:17Z",
-        "file": "rancher/carry-right.png",
-        "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/carry-right-909e8d15e419.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              99.35,
-              73.3,
-              42.85
+              84.45,
+              61.8,
+              39.5
             ],
-            "paletteDelta": 5.43
+            "paletteDelta": 3.16
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.085,
+          "maxBodyCenterJump": 2.06,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.88,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 3.9,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 35.0,
           "medianColor": [
-            96.9,
-            68.45,
-            42.95
+            84.35,
+            63.15,
+            42.35
           ],
-          "medianColorCount": 422.0,
-          "medianShadingRatio": 0.6367,
+          "medianColorCount": 303.0,
+          "medianShadingRatio": 0.6838,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "26ff85f17bc5663961dcae0ae0f0525a889c46145f53df2e5b2029a2bac6ab8f",
+        "sha256": "909e8d15e41975c63275c0c96d5e26f365a3e3154f44d1d8a41ee70eefb00b35",
         "status": "accepted"
       }
     },
     "rancher/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:15Z",
-        "file": "rancher/carry-up.png",
-        "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/carry-up-2766b4de5751.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 35.0,
             "medianColor": [
-              96.9,
-              68.45,
-              42.95
+              84.45,
+              63.1,
+              42.2
             ],
-            "paletteDelta": 11.16
+            "paletteDelta": 7.31
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.035,
+          "maxBodyCenterJump": 1.77,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.72,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.18,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            99.35,
-            73.3,
-            33.2
+            81.1,
+            57.9,
+            38.3
           ],
-          "medianColorCount": 465.0,
-          "medianShadingRatio": 0.6462,
+          "medianColorCount": 286.5,
+          "medianShadingRatio": 0.6629,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "1eb8a361fb2cb354bc59a8658173b2db2187efcad2c630c4fd3312a1e21b6396",
+        "sha256": "2766b4de57511c0d05ac8344557b39bb86603777dbeb003e77c3b4dddd8bd0b2",
         "status": "accepted"
       }
     },
     "rancher/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:06Z",
-        "file": "rancher/idle-down.png",
-        "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/idle-down-34bfb2954108.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              100.25,
-              74.65,
-              45.45
+              80.7,
+              60.65,
+              41.25
             ],
-            "paletteDelta": 7.54
+            "paletteDelta": 1.19
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.056,
+          "maxBodyCenterJump": 2.06,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.2,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 1.26,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            107.4,
-            76.55,
-            44.0
+            81.05,
+            60.1,
+            40.25
           ],
-          "medianColorCount": 571.0,
-          "medianShadingRatio": 0.6406,
+          "medianColorCount": 299.0,
+          "medianShadingRatio": 0.6666,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "da861926d9bfc4538d2bc1654e6bda5afc2705d4912fc94911689ca8c46d5f95",
+        "sha256": "34bfb2954108d051a3997ec3d38a9fc7612e5f3a7f6c4bdca2c70efd2cd279a4",
         "status": "accepted"
       }
     },
     "rancher/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:07Z",
-        "file": "rancher/idle-left.png",
-        "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/idle-left-2e7e692f04c4.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              100.25,
-              74.65,
-              44.0
+              80.7,
+              60.1,
+              40.25
             ],
-            "paletteDelta": 1.45
+            "paletteDelta": 1.25
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.73,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.42,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.92,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            100.25,
-            74.65,
-            45.45
+            81.0,
+            60.7,
+            41.3
           ],
-          "medianColorCount": 445.0,
-          "medianShadingRatio": 0.6794,
+          "medianColorCount": 298.0,
+          "medianShadingRatio": 0.6856,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "97a22a27727ff1d828a18f0512188e37cfbfd329fb02a430268f11d740191078",
+        "sha256": "2e7e692f04c4405110059f35fa1e6463acb579dc8597c4f915e5493dc6cd22f8",
         "status": "accepted"
       }
     },
     "rancher/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:08Z",
-        "file": "rancher/idle-right.png",
-        "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/idle-right-83a660fc7e10.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              100.25,
-              74.65,
-              44.0
+              81.0,
+              60.1,
+              40.25
             ],
-            "paletteDelta": 1.45
+            "paletteDelta": 1.18
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.72,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.42,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.81,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            100.25,
-            74.65,
-            45.45
+            80.7,
+            60.65,
+            41.25
           ],
-          "medianColorCount": 445.0,
-          "medianShadingRatio": 0.6794,
+          "medianColorCount": 296.5,
+          "medianShadingRatio": 0.6827,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "886ea9f767cd446fb53cddcefe348433aae2377143601feca6d1fd52e923c4bf",
+        "sha256": "83a660fc7e10ecbd291fdaa003f68f67acb04edf587b88c5602a84a3e2215a6c",
         "status": "accepted"
       }
     },
     "rancher/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:07Z",
-        "file": "rancher/idle-up.png",
-        "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/idle-up-9a5e3c995797.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              100.25,
-              74.65,
-              45.45
+              81.0,
+              60.65,
+              41.25
             ],
-            "paletteDelta": 15.35
+            "paletteDelta": 6.78
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.056,
+          "maxBodyCenterJump": 2.03,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.14,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.07,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            95.6,
-            72.05,
-            31.05
+            76.3,
+            56.4,
+            38.85
           ],
-          "medianColorCount": 466.5,
-          "medianShadingRatio": 0.6931,
+          "medianColorCount": 276.5,
+          "medianShadingRatio": 0.6593,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "8247aedb5597dbb19ead834f410e927d6798d9348c98691d2efaf084c8c03dac",
+        "sha256": "9a5e3c9957972fa38b0cf9f675304eff632561b8ec5493e52f8189bc2115d1c8",
         "status": "accepted"
       }
     },
     "rancher/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:09Z",
-        "file": "rancher/walk-down.png",
-        "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/walk-down-832d4c790867.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              92.35,
-              66.35,
-              43.3
+              80.15,
+              60.2,
+              41.2
             ],
-            "paletteDelta": 15.56
+            "paletteDelta": 1.24
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.033,
+          "maxBodyCenterJump": 1.71,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.07,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.2,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            105.6,
-            74.5,
-            43.35
+            81.05,
+            60.25,
+            40.35
           ],
-          "medianColorCount": 555.5,
-          "medianShadingRatio": 0.6385,
+          "medianColorCount": 300.5,
+          "medianShadingRatio": 0.6723,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2027ab8215d73d298fe7674316451bea4868eae7eb54a142596aa604e091fd79",
+        "sha256": "832d4c7908679cd820b68169e0d6487e72c60bb374c142911df0379523e50aff",
         "status": "accepted"
       }
     },
     "rancher/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:10Z",
-        "file": "rancher/walk-left.png",
-        "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/walk-left-ddae21e22527.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              96.55,
-              72.25,
-              43.3
+              80.15,
+              60.25,
+              40.35
             ],
-            "paletteDelta": 7.24
+            "paletteDelta": 0.87
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.081,
+          "maxBodyCenterJump": 2.25,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.29,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 5.4,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            92.35,
-            66.35,
-            43.3
+            80.35,
+            60.2,
+            41.2
           ],
-          "medianColorCount": 425.0,
-          "medianShadingRatio": 0.6963,
+          "medianColorCount": 287.5,
+          "medianShadingRatio": 0.6841,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "5ec9181ccc9d8836aaf4eaa306bed3206676f8669801bde31eb3b84b66186c04",
+        "sha256": "ddae21e22527fad745a8ac36383e62755e99c044a009a4e0f77dcbd5bf0e05c7",
         "status": "accepted"
       }
     },
     "rancher/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:11Z",
-        "file": "rancher/walk-right.png",
-        "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/walk-right-fc16bbacb6de.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 3,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              96.55,
-              72.25,
-              43.3
+              80.35,
+              60.2,
+              40.35
             ],
-            "paletteDelta": 7.24
+            "paletteDelta": 0.97
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 7.6,
+          "maxAlphaRatio": 1.085,
+          "maxBodyCenterJump": 2.12,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.29,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 5.3,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            92.35,
-            66.35,
-            43.3
+            80.15,
+            60.25,
+            41.3
           ],
-          "medianColorCount": 425.0,
-          "medianShadingRatio": 0.6963,
+          "medianColorCount": 288.0,
+          "medianShadingRatio": 0.6815,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ea991b8cc2ccf56d70ff94cfb520506eae9166e3f1c4aa59e29a3915d2839d7b",
+        "sha256": "fc16bbacb6dec05a084938b0a302846e3c647e1c396c4f82b15fc212ac0c29ad",
         "status": "accepted"
       }
     },
     "rancher/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:10Z",
-        "file": "rancher/walk-up.png",
-        "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/walk-up-456e81d22bc0.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              92.35,
-              66.35,
-              43.3
+              80.35,
+              60.25,
+              41.2
             ],
-            "paletteDelta": 12.8
+            "paletteDelta": 5.78
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.033,
+          "maxBodyCenterJump": 1.67,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.37,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.92,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            96.55,
-            72.25,
-            32.75
+            76.25,
+            56.7,
+            39.2
           ],
-          "medianColorCount": 486.5,
-          "medianShadingRatio": 0.6885,
+          "medianColorCount": 276.5,
+          "medianShadingRatio": 0.6603,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "9150e89cada3c93f1841d5de0ed107431491de25572763bc1af9bda24d3a04df",
+        "sha256": "456e81d22bc01d27b7f21f458d54181775bf52c70d93857a8fad3f38903d844a",
         "status": "accepted"
       }
     },
     "rancher/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:12Z",
-        "file": "rancher/work-down.png",
-        "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/work-down-4a42d2f10e9b.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 10.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 42.0,
             "medianColor": [
-              100.25,
-              74.65,
-              45.45
+              87.3,
+              63.9,
+              42.2
             ],
-            "paletteDelta": 7.54
+            "paletteDelta": 11.88
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.025,
+          "maxBodyCenterJump": 0.84,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.25,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 2.39,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            107.4,
-            76.55,
-            44.0
+            96.6,
+            70.7,
+            45.1
           ],
-          "medianColorCount": 572.5,
-          "medianShadingRatio": 0.6408,
+          "medianColorCount": 444.0,
+          "medianShadingRatio": 0.6829,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "9a944b4189a5f2f9939abe6536a5040611656762ed423ec8cf2eab77b271cb56",
+        "sha256": "4a42d2f10e9baecc1a8610b6c296e3162bf260a1f98d0fd16328f75304103f42",
         "status": "accepted"
       }
     },
     "rancher/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:13Z",
-        "file": "rancher/work-left.png",
-        "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/work-left-2f7a90428f9d.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 42.0,
             "medianColor": [
-              100.25,
-              74.65,
-              44.0
+              87.4,
+              63.95,
+              42.3
             ],
-            "paletteDelta": 1.45
+            "paletteDelta": 0.15
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.017,
+          "maxBodyCenterJump": 0.65,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.42,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 2.15,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 42.0,
           "medianColor": [
-            100.25,
-            74.65,
-            45.45
+            87.3,
+            63.9,
+            42.2
           ],
-          "medianColorCount": 444.0,
-          "medianShadingRatio": 0.6799,
+          "medianColorCount": 406.0,
+          "medianShadingRatio": 0.6752,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "32af99f460ca1d7f302c082077e67192c8a5f2dc177eb1f03fb60a33bca17b14",
+        "sha256": "2f7a90428f9de85023b0046222c455cd65d6207435a15ff475929172f9032106",
         "status": "accepted"
       }
     },
     "rancher/work/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:14Z",
-        "file": "rancher/work-right.png",
-        "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/work-right-6701960b20bd.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 42.0,
             "medianColor": [
-              100.25,
-              74.65,
-              44.0
+              87.3,
+              63.9,
+              42.2
             ],
-            "paletteDelta": 1.45
+            "paletteDelta": 0.15
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.016,
+          "maxBodyCenterJump": 0.64,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.42,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 2.08,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 42.0,
           "medianColor": [
-            100.25,
-            74.65,
-            45.45
+            87.4,
+            63.95,
+            42.3
           ],
-          "medianColorCount": 444.0,
-          "medianShadingRatio": 0.6799,
+          "medianColorCount": 409.5,
+          "medianShadingRatio": 0.6694,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "f1607b8fbec2bca4ca8522332b3e2458a97b58dab611548ccf5d82cbe50df679",
+        "sha256": "6701960b20bda27fd6065134a577b2d4e6161549633df94debfc7b8a938ba090",
         "status": "accepted"
       }
     },
     "rancher/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:12Z",
-        "file": "rancher/work-up.png",
-        "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-08T22:05:13Z",
+        "file": "production/rancher/work-up-4424e3b15e3b.png",
+        "note": "A15 release rancher: distinct stockman identity, cedar-sage garment, stockman-heavy-roll-v1 gait, feed fork, grounded split-log trough, baked cargo",
+        "provenance": "a15-modular-rancher-stockman-cedar-sage",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 42.0,
             "medianColor": [
-              100.25,
-              74.65,
-              45.45
+              87.4,
+              63.95,
+              42.3
             ],
-            "paletteDelta": 15.34
+            "paletteDelta": 4.58
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 0.97,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.14,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.88,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 44.0,
           "medianColor": [
-            95.65,
-            72.05,
-            31.05
+            83.6,
+            61.5,
+            41.6
           ],
-          "medianColorCount": 466.5,
-          "medianShadingRatio": 0.6939,
+          "medianColorCount": 385.0,
+          "medianShadingRatio": 0.6629,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "8180f3df5c8bfcc737a6f0bced9bb45849d7452bb78997aab091278583b0dc15",
+        "sha256": "4424e3b15e3bff4035247e4284e8d9423e3af314831f82255cf13715b66bcb2f",
         "status": "accepted"
       }
     },
@@ -9154,709 +9154,709 @@
     },
     "trader/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:37Z",
-        "file": "trader/carry-down.png",
-        "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/carry-down-4d9f55086602.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 33.0,
             "medianColor": [
-              97.75,
-              68.05,
-              43.7
+              78.85,
+              47.75,
+              33.4
             ],
-            "paletteDelta": 12.2
+            "paletteDelta": 7.77
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.027,
+          "maxBodyCenterJump": 1.48,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.46,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.45,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            108.3,
-            74.15,
-            44.3
+            85.45,
+            51.3,
+            31.35
           ],
-          "medianColorCount": 517.0,
-          "medianShadingRatio": 0.5965,
+          "medianColorCount": 422.5,
+          "medianShadingRatio": 0.713,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "bbdba5c6a456f7b1a32846b33138364985edc51df051f6fe33408b732603a810",
+        "sha256": "4d9f55086602a6a5423423afe3d8308ad03f9c3cdc15f84d31c95be1aa33fc65",
         "status": "accepted"
       }
     },
     "trader/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:39Z",
-        "file": "trader/carry-left.png",
-        "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/carry-left-a6c757bb64d5.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              101.2,
-              71.8,
-              43.7
+              78.85,
+              48.25,
+              33.4
             ],
-            "paletteDelta": 5.1
+            "paletteDelta": 0.52
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.074,
+          "maxBodyCenterJump": 1.5,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.85,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.66,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 33.0,
           "medianColor": [
-            97.75,
-            68.05,
-            43.7
+            79.0,
+            47.75,
+            33.45
           ],
-          "medianColorCount": 413.5,
-          "medianShadingRatio": 0.6377,
+          "medianColorCount": 402.0,
+          "medianShadingRatio": 0.7091,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d249fd84d192e26b543bfcb1c3d5c090aedc5b230ee0357bb42be7f625f02228",
+        "sha256": "a6c757bb64d5068bb5e545ef847b2ce82605d8a34c38029508e9b072160e77c6",
         "status": "accepted"
       }
     },
     "trader/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:40Z",
-        "file": "trader/carry-right.png",
-        "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/carry-right-4a2bd2cc30d4.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              101.2,
-              71.8,
-              43.7
+              79.0,
+              48.25,
+              33.4
             ],
-            "paletteDelta": 5.1
+            "paletteDelta": 0.62
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.074,
+          "maxBodyCenterJump": 1.41,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.85,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.77,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 33.0,
           "medianColor": [
-            97.75,
-            68.05,
-            43.7
+            78.85,
+            47.65,
+            33.4
           ],
-          "medianColorCount": 414.5,
-          "medianShadingRatio": 0.6379,
+          "medianColorCount": 396.5,
+          "medianShadingRatio": 0.7048,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "83ffc308231be3ed4cb536c05288aaa6a3f847d8f16fefe89ca7c8522ee3e1d7",
+        "sha256": "4a2bd2cc30d4769669f456c3f027b9240d3ac110a0fdac4f3e800c8cc0ee6f61",
         "status": "accepted"
       }
     },
     "trader/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:38Z",
-        "file": "trader/carry-up.png",
-        "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/carry-up-e70f7dcb25fd.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 33.0,
             "medianColor": [
-              97.75,
-              68.05,
-              43.7
+              79.0,
+              47.75,
+              33.4
             ],
-            "paletteDelta": 10.08
+            "paletteDelta": 1.58
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.024,
+          "maxBodyCenterJump": 1.43,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.8,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.05,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            101.2,
-            71.8,
-            35.0
+            77.5,
+            48.25,
+            33.4
           ],
-          "medianColorCount": 479.5,
-          "medianShadingRatio": 0.6472,
+          "medianColorCount": 376.0,
+          "medianShadingRatio": 0.7238,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ce95560c09babb408ff4b2265ac1b66846bb45712b70e76ef25a33ed755360b3",
+        "sha256": "e70f7dcb25fdf8498fef2e31194c0f1a9419cc89e44603f9b44b7a6b5557748d",
         "status": "accepted"
       }
     },
     "trader/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:29Z",
-        "file": "trader/idle-down.png",
-        "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/idle-down-66e89a0fd805.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              101.6,
-              74.15,
-              46.75
+              74.4,
+              45.55,
+              33.4
             ],
-            "paletteDelta": 7.78
+            "paletteDelta": 6.05
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.043,
+          "maxBodyCenterJump": 1.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.3,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 0.99,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            109.1,
-            75.9,
-            45.65
+            79.35,
+            47.3,
+            30.4
           ],
-          "medianColorCount": 562.5,
-          "medianShadingRatio": 0.638,
+          "medianColorCount": 400.5,
+          "medianShadingRatio": 0.725,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "eca4f44bac57c184589b73145e55f3d279b0e04bd934c44cbb1528933433b2f5",
+        "sha256": "66e89a0fd80583ac71d6ed7c0f8d6102ea0b3385167a84a062d35cd38b87d2d7",
         "status": "accepted"
       }
     },
     "trader/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:30Z",
-        "file": "trader/idle-left.png",
-        "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/idle-left-529542d962d2.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              101.6,
-              74.15,
-              45.65
+              74.4,
+              45.55,
+              32.75
             ],
-            "paletteDelta": 1.1
+            "paletteDelta": 0.9
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.018,
+          "maxBodyCenterJump": 0.71,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.59,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.75,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            101.6,
-            74.15,
-            46.75
+            74.75,
+            45.9,
+            33.5
           ],
-          "medianColorCount": 441.5,
-          "medianShadingRatio": 0.68,
+          "medianColorCount": 392.5,
+          "medianShadingRatio": 0.7089,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ab40bf6229a601dadff8bf16266844ce404bf38d25199099002aedee676be1cc",
+        "sha256": "529542d962d268217fbeb701ede7f3a0eeffd20e3d3fce9c662dc17425c0507f",
         "status": "accepted"
       }
     },
     "trader/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:31Z",
-        "file": "trader/idle-right.png",
-        "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/idle-right-7dac7fdfbd60.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              101.6,
-              74.15,
-              45.65
+              74.75,
+              45.9,
+              32.75
             ],
-            "paletteDelta": 1.1
+            "paletteDelta": 0.82
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.017,
+          "maxBodyCenterJump": 0.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.59,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.81,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            101.6,
-            74.15,
-            46.75
+            74.4,
+            45.55,
+            33.4
           ],
-          "medianColorCount": 441.5,
-          "medianShadingRatio": 0.68,
+          "medianColorCount": 388.0,
+          "medianShadingRatio": 0.6983,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a426af735e4933d275cdfef50bfdab169336d42f067702a05a754e5922bf5cc0",
+        "sha256": "7dac7fdfbd60f5f708e738eb86692a0f8728e8aec2b77b8f05684ac0c6e68d9d",
         "status": "accepted"
       }
     },
     "trader/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:30Z",
-        "file": "trader/idle-up.png",
-        "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/idle-up-86d321a75459.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              101.6,
-              74.15,
-              46.75
+              74.75,
+              45.9,
+              33.4
             ],
-            "paletteDelta": 15.26
+            "paletteDelta": 0.95
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.044,
+          "maxBodyCenterJump": 2.03,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.09,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.19,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            97.55,
-            69.95,
-            32.65
+            74.15,
+            45.55,
+            32.75
           ],
-          "medianColorCount": 484.5,
-          "medianShadingRatio": 0.7011,
+          "medianColorCount": 362.0,
+          "medianShadingRatio": 0.7249,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "724500272d31cf6b656e3cc8daa50dd694d0a879ea5d38903c9252daed709f55",
+        "sha256": "86d321a754595cbb2ff623bdc3af4dfb710488d1a1e040f9e4f2d598055f713a",
         "status": "accepted"
       }
     },
     "trader/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:32Z",
-        "file": "trader/walk-down.png",
-        "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/walk-down-18e886a41c8b.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              93.3,
-              65.75,
-              44.2
+              73.65,
+              45.6,
+              33.55
             ],
-            "paletteDelta": 16.23
+            "paletteDelta": 6.92
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.041,
+          "maxBodyCenterJump": 1.68,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.98,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.28,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            107.25,
-            74.0,
-            45.05
+            79.5,
+            47.25,
+            30.25
           ],
-          "medianColorCount": 548.5,
-          "medianShadingRatio": 0.6364,
+          "medianColorCount": 401.0,
+          "medianShadingRatio": 0.7248,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "30ff839d47e102e19df3270bb9b428241f6ad17490392fda1c513d2624a74344",
+        "sha256": "18e886a41c8b33da68a40c7e5ce767dfcf545c375b4bb2603d38ff33ceb9ec5a",
         "status": "accepted"
       }
     },
     "trader/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:33Z",
-        "file": "trader/walk-left.png",
-        "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/walk-left-81a3c07151c8.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 3,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              98.6,
-              70.5,
-              44.2
+              73.7,
+              45.6,
+              32.6
             ],
-            "paletteDelta": 7.12
+            "paletteDelta": 1.01
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 7.6,
+          "maxAlphaRatio": 1.068,
+          "maxBodyCenterJump": 2.02,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.34,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 5.52,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            93.3,
-            65.75,
-            44.2
+            73.65,
+            45.75,
+            33.6
           ],
-          "medianColorCount": 420.5,
-          "medianShadingRatio": 0.6963,
+          "medianColorCount": 385.0,
+          "medianShadingRatio": 0.7106,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a504154ed3ef23667753434ab46706f4af4238ccebfee5bd05f8ab1c5c354d91",
+        "sha256": "81a3c07151c87dff0cd4abd3d3b0c0bb95d6a5a6c1ee01a8a8bf17da9f8875ea",
         "status": "accepted"
       }
     },
     "trader/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:34Z",
-        "file": "trader/walk-right.png",
-        "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/walk-right-ad7a79954324.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 4,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              98.6,
-              70.5,
-              44.2
+              73.7,
+              45.75,
+              32.6
             ],
-            "paletteDelta": 7.12
+            "paletteDelta": 0.98
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 8.8,
+          "maxAlphaRatio": 1.07,
+          "maxBodyCenterJump": 1.77,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.34,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 5.36,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            93.3,
-            65.75,
-            44.2
+            73.5,
+            45.6,
+            33.55
           ],
-          "medianColorCount": 420.5,
-          "medianShadingRatio": 0.6963,
+          "medianColorCount": 387.5,
+          "medianShadingRatio": 0.7072,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "1bdc35d735742a5d03935c5d177590fbe760c6f513d0e26d057faf11617cdba4",
+        "sha256": "ad7a7995432485e61a43ecbbe5c9613c4c18af63a93367e142cfe0d65455b642",
         "status": "accepted"
       }
     },
     "trader/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:32Z",
-        "file": "trader/walk-up.png",
-        "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/walk-up-d4dc5ae9142d.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              93.3,
-              65.75,
-              44.2
+              73.65,
+              45.75,
+              33.55
             ],
-            "paletteDelta": 11.91
+            "paletteDelta": 1.03
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.038,
+          "maxBodyCenterJump": 1.78,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.37,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.7,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            98.6,
-            70.5,
-            34.65
+            73.7,
+            45.35,
+            32.6
           ],
-          "medianColorCount": 497.0,
-          "medianShadingRatio": 0.6908,
+          "medianColorCount": 362.5,
+          "medianShadingRatio": 0.7303,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "3952c8167fdead52bd91d3d026a7a5b178d3af739db0e79c9f54bf827911aff4",
+        "sha256": "d4dc5ae9142dce65edd407c06a2c2fed65b108d1d38a9006f5376b5193a86d51",
         "status": "accepted"
       }
     },
     "trader/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:35Z",
-        "file": "trader/work-down.png",
-        "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/work-down-fba986ff2643.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
           "bodyWidthRange": 2,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              101.6,
-              74.15,
-              46.75
+              77.65,
+              49.15,
+              33.6
             ],
-            "paletteDelta": 7.83
+            "paletteDelta": 11.28
           },
           "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "maxAlphaRatio": 1.035,
+          "maxBodyCenterJump": 1.8,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.25,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 1.12,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.5,
           "medianColor": [
-            109.15,
-            75.9,
-            45.65
+            88.25,
+            52.95,
+            32.95
           ],
-          "medianColorCount": 563.5,
-          "medianShadingRatio": 0.638,
+          "medianColorCount": 532.0,
+          "medianShadingRatio": 0.7221,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "fb77cbe233e884ce6f0d4d7af97323a10fc81828d503a4aa102d3b84d1d445cf",
+        "sha256": "fba986ff26437f2e9c569f11f740e35320a8de09a3abe49314760ae6fdf5262e",
         "status": "accepted"
       }
     },
     "trader/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:36Z",
-        "file": "trader/work-left.png",
-        "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/work-left-da6402ac52e4.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 42.0,
             "medianColor": [
-              101.6,
-              74.15,
-              45.65
+              77.65,
+              49.15,
+              32.95
             ],
-            "paletteDelta": 1.1
+            "paletteDelta": 2.03
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.03,
+          "maxBodyCenterJump": 0.95,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.59,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 2.03,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 43.0,
           "medianColor": [
-            101.6,
-            74.15,
-            46.75
+            78.55,
+            50.25,
+            34.4
           ],
-          "medianColorCount": 439.5,
-          "medianShadingRatio": 0.6802,
+          "medianColorCount": 505.0,
+          "medianShadingRatio": 0.7071,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a1440d65e7cffce5224755201fc30ecf80ca804090072d614952562d632a4d1d",
+        "sha256": "da6402ac52e407af8bd3ee2f4aac635f56635b53b1d53781b07e2d9714be312d",
         "status": "accepted"
       }
     },
     "trader/work/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:37Z",
-        "file": "trader/work-right.png",
-        "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/work-right-f3d2d7f43781.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              101.6,
-              74.15,
-              45.65
+              78.55,
+              50.25,
+              32.95
             ],
-            "paletteDelta": 1.1
+            "paletteDelta": 1.56
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 0.81,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.59,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 1.84,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 42.0,
           "medianColor": [
-            101.6,
-            74.15,
-            46.75
+            77.65,
+            49.15,
+            33.6
           ],
-          "medianColorCount": 439.5,
-          "medianShadingRatio": 0.6802,
+          "medianColorCount": 509.5,
+          "medianShadingRatio": 0.6953,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "312bbb170cd3a2f4cc3defd9646cf5e6a11b2077731bb4a2bc28f4269404435f",
+        "sha256": "f3d2d7f437812b3766994f9d56c3b3d93c3473eea2da030eca89b55762dcc98c",
         "status": "accepted"
       }
     },
     "trader/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:35Z",
-        "file": "trader/work-up.png",
-        "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-09T00:13:30Z",
+        "file": "production/trader/work-up-1792703e2ef9.png",
+        "note": "A16 release trader: mature factor identity, madder-teal hollow garment, factor-brisk-step-v1 gait, brass steelyard, grounded trade counter, shared A3 cargo crate",
+        "provenance": "a16-modular-trader-factor-madder-teal",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 5,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 42.0,
             "medianColor": [
-              101.6,
-              74.15,
-              46.75
+              78.55,
+              50.25,
+              33.6
             ],
-            "paletteDelta": 15.26
+            "paletteDelta": 6.3
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 8.0,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 1.43,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.09,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.6,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 44.0,
           "medianColor": [
-            97.55,
-            69.95,
-            32.65
+            74.75,
+            45.95,
+            31.0
           ],
-          "medianColorCount": 483.5,
-          "medianShadingRatio": 0.7016,
+          "medianColorCount": 478.0,
+          "medianShadingRatio": 0.7068,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "bf9480302fc17ea52b601b3e352e0a16147cf55752abd326dcadd4ab7a4b1cdc",
+        "sha256": "1792703e2ef92a40a8cf659b7d6d0c7012fdc782417bd0732e66cd85dc5323d6",
         "status": "accepted"
       }
     }
   },
-  "updatedAt": "2026-08-01T14:50:40Z",
+  "updatedAt": "2026-08-09T00:13:30Z",
   "version": 2
 }

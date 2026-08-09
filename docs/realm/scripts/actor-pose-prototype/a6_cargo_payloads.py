@@ -360,6 +360,7 @@ def build(
             "ownerRows": [
                 "guard/carry",
                 "farmer/carry",
+                "rancher/carry",
                 "lumber/carry",
                 "builder/carry",
                 "blacksmith/carry",
@@ -367,6 +368,7 @@ def build(
                 "stonecutter/carry",
                 "fisher/carry",
                 "settler/carry",
+                "trader/carry",
             ],
             "bakedContainer": True,
         },

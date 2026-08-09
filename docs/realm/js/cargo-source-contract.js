@@ -11,6 +11,7 @@ export const CARGO_DIRECTIONS = Object.freeze(['down', 'up', 'left', 'right']);
 export const CARGO_OWNER_ROWS = Object.freeze([
   'guard/carry',
   'farmer/carry',
+  'rancher/carry',
   'lumber/carry',
   'builder/carry',
   'blacksmith/carry',
@@ -18,6 +19,7 @@ export const CARGO_OWNER_ROWS = Object.freeze([
   'stonecutter/carry',
   'fisher/carry',
   'settler/carry',
+  'trader/carry',
 ]);
 export const CARGO_FRAMES = 8;
 

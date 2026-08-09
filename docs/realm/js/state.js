@@ -34,8 +34,8 @@ export const TILE_COLORS = {
 };
 
 export const BUILDINGS = {
-  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:4, desc:'Shelters settlers and pays taxes. Evolves Hovel → Manor with well, market, church, and tavern coverage.' },
-  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{wheat:3}, workers:1, desc:'Grows wheat — eaten raw, or milled and baked into more bread',
+  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:4, foodStore:8, desc:'Shelters settlers, holds 8 pantry food, and pays taxes. Evolves Hovel → Manor with well, market, church, and tavern coverage.' },
+  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:1,wheat:3}, workers:1, desc:'Harvests one direct ration plus bulk wheat for milling into much more bread',
     upgrades: [
       { cost:{wood:15,stone:8},          prodMult:1.5, name:'Level 2' },
       { cost:{wood:25,stone:20,iron:5},  prodMult:2.0, name:'Level 3' },
@@ -61,7 +61,7 @@ export const BUILDINGS = {
       { cost:{wood:30,stone:22,gold:10}, prodMult:1.5, name:'Level 2' },
       { cost:{wood:50,stone:38,gold:25,iron:5}, prodMult:2.0, name:'Level 3' },
     ] },
-  barracks:  { name:'Barracks',    icon:'⚔️', cost:{wood:20,stone:20,iron:5,planks:10}, defense:10, workers:2, desc:'Trains soldiers for defense' },
+  barracks:  { name:'Barracks',    icon:'⚔️', cost:{wood:20,stone:20,iron:5,planks:10}, defense:10, workers:2, desc:'A staffed drill yard where you can muster swordsmen' },
   tower:     { name:'Watch Tower', icon:'🗼', cost:{stone:25,iron:5,planks:8},  defense:15, reveal:4, desc:'Reveals fog and defends' },
   well:      { name:'Well',        icon:'🪣', cost:{stone:10},         happiness:5,  radius:4, desc:'Provides water, boosts happiness' },
   tavern:    { name:'Tavern',      icon:'🍺', cost:{wood:20,gold:10},  happiness:10, radius:5, workers:1, desc:'Entertainment, big happiness boost' },
@@ -71,7 +71,7 @@ export const BUILDINGS = {
   castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50,planks:20}, defense:50, happiness:20, pop:10, desc:'The realm\'s mightiest defense — and the Wonder\'s foundation stone' },
   wonder:    { name:'Hall of Ages', icon:'🕍', cost:{stone:50,planks:20,gold:40}, workers:4, happiness:10, radius:8, maxCount:1, desc:'The Wonder. Raise all three stages to win the age' },
   granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
-  storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, desc:'Receives delivered wood, stone, iron, and overflow goods' },
+  storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, foodStore:40, desc:'Receives delivered goods and holds up to 40 food' },
   church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15,planks:8}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
   school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
   windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, convert:{from:'wheat',to:'flour',amount:4}, desc:'Mills wheat into flour for the bakery' },
@@ -80,7 +80,7 @@ export const BUILDINGS = {
   cowpen:    { name:'Cow Pen',     icon:'🐄', cost:{wood:25,stone:5}, prod:{food:2}, workers:1, desc:'Pastures cattle for milk and meat' },
   fisherman: { name:"Fisherman's Hut", icon:'🐟', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
   blacksmith: { name:'Blacksmith', icon:'🔨', cost:{wood:20,stone:15}, workers:1, convert:{from:'iron',to:'tools',amount:2,cap:20}, desc:'Forges iron into tools that speed production. Boosts soldier damage by 50%.', boost:{type:'soldier',radius:8,multiplier:1.5} },
-  archery:   { name:'Archery Range', icon:'🏹', cost:{wood:30,stone:10}, workers:1, defense:5, desc:'Trains archer units. Archers have longer range but less HP.' },
+  archery:   { name:'Archery Range', icon:'🏹', cost:{wood:30,stone:10}, workers:1, defense:5, desc:'A staffed range where you can muster archers with longer reach' },
   // Loop 243 (the-fixer, 101 filed ~140 ticks): mayor structural-unlock.
   // Town Hall — civic governance building gated on a named mayor (set by
   // tavern-build per 034 hook). Closes the named-character cast filing arc
@@ -220,7 +220,7 @@ export const G = {
 // dependent. Add new presentation state here at the same time it is introduced.
 const RESETTABLE_PRESENTATION_ROOT_KEYS = Object.freeze([
   '_buildRipples', '_churchBeam', '_confetti', '_followAvatar', '_hoveredBiome',
-  '_lastPaintTile', '_lastPlaceFailMsg', '_lightningFlash', '_lightningTimer',
+  '_lastPaintTile', '_lastPlaceFailMsg', '_lightningFlash', '_lightningTimer', '_placingRally',
   '_lastFoodWarnDay', '_lastSaveTick', '_refreshPanelFor', '_renderAlpha',
   '_renderDeltaMs',
   'acorns', 'animals', 'bats', 'bigSnow', 'birds', 'boats', 'bolts',
@@ -278,6 +278,7 @@ function createPresentationState() {
     _churchBeam: 0,
     _confetti: [],
     _followAvatar: false,
+    _placingRally: false,
     _hoveredBiome: null,
     _lastPaintTile: null,
     _lastPlaceFailMsg: 0,

@@ -46,8 +46,8 @@ different birds; they must never see different granaries.
 
 | Tier | Modules |
 |---|---|
-| CORE | state, world, pathfinding, ground-traffic, citizens, soldiers, combat, walkers, economy, events, tech, trade, wonder, scenarios, missions, story, raid-summary, sim, commands, bus, log, fx, avatar, building-lifecycle, citizen-ownership, death-markers |
-| SHELL | main (loop/init), render, minimap, postfx, ui, input, audio, notifications (DOM half), story-ui (chronicle DOM + optional wall-clock preview), achievements, advisor, save (localStorage wrapper), save-state/save-schema (pure boundary), citizen-inspector, citizen-presentation, citizen-render-cache, presentation-cues, enhancements, particles (update), animals, sprite-lab, sprite-muster, sprite-source-contract, actor-registration, atlas-loader |
+| CORE | state, world, pathfinding, ground-traffic, citizens, soldiers, combat, military, walkers, economy, building-inventory, events, tech, trade, wonder, scenarios, first-muster, post-raid-recovery, missions, story, raid-summary, sim, commands, bus, log, fx, avatar, building-lifecycle, building-operation, workforce-policy, citizen-ownership, residences, death-markers |
+| SHELL | main (loop/init), render, minimap, postfx, ui, input, audio, notifications (DOM half), story-ui (chronicle DOM + optional wall-clock preview), achievements, advisor, save (localStorage wrapper), save-state/save-schema (pure boundary), citizen-inspector, citizen-presentation, citizen-render-cache, presentation-cues, enhancements, particles (update), animals, sprite-lab, sprite-muster, sprite-source-contract, actor-registration, enemy-sprite-contract, atlas-loader |
 
 ## Core contract rules
 
@@ -87,6 +87,8 @@ different birds; they must never see different granaries.
 `PLACE_BUILDING{type,x,y}` · `DEMOLISH{x,y}` · `UNDO` · `UPGRADE{x,y}` ·
 `START_RESEARCH{tech}` · `TRADE{partner,res,amount}` · `SET_RALLY{x,y}|null` ·
 `SET_STANCE{stance}` · `GARRISON{x,y}` · `EJECT_GARRISON{x,y}` ·
+`RECRUIT_UNIT{x,y}` · `SET_WORKFORCE_PRIORITY{x,y,priority}` ·
+`CHOOSE_RECOVERY_DOCTRINE{doctrine}` ·
 `AVATAR_MOVE{dx,dy}` · `AVATAR_GOTO{x,y}`
 
 Every applied command is stamped with `G.gameTick` and appended to the in-memory
@@ -124,8 +126,8 @@ the core neither knows nor cares.
 ## Save format
 
 - Realm is in development and uses one strict Engine v2 save epoch. The current
-  contract is module revision `166`, schema `realm.engine-v2`, key
-  `realm-engine-v2-save`, save version `4`, simulation version `3`, and core
+  contract is module revision `191`, schema `realm.engine-v2`, key
+  `realm-engine-v2-save`, save version `4`, simulation version `4`, and core
   order
   `sha256:14621d8fcd8b94594989a9bc8b98e0e67c7f654687e80cdab8cafd940c19c014`.
   These values come only from `runtime-contract.json`; the order identifier is

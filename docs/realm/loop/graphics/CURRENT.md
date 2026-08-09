@@ -1,15 +1,67 @@
 # Current Graphics Handoff
 
-## Paused after Realm 184 — 2026-08-01
+## Realm 191 A16 trader production family — 2026-08-08
 
-Production graphics are deliberately paused while project focus returns to
-gameplay, responsive UX, crowd movement, and general cleanup. The canonical
-restart process is [`PAUSE_AND_RESUME.md`](PAUSE_AND_RESUME.md); the active
-non-art handoff is [`../playability/CURRENT.md`](../playability/CURRENT.md).
+The complete trader family is now atomically promoted as A16. The retired
+palette-transfer rows were replaced together by one mature traveling
+factor/bookkeeper identity: deep madder coat, peacock-teal sash, soft merchant
+cap, brass hand balance, grounded folding ledger counter, independent cargo
+crate, and the custom `factor-brisk-step-v1` four-direction gait.
 
-Do not resume from the historical queue or start A15 automatically. When the
-owner explicitly returns to graphics, confirm the then-current runtime
-contracts and continue with one complete rancher family.
+All `16` rows / `128` frames are sourced from four independent built-in
+image-generation authorities for identity, hollow garment, tool, and
+workstation. The compiler and verifier lock source prompts and hashes, hollow
+cap/neck/cuff/coat openings, role landmarks, binary alpha, `79±1px` baseline,
+all four exact runtime tiers, all eight gait frames differing from shared A5,
+and a byte-identical clean rebuild. Exact `35x46` and `64x84` visual review was
+approved before the single family promotion.
+
+Production remains `224` rows / `1,792` frames / `0` candidates. The next
+complete family is innkeeper, followed by scholar and forager. Continue through
+the same atomic workflow in [`PAUSE_AND_RESUME.md`](PAUSE_AND_RESUME.md); do not
+repair or promote isolated rows.
+
+## Realm 190 painted raiders and A15 rancher — 2026-08-08
+
+The release dive re-ran the complete structural and runtime animation surface:
+`14` role sheets, `224/224` locked rows, `1,792/1,792` frames, zero blanks,
+mapping errors, phase errors, or runtime page errors. Cadence and interpolation
+are sound. The quality deficit is authored motion and identity, not the atlas
+renderer.
+
+At this historical checkpoint, four `71–72px` families — trader, innkeeper,
+scholar, and forager — still shared byte-identical alpha geometry across `64`
+rows. Eighteen front/back walk rows in
+older modular families also expose the restrained shared A5 chronology.
+
+The procedural enemy blocker is closed. Ash reaver, iron lancer, and bone
+breaker now own distinct painted identities and axe, spear, and club silhouettes
+across idle, walk, attack, and retreat. The deterministic source package emits
+`48` rows / `384` frames at exact `27x35`, `35x46`, `54x70`, and `64x84` tiers.
+Image-generation prompts, keyed and transparent authorities, hashes,
+chroma-removal settings, planes, masks, landmarks, and compiler reports are all
+recorded. The live browser proof exercises all `12` variant/action combinations
+at the default Retina path with pixel-perfect scaling and smoothing disabled.
+
+One systemic registration defect was fixed without altering art:
+`actor-registration.js` still contained `28` negative offsets from retired
+source rows. Regeneration from the current sources removed them, and the gate
+now requires the effective baseline itself to remain at `79±1px`.
+
+The complete rancher family is now atomically promoted as A15. Its distinct
+stockman identity, hollow cedar-sage garment, three-tine feed fork, grounded
+split-log trough, independent carry crate, and custom four-direction gait own
+all `16` rows / `128` frames. It has `0/16` alpha-identical rows against the
+remaining palette-swap roles. The exact default and review tiers, source
+authority hashes, hollow cavities, landmarks, binary alpha, registration,
+direction phase, clean rebuild, runtime cargo, and assigned-cowpen browser
+slice all pass. Production remains `224` rows / `1,792` frames / `0` candidates.
+
+The next actor-family replacement is trader, followed by innkeeper, scholar,
+and forager. Do not promote partial rows or resume the historical queue. The
+canonical process remains
+[`PAUSE_AND_RESUME.md`](PAUSE_AND_RESUME.md), and the active gameplay handoff is
+[`../playability/CURRENT.md`](../playability/CURRENT.md).
 
 ## Realm 184 settler production family — 2026-08-01
 

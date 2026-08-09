@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=188';
-import { makeCitizen } from '../js/world.js?realm=188';
-import { dispatch } from '../js/commands.js?realm=188';
+import { G, getSeed, setSeed } from '../js/state.js?realm=191';
+import { makeCitizen } from '../js/world.js?realm=191';
+import { dispatch } from '../js/commands.js?realm=191';
 import {
   claimCitizenAssignment,
   commandAssignCitizen,
@@ -18,7 +18,7 @@ import {
   transitionCitizenActivity,
   validateCitizenOwnership,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=188';
+} from '../js/citizen-ownership.js?realm=191';
 
 function reset() {
   G.gameTick = 0;
@@ -243,11 +243,14 @@ assert.equal(commandCitizen.assignment?.building, commandFarm);
 commandCitizen.profession.reason = 'spawn-settler';
 assert.equal(validateCitizenOwnership(commandCitizen).ok, false, 'mismatched profession reason was accepted');
 commandCitizen.profession.reason = 'first-vocation';
+const removalHome = building('house', 23, 21);
+commandCitizen.home = removalHome;
 G.selectedCitizenId = commandCitizen.actorId;
 const populationBeforeRemoval = G.population = G.citizens.length;
 removeCitizenFromWorld(commandCitizen);
 assert.equal(G.citizens.includes(commandCitizen), false);
 assert.equal(G.population, populationBeforeRemoval - 1);
+assert.equal(commandCitizen.home, null, 'citizen removal retained a live residence reference');
 assert.equal(G.selectedCitizenId, null, 'citizen removal retained a dead selection');
 assert.equal(staffingCount(commandFarm), 0);
 

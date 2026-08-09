@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=188';
-import { renderBoats, renderFlocks, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=188';
-import { makeAtlasLoader } from './atlas-loader.js?realm=188';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=188';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=191';
+import { renderBoats, renderFlocks, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=191';
+import { makeAtlasLoader } from './atlas-loader.js?realm=191';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=191';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,7 +15,7 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=188';
+} from './sprite-source-contract.js?realm=191';
 import {
   CARGO_DIRECTIONS,
   CARGO_FRAMES,
@@ -24,21 +24,31 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from './cargo-source-contract.js?realm=188';
+} from './cargo-source-contract.js?realm=191';
+import {
+  ENEMY_ACTIONS,
+  ENEMY_DIRECTIONS,
+  ENEMY_FRAME_H,
+  ENEMY_FRAME_W,
+  ENEMY_FRAMES,
+  ENEMY_RUNTIME_ATLASES,
+  ENEMY_VARIANTS,
+  enemyAtlasFrameRect,
+} from './enemy-sprite-contract.js?realm=191';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=188';
+} from './render-resolution.js?realm=191';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=188';
+} from './citizen-presentation.js?realm=191';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=188';
-import { staffingCount } from './citizen-ownership.js?realm=188';
+} from './citizen-render-cache.js?realm=191';
+import { staffingCount } from './citizen-ownership.js?realm=191';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -173,6 +183,10 @@ const _ACTOR_ATLAS_TIERS = ACTOR_RUNTIME_ATLASES.map((tier) => ({
   load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
 }));
 const _CARGO_ATLAS_TIERS = CARGO_RUNTIME_ATLASES.map((tier) => ({
+  ...tier,
+  load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
+}));
+const _ENEMY_ATLAS_TIERS = ENEMY_RUNTIME_ATLASES.map((tier) => ({
   ...tier,
   load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
 }));
@@ -457,6 +471,141 @@ export function drawActorAtlasFrame(targetCtx, {
     sourceImage,
     source.sx, sourceY, source.sw, source.sh,
     x, y + ddy, width, height
+  );
+  targetCtx.restore();
+  return true;
+}
+
+function enemyAtlasSelection(targetCtx, width, height) {
+  const projected = projectedActorSize(targetCtx, width, height);
+  const preferred = chooseActorRuntimeTier(projected, _ENEMY_ATLAS_TIERS);
+  const atlas = preferred.load();
+  let selection = atlas ? { ...preferred, atlas } : null;
+  if (!selection) {
+    for (const tier of _ENEMY_ATLAS_TIERS) {
+      if (tier === preferred || tier.load.state !== 'ready') continue;
+      const fallback = tier.load();
+      if (!fallback) continue;
+      selection = {
+        ...chooseActorRuntimeTier(projected, [tier]),
+        atlas: fallback,
+      };
+      break;
+    }
+  }
+  if (selection && C) {
+    C.dataset.enemyAtlasTier = selection.key;
+    C.dataset.enemyAtlasFrame = `${selection.frameW}x${selection.frameH}`;
+    C.dataset.enemyAtlasPixelPerfect = String(selection.pixelPerfect);
+    C.dataset.enemyAtlasSmoothing = String(shouldSmoothActorTier(selection));
+  }
+  return selection;
+}
+
+export function enemyActionForRender(enemy) {
+  if ((enemy?.attackCue || 0) > 0) return 'attack';
+  if (enemy?.retreating) return 'retreat';
+  const target = enemy?.engaged || enemy;
+  const dx = target === enemy ? (enemy?.tx || 0) - (enemy?.x || 0) : target.x - enemy.x;
+  const dy = target === enemy ? (enemy?.ty || 0) - (enemy?.y || 0) : target.y - enemy.y;
+  if (enemy?.engaged || ((enemy?.attackTimer || 0) > 0 && Math.hypot(dx, dy) <= 0.3)) {
+    return 'attack';
+  }
+  // Wall/building strikes intentionally do not add presentation fields to
+  // gameplay state. Mirror combat's read-only next-cell lookup so a blocked
+  // raider uses the authored attack row instead of walking in place.
+  const x = Math.round(enemy?.x || 0);
+  const y = Math.round(enemy?.y || 0);
+  const targetX = Math.round(enemy?.tx || 0);
+  const targetY = Math.round(enemy?.ty || 0);
+  const stepX = x + Math.sign(targetX - x);
+  const stepY = y + Math.sign(targetY - y);
+  const blockers = [
+    G.buildingGrid[y]?.[x],
+    G.buildingGrid[stepY]?.[stepX],
+    G.buildingGrid[y]?.[stepX],
+    G.buildingGrid[stepY]?.[x],
+  ];
+  if (blockers.some((building) => building?.hp > 0 && building.type !== 'road')) {
+    return 'attack';
+  }
+  return Math.hypot(dx, dy) > 0.3 && !enemy?.engaged ? 'walk' : 'idle';
+}
+
+export function enemyDirectionForRender(enemy) {
+  const target = enemy?.engaged || enemy;
+  let dx = target === enemy ? (enemy?.tx || 0) - (enemy?.x || 0) : target.x - enemy.x;
+  let dy = target === enemy ? (enemy?.ty || 0) - (enemy?.y || 0) : target.y - enemy.y;
+  if (Math.hypot(dx, dy) < 0.001) {
+    const continuity = actorRenderRecord(enemy);
+    return ENEMY_DIRECTIONS.includes(continuity.enemyDirection)
+      ? continuity.enemyDirection
+      : 'down';
+  }
+  const screenX = dx - dy;
+  const screenY = (dx + dy) * 0.5;
+  const direction = Math.abs(screenX) > Math.abs(screenY) * 1.15
+    ? (screenX < 0 ? 'left' : 'right')
+    : (screenY < 0 ? 'up' : 'down');
+  actorRenderRecord(enemy).enemyDirection = direction;
+  return direction;
+}
+
+export function enemyAnimationFrame(enemy, action) {
+  if (action === 'attack' && (enemy?.attackCue || 0) > 0) {
+    const remaining = Math.max(0, Math.min(12, enemy?.attackCue || 0));
+    return Math.min(ENEMY_FRAMES - 1, Math.floor((12 - remaining) * ENEMY_FRAMES / 12));
+  }
+  const record = actorRenderRecord(enemy);
+  const animationKey = `enemy/${enemy?.variant ?? 0}/${action}`;
+  if (record.enemyAnimationKey !== animationKey) {
+    record.enemyAnimationKey = animationKey;
+    record.enemyAnimationStartedAt = G.gameTick;
+  }
+  const rate = action === 'idle' ? 14 : action === 'retreat' ? 4 : 6;
+  const elapsed = Math.max(0, G.gameTick - (record.enemyAnimationStartedAt ?? G.gameTick));
+  return Math.floor(elapsed / rate) % ENEMY_FRAMES;
+}
+
+export function drawEnemyAtlasFrame(targetCtx, {
+  variant,
+  action,
+  direction,
+  frame = 0,
+  x,
+  y,
+  width = 27,
+  height = 35,
+  alpha = 1,
+} = {}) {
+  if (
+    !targetCtx || !Number.isFinite(x) || !Number.isFinite(y)
+    || !ENEMY_ACTIONS.includes(action) || !ENEMY_DIRECTIONS.includes(direction)
+  ) return false;
+  const variantIndex = Math.max(0, Math.min(
+    ENEMY_VARIANTS.length - 1,
+    Number.isSafeInteger(variant) ? variant : ENEMY_VARIANTS.indexOf(variant),
+  ));
+  const selection = enemyAtlasSelection(targetCtx, width, height);
+  if (!selection) return false;
+  const source = enemyAtlasFrameRect(
+    variantIndex,
+    action,
+    direction,
+    frame,
+    selection.frameW,
+    selection.frameH,
+  );
+  if (!source) return false;
+  targetCtx.save();
+  targetCtx.globalAlpha *= alpha;
+  const smoothing = shouldSmoothActorTier(selection);
+  targetCtx.imageSmoothingEnabled = smoothing;
+  if (smoothing) targetCtx.imageSmoothingQuality = 'high';
+  targetCtx.drawImage(
+    selection.atlas,
+    source.sx, source.sy, source.sw, source.sh,
+    x, y, width, height,
   );
   targetCtx.restore();
   return true;
@@ -2709,6 +2858,7 @@ export function render() {
     if (inWorldView(b.x, b.y, 4)) enqueueWorld(WORLD_DRAW_KIND.building, b, b.x, b.y, 0);
   }
   for (const c of citizenPresentations) {
+    if (c.indoors) continue;
     if (inWorldView(c.x, c.y)) enqueueWorld(WORLD_DRAW_KIND.citizen, c);
   }
   for (const a of G.animals || []) {
@@ -2996,7 +3146,9 @@ export function render() {
       idle:'Idle', find_job:'Looking for work', walk_to_work:'Going to work',
       working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
       needs_delivery:'Needs storage', foraging:'Foraging', eating:'Eating',
+      walk_to_eat:'Walking to food', waiting_for_food:'Waiting for food',
       go_home:'Going home', sleep:'Sleeping', leisure:'At leisure',
+      seek_shelter:'Running home', sheltered:'Sheltered at home', flee:'Fleeing the raid',
     }[hoveredCitizen.activity.kind] || hoveredCitizen.activity.kind;
     const assignment = hoveredCitizen.assignment;
     const jobLabel = assignment ? BUILDINGS[assignment.building.type]?.name : null;
@@ -3116,16 +3268,9 @@ export function render() {
     ctx.ellipse(es.x, es.y + 2, 11 * emberPulse, 5.5 * emberPulse, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
-    // Per-enemy visual variety from fixed spawn variant
-    const eVariant = e.variant ?? 0; // 0=swordsman, 1=spearman, 2=berserker
-    const eHash = eVariant * 2.1; // stable phase offset for eye pulse
-    if (G.camera.zoom < 0.6) {
-      ctx.fillStyle = ['#5a1a1a','#3a2a3a','#6a1818'][eVariant];
-      ctx.beginPath();
-      ctx.arc(es.x, es.y - 4, 3, 0, Math.PI*2);
-      ctx.fill();
-      continue;
-    }
+    // Painted production family: 0=ash reaver, 1=iron lancer,
+    // 2=bone breaker. The saved integer remains presentation-only.
+    const eVariant = Math.max(0, Math.min(ENEMY_VARIANTS.length - 1, e.variant ?? 0));
     // Danger ground ring — red-tinted so raiders read as threat, not citizens
     // (pulses brighter for a few frames after the raider lands a blow)
     ctx.fillStyle = e.attackCue > 0 ? 'rgba(255,40,40,0.5)' : 'rgba(200,0,0,0.28)';
@@ -3137,145 +3282,28 @@ export function render() {
     ctx.beginPath();
     ctx.ellipse(es.x, es.y + 2, 5, 2, 0, 0, Math.PI*2);
     ctx.fill();
-    // Loop 56 (render S4): raider silhouette rebuild — added legs/greaves,
-    // real arms, hulking shoulders for a menacing stance. Prior raiders
-    // were the pre-L41 citizen shape (floating torso + helmet). Now they
-    // have full chibi proportions but with brutal details (heavier build,
-    // spiked helm, armored greaves instead of cloth legs).
-    const eMoving = Math.hypot(e.tx - e.x, e.ty - e.y) > 0.3;
-    const ePhase = G.gameTick * 0.24 + (eHash & 0xff) * 0.04;
-    const eBob = eMoving ? Math.sin(ePhase) * 0.7 : 0;
-    const eStepSin = Math.sin(ePhase);
-    const eStep = eMoving ? eStepSin * 1.5 : 0;
-    const eCosP = Math.cos(ePhase);
-    const edx = e.tx - e.x, edy = e.ty - e.y;
-    const eDist = Math.hypot(edx, edy) || 1;
-    const eFaceX = edx / eDist > 0.1 ? 1 : edx / eDist < -0.1 ? -1 : 0;
-    const eFaceZ = edy / eDist > 0.1 ? 1 : edy / eDist < -0.1 ? -1 : 0;
-    const eFaceScreenX = eFaceX - eFaceZ;
-    const eLean = eMoving ? eFaceScreenX * 0.9 : 0;
-    const eBodyX = es.x + eLean * 0.35;
-    const eBodyTilt = eLean * 0.055;
-    const eCY = es.y + eBob;
-
-    // Greaves (metal leg plates) — bit heavier than citizen pants
-    const greaveColor = '#22222a';
-    const eLiftL = eMoving ? Math.max(0, eCosP) * 1.4 : 0;
-    const eLiftR = eMoving ? Math.max(0, -eCosP) * 1.4 : 0;
-    const eShiftL = eMoving ? Math.max(0, eCosP) * 1.0 : 0;
-    const eShiftR = eMoving ? Math.max(0, -eCosP) * 1.0 : 0;
-    const eLegLx = es.x - 2.2 + eShiftL * 0.5 - eStep * 0.15;
-    const eLegRx = es.x + 2.2 - eShiftR * 0.5 + eStep * 0.15;
-    const eLegLen = 5;
-    ctx.fillStyle = greaveColor;
-    ctx.fillRect(eLegLx - 1.4, es.y - 1 - eLiftL - (eLegLen - eLiftL * 0.4), 2.8, eLegLen - eLiftL * 0.4);
-    ctx.fillRect(eLegRx - 1.4, es.y - 1 - eLiftR - (eLegLen - eLiftR * 0.4), 2.8, eLegLen - eLiftR * 0.4);
-    // Metal highlight on greaves (sheen)
-    ctx.fillStyle = 'rgba(140,140,160,0.3)';
-    ctx.fillRect(eLegLx - 1.4, es.y - 1 - eLiftL - (eLegLen - eLiftL * 0.4), 0.6, eLegLen - eLiftL * 0.4);
-    ctx.fillRect(eLegRx - 1.4, es.y - 1 - eLiftR - (eLegLen - eLiftR * 0.4), 0.6, eLegLen - eLiftR * 0.4);
-    // Heavy boots
-    ctx.fillStyle = '#18181f';
-    ctx.beginPath();
-    ctx.ellipse(eLegLx, es.y + 0.5 - eLiftL, 2.8, 1.7, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(eLegRx, es.y + 0.5 - eLiftR, 2.8, 1.7, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Body — hulking shoulders + waist. Armor plate colors
-    const bodyColors = ['#3a2030', '#2a2a3a', '#3a1818'];
-    ctx.fillStyle = bodyColors[eVariant];
-    // Lower torso (armor skirt/waist)
-    ctx.beginPath();
-    ctx.ellipse(eBodyX, eCY - 7, 4.8, 4.6, eBodyTilt, 0, Math.PI * 2);
-    ctx.fill();
-    // Upper torso — wider than citizens for brute look
-    ctx.beginPath();
-    ctx.ellipse(eBodyX, eCY - 11, 6.0, 4.5, eBodyTilt, 0, Math.PI * 2);
-    ctx.fill();
-    // Shoulder pauldrons — dark metal knobs at each shoulder
-    ctx.fillStyle = '#1a1a20';
-    ctx.beginPath();
-    ctx.ellipse(eBodyX - 5.5, eCY - 12, 2.0, 1.8, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(eBodyX + 5.5, eCY - 12, 2.0, 1.8, 0, 0, Math.PI * 2); ctx.fill();
-    // Armour trim (chest band)
-    ctx.fillStyle = ['#6a3a48','#3a4060','#6a2828'][eVariant];
-    ctx.fillRect(eBodyX - 4.2, eCY - 8.5, 8.4, 1.3);
-
-    // Arms — longer hanging ovals with spiked shoulders
-    const eArmSwing = eMoving ? eStepSin * 0.6 : 0;
-    ctx.fillStyle = ['#4a2a3a','#2a2a4a','#4a1a1a'][eVariant];
-    ctx.beginPath();
-    ctx.ellipse(eBodyX - 6.2, eCY - 8 + eArmSwing, 1.7, 3.6, Math.PI * 0.08, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(eBodyX + 6.2, eCY - 8 - eArmSwing, 1.7, 3.6, -Math.PI * 0.08, 0, Math.PI * 2);
-    ctx.fill();
-    // Gauntlets (metal hand covers) at arm ends
-    ctx.fillStyle = '#3a3a42';
-    ctx.beginPath();
-    ctx.arc(eBodyX - 6.2, eCY - 4.5 + eArmSwing, 1.2, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath();
-    ctx.arc(eBodyX + 6.2, eCY - 4.5 - eArmSwing, 1.2, 0, Math.PI * 2); ctx.fill();
-
-    // Head — helmet (slightly smaller than citizen head — visor visible)
-    const eHeadX = eBodyX + eFaceScreenX * 0.4;
-    ctx.fillStyle = '#1a1010';
-    ctx.beginPath();
-    ctx.arc(eHeadX, eCY - 15, 4.0, 0, Math.PI * 2);
-    ctx.fill();
-    // Helmet brim (horizontal bar)
-    ctx.fillStyle = ['#5a3a40','#3a3a50','#5a2a2a'][eVariant];
-    ctx.fillRect(eHeadX - 4.8, eCY - 13.5, 9.6, 1.3);
-    // Spike on top of helmet (new — makes silhouette unmistakably hostile)
-    ctx.fillStyle = '#4a3a30';
-    ctx.beginPath();
-    ctx.moveTo(eHeadX, eCY - 19);
-    ctx.lineTo(eHeadX - 1, eCY - 16.5);
-    ctx.lineTo(eHeadX + 1, eCY - 16.5);
-    ctx.closePath();
-    ctx.fill();
-    // Red eye glow — pulsing
-    ctx.fillStyle = '#ff4040';
-    ctx.globalAlpha = Math.max(0.85, daylight) * (0.7 + 0.3 * Math.sin(G.gameTick * 0.12 + eHash));
-    ctx.beginPath();
-    ctx.arc(eHeadX - 1.3, eCY - 15, 0.75, 0, Math.PI * 2);
-    ctx.arc(eHeadX + 1.3, eCY - 15, 0.75, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = Math.max(0.85, daylight);
-    // Weapon — axe, spear, or club depending on variant
-    if (G.camera.zoom >= 0.7) {
-      ctx.strokeStyle = '#5a3a1a';
-      ctx.lineWidth = 1;
-      ctx.save();
-      ctx.translate(eBodyX + 5, es.y - 8 + eBob);
-      if (eVariant === 0) {
-        // Axe: handle + wedge head
-        ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -5); ctx.stroke();
-        ctx.fillStyle = '#8a8890';
-        ctx.beginPath(); ctx.moveTo(0, -5); ctx.lineTo(4, -3); ctx.lineTo(1, 0); ctx.closePath(); ctx.fill();
-      } else if (eVariant === 1) {
-        // Spear: long handle + tip
-        ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(0, -7); ctx.stroke();
-        ctx.fillStyle = '#a0a0b0';
-        ctx.beginPath(); ctx.moveTo(-1, -5); ctx.lineTo(1, -5); ctx.lineTo(0, -9); ctx.closePath(); ctx.fill();
-      } else {
-        // Club: thick handle + knob
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -4); ctx.stroke();
-        ctx.fillStyle = '#5a3a10';
-        ctx.beginPath(); ctx.arc(0, -5, 2, 0, Math.PI*2); ctx.fill();
-      }
-      ctx.restore();
-    }
+    const action = enemyActionForRender(e);
+    const direction = enemyDirectionForRender(e);
+    const frame = enemyAnimationFrame(e, action);
+    const targetW = 27;
+    const targetH = 35;
+    drawEnemyAtlasFrame(ctx, {
+      variant: eVariant,
+      action,
+      direction,
+      frame,
+      x: es.x - targetW / 2,
+      y: es.y + 3 - targetH,
+      width: targetW,
+      height: targetH,
+      alpha: Math.max(0.85, daylight),
+    });
     // HP bar
     if (e.hp < e.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(es.x - 7, es.y - 22, 14, 2);
+      ctx.fillRect(es.x - 7, es.y - 36, 14, 2);
       ctx.fillStyle = '#ef4444';
-      ctx.fillRect(es.x - 7, es.y - 22, 14 * (e.hp/e.maxHp), 2);
+      ctx.fillRect(es.x - 7, es.y - 36, 14 * (e.hp/e.maxHp), 2);
     }
   }
   }

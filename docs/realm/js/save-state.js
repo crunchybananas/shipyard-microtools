@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=188';
-import { missions } from './missions.js?realm=188';
+} from './state.js?realm=191';
+import { missions } from './missions.js?realm=191';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=188';
+} from './save-schema.js?realm=191';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,7 +22,10 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
+import { houseResidentCapacity } from './residences.js?realm=191';
+import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=191';
+import { foodCapacity } from './building-inventory.js?realm=191';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization
@@ -141,8 +144,8 @@ const CITIZEN_KEYS = new Set([
   'x', 'y', 'tx', 'ty', 'speed', 'hp', 'carrying',
   'carryAmount', 'hunger', 'rest', 'needs', 'home', 'activityTimer',
   'path', 'pathIdx', 'faceX', 'faceZ', 'hurtTimer', 'workTarget', 'forageTarget',
-  '_deliveryTarget', '_evacRot', '_evacTarget', '_evacTicks', '_fleeing', '_hb',
-  '_lastPathX', '_lastPathY', '_leisureDay',
+  '_deliveryTarget', '_foodTarget', '_evacRot', '_evacTarget', '_evacTicks', '_fleeing', '_hb',
+  '_lastPathX', '_lastPathY', '_leisureDay', '_forageReadyAt',
   '_leisureTarget', '_movedAt', '_needsDeliveryNoticeAt', '_noGo', '_pathEpoch',
   '_pathFailedAt', '_pathGoal', '_pathStartedAt', '_requestedTx', '_requestedTy',
   '_stuckTicks', '_wdBest', '_wdTicks', '_workFaceX', '_workFaceZ',
@@ -158,14 +161,15 @@ const BUILDING_KEYS = new Set([
   'type', 'x', 'y', 'hp', 'active', 'prodTimer', 'produced',
   'prodShowCount', 'level', 'buildProgress', 'buildTotal', 'buildStartedAt',
   '_fireTimer', 'caravanOut', 'completeTick', 'fireTimer', 'onFire',
-  'tierStreak', 'toolCycle', 'trainTimer', 'upgradeTick', 'visits',
+  'tierStreak', 'toolCycle', 'trainTimer', 'recruitType', 'recruitName',
+  'upgradeTick', 'visits', 'workforcePriority', 'inventory', 'founderStockpile',
 ]);
 const REQUIRED_BUILDING_KEYS = new Set([
   'type', 'x', 'y', 'hp', 'active', 'prodTimer', 'produced',
   'prodShowCount', 'level', 'buildProgress', 'buildTotal', 'buildStartedAt',
 ]);
-const AVATAR_KEYS = new Set(['x', 'y', 'tx', 'ty', 'vx', 'vy', 'path', 'pathIdx', 'speed', 'name', 'state', 'faceX', 'faceZ', '_movedAt', '_px', '_py', '_laneX', '_laneY', '_dirKey', '_dirPend', '_dirPendMs', '_actorAnimationKey', '_actorAnimationStartedAt']);
-const REQUIRED_AVATAR_KEYS = new Set(['x', 'y', 'tx', 'ty', 'vx', 'vy', 'path', 'pathIdx', 'speed', 'name', 'state', 'faceX', 'faceZ']);
+const AVATAR_KEYS = new Set(['x', 'y', 'tx', 'ty', 'vx', 'vy', 'path', 'pathIdx', 'speed', 'name', 'state', 'scoutedTiles', 'scoutingFinds', 'faceX', 'faceZ', '_movedAt', '_px', '_py', '_laneX', '_laneY', '_dirKey', '_dirPend', '_dirPendMs', '_actorAnimationKey', '_actorAnimationStartedAt']);
+const REQUIRED_AVATAR_KEYS = new Set(['x', 'y', 'tx', 'ty', 'vx', 'vy', 'path', 'pathIdx', 'speed', 'name', 'state', 'scoutedTiles', 'scoutingFinds', 'faceX', 'faceZ']);
 const SOLDIER_KEYS = new Set(['x', 'y', 'tx', 'ty', 'homeBuilding', 'garrison', 'name', 'type', 'hp', 'maxHp', 'state', 'stateTimer', '_postIdx', 'attackTimer', '_px', '_py', '_pdx', '_pdy', '_mvx', '_mvy', '_movedAt', '_actorAnimationKey', '_actorAnimationStartedAt']);
 const ENEMY_KEYS = new Set(['x', 'y', 'tx', 'ty', 'hp', 'maxHp', 'damage', 'plunderGoal', 'type', 'state', 'variant', 'attackCue', 'attackTimer', 'engaged', 'loot', 'plundered', 'retreating', '_px', '_py']);
 const PROJECTILE_KEYS = new Set(['x', 'y', 'tx', 'ty', 'target', 'damage', 'life', 'type']);
@@ -418,10 +422,11 @@ const CITIZEN_FIELD_VALIDATORS = new Map([
   ['activityTimer', finiteRule], ['path', nullableRule(pathArrayRule)], ['pathIdx', nonNegativeIntegerRule],
   ['faceX', finiteRule], ['faceZ', finiteRule],
   ['workTarget', nullableObjectRule], ['forageTarget', nullableObjectRule],
-  ['_deliveryTarget', nullableReferenceRule], ['_evacRot', nonNegativeIntegerRule],
+  ['_deliveryTarget', nullableReferenceRule], ['_foodTarget', nullableReferenceRule], ['_evacRot', nonNegativeIntegerRule],
   ['_evacTarget', nullableObjectRule], ['_evacTicks', nonNegativeIntegerRule],
   ['_fleeing', booleanRule], ['_hb', nonNegativeIntegerRule],
   ['_lastPathX', finiteRule], ['_lastPathY', finiteRule], ['_leisureDay', positiveIntegerRule],
+  ['_forageReadyAt', nonNegativeIntegerRule],
   ['_leisureTarget', nullableObjectRule], ['_needsDeliveryNoticeAt', nonNegativeIntegerRule],
   ['_noGo', ordinaryObjectRule], ['_pathEpoch', nonNegativeIntegerRule],
   ['_pathFailedAt', nonNegativeIntegerRule], ['_pathGoal', nullableObjectRule],
@@ -441,7 +446,16 @@ const BUILDING_FIELD_VALIDATORS = new Map([
   ['caravanOut', booleanRule], ['completeTick', nonNegativeIntegerRule],
   ['fireTimer', finiteRule], ['onFire', booleanRule], ['tierStreak', safeIntegerRule],
   ['toolCycle', nonNegativeIntegerRule], ['trainTimer', nonNegativeFiniteRule],
+  ['recruitType', fieldRule(value => value === 'swordsman' || value === 'archer', 'Unknown queued recruit type.', 'invalid-enum')],
+  ['recruitName', boundedStringRule],
   ['upgradeTick', nonNegativeIntegerRule], ['visits', ordinaryObjectRule],
+  ['inventory', ordinaryObjectRule],
+  ['founderStockpile', fieldRule(value => value === true, 'Founder stockpile marker, when present, must be true.', 'inconsistent-state')],
+  ['workforcePriority', fieldRule(
+    value => WORKFORCE_PRIORITIES.includes(value),
+    'Unknown workforce priority.',
+    'invalid-enum',
+  )],
 ]);
 
 const AVATAR_FIELD_VALIDATORS = new Map([
@@ -449,6 +463,7 @@ const AVATAR_FIELD_VALIDATORS = new Map([
   ['vx', finiteRule], ['vy', finiteRule], ['path', nullableRule(pathArrayRule)],
   ['pathIdx', nonNegativeIntegerRule], ['speed', nonNegativeFiniteRule],
   ['name', boundedStringRule], ['state', fieldRule(value => value === 'idle', 'Unknown avatar state.', 'invalid-enum')],
+  ['scoutedTiles', nonNegativeIntegerRule], ['scoutingFinds', nonNegativeIntegerRule],
   ['faceX', finiteRule], ['faceZ', finiteRule],
 ]);
 
@@ -845,6 +860,24 @@ function validateBuildingNestedState(building, path) {
       if (!Number.isSafeInteger(tick) || tick < 0) return failure('out-of-range', `${path}.visits.${kind}`, 'Visit timestamps must be non-negative ticks.');
     }
   }
+  if (building.inventory !== undefined) {
+    const inventoryPath = `${path}.inventory`;
+    const inventorySurface = validateObjectSurface(building.inventory, new Set(['food']), new Set(['food']), inventoryPath);
+    if (!inventorySurface.ok) return inventorySurface;
+    const food = building.inventory.food;
+    if (!Number.isSafeInteger(food) || food < 0) {
+      return failure('out-of-range', `${inventoryPath}.food`, 'Stored food must be a non-negative safe integer.');
+    }
+    const capacity = foodCapacity(building);
+    if (building.buildProgress < 1 || capacity <= 0 || food > capacity) {
+      return failure('out-of-range', inventoryPath, 'Food inventory requires a completed pantry/store and may not exceed its capacity.');
+    }
+  }
+  if (building.founderStockpile === true) {
+    if (building.type !== 'storehouse' || building.buildProgress < 1 || building.inventory === undefined) {
+      return failure('inconsistent-state', path, 'Founder stockpile must be a completed Storehouse with an inventory.');
+    }
+  }
   return { ok: true };
 }
 
@@ -896,6 +929,9 @@ function validateCandidateGame(game) {
     if (!avatarNumbers.ok) return avatarNumbers;
     const avatarPath = validatePath(game.avatar.path, game.avatar.pathIdx, '$.state.game.avatar');
     if (!avatarPath.ok) return avatarPath;
+    if (game.avatar.scoutingFinds !== Math.floor(game.avatar.scoutedTiles / 24)) {
+      return failure('inconsistent-state', '$.state.game.avatar.scoutingFinds', 'Founder scouting finds must match charted terrain.');
+    }
   }
   if (!(game.researchedTechs instanceof Set)) return failure('wrong-type', '$.state.game.researchedTechs', 'researchedTechs must be a Set.');
   if (!isObject(game.debug) || Object.keys(game.debug).length !== 1 || typeof game.debug.disableEvents !== 'boolean') {
@@ -957,6 +993,8 @@ function validateCandidateGame(game) {
   const assignmentCounts = new Map();
   const actorIds = new Set();
   let maxActorId = 0;
+  let physicalFood = 0;
+  let founderStockpiles = 0;
   for (let i = 0; i < game.buildings.length; i++) {
     const building = game.buildings[i];
     const path = `$.state.game.buildings[${i}]`;
@@ -987,13 +1025,32 @@ function validateCandidateGame(game) {
     if (!Number.isSafeInteger(building.buildStartedAt) || building.buildStartedAt < 0) {
       return failure('out-of-range', `${path}.buildStartedAt`, 'Building construction start must be a non-negative safe integer.');
     }
+    const hasRecruitType = Object.hasOwn(building, 'recruitType');
+    const hasRecruitName = Object.hasOwn(building, 'recruitName');
+    if (hasRecruitType !== hasRecruitName) {
+      return failure('inconsistent-state', path, 'Military recruit type and name must appear together.');
+    }
+    if (hasRecruitType) {
+      const expected = building.type === 'barracks' ? 'swordsman' : building.type === 'archery' ? 'archer' : null;
+      if (building.buildProgress < 1 || building.recruitType !== expected) {
+        return failure('inconsistent-state', path, 'Queued recruit does not match a completed military building.');
+      }
+    }
     if (!Number.isInteger(building.x) || building.x < 0 || building.x >= MAP_W || !Number.isInteger(building.y) || building.y < 0 || building.y >= MAP_H) {
       return failure('out-of-range', path, 'Building coordinates must be integer map positions.');
     }
     const tileKey = `${building.x},${building.y}`;
     if (occupied.has(tileKey)) return failure('duplicate-reference', path, 'Two buildings occupy the same tile.');
     occupied.set(tileKey, building);
+    physicalFood += building.inventory?.food || 0;
+    if (building.founderStockpile === true) founderStockpiles += 1;
   }
+
+  if (game.storyFlags.physicalFoodInventory !== true) {
+    return failure('inconsistent-state', '$.state.game.storyFlags.physicalFoodInventory', 'Current saves require authoritative physical food inventory.');
+  }
+  if (founderStockpiles > 1) return failure('inconsistent-state', '$.state.game.buildings', 'A realm may retain at most one founder stockpile.');
+  if (physicalFood !== game.resources.food) return failure('inconsistent-state', '$.state.game.resources.food', 'Global food must exactly mirror physical building inventory.');
 
   for (let i = 0; i < game.citizens.length; i++) {
     const citizen = game.citizens[i];
@@ -1015,6 +1072,10 @@ function validateCandidateGame(game) {
     }
     if (citizen.home !== null && !buildings.has(citizen.home)) return failure('invalid-reference', `${path}.home`, 'Home must reference a current building.');
     if (citizen._deliveryTarget !== null && citizen._deliveryTarget !== undefined && !buildings.has(citizen._deliveryTarget)) return failure('invalid-reference', `${path}._deliveryTarget`, 'Delivery target must reference a current building.');
+    if (citizen._foodTarget !== null && citizen._foodTarget !== undefined) {
+      if (!buildings.has(citizen._foodTarget)) return failure('invalid-reference', `${path}._foodTarget`, 'Food target must reference a current building.');
+      if (citizen._foodTarget.buildProgress < 1 || foodCapacity(citizen._foodTarget) <= 0) return failure('invalid-reference', `${path}._foodTarget`, 'Food target must reference a completed pantry/store.');
+    }
     if (citizen.profession.sinceTick > game.gameTick) return failure('out-of-range', `${path}.profession.sinceTick`, 'Profession transition cannot be in the future.');
     if (citizen.activity.sinceTick > game.gameTick) return failure('out-of-range', `${path}.activity.sinceTick`, 'Activity transition cannot be in the future.');
     if (citizen.assignment) {
@@ -1026,6 +1087,12 @@ function validateCandidateGame(game) {
       if (citizen.assignment.duty !== expectedDuty) return failure('inconsistent-state', `${path}.assignment.duty`, 'Assignment duty disagrees with building state.');
       const expectedPurpose = assignmentPurposeForProfession(citizen.profession.kind, building);
       if (citizen.assignment.purpose !== expectedPurpose) return failure('inconsistent-state', `${path}.assignment.purpose`, 'Assignment purpose disagrees with citizen profession and building state.');
+      if (
+        building.workforcePriority === 'off'
+        && citizen.assignment.reason !== 'player-command'
+      ) {
+        return failure('inconsistent-state', `${path}.assignment`, 'Off-duty buildings may retain only Crown-ordered workers.');
+      }
       const count = (assignmentCounts.get(building) || 0) + 1;
       const capacity = citizenStaffingCapacity(building);
       if (capacity < 1) return failure('invalid-reference', `${path}.assignment.building`, 'Assignment building has no citizen staffing capacity.');
@@ -1044,6 +1111,17 @@ function validateCandidateGame(game) {
     }
     const citizenPath = validatePath(citizen.path, citizen.pathIdx, path);
     if (!citizenPath.ok) return citizenPath;
+  }
+  for (const house of game.buildings) {
+    if (house.type !== 'house' || house.buildProgress < 1) continue;
+    const residents = game.citizens.filter(citizen => citizen.home === house);
+    if (residents.length > houseResidentCapacity(house)) {
+      return failure(
+        'out-of-range',
+        `$.state.game.buildings[${game.buildings.indexOf(house)}]`,
+        'Derived house residents exceed completed housing capacity.',
+      );
+    }
   }
   if (game.nextActorId <= maxActorId) {
     return failure('out-of-range', '$.state.game.nextActorId', 'Citizen allocator must remain above every live actor ID.');

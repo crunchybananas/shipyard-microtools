@@ -2,12 +2,12 @@
 // World generation — terrain, fog, noise
 // ════════��═════════════════════════��═════════════════════════
 
-import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=188';
-import { makeAvatar } from './avatar.js?realm=188';
+import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=191';
+import { makeAvatar } from './avatar.js?realm=191';
 import {
   assertCitizenActorIdAvailable,
   createCitizenOwnership,
-} from './citizen-ownership.js?realm=188';
+} from './citizen-ownership.js?realm=191';
 
 function hash2(x,y){ let n=x*374761393+y*668265263; n=(n^(n>>13))*1274126177; return(n^(n>>16))&0x7fffffff; }
 function noise2(x,y){
@@ -24,10 +24,15 @@ function fbm(x,y,oct){
 }
 
 export function revealAround(cx,cy,r){
+  let revealed = 0;
   for(let dy=-r;dy<=r;dy++) for(let dx=-r;dx<=r;dx++){
     const nx=cx+dx,ny=cy+dy;
-    if(nx>=0&&nx<MAP_W&&ny>=0&&ny<MAP_H&&dx*dx+dy*dy<=r*r+1) G.fog[ny][nx]=true;
+    if(nx>=0&&nx<MAP_W&&ny>=0&&ny<MAP_H&&dx*dx+dy*dy<=r*r+1) {
+      if (!G.fog[ny][nx]) revealed++;
+      G.fog[ny][nx]=true;
+    }
   }
+  return revealed;
 }
 
 export function makeCitizen(x,y){

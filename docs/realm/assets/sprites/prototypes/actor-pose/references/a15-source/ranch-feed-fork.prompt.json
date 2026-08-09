@@ -1,0 +1,29 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "ranch-feed-fork",
+  "generated_at": "2026-08-08",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f3-74aa-77b3-abe6-c58235e91e33/exec-f82886bb-8ec3-4f0d-bff7-fe28c003dcf2.png"
+  },
+  "references": [],
+  "prompt": "Use case: stylized-concept. Asset type: Realm modular ranch tool source board for offline skeletal sprite compilation. Create exactly four isolated orthographic views of the same practical three-tine livestock feed fork. It has a straight worn pale-ash handle, a dark leather center grip, a compact forged-iron socket, and three short blunt slightly curved iron tines. Each view is vertical with the handle butt at top and the tines at bottom: broad front/down, independently authored broad rear/up, narrow left profile, and independently authored narrow right profile. Crisp hand-painted late-1990s strategy-game sprite source art, readable wood/leather/iron clusters, warm upper-left light, exact same construction and scale in all views, generous padding, uniform flat #ff00ff chroma-key background. No hands, person, hay, trough, livestock, scenery, shadow, labels, text, watermark, extra tools, clipping, or magenta inside the tool.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#e70cde"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a15-source/ranch-feed-fork-keyed.png",
+  "keyed_sha256": "a8e7c4f341536484bd8dd62f0bcc25128bbfcefd17e3c4b7c828f51009c3a5d9",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a15-source/ranch-feed-fork.png",
+  "alpha_sha256": "f2c483c23932e3c2aa5b5f4e4a5954c3461c98432c05680fe168aac814255341"
+}

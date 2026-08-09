@@ -2,13 +2,14 @@
 // Random Events — drought, gold rush, plague, migration, etc.
 // ════════════════════════════════════════════════════════════
 
-import { G, rng, rngInt } from './state.js?realm=188';
-import { trySpawnSettlers } from './economy.js?realm=188';
-import { sfx as playSound } from './log.js?realm=188';
-import { emit } from './bus.js?realm=188';
-import { chronicle, announce } from './log.js?realm=188';
-import { recordDeathMarker } from './death-markers.js?realm=188';
-import { removeCitizenFromWorld } from './citizen-ownership.js?realm=188';
+import { G, rng, rngInt } from './state.js?realm=191';
+import { trySpawnSettlers } from './economy.js?realm=191';
+import { sfx as playSound } from './log.js?realm=191';
+import { emit } from './bus.js?realm=191';
+import { chronicle, announce } from './log.js?realm=191';
+import { recordDeathMarker } from './death-markers.js?realm=191';
+import { removeCitizenFromWorld } from './citizen-ownership.js?realm=191';
+import { withdrawFoodFromStores } from './building-inventory.js?realm=191';
 
 // positive:true → green banner + 'season' sound
 // positive:false → red banner + 'raidWarning' sound
@@ -210,7 +211,7 @@ export const EVENT_DEFS = [
     positive: false,
     onStart() {
       G.resources.gold = Math.max(0, G.resources.gold - 30);
-      G.resources.food = Math.max(0, G.resources.food - 20);
+      withdrawFoodFromStores(Math.min(20, Math.floor(G.resources.food)), { state: G });
     },
     onEnd() {},
     endMsg: '',
@@ -296,7 +297,8 @@ export const EVENT_DEFS = [
     positive: true,
     onStart() {
       if (G.resources.food >= 20) {
-        G.resources.food -= 20;
+        const paid = withdrawFoodFromStores(20, { state: G });
+        if (paid.taken !== 20) throw new Error('Stranger trade food wallet disagrees with physical stores.');
         G.resources.iron += 15;
         try { chronicle('A cloaked stranger arrived at dawn, trading iron for food. They vanished by nightfall.', 'event'); } catch(_e){}
       } else {

@@ -1,8 +1,8 @@
-import { G, BUILDINGS } from './state.js?realm=188';
-import { staffingCount } from './citizen-ownership.js?realm=188';
+import { G, BUILDINGS } from './state.js?realm=191';
+import { staffingCount } from './citizen-ownership.js?realm=191';
 
 const TIPS = [
-  { id: 'lowfood', check: () => G.resources.food < 20, text: "Food is running low. Build more farms or fisherman huts!", cooldown: 600 },
+  { id: 'lowfood', check: () => G.resources.food < 20, text: "Stored food is running low. Staff a food source and keep pantry space available!", cooldown: 600 },
   { id: 'nohouses', check: () => G.day > 3 && G.buildings.filter(b=>b.type==='house').length === 0, text: "Your settlers have no homes. Build a House!", cooldown: 600 },
   { id: 'noworkers', check: () => {
     const jobsNeeded = G.buildings.reduce((sum, b) => sum + (BUILDINGS[b.type]?.workers || 0) - staffingCount(b), 0);

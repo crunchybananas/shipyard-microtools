@@ -1,0 +1,115 @@
+{
+  "schema": "realm.enemy-sprites.raider-family.v1",
+  "stage": "painted-raider-release-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "groundY": 79,
+    "clearRows": [80, 81, 82, 83]
+  },
+  "scope": {
+    "variants": ["ash-reaver", "iron-lancer", "bone-breaker"],
+    "actions": ["idle", "walk", "attack", "retreat"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 48,
+    "frames": 384
+  },
+  "identity": {
+    "key": "scarred-raider",
+    "path": "assets/sprites/enemies-source/references/raider-identity.png",
+    "sha256": "345fa860a897d97a9e29ac4beaf831844f84f8a9d1027aaf4f894be28b937b98",
+    "keyedPath": "assets/sprites/enemies-source/references/raider-identity-keyed.png",
+    "keyedSha256": "691ba323745f3c7e05760de719da46cdbae9ccaaa5d2382427ecc8e2bc9a675a",
+    "parts": {
+      "down": {
+        "head": [366, 22, 505, 235],
+        "torso": [297, 283, 592, 577],
+        "arm_screen_left": [128, 285, 241, 619],
+        "arm_screen_right": [1225, 289, 1339, 624],
+        "leg": [287, 608, 551, 1001]
+      },
+      "up": {
+        "head": [682, 21, 816, 216],
+        "torso": [640, 289, 929, 574],
+        "arm_screen_left": [128, 285, 241, 619],
+        "arm_screen_right": [1225, 289, 1339, 624],
+        "leg": [644, 611, 907, 1005]
+      },
+      "left": {
+        "head": [964, 31, 1113, 227],
+        "torso": [988, 281, 1150, 573],
+        "arm": [1225, 289, 1339, 624],
+        "leg": [978, 609, 1128, 1005]
+      },
+      "right": {
+        "head": [964, 31, 1113, 227],
+        "torso": [988, 281, 1150, 573],
+        "arm": [1225, 289, 1339, 624],
+        "leg": [978, 609, 1128, 1005]
+      }
+    }
+  },
+  "garments": {
+    "ash-reaver": {
+      "path": "assets/sprites/enemies-source/references/ash-reaver-garment.png",
+      "sha256": "59ad9f0dc55df88aad1a35773a1cbbc884fad81323f239482a6c0b7e02e5747a",
+      "keyedPath": "assets/sprites/enemies-source/references/ash-reaver-garment-keyed.png",
+      "keyedSha256": "cbd25afd3663ec147e25788d318098780417f8a20c98fb1c982f14fc4c23d947",
+      "parts": {
+        "down": {"headgear": [298, 10, 527, 193], "tunic": [281, 213, 603, 553], "sleeve_screen_left": [148, 254, 269, 487], "sleeve_screen_right": [1196, 253, 1317, 494], "belt": [310, 553, 558, 665], "boot": [294, 658, 561, 998]},
+        "up": {"headgear": [623, 15, 851, 164], "tunic": [598, 218, 903, 545], "sleeve_screen_left": [148, 254, 269, 487], "sleeve_screen_right": [1196, 253, 1317, 494], "belt": [640, 554, 864, 629], "boot": [620, 659, 884, 997]},
+        "left": {"headgear": [941, 14, 1154, 198], "tunic": [948, 222, 1143, 546], "sleeve": [1196, 253, 1317, 494], "belt": [948, 555, 1127, 671], "boot": [934, 667, 1102, 999]},
+        "right": {"headgear": [941, 14, 1154, 198], "tunic": [948, 222, 1143, 546], "sleeve": [1196, 253, 1317, 494], "belt": [948, 555, 1127, 671], "boot": [934, 667, 1102, 999]}
+      }
+    },
+    "iron-lancer": {
+      "path": "assets/sprites/enemies-source/references/iron-lancer-garment.png",
+      "sha256": "b11238322d3316c2f757360cc06c33d4a9b11c112cd8ed0eb36af173a4ef3d0c",
+      "keyedPath": "assets/sprites/enemies-source/references/iron-lancer-garment-keyed.png",
+      "keyedSha256": "2b6ef140db2cc97fa16b94c5411bf0ac7a03ba0b7b1814c33b1da00988fec453",
+      "parts": {
+        "down": {"headgear": [365, 3, 519, 207], "tunic": [275, 215, 613, 540], "sleeve_screen_left": [140, 255, 261, 495], "sleeve_screen_right": [1215, 256, 1332, 495], "belt": [316, 557, 561, 664], "boot": [296, 650, 587, 1003]},
+        "up": {"headgear": [690, 3, 845, 210], "tunic": [599, 219, 927, 538], "sleeve_screen_left": [140, 255, 261, 495], "sleeve_screen_right": [1215, 256, 1332, 495], "belt": [643, 557, 875, 624], "boot": [625, 657, 876, 1001]},
+        "left": {"headgear": [978, 9, 1145, 207], "tunic": [947, 218, 1142, 539], "sleeve": [1215, 256, 1332, 495], "belt": [949, 557, 1138, 665], "boot": [935, 661, 1102, 1001]},
+        "right": {"headgear": [978, 9, 1145, 207], "tunic": [947, 218, 1142, 539], "sleeve": [1215, 256, 1332, 495], "belt": [949, 557, 1138, 665], "boot": [935, 661, 1102, 1001]}
+      }
+    },
+    "bone-breaker": {
+      "path": "assets/sprites/enemies-source/references/bone-breaker-garment.png",
+      "sha256": "ca7a9f748d678689fd62c79b648be24528e3b7670526cc6a579b24af2740b446",
+      "keyedPath": "assets/sprites/enemies-source/references/bone-breaker-garment-keyed.png",
+      "keyedSha256": "c8a8bad984f94a9e05b581e57b3253d347757edebb9b8be9bd381d00cce082e7",
+      "parts": {
+        "down": {"headgear": [286, 10, 546, 204], "tunic": [263, 215, 607, 562], "sleeve_screen_left": [127, 248, 262, 511], "sleeve_screen_right": [1209, 248, 1336, 523], "belt": [293, 570, 565, 693], "boot": [289, 675, 567, 1006]},
+        "up": {"headgear": [632, 15, 883, 187], "tunic": [599, 221, 927, 561], "sleeve_screen_left": [127, 248, 262, 511], "sleeve_screen_right": [1209, 248, 1336, 523], "belt": [635, 571, 885, 667], "boot": [620, 675, 884, 1005]},
+        "left": {"headgear": [952, 22, 1185, 214], "tunic": [947, 217, 1169, 562], "sleeve": [1209, 248, 1336, 523], "belt": [948, 571, 1162, 698], "boot": [928, 683, 1102, 1005]},
+        "right": {"headgear": [952, 22, 1185, 214], "tunic": [947, 217, 1169, 562], "sleeve": [1209, 248, 1336, 523], "belt": [948, 571, 1162, 698], "boot": [928, 683, 1102, 1005]}
+      }
+    }
+  },
+  "weapons": {
+    "path": "assets/sprites/enemies-source/references/raider-weapons.png",
+    "sha256": "c32c83e4397ffaa6c0e5d3a1ce5c8734f5170fc3cf770ca5e4372ddf9f392216",
+    "keyedPath": "assets/sprites/enemies-source/references/raider-weapons-keyed.png",
+    "keyedSha256": "79e281d54dfc116667fd5a920695cdbf45b9f9d82d297208d0060df7df568b2f",
+    "variants": {
+      "ash-reaver": {"kind": "bearded-axe", "renderHeight": 25, "gripFractionFromTop": 0.88, "parts": {"down": [13, 239, 208, 909], "up": [250, 242, 438, 908], "left": [457, 243, 520, 908], "right": [457, 243, 520, 908]}},
+      "iron-lancer": {"kind": "raider-spear", "renderHeight": 24, "gripFractionFromTop": 0.92, "parts": {"down": [642, 104, 709, 935], "up": [775, 103, 843, 935], "left": [908, 104, 955, 935], "right": [908, 104, 955, 935]}},
+      "bone-breaker": {"kind": "iron-war-club", "renderHeight": 25, "gripFractionFromTop": 0.88, "parts": {"down": [1020, 262, 1208, 914], "up": [1206, 263, 1396, 914], "left": [1415, 262, 1535, 914], "right": [1415, 262, 1535, 914]}}
+    }
+  },
+  "pose": {
+    "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+    "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+  },
+  "provenance": "assets/sprites/enemies-source/references/imagegen-provenance.json",
+  "authority": {
+    "sourceUnit": "hash-locked painted modular identity, garment, and weapon boards",
+    "animationUnit": "one 512x84 eight-frame row per variant, action, and direction",
+    "runtime": "flattened deterministic raster tiers; no live skeletal renderer",
+    "leftHandedness": "left is compiled from reflected joints and independently transformed components; no finished row mirroring",
+    "stateMapping": "runtime derives idle, walk, attack, and retreat from existing enemy movement, attackCue, engagement, and retreating fields"
+  }
+}

@@ -1,0 +1,1122 @@
+{
+  "frames": [
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          31,
+          42
+        ],
+        "near": [
+          31,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          24,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          22,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          25,
+          64
+        ],
+        "sole_run": [
+          22,
+          26
+        ],
+        "toe": [
+          26,
+          79
+        ]
+      },
+      "frame": 0,
+      "hands": {
+        "far": [
+          30,
+          50
+        ],
+        "near": [
+          26,
+          47
+        ]
+      },
+      "head": [
+        35,
+        16
+      ],
+      "near": {
+        "ankle": [
+          40,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          39,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          40,
+          64
+        ],
+        "sole_run": [
+          39,
+          44
+        ],
+        "toe": [
+          44,
+          79
+        ]
+      },
+      "pelvis": [
+        34,
+        53
+      ],
+      "phase": "break-near-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          33
+        ],
+        "near": [
+          36,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          51
+        ],
+        "left_hand": [
+          30,
+          50
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          26,
+          47
+        ]
+      },
+      "weapon_tip": [
+        7,
+        35
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          30,
+          46
+        ],
+        "near": [
+          28,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          30,
+          42
+        ],
+        "near": [
+          32,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          25,
+          74
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          22,
+          76
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          32,
+          66
+        ],
+        "sole_run": null,
+        "toe": [
+          27,
+          76
+        ]
+      },
+      "frame": 1,
+      "hands": {
+        "far": [
+          28,
+          51
+        ],
+        "near": [
+          28,
+          48
+        ]
+      },
+      "head": [
+        35,
+        17
+      ],
+      "near": {
+        "ankle": [
+          39,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          36,
+          79
+        ],
+        "hip": [
+          34,
+          54
+        ],
+        "knee": [
+          41,
+          65
+        ],
+        "sole_run": [
+          36,
+          41
+        ],
+        "toe": [
+          41,
+          79
+        ]
+      },
+      "pelvis": [
+        34,
+        54
+      ],
+      "phase": "break-near-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          34
+        ],
+        "near": [
+          36,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          52
+        ],
+        "left_hand": [
+          28,
+          51
+        ],
+        "load": [
+          32,
+          53
+        ],
+        "right_hand": [
+          28,
+          48
+        ]
+      },
+      "weapon_tip": [
+        9,
+        36
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          29,
+          46
+        ],
+        "near": [
+          30,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          28,
+          42
+        ],
+        "near": [
+          34,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          38,
+          72
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          37,
+          75
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          41,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          42,
+          75
+        ]
+      },
+      "frame": 2,
+      "hands": {
+        "far": [
+          25,
+          51
+        ],
+        "near": [
+          31,
+          48
+        ]
+      },
+      "head": [
+        35,
+        16
+      ],
+      "near": {
+        "ankle": [
+          34,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          31,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          37,
+          65
+        ],
+        "sole_run": [
+          31,
+          36
+        ],
+        "toe": [
+          36,
+          79
+        ]
+      },
+      "pelvis": [
+        34,
+        53
+      ],
+      "phase": "break-near-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          33
+        ],
+        "near": [
+          36,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          51
+        ],
+        "left_hand": [
+          25,
+          51
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          31,
+          48
+        ]
+      },
+      "weapon_tip": [
+        12,
+        36
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          26,
+          46
+        ],
+        "near": [
+          32,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          26,
+          40
+        ],
+        "near": [
+          36,
+          38
+        ]
+      },
+      "far": {
+        "ankle": [
+          39,
+          69
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          40,
+          73
+        ],
+        "hip": [
+          30,
+          51
+        ],
+        "knee": [
+          41,
+          58
+        ],
+        "sole_run": null,
+        "toe": [
+          45,
+          73
+        ]
+      },
+      "frame": 3,
+      "hands": {
+        "far": [
+          21,
+          49
+        ],
+        "near": [
+          35,
+          46
+        ]
+      },
+      "head": [
+        35,
+        15
+      ],
+      "near": {
+        "ankle": [
+          28,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          25,
+          79
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          30,
+          65
+        ],
+        "sole_run": [
+          25,
+          30
+        ],
+        "toe": [
+          30,
+          79
+        ]
+      },
+      "pelvis": [
+        34,
+        52
+      ],
+      "phase": "break-near-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          32
+        ],
+        "near": [
+          36,
+          31
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          50
+        ],
+        "left_hand": [
+          21,
+          49
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          35,
+          46
+        ]
+      },
+      "weapon_tip": [
+        16,
+        34
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          24,
+          44
+        ],
+        "near": [
+          36,
+          42
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          26,
+          42
+        ],
+        "near": [
+          36,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          39,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          39,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          36,
+          64
+        ],
+        "sole_run": [
+          39,
+          44
+        ],
+        "toe": [
+          44,
+          79
+        ]
+      },
+      "frame": 4,
+      "hands": {
+        "far": [
+          20,
+          50
+        ],
+        "near": [
+          36,
+          47
+        ]
+      },
+      "head": [
+        35,
+        16
+      ],
+      "near": {
+        "ankle": [
+          25,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          22,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          30,
+          65
+        ],
+        "sole_run": [
+          22,
+          26
+        ],
+        "toe": [
+          26,
+          79
+        ]
+      },
+      "pelvis": [
+        34,
+        53
+      ],
+      "phase": "break-far-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          33
+        ],
+        "near": [
+          36,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          51
+        ],
+        "left_hand": [
+          20,
+          50
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          36,
+          47
+        ]
+      },
+      "weapon_tip": [
+        17,
+        35
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          23,
+          46
+        ],
+        "near": [
+          36,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          27,
+          42
+        ],
+        "near": [
+          35,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          39,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          37,
+          79
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          35,
+          65
+        ],
+        "sole_run": [
+          37,
+          42
+        ],
+        "toe": [
+          42,
+          79
+        ]
+      },
+      "frame": 5,
+      "hands": {
+        "far": [
+          22,
+          51
+        ],
+        "near": [
+          34,
+          48
+        ]
+      },
+      "head": [
+        35,
+        17
+      ],
+      "near": {
+        "ankle": [
+          28,
+          74
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          24,
+          76
+        ],
+        "hip": [
+          34,
+          54
+        ],
+        "knee": [
+          36,
+          67
+        ],
+        "sole_run": null,
+        "toe": [
+          29,
+          76
+        ]
+      },
+      "pelvis": [
+        34,
+        54
+      ],
+      "phase": "break-far-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          34
+        ],
+        "near": [
+          36,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          52
+        ],
+        "left_hand": [
+          22,
+          51
+        ],
+        "load": [
+          32,
+          53
+        ],
+        "right_hand": [
+          34,
+          48
+        ]
+      },
+      "weapon_tip": [
+        15,
+        36
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          24,
+          46
+        ],
+        "near": [
+          34,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          28,
+          42
+        ],
+        "near": [
+          34,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          34,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          31,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          32,
+          65
+        ],
+        "sole_run": [
+          31,
+          36
+        ],
+        "toe": [
+          36,
+          79
+        ]
+      },
+      "frame": 6,
+      "hands": {
+        "far": [
+          25,
+          51
+        ],
+        "near": [
+          31,
+          48
+        ]
+      },
+      "head": [
+        35,
+        16
+      ],
+      "near": {
+        "ankle": [
+          40,
+          72
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          39,
+          75
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          44,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          44,
+          75
+        ]
+      },
+      "pelvis": [
+        34,
+        53
+      ],
+      "phase": "break-far-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          33
+        ],
+        "near": [
+          36,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          51
+        ],
+        "left_hand": [
+          25,
+          51
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          31,
+          48
+        ]
+      },
+      "weapon_tip": [
+        12,
+        36
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          26,
+          46
+        ],
+        "near": [
+          32,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          30,
+          40
+        ],
+        "near": [
+          32,
+          38
+        ]
+      },
+      "far": {
+        "ankle": [
+          28,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          25,
+          79
+        ],
+        "hip": [
+          30,
+          51
+        ],
+        "knee": [
+          27,
+          64
+        ],
+        "sole_run": [
+          25,
+          30
+        ],
+        "toe": [
+          30,
+          79
+        ]
+      },
+      "frame": 7,
+      "hands": {
+        "far": [
+          29,
+          49
+        ],
+        "near": [
+          27,
+          46
+        ]
+      },
+      "head": [
+        35,
+        15
+      ],
+      "near": {
+        "ankle": [
+          42,
+          69
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          42,
+          73
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          45,
+          59
+        ],
+        "sole_run": null,
+        "toe": [
+          47,
+          73
+        ]
+      },
+      "pelvis": [
+        34,
+        52
+      ],
+      "phase": "break-far-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          32,
+          32
+        ],
+        "near": [
+          36,
+          31
+        ]
+      },
+      "sockets": {
+        "belt": [
+          35,
+          50
+        ],
+        "left_hand": [
+          29,
+          49
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          27,
+          46
+        ]
+      },
+      "weapon_tip": [
+        8,
+        34
+      ],
+      "weapon_vector": [
+        -11,
+        -7
+      ],
+      "wrists": {
+        "far": [
+          30,
+          44
+        ],
+        "near": [
+          30,
+          42
+        ]
+      }
+    }
+  ],
+  "schema": "realm.enemy-sprites.raider-landmarks.v1",
+  "scope": {
+    "action": "retreat",
+    "direction": "right",
+    "variant": "ash-reaver"
+  }
+}

@@ -39,6 +39,7 @@ const BASELINE_TOL = 2.0;    // px of within-row feet drift allowed
 const CENTROID_TOL = 3.5;    // walk/idle horizontal drift (whole-body registration)
 const CENTROID_TOL_TOOL = 8; // work/carry rows swing tools — sway is the animation
 const GROUP_BASELINE_TOL = 2.5; // px of cross-direction baseline spread per role+action
+const ABSOLUTE_BASELINE_TOL = 1; // effective feet must stay on the cast-wide ground row
 
 const asJson = process.argv.includes('--json');
 const asWrite = process.argv.includes('--write');
@@ -175,7 +176,7 @@ if (asWrite) {
 // to see the uncorrected sheet numbers.
 let REG = {};
 if (!process.argv.includes('--raw')) {
-  try { REG = (await import('../js/actor-registration.js?realm=188')).ACTOR_REGISTRATION; } catch (_e) {}
+  try { REG = (await import('../js/actor-registration.js?realm=191')).ACTOR_REGISTRATION; } catch (_e) {}
 }
 for (const r of results) {
   if (r.empty) continue;
@@ -198,6 +199,7 @@ for (const g of groupSpread) g.spread = 0;
 const swayTol = (r) => (r.action === 'work' || r.action === 'carry') ? CENTROID_TOL_TOOL : CENTROID_TOL;
 const badRows = results.filter(r => !r.empty && (r.baseDrift > BASELINE_TOL || r.cxDrift > swayTol(r)));
 const badGroups = groupSpread.filter(g => g.spread > GROUP_BASELINE_TOL);
+const badAbsolute = results.filter(r => !r.empty && Math.abs(r.medBaseline - REF_BASELINE) > ABSOLUTE_BASELINE_TOL);
 
 badRows.sort((a, b) => (b.baseDrift + b.cxDrift) - (a.baseDrift + a.cxDrift));
 console.log(`[registration] ${results.length} rows measured`);
@@ -208,8 +210,12 @@ for (const r of badRows.slice(0, 20)) {
 if (badRows.length > 20) console.log(`    … and ${badRows.length - 20} more`);
 console.log(`  role+action groups with cross-direction feet spread >${GROUP_BASELINE_TOL}px: ${badGroups.length}`);
 for (const g of badGroups.slice(0, 12)) console.log(`    ✗ ${g.k} — ${g.spread}px between directions`);
+console.log(`  rows off absolute ground baseline ${REF_BASELINE}±${ABSOLUTE_BASELINE_TOL}px: ${badAbsolute.length}`);
+for (const r of badAbsolute.slice(0, 20)) {
+  console.log(`    ✗ ${r.role}/${r.action}/${r.dir} — effective baseline ${r.medBaseline}`);
+}
 
-if (badRows.length || badGroups.length) {
+if (badRows.length || badGroups.length || badAbsolute.length) {
   console.error('[registration] FAILED — sprite cells are not consistently registered');
   process.exit(1);
 }

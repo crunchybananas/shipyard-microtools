@@ -3,7 +3,7 @@
 // diary of the realm. Persists to save.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=188';
+import { G } from './state.js?realm=191';
 
 // G.chronicle: [{ day, season, text, tag }]
 // tag in: 'milestone','event','character','raid','season','death','birth','victory','misc'
@@ -20,8 +20,9 @@ import { G } from './state.js?realm=188';
 // even if that means the buffer sits slightly over 300.
 // Chronicle writes and initialization are owned by log.js (core tier —
 // ENGINE.md rule 4). Story consumes that API directly.
-import { announce, chronicle, initChronicle, sfx } from './log.js?realm=188';
-import { renameCitizen } from './citizen-ownership.js?realm=188';
+import { announce, chronicle, initChronicle, sfx } from './log.js?realm=191';
+import { renameCitizen } from './citizen-ownership.js?realm=191';
+import { authoredBuildingCount } from './building-inventory.js?realm=191';
 
 
 export function hasFlag(key) { initChronicle(); return !!G.storyFlags[key]; }
@@ -2421,8 +2422,8 @@ const SUPPLEMENTAL_STORY_BEATS = Object.freeze([
     trigger: state => state.buildings.some(building => building.type === 'tradingpost'),
     text: 'A trading post is erected on the sandy shore. Ships will come now, bearing goods from distant lands.' },
   { flag: 'victoryFinal', every: 120, tag: 'victory', trigger: state => state.won,
-    text: state => `${state.kingdomName} is victorious! After ${state.day} days, with ${state.population} citizens and ${state.buildings.length} buildings, the Hall of Ages stands as an eternal monument.` },
-  { flag: '100bldg', every: 240, tag: 'victory', trigger: state => state.buildings.length >= 100,
+    text: state => `${state.kingdomName} is victorious! After ${state.day} days, with ${state.population} citizens and ${authoredBuildingCount(state)} buildings, the Hall of Ages stands as an eternal monument.` },
+  { flag: '100bldg', every: 240, tag: 'victory', trigger: state => authoredBuildingCount(state) >= 100,
     text: 'One hundred buildings! The realm stretches across the island. What began as three settlers and an empty field is now a city.' },
 ]);
 
@@ -2430,7 +2431,7 @@ function checkStoryCadence() {
   if (G.gameTick % 120 === 0) {
     for (const count of BUILDING_COUNT_MILESTONES) {
       const flag = `building_count_${count}`;
-      if (G.buildings.length >= count && !hasFlag(flag)) {
+      if (authoredBuildingCount(G) >= count && !hasFlag(flag)) {
         setFlag(flag);
         chronicle(`${count} structures now stand in ${G.kingdomName}. The skyline grows.`, 'milestone');
         break;

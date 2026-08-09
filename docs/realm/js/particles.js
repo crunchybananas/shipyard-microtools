@@ -2,8 +2,8 @@
 // Particles — floating resource numbers, smoke, sparkles
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=188';
-import { workersForBuilding } from './citizen-ownership.js?realm=188';
+import { G } from './state.js?realm=191';
+import { workersForBuilding } from './citizen-ownership.js?realm=191';
 
 export function updateParticles() {
   for (let i = G.particles.length - 1; i >= 0; i--) {

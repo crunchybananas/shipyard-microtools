@@ -13,22 +13,24 @@
 // added here MUST pass verify-core-purity + verify-determinism.
 // ════════════════════════════════════════════════════════════
 
-import { G, updateSeason, getSeasonData } from './state.js?realm=188';
-import { updateCitizens } from './citizens.js?realm=188';
-import { updateAvatar } from './avatar.js?realm=188';
-import { updateSoldiers } from './soldiers.js?realm=188';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=188';
-import { updateWalkers } from './walkers.js?realm=188';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=188';
-import { checkMissions } from './missions.js?realm=188';
-import { updateResearch, checkEraAdvance } from './tech.js?realm=188';
-import { updateWonder } from './wonder.js?realm=188';
-import { checkRandomEvents } from './events.js?realm=188';
-import { checkScenarioComplete } from './scenarios.js?realm=188';
-import { chronicle, announce, sfx } from './log.js?realm=188';
-import { emit } from './bus.js?realm=188';
-import { checkStoryBeats } from './story.js?realm=188';
-import { updateRaidSummary } from './raid-summary.js?realm=188';
+import { G, updateSeason, getSeasonData } from './state.js?realm=191';
+import { updateCitizens } from './citizens.js?realm=191';
+import { updateAvatar } from './avatar.js?realm=191';
+import { updateSoldiers } from './soldiers.js?realm=191';
+import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=191';
+import { updateWalkers } from './walkers.js?realm=191';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=191';
+import { checkMissions } from './missions.js?realm=191';
+import { updateResearch, checkEraAdvance } from './tech.js?realm=191';
+import { updateWonder } from './wonder.js?realm=191';
+import { checkRandomEvents } from './events.js?realm=191';
+import { checkScenarioComplete } from './scenarios.js?realm=191';
+import { chronicle, announce, sfx } from './log.js?realm=191';
+import { emit } from './bus.js?realm=191';
+import { checkStoryBeats } from './story.js?realm=191';
+import { updateRaidSummary } from './raid-summary.js?realm=191';
+import { updateFirstMusterChapter } from './first-muster.js?realm=191';
+import { updatePostRaidRecovery } from './post-raid-recovery.js?realm=191';
 
 // ── Day/Night clock (moved from main.js updateTime) ─────────────────
 function tickClock() {
@@ -41,8 +43,8 @@ function tickClock() {
   sfx('bellToll');
   collectTaxes();
   checkRaids();
-  // Note: raidsSurvived increments inside checkRaids() only when the
-  // player had defenses at the moment of raid-spawn (Loop 014).
+  // raidsSurvived is awarded by raid-summary only after the warband clears
+  // and at least one citizen remains. Spawn-time ownership is not survival.
   checkRandomEvents();
   if (updateSeason()) {
     const s = getSeasonData();
@@ -84,6 +86,8 @@ function tickClock() {
 }
 
 function checkScenarioVictory() {
+  updateFirstMusterChapter();
+  updatePostRaidRecovery();
   if (G._scenarioWon) return;
   if (!checkScenarioComplete()) return;
   G._scenarioWon = true;

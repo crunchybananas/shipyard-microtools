@@ -1,0 +1,3046 @@
+{
+  "outputs": {
+    "atlases/enemies-atlas-default.png": {
+      "bytes": 369908,
+      "sha256": "8814b9acef0838f22c9232be4d82086a020ce28a9b6336e68232f9943a5ae4af"
+    },
+    "atlases/enemies-atlas-double.png": {
+      "bytes": 713340,
+      "sha256": "6c9381c1e294c55aa5c228b7e319452617071811e98dbb951d8034e02a749115"
+    },
+    "atlases/enemies-atlas-native.png": {
+      "bytes": 238147,
+      "sha256": "09d50cdada91e16b4d85bc45135592457367b0420c532f670e1b07b7dd904fe8"
+    },
+    "atlases/enemies-atlas.png": {
+      "bytes": 661831,
+      "sha256": "07216045397bb10786211fbd2355ba8d6ef514d9f23908e54dc7919b94a00d71"
+    },
+    "enemies-runtime-atlases.json": {
+      "bytes": 1304,
+      "sha256": "75567829fcea8dad587d9afb3e246f6bd4f149ee74cdcf97bb9da670d36d822c"
+    },
+    "id-masks/ash-reaver/attack-down.png": {
+      "bytes": 3286,
+      "sha256": "b4910736d027a69567ea412977a90959f3d38db89272b77a4f0fb499d773f30c"
+    },
+    "id-masks/ash-reaver/attack-left.png": {
+      "bytes": 2741,
+      "sha256": "6697025183478b93d4e3b9b6bfc5d1ec0610b188a089b07c81e66723a7f6f018"
+    },
+    "id-masks/ash-reaver/attack-right.png": {
+      "bytes": 2801,
+      "sha256": "bd071ef8572cf3bd1abe2c077e7200a7f461e3fdd1f2ad90fa308e03811859c8"
+    },
+    "id-masks/ash-reaver/attack-up.png": {
+      "bytes": 3128,
+      "sha256": "df4e541c8d8891753bc7c665feab01cd9aeaca01276180556bac64d323bd67ba"
+    },
+    "id-masks/ash-reaver/idle-down.png": {
+      "bytes": 2898,
+      "sha256": "8245b9308ddf69318e0e1c6724c683040f97159f7ae16c09eea0fde5670acc2c"
+    },
+    "id-masks/ash-reaver/idle-left.png": {
+      "bytes": 2521,
+      "sha256": "fde5fd1753012a740f4ae232c6de541b3836093150b11a1a816e97d00fd51796"
+    },
+    "id-masks/ash-reaver/idle-right.png": {
+      "bytes": 2581,
+      "sha256": "860ee486e003412cd5f6d50dc607b52f13f8ddd4380c38de0c56e025caff2564"
+    },
+    "id-masks/ash-reaver/idle-up.png": {
+      "bytes": 2673,
+      "sha256": "88ab8a35f96bc172cabce25032ecb4bd591f0b7d77c6b92793a36287ee9ee7cc"
+    },
+    "id-masks/ash-reaver/retreat-down.png": {
+      "bytes": 2889,
+      "sha256": "28461862ece2c830e3b0009aad91d25f096fc5e18e43155692aa035360dda5fe"
+    },
+    "id-masks/ash-reaver/retreat-left.png": {
+      "bytes": 3260,
+      "sha256": "8eaebf11f28505e5d125e344326891553396b8a1cf1a5b14e19b1520f69e279d"
+    },
+    "id-masks/ash-reaver/retreat-right.png": {
+      "bytes": 3186,
+      "sha256": "f39b502bec80dfad6eed599f3c016164667895c3b7005183fd90925215c2b2b6"
+    },
+    "id-masks/ash-reaver/retreat-up.png": {
+      "bytes": 2630,
+      "sha256": "3784050d687de0708ba05bbb48a186597bfe8201380056c41bde082981473792"
+    },
+    "id-masks/ash-reaver/walk-down.png": {
+      "bytes": 2976,
+      "sha256": "a8be9f876e5c1af28da2328ea656bbd8247c88e627c6ad7f0f25b9a252ccc42a"
+    },
+    "id-masks/ash-reaver/walk-left.png": {
+      "bytes": 2983,
+      "sha256": "f26fe5546adecdecfcaae816e97557f72d05af83f2033446ddb00a1fbad4afb5"
+    },
+    "id-masks/ash-reaver/walk-right.png": {
+      "bytes": 2930,
+      "sha256": "2114b3213e211dd28637f8490f2b4b96415c6034528b18c60c20c6e33fb9ff60"
+    },
+    "id-masks/ash-reaver/walk-up.png": {
+      "bytes": 2681,
+      "sha256": "456a4f68c30fd9c2885c1ef6742947937dcf6d889b9d36d93808513e1fb2581e"
+    },
+    "id-masks/bone-breaker/attack-down.png": {
+      "bytes": 3101,
+      "sha256": "e503e173b01226f6e8fe2da1a8784ef4ac1ef9cd8a702d2bde408293c1629c05"
+    },
+    "id-masks/bone-breaker/attack-left.png": {
+      "bytes": 2828,
+      "sha256": "c99bfaedf4e6c7148586963ce5a3e6a172aa9f806ea193377fb69e119b1d969a"
+    },
+    "id-masks/bone-breaker/attack-right.png": {
+      "bytes": 2807,
+      "sha256": "ec3b1a0e17e73aeda8eeb9c2326586279f65845e0fd2e0e204ff080b02fbc6ac"
+    },
+    "id-masks/bone-breaker/attack-up.png": {
+      "bytes": 3001,
+      "sha256": "a379c02d5ed6418fba2f0f32244822571e23d465d1e87a01c5ca2bc3bebbcfa5"
+    },
+    "id-masks/bone-breaker/idle-down.png": {
+      "bytes": 2653,
+      "sha256": "f9ed99535520e4b4479d77c98316eaa7fa90ab0493ceeb646b55a781adaeadf9"
+    },
+    "id-masks/bone-breaker/idle-left.png": {
+      "bytes": 2582,
+      "sha256": "e5d171bea5c9fc48ae98b651eb192b787f5b04efe9d8dc10e83c0dad0d7db5b6"
+    },
+    "id-masks/bone-breaker/idle-right.png": {
+      "bytes": 2483,
+      "sha256": "7a1fc2ceb88ebca3232ffd5204cf06e18117ccb12dce478dde9b664b17157524"
+    },
+    "id-masks/bone-breaker/idle-up.png": {
+      "bytes": 2766,
+      "sha256": "9db04b4fce975247affc874979c9fc8d7100b114254adbe641cd2c76bf0a34b9"
+    },
+    "id-masks/bone-breaker/retreat-down.png": {
+      "bytes": 2642,
+      "sha256": "0d5d393404420578c2bdb6dbc9e8c3f58a97071a91298e3c4c70bfe5dcd3e711"
+    },
+    "id-masks/bone-breaker/retreat-left.png": {
+      "bytes": 3238,
+      "sha256": "e99cdfd82e6332937fc4df347d5aef69a799a2ecb5d1a98d626c9e5e0a19c377"
+    },
+    "id-masks/bone-breaker/retreat-right.png": {
+      "bytes": 3084,
+      "sha256": "60ba22a05f6ab79647db2b89590fcdc29bf18fa618a4eb303ac7bea7d1743657"
+    },
+    "id-masks/bone-breaker/retreat-up.png": {
+      "bytes": 2664,
+      "sha256": "04e89fe0bdefba4efd46b848db16eab0408b8395f224a2dd5155515e2b4037f1"
+    },
+    "id-masks/bone-breaker/walk-down.png": {
+      "bytes": 2733,
+      "sha256": "61c60a71e74d81e53d782e114905531ba41adafe57a2a707fb85fd6ca86e0a95"
+    },
+    "id-masks/bone-breaker/walk-left.png": {
+      "bytes": 2953,
+      "sha256": "a8f41de6c52a827a44156d0b42f6be3f9489da060afb51e32b75adfae02c44f8"
+    },
+    "id-masks/bone-breaker/walk-right.png": {
+      "bytes": 2830,
+      "sha256": "f433f2c599acd94b5b53b5a413cb3f9d69fe9bd7bda44407a6ff5c3186fe3778"
+    },
+    "id-masks/bone-breaker/walk-up.png": {
+      "bytes": 2658,
+      "sha256": "1e2bee947ea5472ec17f8e1e7f2fe740ca3e86fb297acbc35c62aea88b048e40"
+    },
+    "id-masks/iron-lancer/attack-down.png": {
+      "bytes": 3026,
+      "sha256": "19c098e8c340772c1437af7f4f9257246bfcb357257f8ae2e4c97742dbf9ad3a"
+    },
+    "id-masks/iron-lancer/attack-left.png": {
+      "bytes": 2627,
+      "sha256": "18c405ec65005a02f4803c813cd667824a38429c5c35ec99b915e17d09ff8356"
+    },
+    "id-masks/iron-lancer/attack-right.png": {
+      "bytes": 2694,
+      "sha256": "0eefa7b5739e3062909bca3ce6d6b4edc4967cd621a8acba8ffce0de0aee4d1b"
+    },
+    "id-masks/iron-lancer/attack-up.png": {
+      "bytes": 2872,
+      "sha256": "215e3b50da04dda0cc4cd4357f8fb1709fd8713c960ef5f559a45e2a2ca4ecde"
+    },
+    "id-masks/iron-lancer/idle-down.png": {
+      "bytes": 2587,
+      "sha256": "59d6905c81d5a1696f8bb718467082204dcb6c367a8d217a6025230d4592723c"
+    },
+    "id-masks/iron-lancer/idle-left.png": {
+      "bytes": 2477,
+      "sha256": "1f1f37e494d2a3f2ea52503063de231cba83fca83e60a1de28587eae3f1c31cd"
+    },
+    "id-masks/iron-lancer/idle-right.png": {
+      "bytes": 2453,
+      "sha256": "7f67b612c2272da28ce273b4bb854e2f2b94a401cde8378ae2052872bf5a5abf"
+    },
+    "id-masks/iron-lancer/idle-up.png": {
+      "bytes": 2489,
+      "sha256": "c78b94b1e7463f3efbf5fec04134abc00b6d232d5050b6cc73242ffcf4cba9e3"
+    },
+    "id-masks/iron-lancer/retreat-down.png": {
+      "bytes": 2679,
+      "sha256": "e0662f73ce4548ee32c238fcd333139d835c781cb7a0da1d4d1123a8bb6ccd79"
+    },
+    "id-masks/iron-lancer/retreat-left.png": {
+      "bytes": 3143,
+      "sha256": "bfa9495eb1ab0141227b801922f253319b9c1ab15f95f82b7f31cbefc83a5809"
+    },
+    "id-masks/iron-lancer/retreat-right.png": {
+      "bytes": 3050,
+      "sha256": "004c5b4d00e10c62d8e99e6e45e87dd0db1fa213e901dce9481a046d519c6428"
+    },
+    "id-masks/iron-lancer/retreat-up.png": {
+      "bytes": 2508,
+      "sha256": "7873315393c3fa25be86fce88816130451b9034143bc23700385babde089b6fb"
+    },
+    "id-masks/iron-lancer/walk-down.png": {
+      "bytes": 2732,
+      "sha256": "b99624cdbce56610088831dfd41a710450e45f88a6dbc5a61323b500ffc2448b"
+    },
+    "id-masks/iron-lancer/walk-left.png": {
+      "bytes": 2874,
+      "sha256": "b0aad07aa7b5bf4042d3d742a3077f4901c88066909708dd6bcb2a8a7ff6fcc7"
+    },
+    "id-masks/iron-lancer/walk-right.png": {
+      "bytes": 2790,
+      "sha256": "e788d4d5aa67a4cb2dac37a33aa4b1f97d188221ee7c8bf7d372aa4610518d89"
+    },
+    "id-masks/iron-lancer/walk-up.png": {
+      "bytes": 2413,
+      "sha256": "af577359c327af6dc41552ba867e1f2ec0801cbc35c55d314ecafc272a0f25b0"
+    },
+    "landmarks/ash-reaver/attack-down.json": {
+      "bytes": 16658,
+      "sha256": "3ee665a73f5fc939fde69b623e43186f61404bb5bc95a27e0f2357597a10b659"
+    },
+    "landmarks/ash-reaver/attack-left.json": {
+      "bytes": 16396,
+      "sha256": "f935c3e087a95827a47ba4f2384183b36669050227d1ac751234d312ab6f621e"
+    },
+    "landmarks/ash-reaver/attack-right.json": {
+      "bytes": 16400,
+      "sha256": "7f93abb4dd26cc3b6dbff1f9d948bd1418d0383aec65c2334256a26d90e06294"
+    },
+    "landmarks/ash-reaver/attack-up.json": {
+      "bytes": 16643,
+      "sha256": "9d6553673ae37b06e89011e42e7844e208bd379d0e242e4b0c98691d7bbf733f"
+    },
+    "landmarks/ash-reaver/idle-down.json": {
+      "bytes": 16624,
+      "sha256": "c27be20fb4ecddae92ae113f08e976f4b28ea18209f7e6315d3fcbde749e4cd2"
+    },
+    "landmarks/ash-reaver/idle-left.json": {
+      "bytes": 16352,
+      "sha256": "8e07ef72f3f3a3e10025e14858190b4d09664346c39e2b4bc8b6cf0c9c37008e"
+    },
+    "landmarks/ash-reaver/idle-right.json": {
+      "bytes": 16369,
+      "sha256": "47eb25ef85023094e2e92df93c71ca6f9673ad6dd137361869c39e2a6db36a22"
+    },
+    "landmarks/ash-reaver/idle-up.json": {
+      "bytes": 16614,
+      "sha256": "0944fdeb06ecd797898edfea2a48114657982c5aa3489220a818289a09b335f3"
+    },
+    "landmarks/ash-reaver/retreat-down.json": {
+      "bytes": 16599,
+      "sha256": "874925aea422b870f4a7645dd1a0f02204eb360c3dce399bcd326a83f21f0b8a"
+    },
+    "landmarks/ash-reaver/retreat-left.json": {
+      "bytes": 16199,
+      "sha256": "71dd8e32085bf3a35aaf82e51ce1fe4c1e730508018db2a3958937f42f8f8d7c"
+    },
+    "landmarks/ash-reaver/retreat-right.json": {
+      "bytes": 16213,
+      "sha256": "8b371acc3adfb2d9d3c328c94c4a5126f078218448fbd40131b909c1cb74828b"
+    },
+    "landmarks/ash-reaver/retreat-up.json": {
+      "bytes": 16573,
+      "sha256": "360404ae7861f7ac968d36c5cc5b0d636e102e9c4ccb64cf4208e38d6194aa58"
+    },
+    "landmarks/ash-reaver/walk-down.json": {
+      "bytes": 16540,
+      "sha256": "b091e798f9a1a35c852b5d30a4fc4635b3cb05d65d7bb3f7ce38078970a745f4"
+    },
+    "landmarks/ash-reaver/walk-left.json": {
+      "bytes": 16148,
+      "sha256": "655973930073f568e973788bfed853489ea32e50c1cd7a115e7380ed2c64dde3"
+    },
+    "landmarks/ash-reaver/walk-right.json": {
+      "bytes": 16165,
+      "sha256": "6d5b0f7dcbc8d9862484e3feea07d8902b0ca5178c6fe03a255300db1e27f605"
+    },
+    "landmarks/ash-reaver/walk-up.json": {
+      "bytes": 16530,
+      "sha256": "b836b52031a48eb2c6dd74fb98a1ca8b7acb5cccf87edebd0f992cc7ef1005b6"
+    },
+    "landmarks/bone-breaker/attack-down.json": {
+      "bytes": 16660,
+      "sha256": "65e0047444cb8a6c003789dd3f84b2de74ab836ddc9707a385b1074e6e38534b"
+    },
+    "landmarks/bone-breaker/attack-left.json": {
+      "bytes": 16398,
+      "sha256": "7373071de96cb268261bf1e41f0e6d652217cb721e79cd1d584f180b482b255e"
+    },
+    "landmarks/bone-breaker/attack-right.json": {
+      "bytes": 16402,
+      "sha256": "90374eef19c1ef0ce191ad85396ae34827b010931fab0cf9fa275a0da1b8c690"
+    },
+    "landmarks/bone-breaker/attack-up.json": {
+      "bytes": 16645,
+      "sha256": "35695abfdfb3b45bdb8718a1143593c076fbb3e6b9d718b23a5526fa981e7f1d"
+    },
+    "landmarks/bone-breaker/idle-down.json": {
+      "bytes": 16626,
+      "sha256": "6ef9dccdcc6f7821ed729e6b0bc6da9fa26817444807658726322b5b90645e16"
+    },
+    "landmarks/bone-breaker/idle-left.json": {
+      "bytes": 16354,
+      "sha256": "67634dde99d1b4df084dc6cd7266722389edfb8f0bd1905e66e44cb8d946d0a8"
+    },
+    "landmarks/bone-breaker/idle-right.json": {
+      "bytes": 16371,
+      "sha256": "8adf41610877eb64dd1cef2c74f306faec93922bf4c0698e85874d2945082d86"
+    },
+    "landmarks/bone-breaker/idle-up.json": {
+      "bytes": 16616,
+      "sha256": "5efce4335d8eba9edb91a6d22fe71d1966b5baf77f892e3cbbd59287043be2e7"
+    },
+    "landmarks/bone-breaker/retreat-down.json": {
+      "bytes": 16601,
+      "sha256": "97254f83b2aa793c874f76044f8d04c51c5f63a2c983763f319047ddf7d1af34"
+    },
+    "landmarks/bone-breaker/retreat-left.json": {
+      "bytes": 16201,
+      "sha256": "2daad3bb3e61109c82f60c9438240bf20777a290db49d4b6dd6d60f4b22ec14e"
+    },
+    "landmarks/bone-breaker/retreat-right.json": {
+      "bytes": 16215,
+      "sha256": "5e99c05827a2774f813d540ce825d47cd264cc9a4bf3509a1710070e916d16c4"
+    },
+    "landmarks/bone-breaker/retreat-up.json": {
+      "bytes": 16575,
+      "sha256": "24ff2d4ce91235a117fa60795886290106b0ef54c27800f22c66caa66901aa0b"
+    },
+    "landmarks/bone-breaker/walk-down.json": {
+      "bytes": 16542,
+      "sha256": "6bdb27c6c7c4292516a7b332d0808ac69349d68718a59974b9eeb5a7b5179da0"
+    },
+    "landmarks/bone-breaker/walk-left.json": {
+      "bytes": 16150,
+      "sha256": "209612cc9b458fd1d60945f53e8f99efcd4127e0e931f9ef9a78c5a45fe1242d"
+    },
+    "landmarks/bone-breaker/walk-right.json": {
+      "bytes": 16167,
+      "sha256": "1f12678ab612a8b982546f0c6b97dbe1a21b64283e28838ef445ff881706b637"
+    },
+    "landmarks/bone-breaker/walk-up.json": {
+      "bytes": 16532,
+      "sha256": "8c8fae65d4d5b7588c092d29f9959919000257c17d5269aedff05910c79571df"
+    },
+    "landmarks/iron-lancer/attack-down.json": {
+      "bytes": 16659,
+      "sha256": "8a7fb8428d3d9f7b0764e67fdfe2cef8161e55c87f417367c2e06385212f7c14"
+    },
+    "landmarks/iron-lancer/attack-left.json": {
+      "bytes": 16397,
+      "sha256": "a7b5d8f92152a1eecf0fb61b2ae8b7a81535662cf334f91ef12303856487d73c"
+    },
+    "landmarks/iron-lancer/attack-right.json": {
+      "bytes": 16401,
+      "sha256": "cb7b19d5fd7a8170d494eec460a9716a951596f245fe7b7da4a26a70bc8eacc3"
+    },
+    "landmarks/iron-lancer/attack-up.json": {
+      "bytes": 16644,
+      "sha256": "6b717346f45becf0ca582552ce7f479dd446b8dd69696d6dc90eb40fb7ac4d93"
+    },
+    "landmarks/iron-lancer/idle-down.json": {
+      "bytes": 16625,
+      "sha256": "15f312af3099df7cfceaaef2a0abbc7b6c9bb4440c1f0201a30df947f06d6803"
+    },
+    "landmarks/iron-lancer/idle-left.json": {
+      "bytes": 16353,
+      "sha256": "7c0b65c4d7241da9f58d0cd0377805beea89f9d1968ebd0bf8765a04d4996216"
+    },
+    "landmarks/iron-lancer/idle-right.json": {
+      "bytes": 16370,
+      "sha256": "84d5d456f65777071d275b906d7db0553957b05e060d2e5f727413c92a7df2d1"
+    },
+    "landmarks/iron-lancer/idle-up.json": {
+      "bytes": 16615,
+      "sha256": "c0009a5baabc9904c083bc9b1e34a541a5ca17b9c4a4706b84cceafdd59723aa"
+    },
+    "landmarks/iron-lancer/retreat-down.json": {
+      "bytes": 16600,
+      "sha256": "80f032b3c607c169bbf30e67a04a76d37b8b05b428b06f0d77a9bedbd6745a25"
+    },
+    "landmarks/iron-lancer/retreat-left.json": {
+      "bytes": 16200,
+      "sha256": "79fbd5a4bfdea29df3585e48c4dc4d9894256dc14cf044e503166dc25728e30e"
+    },
+    "landmarks/iron-lancer/retreat-right.json": {
+      "bytes": 16214,
+      "sha256": "ce4ca32f0e2ee48fe15ba6a466075c57b5956329a6351e626bb2cd9e8fb9aaa0"
+    },
+    "landmarks/iron-lancer/retreat-up.json": {
+      "bytes": 16574,
+      "sha256": "adf297fa975edc9a340f711edd656a621c51acf1af822a8ca735c8f0d1a3fd0e"
+    },
+    "landmarks/iron-lancer/walk-down.json": {
+      "bytes": 16541,
+      "sha256": "45b013b2fa2daa2ac673ac71d84b9f35a82c557ed8c8cb6bc24c8d54c02933eb"
+    },
+    "landmarks/iron-lancer/walk-left.json": {
+      "bytes": 16149,
+      "sha256": "96b3b2987c388017b700134a34e7a12d2d426319a23736e5faa018662d8bf515"
+    },
+    "landmarks/iron-lancer/walk-right.json": {
+      "bytes": 16166,
+      "sha256": "fe84868bc733d426128627270a0785e9dae1aaac72f2e8436023d11b6bb8a00d"
+    },
+    "landmarks/iron-lancer/walk-up.json": {
+      "bytes": 16531,
+      "sha256": "28b7306c98c366d9aa7286077fcfbbde5bd8a9c4350806d386421ddd7654fb7c"
+    },
+    "planes/body/ash-reaver/attack-down.png": {
+      "bytes": 18171,
+      "sha256": "0b00821e17787f32b3bc2a99ddadf5ae27e40b9a1734c74822f2c0866fa43a1d"
+    },
+    "planes/body/ash-reaver/attack-left.png": {
+      "bytes": 12372,
+      "sha256": "3f13c9edb6d672baedb6ca46c26e647dfa66af535722c01e1e0da1048525cdbb"
+    },
+    "planes/body/ash-reaver/attack-right.png": {
+      "bytes": 12185,
+      "sha256": "1e486a63bf4595b54f916ec6119a8c6c71b3a956fdb5b1cc5eb4c5d19b1ee1b9"
+    },
+    "planes/body/ash-reaver/attack-up.png": {
+      "bytes": 17580,
+      "sha256": "d230b1960acea5bf04858be5884b2838d15984eac44df6530fa712273af6f405"
+    },
+    "planes/body/ash-reaver/idle-down.png": {
+      "bytes": 17090,
+      "sha256": "1f9a00cb6ec6dc4ff7b0715d18addf4ed16ae19d97f68268f250f9317d528db0"
+    },
+    "planes/body/ash-reaver/idle-left.png": {
+      "bytes": 11895,
+      "sha256": "49211488133e77c4eb62a539bcf65dffa014b02f6f8a4b4157ff3abb9fcff612"
+    },
+    "planes/body/ash-reaver/idle-right.png": {
+      "bytes": 12162,
+      "sha256": "2c8e26ecf2c5bb56d85fc7c7b94d9c5ec3c0beab11c875ce4daef59abefb3a55"
+    },
+    "planes/body/ash-reaver/idle-up.png": {
+      "bytes": 15956,
+      "sha256": "c100bd517f5dc98bd972a7f7359ff6d7eb0637bc04abb96621d142bd3f0d4524"
+    },
+    "planes/body/ash-reaver/retreat-down.png": {
+      "bytes": 17411,
+      "sha256": "96973a8de0f6f327fa3022ef69b2d01d9b8ddd5587fc10897b4b46acbd860911"
+    },
+    "planes/body/ash-reaver/retreat-left.png": {
+      "bytes": 20169,
+      "sha256": "2808860acb4c891f95d16dc17d6eb54794e1ed0e45b2501ab84ca89635cec75e"
+    },
+    "planes/body/ash-reaver/retreat-right.png": {
+      "bytes": 20296,
+      "sha256": "1ec4cd329ea425d9dc95ea97fd4274d8f65db081564b37d7cabfa1597d9a7fe0"
+    },
+    "planes/body/ash-reaver/retreat-up.png": {
+      "bytes": 17533,
+      "sha256": "31dd2cb3fa1eb10e678f6eb30110e960d71556e644f06cf07946694f3d989aaf"
+    },
+    "planes/body/ash-reaver/walk-down.png": {
+      "bytes": 17906,
+      "sha256": "c1f14a3451d03d2662aa3e8fa4468412dddfd72d0e414b1b29103de67a19b4c0"
+    },
+    "planes/body/ash-reaver/walk-left.png": {
+      "bytes": 19691,
+      "sha256": "eb3cc345a2457060cfebee2dea06c7c26024920595d7a7656c3c1f21fcfaa899"
+    },
+    "planes/body/ash-reaver/walk-right.png": {
+      "bytes": 19764,
+      "sha256": "1d4bf1f954103a94970051dbbf740e19f6ff245737b3b198d5aa81805593d03d"
+    },
+    "planes/body/ash-reaver/walk-up.png": {
+      "bytes": 17086,
+      "sha256": "8d37ffc8e8f45cca91290651e28cf6db296a8c15f735a3c3c8dd4af219bf9e0e"
+    },
+    "planes/body/bone-breaker/attack-down.png": {
+      "bytes": 18805,
+      "sha256": "1085a958fd879bffcf846846beebfd35c521680ac67a830a1b427f313d429b51"
+    },
+    "planes/body/bone-breaker/attack-left.png": {
+      "bytes": 13046,
+      "sha256": "6bf5d2c30edbf7459b7039beeac0bed97152ad4c1a167a25adccf72d022edf32"
+    },
+    "planes/body/bone-breaker/attack-right.png": {
+      "bytes": 12781,
+      "sha256": "3aaf6633eeb21f74288ed746e3487b8600831cf1e418409da3f9a690e5bffbd6"
+    },
+    "planes/body/bone-breaker/attack-up.png": {
+      "bytes": 18273,
+      "sha256": "7e5963d1f10d0a69d0a5e230e499f9aa0dcb87e1547317c7b0382390e64707ef"
+    },
+    "planes/body/bone-breaker/idle-down.png": {
+      "bytes": 16953,
+      "sha256": "edf1e9b563b4ce45ae4159626e3e202df19a94b115de5a51ee93c62cdb7a7b63"
+    },
+    "planes/body/bone-breaker/idle-left.png": {
+      "bytes": 13110,
+      "sha256": "bc8c2cf3280d9f9f9514cde4e1bda8f3f9ea97dfda996afb81cba916dc5bd844"
+    },
+    "planes/body/bone-breaker/idle-right.png": {
+      "bytes": 13108,
+      "sha256": "898cf45aae16930c0951f32eeab43245e4a0c086d3c96ae5507692d97d3e23a7"
+    },
+    "planes/body/bone-breaker/idle-up.png": {
+      "bytes": 16648,
+      "sha256": "0c08b0d27baeb0b4fdba79df10c6a245a6932fc0a4037b00795d7a953358bc8d"
+    },
+    "planes/body/bone-breaker/retreat-down.png": {
+      "bytes": 18314,
+      "sha256": "9bbc51bc5b67f15649875bf1d36fd901ebd5857f97fee635d486b75ac446cf23"
+    },
+    "planes/body/bone-breaker/retreat-left.png": {
+      "bytes": 21542,
+      "sha256": "c1c0a65ee9926653ad8b251d146fa8dc512afe72e371a3ef62e1f211334ce942"
+    },
+    "planes/body/bone-breaker/retreat-right.png": {
+      "bytes": 21425,
+      "sha256": "6af7cb7a3595eccfdbc83419565afba43e65eb3f9e277a47c2ab2dc8874a8afd"
+    },
+    "planes/body/bone-breaker/retreat-up.png": {
+      "bytes": 18128,
+      "sha256": "1256a7557ce2a2931aefc33401bb52b8d4439056b4222c23c8acfaf1df802a61"
+    },
+    "planes/body/bone-breaker/walk-down.png": {
+      "bytes": 18356,
+      "sha256": "53f75ef1904d65832113cbab63feef9d2947b24beddea29d1700bdc45aab35ee"
+    },
+    "planes/body/bone-breaker/walk-left.png": {
+      "bytes": 20637,
+      "sha256": "a603fbc53021d40887410ab6ea9abc05d5ebccd8926a2ead8f5d4beea24f1a7d"
+    },
+    "planes/body/bone-breaker/walk-right.png": {
+      "bytes": 20720,
+      "sha256": "99afd677204c8e79a61cc6d5ce772b83b535ee73b79cf032ed0e6707e9f8e031"
+    },
+    "planes/body/bone-breaker/walk-up.png": {
+      "bytes": 17921,
+      "sha256": "859437ba518d9ae862e4d09d968fd4eeff24209d8c3eb1cd348caee77a4c048b"
+    },
+    "planes/body/iron-lancer/attack-down.png": {
+      "bytes": 18815,
+      "sha256": "661fa5df83a357d1f02bfc1b615db77a66240769539d0e31f9702e1e4a19c119"
+    },
+    "planes/body/iron-lancer/attack-left.png": {
+      "bytes": 12539,
+      "sha256": "9c2051b4e77924389c451e3114a09f34d36e0284666e059a9004b93bb493a37b"
+    },
+    "planes/body/iron-lancer/attack-right.png": {
+      "bytes": 12836,
+      "sha256": "5344cfaf3b4001512cfd9a4b06ced01420ff2a42ad6075948ff8a9d7c062eaa0"
+    },
+    "planes/body/iron-lancer/attack-up.png": {
+      "bytes": 18187,
+      "sha256": "f3c2eac5921250061f42e8dbc0321f0bf47844ecee5bc0ddfea448fc8d6d7a5f"
+    },
+    "planes/body/iron-lancer/idle-down.png": {
+      "bytes": 16582,
+      "sha256": "be4f8d2a1c5cefbc7bf28e0a9efc0d6613933c536e5a04130965414d64a418a7"
+    },
+    "planes/body/iron-lancer/idle-left.png": {
+      "bytes": 12600,
+      "sha256": "cdc8656d0b198d1639e5c1b7fdce63cf9401da7f6097808da616a33c1ce41cfc"
+    },
+    "planes/body/iron-lancer/idle-right.png": {
+      "bytes": 12568,
+      "sha256": "53458cfe84e1c5a43f1df78466ab238c95b44fa55ac01f5af78c3cbf931b55bc"
+    },
+    "planes/body/iron-lancer/idle-up.png": {
+      "bytes": 16510,
+      "sha256": "ab5ce1ca426cbdf722552517cfc42543fa81b7d2e6aa59447291e4946b22d0b7"
+    },
+    "planes/body/iron-lancer/retreat-down.png": {
+      "bytes": 17325,
+      "sha256": "e944af0fd7012f800dda0c6d8c877cb44b3b5e47c5057373c09ab6daf9a52d15"
+    },
+    "planes/body/iron-lancer/retreat-left.png": {
+      "bytes": 20726,
+      "sha256": "b0701acba14b6c68ea58225897b12b2e3041c3fabddf84d290e283ef3a6fc60a"
+    },
+    "planes/body/iron-lancer/retreat-right.png": {
+      "bytes": 20926,
+      "sha256": "17c211a4d89d8488c755ae2e15b74df248ad11dbc384b9ff1421d87585b5f586"
+    },
+    "planes/body/iron-lancer/retreat-up.png": {
+      "bytes": 18452,
+      "sha256": "a6e1a007874dfe87d57d328417c91655fce4936b66720b108fa4f7a30729bbd8"
+    },
+    "planes/body/iron-lancer/walk-down.png": {
+      "bytes": 17458,
+      "sha256": "77a55b59d8e9b0260a7a372ff8caf431206422e9da53cf19d6ba6f77aae4d5bc"
+    },
+    "planes/body/iron-lancer/walk-left.png": {
+      "bytes": 20490,
+      "sha256": "2c8556e7494983ededb4e8abaf9b14881135110fc5e4161e4caabf40c7c64ce1"
+    },
+    "planes/body/iron-lancer/walk-right.png": {
+      "bytes": 20796,
+      "sha256": "46014a5af741e77cddb90f327cbf0d19bdc88a5373891c6ae501332c04fef777"
+    },
+    "planes/body/iron-lancer/walk-up.png": {
+      "bytes": 17508,
+      "sha256": "67f9db55977d61a8807dcf69f1fe18b2c468380089963036ef7b6f0341c1a46f"
+    },
+    "planes/equipment/ash-reaver/attack-down.png": {
+      "bytes": 3878,
+      "sha256": "2190311ef2daaf68cf07637766eb4a59e7bb51a018baa5d49af3248a6dd32850"
+    },
+    "planes/equipment/ash-reaver/attack-left.png": {
+      "bytes": 3283,
+      "sha256": "87e290dfb4e9eb1ec4cdfa57c2b5245355a6915c989b7c88fa6a74be36d2884f"
+    },
+    "planes/equipment/ash-reaver/attack-right.png": {
+      "bytes": 3186,
+      "sha256": "0e811dd715ad859d0fc2cb961c710bf27da85cdcad9c4396925b802db6dab8d4"
+    },
+    "planes/equipment/ash-reaver/attack-up.png": {
+      "bytes": 3882,
+      "sha256": "1ecd78403d61f56cfe4d17d2875b8b91107bf8a9230c2aeddc37f5d5830aacdf"
+    },
+    "planes/equipment/ash-reaver/idle-down.png": {
+      "bytes": 2290,
+      "sha256": "e0b6321c0ac5ad593b63322b5fc429455ebef22ebcec1ab73f6ac9fe6364f91a"
+    },
+    "planes/equipment/ash-reaver/idle-left.png": {
+      "bytes": 2097,
+      "sha256": "06c9090e38d273c13044ce785ac3564bf7144ab9ce7e1866c48f4fc9085ff5e0"
+    },
+    "planes/equipment/ash-reaver/idle-right.png": {
+      "bytes": 1886,
+      "sha256": "2a6f0c46440005cad0955155cca5e1fb0b7fc45006f4a5b2de93c42a70c0ea03"
+    },
+    "planes/equipment/ash-reaver/idle-up.png": {
+      "bytes": 2196,
+      "sha256": "ece69f3c101c3a1fef1c3f5c99fd3a0f4a121cd251d729b9bc05aa7130db2f3e"
+    },
+    "planes/equipment/ash-reaver/retreat-down.png": {
+      "bytes": 1646,
+      "sha256": "242a43015e0644f57dad1afcc275a5c9424cfc57aa9ae7f0af55c9903e047830"
+    },
+    "planes/equipment/ash-reaver/retreat-left.png": {
+      "bytes": 1065,
+      "sha256": "ff00f53cabb0f5491e22173537f599f62661085ad75314aa385fc23beb8dbe82"
+    },
+    "planes/equipment/ash-reaver/retreat-right.png": {
+      "bytes": 1003,
+      "sha256": "e9161a8e6dafd273f11108839c05ddc1877d6d0f9e6ef42252aa3b43a0718d5a"
+    },
+    "planes/equipment/ash-reaver/retreat-up.png": {
+      "bytes": 1546,
+      "sha256": "a4984dd83517979bc7a4d1566ffb29d9cb7c29008bd93141c0d0ae5c724fb979"
+    },
+    "planes/equipment/ash-reaver/walk-down.png": {
+      "bytes": 2958,
+      "sha256": "23b6ec75d510802c0788812034ec4ad6393ae0f9918469ec7e613cbdec715ab2"
+    },
+    "planes/equipment/ash-reaver/walk-left.png": {
+      "bytes": 2622,
+      "sha256": "8f1113e7e86d2933d362ad17e501d0af1acce24aca55573b920e1a7f54679eff"
+    },
+    "planes/equipment/ash-reaver/walk-right.png": {
+      "bytes": 2431,
+      "sha256": "6b57fe84dd2b2c83e92bf2c56f517e7abe4a72fb377d99288d5323182877c079"
+    },
+    "planes/equipment/ash-reaver/walk-up.png": {
+      "bytes": 2899,
+      "sha256": "d9e174ac6ac7ec5dc1bb198f9a90d8efa9591d8f195352520069c9a3658db03a"
+    },
+    "planes/equipment/bone-breaker/attack-down.png": {
+      "bytes": 4205,
+      "sha256": "f7469b35116f43ce5a85484fc3d9f6cb4f5a3df758b1961ba80ba937e8679030"
+    },
+    "planes/equipment/bone-breaker/attack-left.png": {
+      "bytes": 3643,
+      "sha256": "426bffdeb9c564eed2ef2bc1dad74350419970add9f2a344e969a652214070bd"
+    },
+    "planes/equipment/bone-breaker/attack-right.png": {
+      "bytes": 3566,
+      "sha256": "9f9c4b0b10e08eb8b68c47000827caa4b9396ccafd22ccc1a02babfd0a88ff61"
+    },
+    "planes/equipment/bone-breaker/attack-up.png": {
+      "bytes": 4094,
+      "sha256": "2c036e09bd691fa747cf4296e0807fe38f32db2314facca62c1342eca9c62be1"
+    },
+    "planes/equipment/bone-breaker/idle-down.png": {
+      "bytes": 2710,
+      "sha256": "6e027500587c4a6f67405eea35d46c00d2648d0e8dc9a57614df0b4226851af0"
+    },
+    "planes/equipment/bone-breaker/idle-left.png": {
+      "bytes": 2176,
+      "sha256": "5a50dfc7fa007e80b68f9595f12553fed89b404e587c6a0dab96f13057de30ba"
+    },
+    "planes/equipment/bone-breaker/idle-right.png": {
+      "bytes": 1971,
+      "sha256": "7e0c155276bd14f1a566d5593f7f0d2079714e0acae60d9ea30d94b973a1e97e"
+    },
+    "planes/equipment/bone-breaker/idle-up.png": {
+      "bytes": 2480,
+      "sha256": "188a8814de0205ebd3ddf9339236c74e821c2b0dfd40df8b92bfe301b283a1a7"
+    },
+    "planes/equipment/bone-breaker/retreat-down.png": {
+      "bytes": 1490,
+      "sha256": "94fe7389b96d6b41094fde07e1f17e1a0d55d7676f178c53ae27a0d40cc5bb08"
+    },
+    "planes/equipment/bone-breaker/retreat-left.png": {
+      "bytes": 1215,
+      "sha256": "2e2c8887ebb940cacd4d0a50fdb2360dffc20e1190a73de3c00dffc66eab5945"
+    },
+    "planes/equipment/bone-breaker/retreat-right.png": {
+      "bytes": 1037,
+      "sha256": "84f1793aa27467d3d755f80db876ba9106ab538fa7f7821dec0d1f09af12598f"
+    },
+    "planes/equipment/bone-breaker/retreat-up.png": {
+      "bytes": 1666,
+      "sha256": "7638c0c0cd3202fb7a104237cb618e041459291003aadab4b0e26826ab24a9f8"
+    },
+    "planes/equipment/bone-breaker/walk-down.png": {
+      "bytes": 3273,
+      "sha256": "add2366be9b76a56e11b3be0bac421d99017535f544e3ce8d927ca5582c0b611"
+    },
+    "planes/equipment/bone-breaker/walk-left.png": {
+      "bytes": 2870,
+      "sha256": "4d6800eba6d19ec397705f035879c2231e5ff06c7a3f9023db7efc68eb7fa81d"
+    },
+    "planes/equipment/bone-breaker/walk-right.png": {
+      "bytes": 2730,
+      "sha256": "75cffdedaf8015568e33ce39b0c4e3ae9b4c286cf8546fdb813603fb087b00bf"
+    },
+    "planes/equipment/bone-breaker/walk-up.png": {
+      "bytes": 3126,
+      "sha256": "3f8dc1328154ffca7d19551afad07e66ea6f4c6eaf68103efddee8a8e5184efa"
+    },
+    "planes/equipment/iron-lancer/attack-down.png": {
+      "bytes": 3006,
+      "sha256": "f5ef4b34a77d0e997c00a2909d7ae53c1972b17c009e7140e4425dc81d64ccb9"
+    },
+    "planes/equipment/iron-lancer/attack-left.png": {
+      "bytes": 3386,
+      "sha256": "d1577335d9b421db8381ce231fcb773514eda7806bdcd6e670b1ea6384f19ce4"
+    },
+    "planes/equipment/iron-lancer/attack-right.png": {
+      "bytes": 3352,
+      "sha256": "1dafb36635fc86bb3b7027cbe41247db1d9eaf957ceaae6c7428b69db0c0fa08"
+    },
+    "planes/equipment/iron-lancer/attack-up.png": {
+      "bytes": 3024,
+      "sha256": "f81efe549ccfe9a2c0897bcdafffd04ce9ea48537a6f637879c9556e3c148513"
+    },
+    "planes/equipment/iron-lancer/idle-down.png": {
+      "bytes": 1777,
+      "sha256": "7a119efb9c85abb774b9cbdafdd0920fe2fc69331c07e82845b0be03cb47b208"
+    },
+    "planes/equipment/iron-lancer/idle-left.png": {
+      "bytes": 2006,
+      "sha256": "7b40d9542517216544eec413b87a1b45dd524095b527f322df07e465866b21c2"
+    },
+    "planes/equipment/iron-lancer/idle-right.png": {
+      "bytes": 1906,
+      "sha256": "77a52009f66c13a0a1cc9c0bc342211ddab250a2bbd3232ec5fef58bafc0aaea"
+    },
+    "planes/equipment/iron-lancer/idle-up.png": {
+      "bytes": 1749,
+      "sha256": "b55a18ca4b7f5311ec4706752d97e12ef6a8461691e87ec1541017e65a206942"
+    },
+    "planes/equipment/iron-lancer/retreat-down.png": {
+      "bytes": 1121,
+      "sha256": "3277c7eeb927e8d2d7e1359811d4c4f551ac849667b0eea1b9c1050cea20bf3b"
+    },
+    "planes/equipment/iron-lancer/retreat-left.png": {
+      "bytes": 1107,
+      "sha256": "56559174626c05b9ce3db8ebcc6d1b937fd89cc9b4bc839dab791dc3ad99bdff"
+    },
+    "planes/equipment/iron-lancer/retreat-right.png": {
+      "bytes": 972,
+      "sha256": "4a9094273d24feec7bbc0e10ae2c4cf3c236a278f3fa281718906aedbc2b9923"
+    },
+    "planes/equipment/iron-lancer/retreat-up.png": {
+      "bytes": 1271,
+      "sha256": "8cad60184c2220c75816c8ba180bb855c045384907cc13499c9e04d6127fe1c8"
+    },
+    "planes/equipment/iron-lancer/walk-down.png": {
+      "bytes": 2280,
+      "sha256": "e7a2b782ee8f8592b59684a0a2b749d2580b94ace26384ceaff08544ace6f33f"
+    },
+    "planes/equipment/iron-lancer/walk-left.png": {
+      "bytes": 2670,
+      "sha256": "38dd089101f7b10a2ce879e38f61b1c33bffd4d19141b6b6e6c2affa4807fb7d"
+    },
+    "planes/equipment/iron-lancer/walk-right.png": {
+      "bytes": 2453,
+      "sha256": "096b4d932e2aba167a079be73075359cebf8f958fb732b1396c7177a05b99cc8"
+    },
+    "planes/equipment/iron-lancer/walk-up.png": {
+      "bytes": 2234,
+      "sha256": "830ef0fb2eeb875d23a3b95d45015e32996c28e4283149dc2279e0856ed0fddf"
+    },
+    "planes/garment/ash-reaver/attack-down.png": {
+      "bytes": 14127,
+      "sha256": "dc2bd3b44508e8b2e32e21bdbe43e405d61849eed8f20cf738fca0199cf546b5"
+    },
+    "planes/garment/ash-reaver/attack-left.png": {
+      "bytes": 9819,
+      "sha256": "d28e1b2af3235f9ab93adc52695196cacf277c81c4a971cbd137dcb568705db4"
+    },
+    "planes/garment/ash-reaver/attack-right.png": {
+      "bytes": 9476,
+      "sha256": "7bb2b39f8a8f1d7bba2cbf4f4db278ff385e545cd2d6ee0a197062a58f6bba31"
+    },
+    "planes/garment/ash-reaver/attack-up.png": {
+      "bytes": 14433,
+      "sha256": "a6aff4a80800c91618fb9be197871a42f5e15d228e234f7dff38c68481b12bde"
+    },
+    "planes/garment/ash-reaver/idle-down.png": {
+      "bytes": 13417,
+      "sha256": "f68881563fba61e295a5e66b3fcfdbe14433a6ca0bf321498d80eb296f698501"
+    },
+    "planes/garment/ash-reaver/idle-left.png": {
+      "bytes": 9034,
+      "sha256": "ee2d916812810b8068ac1d9aadb7a794a81f5865e4a15bf2372607f7c6cd17e4"
+    },
+    "planes/garment/ash-reaver/idle-right.png": {
+      "bytes": 8729,
+      "sha256": "d607a4973a40ca48df8664ef8f4831325ca61079a375cb63c754c41378077217"
+    },
+    "planes/garment/ash-reaver/idle-up.png": {
+      "bytes": 13009,
+      "sha256": "ad5b193dd665c085c0a7afd72ec58b363695b9f567e6c37e213809affc2eb9c4"
+    },
+    "planes/garment/ash-reaver/retreat-down.png": {
+      "bytes": 15262,
+      "sha256": "3ec07ed0c50f1500d11fbd0c4b2547857e2a4ea45c1c5705c1a97ce6e9eb19e9"
+    },
+    "planes/garment/ash-reaver/retreat-left.png": {
+      "bytes": 18178,
+      "sha256": "0a629b6e40632cf3fa0c081704c215c8c7052cac5c0e2e859090837b16389f0b"
+    },
+    "planes/garment/ash-reaver/retreat-right.png": {
+      "bytes": 17736,
+      "sha256": "0573191fe97065b3c273308ca645d0c3ee48759fab558e24bd8aeed97c94428b"
+    },
+    "planes/garment/ash-reaver/retreat-up.png": {
+      "bytes": 15343,
+      "sha256": "f5e2a1ff46db85a5770835c0af5ae3fdc52c9cfc3a89fc30b58eed6fc04942e4"
+    },
+    "planes/garment/ash-reaver/walk-down.png": {
+      "bytes": 15375,
+      "sha256": "528bb65198320bfb820e7ba2bda481d4b7c2145d8b94d6211e622f061d546423"
+    },
+    "planes/garment/ash-reaver/walk-left.png": {
+      "bytes": 18144,
+      "sha256": "113b1d1d2f5b250d8e6e7295e3051693d3cf9c068cd699281f3dd8e8bcc2cbd2"
+    },
+    "planes/garment/ash-reaver/walk-right.png": {
+      "bytes": 17884,
+      "sha256": "16b63efbee2e5743f3c5dd698e486482d4ea015dbc5c57f986ad8b52faf894bd"
+    },
+    "planes/garment/ash-reaver/walk-up.png": {
+      "bytes": 15258,
+      "sha256": "683719670263ff6e75a1fd2017bf97133cc493f7ca2793190290176689667056"
+    },
+    "planes/garment/bone-breaker/attack-down.png": {
+      "bytes": 15005,
+      "sha256": "9fbfd6a392089905f12efd95c5c40b341a36308798a10f1748417a44ccde1c34"
+    },
+    "planes/garment/bone-breaker/attack-left.png": {
+      "bytes": 10400,
+      "sha256": "7545360df7a936bc2b0822cf84faf28ce65c97ebab2362bbc0d2ecfc78e3eb78"
+    },
+    "planes/garment/bone-breaker/attack-right.png": {
+      "bytes": 10159,
+      "sha256": "4a13f8cafbc7caecf41cefcab593f1ec6ba21943f8a83f45cdcd52bda42baa01"
+    },
+    "planes/garment/bone-breaker/attack-up.png": {
+      "bytes": 15667,
+      "sha256": "f3a7c3575e10ff2d0ed8c519366905e4cc9c7a44c797b543ddbc921d77d6c187"
+    },
+    "planes/garment/bone-breaker/idle-down.png": {
+      "bytes": 14573,
+      "sha256": "17703d9192085eb5c6332bd973bb55c66d2938410aca9ed5b572b67605a2b87b"
+    },
+    "planes/garment/bone-breaker/idle-left.png": {
+      "bytes": 10131,
+      "sha256": "13deed2c693a8513b4ebe865447a9a3344c619e03c7fe8e67d7b83fedd7bdbb4"
+    },
+    "planes/garment/bone-breaker/idle-right.png": {
+      "bytes": 9599,
+      "sha256": "7f35a8fbdf8aa7f9eef46c78fa4297176a3d09ac596fb9c5313ef0d9b264d93b"
+    },
+    "planes/garment/bone-breaker/idle-up.png": {
+      "bytes": 14074,
+      "sha256": "3bf62ca9994a7d8d29a011c12181c1abddcb968310f00598b8d120214f2e7f9e"
+    },
+    "planes/garment/bone-breaker/retreat-down.png": {
+      "bytes": 16093,
+      "sha256": "67eb1edb2dd2327b4e3fdc3cb5518e805681d111e8be37ae815e7bf7ee64f0f8"
+    },
+    "planes/garment/bone-breaker/retreat-left.png": {
+      "bytes": 18855,
+      "sha256": "bccaf5bb3f38907c6c2a5782e0c9d40870e1ba887b39dac84945f70db4210806"
+    },
+    "planes/garment/bone-breaker/retreat-right.png": {
+      "bytes": 18902,
+      "sha256": "00d5e8ce4b38cad153a38c7b4e9bcfe4be9d1d07555644f2c4fc5b55bda8701f"
+    },
+    "planes/garment/bone-breaker/retreat-up.png": {
+      "bytes": 16350,
+      "sha256": "e1df9e4dea6f3efcc2cd4098585c5538ec71b5653ea2aab0563a882526a72a75"
+    },
+    "planes/garment/bone-breaker/walk-down.png": {
+      "bytes": 16879,
+      "sha256": "c614f96789f08704e3b249d7ea0045ff09698f7b05881c945f64d46ad0016854"
+    },
+    "planes/garment/bone-breaker/walk-left.png": {
+      "bytes": 18848,
+      "sha256": "653e23eb758314bb7151357d8c5b7f5e2c4c4e7a4096b4392a450dd08782f1b7"
+    },
+    "planes/garment/bone-breaker/walk-right.png": {
+      "bytes": 18812,
+      "sha256": "481b6be133766ef85d1a8610af9ebcd82d71d2a4ca413f5639726b1c4af13a3a"
+    },
+    "planes/garment/bone-breaker/walk-up.png": {
+      "bytes": 15693,
+      "sha256": "2f76ee232560f9598323759e9b6185fb94cef2eed9f01f88127bb7eb66e93fa0"
+    },
+    "planes/garment/iron-lancer/attack-down.png": {
+      "bytes": 14608,
+      "sha256": "82c1e1ee85cada49441b88232a27a0d72062e69b3a487d435ff6b1a426c99c34"
+    },
+    "planes/garment/iron-lancer/attack-left.png": {
+      "bytes": 9975,
+      "sha256": "72af6a92e2dc99af7ab8ecb57ac85847b3880c09ad00a3dc67ecbb91cec557a1"
+    },
+    "planes/garment/iron-lancer/attack-right.png": {
+      "bytes": 9959,
+      "sha256": "a3693da84a848c67a066f188fabeaaab6c0510336932e6a311e558280dc8a413"
+    },
+    "planes/garment/iron-lancer/attack-up.png": {
+      "bytes": 15057,
+      "sha256": "120898932bb12510e979c0c1b37653aeb1169c045a160df15351c9747f7d0b96"
+    },
+    "planes/garment/iron-lancer/idle-down.png": {
+      "bytes": 13496,
+      "sha256": "00258e0d54b5de5d1a1814208b35858b5c040a50642cb5e9133b1dbc98117f13"
+    },
+    "planes/garment/iron-lancer/idle-left.png": {
+      "bytes": 9028,
+      "sha256": "815dca9f3ffbadbdcefd4a9d05d6c2fd67097eee3367f94cd5ef45b2e4bed8ab"
+    },
+    "planes/garment/iron-lancer/idle-right.png": {
+      "bytes": 9139,
+      "sha256": "de82505ab340d4d659bb22a17b4da56e745def6ce9e378362e54a51af4c7f224"
+    },
+    "planes/garment/iron-lancer/idle-up.png": {
+      "bytes": 13671,
+      "sha256": "b8ae611da158e8e4b6382ba25b2174c0d13f3b212389ce995fc2cd5d48846add"
+    },
+    "planes/garment/iron-lancer/retreat-down.png": {
+      "bytes": 14575,
+      "sha256": "1ff833736de88a98a12359bea1670acb3387200cf417dbb20b64b70297fd80c4"
+    },
+    "planes/garment/iron-lancer/retreat-left.png": {
+      "bytes": 17999,
+      "sha256": "da88e63750d242bb847fd3e589c2e1d49f81a65179ac9bf6b5374bb97d211c95"
+    },
+    "planes/garment/iron-lancer/retreat-right.png": {
+      "bytes": 18521,
+      "sha256": "f21b0abfc00f56dad4f1fc17d7bcd9ab233a898082d94e39b2a4d7f12a47378e"
+    },
+    "planes/garment/iron-lancer/retreat-up.png": {
+      "bytes": 16589,
+      "sha256": "7224e6bf7b5809d665a04654012cdf63a4a41226e5bef7073e170f9fe52f7414"
+    },
+    "planes/garment/iron-lancer/walk-down.png": {
+      "bytes": 15223,
+      "sha256": "285c0c155655c645bbbd0d4b4e886f6e61c20decaf526dbef38ec7f75fcb3227"
+    },
+    "planes/garment/iron-lancer/walk-left.png": {
+      "bytes": 18313,
+      "sha256": "9a0a3250d8077888314e4ec7f8d4f16216ccc38b5a025d99eedfbf130dd6edd9"
+    },
+    "planes/garment/iron-lancer/walk-right.png": {
+      "bytes": 18897,
+      "sha256": "c0b3689983f52c5b0cd3f068f835e219c79d40acaa9134d78955ab168db2ff7e"
+    },
+    "planes/garment/iron-lancer/walk-up.png": {
+      "bytes": 15910,
+      "sha256": "40c83ef195fd91638bec4b14cc4dd684c02910ab24f8efa02e515148a07a5ae0"
+    },
+    "planes/identity/ash-reaver/attack-down.png": {
+      "bytes": 15986,
+      "sha256": "7e4c3f0cbf087b390dd853d975a1f9389ad0bc5b9073766f567ee75dc8a39094"
+    },
+    "planes/identity/ash-reaver/attack-left.png": {
+      "bytes": 11105,
+      "sha256": "dd4b6009167a196296d24fa4374b166e039023b7baa1db1d4d4cf309b41badec"
+    },
+    "planes/identity/ash-reaver/attack-right.png": {
+      "bytes": 10935,
+      "sha256": "b9994f507ca3b2104065507037ef669d21e79aeb63c70da4c76ba6b9e00c9a50"
+    },
+    "planes/identity/ash-reaver/attack-up.png": {
+      "bytes": 16020,
+      "sha256": "fd5b762fc7b52f63722db1ecd21f48febf9753027c90387818a35bb6e8ad21b7"
+    },
+    "planes/identity/ash-reaver/idle-down.png": {
+      "bytes": 14688,
+      "sha256": "61edcbb5db1ebe3bd2e22f71ff6086660aebd02225f5a0d85b84fa87e5511983"
+    },
+    "planes/identity/ash-reaver/idle-left.png": {
+      "bytes": 10814,
+      "sha256": "878ffd41f88a82426fee697cc2c12f94b5d9fa250f438214099317e97dad2060"
+    },
+    "planes/identity/ash-reaver/idle-right.png": {
+      "bytes": 10829,
+      "sha256": "8d8f18836d7c1fed30b07e61d22568e1a70b95651b2a3d93cfa0d464de39ca16"
+    },
+    "planes/identity/ash-reaver/idle-up.png": {
+      "bytes": 14266,
+      "sha256": "ba5b4a2e74039b0277f8a8802d14fd523c6bfd2542e3a074b6481911ec100fef"
+    },
+    "planes/identity/ash-reaver/retreat-down.png": {
+      "bytes": 14763,
+      "sha256": "d48abd2c2cbc8e7be5de1e6b3ef17b0f9dd9036eb737a552cdafadcf2468824e"
+    },
+    "planes/identity/ash-reaver/retreat-left.png": {
+      "bytes": 18100,
+      "sha256": "56bf0699a1e97b5d76c03564b901cb4744a92e7e4960f0d767bb3c77d151ccaf"
+    },
+    "planes/identity/ash-reaver/retreat-right.png": {
+      "bytes": 18313,
+      "sha256": "b2fd6df91be4085316d1f815ba005a197981d31efa5843b38fed58e579d0edb8"
+    },
+    "planes/identity/ash-reaver/retreat-up.png": {
+      "bytes": 14952,
+      "sha256": "e585c637d927018d1568ff52a9af388437055d56945441df308638d206fef366"
+    },
+    "planes/identity/ash-reaver/walk-down.png": {
+      "bytes": 15370,
+      "sha256": "de0a741d7074828852f1ce5378565fa7f14af1364b1cf69c1884b49370ff8929"
+    },
+    "planes/identity/ash-reaver/walk-left.png": {
+      "bytes": 17646,
+      "sha256": "6a4a524ce8e46c9a1b17998dc3c2d114c4a24098f7f6936618de64ad2b601e08"
+    },
+    "planes/identity/ash-reaver/walk-right.png": {
+      "bytes": 17730,
+      "sha256": "9c0e9cab87565b1a1376cfdbab321b3bc96eef2d6e8cba558e6ac3a495ede9ce"
+    },
+    "planes/identity/ash-reaver/walk-up.png": {
+      "bytes": 14573,
+      "sha256": "0a871c6f5a99bc2066f3055d1eb5b3c57b50f3a32dd2270d104438719d51526a"
+    },
+    "planes/identity/bone-breaker/attack-down.png": {
+      "bytes": 15986,
+      "sha256": "7e4c3f0cbf087b390dd853d975a1f9389ad0bc5b9073766f567ee75dc8a39094"
+    },
+    "planes/identity/bone-breaker/attack-left.png": {
+      "bytes": 11105,
+      "sha256": "dd4b6009167a196296d24fa4374b166e039023b7baa1db1d4d4cf309b41badec"
+    },
+    "planes/identity/bone-breaker/attack-right.png": {
+      "bytes": 10935,
+      "sha256": "b9994f507ca3b2104065507037ef669d21e79aeb63c70da4c76ba6b9e00c9a50"
+    },
+    "planes/identity/bone-breaker/attack-up.png": {
+      "bytes": 16020,
+      "sha256": "fd5b762fc7b52f63722db1ecd21f48febf9753027c90387818a35bb6e8ad21b7"
+    },
+    "planes/identity/bone-breaker/idle-down.png": {
+      "bytes": 14688,
+      "sha256": "61edcbb5db1ebe3bd2e22f71ff6086660aebd02225f5a0d85b84fa87e5511983"
+    },
+    "planes/identity/bone-breaker/idle-left.png": {
+      "bytes": 10814,
+      "sha256": "878ffd41f88a82426fee697cc2c12f94b5d9fa250f438214099317e97dad2060"
+    },
+    "planes/identity/bone-breaker/idle-right.png": {
+      "bytes": 10829,
+      "sha256": "8d8f18836d7c1fed30b07e61d22568e1a70b95651b2a3d93cfa0d464de39ca16"
+    },
+    "planes/identity/bone-breaker/idle-up.png": {
+      "bytes": 14266,
+      "sha256": "ba5b4a2e74039b0277f8a8802d14fd523c6bfd2542e3a074b6481911ec100fef"
+    },
+    "planes/identity/bone-breaker/retreat-down.png": {
+      "bytes": 14763,
+      "sha256": "d48abd2c2cbc8e7be5de1e6b3ef17b0f9dd9036eb737a552cdafadcf2468824e"
+    },
+    "planes/identity/bone-breaker/retreat-left.png": {
+      "bytes": 18100,
+      "sha256": "56bf0699a1e97b5d76c03564b901cb4744a92e7e4960f0d767bb3c77d151ccaf"
+    },
+    "planes/identity/bone-breaker/retreat-right.png": {
+      "bytes": 18313,
+      "sha256": "b2fd6df91be4085316d1f815ba005a197981d31efa5843b38fed58e579d0edb8"
+    },
+    "planes/identity/bone-breaker/retreat-up.png": {
+      "bytes": 14952,
+      "sha256": "e585c637d927018d1568ff52a9af388437055d56945441df308638d206fef366"
+    },
+    "planes/identity/bone-breaker/walk-down.png": {
+      "bytes": 15370,
+      "sha256": "de0a741d7074828852f1ce5378565fa7f14af1364b1cf69c1884b49370ff8929"
+    },
+    "planes/identity/bone-breaker/walk-left.png": {
+      "bytes": 17646,
+      "sha256": "6a4a524ce8e46c9a1b17998dc3c2d114c4a24098f7f6936618de64ad2b601e08"
+    },
+    "planes/identity/bone-breaker/walk-right.png": {
+      "bytes": 17730,
+      "sha256": "9c0e9cab87565b1a1376cfdbab321b3bc96eef2d6e8cba558e6ac3a495ede9ce"
+    },
+    "planes/identity/bone-breaker/walk-up.png": {
+      "bytes": 14573,
+      "sha256": "0a871c6f5a99bc2066f3055d1eb5b3c57b50f3a32dd2270d104438719d51526a"
+    },
+    "planes/identity/iron-lancer/attack-down.png": {
+      "bytes": 15986,
+      "sha256": "7e4c3f0cbf087b390dd853d975a1f9389ad0bc5b9073766f567ee75dc8a39094"
+    },
+    "planes/identity/iron-lancer/attack-left.png": {
+      "bytes": 11105,
+      "sha256": "dd4b6009167a196296d24fa4374b166e039023b7baa1db1d4d4cf309b41badec"
+    },
+    "planes/identity/iron-lancer/attack-right.png": {
+      "bytes": 10935,
+      "sha256": "b9994f507ca3b2104065507037ef669d21e79aeb63c70da4c76ba6b9e00c9a50"
+    },
+    "planes/identity/iron-lancer/attack-up.png": {
+      "bytes": 16020,
+      "sha256": "fd5b762fc7b52f63722db1ecd21f48febf9753027c90387818a35bb6e8ad21b7"
+    },
+    "planes/identity/iron-lancer/idle-down.png": {
+      "bytes": 14688,
+      "sha256": "61edcbb5db1ebe3bd2e22f71ff6086660aebd02225f5a0d85b84fa87e5511983"
+    },
+    "planes/identity/iron-lancer/idle-left.png": {
+      "bytes": 10814,
+      "sha256": "878ffd41f88a82426fee697cc2c12f94b5d9fa250f438214099317e97dad2060"
+    },
+    "planes/identity/iron-lancer/idle-right.png": {
+      "bytes": 10829,
+      "sha256": "8d8f18836d7c1fed30b07e61d22568e1a70b95651b2a3d93cfa0d464de39ca16"
+    },
+    "planes/identity/iron-lancer/idle-up.png": {
+      "bytes": 14266,
+      "sha256": "ba5b4a2e74039b0277f8a8802d14fd523c6bfd2542e3a074b6481911ec100fef"
+    },
+    "planes/identity/iron-lancer/retreat-down.png": {
+      "bytes": 14763,
+      "sha256": "d48abd2c2cbc8e7be5de1e6b3ef17b0f9dd9036eb737a552cdafadcf2468824e"
+    },
+    "planes/identity/iron-lancer/retreat-left.png": {
+      "bytes": 18100,
+      "sha256": "56bf0699a1e97b5d76c03564b901cb4744a92e7e4960f0d767bb3c77d151ccaf"
+    },
+    "planes/identity/iron-lancer/retreat-right.png": {
+      "bytes": 18313,
+      "sha256": "b2fd6df91be4085316d1f815ba005a197981d31efa5843b38fed58e579d0edb8"
+    },
+    "planes/identity/iron-lancer/retreat-up.png": {
+      "bytes": 14952,
+      "sha256": "e585c637d927018d1568ff52a9af388437055d56945441df308638d206fef366"
+    },
+    "planes/identity/iron-lancer/walk-down.png": {
+      "bytes": 15370,
+      "sha256": "de0a741d7074828852f1ce5378565fa7f14af1364b1cf69c1884b49370ff8929"
+    },
+    "planes/identity/iron-lancer/walk-left.png": {
+      "bytes": 17646,
+      "sha256": "6a4a524ce8e46c9a1b17998dc3c2d114c4a24098f7f6936618de64ad2b601e08"
+    },
+    "planes/identity/iron-lancer/walk-right.png": {
+      "bytes": 17730,
+      "sha256": "9c0e9cab87565b1a1376cfdbab321b3bc96eef2d6e8cba558e6ac3a495ede9ce"
+    },
+    "planes/identity/iron-lancer/walk-up.png": {
+      "bytes": 14573,
+      "sha256": "0a871c6f5a99bc2066f3055d1eb5b3c57b50f3a32dd2270d104438719d51526a"
+    },
+    "proof/quality-body/ash-reaver/attack-down-x4.png": {
+      "bytes": 31300,
+      "sha256": "1690e02ecaad19ae2556c467a1db3c0a74f48507513d6d123d3930ab9996120a"
+    },
+    "proof/quality-body/ash-reaver/attack-left-x4.png": {
+      "bytes": 23825,
+      "sha256": "d4213d5b4b19c167d332f50f7718a353a99aea4d74ef75e619989c1b80cdfb8f"
+    },
+    "proof/quality-body/ash-reaver/attack-right-x4.png": {
+      "bytes": 23979,
+      "sha256": "5e8d7ff1cff6f4bb32c069532b9afb2ba9685c31e2745d8a0e351dd7e2fda010"
+    },
+    "proof/quality-body/ash-reaver/attack-up-x4.png": {
+      "bytes": 30519,
+      "sha256": "f5d08447c9a76c98adc42be03775ceab09d3cbac091aa6992282125890deb246"
+    },
+    "proof/quality-body/ash-reaver/idle-down-x4.png": {
+      "bytes": 33041,
+      "sha256": "ca592dc08b7802e11cb0cbf3629670b3d92cbceb069912c3e7f4ec4dd43bc439"
+    },
+    "proof/quality-body/ash-reaver/idle-left-x4.png": {
+      "bytes": 26907,
+      "sha256": "250c0225d32e678bf9d73ff3ac0df370fd9d6de449eff425dce71ee2bd212757"
+    },
+    "proof/quality-body/ash-reaver/idle-right-x4.png": {
+      "bytes": 27199,
+      "sha256": "2f2da0a33fb7d2bed32aa41cdcbb44d2ff7efe98ec8e93d85a27e926b4f46218"
+    },
+    "proof/quality-body/ash-reaver/idle-up-x4.png": {
+      "bytes": 32460,
+      "sha256": "41a60a9a4e07bf5ff7ccd546cef22ce129e98ddc735f1b1f4bbc105dfe4c724a"
+    },
+    "proof/quality-body/ash-reaver/retreat-down-x4.png": {
+      "bytes": 31314,
+      "sha256": "154f05fb6fdd87737cb8da3f74d3ff56e9b22d403b2abeb4e2902454a020228a"
+    },
+    "proof/quality-body/ash-reaver/retreat-left-x4.png": {
+      "bytes": 33900,
+      "sha256": "0806118fff2d2e32a662e6d1d07623272eec0b12b982bcd484611ad1892f1f8c"
+    },
+    "proof/quality-body/ash-reaver/retreat-right-x4.png": {
+      "bytes": 34119,
+      "sha256": "1b36b0f1012483cab59296f736e4af394c762051c812211d465250e7c420c8dc"
+    },
+    "proof/quality-body/ash-reaver/retreat-up-x4.png": {
+      "bytes": 31280,
+      "sha256": "9a342759dda61ab0536a7a4c68018096e5dbb9578b1faefa3cd462cf44e70f74"
+    },
+    "proof/quality-body/ash-reaver/walk-down-x4.png": {
+      "bytes": 32047,
+      "sha256": "044a481c098db4226eb240e7ebbde6d341c74c3f24b7b788355ef9be9e03ba2b"
+    },
+    "proof/quality-body/ash-reaver/walk-left-x4.png": {
+      "bytes": 33834,
+      "sha256": "7d14faf2a443bb9a6a174579d14659330ad15a1b9b35595e0332176079b779fb"
+    },
+    "proof/quality-body/ash-reaver/walk-right-x4.png": {
+      "bytes": 33907,
+      "sha256": "c47aa56844dc5b5e591381eb0c7e96e92b58fd92be49c3ed859f5b27213cb068"
+    },
+    "proof/quality-body/ash-reaver/walk-up-x4.png": {
+      "bytes": 31185,
+      "sha256": "d79511099f954d14d6ee6bb417fa30ecc316f2ade60f7a351dd42ac645e711a3"
+    },
+    "proof/quality-body/bone-breaker/attack-down-x4.png": {
+      "bytes": 31737,
+      "sha256": "3062f2c79be6464e15d80c1bdd9a564811ca219ad933ac6489348b65ffacadf7"
+    },
+    "proof/quality-body/bone-breaker/attack-left-x4.png": {
+      "bytes": 24603,
+      "sha256": "a189b4b3d87dfd22ab8625a6e616a93aef2c1f5d657f97fc6b1a7a6bf49cff50"
+    },
+    "proof/quality-body/bone-breaker/attack-right-x4.png": {
+      "bytes": 24777,
+      "sha256": "0a281695585cf9df5e21430fa5fdba3b58912c81e244af349607e1e5f33c3cd0"
+    },
+    "proof/quality-body/bone-breaker/attack-up-x4.png": {
+      "bytes": 31405,
+      "sha256": "c901564c1db6f9a4f419a35508322555633c098f8cb94ebea09367d9ca60bcf0"
+    },
+    "proof/quality-body/bone-breaker/idle-down-x4.png": {
+      "bytes": 33785,
+      "sha256": "277006a4c3e8b9989dd60e53ce708b37d414163442014a6455cd3326e6feef5c"
+    },
+    "proof/quality-body/bone-breaker/idle-left-x4.png": {
+      "bytes": 28051,
+      "sha256": "5a082d88d3e4d03dfc6ec841291be42252044feee246a7dc91e02ae66aea0af4"
+    },
+    "proof/quality-body/bone-breaker/idle-right-x4.png": {
+      "bytes": 28158,
+      "sha256": "8c5478c148a602a53200dbbb55864382a05b7e7f328fee9bc978a8c52c21c677"
+    },
+    "proof/quality-body/bone-breaker/idle-up-x4.png": {
+      "bytes": 33475,
+      "sha256": "a633ec62e4d2bd67070b347d4a5b7a4d64106486e39724a82cc1d8562e5c7447"
+    },
+    "proof/quality-body/bone-breaker/retreat-down-x4.png": {
+      "bytes": 32117,
+      "sha256": "207615b3ecf48660de1c87c106a78484b259dfd08b5e4c2d4e85baf3e49475fe"
+    },
+    "proof/quality-body/bone-breaker/retreat-left-x4.png": {
+      "bytes": 34884,
+      "sha256": "95150905d0d3a6c7df03b91671a86018b074f7347bfeb228ee70c74786934484"
+    },
+    "proof/quality-body/bone-breaker/retreat-right-x4.png": {
+      "bytes": 35187,
+      "sha256": "c9d56487372f59f8c022f0d3a3040ce6b7d23eba505bb3303e42267590b29756"
+    },
+    "proof/quality-body/bone-breaker/retreat-up-x4.png": {
+      "bytes": 32175,
+      "sha256": "ee57821c0196aed2f17a9d07cb4687f7f6dff5935cad59695bfc87e986163d64"
+    },
+    "proof/quality-body/bone-breaker/walk-down-x4.png": {
+      "bytes": 32770,
+      "sha256": "1308e7ce7fd0b7c65284482b79ebc0bef93bc9fa8794d3619ffd9656f576130c"
+    },
+    "proof/quality-body/bone-breaker/walk-left-x4.png": {
+      "bytes": 34720,
+      "sha256": "fe0b64275ae3c8c2116668b93687602057a7b18b3ae1c309ef8cbc246b0cab40"
+    },
+    "proof/quality-body/bone-breaker/walk-right-x4.png": {
+      "bytes": 34649,
+      "sha256": "8006ffddc07670b27f8101379c11fcca088ac53911dd1abd6968ab5d3a8dfc3d"
+    },
+    "proof/quality-body/bone-breaker/walk-up-x4.png": {
+      "bytes": 32069,
+      "sha256": "1e019705e33673cdc88c1f5c50beed333fbdacc84cf2aff60f5e73b78ff7e26c"
+    },
+    "proof/quality-body/iron-lancer/attack-down-x4.png": {
+      "bytes": 31783,
+      "sha256": "5f0a3f7f9bca66be76aafb4e250075beaf557223560adc7db25d69bfcf54640a"
+    },
+    "proof/quality-body/iron-lancer/attack-left-x4.png": {
+      "bytes": 24434,
+      "sha256": "f2853da774e86f7a79ced572d568adc5217070b5fbcdbdc5c66fcb2124eeb767"
+    },
+    "proof/quality-body/iron-lancer/attack-right-x4.png": {
+      "bytes": 24645,
+      "sha256": "4053ad1d37e27b1dd05f83911138271e298a20d4969c7afec52292300e77dd85"
+    },
+    "proof/quality-body/iron-lancer/attack-up-x4.png": {
+      "bytes": 31384,
+      "sha256": "41b27985557c0d7cb05a6fd01c2af7796b6d9306b9a575bb0d802f7a5dad35f8"
+    },
+    "proof/quality-body/iron-lancer/idle-down-x4.png": {
+      "bytes": 33344,
+      "sha256": "4a78ef67f6c4b79ec6e2d0764b82934dee658df647a21c1261adea598cb66c92"
+    },
+    "proof/quality-body/iron-lancer/idle-left-x4.png": {
+      "bytes": 27829,
+      "sha256": "0fbc4574a703cbae9575408368460d204cc84c11d7fb1c2247601a3b08bd7a14"
+    },
+    "proof/quality-body/iron-lancer/idle-right-x4.png": {
+      "bytes": 28016,
+      "sha256": "f8edf5d48869a4e090d33a66cd530a901501bdf522dbd89cef525de163125efe"
+    },
+    "proof/quality-body/iron-lancer/idle-up-x4.png": {
+      "bytes": 33238,
+      "sha256": "160dbe89df1f1bfaa6fcb1cdcc73eb35851197dccb87b49c1dd07ba3fc5e8639"
+    },
+    "proof/quality-body/iron-lancer/retreat-down-x4.png": {
+      "bytes": 31734,
+      "sha256": "d5d4243c2c25170dba71638bf33ae6911c2a992505533f080b1b1ecd651fcad0"
+    },
+    "proof/quality-body/iron-lancer/retreat-left-x4.png": {
+      "bytes": 35117,
+      "sha256": "1b68f7b05aba5f5db83405cb51f6febb0c6bf06060f658e7f25b3a78241809d8"
+    },
+    "proof/quality-body/iron-lancer/retreat-right-x4.png": {
+      "bytes": 35575,
+      "sha256": "267d1f2371f624c2c848d0abb010b8bcd6d9fe8ddf47883bd313c5f6c3a1a930"
+    },
+    "proof/quality-body/iron-lancer/retreat-up-x4.png": {
+      "bytes": 32537,
+      "sha256": "6c04975611fbdbbd38a4dbe465b6cdb0fdabbad759f3776b20c78111902a493c"
+    },
+    "proof/quality-body/iron-lancer/walk-down-x4.png": {
+      "bytes": 32701,
+      "sha256": "398fb9d77b84cee36be1ea5fe818c86e7b9ea898ea3f6fdd5e892ba7a6ce90db"
+    },
+    "proof/quality-body/iron-lancer/walk-left-x4.png": {
+      "bytes": 35015,
+      "sha256": "7b3e3aac412043ea4ad3c3dfc82fd5f99f4c1149ee45918e801949ddd8556601"
+    },
+    "proof/quality-body/iron-lancer/walk-right-x4.png": {
+      "bytes": 34875,
+      "sha256": "d6aad698b3cd413a319401b7b5c6744de40e6c5184c9ab46b963a3c73569cef0"
+    },
+    "proof/quality-body/iron-lancer/walk-up-x4.png": {
+      "bytes": 32279,
+      "sha256": "a17969ec2517666fbd43816c07815cbcc94d4aec70f60d356385389dad5ea5b1"
+    },
+    "proof/quality/ash-reaver/attack-down-x4.png": {
+      "bytes": 34514,
+      "sha256": "2952a5f8477bf089361a647a589f0c0d3ac6c2bb5863c2291ea6a29fa38b8057"
+    },
+    "proof/quality/ash-reaver/attack-left-x4.png": {
+      "bytes": 26147,
+      "sha256": "bac617fdfaa7070d49ae004a3c74d706e770b9d1796ac315b0dd818084fd2e9a"
+    },
+    "proof/quality/ash-reaver/attack-right-x4.png": {
+      "bytes": 26241,
+      "sha256": "0d0529cac46e6864d49ca20e427b5fa1203bc2aa8907fda7a606f08bf623b49b"
+    },
+    "proof/quality/ash-reaver/attack-up-x4.png": {
+      "bytes": 32976,
+      "sha256": "b40c9a6b51cde6ef6b6b1a5fc81690150d81be4dac73ec957a31f3a4c4b6e1d5"
+    },
+    "proof/quality/ash-reaver/idle-down-x4.png": {
+      "bytes": 34690,
+      "sha256": "c5436377ef9d73492f0c4f8ebe279099487cac84dfecf0f51231dc788f31de8a"
+    },
+    "proof/quality/ash-reaver/idle-left-x4.png": {
+      "bytes": 27819,
+      "sha256": "81fb3c26687b798688596f4f1ef0f0544e7dc4e161236c003dcb57a746aa892c"
+    },
+    "proof/quality/ash-reaver/idle-right-x4.png": {
+      "bytes": 28004,
+      "sha256": "50819bf7a7b947c14689af4538e74be745dc476c97df79395497659674cf764e"
+    },
+    "proof/quality/ash-reaver/idle-up-x4.png": {
+      "bytes": 33977,
+      "sha256": "4b1b65417e7c9d691c3ef30d0618b201c24831699057d4a98c851fb4a91921a5"
+    },
+    "proof/quality/ash-reaver/retreat-down-x4.png": {
+      "bytes": 33344,
+      "sha256": "485d97a0063eaf4a5d25d02b2703eb0ce6b31ddc990de70eef8a828b93f9f34a"
+    },
+    "proof/quality/ash-reaver/retreat-left-x4.png": {
+      "bytes": 34688,
+      "sha256": "45aac016d49f0ba1b124eef51582164db9d5568f0d99f0c3a3c86bcc4c2944aa"
+    },
+    "proof/quality/ash-reaver/retreat-right-x4.png": {
+      "bytes": 35274,
+      "sha256": "522842f4b2f36a17f681b868d59e7f3a8479d8f31c6afa375467eb3cc9c9ad06"
+    },
+    "proof/quality/ash-reaver/retreat-up-x4.png": {
+      "bytes": 33148,
+      "sha256": "d20ef3fd0641e3789bb9ffa5ea36bb535c09d01ca2aaa97431086caa9fceca29"
+    },
+    "proof/quality/ash-reaver/walk-down-x4.png": {
+      "bytes": 33609,
+      "sha256": "fcf380816ea4dd06e5d549f663e882ffb8ee5488f6790790ef824dd3d9231a5a"
+    },
+    "proof/quality/ash-reaver/walk-left-x4.png": {
+      "bytes": 34626,
+      "sha256": "c2313500826411ec8f6fe253c0365c0484b832d28a7b075929dd4273bc2ecddf"
+    },
+    "proof/quality/ash-reaver/walk-right-x4.png": {
+      "bytes": 34858,
+      "sha256": "91a320ecd42d9bd7e93c953e0403ca23f9baf547876e1ed69ec61df1ad78be40"
+    },
+    "proof/quality/ash-reaver/walk-up-x4.png": {
+      "bytes": 32488,
+      "sha256": "daeb1708184ba2309b1804376604b6e55fda385a9101c6e80220059765ffd6e7"
+    },
+    "proof/quality/bone-breaker/attack-down-x4.png": {
+      "bytes": 35054,
+      "sha256": "a94602f799a703b23e5b3a40488e17b9ab377ecde9dbdd7bae8221121b730982"
+    },
+    "proof/quality/bone-breaker/attack-left-x4.png": {
+      "bytes": 27443,
+      "sha256": "72fa35cfa312ba07ba9114def0ee01abc0da05bdd8253754ad73c15480422c4e"
+    },
+    "proof/quality/bone-breaker/attack-right-x4.png": {
+      "bytes": 27132,
+      "sha256": "6cb49fc3f618bc52f7ac59598aa0154de37ec248f9047f7f055f9309f1ea3888"
+    },
+    "proof/quality/bone-breaker/attack-up-x4.png": {
+      "bytes": 34160,
+      "sha256": "397b05fd2644da03bd10ad2ca8c48fb7229e22fa228b8d7eb8bc8668f6e9863a"
+    },
+    "proof/quality/bone-breaker/idle-down-x4.png": {
+      "bytes": 35196,
+      "sha256": "445924a4d75bfbbb31d9672673f3ff532c6a014ca4cfd7d9eb2ce964ab0675f5"
+    },
+    "proof/quality/bone-breaker/idle-left-x4.png": {
+      "bytes": 29033,
+      "sha256": "d6a61f9af683185c73110e45552de478a1cfbfe774cd076201ce4ce854dc0265"
+    },
+    "proof/quality/bone-breaker/idle-right-x4.png": {
+      "bytes": 29554,
+      "sha256": "7f49c81fa4d1a4dae495d42c77d59c4d59fd27fe10cf5cb3c5a0f9c93f65080c"
+    },
+    "proof/quality/bone-breaker/idle-up-x4.png": {
+      "bytes": 34981,
+      "sha256": "22963edbe7c69bebbb26902c696dbe2590407a2f0303816bfae6474d9ded339c"
+    },
+    "proof/quality/bone-breaker/retreat-down-x4.png": {
+      "bytes": 34267,
+      "sha256": "8d191671e0e0216c6377c8e4b09c014f5b35d80191d10831016c7c80cf225ff7"
+    },
+    "proof/quality/bone-breaker/retreat-left-x4.png": {
+      "bytes": 35897,
+      "sha256": "fd77830c92b5b64299933590139fb612fe8bf06573c603ad07c761e149fc02fc"
+    },
+    "proof/quality/bone-breaker/retreat-right-x4.png": {
+      "bytes": 36428,
+      "sha256": "c2ab5860e15dbc8a2ea7936c7afdff67366fdebefacaab2581174f3f2d94347f"
+    },
+    "proof/quality/bone-breaker/retreat-up-x4.png": {
+      "bytes": 34220,
+      "sha256": "f8bca85c6d50512b6ed84d0aa0e60ea66e52a6404c8dc347f7071c58fda60a0a"
+    },
+    "proof/quality/bone-breaker/walk-down-x4.png": {
+      "bytes": 34416,
+      "sha256": "60025c264a56f71aa728d0ca43c621bb6f89e752553b9339452c4b14e22ae658"
+    },
+    "proof/quality/bone-breaker/walk-left-x4.png": {
+      "bytes": 35579,
+      "sha256": "df525779be37e4174d4d1d53c7fb885bbd3cd1acb9bc29178b924f2c5e70e3f9"
+    },
+    "proof/quality/bone-breaker/walk-right-x4.png": {
+      "bytes": 35933,
+      "sha256": "78976a7eb3bb28334f1287bf8e4dd90e9c3dfdc2920b2965a8a50f431d2b5972"
+    },
+    "proof/quality/bone-breaker/walk-up-x4.png": {
+      "bytes": 33288,
+      "sha256": "3b6d2eaa54b4243167dde3dc5a1ed3d06c4ac3c9339da1e11f34622687fce4b3"
+    },
+    "proof/quality/iron-lancer/attack-down-x4.png": {
+      "bytes": 33822,
+      "sha256": "59a9da6eb2b9dce3775d3873bcb586708fffc32245409bea67709e6503d0917a"
+    },
+    "proof/quality/iron-lancer/attack-left-x4.png": {
+      "bytes": 26776,
+      "sha256": "3e3bb53356cea93d6fdff364aecd1c89fdc837db91c85e0fd5dcf1da387732c5"
+    },
+    "proof/quality/iron-lancer/attack-right-x4.png": {
+      "bytes": 27048,
+      "sha256": "2716187a04711459af90f679863f3e80b76728522a0ead3d87403136245fc279"
+    },
+    "proof/quality/iron-lancer/attack-up-x4.png": {
+      "bytes": 33353,
+      "sha256": "c87c123e5a87ce105eefd5b77d0d49da5943b79b7340d984429f254ab3f16bdf"
+    },
+    "proof/quality/iron-lancer/idle-down-x4.png": {
+      "bytes": 34130,
+      "sha256": "4de18ba690778994257518f09a1d03c08d2764b0fa8213c5198067aa4492f869"
+    },
+    "proof/quality/iron-lancer/idle-left-x4.png": {
+      "bytes": 28871,
+      "sha256": "aefaa8c386ca368cd81f98d73e613229872b34e4fe4fdbe34097b941dd75f340"
+    },
+    "proof/quality/iron-lancer/idle-right-x4.png": {
+      "bytes": 28896,
+      "sha256": "1dd24dcc598684a60c8fd38120fd2db4ee367138e8eb38f422e15dd17b4625ab"
+    },
+    "proof/quality/iron-lancer/idle-up-x4.png": {
+      "bytes": 34049,
+      "sha256": "25db772fa9e6c760995e0b55be85c517404332c7a22afd699fda94c071d6abfe"
+    },
+    "proof/quality/iron-lancer/retreat-down-x4.png": {
+      "bytes": 33415,
+      "sha256": "edda17c2be43d83b710998478f1b21f4b36ebaf7f579ed60ece351dc4973eaf7"
+    },
+    "proof/quality/iron-lancer/retreat-left-x4.png": {
+      "bytes": 36093,
+      "sha256": "d2b7dc0bb6aa0902fae0671fef01a27754e08448415b4bbfa17e39e6acfed221"
+    },
+    "proof/quality/iron-lancer/retreat-right-x4.png": {
+      "bytes": 37029,
+      "sha256": "cce8b476f0db6e753d1a68a607b93b1eb092a5d2b3eab75aa831119df87cc23f"
+    },
+    "proof/quality/iron-lancer/retreat-up-x4.png": {
+      "bytes": 33979,
+      "sha256": "8659e5eb198cc640aac09ef5845980bc71ad0cd9095a52ec69dde4f5f9b7bfcb"
+    },
+    "proof/quality/iron-lancer/walk-down-x4.png": {
+      "bytes": 33525,
+      "sha256": "7f4babea34ad528bc9dc51107244d6545b988f413e30bf54b84c0622dcaf8163"
+    },
+    "proof/quality/iron-lancer/walk-left-x4.png": {
+      "bytes": 35951,
+      "sha256": "2d919e8862649bad1b9dd630da0de42cb87cdbe1c8f1ff0d51947182623fb4fe"
+    },
+    "proof/quality/iron-lancer/walk-right-x4.png": {
+      "bytes": 35963,
+      "sha256": "89308c5c938e428d14f92cc91b1071a1623211cee9989d93917b06adf049cb08"
+    },
+    "proof/quality/iron-lancer/walk-up-x4.png": {
+      "bytes": 32942,
+      "sha256": "c7f7a76ec4176b065830bb7d28e4a67e7305fb93a845c2420d02fb12ee4f24ca"
+    },
+    "proof/raiders-default-35x46.png": {
+      "bytes": 379381,
+      "sha256": "13c496bf780e9173f1372a721d0e3394569459f73514db97de49215d58d1e99d"
+    },
+    "proof/raiders-review-64x84.png": {
+      "bytes": 673285,
+      "sha256": "ad66d6a32b86cb34d0ba6d16a8ca784f4ba6076ae99455567e0bad50ce9c56f4"
+    },
+    "reports/quality-body/ash-reaver/attack-down.json": {
+      "bytes": 6249,
+      "sha256": "e620d3de3684cce16a07539c7f0c0cd0369bfd444e20e1ba7527ed51759e8e03"
+    },
+    "reports/quality-body/ash-reaver/attack-left.json": {
+      "bytes": 6252,
+      "sha256": "3a47ee9f61e42e56d95d64dfbb328862b000f7c16550b6ab9c0f970d66f5bf8a"
+    },
+    "reports/quality-body/ash-reaver/attack-right.json": {
+      "bytes": 6246,
+      "sha256": "c004229b6109d194a6840c5bb46775f927127110a8ab25669e4e182ca02bc19a"
+    },
+    "reports/quality-body/ash-reaver/attack-up.json": {
+      "bytes": 6247,
+      "sha256": "0991b99147c1eff2b55a882004f4347f85dc3dfaa37dd06af93e712e3aa9e1a7"
+    },
+    "reports/quality-body/ash-reaver/idle-down.json": {
+      "bytes": 6242,
+      "sha256": "294e7872471d1b70c3b7bd0ee8be367bbfac71e71215317a4aab067a8e9e919e"
+    },
+    "reports/quality-body/ash-reaver/idle-left.json": {
+      "bytes": 6241,
+      "sha256": "1ee1f40392498afe7b17ddd80cc146a431ca6393258172d517be3f2eb354e5c1"
+    },
+    "reports/quality-body/ash-reaver/idle-right.json": {
+      "bytes": 6241,
+      "sha256": "b2300dcf510c13e1cf12d81b11466a2974965ec0bd2b65779929c5328c093ef4"
+    },
+    "reports/quality-body/ash-reaver/idle-up.json": {
+      "bytes": 6241,
+      "sha256": "bf19bb71f19b3b80cfdb8991dd621519b06c706d565932854dfdc71c04c3baa1"
+    },
+    "reports/quality-body/ash-reaver/retreat-down.json": {
+      "bytes": 6245,
+      "sha256": "65e83d886572722eb6b9f38d40cd16692d2ce6ab4c7f6c367c38ba6e64b9f03f"
+    },
+    "reports/quality-body/ash-reaver/retreat-left.json": {
+      "bytes": 6250,
+      "sha256": "084be78e081318358905d02958fdc4b2402704a396b7316d6672c8c8c1a0f692"
+    },
+    "reports/quality-body/ash-reaver/retreat-right.json": {
+      "bytes": 6251,
+      "sha256": "9f78fe2206f9861cd29f9b969c51852604af03dfd0c872184744888634d146a6"
+    },
+    "reports/quality-body/ash-reaver/retreat-up.json": {
+      "bytes": 6249,
+      "sha256": "a8dba452f56a42b51e024106609f1d3d13924995d9ccffb7c6aded1dabf83d8e"
+    },
+    "reports/quality-body/ash-reaver/walk-down.json": {
+      "bytes": 6244,
+      "sha256": "80def0f1b21b4f7a8c1086fd7cdffcb7959d6da61135e635792e37d54f02bb63"
+    },
+    "reports/quality-body/ash-reaver/walk-left.json": {
+      "bytes": 6235,
+      "sha256": "4ae8afc71f262877c3548c0e988ab256483e3524e6003c904363f9c29dff7245"
+    },
+    "reports/quality-body/ash-reaver/walk-right.json": {
+      "bytes": 6241,
+      "sha256": "ad048d583d4977d697b057d04181349274f9ed7af29861e7f325fd4fe2f680cf"
+    },
+    "reports/quality-body/ash-reaver/walk-up.json": {
+      "bytes": 6239,
+      "sha256": "0ee3a3ded53d76352117530f1593b987a038d580d7220ba1bc8fa4dff6c52757"
+    },
+    "reports/quality-body/bone-breaker/attack-down.json": {
+      "bytes": 6250,
+      "sha256": "c981b5ac8390549e3d36884b29575e84d47cbea8cd8362524941bc7aa6c52f6c"
+    },
+    "reports/quality-body/bone-breaker/attack-left.json": {
+      "bytes": 6247,
+      "sha256": "be99efdfd1262a6dcab26fd92a3d4027046afa8aa4417bac0e41876c24835a23"
+    },
+    "reports/quality-body/bone-breaker/attack-right.json": {
+      "bytes": 6254,
+      "sha256": "b2216c666143c63b987e9e92c8010098923f4ff97e4c5cdb09a78a025d2fc0da"
+    },
+    "reports/quality-body/bone-breaker/attack-up.json": {
+      "bytes": 6250,
+      "sha256": "a4d2f0526127b8e5ca3622a7692a1c369e065224e6bbf4946989e5b62c8375fa"
+    },
+    "reports/quality-body/bone-breaker/idle-down.json": {
+      "bytes": 6240,
+      "sha256": "3eafacdaf73b24b7e692f45df5090356fed02122777a2dca9f9e07f416748d40"
+    },
+    "reports/quality-body/bone-breaker/idle-left.json": {
+      "bytes": 6245,
+      "sha256": "89e579d09ab44ef654b27767737361da0067ebaf8d3fdfcbafe310234d598e0e"
+    },
+    "reports/quality-body/bone-breaker/idle-right.json": {
+      "bytes": 6250,
+      "sha256": "0d2c380879a56ad5f6a52f888882367a259011e7bff80bf20a46c4b7dc9b8aa5"
+    },
+    "reports/quality-body/bone-breaker/idle-up.json": {
+      "bytes": 6245,
+      "sha256": "ad6bcc3653d679352924f58291cc8859e89b1a897a18853a245d3abe4dfb9a1a"
+    },
+    "reports/quality-body/bone-breaker/retreat-down.json": {
+      "bytes": 6249,
+      "sha256": "54e83d2759a3c5be9d19034c4f32aa69b4663a5471e09d4199ccbf68009b30e3"
+    },
+    "reports/quality-body/bone-breaker/retreat-left.json": {
+      "bytes": 6249,
+      "sha256": "368ff689687ba1b7aeb397b2d0499069304c6e5e0f7470dad307975c12501e22"
+    },
+    "reports/quality-body/bone-breaker/retreat-right.json": {
+      "bytes": 6251,
+      "sha256": "3014ab7430fa4d4ae3bb04eedd56eee624ac87a2ffff0df71233f27b1103845e"
+    },
+    "reports/quality-body/bone-breaker/retreat-up.json": {
+      "bytes": 6248,
+      "sha256": "c0fc65d940169afcb847eb9acd17e1305e766408a9b2d3075751b0f1444fd22c"
+    },
+    "reports/quality-body/bone-breaker/walk-down.json": {
+      "bytes": 6243,
+      "sha256": "fdcb039e0561c320ed9a363b7cafccb2bc1a5c22fed15add6a805c71f8a0171c"
+    },
+    "reports/quality-body/bone-breaker/walk-left.json": {
+      "bytes": 6244,
+      "sha256": "4fa6e8dbb8ace7e9b3d8aadf3be69d650f9ae0e6249e3d952a78381e638c9d81"
+    },
+    "reports/quality-body/bone-breaker/walk-right.json": {
+      "bytes": 6248,
+      "sha256": "4bb9e2f025db434600d582cb128f52e4edc118b705e8e02f43373fb35e444b28"
+    },
+    "reports/quality-body/bone-breaker/walk-up.json": {
+      "bytes": 6245,
+      "sha256": "44874274096c9608d5668afaaa8b8f58f71049ac5cf6ae7dd6d42fb0ef1a0b1f"
+    },
+    "reports/quality-body/iron-lancer/attack-down.json": {
+      "bytes": 6248,
+      "sha256": "86574b7df8c8189b92adfc4f7007f54a18a4f1d2d27738948955b0928215cceb"
+    },
+    "reports/quality-body/iron-lancer/attack-left.json": {
+      "bytes": 6246,
+      "sha256": "3f6c93f837067ee446f5c702a2c9311f14e765b5ce83eb04bb51259cd702dfda"
+    },
+    "reports/quality-body/iron-lancer/attack-right.json": {
+      "bytes": 6247,
+      "sha256": "1bbdd873fc71c9e8cf398f561e0bccc3272376c28990b28cdaded3144296e70f"
+    },
+    "reports/quality-body/iron-lancer/attack-up.json": {
+      "bytes": 6246,
+      "sha256": "e103b596766e8083adafe096b89c7d84cf934113d432dcbffd76193efc653b98"
+    },
+    "reports/quality-body/iron-lancer/idle-down.json": {
+      "bytes": 6246,
+      "sha256": "305c59d92d08ad0c61a1cd3f2333fbed4b98e2ba7141cd172ef4776d64118425"
+    },
+    "reports/quality-body/iron-lancer/idle-left.json": {
+      "bytes": 6245,
+      "sha256": "db6b3882ca95271d41d14cdf326b0203ff55dc085202f3b8d25a7850412d2dc1"
+    },
+    "reports/quality-body/iron-lancer/idle-right.json": {
+      "bytes": 6247,
+      "sha256": "4d7707c7d1d58091bd5a156c483bda07fe5e80800089b8ff311ef12d18a886cd"
+    },
+    "reports/quality-body/iron-lancer/idle-up.json": {
+      "bytes": 6240,
+      "sha256": "7647cd74c5ae9132c505837ac2856100e9bd74ae6246d0df7b634b84d943bae3"
+    },
+    "reports/quality-body/iron-lancer/retreat-down.json": {
+      "bytes": 6251,
+      "sha256": "4cd94f59426086f4dd00d4f3dcc191cfe11da52558458e1110efee799675d0eb"
+    },
+    "reports/quality-body/iron-lancer/retreat-left.json": {
+      "bytes": 6248,
+      "sha256": "611ee8589c285ce117e98548b5473309196d1a81a34cd0864e74e9c6fd5ef87e"
+    },
+    "reports/quality-body/iron-lancer/retreat-right.json": {
+      "bytes": 6251,
+      "sha256": "43424ca2e7d8316a88024b3a1581c0f1e58e6feefa7c79f86772f991793f8b95"
+    },
+    "reports/quality-body/iron-lancer/retreat-up.json": {
+      "bytes": 6247,
+      "sha256": "b40605ccf4eb58d4724cc5644d3fa983ed992376cc8b4421267644878978930e"
+    },
+    "reports/quality-body/iron-lancer/walk-down.json": {
+      "bytes": 6245,
+      "sha256": "4fa07499618e568412072b04eb6a41eb1cc86ec70cc6a59aab6d5210ee9f4433"
+    },
+    "reports/quality-body/iron-lancer/walk-left.json": {
+      "bytes": 6241,
+      "sha256": "788dc84eec848238443618c9f246b0c930d32c9fc7ff359e80ca9e094d0a2159"
+    },
+    "reports/quality-body/iron-lancer/walk-right.json": {
+      "bytes": 6246,
+      "sha256": "d3ab4f1c9495a27d773f7cd5036bdc3c04c70f607901e162c6ff4b361a7826b8"
+    },
+    "reports/quality-body/iron-lancer/walk-up.json": {
+      "bytes": 6240,
+      "sha256": "ca861471a9205631e163418c83e48d02b1bc8a792f5eaed826cb5148c3d80583"
+    },
+    "reports/quality/ash-reaver/attack-down.json": {
+      "bytes": 6240,
+      "sha256": "304fa2575625546c7b01e44937f218d99d6cd905cb48396d12a3d3fa756d81bd"
+    },
+    "reports/quality/ash-reaver/attack-left.json": {
+      "bytes": 6239,
+      "sha256": "9124c6749fea1104c920fda00667553ca77fde312cbb375b7dbfb0e3a5ced8e8"
+    },
+    "reports/quality/ash-reaver/attack-right.json": {
+      "bytes": 6238,
+      "sha256": "1f2f7a12ccd754819e0dd9d8c2a4e6b5185355773a143bb8f7b3e9328ffbde42"
+    },
+    "reports/quality/ash-reaver/attack-up.json": {
+      "bytes": 6239,
+      "sha256": "2d712bf6061b599646539ebdb7ad1d17f8ae92c751c1eb3b07cc34e6848d3c6e"
+    },
+    "reports/quality/ash-reaver/idle-down.json": {
+      "bytes": 6237,
+      "sha256": "61e66dabc447482417fbc7c5e8f2242f79f281cef7c8bd5edb23cf82b2c6607a"
+    },
+    "reports/quality/ash-reaver/idle-left.json": {
+      "bytes": 6240,
+      "sha256": "dc8253b49e4b227274f44ed42ff5600be34e35fc3aa685c989a0c3ba0ef1fbc6"
+    },
+    "reports/quality/ash-reaver/idle-right.json": {
+      "bytes": 6236,
+      "sha256": "7ad86a1ad6ac2cee222495661200e3089a39751dd1e0cb134d7a9b1da20bc82f"
+    },
+    "reports/quality/ash-reaver/idle-up.json": {
+      "bytes": 6235,
+      "sha256": "95c97dde9c1bffacf0d58edc9dc10515b322c4e04c11c7189b11a2a04b6c25ab"
+    },
+    "reports/quality/ash-reaver/retreat-down.json": {
+      "bytes": 6238,
+      "sha256": "7040f01d79ac3b9d50958064bfc80ff385c0574ad2353b0899761b46301c1b58"
+    },
+    "reports/quality/ash-reaver/retreat-left.json": {
+      "bytes": 6244,
+      "sha256": "af5ea530630f4bb2ccc24ad69adefb1b16a1a49c1ebbc751209b13988263f6e5"
+    },
+    "reports/quality/ash-reaver/retreat-right.json": {
+      "bytes": 6242,
+      "sha256": "0b3a874ea9e1cc345093be9386e119eac8383518d7b6cc99c833e4efb3b6c25c"
+    },
+    "reports/quality/ash-reaver/retreat-up.json": {
+      "bytes": 6240,
+      "sha256": "d1ea65242daab3295f1f5e7ab28f954f3bcbee4c254b2a118402f296f3e8747c"
+    },
+    "reports/quality/ash-reaver/walk-down.json": {
+      "bytes": 6234,
+      "sha256": "217364b09fa1795f6aa23ebb910cd8d347d353d298fc98a8edad96134433d2da"
+    },
+    "reports/quality/ash-reaver/walk-left.json": {
+      "bytes": 6228,
+      "sha256": "a39390d67177d15fb4c8ce1717bf13eacc69f4d7a988e9fd05736f0a1680be56"
+    },
+    "reports/quality/ash-reaver/walk-right.json": {
+      "bytes": 6233,
+      "sha256": "72e0f15f3edf350dad65bcd71d747ef836d604ff95e3d7c6950f5e1177e32394"
+    },
+    "reports/quality/ash-reaver/walk-up.json": {
+      "bytes": 6231,
+      "sha256": "e56f537149b06822827089bd4110106e7e060202aaefb8089cdb48e93c32b09b"
+    },
+    "reports/quality/bone-breaker/attack-down.json": {
+      "bytes": 6246,
+      "sha256": "941399a042f9067d235584c1c201cdbacc355418a96046d068f5c1d96c78dafc"
+    },
+    "reports/quality/bone-breaker/attack-left.json": {
+      "bytes": 6238,
+      "sha256": "e7f5a8689d0baec2e95b3d2efc52b16d6407000a8b33b41def990cc7724f3095"
+    },
+    "reports/quality/bone-breaker/attack-right.json": {
+      "bytes": 6243,
+      "sha256": "5b06bb5549583c8b804158f86c229315fa1c367e92de4b24bd14e452d0cc056a"
+    },
+    "reports/quality/bone-breaker/attack-up.json": {
+      "bytes": 6239,
+      "sha256": "9f31153477c5b9c4290be2865b2316438fa04fb71240ffce34d1d75d13c5f408"
+    },
+    "reports/quality/bone-breaker/idle-down.json": {
+      "bytes": 6236,
+      "sha256": "38949a6c52cac4d4613880e7c5c6378299b878c57b1c93974fbb487116915971"
+    },
+    "reports/quality/bone-breaker/idle-left.json": {
+      "bytes": 6237,
+      "sha256": "04465cfa5015aa20365cbe9d4a35c4a0fe696405aec22f9a9317a34b88f0960e"
+    },
+    "reports/quality/bone-breaker/idle-right.json": {
+      "bytes": 6244,
+      "sha256": "2956aacc3ddd383f98e5283679e882920397648b2be102bc3d4f8d4811da2086"
+    },
+    "reports/quality/bone-breaker/idle-up.json": {
+      "bytes": 6237,
+      "sha256": "b4b75829336214cd5eb5461028e7053a02e4e9cfee192a4ca7ccaf921ed9304c"
+    },
+    "reports/quality/bone-breaker/retreat-down.json": {
+      "bytes": 6237,
+      "sha256": "60f1830de174ff7c1f54aca3da2a76a094f91f87266e56ddcd4a6ca3d25d09e9"
+    },
+    "reports/quality/bone-breaker/retreat-left.json": {
+      "bytes": 6243,
+      "sha256": "69c8ba62136cab0277bd76ed989e2a987340df21f6090f4d5aec3ea5233cb1de"
+    },
+    "reports/quality/bone-breaker/retreat-right.json": {
+      "bytes": 6241,
+      "sha256": "95b52267d486ebbf811d9cb03f144c12549359585091723f085886607380806d"
+    },
+    "reports/quality/bone-breaker/retreat-up.json": {
+      "bytes": 6239,
+      "sha256": "d9628dfaeeb7d60aff88d5e633f4dc619ecadae98f4ae8ae6259a1b0f515caa6"
+    },
+    "reports/quality/bone-breaker/walk-down.json": {
+      "bytes": 6238,
+      "sha256": "a7522be968e2ccd7c47cc0c8f4f996444abbc0e892035bc5b762f8a598dead26"
+    },
+    "reports/quality/bone-breaker/walk-left.json": {
+      "bytes": 6235,
+      "sha256": "87218a029c13185e92e16c2a5504a454f53200dd801bf84f03eb186dea92b33a"
+    },
+    "reports/quality/bone-breaker/walk-right.json": {
+      "bytes": 6240,
+      "sha256": "86104fa3d7dfd6bac482378ee59512f75a26f49bb394ffdf03d3492a997c92d3"
+    },
+    "reports/quality/bone-breaker/walk-up.json": {
+      "bytes": 6234,
+      "sha256": "cca88b53d61492c637180552469b7374eb300dc36f5fa53750f0656bc2f10da9"
+    },
+    "reports/quality/iron-lancer/attack-down.json": {
+      "bytes": 6241,
+      "sha256": "4a136c5ba1f8d66bd34988dbdf3ee4aa70dc0258b3dc9290529129bb36f2f10d"
+    },
+    "reports/quality/iron-lancer/attack-left.json": {
+      "bytes": 6239,
+      "sha256": "ee3f7e6029a4911ec6d2c0a0685d4d545a443005dfbc5467b974ab751faa967e"
+    },
+    "reports/quality/iron-lancer/attack-right.json": {
+      "bytes": 6244,
+      "sha256": "5428077cf2645c742d1678828f5e6342aa6124c09e24ebf0c1ece3bacad1dc53"
+    },
+    "reports/quality/iron-lancer/attack-up.json": {
+      "bytes": 6238,
+      "sha256": "2b2284e528b8a1d755c89c865f21f4590d9e51605eff2a91084f21e96f053bcf"
+    },
+    "reports/quality/iron-lancer/idle-down.json": {
+      "bytes": 6241,
+      "sha256": "9b90bb7abb69df008972566ac8e09c5dd0f98b8ae0107c91aa49e0bcea06e150"
+    },
+    "reports/quality/iron-lancer/idle-left.json": {
+      "bytes": 6237,
+      "sha256": "0218afe93be7e6c89c13565941dcf4ba8f230aa8b07af66cf2dd769fa4c952f2"
+    },
+    "reports/quality/iron-lancer/idle-right.json": {
+      "bytes": 6239,
+      "sha256": "6de3cb0f77fc52d40e46d2c8a2031180a863213ebabb8aa96285bdf7c3453804"
+    },
+    "reports/quality/iron-lancer/idle-up.json": {
+      "bytes": 6234,
+      "sha256": "5b218777ec99f5780c191dc6e0ad243fb612f5dbe233fa2c76e5f036bd378c3b"
+    },
+    "reports/quality/iron-lancer/retreat-down.json": {
+      "bytes": 6245,
+      "sha256": "18d6e67b2f71cd2c2506fa6244f9f5701f475e348ec12ae4e860d70fa91d8f8c"
+    },
+    "reports/quality/iron-lancer/retreat-left.json": {
+      "bytes": 6238,
+      "sha256": "7a73c127009b55a200373272e96e21cac00012b3369d01f9fca2797476102f5c"
+    },
+    "reports/quality/iron-lancer/retreat-right.json": {
+      "bytes": 6240,
+      "sha256": "9816b1261b47ac2e4260b4b8c3e7a7c3cf1dabb7679543896898228b136bebaf"
+    },
+    "reports/quality/iron-lancer/retreat-up.json": {
+      "bytes": 6237,
+      "sha256": "2c3ea0b9d69fcfa2570d85db87ce09bdf5f8c5010d710ac64e3410e458080233"
+    },
+    "reports/quality/iron-lancer/walk-down.json": {
+      "bytes": 6240,
+      "sha256": "557787522b16b540a53c64f1279ccbec212b83d33ae787ba6531adf85ba13c4b"
+    },
+    "reports/quality/iron-lancer/walk-left.json": {
+      "bytes": 6232,
+      "sha256": "0d375bdded9f3d3f89fa5e6f820fb4b17715b3a2e8827745b2ca96110d775062"
+    },
+    "reports/quality/iron-lancer/walk-right.json": {
+      "bytes": 6238,
+      "sha256": "35bba1bd50099db46f25975f93f47c44d179dbc2df620672ec4cfacb1e2c231a"
+    },
+    "reports/quality/iron-lancer/walk-up.json": {
+      "bytes": 6231,
+      "sha256": "3252c19961f3ff7e753500991a2ce93f2ed2b22f186d879e6b3fb4b9a21086a6"
+    },
+    "reports/raider-family-gate.json": {
+      "bytes": 288712,
+      "sha256": "58f4b2a15200c30418d674a1b3732222cb82da028785f1e1536fb81578d46477"
+    },
+    "rows-runtime/default/ash-reaver/attack-down.png": {
+      "bytes": 8753,
+      "sha256": "6fbb7c2a52b792d37c862dd512b4df231803b4ca93169818a0fbe95a70d0cb32"
+    },
+    "rows-runtime/default/ash-reaver/attack-left.png": {
+      "bytes": 6292,
+      "sha256": "ffd9923ed81e87aa039650248ad498cb73e358f6d13732b8ee03c7da62edd504"
+    },
+    "rows-runtime/default/ash-reaver/attack-right.png": {
+      "bytes": 6224,
+      "sha256": "6dfb355673b83921f9e74da01b89b50e0dc8e6df56994e66b36b0a50ecbf28f9"
+    },
+    "rows-runtime/default/ash-reaver/attack-up.png": {
+      "bytes": 8486,
+      "sha256": "c185dab78aee2965926649891edf7b4678a67cdeb950afc78dafa76f542505f9"
+    },
+    "rows-runtime/default/ash-reaver/idle-down.png": {
+      "bytes": 8670,
+      "sha256": "07bc3fb60bb7b3c57e465e412fe5449ac15fc1495b7a250615c59205b462a03d"
+    },
+    "rows-runtime/default/ash-reaver/idle-left.png": {
+      "bytes": 6853,
+      "sha256": "ebb092b2f791f1e2b9dd0bb4f1112262668c73304081d0cf05dea4de444bd3a8"
+    },
+    "rows-runtime/default/ash-reaver/idle-right.png": {
+      "bytes": 6814,
+      "sha256": "a215d687644361fc18d33e8cb755f23b746ec83dcdbbe922f31f9c4d942cd1eb"
+    },
+    "rows-runtime/default/ash-reaver/idle-up.png": {
+      "bytes": 8751,
+      "sha256": "047a4fbffb486d5a7644871db14d4ffb349ea8b7490edbd5bd6708f77d7aacbe"
+    },
+    "rows-runtime/default/ash-reaver/retreat-down.png": {
+      "bytes": 8580,
+      "sha256": "62bfe66eda313df9a6e013e16ed1bc5cc5dc5942f48121e50dcf37b0a1a28e4b"
+    },
+    "rows-runtime/default/ash-reaver/retreat-left.png": {
+      "bytes": 7873,
+      "sha256": "3a2cc0866befe0546d746f11388b9d3d325d989c70c6a083be3d1986a00ea40d"
+    },
+    "rows-runtime/default/ash-reaver/retreat-right.png": {
+      "bytes": 7849,
+      "sha256": "216e359deaf48e8091157f1c2285f303f9e1933fce7e4e52939794668325b65e"
+    },
+    "rows-runtime/default/ash-reaver/retreat-up.png": {
+      "bytes": 8565,
+      "sha256": "459e321e4518ea4f4046b7b59a5316ca107aa51e9dc6e502b6f146c4431c3fe3"
+    },
+    "rows-runtime/default/ash-reaver/walk-down.png": {
+      "bytes": 8700,
+      "sha256": "6f0b2ba3561951baa082281d8e6b90edc062051bde2e84bc617d7f0ab3f9f5ab"
+    },
+    "rows-runtime/default/ash-reaver/walk-left.png": {
+      "bytes": 7433,
+      "sha256": "58a26376a10c44d47a74b9d94846223175c9d36e706fcd110610a2581171e74e"
+    },
+    "rows-runtime/default/ash-reaver/walk-right.png": {
+      "bytes": 7495,
+      "sha256": "8458c7c881cc024d9ae18d9d07498a582e6def12ba94323378e25d055f7b6a49"
+    },
+    "rows-runtime/default/ash-reaver/walk-up.png": {
+      "bytes": 8547,
+      "sha256": "d5b61fa32062e8c137f09fe1c6562dfcfe0098be7132f444dfb9db8576836f2f"
+    },
+    "rows-runtime/default/bone-breaker/attack-down.png": {
+      "bytes": 8728,
+      "sha256": "da583fc6fdb5d576cbd555181c7cde56ee3468b54905d03517e3e512d69a831b"
+    },
+    "rows-runtime/default/bone-breaker/attack-left.png": {
+      "bytes": 6451,
+      "sha256": "0febd3a340609bbf61ae329ca3e9f0435fa6197c3b755d34d8325a76e7bf975a"
+    },
+    "rows-runtime/default/bone-breaker/attack-right.png": {
+      "bytes": 6392,
+      "sha256": "b83efb4b466cf4f0bc7d1cf97734290e97ddf9c3cf4066aca3ef506d80a22834"
+    },
+    "rows-runtime/default/bone-breaker/attack-up.png": {
+      "bytes": 8458,
+      "sha256": "0958a93138c9dc7df451715388059d70280864a8922ad31a750138a7f082757a"
+    },
+    "rows-runtime/default/bone-breaker/idle-down.png": {
+      "bytes": 8851,
+      "sha256": "44a9ca541208afeba47e344b17a8a95408f4b763fcc8e345d34356ed4c248e47"
+    },
+    "rows-runtime/default/bone-breaker/idle-left.png": {
+      "bytes": 7090,
+      "sha256": "c45839ceb2d62c00616ff844ac428316e6fa3339cdc23e9fe6ffa5ed284cd376"
+    },
+    "rows-runtime/default/bone-breaker/idle-right.png": {
+      "bytes": 7065,
+      "sha256": "b549b8030bc3ef87592aae64b9db83be7b7bb3dffec1419dd039f57129b03a17"
+    },
+    "rows-runtime/default/bone-breaker/idle-up.png": {
+      "bytes": 8590,
+      "sha256": "404942ed8c392e6b52ad9e863a5a66be6c8fa4d6ba336cc1bd581b0e5757aa60"
+    },
+    "rows-runtime/default/bone-breaker/retreat-down.png": {
+      "bytes": 8947,
+      "sha256": "a485a653b3ae544009f03062c50a5a61b09e8cf4fba303b0b878947b79fc3f6d"
+    },
+    "rows-runtime/default/bone-breaker/retreat-left.png": {
+      "bytes": 8001,
+      "sha256": "bbce5f991f3581b30dc49db1f321ef2025d868e465d3c91b45e2983fc193c9a6"
+    },
+    "rows-runtime/default/bone-breaker/retreat-right.png": {
+      "bytes": 8074,
+      "sha256": "6715887d8346089834ab6de9029a9df035dd92f6c48baab017519cd67c5a779a"
+    },
+    "rows-runtime/default/bone-breaker/retreat-up.png": {
+      "bytes": 8736,
+      "sha256": "8e4f719b5320d66428a0cbc4774ddbf1d2f4b42bd72b67eeb883fcfcdc9f7fc7"
+    },
+    "rows-runtime/default/bone-breaker/walk-down.png": {
+      "bytes": 8873,
+      "sha256": "825c136ef86a03eb2446091d12324a6cb1fabf7aac5ec559c06229503b7dc7f9"
+    },
+    "rows-runtime/default/bone-breaker/walk-left.png": {
+      "bytes": 7558,
+      "sha256": "c0b787684338b004782d5153a9da190c0bce6034dcfd93416e55d2cea64d3fb7"
+    },
+    "rows-runtime/default/bone-breaker/walk-right.png": {
+      "bytes": 7644,
+      "sha256": "0e340749ed7058d5f86dcfc04e662f384347a577e8db85d4693e6d8dd0ee7d92"
+    },
+    "rows-runtime/default/bone-breaker/walk-up.png": {
+      "bytes": 8564,
+      "sha256": "6b700591f68ae58a921aebee37527a3736d57156150b22d4ae7d48135d58591f"
+    },
+    "rows-runtime/default/iron-lancer/attack-down.png": {
+      "bytes": 8434,
+      "sha256": "e77b8ef99c9b40f74fb2e13e76f132e8fdc858013f03349a9aa267e193903a59"
+    },
+    "rows-runtime/default/iron-lancer/attack-left.png": {
+      "bytes": 6233,
+      "sha256": "8542794cab30d7a076d10077c70604470c212fdfc0d2b87b38da00d7c2acc2aa"
+    },
+    "rows-runtime/default/iron-lancer/attack-right.png": {
+      "bytes": 6290,
+      "sha256": "5319efa857bad6b6368de1f8e8cb46165ce21142f602526ba248ebaf4f7f9e0b"
+    },
+    "rows-runtime/default/iron-lancer/attack-up.png": {
+      "bytes": 8172,
+      "sha256": "5a8e5d37fcf70eda7fb28cdf847ec35bb02da4c97f50d09e149f8acd5e997d68"
+    },
+    "rows-runtime/default/iron-lancer/idle-down.png": {
+      "bytes": 8684,
+      "sha256": "c98e424b46374e0b4ba99b8f5ea9bd378aedbceeb6e2a64f3ae486bb0b5fad5d"
+    },
+    "rows-runtime/default/iron-lancer/idle-left.png": {
+      "bytes": 6765,
+      "sha256": "51b7ea1717870ee5015ccf6010b7b82bea8e5d461f34dfd9416a0a5320f0ad88"
+    },
+    "rows-runtime/default/iron-lancer/idle-right.png": {
+      "bytes": 6896,
+      "sha256": "30aeb84d58db6b3568f53723c1283893a22862cd360ed73393952afa6375ae26"
+    },
+    "rows-runtime/default/iron-lancer/idle-up.png": {
+      "bytes": 8498,
+      "sha256": "f2b10849f3a77ee9b335386d2cd41ab1ed36d029dbeaa204e9740b7a2ca93680"
+    },
+    "rows-runtime/default/iron-lancer/retreat-down.png": {
+      "bytes": 8353,
+      "sha256": "c8a55b25f5f69701372141844308b28950ef9743149959f9a4808211d798dba1"
+    },
+    "rows-runtime/default/iron-lancer/retreat-left.png": {
+      "bytes": 7693,
+      "sha256": "caaac137eff7f462e9bd2b64a049404a272b1238207d55bc64cb185e05062a4c"
+    },
+    "rows-runtime/default/iron-lancer/retreat-right.png": {
+      "bytes": 7822,
+      "sha256": "cfa7d33a8e90ecc144e6f8f00dc686f38c00cde1165978192e88ced94431873e"
+    },
+    "rows-runtime/default/iron-lancer/retreat-up.png": {
+      "bytes": 8488,
+      "sha256": "c27b5102ab8fb1c9c479af4cb7297936e8e02ce916d0087e197a00b50f05905e"
+    },
+    "rows-runtime/default/iron-lancer/walk-down.png": {
+      "bytes": 8583,
+      "sha256": "ad3ecbfbad9a0362955bdae716550131363b448c512fcd5fdb83a39c665d9ac9"
+    },
+    "rows-runtime/default/iron-lancer/walk-left.png": {
+      "bytes": 7296,
+      "sha256": "774ed79a6bbba05c12b899b1e649be943b30e8779f0937451a190d30b9209250"
+    },
+    "rows-runtime/default/iron-lancer/walk-right.png": {
+      "bytes": 7489,
+      "sha256": "2a73aad2f2ad722055fb3cb2c1645b5c26a0eee33fbcfb8c179a9ab9663ba95d"
+    },
+    "rows-runtime/default/iron-lancer/walk-up.png": {
+      "bytes": 8372,
+      "sha256": "a8d26ae343a82a82803d01300dce3f22827d2ab1250078f5359b139b0f0e956a"
+    },
+    "rows-runtime/double/ash-reaver/attack-down.png": {
+      "bytes": 16587,
+      "sha256": "9b1a8d03c32d9043b71deb0124873da645937dd295b280046e1b18ab319da7a9"
+    },
+    "rows-runtime/double/ash-reaver/attack-left.png": {
+      "bytes": 11650,
+      "sha256": "b53c0cf8c3ecafbf6752abd10d7458a0bdb4bb1c1c4628eaea72cd28146b47a6"
+    },
+    "rows-runtime/double/ash-reaver/attack-right.png": {
+      "bytes": 11576,
+      "sha256": "2a2f3f5446bc298bfb0caa77d866ef104b3157626f85f8c38ebfce8fb34ffe9f"
+    },
+    "rows-runtime/double/ash-reaver/attack-up.png": {
+      "bytes": 15483,
+      "sha256": "72f130b5596be50cb9ff538f6fbc0a0c217b974c97477694479a2c8dee1a1a16"
+    },
+    "rows-runtime/double/ash-reaver/idle-down.png": {
+      "bytes": 16794,
+      "sha256": "cdf52524d37ae7166720eb1a026fcf8a8c61f74a4c517486869cd624c959c4f4"
+    },
+    "rows-runtime/double/ash-reaver/idle-left.png": {
+      "bytes": 12462,
+      "sha256": "dd6d2a5dc00d8ffbbc77943a4cebfd9f94d145b884add7cbb6e47523b4c3374f"
+    },
+    "rows-runtime/double/ash-reaver/idle-right.png": {
+      "bytes": 12284,
+      "sha256": "d50718c493b035b9722e78f004102ada1cff3c3a3c3022edc7b1b2022ca50d23"
+    },
+    "rows-runtime/double/ash-reaver/idle-up.png": {
+      "bytes": 16183,
+      "sha256": "1d19daab445449e37caa3166bda6b9c19b600e6de36e551a8677a94da504ed57"
+    },
+    "rows-runtime/double/ash-reaver/retreat-down.png": {
+      "bytes": 16124,
+      "sha256": "644dad6de70fb7dfb2e180cdb47457b65e2ef1c9c6e4c0a0c9d5c65e1666243e"
+    },
+    "rows-runtime/double/ash-reaver/retreat-left.png": {
+      "bytes": 15600,
+      "sha256": "4ab63d733ae20e9520673e973c036001b3f7c6e7cceff37fcfb4e4c3029d9261"
+    },
+    "rows-runtime/double/ash-reaver/retreat-right.png": {
+      "bytes": 15416,
+      "sha256": "30b3b763fe932e10bc7fbc230164c4f6687017f62b401e3e0565c11ad4b98d11"
+    },
+    "rows-runtime/double/ash-reaver/retreat-up.png": {
+      "bytes": 16342,
+      "sha256": "77b4723d7c8815c743f4c96affd263d1e3305bb30a77f21442a766d8ae128aa4"
+    },
+    "rows-runtime/double/ash-reaver/walk-down.png": {
+      "bytes": 16608,
+      "sha256": "53a73bbff29331cc44b48605f81923a9874a0f8254253e16e4010017669f1eff"
+    },
+    "rows-runtime/double/ash-reaver/walk-left.png": {
+      "bytes": 14787,
+      "sha256": "ed9949d01cc555a643a917ee851c6bdd864d122534791427be93f380a7d71d19"
+    },
+    "rows-runtime/double/ash-reaver/walk-right.png": {
+      "bytes": 14845,
+      "sha256": "8f77f155cc7f005d1062d881b0b849cf206cae39bf82d470dd46d7723dd5831d"
+    },
+    "rows-runtime/double/ash-reaver/walk-up.png": {
+      "bytes": 16291,
+      "sha256": "e353a5c7af16024dec627cc66eb8f2d713a7ac2a25a37a7a57c5e84659697f0f"
+    },
+    "rows-runtime/double/bone-breaker/attack-down.png": {
+      "bytes": 16693,
+      "sha256": "ee085fc118d37c5ae77283d3af1f6f4186dd16a8e67be77da0e035354ca2f726"
+    },
+    "rows-runtime/double/bone-breaker/attack-left.png": {
+      "bytes": 12232,
+      "sha256": "7a66fda5afbdc0e976fcf76f0c733d63829b5cbb46ff34af18faa1f5cc9ef7fc"
+    },
+    "rows-runtime/double/bone-breaker/attack-right.png": {
+      "bytes": 12356,
+      "sha256": "1e93fb548dca5eb95a110de7a2136b4d4b315b9b873a1540394c5f2176cc8388"
+    },
+    "rows-runtime/double/bone-breaker/attack-up.png": {
+      "bytes": 16122,
+      "sha256": "dfd51ee90022ca3ddd2d237554706a845ab62ef2449b2c9b2ab0cfa1325bf380"
+    },
+    "rows-runtime/double/bone-breaker/idle-down.png": {
+      "bytes": 16513,
+      "sha256": "84ebebe881598a3f4753b1d5b1ed44d871587252071d44e4b92b633203f5c9e8"
+    },
+    "rows-runtime/double/bone-breaker/idle-left.png": {
+      "bytes": 12881,
+      "sha256": "ef2af98463f840be1d6772304cc26f54ae6ec0f402e0e6af6d2a82ccd2551228"
+    },
+    "rows-runtime/double/bone-breaker/idle-right.png": {
+      "bytes": 13263,
+      "sha256": "e25815d824709c99bb729d0505763f739a0beb9226295ea8b3fc1f6049ade5e4"
+    },
+    "rows-runtime/double/bone-breaker/idle-up.png": {
+      "bytes": 16347,
+      "sha256": "82349902953abcefb0050d123bef8103158f558e55ea0d76498ab6d199d4320b"
+    },
+    "rows-runtime/double/bone-breaker/retreat-down.png": {
+      "bytes": 16719,
+      "sha256": "ffc8d30298de2546648e1c4236c4da8ad406eea6ad4cc869bb2b35aacf730735"
+    },
+    "rows-runtime/double/bone-breaker/retreat-left.png": {
+      "bytes": 15940,
+      "sha256": "082301baca74268c0acabd45acc5cc5898d1f2a4cb7d59968afd192a73117f1d"
+    },
+    "rows-runtime/double/bone-breaker/retreat-right.png": {
+      "bytes": 15782,
+      "sha256": "775dd3b7033c62ee027e40901bd7122ecd34cb6093cb2116446caccded581409"
+    },
+    "rows-runtime/double/bone-breaker/retreat-up.png": {
+      "bytes": 16814,
+      "sha256": "1dc2dd95b368146e90ef08a308b7f49fc14db505caa3bb5ec6ca5901a9590c96"
+    },
+    "rows-runtime/double/bone-breaker/walk-down.png": {
+      "bytes": 16798,
+      "sha256": "0c0e994d16a14a8fea258fa480caafa922c177f33044bf427a5738ca8fb98d03"
+    },
+    "rows-runtime/double/bone-breaker/walk-left.png": {
+      "bytes": 15513,
+      "sha256": "5a4e0c2f27a4a7a0a74bd8c57db1aa234a84d3ab45d866d77fdf8c06c02b790f"
+    },
+    "rows-runtime/double/bone-breaker/walk-right.png": {
+      "bytes": 15746,
+      "sha256": "6861644360134da8a469771734f3e69696878c7a2a64d34208ed579ff4aafd34"
+    },
+    "rows-runtime/double/bone-breaker/walk-up.png": {
+      "bytes": 16337,
+      "sha256": "931c406a3dd53f3ad055beeff450079a835fe78ff66ea5da325d33a94bf65d3a"
+    },
+    "rows-runtime/double/iron-lancer/attack-down.png": {
+      "bytes": 15515,
+      "sha256": "7f385f4ca4502142593c5acc1811bea679d5d31e12b6cea5ec994b4af365b533"
+    },
+    "rows-runtime/double/iron-lancer/attack-left.png": {
+      "bytes": 11879,
+      "sha256": "38f727244f821208828c32d75dd02a3b9fb10537b902b61fa0f4f80ec737bf0d"
+    },
+    "rows-runtime/double/iron-lancer/attack-right.png": {
+      "bytes": 11761,
+      "sha256": "3aab27f52c43dbf4038d5873da5320f71d23ebfc079af83119ca9e772b633720"
+    },
+    "rows-runtime/double/iron-lancer/attack-up.png": {
+      "bytes": 15335,
+      "sha256": "586796bcf5d6ecb5f7ca919bf3abdaeffb3d9759b3fe7c449e8aee1ad7366cdf"
+    },
+    "rows-runtime/double/iron-lancer/idle-down.png": {
+      "bytes": 15619,
+      "sha256": "1b7ed088326af7710c5e99a8e9c3380267ba4d2e1c0b25bf55a803f9149f76f9"
+    },
+    "rows-runtime/double/iron-lancer/idle-left.png": {
+      "bytes": 12551,
+      "sha256": "0ea64c62b161170ace9ba8746b8ec4981bc3b6e91cd08cbcfb158e2a7cd5bc27"
+    },
+    "rows-runtime/double/iron-lancer/idle-right.png": {
+      "bytes": 12521,
+      "sha256": "e7450942c056b66261ef5358f9d7ddee7a50899d8a461f5fba5ce17ac4d74773"
+    },
+    "rows-runtime/double/iron-lancer/idle-up.png": {
+      "bytes": 15470,
+      "sha256": "618675118a6f0aee295084b03b8013a6624d1e404a96f18164db883b389430e8"
+    },
+    "rows-runtime/double/iron-lancer/retreat-down.png": {
+      "bytes": 15465,
+      "sha256": "7ec7929aa0960a893fa910fdc51cb3c0576e319acccbda974528dab30e47dce1"
+    },
+    "rows-runtime/double/iron-lancer/retreat-left.png": {
+      "bytes": 15698,
+      "sha256": "9c94dfad534f6c5a82c3bb69f16fb02475a8e3a525809f9c5b56e6073f1f3c19"
+    },
+    "rows-runtime/double/iron-lancer/retreat-right.png": {
+      "bytes": 15597,
+      "sha256": "da36992a2b1a5fdbd235cf2510c81f4c4603f19652c5ba9f309bd8787c06498c"
+    },
+    "rows-runtime/double/iron-lancer/retreat-up.png": {
+      "bytes": 15716,
+      "sha256": "6ed58041b588106681e40eca77eea13330ddaecf70628b12a86dbfe435b258d3"
+    },
+    "rows-runtime/double/iron-lancer/walk-down.png": {
+      "bytes": 15329,
+      "sha256": "f78839dff829461b502eb92691f53f410077e46a9435cb404f92561738b21180"
+    },
+    "rows-runtime/double/iron-lancer/walk-left.png": {
+      "bytes": 15075,
+      "sha256": "4a8691398cfca013c806c8acc59df75796293b9a3fbfed74c60768fed35a496f"
+    },
+    "rows-runtime/double/iron-lancer/walk-right.png": {
+      "bytes": 15219,
+      "sha256": "3e645eb29d61aaeeb9158a5d36ad32eca493f8b6bd99bbbf20e75435c8728452"
+    },
+    "rows-runtime/double/iron-lancer/walk-up.png": {
+      "bytes": 15075,
+      "sha256": "c3d4b87768b003b8c00c6cc7f8532c43e8a0ca9230500f2445a3eb28fc124480"
+    },
+    "rows-runtime/native/ash-reaver/attack-down.png": {
+      "bytes": 5674,
+      "sha256": "3602965c11c5a925b1f839eac1a8294a5a08f38ba8b659fa7fe8bee97a496859"
+    },
+    "rows-runtime/native/ash-reaver/attack-left.png": {
+      "bytes": 4253,
+      "sha256": "2da631efcf72dee7190c939fb1c03dadec80347652b534970e0e760581c7e68b"
+    },
+    "rows-runtime/native/ash-reaver/attack-right.png": {
+      "bytes": 4230,
+      "sha256": "dbc6b9d96dad4ff125d60c05c8df187e51cde3d16211f35b2a8327bfffc7ac43"
+    },
+    "rows-runtime/native/ash-reaver/attack-up.png": {
+      "bytes": 5517,
+      "sha256": "b33cc4f9024b5cc33ea051fbf7260c904bdf458f003ccedbf1f16eaa648bcf06"
+    },
+    "rows-runtime/native/ash-reaver/idle-down.png": {
+      "bytes": 5761,
+      "sha256": "f24860d8cd693f84139dcdf31e5c44a9799bea1349702c43b1c7e8f1b637481c"
+    },
+    "rows-runtime/native/ash-reaver/idle-left.png": {
+      "bytes": 4619,
+      "sha256": "edef4e88334d181bccc6c9caf4f417013c81899c4d8487952625ea63fc297fa0"
+    },
+    "rows-runtime/native/ash-reaver/idle-right.png": {
+      "bytes": 4555,
+      "sha256": "3bf20e177529bf21c764efc63c2329544840609cd1ee95715605fb5e0b902be6"
+    },
+    "rows-runtime/native/ash-reaver/idle-up.png": {
+      "bytes": 5825,
+      "sha256": "a1e5ab3ddc0a2ef16dbcb9fd8ed4be35ff813409c08193a741b45e77d87040fb"
+    },
+    "rows-runtime/native/ash-reaver/retreat-down.png": {
+      "bytes": 5595,
+      "sha256": "5cf0f0861ca631dcf4adcad062bfcd12d54faa79c137aaf23d36882fdaf14810"
+    },
+    "rows-runtime/native/ash-reaver/retreat-left.png": {
+      "bytes": 5244,
+      "sha256": "40c7abb64cbe9e6aef97831f879bb4d0c61175a70c5a394a2f43b8f83ec4801f"
+    },
+    "rows-runtime/native/ash-reaver/retreat-right.png": {
+      "bytes": 5151,
+      "sha256": "9f0e3edfedd5595b5c61d76c4d367c211cac2c5ab6e1697194b0205df5dfd9b1"
+    },
+    "rows-runtime/native/ash-reaver/retreat-up.png": {
+      "bytes": 5823,
+      "sha256": "93d9cd548b90685e93b026977ec0e96afb98f49c57ab66208efe27e05fc481e3"
+    },
+    "rows-runtime/native/ash-reaver/walk-down.png": {
+      "bytes": 5703,
+      "sha256": "1bcd57319d8aff23626da83196ee328b409e17c7ec16ef4109a868c113e8609e"
+    },
+    "rows-runtime/native/ash-reaver/walk-left.png": {
+      "bytes": 4974,
+      "sha256": "1c3d50cc01d94e04738e26248f054be35dad9b502c676b12d80995ecfc6d7e1a"
+    },
+    "rows-runtime/native/ash-reaver/walk-right.png": {
+      "bytes": 4936,
+      "sha256": "59f7cf862268c07099033b844b43af7b31a7bcf97c2d4c3cb0d75c3cf055af7c"
+    },
+    "rows-runtime/native/ash-reaver/walk-up.png": {
+      "bytes": 5696,
+      "sha256": "05402173c1ba0d6673a919c9413e5ac59d7529a85a66402f2b82a534bbbf28f0"
+    },
+    "rows-runtime/native/bone-breaker/attack-down.png": {
+      "bytes": 5708,
+      "sha256": "dd1e9b5439e5fd77f25fd9f5d9d71c88e43dcfc458c60bc3166d73ea3e4339e1"
+    },
+    "rows-runtime/native/bone-breaker/attack-left.png": {
+      "bytes": 4342,
+      "sha256": "98f86a78d3f3de9af6a0d84169911f3d52bf5e4b93fbd9fc8428f63fa04aa3c6"
+    },
+    "rows-runtime/native/bone-breaker/attack-right.png": {
+      "bytes": 4390,
+      "sha256": "a7fb879d4f372759e700165825f31255a7f5900d85f3e1897dbf52860423b011"
+    },
+    "rows-runtime/native/bone-breaker/attack-up.png": {
+      "bytes": 5563,
+      "sha256": "03ea5ac0b5b4c4f6a8345d3d7ed52e139bb74870bf3b3432a16349bc03ebe6cd"
+    },
+    "rows-runtime/native/bone-breaker/idle-down.png": {
+      "bytes": 5910,
+      "sha256": "210a397044e8697c35bd2d8f76d4b59e3c802c71b85dd56a67d7a74da80c575f"
+    },
+    "rows-runtime/native/bone-breaker/idle-left.png": {
+      "bytes": 4720,
+      "sha256": "90c31306fb00deb5e54503e2a3987294ba1fb359192dd064d3be44c5b33598c1"
+    },
+    "rows-runtime/native/bone-breaker/idle-right.png": {
+      "bytes": 4701,
+      "sha256": "d26aa3529b5d55087082eb5410bab4710fe1dfd621c2bc06fd61cb0dff8ddba7"
+    },
+    "rows-runtime/native/bone-breaker/idle-up.png": {
+      "bytes": 5805,
+      "sha256": "50a3d9a0c083a81f02a70063e9adffde50fe36e7b33274f3909e5db9e8f6bd20"
+    },
+    "rows-runtime/native/bone-breaker/retreat-down.png": {
+      "bytes": 5934,
+      "sha256": "0c57376dce2893bf8b66b9e38cc5f4e547acdcfd177ae5ed61c56758be3e0197"
+    },
+    "rows-runtime/native/bone-breaker/retreat-left.png": {
+      "bytes": 5419,
+      "sha256": "ecd921ca5c19826c079b216c07e1001da3d681b7142451712613ad4e4c7f8077"
+    },
+    "rows-runtime/native/bone-breaker/retreat-right.png": {
+      "bytes": 5494,
+      "sha256": "e5e471dcabb70b7e53657a173085380561b7747c369c1d579324141507479bc8"
+    },
+    "rows-runtime/native/bone-breaker/retreat-up.png": {
+      "bytes": 5947,
+      "sha256": "d2baa74843dd27ad99ebf08a9430d5ed112617bd6adb0dedeb83c4e7a793e88b"
+    },
+    "rows-runtime/native/bone-breaker/walk-down.png": {
+      "bytes": 5897,
+      "sha256": "1142558f1560768c960266e807ff0859fb5a848fdf2bb63a621f7f0d89f2d41d"
+    },
+    "rows-runtime/native/bone-breaker/walk-left.png": {
+      "bytes": 5023,
+      "sha256": "99eef894d421329a3feebc5fda148e38f0565bc7457659449591fccc5b9d4dbb"
+    },
+    "rows-runtime/native/bone-breaker/walk-right.png": {
+      "bytes": 5202,
+      "sha256": "2167781d59ffef9450a0d31b4d3a70a8b698d1098885b24ff24d35e38546f632"
+    },
+    "rows-runtime/native/bone-breaker/walk-up.png": {
+      "bytes": 5652,
+      "sha256": "3b9890c2a0251ac4c68fe3c2171314cead0be5b5a04f76d47fd0ca0495eb8aad"
+    },
+    "rows-runtime/native/iron-lancer/attack-down.png": {
+      "bytes": 5546,
+      "sha256": "0179eaa9cfd456e1ec66d67c07801f423257fe8d5a68a9d569c89e2d1b2c475f"
+    },
+    "rows-runtime/native/iron-lancer/attack-left.png": {
+      "bytes": 4292,
+      "sha256": "e9bfc3f3ea98e42eb3d11e0a373e6e7db05c0f1e2974c66baa224315264990d9"
+    },
+    "rows-runtime/native/iron-lancer/attack-right.png": {
+      "bytes": 4239,
+      "sha256": "16c3adbd29e8bd48f54a9e959c286d7342bdcf863d73bbd2a8e19f9ba54147ee"
+    },
+    "rows-runtime/native/iron-lancer/attack-up.png": {
+      "bytes": 5408,
+      "sha256": "459a475e0efb9f017c3b2367970c0a24c380715d2e6e74e372e00a7a6ea3e33e"
+    },
+    "rows-runtime/native/iron-lancer/idle-down.png": {
+      "bytes": 5769,
+      "sha256": "1c9f140d79e1ec88baff20b7cef4254229f71106b6748f4926eae90adb07a458"
+    },
+    "rows-runtime/native/iron-lancer/idle-left.png": {
+      "bytes": 4640,
+      "sha256": "faa5b2a96caff421d1be273f3035bb4af516355ab59009f122f41dfe2200e171"
+    },
+    "rows-runtime/native/iron-lancer/idle-right.png": {
+      "bytes": 4669,
+      "sha256": "c62a61ec81c8ddcc40b1a077b81c33775ad2d53521505aad93b8fe47846f1042"
+    },
+    "rows-runtime/native/iron-lancer/idle-up.png": {
+      "bytes": 5779,
+      "sha256": "4fbe8d8b94c4bad9f25df4925e8261bcccd186ff766907681aebc8c3cf5381d8"
+    },
+    "rows-runtime/native/iron-lancer/retreat-down.png": {
+      "bytes": 5653,
+      "sha256": "eb120b97a70509d34281e112d052651a2d47eb4748e8601f8f8535f5cdf9d0e5"
+    },
+    "rows-runtime/native/iron-lancer/retreat-left.png": {
+      "bytes": 5236,
+      "sha256": "4dc78380bca5b751b28bedd629fc79dda2d401614cb034b796b31668cd259720"
+    },
+    "rows-runtime/native/iron-lancer/retreat-right.png": {
+      "bytes": 5154,
+      "sha256": "bd2dfd26fbf53f31f234b602df8580a463dc3df66a7f324036d5d267a9cc9ae7"
+    },
+    "rows-runtime/native/iron-lancer/retreat-up.png": {
+      "bytes": 5655,
+      "sha256": "3c039bce092bfffd8986ff2edb854e47422f091166d1194d2321fcc6cafcc550"
+    },
+    "rows-runtime/native/iron-lancer/walk-down.png": {
+      "bytes": 5597,
+      "sha256": "4a9f7151a1621a8c2c254606ffd2a842abbcce5b831b6dfba0ab06d05a9ae488"
+    },
+    "rows-runtime/native/iron-lancer/walk-left.png": {
+      "bytes": 5020,
+      "sha256": "425239de4d8b274ccc10608180061a4b9eb9b0cc9dfe97f6dcf104c661f9cde4"
+    },
+    "rows-runtime/native/iron-lancer/walk-right.png": {
+      "bytes": 5057,
+      "sha256": "23df768958dbb4ecdc6616c93ff93d75536edd72b344fc69c35a59f85d75e7c4"
+    },
+    "rows-runtime/native/iron-lancer/walk-up.png": {
+      "bytes": 5488,
+      "sha256": "134a9ff2d0e69a7a6b780b52eca690c3bf530e2add0d097793d05ae3b4dab2a7"
+    },
+    "rows-runtime/review/ash-reaver/attack-down.png": {
+      "bytes": 15981,
+      "sha256": "1db415fd6b01bb1557feb83b4affb08eed00eb552a1a3e551b786fa4d0ff6256"
+    },
+    "rows-runtime/review/ash-reaver/attack-left.png": {
+      "bytes": 11050,
+      "sha256": "128696b2d9ca05692a6a1b2aa22efe341470e118db731bb07e44141c19fdca4d"
+    },
+    "rows-runtime/review/ash-reaver/attack-right.png": {
+      "bytes": 11285,
+      "sha256": "2689840b9343764da5fe4a34430f702580345810d59b144c8e7d23e51f076323"
+    },
+    "rows-runtime/review/ash-reaver/attack-up.png": {
+      "bytes": 15519,
+      "sha256": "9d0ecf74631f1f3fe36737adfee0e3b71df35858dc7be75d9e833a16895c64b7"
+    },
+    "rows-runtime/review/ash-reaver/idle-down.png": {
+      "bytes": 14012,
+      "sha256": "fa566f7de03aecac4588ae926be0d56e391fcc57a568b61d26ecd847a60a839e"
+    },
+    "rows-runtime/review/ash-reaver/idle-left.png": {
+      "bytes": 10393,
+      "sha256": "f0cfab24df7c051664659d1d3ee90481fa3fb2cc829d45456779fbd4f93eb4fd"
+    },
+    "rows-runtime/review/ash-reaver/idle-right.png": {
+      "bytes": 9863,
+      "sha256": "9395c2ffccf2d35d806124f312a98d35b09a0bd9622c4f5c293de97b61854bfe"
+    },
+    "rows-runtime/review/ash-reaver/idle-up.png": {
+      "bytes": 13311,
+      "sha256": "40152e21dd7c35abd2c41c6a7554d7dbdcebe082547af56af94df44cbcf334db"
+    },
+    "rows-runtime/review/ash-reaver/retreat-down.png": {
+      "bytes": 14029,
+      "sha256": "fddeb9b0477da745c8b8efcea6f40ebbe3e641ecfd405d51651a771799e41789"
+    },
+    "rows-runtime/review/ash-reaver/retreat-left.png": {
+      "bytes": 16153,
+      "sha256": "adf9cab97a542fb5470d8b0935ad75c72281d5e0f598d1717960247451c31323"
+    },
+    "rows-runtime/review/ash-reaver/retreat-right.png": {
+      "bytes": 16126,
+      "sha256": "f2e1dec9ce64dd7e6a5cad58bf74d9f56530adfdfc4288b9047fc65fdb1f86d9"
+    },
+    "rows-runtime/review/ash-reaver/retreat-up.png": {
+      "bytes": 13964,
+      "sha256": "28e70c7b4ec79f1f66735c12c5a437889c53ed3080b1cb9fa1bdf6108f07d5dc"
+    },
+    "rows-runtime/review/ash-reaver/walk-down.png": {
+      "bytes": 14880,
+      "sha256": "30db5c63960b4fdd0b0cfb778732169df4375b14dd605431dc78be10808b1bad"
+    },
+    "rows-runtime/review/ash-reaver/walk-left.png": {
+      "bytes": 15592,
+      "sha256": "e394968432abd3916ab4848c07fd7bd7cb870ad1b5a6970c1c8ae55ba9668868"
+    },
+    "rows-runtime/review/ash-reaver/walk-right.png": {
+      "bytes": 15384,
+      "sha256": "ae6c5192f9261c69bc7cbffe8ef9d50fc03cfc189bbcf5c5176b46ca205ab8aa"
+    },
+    "rows-runtime/review/ash-reaver/walk-up.png": {
+      "bytes": 14043,
+      "sha256": "12e6e50dca208bbf170ed2b50d7c9685a7d92fca4d0271b47091a494a6c23936"
+    },
+    "rows-runtime/review/bone-breaker/attack-down.png": {
+      "bytes": 15960,
+      "sha256": "b96506fe842b8b7634a58f07f146d8c9c8c05785d07cdc58754df0e99eaabc2e"
+    },
+    "rows-runtime/review/bone-breaker/attack-left.png": {
+      "bytes": 12164,
+      "sha256": "d6e35478b343015e5a0c642f01e91209c583127e9929d7cff295474a227cb2aa"
+    },
+    "rows-runtime/review/bone-breaker/attack-right.png": {
+      "bytes": 11806,
+      "sha256": "68efa30a5dc1757f78c2d4aa8e85cac8da302c8ef1687f755300a289d34f70f1"
+    },
+    "rows-runtime/review/bone-breaker/attack-up.png": {
+      "bytes": 15366,
+      "sha256": "a42e59b0da557fa16231f638983eaff7c3c890ea1c1b0f6837309d1148bd9db7"
+    },
+    "rows-runtime/review/bone-breaker/idle-down.png": {
+      "bytes": 14001,
+      "sha256": "126a52c3955fcaf4a1a2268bf698757ff341414dd7da983c14f295305d9c3ed4"
+    },
+    "rows-runtime/review/bone-breaker/idle-left.png": {
+      "bytes": 10556,
+      "sha256": "78b106f414850a66e3ea2ef1896f85bee2712eeefb656a14c810b8a5b2ceddd0"
+    },
+    "rows-runtime/review/bone-breaker/idle-right.png": {
+      "bytes": 10956,
+      "sha256": "7926fcbb283372460877ad784d08c7685e92346624aeb06f8c065cdfe341e77b"
+    },
+    "rows-runtime/review/bone-breaker/idle-up.png": {
+      "bytes": 13519,
+      "sha256": "8ab9a74140e14a073a040016791172cdc736b830ad31355d2040cee38e3930fc"
+    },
+    "rows-runtime/review/bone-breaker/retreat-down.png": {
+      "bytes": 14847,
+      "sha256": "376c45eeaecbfad4a63961c3be09f987ef57cdb3a31509384ae621f67a81d68b"
+    },
+    "rows-runtime/review/bone-breaker/retreat-left.png": {
+      "bytes": 16634,
+      "sha256": "b7e74bb7c0784b9656dd4d313d8e84f6e6f5a9fc43256768cfabd21b04422f2a"
+    },
+    "rows-runtime/review/bone-breaker/retreat-right.png": {
+      "bytes": 17060,
+      "sha256": "5cafdd2321e5f0e1f604bc8601c14ac5e8f817ad4a5605d35af6a8caa7044717"
+    },
+    "rows-runtime/review/bone-breaker/retreat-up.png": {
+      "bytes": 14405,
+      "sha256": "c7076a86b4c41053ccc5d9745fff0b8f1d625286c8243aeb77105633ab2779b0"
+    },
+    "rows-runtime/review/bone-breaker/walk-down.png": {
+      "bytes": 15119,
+      "sha256": "02d1dcf2cc30682c25c1febb3ab2eb638e8dea8a963df5e57da39ad982945151"
+    },
+    "rows-runtime/review/bone-breaker/walk-left.png": {
+      "bytes": 16003,
+      "sha256": "db4335ebb6c9ddbc174e00777b4826b3122658116237ced3fdb883c3e17b06af"
+    },
+    "rows-runtime/review/bone-breaker/walk-right.png": {
+      "bytes": 16299,
+      "sha256": "35e63634d70e11c8f52d06a2bfa35406b538c8dd2d6d2344307e9e27ce6a759d"
+    },
+    "rows-runtime/review/bone-breaker/walk-up.png": {
+      "bytes": 14391,
+      "sha256": "67ae0d77c6165123059c6699ad630830b69f5ec35ea00b2a839dbc538899f02b"
+    },
+    "rows-runtime/review/iron-lancer/attack-down.png": {
+      "bytes": 14696,
+      "sha256": "0ce057c77be3576c08b3fa0b7e187cd4882ca7bb4dc45c75845e6d0cb24c59ae"
+    },
+    "rows-runtime/review/iron-lancer/attack-left.png": {
+      "bytes": 11433,
+      "sha256": "125618ec7c261d19071288cf167a664e8ba1de21c5217653c8bbf5edcd841c03"
+    },
+    "rows-runtime/review/iron-lancer/attack-right.png": {
+      "bytes": 11877,
+      "sha256": "a8ec922adc96644623762e7011e0d447e716c6df1e5acdda111354635e86cd0a"
+    },
+    "rows-runtime/review/iron-lancer/attack-up.png": {
+      "bytes": 14905,
+      "sha256": "c51511f14d34612d72701133cf97e4c1bf633fee1b46c9132dbe3073deee533e"
+    },
+    "rows-runtime/review/iron-lancer/idle-down.png": {
+      "bytes": 12384,
+      "sha256": "b89f55cfc4671f5aefa9d4395d629e56fd60161f6d04e0186cdc150f6507b41c"
+    },
+    "rows-runtime/review/iron-lancer/idle-left.png": {
+      "bytes": 10482,
+      "sha256": "849cc1bcfad6d1362b4beb2a91b7c5cdf054a55062eedd62d4618eb17ac0f3a3"
+    },
+    "rows-runtime/review/iron-lancer/idle-right.png": {
+      "bytes": 10232,
+      "sha256": "c806c46f91a89dcc80d0b2b2bcad84fb93931d7532081e0b5759730c90e04b8c"
+    },
+    "rows-runtime/review/iron-lancer/idle-up.png": {
+      "bytes": 13178,
+      "sha256": "a8e0416f294c66fc39b3eaa378f6de36d080a535f60c7c1192aa1da0bf845228"
+    },
+    "rows-runtime/review/iron-lancer/retreat-down.png": {
+      "bytes": 13081,
+      "sha256": "b147fb99bfe7e4143ad837960c6f47066d6252738d8acd68ce5a6f82c9547178"
+    },
+    "rows-runtime/review/iron-lancer/retreat-left.png": {
+      "bytes": 15618,
+      "sha256": "a1f125addb3e3de6b6b7dbde4130ead990b5d109d835925ae0b57513faccc01e"
+    },
+    "rows-runtime/review/iron-lancer/retreat-right.png": {
+      "bytes": 16159,
+      "sha256": "51fab0477004cceadd5a52d43aaebf2fe97681228adbccfd3b487fa0f7700f13"
+    },
+    "rows-runtime/review/iron-lancer/retreat-up.png": {
+      "bytes": 14114,
+      "sha256": "1bb69fb07bdd8c9e5b64c3ae39d71137cda8e1da8577110992751b4d4eb69a0b"
+    },
+    "rows-runtime/review/iron-lancer/walk-down.png": {
+      "bytes": 13364,
+      "sha256": "f5047df7df9e6118b6166a2e580f10e978eafccedd1bdef8d839105255795f1d"
+    },
+    "rows-runtime/review/iron-lancer/walk-left.png": {
+      "bytes": 15365,
+      "sha256": "7837c62c925f72f193f3968a0120eedb9934d95aaca45add870430a40daa2609"
+    },
+    "rows-runtime/review/iron-lancer/walk-right.png": {
+      "bytes": 15689,
+      "sha256": "f6f0d9311b8918c5a7e44205fa90f792782c1d82987df20e2d31302f3956d370"
+    },
+    "rows-runtime/review/iron-lancer/walk-up.png": {
+      "bytes": 13737,
+      "sha256": "9335d5cd28c4b30de7cbed0cfabaf2dfb8d4fa99f76a5cd1287c94c5d36a0e3f"
+    },
+    "rows/ash-reaver/attack-down.png": {
+      "bytes": 20505,
+      "sha256": "00bcc38efa524cc688555874a903141dc9e71e5dd5d28f4e827dc93d8fb6e76a"
+    },
+    "rows/ash-reaver/attack-left.png": {
+      "bytes": 14005,
+      "sha256": "9023e055362e6a2cecb252c295b16b85c836e498cb6a662358d042b53cf88541"
+    },
+    "rows/ash-reaver/attack-right.png": {
+      "bytes": 13994,
+      "sha256": "e033c53a1b724f2de8172e556ed1fc90fefb4c96047b1da5f91eac96fad7f9aa"
+    },
+    "rows/ash-reaver/attack-up.png": {
+      "bytes": 19720,
+      "sha256": "c8908dcb4a2c21876ceb6f1c0cb4cfd2a80842c7247f2634cff0612b48c2d3df"
+    },
+    "rows/ash-reaver/idle-down.png": {
+      "bytes": 18126,
+      "sha256": "a9c8a918a7a166a44f89dc5eebc4aa662f5f2666078fa78f5c933997205a2c4a"
+    },
+    "rows/ash-reaver/idle-left.png": {
+      "bytes": 12596,
+      "sha256": "69a7f9317d5e793bb8abe92bc1c5593b85d448bac74ab438ff3c144fda50884e"
+    },
+    "rows/ash-reaver/idle-right.png": {
+      "bytes": 12772,
+      "sha256": "43c3b4fa0793683e317b702a34f291818a9b6f8b733df4e3584e34aea1b952c7"
+    },
+    "rows/ash-reaver/idle-up.png": {
+      "bytes": 17320,
+      "sha256": "76c86cbbc131b8de1c5185c83995142e01b3d8411eef9b1c63e22d4003ab0047"
+    },
+    "rows/ash-reaver/retreat-down.png": {
+      "bytes": 17997,
+      "sha256": "0278bec91e2e885acf0ee64a170b373e525de3150679976136f54721eb5b92a9"
+    },
+    "rows/ash-reaver/retreat-left.png": {
+      "bytes": 21168,
+      "sha256": "7250bcaa089d1db6d80437cf6934109cba244a1c1fe0c807ad792ab823210f18"
+    },
+    "rows/ash-reaver/retreat-right.png": {
+      "bytes": 21020,
+      "sha256": "84dcdb45f4301356b4bd3e61c37b9aa511173d219f95fb6599513a2feaa11373"
+    },
+    "rows/ash-reaver/retreat-up.png": {
+      "bytes": 18167,
+      "sha256": "b7e83e94850dbda6edf26ce8a33c5939d28d08ad1e53e4c1d6d2e58e43a13879"
+    },
+    "rows/ash-reaver/walk-down.png": {
+      "bytes": 19034,
+      "sha256": "adf9515fb8185eed123ef26526f3aeb1d6e891df5a98ce4fc60c71c7bd18fe30"
+    },
+    "rows/ash-reaver/walk-left.png": {
+      "bytes": 20103,
+      "sha256": "56f7d04148544182c39d0ab50db9f231bc81d206a884fbd7c31205ed6c694128"
+    },
+    "rows/ash-reaver/walk-right.png": {
+      "bytes": 20366,
+      "sha256": "ed15634ecb63984848acad0908f6b7b7105da26eae9567c65afa639eb536443c"
+    },
+    "rows/ash-reaver/walk-up.png": {
+      "bytes": 17886,
+      "sha256": "30cd0c0b4f163b492cf45f0943af7242cc9ddcf5195c8b04f0bf8e1972ce990e"
+    },
+    "rows/bone-breaker/attack-down.png": {
+      "bytes": 21213,
+      "sha256": "5533acedff881cb4b72b10bbe8d70aee383179fc3bd6a45dd2fcd058b70c488d"
+    },
+    "rows/bone-breaker/attack-left.png": {
+      "bytes": 15283,
+      "sha256": "09be0c8e68a4c107ab0d3fb5585cee01c26557bf437ea5111f1041ef7aa20d5f"
+    },
+    "rows/bone-breaker/attack-right.png": {
+      "bytes": 14967,
+      "sha256": "e5692642ecff9f533ecf5b28ddb00a5ffb16788b4e6f11ffbf9e9f98d5884e91"
+    },
+    "rows/bone-breaker/attack-up.png": {
+      "bytes": 20414,
+      "sha256": "6b1e7e2c9323f0e595323fceaeee56249a7c7574d4a5cb1b34b62f5eb0de2eef"
+    },
+    "rows/bone-breaker/idle-down.png": {
+      "bytes": 18276,
+      "sha256": "f9682b67f2dbb3a5536ab5f77f87afe62f496b3b184d51ba57601e88399a0790"
+    },
+    "rows/bone-breaker/idle-left.png": {
+      "bytes": 13624,
+      "sha256": "8c64c5a5627886c8822c8ff96fe8b510c7a1a7e18f23d1c1d50af40224dc8c5d"
+    },
+    "rows/bone-breaker/idle-right.png": {
+      "bytes": 14155,
+      "sha256": "516fcf5bd8e3603d4f0846eaa064f3c8d203f38f2a62359cd41376c758dc5967"
+    },
+    "rows/bone-breaker/idle-up.png": {
+      "bytes": 18068,
+      "sha256": "271a7a071e7d01d893f1a1cd890b9c5abc1326bfa91635765d6b0f057136ab59"
+    },
+    "rows/bone-breaker/retreat-down.png": {
+      "bytes": 19148,
+      "sha256": "17b6b50e48e3f18ca7280666eff364665c040bd784b33aabe0fdf2eaebcc3acf"
+    },
+    "rows/bone-breaker/retreat-left.png": {
+      "bytes": 22530,
+      "sha256": "513f5f5995a32eb0a8c31e5a0a6354ce8c264d222d08f61ff78dfe01b1e0da3e"
+    },
+    "rows/bone-breaker/retreat-right.png": {
+      "bytes": 22909,
+      "sha256": "1308088d2750ebedfe4ee9ded2066229526dd61853ad29e74ee432fca0b63103"
+    },
+    "rows/bone-breaker/retreat-up.png": {
+      "bytes": 19111,
+      "sha256": "b00f5b458cbd644b8d5214c24f8eab4563aa3010148ce17810d580406a156909"
+    },
+    "rows/bone-breaker/walk-down.png": {
+      "bytes": 19402,
+      "sha256": "d7df06b007a1b0809add929314f839441a2a1cea004334f83176ffb319520788"
+    },
+    "rows/bone-breaker/walk-left.png": {
+      "bytes": 21221,
+      "sha256": "465d9ad18fe643394fb7a70a301357ed8cf7e64ce5f01cf09e142e395731f150"
+    },
+    "rows/bone-breaker/walk-right.png": {
+      "bytes": 21499,
+      "sha256": "0a743b7f7dc2300722d23e623415bb8893996ede4084504dd1aab95d10a6c721"
+    },
+    "rows/bone-breaker/walk-up.png": {
+      "bytes": 18624,
+      "sha256": "9c01af3560b1657e2e3d3780c922709903d3bc821dce4f09d448ee69a7396b6e"
+    },
+    "rows/iron-lancer/attack-down.png": {
+      "bytes": 20429,
+      "sha256": "98098df9ce29a644ae15ffd4cae07888f0cf623f2940b31a500a19389a773f4e"
+    },
+    "rows/iron-lancer/attack-left.png": {
+      "bytes": 14417,
+      "sha256": "7138513390290efed7c40cd2ca6cd82393f54d54d29495d1f1f805ed724c166e"
+    },
+    "rows/iron-lancer/attack-right.png": {
+      "bytes": 14997,
+      "sha256": "935605f908bbf3f4818a6f6506c0846caace52c211bbcdb85a98869effe7899c"
+    },
+    "rows/iron-lancer/attack-up.png": {
+      "bytes": 19603,
+      "sha256": "3745059c5caa109ab3cd6454ab21b4114a9d72ceda83fe251d8232e2c0c6353f"
+    },
+    "rows/iron-lancer/idle-down.png": {
+      "bytes": 17136,
+      "sha256": "1eea0deb77ba5f5e881805a8bc922162cb4822bfd9977ebd6bb9edd450685f4a"
+    },
+    "rows/iron-lancer/idle-left.png": {
+      "bytes": 13439,
+      "sha256": "dc9dd96f62de7370909e227006d2fd1c1e876f15de0a86fdc1975a403df4624c"
+    },
+    "rows/iron-lancer/idle-right.png": {
+      "bytes": 13410,
+      "sha256": "a0810fc52e1bc088af16e64b8f396c74a06b45d4b761c52a306a46955040a640"
+    },
+    "rows/iron-lancer/idle-up.png": {
+      "bytes": 17142,
+      "sha256": "b8666c8ea4a10f431f7b73a5ce6385945252146226b3cbdd59ba305e2b7f72e0"
+    },
+    "rows/iron-lancer/retreat-down.png": {
+      "bytes": 17979,
+      "sha256": "768fa2c78327c671460a80f257a90cb7986f72a14b0fb4a1913519173a936854"
+    },
+    "rows/iron-lancer/retreat-left.png": {
+      "bytes": 21693,
+      "sha256": "c2df17cdb0cef08d96f2e9dc4d906c8e727a49bc2b7f2ecf570447520690a81a"
+    },
+    "rows/iron-lancer/retreat-right.png": {
+      "bytes": 22428,
+      "sha256": "9266f8b6f8aab8cf7fd83bae080319affd7bb62b0a57d5f7d899ef0e97602ce0"
+    },
+    "rows/iron-lancer/retreat-up.png": {
+      "bytes": 18499,
+      "sha256": "19e49d66c3b4dfd478ec57e2671d0fcf2285c5c560ac122582c96e35da37cbb0"
+    },
+    "rows/iron-lancer/walk-down.png": {
+      "bytes": 18310,
+      "sha256": "0dcfeff4bbdabfb6fa27b1ec5cadc82a140102b331e4cadb895868c1f7c94c25"
+    },
+    "rows/iron-lancer/walk-left.png": {
+      "bytes": 21172,
+      "sha256": "c80c03763332e74c2fb4689f63ca84a87be2bc5a490851ef6f7fb6c40d00ae0b"
+    },
+    "rows/iron-lancer/walk-right.png": {
+      "bytes": 21400,
+      "sha256": "4fab62581f62f0706c7d54e5f9790b07bd012577062d76c2a4ccd6e7a19a30b5"
+    },
+    "rows/iron-lancer/walk-up.png": {
+      "bytes": 18004,
+      "sha256": "e95bc28a17f5162fb40aa726ed3e9eaa37bd72900f07ce930dd1edf883e5ce64"
+    },
+    "style/raider-palette.png": {
+      "bytes": 436,
+      "sha256": "f53f9591d20c29ed101123810403cdc9fcfde7f866804b54cc8a9a9bc6a8d8e9"
+    }
+  },
+  "proof": {
+    "default": "proof/raiders-default-35x46.png",
+    "palette": "style/raider-palette.png",
+    "review": "proof/raiders-review-64x84.png"
+  },
+  "schema": "realm.enemy-sprites.raider-family-manifest.v1",
+  "scope": {
+    "actions": [
+      "idle",
+      "walk",
+      "attack",
+      "retreat"
+    ],
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "frameSize": [
+      64,
+      84
+    ],
+    "frames": 384,
+    "rowSize": [
+      512,
+      84
+    ],
+    "rows": 48,
+    "variants": [
+      "ash-reaver",
+      "iron-lancer",
+      "bone-breaker"
+    ]
+  },
+  "sources": {
+    "files": {
+      "assets/sprites/enemies-source/parts.json": {
+        "owner": "family-contract",
+        "sha256": "5f97259d3c7874f00d95f6073c12604c56dd944ff6a096714c756a25c2cc3a1b"
+      },
+      "assets/sprites/enemies-source/references/ash-reaver-garment-keyed.png": {
+        "owner": "ash-reaver-garment-keyed",
+        "sha256": "cbd25afd3663ec147e25788d318098780417f8a20c98fb1c982f14fc4c23d947"
+      },
+      "assets/sprites/enemies-source/references/ash-reaver-garment.png": {
+        "owner": "ash-reaver-garment",
+        "sha256": "59ad9f0dc55df88aad1a35773a1cbbc884fad81323f239482a6c0b7e02e5747a"
+      },
+      "assets/sprites/enemies-source/references/bone-breaker-garment-keyed.png": {
+        "owner": "bone-breaker-garment-keyed",
+        "sha256": "c8a8bad984f94a9e05b581e57b3253d347757edebb9b8be9bd381d00cce082e7"
+      },
+      "assets/sprites/enemies-source/references/bone-breaker-garment.png": {
+        "owner": "bone-breaker-garment",
+        "sha256": "ca7a9f748d678689fd62c79b648be24528e3b7670526cc6a579b24af2740b446"
+      },
+      "assets/sprites/enemies-source/references/imagegen-provenance.json": {
+        "owner": "imagegen-provenance",
+        "sha256": "5f834c133fc2be9759606c84e7f5d00f3c7744a1c3b48562e5435c3f89e05bc5"
+      },
+      "assets/sprites/enemies-source/references/iron-lancer-garment-keyed.png": {
+        "owner": "iron-lancer-garment-keyed",
+        "sha256": "2b6ef140db2cc97fa16b94c5411bf0ac7a03ba0b7b1814c33b1da00988fec453"
+      },
+      "assets/sprites/enemies-source/references/iron-lancer-garment.png": {
+        "owner": "iron-lancer-garment",
+        "sha256": "b11238322d3316c2f757360cc06c33d4a9b11c112cd8ed0eb36af173a4ef3d0c"
+      },
+      "assets/sprites/enemies-source/references/raider-identity-keyed.png": {
+        "owner": "raider-identity-keyed",
+        "sha256": "691ba323745f3c7e05760de719da46cdbae9ccaaa5d2382427ecc8e2bc9a675a"
+      },
+      "assets/sprites/enemies-source/references/raider-identity.png": {
+        "owner": "raider-identity",
+        "sha256": "345fa860a897d97a9e29ac4beaf831844f84f8a9d1027aaf4f894be28b937b98"
+      },
+      "assets/sprites/enemies-source/references/raider-weapons-keyed.png": {
+        "owner": "raider-weapons-keyed",
+        "sha256": "79e281d54dfc116667fd5a920695cdbf45b9f9d82d297208d0060df7df568b2f"
+      },
+      "assets/sprites/enemies-source/references/raider-weapons.png": {
+        "owner": "raider-weapons",
+        "sha256": "c32c83e4397ffaa6c0e5d3a1ce5c8734f5170fc3cf770ca5e4372ddf9f392216"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json": {
+        "owner": "pose-authority",
+        "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+      },
+      "scripts/actor-pose-prototype/a2_layered2d.py": {
+        "owner": "compiler-authority",
+        "sha256": "70129559b1a19b3d67214ff1928b8db17a962fb6edd029c39bb401b067cbda46"
+      },
+      "scripts/actor-pose-prototype/a3_factorial.py": {
+        "owner": "compiler-authority",
+        "sha256": "9523b4ae5b653286a7ea62b53cb7e2d3501fd0357954a575455a15747718fefb"
+      },
+      "scripts/actor-pose-prototype/a4_guard_family.py": {
+        "owner": "compiler-authority",
+        "sha256": "6179b836c13444bb22a847d362d2bcd3e13bd6e9f079159891995c3130b84c7e"
+      },
+      "scripts/actor-pose-prototype/a5_guard_actions.py": {
+        "owner": "compiler-authority",
+        "sha256": "1c7b45c9df44d594e840699a36b69ace9228db08e8ab748f8d39ebe549bb564b"
+      },
+      "scripts/build-enemy-sprites.py": {
+        "owner": "compiler-authority",
+        "sha256": "3c08a147c7b4d77dee97084c40bb2b4eca7b4d5db395eabcb3bf34c6ee3f9c85"
+      },
+      "scripts/sprite_row_quality.py": {
+        "owner": "compiler-authority",
+        "sha256": "f1dc8266d07dd4d58057e23d47c680226a73e9ac59da53bf456ca49694439461"
+      }
+    },
+    "finishedFrameOrRowMirroring": false,
+    "imagegenDirectStrips": false,
+    "networkRequired": false,
+    "paintSourcesTransformedByJointChain": true,
+    "sourceHash": "d213750c82f43bf7fc2a9085ab06c71bb5f1a712a6bd603552827e21b7b18b2f"
+  },
+  "status": "production-ready",
+  "verification": {
+    "byteDeterministicSecondPass": true,
+    "failures": [],
+    "mechanicalPassed": true
+  }
+}
