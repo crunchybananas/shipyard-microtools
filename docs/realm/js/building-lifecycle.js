@@ -6,14 +6,14 @@
 // statistics, and feedback; structural teardown is deliberately identical.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=191';
-import { nearestWalkableTile } from './pathfinding.js?realm=191';
-import { announce, chronicle, sfx } from './log.js?realm=191';
+import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=192';
+import { nearestWalkableTile } from './pathfinding.js?realm=192';
+import { announce, chronicle, sfx } from './log.js?realm=192';
 import {
   releaseAssignmentsForBuilding,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=191';
-import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=191';
+} from './citizen-ownership.js?realm=192';
+import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=192';
 
 const REMOVAL_CAUSES = new Set(['manual', 'fire', 'raid', 'undo']);
 const ASSIGNMENT_BOUND_ACTIVITIES = new Set(['idle', 'find_job', 'walk_to_work', 'working']);

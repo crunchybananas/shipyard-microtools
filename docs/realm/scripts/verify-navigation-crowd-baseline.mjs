@@ -2,25 +2,27 @@
 //
 // Former defect baseline, promoted to a correctness gate. The independent
 // controls and deterministic rerun remain, but weighted routing and crowd
-// separation must now satisfy their acceptance thresholds.
+// liveness must now satisfy their acceptance thresholds. Citizens prefer
+// readable spacing while a smaller hard floor permits brief shoulder overlap
+// at a saturated door or crossing.
 
 import assert from 'node:assert/strict';
-import runtimeContract from '../runtime-contract.json?realm=191' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=192' with { type: 'json' };
 import {
   G,
   MAP_H,
   MAP_W,
   TILE,
   setSeed,
-} from '../js/state.js?realm=191';
+} from '../js/state.js?realm=192';
 import {
   findPath,
   stepEntityToward,
-} from '../js/pathfinding.js?realm=191';
-import { updateCitizens } from '../js/citizens.js?realm=191';
+} from '../js/pathfinding.js?realm=192';
+import { updateCitizens } from '../js/citizens.js?realm=192';
 
 const SQRT2 = Math.SQRT2;
-const MINIMUM_ACTOR_SEPARATION = 0.58;
+const MINIMUM_ACTOR_SEPARATION = 0.295;
 const DIRS = Object.freeze([
   [-1, 0], [1, 0], [0, -1], [0, 1],
   [-1, -1], [-1, 1], [1, -1], [1, 1],

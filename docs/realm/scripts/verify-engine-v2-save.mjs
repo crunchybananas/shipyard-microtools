@@ -1,37 +1,37 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=191';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=191';
-import { coreTick } from '../js/sim.js?realm=191';
-import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=191';
-import { missions } from '../js/missions.js?realm=191';
-import { initChronicle } from '../js/log.js?realm=191';
+import { G, getSeed, setSeed } from '../js/state.js?realm=192';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=192';
+import { coreTick } from '../js/sim.js?realm=192';
+import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=192';
+import { missions } from '../js/missions.js?realm=192';
+import { initChronicle } from '../js/log.js?realm=192';
 import {
   commitGameLoad,
   commitGameLoadForTest,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=191';
-import { hasSave, loadGame, saveGame } from '../js/save.js?realm=191';
-import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=191';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=191';
+} from '../js/save-state.js?realm=192';
+import { hasSave, loadGame, saveGame } from '../js/save.js?realm=192';
+import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=192';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=192';
 import {
   claimCitizenAssignment,
   renameCitizen,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=191';
+} from '../js/citizen-ownership.js?realm=192';
 import {
   citizenRenderCacheSize,
   citizenRenderRecord,
   resetCitizenRenderCache,
-} from '../js/citizen-render-cache.js?realm=191';
+} from '../js/citizen-render-cache.js?realm=192';
 import {
   getCitizenTransitionLedger,
   initCitizenInspector,
   resetCitizenTransitionLedger,
-} from '../js/citizen-inspector.js?realm=191';
+} from '../js/citizen-inspector.js?realm=192';
 
 function clone(value) {
   return structuredClone(value);

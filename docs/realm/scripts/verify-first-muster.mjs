@@ -1,26 +1,26 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, createResourceStock, setSeed } from '../js/state.js?realm=191';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=191';
-import { dispatch } from '../js/commands.js?realm=191';
-import { trySpawnSettlers } from '../js/economy.js?realm=191';
+import { G, createResourceStock, setSeed } from '../js/state.js?realm=192';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=192';
+import { dispatch } from '../js/commands.js?realm=192';
+import { trySpawnSettlers } from '../js/economy.js?realm=192';
 import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   resetCitizenOwnershipRuntime,
   staffingCount,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=191';
+} from '../js/citizen-ownership.js?realm=192';
 import {
   recruitmentCandidatePreview,
   recruitmentForBuilding,
   recruitmentStatus,
   updateRecruitment,
-} from '../js/military.js?realm=191';
-import { residentsForHouse } from '../js/residences.js?realm=191';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=191';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=191';
+} from '../js/military.js?realm=192';
+import { residentsForHouse } from '../js/residences.js?realm=192';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=192';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=192';
 
 function finishedBuilding(type, x, y = 40) {
   const building = {

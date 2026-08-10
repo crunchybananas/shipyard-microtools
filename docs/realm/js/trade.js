@@ -2,13 +2,13 @@
 // Trade — Named foreign partners and resource exchange
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=191';
+import { G } from './state.js?realm=192';
 import {
   depositFoodAcrossStores,
   foodSpace,
   foodStores,
   withdrawFoodFromStores,
-} from './building-inventory.js?realm=191';
+} from './building-inventory.js?realm=192';
 
 export const TRADE_PARTNERS = [
   { id: 'albion',   name: '🏰 Albion',   import: 'wood',  export: 'gold', rate: 2   },  // 1 wood → 2 gold

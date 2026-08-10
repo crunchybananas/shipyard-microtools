@@ -3,26 +3,26 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=191';
-import { makeCitizen } from '../js/world.js?realm=191';
-import { makeAvatar } from '../js/avatar.js?realm=191';
-import { updateCitizens } from '../js/citizens.js?realm=191';
-import { updateEnemies } from '../js/combat.js?realm=191';
+} from '../js/state.js?realm=192';
+import { makeCitizen } from '../js/world.js?realm=192';
+import { makeAvatar } from '../js/avatar.js?realm=192';
+import { updateCitizens } from '../js/citizens.js?realm=192';
+import { updateEnemies } from '../js/combat.js?realm=192';
 import {
   claimCitizenAssignment,
   onCitizenTransition,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=191';
+} from '../js/citizen-ownership.js?realm=192';
 import {
   citizenAtResidencePortal,
   citizenHasValidResidence,
   citizenIsIndoors,
   houseResidentCapacity,
   residencePortalForCitizen,
-} from '../js/residences.js?realm=191';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=191';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=191';
+} from '../js/residences.js?realm=192';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=192';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=192';
 
 function resetCore(seed = 91_801) {
   resetCitizenOwnershipRuntime();

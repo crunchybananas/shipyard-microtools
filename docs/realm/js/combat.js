@@ -2,8 +2,8 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=191';
-import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=191';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=192';
+import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=192';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
@@ -57,25 +57,25 @@ function closeRaidStolenLedger(outcome) {
   G._raidStolen = null;
   return true;
 }
-import { stepEntityToward } from './pathfinding.js?realm=191';
-import { spawnClashFX, visualJitter } from './fx.js?realm=191';
+import { stepEntityToward } from './pathfinding.js?realm=192';
+import { spawnClashFX, visualJitter } from './fx.js?realm=192';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=191';
-import { removeBuilding } from './building-lifecycle.js?realm=191';
-import { announce as notify } from './log.js?realm=191';
-import { chronicle } from './log.js?realm=191';
-import { recordDeathMarker } from './death-markers.js?realm=191';
+import { sfx as playSound } from './log.js?realm=192';
+import { removeBuilding } from './building-lifecycle.js?realm=192';
+import { announce as notify } from './log.js?realm=192';
+import { chronicle } from './log.js?realm=192';
+import { recordDeathMarker } from './death-markers.js?realm=192';
 import {
   removeCitizenFromWorld,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=191';
+} from './citizen-ownership.js?realm=192';
 import {
   citizenHasValidResidence,
   citizenIsIndoors,
-} from './residences.js?realm=191';
+} from './residences.js?realm=192';
 
 function detachProjectileTargets(enemy) {
   let snapshot = null;

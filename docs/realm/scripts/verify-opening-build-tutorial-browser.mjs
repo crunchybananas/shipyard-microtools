@@ -15,7 +15,7 @@ import { ensureServer } from './_serve.mjs';
 const realmRoot = fileURLToPath(new URL('..', import.meta.url));
 const proofDir = join(realmRoot, 'tmp', 'opening-build-tutorial');
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 191, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 192, 'Update this gate together with current browser module URLs');
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 
@@ -87,7 +87,7 @@ async function startFresh(page, name, touch = false) {
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(async () => {
     window.setSpeed(0);
-    const ui = await import('./js/ui.js?realm=191');
+    const ui = await import('./js/ui.js?realm=192');
     ui.updateTutorialTip();
   });
   const welcome = await openingState(page);

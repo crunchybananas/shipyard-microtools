@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=191';
-import { generateWorld } from '../js/world.js?realm=191';
-import { checkRaids } from '../js/economy.js?realm=191';
-import { updateSoldiers } from '../js/soldiers.js?realm=191';
-import { updateEnemies } from '../js/combat.js?realm=191';
-import { depositFood } from '../js/building-inventory.js?realm=191';
+import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=192';
+import { generateWorld } from '../js/world.js?realm=192';
+import { checkRaids } from '../js/economy.js?realm=192';
+import { updateSoldiers } from '../js/soldiers.js?realm=192';
+import { updateEnemies } from '../js/combat.js?realm=192';
+import { depositFood } from '../js/building-inventory.js?realm=192';
 
 function stats() {
   return {

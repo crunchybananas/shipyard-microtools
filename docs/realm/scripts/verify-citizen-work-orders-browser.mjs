@@ -15,7 +15,7 @@ import { ensureServer } from './_serve.mjs';
 const realmRoot = fileURLToPath(new URL('..', import.meta.url));
 const proofDir = join(realmRoot, 'tmp', 'citizen-work-orders');
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 191, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 192, 'Update this gate together with current browser module URLs');
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
@@ -41,8 +41,8 @@ try {
   });
 
   const fixture = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=191');
-    const ownership = await import('./js/citizen-ownership.js?realm=191');
+    const economy = await import('./js/economy.js?realm=192');
+    const ownership = await import('./js/citizen-ownership.js?realm=192');
     const g = window.G;
     Object.assign(g.resources, {
       wood: 10_000, stone: 10_000, gold: 10_000, iron: 10_000,
@@ -158,9 +158,9 @@ try {
   await page.setViewportSize({ width: 1280, height: 800 });
 
   const crisis = await page.evaluate(async ({ orderedId, adaptiveId, farm, lumber, market }) => {
-    const inventory = await import('./js/building-inventory.js?realm=191');
-    const ownership = await import('./js/citizen-ownership.js?realm=191');
-    const state = await import('./js/state.js?realm=191');
+    const inventory = await import('./js/building-inventory.js?realm=192');
+    const ownership = await import('./js/citizen-ownership.js?realm=192');
+    const state = await import('./js/state.js?realm=192');
     const g = window.G;
     const ordered = g.citizens.find(value => value.actorId === orderedId);
     const adaptive = g.citizens.find(value => value.actorId === adaptiveId);
@@ -170,6 +170,12 @@ try {
     }
     Object.assign(g.resources, { wheat: 0, flour: 0 });
     g.dayPhase = Math.floor(g.dayLength * 0.2);
+    // Keep this fixture's premise stable until the workforce policy reacts.
+    // Emergency foraging is a separate recovery path and can otherwise refill
+    // a tiny two-person pantry before the periodic labor review fires.
+    for (const citizen of g.citizens) {
+      citizen._forageReadyAt = g.gameTick + g.dayLength * 100;
+    }
     ordered.x = lumber.x;
     ordered.y = lumber.y;
     ordered.tx = lumber.x;
@@ -187,8 +193,30 @@ try {
     ownership.transitionCitizenActivity(adaptive, 'working', 'arrived-at-work');
     adaptive.activityTimer = 1;
     state.setSeed(37);
-    g.debug.step(1_440);
+    // Observe the first crisis reallocation instead of sampling only after a
+    // full production cycle. Once the Farm is staffed it can truthfully
+    // replenish the pantry and the automatic worker may later return to a
+    // higher-scoring job; that recovery must not erase proof that the survival
+    // policy reacted while food was actually below its threshold.
+    let adaptedAt = null;
+    for (let ticks = 1; ticks <= 1_440; ticks++) {
+      // Production/recovery systems run after citizens in the authoritative
+      // tick. Drain any newly stored rations before the next citizen review so
+      // every sampled decision still sees the intended sustained crisis.
+      for (const store of inventory.foodStores(g, { withFood: true })) {
+        inventory.withdrawFood(store, inventory.storedFood(store), g);
+      }
+      Object.assign(g.resources, { wheat: 0, flour: 0 });
+      g.debug.step(1);
+      if (adaptive.assignment?.building === at(farm)) {
+        adaptedAt = ticks;
+        break;
+      }
+    }
     return {
+      adaptedAt,
+      storedFood: inventory.foodStores(g, { withFood: true })
+        .reduce((sum, store) => sum + inventory.storedFood(store), 0),
       ordered: {
         assignment: ordered.assignment && {
           x: ordered.assignment.building.x,
@@ -221,10 +249,14 @@ try {
     'automatic worker unexpectedly became a player order',
   );
   assert.ok(
-    crisis.adaptive.assignment?.x !== fixture.market.x
-      || crisis.adaptive.assignment?.y !== fixture.market.y,
-    'automatic non-food worker did not adapt during a sustained food crisis',
+    crisis.adaptedAt !== null,
+    `automatic non-food worker did not adapt during a sustained food crisis: ${JSON.stringify(crisis)}`,
   );
+  assert.equal(crisis.storedFood, 0, 'crisis adaptation was observed only after food had already recovered');
+  assert.deepEqual(crisis.adaptive.assignment, {
+    ...fixture.farm,
+    reason: 'food-crisis',
+  }, 'automatic worker did not claim the open Farm during the active crisis');
   assert.equal(crisis.farmStaff, 1, 'automatic AI did not fill the open food job');
 
   await page.locator('#btn-save').click();
@@ -256,7 +288,7 @@ try {
   assert.equal(await returnToAI.count(), 1, 'continued Crown order did not expose Return to AI');
   await returnToAI.click();
   await page.evaluate(async actorId => {
-    const inventory = await import('./js/building-inventory.js?realm=191');
+    const inventory = await import('./js/building-inventory.js?realm=192');
     const g = window.G;
     const citizen = g.citizens.find(value => value.actorId === actorId);
     const store = inventory.foodStores(g, { withSpace: true })[0];

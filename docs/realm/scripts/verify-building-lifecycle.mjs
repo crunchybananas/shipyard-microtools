@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, BUILDINGS, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=191';
-import { generateWorld } from '../js/world.js?realm=191';
-import { placeBuilding, updateFires } from '../js/economy.js?realm=191';
-import { buildingCapacity } from '../js/building-lifecycle.js?realm=191';
-import { dispatch } from '../js/commands.js?realm=191';
-import { updateEnemies } from '../js/combat.js?realm=191';
-import { initChronicle } from '../js/log.js?realm=191';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=191';
+import { G, BUILDINGS, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=192';
+import { generateWorld } from '../js/world.js?realm=192';
+import { placeBuilding, updateFires } from '../js/economy.js?realm=192';
+import { buildingCapacity } from '../js/building-lifecycle.js?realm=192';
+import { dispatch } from '../js/commands.js?realm=192';
+import { updateEnemies } from '../js/combat.js?realm=192';
+import { initChronicle } from '../js/log.js?realm=192';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=192';
 import {
   claimCitizenAssignment,
   onCitizenTransition,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=191';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=191';
+} from '../js/citizen-ownership.js?realm=192';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=192';
 
 setSeed(424242);
 generateWorld();

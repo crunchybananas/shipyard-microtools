@@ -2,8 +2,8 @@
 // ordinary benefit. Construction sites are never operational; staffed
 // buildings also require at least their catalogued workforce.
 
-import { BUILDINGS } from './state.js?realm=191';
-import { staffingCount, workersForBuilding } from './citizen-ownership.js?realm=191';
+import { BUILDINGS } from './state.js?realm=192';
+import { staffingCount, workersForBuilding } from './citizen-ownership.js?realm=192';
 
 export function isBuildingComplete(building) {
   return !!building && building.active === true && building.buildProgress >= 1;

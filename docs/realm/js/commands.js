@@ -15,19 +15,19 @@
 //   NOT commands.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, rngRange } from './state.js?realm=191';
-import { placeBuilding, upgradeBuilding } from './economy.js?realm=191';
-import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=191';
-import { startResearch } from './tech.js?realm=191';
-import { executeTrade } from './trade.js?realm=191';
-import { avatarMove, avatarGoto } from './avatar.js?realm=191';
-import { queueRecruit } from './military.js?realm=191';
-import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=191';
-import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=191';
+import { G, BUILDINGS, rngRange } from './state.js?realm=192';
+import { placeBuilding, upgradeBuilding } from './economy.js?realm=192';
+import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=192';
+import { startResearch } from './tech.js?realm=192';
+import { executeTrade } from './trade.js?realm=192';
+import { avatarMove, avatarGoto } from './avatar.js?realm=192';
+import { queueRecruit } from './military.js?realm=192';
+import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=192';
+import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=192';
 import {
   commandAssignCitizen,
   commandReleaseCitizen,
-} from './citizen-ownership.js?realm=191';
+} from './citizen-ownership.js?realm=192';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;

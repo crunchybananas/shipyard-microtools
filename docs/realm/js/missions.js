@@ -2,10 +2,10 @@
 // Missions — goals and progression
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=191';
-import { sfx as playSound, announce } from './log.js?realm=191';
-import { visualJitter } from './fx.js?realm=191';
-import { depositFoodAcrossStores } from './building-inventory.js?realm=191';
+import { G, MAP_W, MAP_H } from './state.js?realm=192';
+import { sfx as playSound, announce } from './log.js?realm=192';
+import { visualJitter } from './fx.js?realm=192';
+import { depositFoodAcrossStores } from './building-inventory.js?realm=192';
 
 export const missions = [
   { id:'farm1',   text:'Complete a farm',                  check:()=>G.buildings.some(b=>b.type==='farm' && b.buildProgress>=1),      done:false, reward:{food:4} },

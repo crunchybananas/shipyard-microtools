@@ -5,7 +5,7 @@
 // Automatic policy may move only AI-managed workers; a player-command assignment
 // is a Crown order and is never reconsidered here.
 
-import { G, BUILDINGS, getDifficulty } from './state.js?realm=191';
+import { G, BUILDINGS, getDifficulty } from './state.js?realm=192';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -16,7 +16,7 @@ import {
   transitionCitizenActivity,
   vocationForBuilding,
   workersForBuilding,
-} from './citizen-ownership.js?realm=191';
+} from './citizen-ownership.js?realm=192';
 
 export const WORKFORCE_PRIORITIES = Object.freeze(['high', 'normal', 'low', 'off']);
 export const AUTO_REASSIGN_THRESHOLD = 12;

@@ -1,10 +1,10 @@
 // Deterministic Engine-v2 Phase 0C worksite, invalidation, and mixed-traffic
 // correctness gate. These fixtures retain the original Phase 0C measurements
-// while requiring bounded separation, immediate obstacle invalidation, and
-// stable actor ownership.
+// while requiring a hard safety floor, immediate obstacle invalidation, and
+// stable actor ownership. Preferred personal space is soft under congestion.
 
 import assert from 'node:assert/strict';
-import runtimeContract from '../runtime-contract.json?realm=191' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=192' with { type: 'json' };
 import {
   G,
   MAP_H,
@@ -12,26 +12,26 @@ import {
   TILE,
   createResourceStock,
   setSeed,
-} from '../js/state.js?realm=191';
+} from '../js/state.js?realm=192';
 import {
   findPath,
   getPathfindingDiagnostics,
-} from '../js/pathfinding.js?realm=191';
-import { updateCitizens } from '../js/citizens.js?realm=191';
-import { updateSoldiers } from '../js/soldiers.js?realm=191';
-import { updateWalkers } from '../js/walkers.js?realm=191';
-import { updateAnimals } from '../js/animals.js?realm=191';
+} from '../js/pathfinding.js?realm=192';
+import { updateCitizens } from '../js/citizens.js?realm=192';
+import { updateSoldiers } from '../js/soldiers.js?realm=192';
+import { updateWalkers } from '../js/walkers.js?realm=192';
+import { updateAnimals } from '../js/animals.js?realm=192';
 import {
   createCitizenOwnership,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=191';
-import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=191';
+} from '../js/citizen-ownership.js?realm=192';
+import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=192';
 
-const RECORDED_REVISION = 191;
+const RECORDED_REVISION = 192;
 const RECORDED_SAVE_VERSION = 4;
-const RECORDED_SIMULATION_VERSION = 4;
-const MINIMUM_ACTOR_SEPARATION = 0.58;
+const RECORDED_SIMULATION_VERSION = 5;
+const MINIMUM_ACTOR_SEPARATION = 0.295;
 
 function rounded(value, digits = 12) {
   return Number(value.toFixed(digits));

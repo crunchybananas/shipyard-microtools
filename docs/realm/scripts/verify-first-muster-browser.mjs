@@ -28,7 +28,7 @@ try {
   await barracksBuildButton.waitFor({ state: 'visible' });
   assert.equal(await barracksBuildButton.isEnabled(), true, 'military scenario advertised barracks but could not afford one');
   const immediateSave = await page.evaluate(async () => {
-    const saveState = await import('./js/save-state.js?realm=191');
+    const saveState = await import('./js/save-state.js?realm=192');
     const prepared = saveState.prepareSave(saveState.serializeGame({ savedAt: 189 }));
     return {
       ok: prepared.ok,
@@ -44,9 +44,9 @@ try {
   );
 
   const setup = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=191');
-    const ownership = await import('./js/citizen-ownership.js?realm=191');
-    const ui = await import('./js/ui.js?realm=191');
+    const state = await import('./js/state.js?realm=192');
+    const ownership = await import('./js/citizen-ownership.js?realm=192');
+    const ui = await import('./js/ui.js?realm=192');
     const g = window.G;
     Object.assign(g.resources, { wood: 100, stone: 100, food: 20, gold: 50, iron: 20, planks: 20 });
     for (const row of g.fog) row.fill(true);

@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=191';
-import { missions } from './missions.js?realm=191';
+} from './state.js?realm=192';
+import { missions } from './missions.js?realm=192';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=191';
+} from './save-schema.js?realm=192';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,10 +22,10 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=191';
-import { houseResidentCapacity } from './residences.js?realm=191';
-import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=191';
-import { foodCapacity } from './building-inventory.js?realm=191';
+} from './citizen-ownership.js?realm=192';
+import { houseResidentCapacity } from './residences.js?realm=192';
+import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=192';
+import { foodCapacity } from './building-inventory.js?realm=192';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization

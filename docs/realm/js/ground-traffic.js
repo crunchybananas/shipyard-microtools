@@ -2,19 +2,48 @@
 // move their own actors; shell callers pass only shell-owned movers so the
 // presentation layer never mutates authoritative simulation entities.
 
-import { G, MAP_H, MAP_W, TILE } from './state.js?realm=191';
+import { G, MAP_H, MAP_W, TILE } from './state.js?realm=192';
 
 export const GROUND_ACTOR_SPACE = 0.60;
 
-function canOccupy(actor, x, y) {
-  const rx = Math.round(x);
-  const ry = Math.round(y);
+function tileAllowsActor(actor, rx, ry, originX, originY) {
   if (rx < 0 || rx >= MAP_W || ry < 0 || ry >= MAP_H) return false;
   const tile = G.map[ry]?.[rx];
   if (tile === TILE.WATER || tile === TILE.MOUNTAIN || tile === undefined) return false;
   const building = G.buildingGrid[ry]?.[rx];
   if (!building || building.type === 'road') return true;
-  return rx === Math.round(actor.x) && ry === Math.round(actor.y);
+  return rx === originX && ry === originY;
+}
+
+function canOccupy(actor, x, y) {
+  const originX = Math.round(actor.x);
+  const originY = Math.round(actor.y);
+  if (!tileAllowsActor(actor, originX, originY, originX, originY)) return false;
+  const dx = x - actor.x;
+  const dy = y - actor.y;
+  // Projection is normally sub-tile, but minimumSpace is a public option.
+  // Sample the full segment so a large correction cannot hop over a footprint.
+  const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 0.25));
+  let previousX = originX;
+  let previousY = originY;
+  for (let step = 1; step <= steps; step++) {
+    const progress = step / steps;
+    const rx = Math.round(actor.x + dx * progress);
+    const ry = Math.round(actor.y + dy * progress);
+    if (rx === previousX && ry === previousY) continue;
+    if (!tileAllowsActor(actor, rx, ry, originX, originY)) return false;
+    // Match A* and direct movement: crossing a diagonal tile boundary requires
+    // both orthogonal cells to be open. Reactive spacing must not become a
+    // topology bypass through two touching building corners.
+    if (
+      rx !== previousX && ry !== previousY
+      && (!tileAllowsActor(actor, rx, previousY, originX, originY)
+        || !tileAllowsActor(actor, previousX, ry, originX, originY))
+    ) return false;
+    previousX = rx;
+    previousY = ry;
+  }
+  return true;
 }
 
 function uniqueActors(actors) {

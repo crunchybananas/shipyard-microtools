@@ -13,24 +13,24 @@
 // added here MUST pass verify-core-purity + verify-determinism.
 // ════════════════════════════════════════════════════════════
 
-import { G, updateSeason, getSeasonData } from './state.js?realm=191';
-import { updateCitizens } from './citizens.js?realm=191';
-import { updateAvatar } from './avatar.js?realm=191';
-import { updateSoldiers } from './soldiers.js?realm=191';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=191';
-import { updateWalkers } from './walkers.js?realm=191';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=191';
-import { checkMissions } from './missions.js?realm=191';
-import { updateResearch, checkEraAdvance } from './tech.js?realm=191';
-import { updateWonder } from './wonder.js?realm=191';
-import { checkRandomEvents } from './events.js?realm=191';
-import { checkScenarioComplete } from './scenarios.js?realm=191';
-import { chronicle, announce, sfx } from './log.js?realm=191';
-import { emit } from './bus.js?realm=191';
-import { checkStoryBeats } from './story.js?realm=191';
-import { updateRaidSummary } from './raid-summary.js?realm=191';
-import { updateFirstMusterChapter } from './first-muster.js?realm=191';
-import { updatePostRaidRecovery } from './post-raid-recovery.js?realm=191';
+import { G, updateSeason, getSeasonData } from './state.js?realm=192';
+import { updateCitizens } from './citizens.js?realm=192';
+import { updateAvatar } from './avatar.js?realm=192';
+import { updateSoldiers } from './soldiers.js?realm=192';
+import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=192';
+import { updateWalkers } from './walkers.js?realm=192';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=192';
+import { checkMissions } from './missions.js?realm=192';
+import { updateResearch, checkEraAdvance } from './tech.js?realm=192';
+import { updateWonder } from './wonder.js?realm=192';
+import { checkRandomEvents } from './events.js?realm=192';
+import { checkScenarioComplete } from './scenarios.js?realm=192';
+import { chronicle, announce, sfx } from './log.js?realm=192';
+import { emit } from './bus.js?realm=192';
+import { checkStoryBeats } from './story.js?realm=192';
+import { updateRaidSummary } from './raid-summary.js?realm=192';
+import { updateFirstMusterChapter } from './first-muster.js?realm=192';
+import { updatePostRaidRecovery } from './post-raid-recovery.js?realm=192';
 
 // ── Day/Night clock (moved from main.js updateTime) ─────────────────
 function tickClock() {

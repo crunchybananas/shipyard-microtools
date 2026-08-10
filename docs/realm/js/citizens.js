@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, TILE } from './state.js?realm=191';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=191';
-import { getCitizenSpeedMult } from './events.js?realm=191';
-import { revealAround } from './world.js?realm=191';
-import { visualJitter } from './fx.js?realm=191';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, TILE } from './state.js?realm=192';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=192';
+import { getCitizenSpeedMult } from './events.js?realm=192';
+import { revealAround } from './world.js?realm=192';
+import { visualJitter } from './fx.js?realm=192';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -15,7 +15,7 @@ import {
   releaseCitizenAssignment,
   staffingCount,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=191';
+} from './citizen-ownership.js?realm=192';
 import {
   assignCitizenResidence,
   citizenAtResidencePortal,
@@ -23,8 +23,8 @@ import {
   citizenIsIndoors,
   residencePortalForCitizen,
   residentsForHouse,
-} from './residences.js?realm=191';
-import { isBuildingOperational } from './building-operation.js?realm=191';
+} from './residences.js?realm=192';
+import { isBuildingOperational } from './building-operation.js?realm=192';
 import {
   canDepositFood,
   depositFood,
@@ -32,7 +32,7 @@ import {
   isFoodStore,
   storedFood,
   withdrawFood,
-} from './building-inventory.js?realm=191';
+} from './building-inventory.js?realm=192';
 import {
   AUTO_REVIEW_INTERVAL_TICKS,
   buildingAcceptsAutomaticWorkers,
@@ -41,7 +41,7 @@ import {
   reviewAutomaticAssignment,
   scoreCitizenJob,
   workforceFoodDaysLeft,
-} from './workforce-policy.js?realm=191';
+} from './workforce-policy.js?realm=192';
 
 const DEFAULT_ACTIVITY_REASON = Object.freeze({
   idle: 'idle-wait',
@@ -228,7 +228,16 @@ function compressPath(path) {
 
 const BLACKLIST_TICKS = 600;
 
+function pruneExpiredNoGo(c) {
+  if (!c._noGo) return;
+  for (const [coordinate, tick] of Object.entries(c._noGo)) {
+    if (G.gameTick - tick >= BLACKLIST_TICKS) delete c._noGo[coordinate];
+  }
+  if (Object.keys(c._noGo).length === 0) delete c._noGo;
+}
+
 function blacklistTarget(c, x, y) {
+  pruneExpiredNoGo(c);
   c._noGo = c._noGo || {};
   c._noGo[`${Math.round(x)},${Math.round(y)}`] = G.gameTick;
 }
@@ -258,6 +267,21 @@ function watchProgress(c) {
   const gx = c._requestedTx ?? c.tx ?? c.x;
   const gy = c._requestedTy ?? c.ty ?? c.y;
   const d = Math.hypot(gx - c.x, gy - c.y);
+  // A live body queue is not failed topology. Direct intents can be visibly
+  // cancelled by the post-move hard-floor correction even when the per-actor
+  // movement branch accepted them; keep the target and let right-of-way age
+  // resolve while another active actor remains in the local traffic cell.
+  const queuedByCitizen = G.citizens.some(other => (
+    other !== c
+    && !citizenIsIndoors(other)
+    && isActivelyMoving(other)
+    && Math.hypot(c.x - other.x, c.y - other.y) < 1.05
+  ));
+  if (queuedByCitizen) {
+    c._wdBest = d;
+    c._wdTicks = 0;
+    return;
+  }
   if (c._wdBest == null || d < c._wdBest - 0.2) { c._wdBest = d; c._wdTicks = 0; return; }
   c._wdTicks = (c._wdTicks || 0) + 1;
   if (c._wdTicks > 120) {
@@ -376,28 +400,47 @@ function foodRetryTicks(c) {
   return FOOD_RETRY_BASE_TICKS + (citizenHash(c) % FOOD_RETRY_SPREAD_TICKS);
 }
 
-function foodStoreApproach(c, building) {
-  if (!isFoodStore(building)) return null;
-  return nearestWalkableTile(
-    Math.round(building.x),
-    Math.round(building.y),
-    3,
-    Math.round(c.x),
-    Math.round(c.y),
-  );
+function foodStoreApproaches(c, building) {
+  if (!isFoodStore(building)) return [];
+  const bx = Math.round(building.x);
+  const by = Math.round(building.y);
+  const candidates = [];
+  // A meal is served at the building's actual portal ring. Eight stable slots
+  // are enough to distribute a crowd without letting a citizen consume from
+  // several tiles away merely because that outer tile was pathfindable.
+  for (let radius = 1; radius <= 1; radius++) {
+    for (let y = by - radius; y <= by + radius; y++) {
+      for (let x = bx - radius; x <= bx + radius; x++) {
+        if (Math.max(Math.abs(x - bx), Math.abs(y - by)) !== radius) continue;
+        if (!isWalkable(x, y)) continue;
+        const crowd = targetCrowdPenalty(c, x, y);
+        const fromHere = dist2(c.x, c.y, x, y);
+        const jitter = ((citizenHash(c) ^ (x * 1597334677) ^ (y * 3812015801)) >>> 0)
+          / 0xffffffff * 0.2;
+        candidates.push({
+          x,
+          y,
+          score: radius * 1.8 + fromHere * 0.12 + crowd * 5.5 + jitter,
+        });
+      }
+    }
+  }
+  candidates.sort((a, b) => a.score - b.score || a.y - b.y || a.x - b.x);
+  return candidates;
 }
 
 function reachableFoodRoute(c, building) {
   if (isBlacklisted(c, building.x, building.y)) return null;
-  const approach = foodStoreApproach(c, building);
-  if (!approach) return null;
-  const route = findPath(
-    Math.round(c.x),
-    Math.round(c.y),
-    approach.x,
-    approach.y,
-  );
-  return route ? { approach, route } : null;
+  for (const approach of foodStoreApproaches(c, building)) {
+    const route = findPath(
+      Math.round(c.x),
+      Math.round(c.y),
+      approach.x,
+      approach.y,
+    );
+    if (route) return { approach, route };
+  }
+  return null;
 }
 
 function foodTargetStillValid(c) {
@@ -407,14 +450,25 @@ function foodTargetStillValid(c) {
 }
 
 function citizenAtFoodTarget(c, building = c._foodTarget) {
-  const approach = foodStoreApproach(c, building);
-  return !!approach && Math.hypot(c.x - approach.x, c.y - approach.y) <= 0.8;
+  if (!building) return false;
+  const goal = c._pathGoal;
+  if (
+    goal
+    && Math.max(Math.abs(goal.x - building.x), Math.abs(goal.y - building.y)) <= 3
+    && Math.hypot(c.x - goal.x, c.y - goal.y) <= 0.82
+  ) {
+    return true;
+  }
+  return foodStoreApproaches(c, building)
+    .some(approach => Math.hypot(c.x - approach.x, c.y - approach.y) <= 0.82);
 }
 
 function waitForFood(c, reason = 'food-shortage') {
   const wasWaiting = c.activity.kind === 'waiting_for_food';
   c._foodTarget = null;
   clearPath(c);
+  c.tx = c.x;
+  c.ty = c.y;
   setActivity(c, 'waiting_for_food', { reason, timer: foodRetryTicks(c) });
   if (!wasWaiting) {
     G.particles.push({
@@ -470,12 +524,12 @@ function resumeAfterMeal(c) {
   }
 }
 
-// Deterministic right-of-way prevents crossing and opposing citizens from
-// entering the same space. Separation then supplies a visible passing lane
-// and remains the fallback for newly spawned or stationary crowds. This radius
-// is large enough to keep actor silhouettes distinct without pushing walkers
-// a full tile away from their route.
-const PERSONAL_SPACE = 0.60;
+// Preferred spacing keeps painted bodies readable, while the smaller hard
+// floor permits brief shoulder overlap at doors and crossings. Local traffic
+// resolves toward the preferred radius; post-move separation enforces only the
+// safety floor so a dense queue cannot become an immovable 0.6-tile wall.
+const PREFERRED_SPACE = 0.55;
+const HARD_ACTOR_SPACE = 0.31;
 
 function tileWalkable(x, y) {
   const mx = Math.round(x), my = Math.round(y);
@@ -671,69 +725,286 @@ function canStepCitizen(c, nx, ny) {
   return standingOnBlockedTile(c) && rx === cx && ry === cy && terrainWalkable(nx, ny);
 }
 
-const YIELD_BUCKET_SIZE = 1.1;
-const YIELD_BUCKET_STRIDE = Math.ceil(MAP_W / YIELD_BUCKET_SIZE) + 4;
-let yieldBucketsTick = -1;
-let yieldBucketsCitizens = null;
-let yieldBucketsCount = -1;
-let yieldBuckets = new Map();
+const TRAFFIC_BUCKET_SIZE = 1.2;
+const TRAFFIC_BUCKET_STRIDE = Math.ceil(MAP_W / TRAFFIC_BUCKET_SIZE) + 4;
+let trafficBucketsTick = -1;
+let trafficBucketsCitizens = null;
+let trafficBucketsCount = -1;
+let trafficBuckets = new Map();
+let trafficReservationsTick = -1;
+let trafficReservations = [];
 
-function currentYieldBuckets() {
+function currentTrafficBuckets() {
   if (
-    yieldBucketsTick === G.gameTick
-    && yieldBucketsCitizens === G.citizens
-    && yieldBucketsCount === G.citizens.length
-  ) return yieldBuckets;
+    trafficBucketsTick === G.gameTick
+    && trafficBucketsCitizens === G.citizens
+    && trafficBucketsCount === G.citizens.length
+  ) return trafficBuckets;
 
-  yieldBucketsTick = G.gameTick;
-  yieldBucketsCitizens = G.citizens;
-  yieldBucketsCount = G.citizens.length;
-  yieldBuckets = new Map();
+  trafficBucketsTick = G.gameTick;
+  trafficBucketsCitizens = G.citizens;
+  trafficBucketsCount = G.citizens.length;
+  trafficBuckets = new Map();
   for (const citizen of G.citizens) {
-    if (!isActivelyMoving(citizen)) continue;
-    const cellX = Math.floor(citizen.x / YIELD_BUCKET_SIZE);
-    const cellY = Math.floor(citizen.y / YIELD_BUCKET_SIZE);
-    const key = cellY * YIELD_BUCKET_STRIDE + cellX;
-    const bucket = yieldBuckets.get(key);
+    if (citizenIsIndoors(citizen)) continue;
+    const cellX = Math.floor(citizen.x / TRAFFIC_BUCKET_SIZE);
+    const cellY = Math.floor(citizen.y / TRAFFIC_BUCKET_SIZE);
+    const key = cellY * TRAFFIC_BUCKET_STRIDE + cellX;
+    const bucket = trafficBuckets.get(key);
     if (bucket) bucket.push(citizen);
-    else yieldBuckets.set(key, [citizen]);
+    else trafficBuckets.set(key, [citizen]);
   }
-  return yieldBuckets;
+  return trafficBuckets;
 }
 
-function shouldYieldToCitizen(c, nx, ny) {
-  if (!isActivelyMoving(c)) return false;
+function trafficUrgency(c) {
+  if (c.activity.kind === 'seek_shelter' || c.activity.kind === 'flee') return 6;
+  if (c.carrying && c.carryAmount > 0) return 5;
+  if (c.assignment?.reason === 'player-command') return 4;
+  if (c.activity.kind === 'walk_to_eat') return 3;
+  if (c.activity.kind === 'walk_to_work') return 2;
+  return 1;
+}
+
+function trafficPriorityWins(a, b) {
+  const urgencyDelta = trafficUrgency(a) - trafficUrgency(b);
+  if (urgencyDelta !== 0) return urgencyDelta > 0;
+  const waitA = Math.floor((a._stuckTicks || 0) / 4);
+  const waitB = Math.floor((b._stuckTicks || 0) / 4);
+  if (waitA !== waitB) return waitA > waitB;
+  const span = Math.max(1, G.citizens.length);
+  const epoch = Math.floor(G.gameTick / 24);
+  const rankA = ((a.actorId || 0) + epoch) % span;
+  const rankB = ((b.actorId || 0) + epoch) % span;
+  if (rankA !== rankB) return rankA < rankB;
+  return (a.actorId || 0) < (b.actorId || 0);
+}
+
+function citizenTravelSpeed(c) {
+  let speed = c.speed * getSeasonData().speedMult * getCitizenSpeedMult();
+  const gx = Math.round(c.x), gy = Math.round(c.y);
+  if (G.buildingGrid[gy]?.[gx]?.type === 'road') speed *= 2;
+  if (c.hunger > 60) speed *= 1 - Math.min(0.4, (c.hunger - 60) / 100);
+  if ((c.rest ?? 100) < 30) speed *= 0.75 + ((c.rest ?? 100) / 30) * 0.25;
+  if (c._fleeing) speed *= 1.35;
+  return speed;
+}
+
+function projectedCitizenStep(c) {
   const direction = activeMovementDirection(c);
-  if (!direction) return false;
-  const buckets = currentYieldBuckets();
-  const cellX = Math.floor(c.x / YIELD_BUCKET_SIZE);
-  const cellY = Math.floor(c.y / YIELD_BUCKET_SIZE);
+  if (!direction) return { x: c.x, y: c.y };
+  const target = c.path[c.pathIdx];
+  const distance = Math.hypot(target.x - c.x, target.y - c.y);
+  const step = Math.min(citizenTravelSpeed(c), distance);
+  return { x: c.x + direction.x * step, y: c.y + direction.y * step };
+}
+
+function trafficConflict(c, nx, ny) {
+  const direction = activeMovementDirection(c);
+  if (!direction) return null;
+  const buckets = currentTrafficBuckets();
+  const cellX = Math.floor(c.x / TRAFFIC_BUCKET_SIZE);
+  const cellY = Math.floor(c.y / TRAFFIC_BUCKET_SIZE);
   for (let y = cellY - 1; y <= cellY + 1; y++) {
     for (let x = cellX - 1; x <= cellX + 1; x++) {
-      for (const other of buckets.get(y * YIELD_BUCKET_STRIDE + x) || []) {
-        if (other === c || (other.actorId || 0) >= (c.actorId || 0)) continue;
-        const otherDirection = activeMovementDirection(other);
-        if (!otherDirection) continue;
-        const alignment = direction.x * otherDirection.x + direction.y * otherDirection.y;
-        // Following traffic can naturally queue. Crossing and opposing
-        // traffic need a deterministic right-of-way decision before they
-        // enter the same personal-space area; post-move separation remains a
-        // safety net, not the primary traffic rule.
-        if (alignment >= 0.45) continue;
+      for (const other of buckets.get(y * TRAFFIC_BUCKET_STRIDE + x) || []) {
+        if (other === c) continue;
         const currentDistance = Math.hypot(c.x - other.x, c.y - other.y);
-        if (currentDistance >= YIELD_BUCKET_SIZE) continue;
-        const nextDistance = Math.hypot(nx - other.x, ny - other.y);
-        if (nextDistance < currentDistance && nextDistance < 0.8) return true;
+        if (currentDistance >= TRAFFIC_BUCKET_SIZE + 0.15) continue;
+        // The actor already processed this tick has an accepted destination;
+        // otherwise right of way decides whether this actor may treat the
+        // other as yielding in place. Projecting both unconditionally made a
+        // head-on pair symmetrically reject the same gap forever.
+        const accepted = trafficReservationsTick === G.gameTick
+          ? trafficReservations.find(reservation => reservation.citizen === other)
+          : null;
+        const hasRightOfWay = !accepted && trafficPriorityWins(c, other);
+        const otherNext = accepted
+          ? accepted
+          : hasRightOfWay
+            ? other
+            : projectedCitizenStep(other);
+        const nextDistance = Math.hypot(nx - otherNext.x, ny - otherNext.y);
+        if (nextDistance >= PREFERRED_SPACE) continue;
+        if (nextDistance >= currentDistance - 0.002 && nextDistance >= HARD_ACTOR_SPACE) continue;
+        if (nextDistance < HARD_ACTOR_SPACE) {
+          // A winner may enter the correction band against an actor that has
+          // not committed this tick. Post-move separation then shares the
+          // displacement. Without this bounded give, a fully packed merge has
+          // no geometrically legal first move even though the lane ahead is
+          // opening. Accepted reservations always remain hard obstacles.
+          if (hasRightOfWay) continue;
+          return {
+            yield: !accepted && !!activeMovementDirection(other),
+            other,
+          };
+        }
+        // Between the preferred and hard radii the overlap is deliberately
+        // soft. Holding right of way throughout that whole band recreates a
+        // 0.55-tile wall at merge points; only a predicted hard penetration
+        // needs an actual yield/sidestep intent.
       }
     }
   }
-  return false;
+
+  if (trafficReservationsTick !== G.gameTick) {
+    trafficReservationsTick = G.gameTick;
+    trafficReservations = [];
+  }
+  for (const reservation of trafficReservations) {
+    if (reservation.citizen === c) continue;
+    const distance = Math.hypot(nx - reservation.x, ny - reservation.y);
+    if (distance < HARD_ACTOR_SPACE) return { yield: false, other: reservation.citizen };
+  }
+  return null;
+}
+
+function reserveCitizenStep(c, x, y) {
+  if (trafficReservationsTick !== G.gameTick) {
+    trafficReservationsTick = G.gameTick;
+    trafficReservations = [];
+  }
+  trafficReservations.push({ citizen: c, x, y });
+}
+
+function opposingTrafficNearby(c, direction) {
+  return G.citizens.some(other => {
+    if (other === c || citizenIsIndoors(other)) return false;
+    if (Math.hypot(c.x - other.x, c.y - other.y) > 2.2) return false;
+    const otherDirection = activeMovementDirection(other);
+    return !!otherDirection
+      && direction.x * otherDirection.x + direction.y * otherDirection.y < -0.4;
+  });
+}
+
+function opposingLaneIntent(c, nx, ny) {
+  const direction = activeMovementDirection(c);
+  if (!direction || !opposingTrafficNearby(c, direction)) return null;
+  const waypoint = c.path?.[c.pathIdx];
+  if (!waypoint) return null;
+  const horizontal = Math.abs(direction.x) >= Math.abs(direction.y);
+  // Right-hand lanes remain inside the same rounded walkable tile. Opposing
+  // horizontal flows hold y +/- 0.21; vertical flows use x -/+ 0.21. The
+  // offset is released immediately when no opposing mover remains nearby.
+  const laneTarget = horizontal
+    ? { x: waypoint.x, y: waypoint.y + (Math.sign(direction.x) || 1) * 0.21 }
+    : { x: waypoint.x - (Math.sign(direction.y) || 1) * 0.21, y: waypoint.y };
+  const dx = laneTarget.x - c.x;
+  const dy = laneTarget.y - c.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance <= 0.0001) return null;
+  const step = Math.min(Math.hypot(nx - c.x, ny - c.y), distance);
+  const x = c.x + dx / distance * step;
+  const y = c.y + dy / distance * step;
+  if (!canStepCitizen(c, x, y) || trafficConflict(c, x, y)) return null;
+  reserveCitizenStep(c, x, y);
+  return { x, y, trafficWait: false, lane: true };
+}
+
+function resolveCitizenStep(c, nx, ny) {
+  const laneIntent = opposingLaneIntent(c, nx, ny);
+  if (laneIntent) return laneIntent;
+  const directConflict = canStepCitizen(c, nx, ny) ? trafficConflict(c, nx, ny) : null;
+  if (canStepCitizen(c, nx, ny) && !directConflict) {
+    reserveCitizenStep(c, nx, ny);
+    return { x: nx, y: ny, trafficWait: false };
+  }
+  // An earlier, lower-priority actor must not reserve a sidestep that seals
+  // the very lane promised to an uncommitted winner later in this tick.
+  if (directConflict?.yield) return null;
+  const dx = nx - c.x;
+  const dy = ny - c.y;
+  const length = Math.hypot(dx, dy);
+  if (length <= 0.0001) return null;
+  const forwardX = dx / length;
+  const forwardY = dy / length;
+  // Keep-right is expressed in the dominant world axis rather than from the
+  // continuously rotating vector to a waypoint. That lets clearance build
+  // over several ticks instead of alternating sides as the actor offsets.
+  const lateral = Math.abs(forwardX) >= Math.abs(forwardY)
+    ? { x: 0, y: Math.sign(forwardX) || 1 }
+    : { x: -Math.sign(forwardY) || -1, y: 0 };
+  const waypoint = c.path?.[c.pathIdx] || { x: nx, y: ny };
+  const candidates = [
+    { forward: 0, side: 1 },
+    { forward: 0.6, side: 0.8 },
+    { forward: 0, side: -1 },
+    { forward: 0.6, side: -0.8 },
+  ].map((candidate, order) => {
+    const x = c.x + (forwardX * candidate.forward + lateral.x * candidate.side) * length;
+    const y = c.y + (forwardY * candidate.forward + lateral.y * candidate.side) * length;
+    return {
+      x,
+      y,
+      order,
+      goalDistance: Math.hypot(waypoint.x - x, waypoint.y - y),
+    };
+  }).sort((a, b) => a.goalDistance - b.goalDistance || a.order - b.order);
+  for (const candidate of candidates) {
+    // Pure lateral comes first: at a 0.30-tile head-on floor, even a small
+    // forward component would put the candidate inside the hard radius and
+    // make both actors reject every tick.
+    const sx = candidate.x;
+    const sy = candidate.y;
+    if (!canStepCitizen(c, sx, sy) || trafficConflict(c, sx, sy)) continue;
+    reserveCitizenStep(c, sx, sy);
+    return { x: sx, y: sy, trafficWait: true };
+  }
+  return null;
+}
+
+function noteCitizenTrafficWait(c) {
+  c._stuckTicks = Math.min(600, (c._stuckTicks || 0) + 1);
+  // A live local queue is not unreachable topology. Keep the route intent and
+  // prevent the universal watchdog from blacklisting a building or releasing
+  // an assignment merely because another body currently has right of way.
+  c._wdTicks = 0;
+  c._wdBest = Math.hypot(
+    (c._requestedTx ?? c.tx ?? c.x) - c.x,
+    (c._requestedTy ?? c.ty ?? c.y) - c.y,
+  );
 }
 
 function replanToRequestedTarget(c) {
   const tx = Math.round(c._requestedTx ?? c.tx ?? c.x);
   const ty = Math.round(c._requestedTy ?? c.ty ?? c.y);
   pathTo(c, tx, ty);
+}
+
+function routeSegmentWalkable(fromX, fromY, toX, toY) {
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const steps = Math.max(Math.abs(dx), Math.abs(dy));
+  if (steps === 0) return isWalkable(toX, toY);
+  let priorX = fromX;
+  let priorY = fromY;
+  for (let step = 1; step <= steps; step++) {
+    const x = Math.round(fromX + dx * step / steps);
+    const y = Math.round(fromY + dy * step / steps);
+    if (x === priorX && y === priorY) continue;
+    if (!isWalkable(x, y)) return false;
+    if (
+      x !== priorX
+      && y !== priorY
+      && (!isWalkable(x, priorY) || !isWalkable(priorX, y))
+    ) return false;
+    priorX = x;
+    priorY = y;
+  }
+  return true;
+}
+
+function remainingCitizenRouteWalkable(c) {
+  if (!c.path || c.pathIdx >= c.path.length) return true;
+  let x = Math.round(c.x);
+  let y = Math.round(c.y);
+  for (let index = c.pathIdx; index < c.path.length; index++) {
+    const waypoint = c.path[index];
+    if (!routeSegmentWalkable(x, y, waypoint.x, waypoint.y)) return false;
+    x = waypoint.x;
+    y = waypoint.y;
+  }
+  return true;
 }
 
 // ── Homes & schedule (Phase 3a) ─────────────────────────────────────
@@ -898,45 +1169,22 @@ function activeMovementDirection(c) {
 }
 
 function separationAxis(a, b, dx, dy, d2, pass) {
-  const ad = activeMovementDirection(a);
-  const bd = activeMovementDirection(b);
-  if (ad && bd && ad.x * bd.x + ad.y * bd.y < -0.45) {
-    // Opposing walkers need a deterministic passing lane. Pure radial
-    // separation makes a one-tile doorway an permanent tug-of-war; the
-    // perpendicular lane lets one pass on each half of the tile.
-    const travelX = ad.x - bd.x;
-    const travelY = ad.y - bd.y;
-    const sign = (a.actorId || 0) <= (b.actorId || 0) ? 1 : -1;
-    // Lock the lane to the dominant travel axis. Recomputing a continuously
-    // rotated perpendicular while the walkers are offset introduces a small
-    // backwards component that can exactly cancel forward motion in a door.
-    if (Math.abs(travelX) >= Math.abs(travelY)) {
-      return { x: 0, y: sign, perpendicular: true };
-    }
-    return {
-      x: sign,
-      y: 0,
-      perpendicular: true,
-    };
-  }
   if (d2 >= 0.0004) {
     const distance = Math.sqrt(d2);
-    return { x: dx / distance, y: dy / distance, perpendicular: false };
+    return { x: dx / distance, y: dy / distance };
   }
   const angle = (
     ((a.actorId || 0) * 37 + (b.actorId || 0) * 53 + pass * 97) % 360
   ) * Math.PI / 180;
-  return { x: Math.cos(angle), y: Math.sin(angle), perpendicular: false };
+  return { x: Math.cos(angle), y: Math.sin(angle) };
 }
 
 function applyCitizenSeparation() {
   const cs = G.citizens;
-  const r2 = PERSONAL_SPACE * PERSONAL_SPACE;
-  const opposingLookahead = 1.25;
-  const opposingLookahead2 = opposingLookahead * opposingLookahead;
+  const r2 = HARD_ACTOR_SPACE * HARD_ACTOR_SPACE;
   const bucketSize = 1;
   const bucketStride = MAP_W + 8;
-  for (let pass = 0; pass < 4; pass++) {
+  for (let pass = 0; pass < 8; pass++) {
     const buckets = new Map();
     for (let index = 0; index < cs.length; index++) {
       const citizen = cs[index];
@@ -963,16 +1211,8 @@ function applyCitizenSeparation() {
             const dy = a.y - b.y;
             const d2 = dx * dx + dy * dy;
             const axis = separationAxis(a, b, dx, dy, d2, pass);
-            let totalPush;
-            if (axis.perpendicular) {
-              if (d2 >= opposingLookahead2) continue;
-              const lateralGap = Math.abs(dx * axis.x + dy * axis.y);
-              if (lateralGap >= PERSONAL_SPACE) continue;
-              totalPush = PERSONAL_SPACE - lateralGap + 0.0001;
-            } else {
-              if (d2 >= r2) continue;
-              totalPush = PERSONAL_SPACE - Math.sqrt(d2) + 0.0001;
-            }
+            if (d2 >= r2) continue;
+            const totalPush = HARD_ACTOR_SPACE - Math.sqrt(d2) + 0.0001;
             const halfPush = totalPush * 0.5;
             const nextA = {
               x: a.x + axis.x * halfPush,
@@ -1004,7 +1244,22 @@ function applyCitizenSeparation() {
 }
 
 export function updateCitizens() {
+  // Keep wait age tied to net route progress after the shared separation
+  // pass. Measuring only the actor's private movement branch made an orbiting
+  // crowd look productive even when separation returned everyone to the same
+  // place, so right of way never accumulated where it was actually needed.
+  const trafficProgressStart = new Map();
+  for (const citizen of G.citizens) {
+    if (!isActivelyMoving(citizen)) continue;
+    const gx = citizen._requestedTx ?? citizen.tx ?? citizen.x;
+    const gy = citizen._requestedTy ?? citizen.ty ?? citizen.y;
+    trafficProgressStart.set(citizen, {
+      distance: Math.hypot(gx - citizen.x, gy - citizen.y),
+      wait: citizen._stuckTicks || 0,
+    });
+  }
   for (const c of G.citizens) {
+    pruneExpiredNoGo(c);
     const raidActive = G.enemies.length > 0;
     if (c.activity.kind === 'sheltered') {
       if (raidActive && citizenIsIndoors(c)) {
@@ -1141,6 +1396,15 @@ export function updateCitizens() {
 
     // ── Universal progress watchdog: no measurable progress toward the
     // active goal for ~120 ticks -> give up cleanly instead of orbiting.
+    // A service approach is an arrival area, not an exact standing pixel.
+    // Personal-space correction may keep a citizen a few hundredths from the
+    // authored tile; accept the real adjacent arrival before the generic
+    // watchdog can reinterpret that occupied slot as an empty pantry.
+    if (
+      c.activity.kind === 'walk_to_eat'
+      && foodTargetStillValid(c)
+      && citizenAtFoodTarget(c)
+    ) clearPath(c);
     watchProgress(c);
     if (c.activity.kind === 'walk_to_eat' && !foodTargetStillValid(c)) {
       c._foodTarget = null;
@@ -1191,12 +1455,15 @@ export function updateCitizens() {
     // Follow path if we have one
     if (c.path && c.pathIdx < c.path.length) {
       // Building topology changes are rare, while a delayed collision with a
-      // newly blocked compressed segment is expensive. Replan immediately on
-      // an epoch change rather than validating only the sparse waypoints.
+      // newly blocked compressed segment is expensive. Validate every tile in
+      // each remaining compressed segment; unrelated construction keeps the
+      // authored route, while a genuine intersection replans immediately.
       if (c._pathEpoch !== (G.obstacleEpoch || 0)) {
         c._pathEpoch = G.obstacleEpoch || 0;
-        replanToRequestedTarget(c);
-        continue;
+        if (!remainingCitizenRouteWalkable(c)) {
+          replanToRequestedTarget(c);
+          continue;
+        }
       }
       const wp = c.path[c.pathIdx];
       if (!isWalkable(wp.x, wp.y)) {
@@ -1210,55 +1477,56 @@ export function updateCitizens() {
         c.y = wp.y;
         c.pathIdx++;
       } else {
-        let spd = c.speed * getSeasonData().speedMult * getCitizenSpeedMult();
-        // Road speed bonus
-        const gx = Math.round(c.x), gy = Math.round(c.y);
-        if (gx >= 0 && gx < MAP_W && gy >= 0 && gy < MAP_H) {
-          const b = G.buildingGrid[gy]?.[gx];
-          if (b && b.type === 'road') spd *= 2;
-        }
-        // Hunger speed penalty: up to -40% at hunger 100, kicks in above 60
-        if (c.hunger > 60) {
-          const penalty = Math.min(0.4, (c.hunger - 60) / 100);
-          spd *= (1 - penalty);
-        }
-        // Exhaustion: below 30 energy, up to -25% speed (Phase 3a)
-        if ((c.rest ?? 100) < 30) spd *= 0.75 + ((c.rest ?? 100) / 30) * 0.25;
-        if (c._fleeing) spd *= 1.35; // panic sprint — flight should read as flight
+        const spd = citizenTravelSpeed(c);
         const step = Math.min(spd, d);
         const nx = c.x + (dx/d) * step;
         const ny = c.y + (dy/d) * step;
         const beforeX = c.x, beforeY = c.y;
-        if (shouldYieldToCitizen(c, nx, ny)) {
-          // Lower actor IDs have right of way through a contested crossing.
-        } else if (canStepCitizen(c, nx, ny)) {
-          c.x = nx;
-          c.y = ny;
+        const directTerrainStep = canStepCitizen(c, nx, ny);
+        const resolvedStep = resolveCitizenStep(c, nx, ny);
+        if (resolvedStep) {
+          c.x = resolvedStep.x;
+          c.y = resolvedStep.y;
           // Consume the waypoint on the same tick that reaches it. The old
           // 0.15-tile early cutoff both cut visible corners and inserted an
           // idle simulation beat between path segments.
-          if (step >= d - 0.000001) {
-            c.x = wp.x;
-            c.y = wp.y;
+          const waypointDistance = Math.hypot(c.x - wp.x, c.y - wp.y);
+          if (waypointDistance <= (resolvedStep.lane ? 0.23 : 0.005)) {
+            if (!resolvedStep.lane) {
+              c.x = wp.x;
+              c.y = wp.y;
+            }
             c.pathIdx++;
           }
           // Render reads this for walk-row hysteresis: paths empty for a
           // single frame between arrival and the next repath, and raw
           // path-presence flapped the walk/idle rows (visible flicker).
           c._movedAt = G.gameTick;
-          if (Math.abs(dx) > 0.04 || Math.abs(dy) > 0.04) {
-            c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
-            c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
+          const actualDx = c.x - beforeX;
+          const actualDy = c.y - beforeY;
+          if (Math.abs(actualDx) > 0.01 || Math.abs(actualDy) > 0.01) {
+            c.faceX = actualDx > 0.01 ? 1 : actualDx < -0.01 ? -1 : 0;
+            c.faceZ = actualDy > 0.01 ? 1 : actualDy < -0.01 ? -1 : 0;
           }
           const moved = Math.hypot(c.x - beforeX, c.y - beforeY);
-          const progressMoved = Math.hypot(c.x - (c._lastPathX ?? c.x), c.y - (c._lastPathY ?? c.y));
-          if (moved < 0.001 || progressMoved < 0.01) c._stuckTicks = (c._stuckTicks || 0) + 1;
-          else {
-            c._stuckTicks = 0;
-            c._lastPathX = c.x;
-            c._lastPathY = c.y;
+          if (resolvedStep.trafficWait) {
+            // Lateral clearance is useful movement, but it is not evidence
+            // that the authored route or food store is unreachable.
+            noteCitizenTrafficWait(c);
+          } else {
+            const lastPathX = Number.isFinite(c._lastPathX) ? c._lastPathX : beforeX;
+            const lastPathY = Number.isFinite(c._lastPathY) ? c._lastPathY : beforeY;
+            const progressMoved = Math.hypot(c.x - lastPathX, c.y - lastPathY);
+            if (moved < 0.001 || progressMoved < 0.01) c._stuckTicks = (c._stuckTicks || 0) + 1;
+            else {
+              c._stuckTicks = 0;
+              c._lastPathX = c.x;
+              c._lastPathY = c.y;
+            }
+            if ((c._stuckTicks || 0) > 45) replanToRequestedTarget(c);
           }
-          if ((c._stuckTicks || 0) > 45) replanToRequestedTarget(c);
+        } else if (directTerrainStep) {
+          noteCitizenTrafficWait(c);
         } else {
           replanToRequestedTarget(c);
         }
@@ -1314,6 +1582,15 @@ export function updateCitizens() {
   }
   // After all movement — apply personal-space separation
   applyCitizenSeparation();
+  for (const [citizen, start] of trafficProgressStart) {
+    if (!G.citizens.includes(citizen) || !isActivelyMoving(citizen)) continue;
+    const gx = citizen._requestedTx ?? citizen.tx ?? citizen.x;
+    const gy = citizen._requestedTy ?? citizen.ty ?? citizen.y;
+    const distance = Math.hypot(gx - citizen.x, gy - citizen.y);
+    citizen._stuckTicks = distance < start.distance - 0.005
+      ? 0
+      : Math.min(600, start.wait + 1);
+  }
 }
 
 function runStateMachine(c) {

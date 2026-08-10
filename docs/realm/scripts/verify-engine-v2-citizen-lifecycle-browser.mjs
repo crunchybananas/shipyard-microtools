@@ -46,12 +46,12 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const ownership = await import('./js/citizen-ownership.js?realm=191');
-    const presentation = await import('./js/citizen-presentation.js?realm=191');
-    const inventory = await import('./js/building-inventory.js?realm=191');
-    const render = await import('./js/render.js?realm=191');
-    const state = await import('./js/state.js?realm=191');
-    const ui = await import('./js/ui.js?realm=191');
+    const ownership = await import('./js/citizen-ownership.js?realm=192');
+    const presentation = await import('./js/citizen-presentation.js?realm=192');
+    const inventory = await import('./js/building-inventory.js?realm=192');
+    const render = await import('./js/render.js?realm=192');
+    const state = await import('./js/state.js?realm=192');
+    const ui = await import('./js/ui.js?realm=192');
     const g = window.G;
 
     const requireCondition = (condition, message) => {

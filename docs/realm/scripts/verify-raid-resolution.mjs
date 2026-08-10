@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, createResourceStock, setSeed } from '../js/state.js?realm=191';
-import { generateWorld } from '../js/world.js?realm=191';
-import { checkRaids } from '../js/economy.js?realm=191';
-import { updateRaidSummary } from '../js/raid-summary.js?realm=191';
+import { G, createResourceStock, setSeed } from '../js/state.js?realm=192';
+import { generateWorld } from '../js/world.js?realm=192';
+import { checkRaids } from '../js/economy.js?realm=192';
+import { updateRaidSummary } from '../js/raid-summary.js?realm=192';
 
 setSeed(48117);
 generateWorld();

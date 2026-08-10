@@ -3,24 +3,24 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=191';
-import { makeCitizen } from '../js/world.js?realm=191';
-import { placeBuilding, updateProduction } from '../js/economy.js?realm=191';
-import { updateCitizens } from '../js/citizens.js?realm=191';
+} from '../js/state.js?realm=192';
+import { makeCitizen } from '../js/world.js?realm=192';
+import { placeBuilding, updateProduction } from '../js/economy.js?realm=192';
+import { updateCitizens } from '../js/citizens.js?realm=192';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=191';
+} from '../js/citizen-ownership.js?realm=192';
 import {
   assignCitizenResidence,
   citizenHasValidResidence,
   citizenIsIndoors,
   houseResidentCapacity,
   residentsForHouse,
-} from '../js/residences.js?realm=191';
-import { isBuildingOperational } from '../js/building-operation.js?realm=191';
-import { depositFood, storedFood, withdrawFood } from '../js/building-inventory.js?realm=191';
+} from '../js/residences.js?realm=192';
+import { isBuildingOperational } from '../js/building-operation.js?realm=192';
+import { depositFood, storedFood, withdrawFood } from '../js/building-inventory.js?realm=192';
 
 function resetCore() {
   resetCitizenOwnershipRuntime();

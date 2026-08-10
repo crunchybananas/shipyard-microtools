@@ -2,36 +2,36 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=191';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=191';
-import { getWonderReport } from './wonder.js?realm=191';
-import { panCameraTo } from './render.js?realm=191';
-import { dispatch } from './commands.js?realm=191';
-import { missions } from './missions.js?realm=191';
-import { getActiveScenario } from './scenarios.js?realm=191';
-import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=191';
-import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=191';
-import { saveGame, loadGame } from './save.js?realm=191';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=191';
-import { notify } from './notifications.js?realm=191';
-import { TRADE_PARTNERS } from './trade.js?realm=191';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=192';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=192';
+import { getWonderReport } from './wonder.js?realm=192';
+import { panCameraTo } from './render.js?realm=192';
+import { dispatch } from './commands.js?realm=192';
+import { missions } from './missions.js?realm=192';
+import { getActiveScenario } from './scenarios.js?realm=192';
+import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=192';
+import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=192';
+import { saveGame, loadGame } from './save.js?realm=192';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=192';
+import { notify } from './notifications.js?realm=192';
+import { TRADE_PARTNERS } from './trade.js?realm=192';
 import {
   citizenStaffingCapacity,
   onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=191';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=191';
-import { residentsForHouse } from './residences.js?realm=191';
-import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=191';
+} from './citizen-ownership.js?realm=192';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=192';
+import { residentsForHouse } from './residences.js?realm=192';
+import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=192';
 import {
   authoredBuildingCount,
   foodCapacity,
   foodStores,
   isFoodStore,
   storedFood,
-} from './building-inventory.js?realm=191';
-import { recruitmentStatus } from './military.js?realm=191';
-import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=191';
+} from './building-inventory.js?realm=192';
+import { recruitmentStatus } from './military.js?realm=192';
+import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=192';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,

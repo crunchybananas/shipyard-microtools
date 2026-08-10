@@ -4,8 +4,8 @@
 // profession, assignment, and activity. Buildings never own worker arrays;
 // staffing is a deterministic derived view of citizen assignments.
 
-import { G, BUILDINGS } from './state.js?realm=191';
-import { emit, off, on } from './bus.js?realm=191';
+import { G, BUILDINGS } from './state.js?realm=192';
+import { emit, off, on } from './bus.js?realm=192';
 
 export const CONSTRUCTION_STAFF_LIMIT = 2;
 
@@ -544,6 +544,19 @@ export function findBuildingByLocator(x, y) {
   return matches[0];
 }
 
+function clearCommandWorkIntent(citizen) {
+  citizen.workTarget = null;
+  citizen.path = null;
+  citizen.pathIdx = 0;
+  delete citizen._requestedTx;
+  delete citizen._requestedTy;
+  citizen._pathGoal = null;
+  citizen._pathStartedAt = null;
+  citizen._stuckTicks = 0;
+  citizen._wdBest = null;
+  citizen._wdTicks = 0;
+}
+
 export function commandAssignCitizen(actorId, x, y) {
   const citizen = findCitizenByActorId(actorId);
   const building = findBuildingByLocator(x, y);
@@ -553,10 +566,9 @@ export function commandAssignCitizen(actorId, x, y) {
     reason: 'player-command',
   });
   if (!changed) return { ok: false, reason: 'already-assigned' };
+  clearCommandWorkIntent(citizen);
   transitionCitizenActivity(citizen, 'walk_to_work', 'player-command');
   citizen.activityTimer = 0;
-  citizen.path = null;
-  citizen.pathIdx = 0;
   return { ok: true };
 }
 
@@ -564,10 +576,9 @@ export function commandReleaseCitizen(actorId) {
   const citizen = findCitizenByActorId(actorId);
   const changed = releaseCitizenAssignment(citizen, 'player-command');
   if (!changed) return { ok: false, reason: 'not-assigned' };
+  clearCommandWorkIntent(citizen);
   transitionCitizenActivity(citizen, 'idle', 'player-command');
   citizen.activityTimer = 0;
-  citizen.path = null;
-  citizen.pathIdx = 0;
   return { ok: true };
 }
 

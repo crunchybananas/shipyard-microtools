@@ -15,7 +15,7 @@ import {
   ENEMY_VARIANTS,
   enemyAtlasFrameRect,
   enemyAtlasRowIndex,
-} from '../js/enemy-sprite-contract.js?realm=191';
+} from '../js/enemy-sprite-contract.js?realm=192';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const packageRoot = join(root, 'assets/sprites/enemies-source/output');
