@@ -7,6 +7,7 @@
   <meta name="description" content="ABYME: an island within an island. A Myst-inspired first-person mystery built from pure web tech — a world synthesized almost entirely in code, with a single real voice at the bottom of it.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏝️</text></svg>">
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.webmanifest">
   <script type="importmap">
     {
       "imports": {
@@ -104,6 +105,15 @@
     <label class="set-row set-check">driftwood mode
       <input type="checkbox" id="set-drift">
     </label>
+    <label class="set-row">reading pace
+      <input type="range" id="set-pace" min="1" max="2" step="0.5">
+    </label>
+    <label class="set-row">letter size
+      <input type="range" id="set-text" min="1" max="1.3" step="0.15">
+    </label>
+    <label class="set-row set-check">calm the flashes
+      <input type="checkbox" id="set-calm">
+    </label>
     <div class="set-note">driftwood: a gentler flame — softer glow, fewer pixels, kinder to the battery</div>
   </div>
 
@@ -135,6 +145,7 @@
       <div class="fin-line1">the tide brought you back</div>
       <h1>A B Y M E</h1>
       <div class="fin-line2">an island within an island</div>
+      <div class="fin-coda"></div>
       <button id="btn-again" class="title-btn">begin again</button>
     </div>
   </div>

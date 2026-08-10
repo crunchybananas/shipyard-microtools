@@ -391,6 +391,24 @@ const A = {
   leitStrum() {
     LEIT.forEach((f, i) => this.pluck(f, i * 0.085, 0.2 - i * 0.018, 2.8));
   },
+
+  // #137 (AAA-B3): each of HIS ROUNDS voices the theme on its own instrument — the
+  // same five notes, three more hands (the WIND round IS the music box, so it plays
+  // itself). Quiet, under the beds; the fourth bends down the way his hands bent it.
+  themeRound(kind) {
+    if (!this._running()) return;
+    const P = {
+      Moor:  { oct: 0.25, vol: 0.16, dec: 1.1, gap: 0.55 },   // low wood — dory-hull knocks
+      Log:   { oct: 2,    vol: 0.07, dec: 0.35, gap: 0.27 },  // dry exact ticks — pen on a return
+      Light: { oct: 1,    vol: 0.11, dec: 6.0, gap: 0.9 },    // warm glass — long-held
+    }[kind];
+    if (!P) return;
+    this._lastRound = { kind, notes: [] };
+    LEIT.forEach((f, i) => {
+      this.pluck(f * P.oct * (i === 3 ? 0.985 : 1), i * P.gap, P.vol, P.dec);
+      this._lastRound.notes.push(i);
+    });
+  },
   deny() {
     if (!this._running()) return;
     const t0 = ctx.currentTime;
@@ -647,12 +665,17 @@ const A = {
   // deeper, and at the source it does not come at all (the box's #51 behavior, in the score).
   // Endless, non-repeating, ~7 nodes; musicTo() keeps its API — it RETARGETS one persistent
   // graph instead of crossfading buffers.
+  // #137 (AAA-B3): each era ARRANGES the same five notes its own way — `arr` is the
+  // phrasing: stated (in order, even, the box's own voice), rising (upward figures,
+  // quicker — wonder), measured (clipped metronomic pairs — the inspection), sinking
+  // (downward, slowest — the last winter). oct lifts the figure's octave; step is the
+  // base note spacing (s); jitter humanizes it (0 = quantized exactly).
   _ERAS: [null,
-    { root: 82.41, cutoff: 950, det: 4, gapLo: 9, gapHi: 15, breath: 16, vol: 1.00 },  // L1 E2 — warm gold
-    { root: 98.00, cutoff: 620, det: 7, gapLo: 11, gapHi: 17, breath: 19, vol: 0.95 }, // L2 G2 — sodium green
-    { root: 110.0, cutoff: 420, det: 11, gapLo: 14, gapHi: 21, breath: 23, vol: 0.90 },// L3 A2 — jaundice
-    { root: 73.42, cutoff: 300, det: 16, gapLo: 17, gapHi: 25, breath: 28, vol: 0.85 },// L4 D2 — isolation blue
-    { root: 65.41, cutoff: 220, det: 22, gapLo: 22, gapHi: 31, breath: 34, vol: 0.80 },// L5 C2 — dead violet
+    { root: 82.41, cutoff: 950, det: 4, gapLo: 9, gapHi: 15, breath: 16, vol: 1.00, arr: 'stated', oct: 1, step: 1.5, jitter: 0.5 },   // L1 E2 — the last day
+    { root: 98.00, cutoff: 620, det: 7, gapLo: 11, gapHi: 17, breath: 19, vol: 0.95, arr: 'rising', oct: 2, step: 1.0, jitter: 0.6 },  // L2 G2 — the arrival years
+    { root: 110.0, cutoff: 420, det: 11, gapLo: 14, gapHi: 21, breath: 23, vol: 0.90, arr: 'measured', oct: 1, step: 1.2, jitter: 0 }, // L3 A2 — the inspection years
+    { root: 73.42, cutoff: 300, det: 16, gapLo: 17, gapHi: 25, breath: 28, vol: 0.85, arr: 'sinking', oct: 1, step: 2.4, jitter: 0.9 },// L4 D2 — the last winter
+    { root: 65.41, cutoff: 220, det: 22, gapLo: 22, gapHi: 31, breath: 34, vol: 0.80, arr: 'sinking', oct: 1, step: 3.0, jitter: 1.2 },// L5 C2 — the near-dark floor
   ],
   _buildBed() {
     const bed = { master: ctx.createGain() };
@@ -700,19 +723,31 @@ const A = {
     const lv = this._musicLevel || 1;
     const era = this._ERAS[Math.max(1, Math.min(5, lv))];
     const depth = Math.max(0, lv - 1);
-    const T = (era.root / 82.41) / 2;                       // into a low, bed-appropriate octave
-    const start = (Math.random() * 5) | 0;
-    const len = Math.max(2, 3 + ((Math.random() * 2) | 0) - (depth > 1 ? 1 : 0));
+    const T = (era.root / 82.41) / 2 * (era.oct || 1);      // era octave over the bed register
+    // #137: the era chooses the PHRASING of the same five notes
+    let seq;
+    switch (era.arr) {
+      case 'stated':   seq = [0, 1, 2, 3, 4]; break;                                   // the box's own order
+      case 'rising':   seq = [0, 1, 2, (Math.random() * 5) | 0]; break;                // upward figure + a reach
+      case 'measured': seq = [(Math.random() * 5) | 0, (Math.random() * 5) | 0]; break;// clipped pairs, exact
+      default: {        // sinking — downward from wherever it starts
+        const s0 = 2 + ((Math.random() * 3) | 0);
+        seq = [s0, Math.max(0, s0 - 1), Math.max(0, s0 - 2)];
+      }
+    }
+    const depthCut = depth > 1 && era.arr !== 'stated' && era.arr !== 'measured' ? seq.length - 1 : seq.length;   // measured pairs ARE the sparseness
+    this._lastTheme = { arr: era.arr, notes: [] };          // structural probe (headless verify)
     let when = 0;
-    for (let k = 0; k < len; k++) {
-      const idx = (start + k) % 5;
+    for (let k = 0; k < depthCut; k++) {
+      const idx = seq[k];
       let f = LEIT[idx] * T;
       if (idx === 3) {                                       // the FOURTH note carries the wound
         if (lv >= 4) continue;                               // at the source it does not come
         if (depth) f *= 1 - 0.015 * depth;                   // a shade flat, flatter deeper
       }
       this._bedNote(f, when, 0.10 - depth * 0.012, 5.5 + depth * 0.8);
-      when += 1.6 + Math.random() * 1.4 + depth * 0.5;
+      this._lastTheme.notes.push(idx);
+      when += (era.step ?? 1.6) + Math.random() * (era.jitter ?? 1.4) + depth * 0.3;
     }
     // #49: once the keeper's song has been accepted (stem 6), the island's own music
     // carries the sixth — fragments sometimes resolve onto the B the pentatonic never had

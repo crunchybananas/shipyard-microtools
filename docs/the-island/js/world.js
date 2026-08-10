@@ -58,15 +58,24 @@ export const W = {
     hatchOpen: false,
     plumbTaken: false,
     plumbHung: false,
+    carried: false,       // the twist's embrace happened (the pair exists; #53 figures key off this)
     dove: false,          // level 2: one recursion down
     climbing: false,      // one-way ascent mode: reached the bottom, now rising back up (#12)
     keeperSilenced: false,// the keeper's last words spoken on the first ascent; then silence (#12)
     returned: false,      // climbed all the way back to the surface: the return left its mark (#12)
     bellRung: false,
+    // fire 35: EVERY flag the code reads gets a default. An absent flag in a boolean
+    // chain leaks undefined — `(a || undefined) && b` — and three.js renders
+    // visible:undefined (it only culls on === false). The beach figure taught us.
+    readGlass: false, phialTaken: false, phialDried: false, keeperSong: false,
+    tideFigureSeen: false, watcherSeen: false, keeperRose: false, beamDeepSeen: false,
+    beamFarewell: false, roundMoor: false, roundLog: false, roundLight: false,
+    roundWind: false,
   },
 
   stems: 0,              // musical layers earned (0..5)
   inventory: [],         // 'ruler' | 'lens' | 'plumb'
+  recDisp: {},          // #132: the inspector's record — per-artifact null | 'carried' | 'filed' | 'kept'
   journal: [],           // [{text, sketch}]
   onceKeys: [],          // one-time cinematics already played
   readKeys: [],          // lore fragment ids the player has READ (the unfolding story; saved)
@@ -168,10 +177,10 @@ const _grade = G(0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // scratch, mutated in place
 // (sodium green, jaundice gold) draining into cold isolation, then a dead violet
 // floor. Depth itself is supplied by the dark multiplier, not by muddy casts.
 const ERA_CASTS = [
-  null,                       // L1 — surface, no cast
-  new THREE.Color(0x8aa830), // L2 — sodium streetlight green-yellow (false comfort)
-  new THREE.Color(0xc29a1c), // L3 — sickly jaundice / fluorescent gold
-  new THREE.Color(0x2f6cc8), // L4 — cold isolation blue
+  null,                       // L1 — the last day: surface, no cast
+  new THREE.Color(0x74a83e), // L2 — the arrival years: living warm green (wonder, not sickness)
+  new THREE.Color(0x8f9aa6), // L3 — the inspection years: steel grey-blue (measurement)
+  new THREE.Color(0x2f6cc8), // L4 — the last winter: cold isolation blue
   new THREE.Color(0x573a72), // L5+ — dead violet, the keeper's near-dark floor
 ];
 // ---- SEA-STRATA level-areas (loop #117): the canonical per-level descriptor table ----
@@ -182,16 +191,36 @@ const ERA_CASTS = [
 //   tide > 1 RAISES the sea ABOVE high-water (waterY = -TIDE_DROP*(1-tide), so tide 1.35
 //   ≈ +1.5m). The spawn-override + tide-raise are wired with each level's content; this
 //   table is the data they read. Indexed by W.level (1..MAX_DEPTH); [0] unused.
+// The strata are not depths — they are ERAS of the keeper's tenancy (AAA-A1, #129):
+// diving is remembering; the island drowns in order, and the order is his. Each era
+// also owns what the water UNCOVERED of the deeper past during it (the founders'
+// stone at L2, the congregation's capitals at L3). Story/art/audio systems key off
+// era.key; era.name is the designers' shared vocabulary (never shown raw in UI).
 export const LEVELS = [
   null,
-  { id: 'surface',  region: null,       spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.0,  encounter: 'songbird' },
-  { id: 'shallows', region: 'region2',  spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.35, encounter: 'tideFigure' },
-  { id: 'midwater', region: 'region3',  spawn: { pos: [90, 0, 30],       yaw: 3.7,  pitch: -0.05 }, tide: 1.65, encounter: 'watcher' },
-  { id: 'source',   region: 'region4',  spawn: { pos: [-82.8, 0, -41.4], yaw: 2.19, pitch: 0.02 },  tide: 1.9,  encounter: 'keeper' },
+  { id: 'surface',  era: { key: 'lastday',    name: 'the last day' },        region: null,       spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.0,  encounter: 'songbird' },
+  { id: 'shallows', era: { key: 'arrival',    name: 'the arrival years' },   region: 'region2',  spawn: { pos: [1.5, 0, -105.5],  yaw: 2.19, pitch: 0.03 },  tide: 1.35, encounter: 'tideFigure' },   // #135: two meters seaward — the fronds frame the lighthouse instead of walling it
+  { id: 'midwater', era: { key: 'inspection', name: 'the inspection years' }, region: 'region3', spawn: { pos: [90, 0, 30],       yaw: 1.32, pitch: -0.07 }, tide: 1.65, encounter: 'watcher' },   // #135: arrive facing the flooded channel — buoy, drowned gap, the far light; the cairn is found on the turn
+  { id: 'source',   era: { key: 'lastwinter', name: 'the last winter' },     region: 'region4',  spawn: { pos: [-82.8, 0, -41.4], yaw: 2.19, pitch: 0.02 },  tide: 1.9,  encounter: 'keeper' },
 ];
 
 const _BIAS_KEYS = ['skyTop', 'skyHorizon', 'sunCol', 'hemiSky', 'hemiGnd', 'fog', 'water', 'waterShallow'];
 const _LUM_FLOOR = 0.045; // no channel crushes to unresolvable black (night × depth)
+
+// The COLOR SCRIPT (#136, AAA-B2): per-era grading rows replacing the old linear
+// depth formulas — the same pipeline, art-directed per era. Read with loop/ERAS.md:
+//   arrival    — warm-green WONDER: hue-rich, barely desaturated, gently dim
+//   inspection — steel-grey MEASUREMENT: the desat does the talking, cast goes cold
+//   lastwinter — near-MONOCHROME cold: heaviest desat, darkest, thickest air
+// dark values are deliberately spread (0.93/0.80/0.66) so the eras stay separable
+// in pure grayscale luminance too (the colorblind-safe requirement).
+const ERA_GRADES = [
+  null, null,                                              // [0] unused, L1 identity
+  { tint: 0.22, desat: 0.07, dark: 0.93, fogMul: 1.22 },   // L2 — the arrival years
+  { tint: 0.30, desat: 0.34, dark: 0.80, fogMul: 1.50 },   // L3 — the inspection years
+  { tint: 0.28, desat: 0.55, dark: 0.66, fogMul: 1.80 },   // L4 — the last winter
+  { tint: 0.55, desat: 0.50, dark: 0.50, fogMul: 2.05 },   // L5+ — the near-dark floor
+];
 
 function gradeBias(g, level) {
   const d = Math.max(0, (level | 0) - 1);
@@ -201,9 +230,10 @@ function gradeBias(g, level) {
   // so the hue actually shifts, THEN desaturate the tinted result toward grey,
   // THEN darken. (The old order desaturated first and killed the hue before the
   // cast could speak — a neutral wall landed one 8-bit value off pure grey.)
-  const tint = Math.min(0.18 * d, 0.6);
-  const desat = Math.min(0.12 * d, 0.5);
-  const dark = Math.max(1 - 0.12 * d, 0.4);
+  const row = ERA_GRADES[Math.min(d + 1, ERA_GRADES.length - 1)];
+  const tint = row.tint;
+  const desat = row.desat;
+  const dark = row.dark;
   for (const key of _BIAS_KEYS) {
     const c = g[key];
     let r = lerp(c.r, cast.r, tint), gg = lerp(c.g, cast.g, tint), b = lerp(c.b, cast.b, tint);
@@ -218,7 +248,7 @@ function gradeBias(g, level) {
     c.r = r; c.g = gg; c.b = b;
   }
   g.sunInt *= dark;
-  g.fogDen *= 1 + 0.26 * d;                                // claustrophobia deepens
+  g.fogDen *= row.fogMul;                                  // claustrophobia, per era
   return g;
 }
 
@@ -270,13 +300,19 @@ export function save(player) {
 }
 
 export function load() {
+  let raw = null;
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return false;
     applySave(W, JSON.parse(raw)); // migrates old payloads, applies the field table
     W.playerPos = W.playerPos ? new THREE.Vector3(...W.playerPos) : null;
     return true;
-  } catch (_) { return false; }
+  } catch (_) {
+    // #140: a corrupt save fails safe to a fresh start — but the payload is
+    // PRESERVED (the first autosave would otherwise clobber the evidence ~12s in)
+    try { if (raw !== null) localStorage.setItem(SAVE_KEY + '-corrupt', raw); } catch (_2) { /* private mode */ }
+    return false;
+  }
 }
 
 export const hasSave = () => {

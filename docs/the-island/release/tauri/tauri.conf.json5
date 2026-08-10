@@ -1,0 +1,22 @@
+// Tauri wrap config (#141) — a thin shell over the static build. Owner-run:
+// `cargo install tauri-cli && cargo tauri build` (needs Rust + platform signing).
+// frontendDist points at the deployed static tree two levels up.
+{
+  productName: 'The Island — ABYME',
+  version: '1.0.0',
+  identifier: 'com.crunchybananas.abyme',
+  build: { frontendDist: '../../' },
+  app: {
+    windows: [{
+      title: 'The Island — ABYME',
+      width: 1440, height: 900, minWidth: 960, minHeight: 600,
+      fullscreen: false, resizable: true,
+    }],
+    security: { csp: null },
+  },
+  bundle: {
+    active: true,
+    targets: ['dmg', 'nsis'],
+    icon: ['../capsule_630x500.png'],
+  },
+}

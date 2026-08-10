@@ -1,0 +1,37 @@
+# The Island's release gate in CI (#139, AAA-C1): the 45-assertion full-game walk
+# + journal↔sketch coverage + the power budget, on every push touching the island.
+name: island-walk
+on:
+  push:
+    paths: ['docs/the-island/**']
+  pull_request:
+    paths: ['docs/the-island/**']
+jobs:
+  walk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+        with:
+          chrome-version: stable
+      - name: run the gate
+        env:
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
+        run: bash docs/the-island/tools/harness/run.sh
+      - name: capture fresh goldens for human eyes (no pixel hard-fail — headless GL
+          rasterization differs per OS; see tools/harness/README.md)
+        if: always()
+        run: |
+          mkdir -p /tmp/goldens
+          cp docs/the-island/loop/goldens/*.png /tmp/goldens/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: island-goldens
+          path: /tmp/goldens
+          if-no-files-found: ignore

@@ -100,6 +100,7 @@ export class Baker {
     this.normals = [];
     this.colors = [];
     this.uvs = [];
+    this.ranges = [];   // #34: per-add() vertex ranges + anchor, so buildChunks can bucket regionally
   }
 
   // geo: BufferGeometry, matrix: Matrix4, color: THREE.Color | (y01, worldPos)=>Color
@@ -107,6 +108,10 @@ export class Baker {
   add(geo, matrix, color) {
     const src = geo.index ? geo.toNonIndexed() : geo;
     const pos = src.attributes.position;
+    // #34: remember where this piece lands in the flat arrays + where it stands in the
+    // world (its matrix translation) — every attribute below appends in lockstep, so a
+    // range slices back out cleanly for the regional build.
+    this.ranges.push({ start: this.positions.length / 3, count: pos.count, x: matrix.elements[12], z: matrix.elements[14] });
     const nor = src.attributes.normal;
     const nm = new THREE.Matrix3().getNormalMatrix(matrix);
     const v = new THREE.Vector3(), n = new THREE.Vector3();
@@ -165,6 +170,44 @@ export class Baker {
     g.setAttribute('uv', new THREE.Float32BufferAttribute(this.uvs, 2));
     return g;
   }
+
+  // #34: the regional build — the same bake, bucketed by each piece's world anchor into
+  // grid cells so the merged statics can frustum-cull. Every vertex is byte-identical to
+  // build()'s output; only which mesh it lives in changes. Returns one geometry per
+  // non-empty cell.
+  buildChunks(cell = 120) {
+    const buckets = new Map();
+    for (const r of this.ranges) {
+      const k = Math.floor((r.x + 240) / cell) * 64 + Math.floor((r.z + 240) / cell);
+      if (!buckets.has(k)) buckets.set(k, []);
+      buckets.get(k).push(r);
+    }
+    const out = [];
+    for (const list of buckets.values()) {
+      let total = 0;
+      for (const r of list) total += r.count;
+      const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3);
+      const col = new Float32Array(total * 3), uv = new Float32Array(total * 2);
+      let off = 0;
+      for (const r of list) {
+        for (let i = 0; i < r.count * 3; i++) {
+          pos[off * 3 + i] = this.positions[r.start * 3 + i];
+          nor[off * 3 + i] = this.normals[r.start * 3 + i];
+          col[off * 3 + i] = this.colors[r.start * 3 + i];
+        }
+        for (let i = 0; i < r.count * 2; i++) uv[off * 2 + i] = this.uvs[r.start * 2 + i];
+        off += r.count;
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+      g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+      g.computeBoundingSphere();
+      out.push(g);
+    }
+    return out;
+  }
 }
 
 // Merge BufferGeometries into one non-indexed geometry (position + normal, and
@@ -205,4 +248,15 @@ export function vary(color, r, dh = 0.015, ds = 0.06, dl = 0.05) {
     clamp(hsl.l + (r() - 0.5) * dl, 0, 1)
   );
   return c;
+}
+
+
+// ---------------------------------------------------------------------------
+// #73: the minimal update scheduler. Per-entity animation kept accreting into
+// applyAtmosphere/Game.tick; content now registers a drive BESIDE its build code
+// and self-gates via when(W). main runs the list once per frame.
+export const DRIVES = [];
+export function addDrive(when, update) { DRIVES.push({ when, update }); }
+export function runDrives(W, dt, elapsed, ctx) {
+  for (const d of DRIVES) if (!d.when || d.when(W)) d.update(dt, elapsed, ctx);
 }

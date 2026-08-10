@@ -12,6 +12,595 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 42 — 2026-08-07 — #141: the door, prepared — EPIC AAA-C lands on its owner gates
+
+**Shipped:** release/ — everything the world-facing steps need, each gate one
+click. The itch path: the game IS the static build, so README.md carries the exact
+zip line (tools/loop/release excluded), upload settings (1280×800, fullscreen,
+mobile ON — touch shipped in #60), the CAPSULE (630×500 cut of the night-beam
+frame), a 1080p breach screenshot, and itch_page.md — canon-safe store copy that
+sells the drowned-island-as-time premise, the hands, the rounds, the record, and
+the shrinking shore without touching the twist, the endings, or biography.
+manifest.webmanifest ships linked (installable identity; NO service worker by
+design — Pages stays cache-honest; offline arrives with the wrap). The Tauri path:
+tauri/tauri.conf.json5 + build notes — a thin shell over the same files, owner-run
+(Rust toolchain + signing), acceptance = the walk green against the wrapped origin
+on macOS/Windows.
+
+**Evidence:** WALK PASS **45/45** with the manifest linked. Store copy audited
+against the canon rules (they're written INTO release/README.md so future edits
+inherit them).
+
+**EPIC AAA-C: all five children done** — #139 CI (harness in-repo; runner
+hardening in flight), #140 saves, #143 accessibility, #142 trailer (master with
+the owner), #141 release prep. What remains across the whole AAA campaign is
+OWNER-GATED by design: play the story overhaul, listen to the audio, sign the
+trailer shot list, click publish on itch, run the Tauri builds, and fire the next
+Bender texture round at will.
+
+**Debt:** CI's third hardening iteration (rAF unthrottle trio) rides fire 41's
+push — confirm the Actions tab goes green once.
+
+**Next tick suggestion:** owner playthrough. The board is empty again — and this
+time the game on it is the AAA plan's game.
+
+---
+
+## loop-fire 41 — 2026-08-07 — #142: the trailer, shot by the harness (AAA-C4)
+
+**Shipped:** tools/trailer/ — a 90-second draft master CAPTURED BY THE GATE ITSELF.
+trailer.mjs frame-steps the world deterministically (tick 1/24 + composer.render +
+screenshot per frame — the dolly never misses a mark, and the whole cut re-renders
+identically from the script): nine shots — golden beach open, the standing stones,
+the gauge at dawn, the kelp arrival wade, the swinging rope, the steel channel, THE
+BREACH filmed from the south beach ridge (the capitals shouldering out of pale water
+17m from the lens — the best frame this game has produced), the keeper's warm
+quarters mid-round, and the night beam cutting through cloud between the pines.
+assemble.sh (ffmpeg): 24fps clips → 1080p → concat + the game's own title card
+(fade in/out) + a quiet era-stem score with an end fade. **85 seconds, ~88MB
+master.** Every frame HUD-free (the panel id was 'debug-panel' — the first pass
+shot the whole cut with the debug panel burned in; the goldens had it too and were
+recaptured clean).
+
+**Canon note for the shot-list gate:** the issue named 'the oar-out' as a closing
+shot — that is ENDING imagery, so the draft closes on the night beam instead. The
+owner's sign-off decides. No twist, no endings, no model-recursion in the cut.
+
+**Evidence:** master at tools/trailer/out/master.mp4 (delivered to the owner;
+frames/ + out/ gitignored — the repo carries the SCRIPT, which IS the trailer).
+Spot frames verified clean at 5s/45s/55s/62s/71s/83s. Title card renders from the
+game's own title screen. CI note: the runner's software-GL throttles rAF, so
+real-time cinematics crawled (33/45 twice — every timing assertion, exactly);
+the unthrottle flag trio rides this commit.
+
+**Debt:** the score is a legacy ACE-Step stem, not the B3 leitmotif arrangements —
+scoring the master with the in-engine theme needs an audio-capture pass (owner may
+prefer to score it by hand anyway).
+
+**Next tick suggestion:** #141 release prep (the last child before epic AAA-C
+closes on owner gates).
+
+---
+
+## loop-fire 40 — 2026-08-07 — #143: the island adjusts to its reader (AAA-C5)
+
+**Shipped:** three new instruments beside the existing four — **reading pace**
+(×1/×1.5/×2 on every whisper's hold, via a UI.setReadPace hook at the queue's single
+consumption point), **letter size** (three steps through a --text-scale CSS var on
+the whisper, the reading surface, and the journal — relative layout, nothing clips),
+and **calm the flashes** (bloom strength 0.68→0.42 + the white curtain's transition
+floor-limited to 1.4s even on its fast dive path). All persist in the same
+abyme-settings blob, device-side, never in the save. Plus loop/ACCESS.md — the
+photosensitivity audit (six bright moments tabled: NO strobe or repeated-flash
+exists anywhere; worst case is one white fade, slower under calm-flash), the
+colorblind pass (every glint luminance-based, every glyph shape-coded, the era
+grades already grayscale-separable by design), and the NO-TIMER GUARANTEE written
+down as a standing rule: nothing in ABYME is ever timed against the player.
+
+**Evidence:** F143 eight-for-eight (pace hook live, --text-scale computed and
+applied — whisper 20px→26px, bloom capped, calm class + curtain duration ≥1.3s,
+clean revert, persistence round-trip). WALK PASS **45/45** with settings untouched
+defaults. CI note: the runner fix (--no-sandbox + swiftshader) is past the old
+crash point mid-run as this lands.
+
+**Debt:** none.
+
+**Next tick suggestion:** the release pair — #141 (itch page + Tauri wrap prep,
+owner publishes) and #142 (the trailer script, owner signs the shot list). Both
+are prepare-in-repo, gate-on-owner.
+
+---
+
+## loop-fire 39 — 2026-08-07 — #140: saves under contract (AAA-C2)
+
+**Shipped:** the save schema has a spec now — tools/harness/saves.spec.mjs, pure
+node (save-schema.js is dependency-free by design): every migration step proven
+(v1's chestOpen inference, its no-ruler negative, v2's no-re-inference), a REAL
+captured full-progress fixture (fixtures/v3-full.json — the walk's own end-state,
+11KB: returned + three rounds + filed/kept record + 20+ journal entries + the era
+threshold), forward-compat (unknown future fields ignored, partial payloads keep
+defaults), five corrupt-payload shapes (no throw, defaults hold), and the
+pack→apply round trip (flags/recDisp/journal stable). **23/23**, wired into run.sh
+before the walk. And the storage boundary got its missing safety: a corrupt save
+now fails safe to a fresh start with the payload PRESERVED in an
+'abyme-save-v1-corrupt' stash — before this, the first autosave clobbered the
+evidence ~12s in. Browser-proven: corrupt blob → Continue click → playable fresh
+game, empty journal, stash intact.
+
+**Evidence:** SAVES 23/23; F140 {playable, freshJournal, preserved} all true;
+WALK PASS 45/45 (the restore branch is the live load-and-finish proof for
+current-version saves). The canonical fixture regenerates from any full walk.
+
+**Debt:** hasSave() stays a cheap null-check, so a corrupt save still SHOWS
+Continue (clicking it fresh-starts safely). Honest title-screen validation would
+parse on boot — cheap, but a UX decision; noted, not snuck in.
+
+**Next tick suggestion:** #143 accessibility (settings work, quick and real),
+then the release pair #141/#142 with their owner gates.
+
+---
+
+## loop-fire 38 — 2026-08-07 — #139: the gate moves into the repo — CI guards everything now (AAA-C1)
+
+**Shipped:** the scratchpad stopped being load-bearing. tools/harness/ now holds the
+whole release gate — run.sh (one command: server + headless Chrome + coverage + the
+walk, env-tunable ports, Chrome autodetect, and the hard-won rules baked in: never
+--disable-gpu, poll for boot, wide first-compile margins), walk.mjs (**45
+assertions** now — the power budget joined: one composer frame at the surface must
+stay under 340 draws / 460k tris), coverage.mjs (path-relative now), cdp.mjs (with
+the error-catch that a swallowed throw taught us), serve.py, and a README that
+carries every gotcha this campaign paid for. `.github/workflows/island-walk.yml`
+runs it on every push touching docs/the-island/**. The walk gets ONE retry — flake
+armor for cold-profile shader hitches, not forgiveness: a real regression fails
+both passes.
+
+**Evidence:** the repo runner proven end-to-end from its new home — two consecutive
+cold-profile runs green (45/45, exit 0); then a SEEDED regression (the era-threshold
+journal suppressed) failed exactly its own assertion on BOTH passes and exited 1;
+reverted and verified intact. Goldens ride as CI artifacts for human eyes — headless
+GL rasterization differs per OS, so pixel hard-fails would lie (README says so).
+
+**Debt:** the CI workflow is committed but its first green run happens on GitHub's
+runners — watch the first push's Actions tab (browser-actions/setup-chrome is the
+only new dependency).
+
+**Next tick suggestion:** #140 saves — fixture + migration tests riding the same
+harness, now that it has a permanent address.
+
+---
+
+## loop-fire 37 — 2026-08-07 — #137: the leitmotif learns the eras — EPIC AAA-B COMPLETE
+
+**Shipped:** the music box's five notes now know they are the game's theme. The era
+beds (fire 5's one persistent graph) gained per-era ARRANGEMENTS of the same figure:
+the last day STATES it (all five, in order, the box's own voice); the arrival years
+RISE (upward figures with a reach, an octave up, quicker); the inspection years are
+MEASURED (clipped exact pairs, zero jitter — quantized like a return); the last
+winter SINKS (downward fragments at the longest spacing — and the fourth note, by
+the shipped canon, never comes at all, so some phrases are one note long: the last
+winter barely speaks). And each of HIS ROUNDS voices the theme on its own
+instrument — low dory-hull wood for the mooring, dry pen-ticks for the return, warm
+long glass for the small lamp; the WIND round plays nothing extra because the box
+itself IS its instrument. The fourth bends down in the rounds' hands too.
+
+**Evidence:** structural verify on a RUNNING audio context — per-era arrangements
+distinct ({stated:01234, rising:0124, measured pairs, sinking with the fourth
+withheld}), three round instruments schedule all five notes, Wind is a no-op;
+mute honored; re-muted after. WALK PASS **44/44**. Zero new assets (0 bytes — pure
+WebAudio); voice remains text, per the owner gate.
+
+**EPIC AAA-B IS COMPLETE:** #135 vistas · #136 color script · #137 leitmotif ·
+#138 Bender normals. The frame is on. **The owner's ears are still the final
+gate on all audio** — the beds and arrangements are verified structurally, not
+aesthetically.
+
+**Debt:** none new.
+
+**Next tick suggestion:** Phase C opens — #139 first (the harness moves into the
+repo and CI starts guarding all of this), then #140 saves, #143 accessibility,
+#141/#142 release prep with owner gates.
+
+---
+
+## loop-fire 36 — 2026-08-07 — #135: the vistas — every arrival gets its frame (AAA-B1)
+
+**Shipped:** a stratum's first sighting is now a composed, HELD frame: cinematic
+bars + locked control for 2.4s, any input skips, exactly once per stratum
+(once-keys vista2/3/4; L1's vista is the intro itself). The spawn pose IS the
+composition, so LEVELS rows now carry directorial intent: **L2** moved two meters
+seaward so the kelp fronds FRAME the distant lighthouse down the drowned avenue
+instead of walling it; **L3** turned around entirely — you now arrive facing the
+flooded channel (the buoy's water, the far light, the capitals' spires on the steel
+horizon — exactly where the breach is about to happen), and the cairn is found on
+the turn, which is better fragment staging anyway; **L4** was already the shot (the
+model table under the lamp shaft — untouched). Goldens for all four checked into
+loop/goldens/ (the CI diff set #139 will consume).
+
+**Refinements en route (the #138 surfaces under direction):** the sand heightmap's
+fine grain read as a moiré carpet at grazing mid-distance — REBLURRED (gaussian
+2.6 at 512²; the ~0.6m dunes survive, the sub-5cm grain dies, 219KB→45KB); and the
+dunes are now GATED to the beach band (vTerH < ~3m smoothstep) — the meadows and
+bluff-tops keep the old soft roll. Dunes belong to the shore, not the moor.
+
+**Evidence:** golden_L2 (fronds framing the light), golden_L3 (steel horizon with
+the far group), golden_L4 (the chart room), beach check (organic ripple field at
+raking dawn, GPU 3.7ms settled). Vista states verified live (locked mid-hold,
+released after, once-keys persisted). WALK PASS **44/44** (new: vista held+released
+across the real dive). No control theft beyond 2.4s; skippable by any input.
+
+**Debt:** goldens carry the era light at fixed times — the CI diff (#139) must pin
+W.time exactly as the capture script does.
+
+**Next tick suggestion:** #137 the leitmotif — the last B child I can run solo;
+then Phase C opens with the harness moving into the repo (#139).
+
+---
+
+## loop-fire 35 — 2026-08-07 — #138: TRUE relief from Bender — and the beach figure that shouldn't have been there (AAA-B4)
+
+**Shipped:** the normal-relief pass, generated on Bender and wired end-to-end. Three
+tileable grayscale HEIGHTMAPS via Peel's asset.texture.generate (FLUX.1-schnell on
+Bender, ~55s each): wind-rippled sand (the first attempt returned flat noise — the
+fix was prompting a macro PHOTOGRAPH under overcast light, not a 'height map'),
+layered rock strata, pine-bark furrows. Post-processed with PIL (512², cross-blend
+tileability fix — resize-then-blend order matters — autocontrast) into assets/*.png
+with full provenance in the MANIFEST. Wiring: applyRelief grew `normalFrom` — derive
+the normal from a TRUE height asset while the albedo stays put — used by the
+boulders (rock_height, normalScale 0.8 after the 0.95 cut read zebra at grazing
+gold) and every trunk (bark_height); the TERRAIN feeds the sand heightmap into the
+existing Mikkelsen derivative bump (world-XZ sample, no UVs, no seams possible),
+supplanting the synthetic sine ripples the moment the image decodes. House rule
+held: normal maps yes, tiled color never.
+
+**AND THE BUG:** the verification pass caught a glowing island-scale figure standing
+on the wake-up beach of every fresh save — shipped since fire 17. Root cause:
+`(W.level >= 2 || F.carried) && isModel` with `carried` UNDEFAULTED leaks
+`undefined` into `.visible`, and three.js only culls on `=== false`. Worse, the
+model's companion leaked visible PRE-carry — a quiet twist spoiler. Fixed at the
+root: every flag the code reads now has a default (13 added), both drivers are
+strict booleans, and the walk gate asserts the fresh-save hidden state forever.
+
+**Evidence:** boulder A/B at identical golden pose: leopard-spot color-noise →
+coherent strata bedding wrapping the form; sand ripples read as organic dune bands
+under raking dawn light; 2×2 tile previews seamless. Steady-state GPU 3.5-4.6ms at
+the beach/treeline panels (60fps), same class as before — the heights replace
+same-size derived normals. WALK PASS **43/43** (new: P0.noBeachFigure), coverage
+103/103. Bark verified via the shared normalFrom path; its close-up is
+canopy-occluded from every angle tried — an honest note, not a doubt.
+
+**Debt:** harness gpuMs()/renderer.info misread under back-to-back composer renders
+(accumulates without reset) — read the panel after real frames instead.
+
+**Next tick suggestion:** #135 vistas — the surfaces finally deserve the frames.
+
+---
+
+## loop-fire 34 — 2026-08-07 — #136: the color script — every era wears its own light (AAA-B2)
+
+**Shipped:** Phase B opens. The old linear depth formulas (tint 0.18d, desat 0.12d,
+dark 1-0.12d) are replaced by ERA_GRADES — four art-directed rows the same pipeline
+reads, one per era: the arrival years are hue-rich warm green, barely desaturated
+(wonder, not sickness — the L2 cast recolored 0x8aa830 sodium → 0x74a83e living
+green); the inspection years go STEEL (cast 0xc29a1c jaundice → 0x8f9aa6 grey-blue,
+desat 0.34 doing the talking); the last winter lands near-monochrome in the
+thickest air (desat 0.55, fogMul 1.80). Dark values deliberately spread
+(0.93/0.80/0.66) so the eras separate in pure grayscale luminance too.
+
+**Evidence:** same-pose era sheet captured L1-L4 (era_L*.png): L2 reads saturated
+green wonder with the kelp avenue alive in frame; L3 unmistakably steel-grey; L4 a
+pale airless milk — winter light, instantly distinct from both. Pure parameter
+change, zero new passes — GPU 4.0/5.0/7.7ms across the three shots, all under
+budget. WALK PASS **42/42** unchanged.
+
+**Debt:** none. (The L4 read came out palest rather than darkest — the fog does the
+final darkening emotionally; kept deliberately, it reads MORE like last winter.)
+
+**Next tick suggestion:** #135 the four vista moments — the color script gives each
+arrival its light; the vistas give each arrival its FRAME (and CI its goldens, and
+the trailer its shots).
+
+---
+
+## loop-fire 33 — 2026-08-07 — #134: endings that re-open — EPIC AAA-A COMPLETE
+
+**Shipped:** both terminals now end THIS player's game, not any player's. A pure
+assembler (content.finaleCoda — node-testable, no imports) reads the walk's three
+persisted sources — the rounds kept, the record's dispositions, the shore losses
+named — and surfaces a quiet coda on the finale card ~5-7s after the terminal's own
+line has had its beat. Leaving: 'his rounds went with me, kept whole · the record —
+1 filed for the office, 1 left with him · the oar passes over the arm, the bench,
+the skiff — named, and held' (and the look-back shot already holds the drowned
+pieces at oar-height by geometry — no camera change needed). Staying: '…the shore
+in the model is smaller than the chart — what it was for is here with me.' A walk
+that left nothing behind degrades to one constant line — silence, never filler.
+
+**Evidence:** WALK PASS **42/42** (+2: the oar coda against the walk's full state,
+the bell coda against the restored 3-round snapshot); the assembler unit-tested for
+three play-shapes (none/some/all) in node. Coverage 103/103 (codas are card text,
+not journal). CSS fade honors the card's register (0.82rem, 2.4s ease).
+
+**EPIC AAA-A IS COMPLETE.** The story overhaul shipped whole in five fires: the
+strata are eras (#129), each stratum arrives as its era (#130), the keeper is
+staged (#131), the middle act asks its question (#132), the world enacts loss
+(#133), and the endings mirror the walk (#134). D1-D5 all answered.
+
+**Debt:** the drowned bench read (from #133) remains the one visual polish note.
+
+**Next tick suggestion:** Phase B opens — #135 the four vista moments (feeds CI
+goldens + the trailer) or #136 the era color script (cheapest, pure parameters,
+instantly visible at every arrival A2 just built).
+
+---
+
+## loop-fire 32 — 2026-08-07 — #133: the Shrinking Shore — loss becomes the grammar (AAA-A5)
+
+**Shipped:** the world finally enacts the thesis instead of describing it. Three new
+shore pieces built in their pre-loss poses — the jetty's OUTER ARM (two boards,
+three posts, continuing the pier seaward), the SOUTH-SHALLOWS BENCH (stump legs,
+plank seat, facing the water), the SKIFF on its blocks (the other boat, overturned
+past the tideline) — and three descent milestones that take them: first dive → the
+arm settles into a shadow under green glass; L3 → the bench stands in the sea it
+faced, seat awash; L4 → the skiff floats off its blocks and rides half a gunwale
+under at the old anchor. Poses are hard-set every frame from persisted state
+(regions.l3seen/l4seen + flags.dove), so saves and the 1:240 model can never drift —
+and because the pieces are NOT model-pruned, **the study's model shows the shore
+shrinking while you are still below**. The walk home names each piece as you pass
+it ('The water holds it now') and the journal keeps the sum — which finally answers
+the tide gauge's fifth ring: 'It was never a measurement. It was a forecast.'
+
+**Evidence:** WALK PASS **40/40** (+2: all three drowned poses after L4; the three
+discovery whispers + sum journal on the returned shore walk). Coverage **103/103**.
+Screenshots: the skiff half-sunk with its whisper live in frame; the arm reading as
+a pale shadow under the green glass off the pier end. No colliders, no removed
+capability — loss is grammar, never penalty (the bereaved-player constraint).
+
+**Debt:** the drowned bench reads as a floating plank more than a drowned bench at
+some angles — B1's vista/polish pass should tune its depth or lean. Harness: walk
+boot now POLLS for ABYME (fixed waits died on cold profiles).
+
+**Next tick suggestion:** #134 endings that re-open — all three read-back sources
+now exist (rounds flags, recDisp, loss keys). The codas assemble what THIS player's
+walk left behind. Closing it completes EPIC AAA-A: the whole story overhaul.
+
+---
+
+## loop-fire 31 — 2026-08-07 — #132: the Inspection, playable — FILE or KEEP (AAA-A4)
+
+**Shipped:** the middle act's running question, asked entirely with existing verbs.
+Every inspector artifact — the tide ledger, the carbon copy, the closure notice, and
+TWO NEW hands of his cold pencil — can now be taken after reading (the label grows
+'— take it'), then FILED in the records cabinet by the cot (the drawer the District
+could always have opened; the filed stack grows inside) or KEPT: carried down through
+the years and left on a slab beside his last note at the source (the kept pile grows
+there). Neither is scored. Both are read back — the codex header now carries 'the
+record: N filed · M kept', and the A6 codas will carry the rest. The new artifacts
+hold the ambiguity line: **the field slip** (pinched under the cairn's top stone —
+the bluff climbed, the minutes counted, and on the reverse a pencil list of what was
+NOT measured: 'distance from the light to the keeper: not recorded. No instrument on
+the requisition reads it') and **the offer of transfer** (wedged behind the cold
+stove — a way off the island kept close enough to burn for a whole winter and never
+burnt; on the back, the reply drafted and never sent: 'there is no room on the form
+for who would keep it'). Both survive real-or-invented. DEEP_SETS grows to NINE
+(slip bares at L3 with the inspection hands, the refusal at L4 with the last winter).
+
+**Evidence:** F132 all-green (factory refs, boot assert silent, label two-phase,
+carried→mesh hidden, filed→stack scales, l3 gate, kept→pile, codex header '1 filed ·
+1 kept', zero errors); WALK PASS **38/38** (+2: full FILE flow at L2, full KEEP flow
+at L4); coverage **102/102**. recDisp persisted via a new save-schema row
+(merge-into-defaults like flags). Harness note: headless Chrome died between turns —
+relaunched WITHOUT --disable-gpu (that flag kills WebGL in new headless; 'Error
+creating WebGL context' is the tell) and widened the dive wait 23→30s for
+cold-profile first-compile.
+
+**Debt:** none. The sourceRest slab is the regions seam's first NEW content (#71
+proving out).
+
+**Next tick suggestion:** #133 the Shrinking Shore — three pre-staged surface losses
+at act boundaries. The last story system before the endings read-back (#134) can
+assemble all three sources.
+
+---
+
+## loop-fire 30 — 2026-08-06 — #131: HIS ROUNDS — the keeper staged at last (AAA-A3)
+
+**Shipped:** the keeper stops being prose. Once the strata are understood as years
+(the era threshold), the furniture of his day becomes findable and performable — one
+act per era, each a hotspot on a prop that now exists for it: **MOOR** (L2, the
+arrival years — a cleat and his coiled turns at the dory; take them and, out past
+the pier, the one who waited stands waist-deep in the water and watches it done),
+**LOG** (L3, the inspection years — the day's return unsigned beside the logbook;
+sign it and something is at the door exactly as long as you don't look), **LIGHT**
+(L4, the last winter — his cot lantern; light it and across the island the model's
+little lighthouse wakes, holds, and settles: one light remembering another — and the
+lantern STAYS lit for the rest of the game), **WIND** (the last day — the music box
+itself becomes the round when wound back on the surface; the bird comes to the sill,
+listens all five notes, tilts at the fourth, and does not correct it). All four =
+once('roundsAll'): "A day of his, performed whole across all the years of him at
+once. The island did not need any of it done. I did." Tableaux are non-verbal,
+figures act and never speak, ghosts only appear if their encounter was already
+integrated, every borrowed mesh is restored exactly. The model's lens material is
+CLONED before the tableau pulses it (it shares the island lens mat otherwise — the
+trap that would have pulsed the real lamp).
+
+**Evidence:** WALK PASS **36/36** — four new assertions (unlock gating, flags,
+journal keeps, and the lantern's persistent lit state through the 10s tableau).
+Coverage **98/98** after teaching it that round journals travel as _doRound args.
+No new lights (the 9-light rule holds; the lantern is emissive-only). W.flags.round*
+persisted for the A6 ending read-back.
+
+**Debt:** none. The A6 codas now have all three read-back sources shipped or
+specified (rounds ✓, inspection record #132, shore #133).
+
+**Next tick suggestion:** #132 the Inspection playable — FILE or KEEP. The rounds
+proved the verb grammar; the cabinet and the carry-down are next, and the codex
+drawer gives the middle act its running question.
+
+---
+
+## loop-fire 29 — 2026-08-06 — #130: era events — each stratum ARRIVES as its era (AAA-A2)
+
+**Shipped:** three authored, unmissable threshold beats on existing props — the slack
+middle now re-aims the player at every arrival. **L2, the rope:** a climber's rope on
+the wade-line, tied off by a hand that meant to come back — STILL SWINGING when you
+arrive (pendulum drive registered beside the build in regions/l2_shallows.js, decay
+~45s, never fully still: the era idles). A look-read keeps it: "the arrival years
+have not finished happening." **L3, the breach:** on first arrival the sea opens over
+the drowned hall and gives the capitals back — the crowns push up through the
+waterline over 9s (gallery y eased in _apply while the timer runs; water rush at the
+start), the only time the water returns a thing. **L4, the farewell:** the first time
+the lit beam shows itself at the bottom it makes ONE full smooth pass beneath the sea
+(W.beamAngle driven through 2π over 12s), then goes out for the rest of the stratum —
+the exception lives IN the lampLit derivation, so nothing can fight it, and climbing
+out restores it. A low E — the theme's root — is the last thing heard. "The island
+has stopped performing for me. What is left down here is only the true things."
+
+**Evidence:** WALK PASS **32/32** — three new assertions, each testing the real
+mechanism: rope present+hotspot+journal at L2; breach mid-rise (y 0.95-2.55 at 3.5s)
+then at rest 2.6 with journal kept by 10.5s; farewell full-pass + lamp doused via
+derivation + journal, under forced night. Coverage **93/93** (three new sketches:
+the pendulum arcs, the three crowns over the waterline, the swept circle gone dark).
+Power: the farewell REDUCES L4 load (beam off for the stratum); rope is ~40 tris.
+
+**Debt:** none added. The breach uses valveRush as its water-voice — a dedicated
+swell/groan one-shot would be richer (B3's rounds instruments can supply it).
+
+**Next tick suggestion:** #131 His Rounds — the keeper staged. The rounds reuse the
+crank/lamp/logbook/bell props and the era events just proved the tableau grammar
+(timed staging + once-keys + walk assertions). Biggest of Phase A; start with the
+find-the-round hinting.
+
+---
+
+## loop-fire 28 — 2026-08-06 — #129: the strata are eras (AAA-A1)
+
+**Shipped:** the reframe everything else in the AAA campaign stands on. LEVELS rows
+carry `era` now (lastday / arrival / inspection / lastwinter — ERA_CASTS' comments
+aligned; the code's color system had been calling them eras all along). All 16 LORE
+entries tagged `era`/`eraDeep` (the hand's writing-time vs the era its cold page
+bares at). loop/ERAS.md is the era bible: the full audit table — every hand,
+artifact, and encounter mapped and grounded — plus the two-histories rule (each era
+owns what the water uncovered of the deeper past during it: the founders' stone at
+L2, the capitals at L3). SPINE.md carries the canon block. And the game says it out
+loud exactly ONCE: 8s after first splashdown at L2, whisper + journal — "I thought I
+was diving under the island. I am diving under the years. The island does not drown
+all at once; it drowns in order, and the order is his." New sketch (island profile,
+three descending waterlines) on the matcher 'it drowns in order'.
+
+**Evidence:** audit found ZERO contradictions — the corpus was latently coherent
+(the private journal exists BECAUSE of the inspector; the kelp slate records the
+FIRST descent; the closure notice's blank date IS the last winter). Walk gate grew
+its 29th assertion (once-key + journal text + LEVELS[2].era.key === 'arrival'):
+**WALK PASS 29/29**. Coverage grew ui.js literal scanning: **90/90**.
+
+**Debt:** ui.js still holds ~4 inline journal/whisper literals (#75 ran on
+puzzles/main only) — covered by the coverage tool now; extract in a hygiene pass.
+
+**Next tick suggestion:** #130 era events — A1's reframe is stated once; A2 makes
+each stratum ARRIVE as its era (the swinging rope, the breaching capitals, the beam
+that goes dark). The rope is the cheapest and lands first.
+
+---
+
+## loop-fire 27 — 2026-08-06 — the AAA plan: the strata are eras
+
+**Shipped:** loop/AAA_PLAN.md — the honest story diagnosis (D1 the middle is a
+reading list, D2 the keeper is prose never presence, D3 no second force, D4 nothing
+is ever lost, D5 endings close without reopening), the one big swing that answers all
+five (**the strata are not depths — they are ERAS of the keeper's tenancy**; depth
+becomes time, diving becomes remembering), five story systems on that spine (era
+events, His Rounds + echo tableaux, the Inspection made playable FILE-or-KEEP, the
+Shrinking Shore, read-back ending codas), and the art/audio/tech/CI/release/
+accessibility pillars phased BEHIND the story per the owner's steer. Filed as three
+epics + 15 acceptance-criteria children under the new `aaa` label.
+
+**Evidence:** EPIC AAA-A #144 (children #129-#134), AAA-B #145 (#135-#138), AAA-C
+#146 (#139-#143); every child names its walk-gate assertion; canon locks restated in
+the epic bodies (INTEGRATION, all-metaphor, keeper-only I/you, twist beats, power).
+
+**Debt:** none — planning fire; the empty board is now a full board with a spine.
+
+**Next tick suggestion:** #129 era re-keying — it is the reframe everything else
+stands on, it is mostly a content.T + LEVELS pass, and A2's staged beats can start
+the moment it lands.
+
+---
+
+## loop-fire 26 — 2026-08-06 — the architecture cluster falls: #77 #70 #73 #72 #69 #75 #71
+
+**Shipped:** the entire remaining board — seven architecture issues — in one verified
+sweep, and the codebase the sequels will be built on. **#77** terrain is a pure leaf
+again (a GATES snapshot + syncGates(W) at frame top; no world import). **#70** props
+registers every named ref through defineProp() and main boot-asserts the registry —
+a missing island ref is now a console error at startup, not a silent null three files
+later. **#73** a tiny drive scheduler (addDrive/runDrives) replaces the applyAtmosphere
+grab-bag; the foreshadow ring, fish-shadows, and jetty night-halo migrated to it, each
+declared beside what it drives. **#72** the Watcher and Tide-Figure now run on ONE
+data-driven encounter engine (static ENCOUNTERS specs — approach/regard, evade/still —
+all shipped tuning preserved digit-for-digit), and both encounters leave a rare echo
+behind after resolution. **#69** written fragments are data: LORE entries carry `place`
+metadata and a factory builds the prop, registers it, and wires the reader hotspot —
+the two inspector papers moved over, bespoke builds deleted. **#75** every inline
+whisper/journal line (122 call sites) extracted to content.T with readable slug keys —
+the island's entire voice now lives in ONE file, byte-identical (120/120 vs HEAD; the
+2 diffs are this session's new echo lines). **#71** SEA-STRATA region content moved to
+js/regions/l2_shallows|l3_gallery|l4_seabed.js, each build(ctx) on its own SEED^salt
+stream — the seam new level-areas land in (tide gauge stays core-side: it is the
+surface's quiet mystery).
+
+**Evidence:** F77 bridge -8.5→18.45 with ruler + annexOpen at L2 + fresh-false gates;
+boot assert silent with zero unresolved NAMES; F73 jetty halo 0.98 night / 0.12 day;
+F72 `{tideSeen, watcherSeen, watcherHidden, echoTimerArmed, errs:0}`; F69 factory refs
+parented (quarters), gated (L1 false / L2 true), both readers open; coverage 88/88
+journal↔sketch; F71 region2=[kelp 420 @ checksum -26559.83, fishShadows 7, tideFigure
+hidden, kelpSlate] region3=[bluffCairn y23.53, bellBuoy (52,2.5,12)] region4=[sourceNote
+13.52] cloneClean; **walk 28/28 after every one of the seven**, zero console errors.
+
+**Debt:** none added. props.js 3148→2939 lines and buildWorld no longer owns region
+content; puzzles/main no longer own prose. The board is EMPTY — every open issue is
+closed with this push.
+
+**Next tick suggestion:** the AAA plan — the story is the axis that still trails the
+craft (owner: "I think the story still needs work"). Diagnose, then an epic with real
+child issues.
+
+---
+
+## loop-fire 25 — 2026-08-01 — #6: distant trees learn to be cheap — and epic #8 CLOSES
+
+**Shipped:** the last child of the perf epic. The canopies live in near/far instanced
+PAIRS per silhouette now, all four on the one swaying material: full 16-radial×2-row
+geometry inside 120m, a 6-radial×1-row build of the SAME tier stack beyond (~63% fewer
+canopy verts), repartitioned every 0.35s by camera distance with hysteresis (enter 120m,
+leave 130m) — the swap lives inside the haze melt (120→300m), where a facet is a dozen
+hazed pixels. Positions/tones byte-identical (the r() stream untouched); the L4 strip
+hides all four; trunks stay global (cheap, and a floating far canopy would show).
+
+**Evidence:** beach pose splits 36 near / 98 far of 134 trees — tris 336k → **314k
+(-22k)**; walk into the woods and the split follows (108/26); the golden-hour treeline
+screenshot cannot tell the sets apart; L4 strips everything; walk 28/28; zero errors.
+**Closes #6 — and with it EPIC #8: the entire performance / voiced-layer / polish epic
+is complete.** The whole remaining ABYME board is the architecture cluster
+(#69-73, #75, #77).
+
+---
+
+## loop-fire 24 — 2026-08-01 — #34: regional Bakers — the built world learns to cull
+
+**Shipped:** the grass-chunking pattern applied at the root: Baker records each add()'s
+vertex range + world anchor, and `buildChunks(120)` slices the SAME bake (byte-identical
+vertices) into per-cell geometries — the island's built world lands in 3 stone + 1 brass
+culling meshes sharing their materials, exactly the "3-4 Baker pairs" the audit priced.
+staticStone/staticBrass are groups now; nothing referenced them externally.
+
+**Honest numbers:** the full statics are ~9.4k tris, and the A/B (frustumCulled on/off at
+two directed poses) shows exactly that culling away when the built world is behind you
+(+3 draws worst case, seaward 266.7k→257.7k). This is an architecture-correctness win —
+every world system now culls — plus the same win in the shadow pass, plus the
+per-landmark seam #34 wanted for future SEA-STRATA toggles. Not a headline frame cut,
+and the LOG says so. Walk 28/28; zero errors. **Closes #34 — epic #8's last child is #6.**
+
+---
+
 ## loop-fire 23 — 2026-08-01 — #50: THE OTHER HANDS — climbers, congregation, inspector
 
 **Owner green-lit the expanded design. Three written presences the keeper's own text

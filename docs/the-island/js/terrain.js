@@ -3,7 +3,16 @@
 
 import * as THREE from 'three';
 import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
-import { W } from './world.js';
+// #77: terrain is a DETERMINISTIC LEAF again — no live world import. The four pieces of
+// world state collision depends on arrive through GATES, synced once per frame by main
+// (syncGates). Headless probes drive GATES directly; nothing here reads W.
+export const GATES = { atTop: false, bridgeUp: false, hatchOpen: false, annexOpen: false };
+export function syncGates(W) {
+  GATES.atTop = !!W.atTop;
+  GATES.bridgeUp = !!W.flags.rulerPlaced;
+  GATES.hatchOpen = !!W.flags.hatchOpen;
+  GATES.annexOpen = W.level >= 2 || !!W.flags.returned;
+}
 import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
@@ -156,7 +165,7 @@ const JETTY = { x: -18, z: -110.5, hx: 1.3, hz: 6.1, y: 1.16 };
 
 export function walkableY(x, z) {
   // the lamp-room gallery: while up top, the lighthouse footprint IS the balcony floor (the climb)
-  if (W.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 3.3) return GALLERY_H;
+  if (GATES.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 3.3) return GALLERY_H;
 
   // the jetty deck: a real surface over the water (was a fall-through)
   if (Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz) return JETTY.y;
@@ -167,7 +176,7 @@ export function walkableY(x, z) {
   if (Math.hypot(x - ANX, z - ANZ) < 2.8) return LIGHTHOUSE_H;   // annex floor (meets the drum disc at r5.4)
 
   // ruler bridge across the chasm
-  if (W.flags.rulerPlaced) {
+  if (GATES.bridgeUp) {
     const bz = SPOTS.chasmBridgeZ;
     if (Math.abs(z - bz) < 2.1 && x > 34 && x < 60) {
       return BRIDGE_DECK; // deck height, rim-to-rim
@@ -175,7 +184,7 @@ export function walkableY(x, z) {
   }
 
   // the vault under the bluff: enter THROUGH the open hole, stairs run south
-  if (W.flags.hatchOpen) {
+  if (GATES.hatchOpen) {
     const hx = SPOTS.hatch.x, hz = SPOTS.hatch.y;
     const lx = x - hx, lz = z - hz;
     // stair ramp: top inside the hole's north half, descending southward
@@ -237,14 +246,14 @@ const LH_GAPS = [[deg(160), deg(170)], [deg(5), deg(25)]];
 
 export function wallBlocked(x0, z0, x1, z1) {
   // up on the lamp-room gallery: the only wall is the balcony rail (keeps you from the 20m drop)
-  if (W.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > 3.0;
+  if (GATES.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > 3.0;
 
   // lighthouse wall: the beach door + the annex doorway
   if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;
   // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2 —
   // and it STAYS open once you have returned from the bottom ("the door, the coat — all as
   // you left them"): the surface after the descent keeps the quarters walkable.
-  if (W.level >= 2 || W.flags.returned) {
+  if (GATES.annexOpen) {
     if (ringBlocked(x0, z0, x1, z1, ANX, ANZ, 2.65, deg(185), deg(212))) return true;
   } else if (Math.hypot(x1 - ANX, z1 - ANZ) < 2.65) {
     return true;
@@ -370,6 +379,12 @@ export function buildTerrain() {
     sh.uniforms.uTime = { value: 0 };
     sh.uniforms.uSunUp = { value: 1 };                       // daylight gate for the caustics
     sh.uniforms.uCaustic = { value: getTexture('water_ripple') };
+    // #138 (AAA-B4): the Bender sand heightmap — organic wind-ripple relief for the
+    // Mikkelsen bump below. uSandOn flips 0→1 when the image decodes; until then the
+    // synthetic sine ripples carry the surface (seamless fallback, no pop risk: the
+    // swap is a height-source change inside the same derivative path).
+    sh.uniforms.uSandOn = { value: 0 };
+    sh.uniforms.uSandH = { value: getTexture('sand_height', () => { sh.uniforms.uSandOn.value = 1; }) };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
     // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. Those
     // textures are no longer sampled here and nothing else loads them, so we drop the dead getTexture
@@ -387,6 +402,7 @@ export function buildTerrain() {
         uniform vec3 uHaze; uniform float uTexAmt;
         uniform float uWaterY; uniform float uTime; uniform float uSunUp;
         uniform sampler2D uCaustic;
+        uniform sampler2D uSandH; uniform float uSandOn;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
@@ -409,6 +425,12 @@ export function buildTerrain() {
         float rip2 = sin(dot(vLXZ, vec2(-0.35, 0.94)) * 4.1 + vnoise(vLXZ * 0.38) * 6.2831); // ~1.5m cross-set, weaker
         float roll = vnoise(vLXZ * 1.1) - 0.5;               // soft ~0.9m undulation
         float Hb   = rip1 * 0.5 + rip2 * 0.22 + roll * 0.5;
+        // #138: ORGANIC ripples (Bender heightmap, world-XZ sample — no UV, no seams)
+        // supplant the synthetic sines on the BEACH BAND only (vTerH < ~3m); higher
+        // ground keeps the old soft roll — dunes belong to the shore, not the meadow.
+        float texH = texture2D(uSandH, vWPos.xz * 0.16).r - 0.5;
+        float sandW = 1.0 - smoothstep(2.2, 3.4, vTerH);
+        Hb = mix(Hb, texH * 2.0 + roll * 0.35, uSandOn * sandW);
         float bDist = 1.0 - smoothstep(45.0, 130.0, length(vViewPosition));
         // SLOPE-AWARE ROCK RELIEF (#36): above ~0.5 baked slope the bump SWAPS (never
         // stacks — same one evaluation) from wind-ripple sand to a cliff language:

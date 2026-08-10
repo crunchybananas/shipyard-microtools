@@ -145,6 +145,9 @@ export const UI = {
   },
 
   // ---- whisper: one quiet italic line at a time ----
+  // #143: reading pace — settings scale every whisper's hold (1 / 1.5 / 2)
+  _readPace: 1,
+  setReadPace(p) { this._readPace = p || 1; },
   whisper(text, holdMs = 4200) {
     if (this.whisperEl.textContent === text && this.whisperEl.classList.contains('show')) return;
     if (this._whisperQueue.some((w) => w.text === text)) return;
@@ -160,7 +163,7 @@ export const UI = {
     this._whisperTimer = setTimeout(() => {
       this.whisperEl.classList.remove('show');
       this._whisperTimer = setTimeout(() => this._nextWhisper(), 1500);
-    }, next.holdMs);
+    }, next.holdMs * this._readPace);
   },
 
   // ---- curtain ----
@@ -212,8 +215,15 @@ export const UI = {
     const h2 = this.journalEl.querySelector('h2');
     if (h2) {
       const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
-      h2.innerHTML = deep > 0
-        ? `Field Notes<span class="deep-tally">${deep} of ${DEEP_FRAGMENTS.length} read from the deep</span>`
+      // #132: the record drawer — what the player has done with the record of a life
+      const disp = Object.values(W.recDisp || {});
+      const filedN = disp.filter((d) => d === 'filed').length;
+      const keptN = disp.filter((d) => d === 'kept').length;
+      const bits = [];
+      if (deep > 0) bits.push(`${deep} of ${DEEP_FRAGMENTS.length} read from the deep`);
+      if (filedN + keptN > 0) bits.push(`the record: ${filedN} filed · ${keptN} kept`);
+      h2.innerHTML = bits.length
+        ? `Field Notes<span class="deep-tally">${bits.join(' — ')}</span>`
         : 'Field Notes';
     }
     if (!W.journal.length) {
