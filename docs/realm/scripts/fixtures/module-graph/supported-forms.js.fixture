@@ -5,6 +5,7 @@ export * from './js/export-all.js?other=1';
 const dynamic = import('./js/dynamic.js');
 const inTemplateExpression = `${import('./js/template-expression.js')}`;
 import contract from '../runtime-contract.json' with { type: 'json' };
+const worker = new Worker(new URL('./js/worker.js?realm=old', import.meta.url), { type: 'module' });
 
 // import './js/comment.js';
 const inertString = "import('./js/string.js')";

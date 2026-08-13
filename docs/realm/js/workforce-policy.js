@@ -5,7 +5,7 @@
 // Automatic policy may move only AI-managed workers; a player-command assignment
 // is a Crown order and is never reconsidered here.
 
-import { G, BUILDINGS, getDifficulty } from './state.js?realm=192';
+import { G, BUILDINGS, getDifficulty } from './state.js?realm=193';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -16,7 +16,8 @@ import {
   transitionCitizenActivity,
   vocationForBuilding,
   workersForBuilding,
-} from './citizen-ownership.js?realm=192';
+} from './citizen-ownership.js?realm=193';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=193';
 
 export const WORKFORCE_PRIORITIES = Object.freeze(['high', 'normal', 'low', 'off']);
 export const AUTO_REASSIGN_THRESHOLD = 12;
@@ -44,8 +45,7 @@ function assertLiveBuilding(building) {
 
 function clearWorkRoute(citizen) {
   citizen.workTarget = null;
-  citizen.path = null;
-  citizen.pathIdx = 0;
+  clearCitizenRouteState(citizen);
   citizen.activityTimer = 0;
 }
 

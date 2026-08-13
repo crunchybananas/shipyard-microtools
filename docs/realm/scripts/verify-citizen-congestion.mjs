@@ -1,4 +1,4 @@
-// Deterministic congestion correctness gate for Realm 192.
+// Deterministic congestion correctness gate for Realm 193.
 //
 // This fixture stresses the citizen state machine rather than only the path
 // planner: twenty hungry citizens share one physical doorway and pantry, and
@@ -13,14 +13,15 @@ import {
   TILE,
   createResourceStock,
   setSeed,
-} from '../js/state.js?realm=192';
-import { makeCitizen } from '../js/world.js?realm=192';
-import { makeAvatar } from '../js/avatar.js?realm=192';
+} from '../js/state.js?realm=193';
+import { makeCitizen } from '../js/world.js?realm=193';
+import { makeAvatar } from '../js/avatar.js?realm=193';
 import {
   findPath,
-  getPathfindingDiagnostics,
-} from '../js/pathfinding.js?realm=192';
-import { updateCitizens } from '../js/citizens.js?realm=192';
+} from '../js/pathfinding.js?realm=193';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=193';
+import { updateCitizens } from '../js/citizens.js?realm=193';
+import { pathCitizenTo } from '../js/citizen-navigation.js?realm=193';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -28,13 +29,13 @@ import {
   commandAssignCitizen,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=192';
-import { storedFood } from '../js/building-inventory.js?realm=192';
+} from '../js/citizen-ownership.js?realm=193';
+import { storedFood } from '../js/building-inventory.js?realm=193';
 import {
   commitGameLoad,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=192';
+} from '../js/save-state.js?realm=193';
 
 const MAX_TICKS = 1200;
 const MAX_ACTIVE_STALL = 90;
@@ -47,6 +48,7 @@ function round(value, digits = 6) {
 }
 
 function resetWorld(seed = 190191) {
+  resetPathfindingService();
   resetCitizenOwnershipRuntime();
   setSeed(seed);
   G.map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(TILE.GRASS));
@@ -473,20 +475,67 @@ function saveContinuationFinding() {
   };
 }
 
+function pendingRequestSaveFinding(offsetTicks) {
+  resetWorld(880_192 + offsetTicks);
+  const citizen = spawnCitizen(5, 5, `Pending T+${offsetTicks}`);
+  citizen._hb = 11;
+  citizen.activityTimer = 999;
+  G.gameTick = 10;
+  assert.equal(pathCitizenTo(citizen, 15, 5, { exact: true }), true);
+  assert.equal(citizen._pathRequest?.requestedTick, 10);
+  assert.equal(citizen._pathRequest?.readyTick, 15);
+  for (let elapsed = 0; elapsed < offsetTicks; elapsed++) {
+    G.gameTick++;
+    updateCitizens();
+  }
+  assert.ok(citizen._pathRequest, 'pending route resolved before its fixed ready tick');
+
+  const savedTick = G.gameTick;
+  const prepared = prepareSave(serializeGame({ savedAt: 0 }));
+  assert.equal(prepared.ok, true, prepared.ok ? undefined : `${prepared.error.path}: ${prepared.error.message}`);
+
+  for (let tick = savedTick + 1; tick <= 40; tick++) {
+    G.gameTick = tick;
+    updateCitizens();
+  }
+  const uninterrupted = JSON.stringify(serializeGame({ savedAt: 0 }));
+
+  resetPathfindingService();
+  const committed = commitGameLoad(prepared.value);
+  assert.equal(committed.ok, true, committed.ok ? undefined : committed.error.message);
+  resetCitizenOwnershipRuntime();
+  for (let tick = savedTick + 1; tick <= 40; tick++) {
+    G.gameTick = tick;
+    updateCitizens();
+  }
+  const resumed = JSON.stringify(serializeGame({ savedAt: 0 }));
+  assert.equal(
+    resumed,
+    uninterrupted,
+    `pending route saved at requestedTick+${offsetTicks} must resume byte-identically`,
+  );
+  return {
+    savedTick,
+    requestedTick: 10,
+    readyTick: 15,
+    sha256: createHash('sha256').update(resumed).digest('hex'),
+  };
+}
+
 function selectiveEpochFinding() {
   setupBidirectional();
   for (let tick = 1; tick <= 12; tick++) {
     G.gameTick = tick;
     updateCitizens();
   }
-  const callsBefore = getPathfindingDiagnostics().findPathCalls;
   completedBuilding('well', 70, 70);
   G.obstacleEpoch++;
   G.gameTick++;
   updateCitizens();
-  const callsAfter = getPathfindingDiagnostics().findPathCalls;
+  const unrelatedEpochReplans = G.citizens
+    .filter(citizen => citizen._pathRequest).length;
   assert.equal(
-    callsAfter - callsBefore,
+    unrelatedEpochReplans,
     0,
     'an unrelated building epoch must preserve every still-valid citizen route',
   );
@@ -505,12 +554,12 @@ function selectiveEpochFinding() {
     G.gameTick = tick;
     updateCitizens();
   }
-  const intersectedCallsBefore = getPathfindingDiagnostics().findPathCalls;
   completedBuilding('well', 15, 2);
   G.obstacleEpoch++;
   G.gameTick++;
   updateCitizens();
-  const intersectedReplans = getPathfindingDiagnostics().findPathCalls - intersectedCallsBefore;
+  const intersectedReplans = G.citizens
+    .filter(citizen => citizen._pathRequest).length;
   assert.equal(
     intersectedReplans,
     1,
@@ -518,7 +567,7 @@ function selectiveEpochFinding() {
   );
   return {
     activeRoutes: 20,
-    unrelatedEpochReplans: callsAfter - callsBefore,
+    unrelatedEpochReplans,
     singleIntersectedRouteReplans: intersectedReplans,
   };
 }
@@ -564,6 +613,10 @@ function runSuite() {
     diners: firstDiners,
     bidirectional: firstRoutes,
     selectiveEpoch: selectiveEpochFinding(),
+    pendingRequestSave: {
+      atRequestedTick: pendingRequestSaveFinding(0),
+      atRequestedTickPlusOne: pendingRequestSaveFinding(1),
+    },
     saveContinuation: saveContinuationFinding(),
   };
 }

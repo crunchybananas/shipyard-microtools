@@ -46,8 +46,8 @@ different birds; they must never see different granaries.
 
 | Tier | Modules |
 |---|---|
-| CORE | state, world, pathfinding, ground-traffic, citizens, soldiers, combat, military, walkers, economy, building-inventory, events, tech, trade, wonder, scenarios, first-muster, post-raid-recovery, missions, story, raid-summary, sim, commands, bus, log, fx, avatar, building-lifecycle, building-operation, workforce-policy, citizen-ownership, residences, death-markers |
-| SHELL | main (loop/init), render, minimap, postfx, ui, input, audio, notifications (DOM half), story-ui (chronicle DOM + optional wall-clock preview), achievements, advisor, save (localStorage wrapper), save-state/save-schema (pure boundary), citizen-inspector, citizen-presentation, citizen-render-cache, presentation-cues, enhancements, particles (update), animals, sprite-lab, sprite-muster, sprite-source-contract, actor-registration, enemy-sprite-contract, atlas-loader |
+| CORE | state, world, pathfinding-kernel, pathfinding-service, pathfinding, ground-traffic, citizens, citizen-activity, citizen-needs, citizen-work, citizen-food, citizen-shelter, citizen-navigation, citizen-traffic, citizen-route-state, soldiers, combat, military, walkers, economy, building-inventory, events, tech, trade, wonder, scenarios, first-muster, post-raid-recovery, missions, story, raid-summary, sim, commands, bus, log, fx, avatar, building-lifecycle, building-operation, workforce-policy, citizen-ownership, residences, death-markers |
+| SHELL | main (loop/init), pathfinding-client, pathfinding-worker, render, minimap, postfx, ui, input, audio, notifications (DOM half), story-ui (chronicle DOM + optional wall-clock preview), achievements, advisor, save (localStorage wrapper), save-state/save-schema (pure boundary), citizen-inspector, citizen-presentation, citizen-render-cache, presentation-cues, enhancements, particles (update), animals, sprite-lab, sprite-muster, sprite-source-contract, actor-registration, enemy-sprite-contract, atlas-loader |
 
 ## Core contract rules
 
@@ -81,6 +81,28 @@ different birds; they must never see different granaries.
 - Hidden tabs keep simulating at full rate (timer-driven) — the town keeps working.
 - Catch-up is capped (max 30 ticks/frame); beyond that, sim time is dropped.
 - `fastForward(days)` runs `coreTick()` in a tight loop — no speed tricks.
+
+## Citizen routing
+
+- `pathfinding-kernel.js` is the sole pure A* implementation. The main thread,
+  the native module Worker, and headless Node execute that same module; road
+  weights, blocked-goal rings, tie-breaking, corner rules, and search budgets
+  therefore cannot drift between hosts.
+- Citizen route requests are authoritative only at a fixed `T+5` simulation
+  tick. The browser shell sends them to `pathfinding-worker.js`; the service
+  first shadow-compares Worker and synchronous bytes, then promotes the Worker
+  only after an exact match. A missing, late, failed, or stale Worker response
+  runs the same kernel synchronously at `T+5`, so platform scheduling cannot
+  change simulation timing or paths.
+- Grid snapshots are compact `Uint8Array` values keyed by `obstacleEpoch`.
+  Production topology writes must increment that epoch. New/load world identity
+  swaps reset the process-local service generation, and late generations are
+  rejected.
+- `_pathRequest` is the only durable in-flight request state. Save/Continue can
+  resume at `T`, `T+1`, or any later pending tick without serializing Worker
+  timing or computed results. Local collision avoidance and right-of-way remain
+  deterministic main-thread traffic decisions; global A* does not model moving
+  citizens as hard obstacles.
 
 ## Commands (the only mutation surface)
 
@@ -126,8 +148,8 @@ the core neither knows nor cares.
 ## Save format
 
 - Realm is in development and uses one strict Engine v2 save epoch. The current
-  contract is module revision `191`, schema `realm.engine-v2`, key
-  `realm-engine-v2-save`, save version `4`, simulation version `4`, and core
+  contract is module revision `193`, schema `realm.engine-v2`, key
+  `realm-engine-v2-save`, save version `4`, simulation version `6`, and core
   order
   `sha256:14621d8fcd8b94594989a9bc8b98e0e67c7f654687e80cdab8cafd940c19c014`.
   These values come only from `runtime-contract.json`; the order identifier is
@@ -242,6 +264,8 @@ node docs/realm/scripts/verify-engine-v2-save.mjs  # strict clean-epoch schema/l
 node docs/realm/scripts/verify-save-continuity.mjs # fresh-process continuation
 node docs/realm/scripts/verify-building-lifecycle.mjs
 node docs/realm/scripts/verify-citizen-transition-ledger.mjs
+node docs/realm/scripts/verify-pathfinding-service.mjs
+node docs/realm/scripts/verify-pathfinding-worker-browser.mjs
 node docs/realm/scripts/verify-navigation-crowd-baseline.mjs --require-correct
 node docs/realm/scripts/verify-phase0c-traffic-baseline.mjs --require-correct
 node docs/realm/scripts/verify-sprite-source-contract.mjs

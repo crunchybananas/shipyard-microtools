@@ -15,7 +15,7 @@ import { ensureServer } from './_serve.mjs';
 const realmRoot = fileURLToPath(new URL('..', import.meta.url));
 const proofDir = join(realmRoot, 'tmp', 'citizen-work-orders');
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 192, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 193, 'Update this gate together with current browser module URLs');
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
@@ -41,8 +41,8 @@ try {
   });
 
   const fixture = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=192');
-    const ownership = await import('./js/citizen-ownership.js?realm=192');
+    const economy = await import('./js/economy.js?realm=193');
+    const ownership = await import('./js/citizen-ownership.js?realm=193');
     const g = window.G;
     Object.assign(g.resources, {
       wood: 10_000, stone: 10_000, gold: 10_000, iron: 10_000,
@@ -158,9 +158,9 @@ try {
   await page.setViewportSize({ width: 1280, height: 800 });
 
   const crisis = await page.evaluate(async ({ orderedId, adaptiveId, farm, lumber, market }) => {
-    const inventory = await import('./js/building-inventory.js?realm=192');
-    const ownership = await import('./js/citizen-ownership.js?realm=192');
-    const state = await import('./js/state.js?realm=192');
+    const inventory = await import('./js/building-inventory.js?realm=193');
+    const ownership = await import('./js/citizen-ownership.js?realm=193');
+    const state = await import('./js/state.js?realm=193');
     const g = window.G;
     const ordered = g.citizens.find(value => value.actorId === orderedId);
     const adaptive = g.citizens.find(value => value.actorId === adaptiveId);
@@ -288,7 +288,7 @@ try {
   assert.equal(await returnToAI.count(), 1, 'continued Crown order did not expose Return to AI');
   await returnToAI.click();
   await page.evaluate(async actorId => {
-    const inventory = await import('./js/building-inventory.js?realm=192');
+    const inventory = await import('./js/building-inventory.js?realm=193');
     const g = window.G;
     const citizen = g.citizens.find(value => value.actorId === actorId);
     const store = inventory.foodStores(g, { withSpace: true })[0];

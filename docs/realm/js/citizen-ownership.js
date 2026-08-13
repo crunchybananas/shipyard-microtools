@@ -4,8 +4,9 @@
 // profession, assignment, and activity. Buildings never own worker arrays;
 // staffing is a deterministic derived view of citizen assignments.
 
-import { G, BUILDINGS } from './state.js?realm=192';
-import { emit, off, on } from './bus.js?realm=192';
+import { G, BUILDINGS } from './state.js?realm=193';
+import { emit, off, on } from './bus.js?realm=193';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=193';
 
 export const CONSTRUCTION_STAFF_LIMIT = 2;
 
@@ -505,6 +506,7 @@ export function removeCitizenFromWorld(citizen, reason = 'citizen-removed') {
       : `Citizen actorId ${citizen.actorId} is not live.`);
   }
   releaseCitizenAssignment(citizen, reason);
+  clearCitizenRouteState(citizen);
   // Residence occupancy is derived from live citizen references. Clear the
   // departing actor's reference as part of the same ownership transition so
   // no caller can retain a removed citizen that still claims a realm home.
@@ -546,13 +548,10 @@ export function findBuildingByLocator(x, y) {
 
 function clearCommandWorkIntent(citizen) {
   citizen.workTarget = null;
-  citizen.path = null;
-  citizen.pathIdx = 0;
+  clearCitizenRouteState(citizen);
   delete citizen._requestedTx;
   delete citizen._requestedTy;
   citizen._pathGoal = null;
-  citizen._pathStartedAt = null;
-  citizen._stuckTicks = 0;
   citizen._wdBest = null;
   citizen._wdTicks = 0;
 }

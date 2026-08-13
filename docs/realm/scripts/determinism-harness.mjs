@@ -3,21 +3,21 @@
 // transaction rewrites these literals together with the browser graph.
 
 import { createHash } from 'node:crypto';
-import runtimeContract from '../runtime-contract.json?realm=192' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=193' with { type: 'json' };
 import {
   AUTHORITATIVE_SIMULATION_EXCLUDED_G_KEYS,
   G,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS,
   getSeed,
   setSeed,
-} from '../js/state.js?realm=192';
-import { generateWorld } from '../js/world.js?realm=192';
-import { CORE_SYSTEM_ORDER, coreStateIdentity, coreTick } from '../js/sim.js?realm=192';
-import { commandStateIdentity, dispatch } from '../js/commands.js?realm=192';
-import { canPlace } from '../js/economy.js?realm=192';
-import { initChronicle } from '../js/log.js?realm=192';
-import { missions } from '../js/missions.js?realm=192';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=192';
+} from '../js/state.js?realm=193';
+import { generateWorld } from '../js/world.js?realm=193';
+import { CORE_SYSTEM_ORDER, coreStateIdentity, coreTick } from '../js/sim.js?realm=193';
+import { commandStateIdentity, dispatch } from '../js/commands.js?realm=193';
+import { canPlace } from '../js/economy.js?realm=193';
+import { initChronicle } from '../js/log.js?realm=193';
+import { missions } from '../js/missions.js?realm=193';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=193';
 
 export { CORE_SYSTEM_ORDER, G, runtimeContract };
 

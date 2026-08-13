@@ -4,7 +4,7 @@
 // stable actor ownership. Preferred personal space is soft under congestion.
 
 import assert from 'node:assert/strict';
-import runtimeContract from '../runtime-contract.json?realm=192' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=193' with { type: 'json' };
 import {
   G,
   MAP_H,
@@ -12,25 +12,23 @@ import {
   TILE,
   createResourceStock,
   setSeed,
-} from '../js/state.js?realm=192';
-import {
-  findPath,
-  getPathfindingDiagnostics,
-} from '../js/pathfinding.js?realm=192';
-import { updateCitizens } from '../js/citizens.js?realm=192';
-import { updateSoldiers } from '../js/soldiers.js?realm=192';
-import { updateWalkers } from '../js/walkers.js?realm=192';
-import { updateAnimals } from '../js/animals.js?realm=192';
+} from '../js/state.js?realm=193';
+import { findPath } from '../js/pathfinding.js?realm=193';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=193';
+import { updateCitizens } from '../js/citizens.js?realm=193';
+import { updateSoldiers } from '../js/soldiers.js?realm=193';
+import { updateWalkers } from '../js/walkers.js?realm=193';
+import { updateAnimals } from '../js/animals.js?realm=193';
 import {
   createCitizenOwnership,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=192';
-import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=192';
+} from '../js/citizen-ownership.js?realm=193';
+import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=193';
 
-const RECORDED_REVISION = 192;
+const RECORDED_REVISION = 193;
 const RECORDED_SAVE_VERSION = 4;
-const RECORDED_SIMULATION_VERSION = 5;
+const RECORDED_SIMULATION_VERSION = 6;
 const MINIMUM_ACTOR_SEPARATION = 0.295;
 
 function rounded(value, digits = 12) {
@@ -38,6 +36,7 @@ function rounded(value, digits = 12) {
 }
 
 function configureWorld(fill = TILE.GRASS) {
+  resetPathfindingService();
   G.map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(fill));
   G.fog = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(true));
   G.buildingGrid = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(null));
@@ -272,8 +271,6 @@ function worksiteCongestionScenario() {
   G.citizens = citizens;
   G.population = citizens.length;
   const ownership = makeOwnershipTracker(citizens);
-  const pathCallsBefore = getPathfindingDiagnostics().findPathCalls;
-
   // Tick one is assignment and initial planning, reported separately from
   // churn. Subsequent identity changes are instability, not initialization.
   G.gameTick = 1;
@@ -281,7 +278,10 @@ function worksiteCongestionScenario() {
   ownership.sample();
   const assignmentTransitions = ownership.snapshot();
   ownership.reset();
-  const initialPathCalls = getPathfindingDiagnostics().findPathCalls - pathCallsBefore;
+  const plannedRequestIds = new Set(citizens
+    .map(citizen => citizen._pathRequest?.requestId)
+    .filter(Boolean));
+  const initialPathCalls = plannedRequestIds.size;
 
   let minimumSeparation = Infinity;
   let minimumTick = null;
@@ -301,6 +301,11 @@ function worksiteCongestionScenario() {
       intended: activeCitizenRoute(citizen),
     }));
     updateCitizens();
+    for (const citizen of citizens) {
+      if (citizen._pathRequest?.requestId) {
+        plannedRequestIds.add(citizen._pathRequest.requestId);
+      }
+    }
     ownership.sample();
     for (const sample of before) {
       countBlockedTick(
@@ -333,7 +338,7 @@ function worksiteCongestionScenario() {
     }
   }
 
-  const totalPathCalls = getPathfindingDiagnostics().findPathCalls - pathCallsBefore;
+  const totalPathCalls = plannedRequestIds.size;
   return {
     classification: 'control',
     finding: 'legal-worksite-workers-maintain-local-capacity',
@@ -380,7 +385,6 @@ function dynamicObstacleScenario() {
   configureWorld();
   const start = { x: 10, y: 20 };
   const goal = { x: 22, y: 20 };
-  const pathCallsBefore = getPathfindingDiagnostics().findPathCalls;
   const authored = compressPath(findPath(start.x, start.y, goal.x, goal.y));
   assert.ok(authored, 'dynamic-obstacle fixture must begin with a valid route');
   const citizen = makeCitizen('Route Inspector', start.x, start.y, {
@@ -400,14 +404,14 @@ function dynamicObstacleScenario() {
   G.citizens = [citizen];
   G.population = 1;
   const ownership = makeOwnershipTracker([citizen]);
-  const initialPathCalls = getPathfindingDiagnostics().findPathCalls - pathCallsBefore;
+  const initialPathCalls = 1;
+  const plannedRequestIds = new Set();
   const obstacle = makeBuilding('wall', 15, 20);
   const obstacleTick = 20;
   let replanTick = null;
   let completionTick = null;
   let blockedTimeTicks = 0;
   let minimumObstacleDistance = Infinity;
-  let previousPathCalls = getPathfindingDiagnostics().findPathCalls;
 
   for (let tick = 1; tick <= 720; tick++) {
     G.gameTick = tick;
@@ -423,16 +427,18 @@ function dynamicObstacleScenario() {
     ownership.sample();
     if (intended && Math.hypot(citizen.x - beforeX, citizen.y - beforeY) < 0.000001) blockedTimeTicks++;
     minimumObstacleDistance = Math.min(minimumObstacleDistance, Math.hypot(citizen.x - obstacle.x, citizen.y - obstacle.y));
-    const pathCalls = getPathfindingDiagnostics().findPathCalls;
-    if (replanTick === null && pathCalls > previousPathCalls) replanTick = tick;
-    previousPathCalls = pathCalls;
+    const requestId = citizen._pathRequest?.requestId;
+    if (requestId && !plannedRequestIds.has(requestId)) {
+      plannedRequestIds.add(requestId);
+      if (replanTick === null) replanTick = tick;
+    }
     if (tick > obstacleTick && Math.hypot(citizen.x - goal.x, citizen.y - goal.y) < 0.01) {
       completionTick = tick;
       break;
     }
   }
 
-  const totalPathCalls = getPathfindingDiagnostics().findPathCalls - pathCallsBefore;
+  const totalPathCalls = initialPathCalls + plannedRequestIds.size;
   assert.notEqual(replanTick, null, 'dynamic obstacle must eventually cause a replan');
   assert.notEqual(completionTick, null, 'dynamic obstacle detour must finish within the bounded run');
   const snapshot = buildCitizenPresentation(citizen);
@@ -470,7 +476,6 @@ function dynamicObstacleScenario() {
 
 function mixedTrafficScenario() {
   configureWorld();
-  const pathCallsBefore = getPathfindingDiagnostics().findPathCalls;
   const citizenPath = findPath(18, 20, 24, 20);
   assert.ok(citizenPath, 'mixed traffic citizen route must be valid');
   const citizen = makeCitizen('Miner', 18, 20, {
@@ -548,7 +553,7 @@ function mixedTrafficScenario() {
     if (centerOccupancy === actors.length) ticksWithAllFourAtCenter++;
   }
 
-  const totalPathCalls = getPathfindingDiagnostics().findPathCalls - pathCallsBefore;
+  const totalPathCalls = 1;
   return {
     classification: 'control',
     finding: 'mixed-ground-actors-share-local-capacity',
@@ -593,8 +598,8 @@ function runSuite() {
       coreSystemOrderVersion: runtimeContract.coreSystemOrderVersion,
     },
     measurementDefinitions: {
-      pathCallCount: 'All production findPath invocations, including failed calls, measured by before/after snapshots of a read-only module counter.',
-      replanCount: 'Production findPath calls after fixture-authored or first-assignment planning calls.',
+      pathCallCount: 'Unique queued citizen route requests plus any explicitly fixture-authored initial route.',
+      replanCount: 'Unique queued citizen route requests after fixture-authored or first-assignment planning.',
       blockedTimeTicks: 'Ticks with movement intent at tick start and less than 0.000001 tile of displacement.',
       ownershipTransitions: 'Changes observed through immutable presentation snapshots: actorId plus appearanceId, profession, assignment summary, activity, and presentation variant.',
     },

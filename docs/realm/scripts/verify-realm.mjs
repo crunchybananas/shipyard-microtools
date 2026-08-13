@@ -54,6 +54,8 @@ const checks = [
   ['building workforce priority', 'verify-building-workforce-priority.mjs'],
   ['citizen presentation', 'verify-engine-v2-citizen-presentation.mjs'],
   ['pathfinding liveness and reachable approaches', 'verify-pathfinding-liveness.mjs'],
+  ['deterministic pathfinding service', 'verify-pathfinding-service.mjs'],
+  ['browser native pathfinding Worker', 'verify-pathfinding-worker-browser.mjs'],
   ['citizen congestion and physical service queues', 'verify-citizen-congestion.mjs'],
   ['navigation and crowding', 'verify-navigation-crowd-baseline.mjs', '--require-correct'],
   ['mixed ground traffic', 'verify-phase0c-traffic-baseline.mjs', '--require-correct'],

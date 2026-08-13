@@ -2,8 +2,8 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=192';
-import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=192';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=193';
+import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=193';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
@@ -57,25 +57,26 @@ function closeRaidStolenLedger(outcome) {
   G._raidStolen = null;
   return true;
 }
-import { stepEntityToward } from './pathfinding.js?realm=192';
-import { spawnClashFX, visualJitter } from './fx.js?realm=192';
+import { stepEntityToward } from './pathfinding.js?realm=193';
+import { spawnClashFX, visualJitter } from './fx.js?realm=193';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=192';
-import { removeBuilding } from './building-lifecycle.js?realm=192';
-import { announce as notify } from './log.js?realm=192';
-import { chronicle } from './log.js?realm=192';
-import { recordDeathMarker } from './death-markers.js?realm=192';
+import { sfx as playSound } from './log.js?realm=193';
+import { removeBuilding } from './building-lifecycle.js?realm=193';
+import { announce as notify } from './log.js?realm=193';
+import { chronicle } from './log.js?realm=193';
+import { recordDeathMarker } from './death-markers.js?realm=193';
 import {
   removeCitizenFromWorld,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=192';
+} from './citizen-ownership.js?realm=193';
 import {
   citizenHasValidResidence,
   citizenIsIndoors,
-} from './residences.js?realm=192';
+} from './residences.js?realm=193';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=193';
 
 function detachProjectileTargets(enemy) {
   let snapshot = null;
@@ -326,8 +327,7 @@ export function updateEnemies() {
         if (c.activity.kind !== 'flee' && citizenHasValidResidence(c)) {
           transitionCitizenActivity(c, 'seek_shelter', 'raid-shelter');
           c.activityTimer = 0;
-          c.path = null;
-          c.pathIdx = 0;
+          clearCitizenRouteState(c);
           continue;
         }
 
@@ -338,8 +338,7 @@ export function updateEnemies() {
         c.ty = Math.max(1, Math.min(MAP_H - 2, c.y + (dy / (d || 1)) * 5));
         transitionCitizenActivity(c, 'flee', 'shelter-unreachable');
         c.activityTimer = 30;
-        c.path = null;
-        c.pathIdx = 0;
+        clearCitizenRouteState(c);
       }
     }
 

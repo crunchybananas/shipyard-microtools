@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import runtimeContract from '../runtime-contract.json?realm=192' with { type: 'json' };
-import { CORE_SYSTEM_ORDER } from '../js/sim.js?realm=192';
+import runtimeContract from '../runtime-contract.json?realm=193' with { type: 'json' };
+import { CORE_SYSTEM_ORDER } from '../js/sim.js?realm=193';
 import {
   REALM_ROOT,
   analyzeRuntimeGraph,
@@ -36,16 +36,17 @@ const supportedFile = join(fixtures, 'supported-forms.js.fixture');
 const supportedSource = readFileSync(supportedFile, 'utf8');
 const supported = parseModuleSpecifiers(supportedSource, supportedFile);
 assert(supported.nonLiteralDynamicImports.length === 0, 'supported forms contain no non-literal imports');
+assert(supported.nonLiteralWorkerEntries.length === 0, 'supported forms contain no non-literal Worker entries');
 assert(
   supported.records.map(record => record.kind).join(',') === [
     'static-import', 'side-effect-import', 're-export', 're-export',
-    'dynamic-import', 'dynamic-import', 'static-import',
+    'dynamic-import', 'dynamic-import', 'static-import', 'worker-entry',
   ].join(','),
-  'recognizes static, side-effect, re-export, literal dynamic, template-expression, and JSON imports',
+  'recognizes static, side-effect, re-export, literal dynamic, template-expression, JSON, and module Worker entries',
   supported.records.map(record => record.kind).join(','),
 );
 assert(
-  supported.records.length === 7 && supported.records.every(record => !/comment|string|template-text|regexp/.test(record.specifier)),
+  supported.records.length === 8 && supported.records.every(record => !/comment|string|template-text|regexp/.test(record.specifier)),
   'does not treat comments, inert strings, template text, or regexps as imports',
 );
 
@@ -55,6 +56,7 @@ assert(inert.records.length === 0, 'inert-only fixture yields zero module edges'
 const nonliteralFile = join(fixtures, 'nonliteral.js.fixture');
 const nonliteral = parseModuleSpecifiers(readFileSync(nonliteralFile, 'utf8'), nonliteralFile);
 assert(nonliteral.nonLiteralDynamicImports.length === 1, 'non-literal dynamic import fails closed');
+assert(nonliteral.nonLiteralWorkerEntries.length === 1, 'non-literal Worker entry fails closed');
 
 const rewriteProbeFile = join(__dirname, 'fixture-browser-probe.mjs');
 const rewritten = rewriteRuntimeSpecifiers(supportedSource, rewriteProbeFile, runtimeContract.moduleRevision);
@@ -93,6 +95,7 @@ if (!graph.ok) {
 assert(graph.counts.htmlEntries === 1, 'index.html has exactly one canonical module entry');
 assert(graph.counts.browserEvaluatorRoots >= 80, `all ${graph.counts.browserEvaluatorRoots} browser-evaluated runtime roots are registered`);
 assert(graph.counts.nodeRuntimeRoots >= 10, 'Node runtime roots are registered');
+assert(graph.counts.workerEntries === 1, 'exactly one native module Worker entry is registered');
 assert(graph.counts.contractEdges >= 1, 'runtime-contract JSON import attributes are registered');
 assert(graph.counts.alternateIdentityAllowlist === 0, 'no alternate runtime identity allowlist is needed');
 const runtimeMutationFile = join(REALM_ROOT, 'js', 'sprite-source-contract.js');

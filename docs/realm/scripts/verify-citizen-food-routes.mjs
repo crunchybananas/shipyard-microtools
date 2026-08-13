@@ -3,22 +3,24 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=192';
-import { makeCitizen } from '../js/world.js?realm=192';
-import { makeAvatar } from '../js/avatar.js?realm=192';
-import { updateCitizens } from '../js/citizens.js?realm=192';
+} from '../js/state.js?realm=193';
+import { makeCitizen } from '../js/world.js?realm=193';
+import { makeAvatar } from '../js/avatar.js?realm=193';
+import { updateCitizens } from '../js/citizens.js?realm=193';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=192';
+} from '../js/citizen-ownership.js?realm=193';
 import {
   foodConservationReport,
   storedFood,
-} from '../js/building-inventory.js?realm=192';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=192';
+} from '../js/building-inventory.js?realm=193';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=193';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=193';
 
 function resetCore(seed = 190_501) {
+  resetPathfindingService();
   resetCitizenOwnershipRuntime();
   setSeed(seed);
   Object.assign(G, {

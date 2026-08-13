@@ -18,7 +18,7 @@ import {
   CARGO_FRAMES,
   CARGO_RESOURCES,
   CARGO_RUNTIME_ATLASES,
-} from '../js/cargo-source-contract.js?realm=192';
+} from '../js/cargo-source-contract.js?realm=193';
 import {
   ACTIONS,
   ACTOR_BASE_DIRNAME,
@@ -40,7 +40,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=192';
+} from '../js/sprite-source-contract.js?realm=193';
 
 const execFileAsync = promisify(execFile);
 

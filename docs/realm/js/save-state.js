@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=192';
-import { missions } from './missions.js?realm=192';
+} from './state.js?realm=193';
+import { missions } from './missions.js?realm=193';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=192';
+} from './save-schema.js?realm=193';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,10 +22,11 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=192';
-import { houseResidentCapacity } from './residences.js?realm=192';
-import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=192';
-import { foodCapacity } from './building-inventory.js?realm=192';
+} from './citizen-ownership.js?realm=193';
+import { houseResidentCapacity } from './residences.js?realm=193';
+import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=193';
+import { foodCapacity } from './building-inventory.js?realm=193';
+import { makePathfindingRequest } from './pathfinding-service.js?realm=193';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization
@@ -147,7 +148,7 @@ const CITIZEN_KEYS = new Set([
   '_deliveryTarget', '_foodTarget', '_evacRot', '_evacTarget', '_evacTicks', '_fleeing', '_hb',
   '_lastPathX', '_lastPathY', '_leisureDay', '_forageReadyAt',
   '_leisureTarget', '_movedAt', '_needsDeliveryNoticeAt', '_noGo', '_pathEpoch',
-  '_pathFailedAt', '_pathGoal', '_pathStartedAt', '_requestedTx', '_requestedTy',
+  '_pathFailedAt', '_pathGoal', '_pathRequest', '_pathStartedAt', '_requestedTx', '_requestedTy',
   '_stuckTicks', '_wdBest', '_wdTicks', '_workFaceX', '_workFaceZ',
   '_px', '_py',
 ]);
@@ -430,6 +431,7 @@ const CITIZEN_FIELD_VALIDATORS = new Map([
   ['_leisureTarget', nullableObjectRule], ['_needsDeliveryNoticeAt', nonNegativeIntegerRule],
   ['_noGo', ordinaryObjectRule], ['_pathEpoch', nonNegativeIntegerRule],
   ['_pathFailedAt', nonNegativeIntegerRule], ['_pathGoal', nullableObjectRule],
+  ['_pathRequest', nullableObjectRule],
   ['_pathStartedAt', nullableRule(nonNegativeIntegerRule)],
   ['_requestedTx', finiteRule], ['_requestedTy', finiteRule],
   ['_stuckTicks', nonNegativeIntegerRule], ['_wdBest', nullableRule(nonNegativeFiniteRule)],
@@ -833,6 +835,66 @@ function validateCitizenNestedState(citizen, path) {
     if (!point.ok) return point;
     if (citizen[key].score !== undefined && !isFiniteNumber(citizen[key].score)) return failure('non-finite-number', `${path}.${key}.score`, 'Path score must be finite.');
   }
+  if (citizen._pathRequest !== undefined && citizen._pathRequest !== null) {
+    const request = citizen._pathRequest;
+    const requestPath = `${path}._pathRequest`;
+    const keys = new Set([
+      'requestId', 'actorId', 'obstacleEpoch', 'requestedTick', 'readyTick',
+      'sx', 'sy', 'ex', 'ey', 'maxExpanded',
+    ]);
+    const surface = validateObjectSurface(request, keys, keys, requestPath);
+    if (!surface.ok) return surface;
+    if (request.actorId !== citizen.actorId) {
+      return failure('inconsistent-state', `${requestPath}.actorId`, 'Pending path actorId must match its citizen.');
+    }
+    for (const key of ['obstacleEpoch', 'requestedTick', 'readyTick']) {
+      if (!Number.isSafeInteger(request[key]) || request[key] < 0) {
+        return failure('out-of-range', `${requestPath}.${key}`, 'Pending path ticks and epoch must be non-negative safe integers.');
+      }
+    }
+    for (const key of ['sx', 'ex']) {
+      if (!Number.isInteger(request[key]) || request[key] < 0 || request[key] >= MAP_W) {
+        return failure('out-of-range', `${requestPath}.${key}`, 'Pending path x coordinates must be integer map positions.');
+      }
+    }
+    for (const key of ['sy', 'ey']) {
+      if (!Number.isInteger(request[key]) || request[key] < 0 || request[key] >= MAP_H) {
+        return failure('out-of-range', `${requestPath}.${key}`, 'Pending path y coordinates must be integer map positions.');
+      }
+    }
+    if (request.maxExpanded !== null && (!Number.isSafeInteger(request.maxExpanded) || request.maxExpanded < 0)) {
+      return failure('out-of-range', `${requestPath}.maxExpanded`, 'Pending path expansion budget must be null or a non-negative safe integer.');
+    }
+    let canonical;
+    try {
+      canonical = makePathfindingRequest({
+        actorId: request.actorId,
+        obstacleEpoch: request.obstacleEpoch,
+        requestedTick: request.requestedTick,
+        sx: request.sx,
+        sy: request.sy,
+        ex: request.ex,
+        ey: request.ey,
+        maxExpanded: request.maxExpanded,
+      });
+    } catch (error) {
+      return failure('inconsistent-state', requestPath, error instanceof Error ? error.message : 'Invalid pending path request.');
+    }
+    if (request.requestId !== canonical.requestId || request.readyTick !== canonical.readyTick) {
+      return failure('inconsistent-state', requestPath, 'Pending path identity and ready tick must match its canonical query.');
+    }
+    if (!Array.isArray(citizen.path) || citizen.path.length !== 0 || citizen.pathIdx !== 0) {
+      return failure('inconsistent-state', requestPath, 'A pending path requires an empty, unconsumed waypoint queue.');
+    }
+    if (
+      citizen._pathGoal === undefined
+      || citizen._pathGoal === null
+      || citizen._pathGoal.x !== request.ex
+      || citizen._pathGoal.y !== request.ey
+    ) {
+      return failure('inconsistent-state', requestPath, 'Pending path goal must match the citizen effective route goal.');
+    }
+  }
   if (citizen._leisureTarget !== undefined && citizen._leisureTarget !== null) {
     const targetPath = `${path}._leisureTarget`;
     const surface = validateObjectSurface(citizen._leisureTarget, new Set(['x', 'y', 'kind']), new Set(['x', 'y', 'kind']), targetPath);
@@ -1078,6 +1140,12 @@ function validateCandidateGame(game) {
     }
     if (citizen.profession.sinceTick > game.gameTick) return failure('out-of-range', `${path}.profession.sinceTick`, 'Profession transition cannot be in the future.');
     if (citizen.activity.sinceTick > game.gameTick) return failure('out-of-range', `${path}.activity.sinceTick`, 'Activity transition cannot be in the future.');
+    if (citizen._pathRequest?.requestedTick > game.gameTick) {
+      return failure('out-of-range', `${path}._pathRequest.requestedTick`, 'Pending path request cannot originate in the future.');
+    }
+    if (citizen._pathRequest?.obstacleEpoch > game.obstacleEpoch) {
+      return failure('out-of-range', `${path}._pathRequest.obstacleEpoch`, 'Pending path request cannot target a future obstacle epoch.');
+    }
     if (citizen.assignment) {
       const building = citizen.assignment.building;
       if (!buildings.has(building)) return failure('invalid-reference', `${path}.assignment.building`, 'Assignment must reference a live building.');

@@ -6,7 +6,7 @@
 // producer's output buffer or a citizen's hands is not wallet-owned until a
 // physical deposit succeeds.
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE } from './state.js?realm=192';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE } from './state.js?realm=193';
 
 const FOOD_STORE_TYPES = new Set(['house', 'granary', 'storehouse']);
 

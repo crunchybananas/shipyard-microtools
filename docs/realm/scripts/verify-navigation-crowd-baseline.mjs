@@ -7,19 +7,19 @@
 // at a saturated door or crossing.
 
 import assert from 'node:assert/strict';
-import runtimeContract from '../runtime-contract.json?realm=192' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=193' with { type: 'json' };
 import {
   G,
   MAP_H,
   MAP_W,
   TILE,
   setSeed,
-} from '../js/state.js?realm=192';
+} from '../js/state.js?realm=193';
 import {
   findPath,
   stepEntityToward,
-} from '../js/pathfinding.js?realm=192';
-import { updateCitizens } from '../js/citizens.js?realm=192';
+} from '../js/pathfinding.js?realm=193';
+import { updateCitizens } from '../js/citizens.js?realm=193';
 
 const SQRT2 = Math.SQRT2;
 const MINIMUM_ACTOR_SEPARATION = 0.295;
@@ -308,6 +308,7 @@ function unreachableControls() {
   assert.equal(disconnectedOracle, null, 'Dijkstra must confirm the disconnected control');
 
   for (let x = start.x; x <= goal.x; x++) G.map[10][x] = TILE.GRASS;
+  G.obstacleEpoch++;
   const connectedPath = findPath(start.x, start.y, goal.x, goal.y);
   const connectedOracle = dijkstra(start, goal);
   assert.ok(connectedPath, 'opening a one-tile corridor must make the same endpoints reachable');

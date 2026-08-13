@@ -3,26 +3,28 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=192';
-import { makeCitizen } from '../js/world.js?realm=192';
-import { placeBuilding, updateProduction } from '../js/economy.js?realm=192';
-import { updateCitizens } from '../js/citizens.js?realm=192';
+} from '../js/state.js?realm=193';
+import { makeCitizen } from '../js/world.js?realm=193';
+import { placeBuilding, updateProduction } from '../js/economy.js?realm=193';
+import { updateCitizens } from '../js/citizens.js?realm=193';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=192';
+} from '../js/citizen-ownership.js?realm=193';
 import {
   assignCitizenResidence,
   citizenHasValidResidence,
   citizenIsIndoors,
   houseResidentCapacity,
   residentsForHouse,
-} from '../js/residences.js?realm=192';
-import { isBuildingOperational } from '../js/building-operation.js?realm=192';
-import { depositFood, storedFood, withdrawFood } from '../js/building-inventory.js?realm=192';
+} from '../js/residences.js?realm=193';
+import { isBuildingOperational } from '../js/building-operation.js?realm=193';
+import { depositFood, storedFood, withdrawFood } from '../js/building-inventory.js?realm=193';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=193';
 
 function resetCore() {
+  resetPathfindingService();
   resetCitizenOwnershipRuntime();
   setSeed(7331);
   Object.assign(G, {

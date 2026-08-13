@@ -2,8 +2,9 @@
 //
 // This file deliberately has no parser dependency. The lexer below recognizes
 // JavaScript lexical boundaries (comments, strings, regexps and template
-// expressions) before extracting the four module-specifier forms Realm uses:
-// static imports, side-effect imports, re-exports and literal dynamic imports.
+// expressions) before extracting Realm's executable module-specifier forms:
+// static imports, side-effect imports, re-exports, literal dynamic imports and
+// native module Worker entry URLs.
 
 // Browser evaluator imports are written as `./js/...` inside scripts, but are
 // evaluated relative to index.html rather than the script file. They are
@@ -260,10 +261,32 @@ export function parseModuleSpecifiers(source, file = '<source>') {
   const tokens = lexJavaScript(source, file);
   const records = [];
   const nonLiteralDynamicImports = [];
+  const nonLiteralWorkerEntries = [];
 
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
     if (token.type !== 'identifier') continue;
+
+    if (
+      token.value === 'new'
+      && tokens[i + 1]?.value === 'Worker'
+      && tokens[i + 2]?.value === '('
+    ) {
+      const literalUrl = tokens[i + 3]?.value === 'new'
+        && tokens[i + 4]?.value === 'URL'
+        && tokens[i + 5]?.value === '('
+        && tokens[i + 6]?.type === 'string'
+        && tokens[i + 7]?.value === ','
+        && tokens[i + 8]?.value === 'import'
+        && tokens[i + 9]?.value === '.'
+        && tokens[i + 10]?.value === 'meta'
+        && tokens[i + 11]?.value === '.'
+        && tokens[i + 12]?.value === 'url'
+        && tokens[i + 13]?.value === ')';
+      if (literalUrl) records.push(moduleRecord('worker-entry', tokens[i + 6], file));
+      else nonLiteralWorkerEntries.push({ file, line: token.line, offset: token.start });
+      continue;
+    }
 
     if (token.value === 'import') {
       if (tokens[i - 1]?.value === '.' || tokens[i - 1]?.value === '?.') continue;
@@ -300,7 +323,7 @@ export function parseModuleSpecifiers(source, file = '<source>') {
       }
     }
   }
-  return { records, nonLiteralDynamicImports };
+  return { records, nonLiteralDynamicImports, nonLiteralWorkerEntries };
 }
 
 /** Find external module script entries while ignoring HTML comments. */
@@ -351,7 +374,7 @@ function resolveRuntimeTarget(record, sourceFile) {
   if (!['.js', '.json'].includes(extname(pathname))) return null;
 
   let target;
-  let execution = 'runtime-module';
+  let execution = record.kind === 'worker-entry' ? 'worker-entry' : 'runtime-module';
   if (sourceFile === join(REALM_ROOT, 'index.html')) {
     target = resolve(REALM_ROOT, pathname.replace(/^\//, ''));
     execution = 'html-entry';
@@ -460,6 +483,9 @@ export function analyzeRuntimeGraph({ revision, overrides = new Map() } = {}) {
       for (const dynamic of parsed.nonLiteralDynamicImports) {
         errors.push(`${displayPath(file)}:${dynamic.line}: non-literal dynamic import is not registered; runtime reachability must fail closed`);
       }
+      for (const worker of parsed.nonLiteralWorkerEntries) {
+        errors.push(`${displayPath(file)}:${worker.line}: non-literal Worker entry is not registered; runtime reachability must fail closed`);
+      }
     } catch (error) {
       errors.push(error.message);
     }
@@ -501,6 +527,7 @@ export function analyzeRuntimeGraph({ revision, overrides = new Map() } = {}) {
     runtimeEdges: edges.filter(edge => edge.source.startsWith(`${JS_ROOT}${sep}`)).length,
     htmlEntries: edges.filter(edge => edge.execution === 'html-entry').length,
     browserEvaluatorRoots: edges.filter(edge => edge.execution === 'browser-evaluator').length,
+    workerEntries: edges.filter(edge => edge.execution === 'worker-entry').length,
     nodeRuntimeRoots: edges.filter(edge => edge.execution === 'node-runtime-root').length,
     reachableRuntimeFiles: [...reachable].filter(file => file.startsWith(`${JS_ROOT}${sep}`)).length,
     contractEdges: edges.filter(edge => edge.target === CONTRACT_PATH).length,
@@ -609,5 +636,5 @@ export function formatGraphSummary(result, revision) {
   const c = result.counts;
   return `[module-graph] realm=${revision}; ${c.reachableRuntimeFiles}/${c.runtimeSources} runtime files reachable; ` +
     `${c.runtimeEdges} internal edges; ${c.htmlEntries} HTML, ${c.browserEvaluatorRoots} browser-evaluator, ` +
-    `${c.nodeRuntimeRoots} Node roots; ${c.contractEdges} contract edges; allowlist=${c.alternateIdentityAllowlist}`;
+    `${c.nodeRuntimeRoots} Node roots, ${c.workerEntries} Worker; ${c.contractEdges} contract edges; allowlist=${c.alternateIdentityAllowlist}`;
 }

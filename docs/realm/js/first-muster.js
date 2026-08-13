@@ -2,10 +2,10 @@
 // military frontier. The compact step cursor lives in storyFlags so existing
 // saves can address it without adding another root-state surface.
 
-import { G, BUILDINGS, rngInt } from './state.js?realm=192';
-import { isBuildingComplete } from './building-operation.js?realm=192';
-import { staffingCount } from './citizen-ownership.js?realm=192';
-import { emit } from './bus.js?realm=192';
+import { G, BUILDINGS, rngInt } from './state.js?realm=193';
+import { isBuildingComplete } from './building-operation.js?realm=193';
+import { staffingCount } from './citizen-ownership.js?realm=193';
+import { emit } from './bus.js?realm=193';
 
 export const FIRST_MUSTER_CHAPTER_ID = 'first_muster';
 export const FIRST_MUSTER_STATE_PATH = 'storyFlags.firstMusterStep';

@@ -6,7 +6,7 @@ import { chromium } from '@playwright/test';
 import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 192, 'Update food-route browser imports with the runtime revision');
+assert.equal(contract.moduleRevision, 193, 'Update food-route browser imports with the runtime revision');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -18,7 +18,7 @@ page.on('console', message => {
 });
 
 try {
-  await page.goto(`${server.gameUrl}?v=citizen-food-routes-browser-192`);
+  await page.goto(`${server.gameUrl}?v=citizen-food-routes-browser-193`);
   await page.waitForLoadState('domcontentloaded');
   await page.waitForFunction(() => (
     typeof window.startNewGame === 'function'
@@ -35,12 +35,12 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=192');
-    const inventory = await import('./js/building-inventory.js?realm=192');
-    const ownership = await import('./js/citizen-ownership.js?realm=192');
-    const render = await import('./js/render.js?realm=192');
-    const state = await import('./js/state.js?realm=192');
-    const ui = await import('./js/ui.js?realm=192');
+    const economy = await import('./js/economy.js?realm=193');
+    const inventory = await import('./js/building-inventory.js?realm=193');
+    const ownership = await import('./js/citizen-ownership.js?realm=193');
+    const render = await import('./js/render.js?realm=193');
+    const state = await import('./js/state.js?realm=193');
+    const ui = await import('./js/ui.js?realm=193');
     const g = window.G;
 
     const requireCondition = (condition, message) => {

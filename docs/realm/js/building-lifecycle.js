@@ -6,14 +6,15 @@
 // statistics, and feedback; structural teardown is deliberately identical.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=192';
-import { nearestWalkableTile } from './pathfinding.js?realm=192';
-import { announce, chronicle, sfx } from './log.js?realm=192';
+import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=193';
+import { nearestWalkableTile } from './pathfinding.js?realm=193';
+import { announce, chronicle, sfx } from './log.js?realm=193';
 import {
   releaseAssignmentsForBuilding,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=192';
-import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=192';
+} from './citizen-ownership.js?realm=193';
+import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=193';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=193';
 
 const REMOVAL_CAUSES = new Set(['manual', 'fire', 'raid', 'undo']);
 const ASSIGNMENT_BOUND_ACTIVITIES = new Set(['idle', 'find_job', 'walk_to_work', 'working']);
@@ -81,8 +82,7 @@ function clearCitizenReference(citizen, building, assignmentReleased) {
   if (nextActivity !== null) {
     transitionCitizenActivity(citizen, nextActivity, 'building-removed');
     citizen.activityTimer = 0;
-    citizen.path = null;
-    citizen.pathIdx = 0;
+    clearCitizenRouteState(citizen);
   }
 }
 

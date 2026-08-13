@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G } from '../js/state.js?realm=192';
+import { G } from '../js/state.js?realm=193';
 import {
   CITIZEN_APPEARANCE_IDS,
   createCitizenOwnership,
-} from '../js/citizen-ownership.js?realm=192';
+} from '../js/citizen-ownership.js?realm=193';
 import {
   buildCitizenPresentation,
   presentationActionForActivity,
   presentationVariantForIdentity,
-} from '../js/citizen-presentation.js?realm=192';
+} from '../js/citizen-presentation.js?realm=193';
 import {
   citizenRenderCacheSize,
   citizenRenderRecord,
   pruneCitizenRenderCache,
   resetCitizenRenderCache,
-} from '../js/citizen-render-cache.js?realm=192';
+} from '../js/citizen-render-cache.js?realm=193';
 
 globalThis.location ||= new URL('http://127.0.0.1/index.html');
-const { actorAnimationFrame } = await import('../js/render.js?realm=192');
+const { actorAnimationFrame } = await import('../js/render.js?realm=193');
 
 G.gameTick = 12;
 G.nextActorId = 1;

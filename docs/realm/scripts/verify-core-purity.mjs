@@ -20,13 +20,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const JS = join(__dirname, '..', 'js');
 
 const CORE = new Set([
-  'state.js', 'world.js', 'pathfinding.js', 'ground-traffic.js', 'citizens.js', 'soldiers.js',
+  'state.js', 'world.js', 'pathfinding-kernel.js', 'pathfinding-service.js',
+  'pathfinding.js', 'ground-traffic.js', 'citizens.js', 'soldiers.js',
   'combat.js', 'walkers.js', 'economy.js', 'events.js', 'tech.js',
   'trade.js', 'wonder.js', 'scenarios.js', 'missions.js', 'sim.js',
   'commands.js', 'bus.js', 'log.js', 'fx.js', 'avatar.js', 'military.js',
   'story.js', 'raid-summary.js', 'first-muster.js', 'post-raid-recovery.js',
   'building-lifecycle.js', 'building-operation.js', 'citizen-ownership.js',
   'building-inventory.js', 'residences.js', 'workforce-policy.js', 'death-markers.js',
+  'citizen-activity.js', 'citizen-navigation.js', 'citizen-traffic.js',
+  'citizen-work.js', 'citizen-shelter.js', 'citizen-food.js', 'citizen-needs.js',
+  'citizen-route-state.js',
 ]);
 
 const BANNED = [

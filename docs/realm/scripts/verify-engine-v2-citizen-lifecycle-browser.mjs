@@ -46,12 +46,13 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const ownership = await import('./js/citizen-ownership.js?realm=192');
-    const presentation = await import('./js/citizen-presentation.js?realm=192');
-    const inventory = await import('./js/building-inventory.js?realm=192');
-    const render = await import('./js/render.js?realm=192');
-    const state = await import('./js/state.js?realm=192');
-    const ui = await import('./js/ui.js?realm=192');
+    const ownership = await import('./js/citizen-ownership.js?realm=193');
+    const presentation = await import('./js/citizen-presentation.js?realm=193');
+    const inventory = await import('./js/building-inventory.js?realm=193');
+    const navigation = await import('./js/citizen-navigation.js?realm=193');
+    const render = await import('./js/render.js?realm=193');
+    const state = await import('./js/state.js?realm=193');
+    const ui = await import('./js/ui.js?realm=193');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -63,8 +64,7 @@ try {
       return applied;
     };
     const clearMotion = citizen => {
-      citizen.path = null;
-      citizen.pathIdx = 0;
+      navigation.clearCitizenPath(citizen);
       citizen.tx = citizen.x;
       citizen.ty = citizen.y;
       citizen._requestedTx = undefined;
@@ -244,9 +244,10 @@ try {
       requireCondition(target.assignment?.building === mine, 'Delivery erased the vocational mine assignment');
       phase('mine-delivered');
 
-      // Enclose the citizen for one real routing decision. findPath() fails,
-      // the citizen system emits causal path-unreachable cleanup, and a later
-      // command succeeds after the terrain is reopened.
+      // Enclose the citizen for one real routing decision. The assignment is
+      // retained while the deterministic T+5 request is pending, then the
+      // citizen emits causal path-unreachable cleanup at the authored result
+      // tick. A later command succeeds after the terrain is reopened.
       setPosition(target, 36, 36);
       target.workTarget = null;
       const enclosedTiles = [];
@@ -257,10 +258,21 @@ try {
           g.map[36 + dy][36 + dx] = state.TILE.MOUNTAIN;
         }
       }
+      // Direct fixture terrain edits must publish the same topology signal as
+      // production building/world mutations so the epoch-keyed grid snapshot
+      // cannot reuse the pre-enclosure walkability map.
+      g.obstacleEpoch += 1;
       ownership.transitionCitizenActivity(target, 'find_job', 'seek-work');
       target.activityTimer = 0;
       avoidHeartbeatNextTick(target);
       g.debug.step(1);
+      requireCondition(target.assignment?.building === mine, 'Pending route released mine assignment early');
+      requireCondition(target._pathRequest?.readyTick === g.gameTick + 5, 'Unreachable route lost fixed T+5 timing');
+      const routeFailureTicks = stepUntil(
+        'unreachable mine route failure',
+        () => target.assignment === null,
+        8,
+      );
       requireCondition(target.assignment === null, 'Unreachable mine retained assignment');
       requireCondition(
         target.activity.kind === 'idle' && target.activity.reason === 'path-unreachable',
@@ -269,6 +281,7 @@ try {
       phase('path-failure-recovery');
 
       for (const entry of enclosedTiles) g.map[entry.y][entry.x] = entry.tile;
+      g.obstacleEpoch += 1;
       setPosition(target, 42, 40);
       target.workTarget = null;
       dispatch({ type: 'ASSIGN_CITIZEN', actorId: target.actorId, x: mine.x, y: mine.y });
@@ -285,8 +298,12 @@ try {
       // proof in verify-citizen-work-orders-browser.mjs.
       ownership.releaseCitizenAssignment(target, 'player-command');
       ownership.claimCitizenAssignment(target, mine, { reason: 'job-market' });
+      const reliefPostA = placeComplete('market', 50, 45);
+      dispatch({ type: 'ASSIGN_CITIZEN', actorId: bystander.actorId, x: reliefPostA.x, y: reliefPostA.y });
       const farm = placeComplete('farm', 44, 45);
-      dispatch({ type: 'RELEASE_CITIZEN', actorId: helper.actorId });
+      // Keep both non-subject citizens on Crown orders. Leaving either one
+      // unassigned made this single-actor lifecycle proof depend on which
+      // heartbeat reached the one-slot Farm first.
       park(helper, 39, 46);
       target.activityTimer = 10_000;
       for (const foodStore of inventory.foodStores(g, { withFood: true })) {
@@ -311,9 +328,7 @@ try {
       // The relief-forage policy chooses the lowest-ID unassigned citizen.
       // Keep the two founders on full explicit work orders so this named
       // lifecycle subject is the sole available relief worker.
-      const reliefPostA = placeComplete('market', 50, 45);
       const reliefPostB = placeComplete('tavern', 51, 45);
-      dispatch({ type: 'ASSIGN_CITIZEN', actorId: bystander.actorId, x: reliefPostA.x, y: reliefPostA.y });
       dispatch({ type: 'ASSIGN_CITIZEN', actorId: helper.actorId, x: reliefPostB.x, y: reliefPostB.y });
       setPosition(target, 36, 40);
       g.map[40][36] = state.TILE.FOREST;
@@ -539,6 +554,7 @@ try {
         profession: target.profession.kind,
         mineApproachTicks,
         deliveryApproachTicks,
+        routeFailureTicks,
         routeRecoveryTicks,
         forageTicks,
         sleepApproachTicks,
@@ -616,6 +632,7 @@ try {
 
   console.log(`✓ actor #${result.actorId} established miner vocation and reached real mine work in ${result.mineApproachTicks} ticks`);
   console.log(`✓ real ${result.carryAmount}-iron cargo crossed carry → deliver in ${result.deliveryApproachTicks} ticks without role morph`);
+  console.log(`✓ unreachable route retained ownership while pending and failed causally after ${result.routeFailureTicks} fixed-tick steps`);
   console.log(`✓ route failure emitted causal recovery and returned to mine work in ${result.routeRecoveryTicks} ticks`);
   console.log(`✓ food crisis used temporary farm cover, then completed forage in ${result.forageTicks} ticks`);
   console.log(`✓ eat, sleep, and dawn recovery preserved actor ID, appearance, and miner profession (rest ${result.restBeforeRecovery.toFixed(1)} → ${result.restAfterRecovery.toFixed(1)})`);

@@ -1,2 +1,3 @@
 const runtimePath = './js/state.js';
 const graph = import(runtimePath);
+const worker = new Worker(runtimePath, { type: 'module' });

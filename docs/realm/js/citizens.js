@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, TILE } from './state.js?realm=192';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=192';
-import { getCitizenSpeedMult } from './events.js?realm=192';
-import { revealAround } from './world.js?realm=192';
-import { visualJitter } from './fx.js?realm=192';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getDayPeriod, TILE } from './state.js?realm=193';
+import { isWalkable } from './pathfinding.js?realm=193';
+import { getCitizenSpeedMult } from './events.js?realm=193';
+import { revealAround } from './world.js?realm=193';
+import { visualJitter } from './fx.js?realm=193';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -14,25 +14,20 @@ import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   staffingCount,
-  transitionCitizenActivity,
-} from './citizen-ownership.js?realm=192';
+} from './citizen-ownership.js?realm=193';
 import {
-  assignCitizenResidence,
-  citizenAtResidencePortal,
   citizenHasValidResidence,
   citizenIsIndoors,
   residencePortalForCitizen,
   residentsForHouse,
-} from './residences.js?realm=192';
-import { isBuildingOperational } from './building-operation.js?realm=192';
+} from './residences.js?realm=193';
+import { isBuildingOperational } from './building-operation.js?realm=193';
 import {
   canDepositFood,
   depositFood,
   findReachableFoodStore,
-  isFoodStore,
-  storedFood,
   withdrawFood,
-} from './building-inventory.js?realm=192';
+} from './building-inventory.js?realm=193';
 import {
   AUTO_REVIEW_INTERVAL_TICKS,
   buildingAcceptsAutomaticWorkers,
@@ -41,59 +36,67 @@ import {
   reviewAutomaticAssignment,
   scoreCitizenJob,
   workforceFoodDaysLeft,
-} from './workforce-policy.js?realm=192';
-
-const DEFAULT_ACTIVITY_REASON = Object.freeze({
-  idle: 'idle-wait',
-  find_job: 'seek-work',
-  walk_to_work: 'route-to-work',
-  working: 'arrived-at-work',
-  walk_to_deliver: 'route-to-delivery',
-  needs_delivery: 'cargo-needs-storage',
-  deliver: 'cargo-delivered',
-  foraging: 'forage-started',
-  walk_to_eat: 'route-to-food',
-  waiting_for_food: 'food-shortage',
-  eating: 'eat-food',
-  go_home: 'route-home',
-  sleep: 'sleep-rest',
-  leisure: 'leisure-started',
-  seek_shelter: 'raid-shelter',
-  sheltered: 'shelter-entered',
-  flee: 'threat-response',
-});
-
-function setActivity(citizen, kind, {
-  reason = DEFAULT_ACTIVITY_REASON[kind],
-  timer = 0,
-} = {}) {
-  const changed = transitionCitizenActivity(citizen, kind, reason);
-  // The decision cadence is scheduler state, not the causal activity clock.
-  // A same-kind request preserves activity.sinceTick and emits no event while
-  // still allowing the state machine to schedule its next decision.
-  citizen.activityTimer = timer;
-  return changed;
-}
-
-function assignedBuilding(citizen) {
-  return citizen.assignment?.building || null;
-}
-
-function dist2(ax, ay, bx, by) {
-  return Math.abs(ax-bx) + Math.abs(ay-by);
-}
-
-// Find nearest building of a given type (or any type if typeOrNull is null).
-// Used to route delivering citizens to a real drop-off instead of the map center.
-function nearestBuilding(c, typeOrNull) {
-  let best = null, bestD = Infinity;
-  for (const b of G.buildings) {
-    if (typeOrNull && b.type !== typeOrNull) continue;
-    const d = dist2(c.x, c.y, b.x, b.y);
-    if (d < bestD) { bestD = d; best = b; }
-  }
-  return best;
-}
+} from './workforce-policy.js?realm=193';
+import {
+  assignedCitizenBuilding as assignedBuilding,
+  citizenStableHash as citizenHash,
+  setCitizenActivity as setActivity,
+} from './citizen-activity.js?realm=193';
+import {
+  advanceCitizenPathRequest,
+  blacklistCitizenTarget as blacklistTarget,
+  citizenManhattanDistance as dist2,
+  citizenTargetIsBlacklisted as isBlacklisted,
+  clearCitizenPath as clearPath,
+  pathCitizenTo as pathTo,
+  pruneCitizenNoGo as pruneExpiredNoGo,
+  remainingCitizenRouteIsWalkable as remainingCitizenRouteWalkable,
+  replanCitizenToRequestedTarget as replanToRequestedTarget,
+} from './citizen-navigation.js?realm=193';
+import {
+  applyCitizenSeparation,
+  canCitizenStep as canStepCitizen,
+  captureCitizenTrafficProgress,
+  citizenIsActivelyMoving as isActivelyMoving,
+  citizenStandsOnBlockedTile as standingOnBlockedTile,
+  citizenTileIsWalkable as tileWalkable,
+  citizenTravelSpeed,
+  finishCitizenTrafficProgress,
+  noteCitizenTrafficWait,
+  resolveCitizenStep,
+} from './citizen-traffic.js?realm=193';
+import {
+  citizenIdleLoiterTarget as idleLoiterTarget,
+  citizenWorkTargetForBuilding as workTargetForBuilding,
+  pathCitizenToWork as pathToWork,
+  startCitizenWorking as startWorking,
+} from './citizen-work.js?realm=193';
+import {
+  CITIZEN_NIGHT_EXEMPT_ACTIVITIES as NIGHT_EXEMPT,
+  beginCitizenOpenRaidFlight as beginOpenRaidFlight,
+  citizenEnemyNear as enemyNear,
+  enterCitizenRaidShelter as enterRaidShelter,
+  leaveCitizenRaidShelter as leaveRaidShelter,
+  seekCitizenRaidShelter as seekRaidShelter,
+  sendCitizenHome as goHome,
+} from './citizen-shelter.js?realm=193';
+import {
+  CITIZEN_MEAL_INTERRUPTIBLE_ACTIVITIES as MEAL_INTERRUPTIBLE_ACTIVITIES,
+  beginCitizenFoodRoute as beginFoodRoute,
+  citizenAtFoodTarget,
+  citizenFoodTargetStillValid as foodTargetStillValid,
+  reachableCitizenFoodRoute as reachableFoodRoute,
+  resumeCitizenAfterMeal as resumeAfterMeal,
+} from './citizen-food.js?realm=193';
+import {
+  CITIZEN_MEAL_HUNGER_THRESHOLD,
+  drainCitizenHeartbeatNeeds,
+  feedCitizenMeal,
+  restCitizenWhileSheltered,
+  restoreCitizenSleepRest,
+  satisfyCitizenLeisureNeed,
+  settleCitizenWakeRest,
+} from './citizen-needs.js?realm=193';
 
 // Chain targets win only within reach: a windmill across the island must
 // not beat the granary next door (AI-audit deferred fix). The carrier
@@ -158,93 +161,6 @@ function requestDeliveryStorage(c) {
       alpha: 1.25, vy: -0.12, decay: 0.018, type: 'speech',
     });
   }
-}
-
-function citizenHash(c) {
-  const actorId = Number.isSafeInteger(c?.actorId) ? c.actorId : 0;
-  let h = Math.imul(actorId ^ 0x9e3779b9, 0x85ebca6b);
-  h ^= h >>> 13;
-  h = Math.imul(h, 0xc2b2ae35);
-  return (h ^ (h >>> 16)) >>> 0;
-}
-
-function targetCrowdPenalty(c, x, y) {
-  let penalty = 0;
-  for (const other of G.citizens || []) {
-    if (other === c || citizenIsIndoors(other)) continue;
-    const dist = Math.hypot(other.x - x, other.y - y);
-    if (dist < 0.72) penalty += 1.6;
-    if (Math.round(other.tx ?? other.x) === x && Math.round(other.ty ?? other.y) === y) penalty += 1.1;
-    const goal = other.path?.goal;
-    if (goal && goal.x === x && goal.y === y) penalty += 1.1;
-  }
-  return penalty;
-}
-
-function chooseCrowdAwareTarget(c, tx, ty) {
-  const rx = Math.round(tx), ry = Math.round(ty);
-  const directCrowd = targetCrowdPenalty(c, rx, ry);
-  if (isWalkable(rx, ry) && directCrowd < 1.2) return { x: rx, y: ry };
-
-  const candidates = [];
-  const maxR = isWalkable(rx, ry) ? 2 : 4;
-  for (let y = ry - maxR; y <= ry + maxR; y++) {
-    for (let x = rx - maxR; x <= rx + maxR; x++) {
-      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
-      if (!isWalkable(x, y)) continue;
-      const ring = Math.abs(x - rx) + Math.abs(y - ry);
-      if (ring > maxR) continue;
-      const crowd = targetCrowdPenalty(c, x, y);
-      const fromHere = Math.abs(x - c.x) + Math.abs(y - c.y);
-      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -0.35 : 0;
-      const jitter = ((citizenHash(c) ^ (x * 73856093) ^ (y * 19349663)) >>> 0) / 0xffffffff * 0.18;
-      candidates.push({
-        x, y,
-        score: ring * 2.0 + fromHere * 0.16 + crowd * 4.5 + roadBonus + jitter,
-      });
-    }
-  }
-  candidates.sort((a, b) => a.score - b.score);
-  return candidates[0] || { x: rx, y: ry };
-}
-
-function compressPath(path) {
-  if (!path || path.length <= 2) return path;
-  const compact = [path[0]];
-  let lastDx = 0, lastDy = 0;
-  for (let i = 1; i < path.length; i++) {
-    const prev = path[i - 1];
-    const cur = path[i];
-    const dx = Math.sign(cur.x - prev.x);
-    const dy = Math.sign(cur.y - prev.y);
-    if (i > 1 && (dx !== lastDx || dy !== lastDy)) compact.push(prev);
-    lastDx = dx;
-    lastDy = dy;
-  }
-  compact.push(path[path.length - 1]);
-  compact.goal = path.goal;
-  return compact;
-}
-
-const BLACKLIST_TICKS = 600;
-
-function pruneExpiredNoGo(c) {
-  if (!c._noGo) return;
-  for (const [coordinate, tick] of Object.entries(c._noGo)) {
-    if (G.gameTick - tick >= BLACKLIST_TICKS) delete c._noGo[coordinate];
-  }
-  if (Object.keys(c._noGo).length === 0) delete c._noGo;
-}
-
-function blacklistTarget(c, x, y) {
-  pruneExpiredNoGo(c);
-  c._noGo = c._noGo || {};
-  c._noGo[`${Math.round(x)},${Math.round(y)}`] = G.gameTick;
-}
-
-function isBlacklisted(c, x, y) {
-  const t = c._noGo?.[`${Math.round(x)},${Math.round(y)}`];
-  return t !== undefined && G.gameTick - t < BLACKLIST_TICKS;
 }
 
 function releaseJob(c, { unreachable = false } = {}) {
@@ -314,33 +230,6 @@ function watchProgress(c) {
   }
 }
 
-function pathTo(c, tx, ty, { exact = false } = {}) {
-  c._requestedTx = tx;
-  c._requestedTy = ty;
-  const target = exact
-    ? { x: Math.round(tx), y: Math.round(ty) }
-    : chooseCrowdAwareTarget(c, tx, ty);
-  c._pathGoal = target;
-  c.path = compressPath(findPath(Math.round(c.x), Math.round(c.y), target.x, target.y));
-  c.pathIdx = 0;
-  c._pathStartedAt = c.path ? G.gameTick : null;
-  c._pathEpoch = G.obstacleEpoch || 0;
-  c._stuckTicks = 0;
-  c._lastPathX = c.x;
-  c._lastPathY = c.y;
-  if (c.path) {
-    const goal = c.path.goal || c.path[c.path.length - 1] || { x: tx, y: ty };
-    c.tx = goal.x;
-    c.ty = goal.y;
-    c._pathFailedAt = 0;
-  } else {
-    c.tx = c.x;
-    c.ty = c.y;
-    c._pathFailedAt = G.gameTick || 0;
-  }
-  return !!c.path;
-}
-
 function routeDelivery(c, resKey) {
   if (resKey === 'food') {
     const routes = new Map();
@@ -388,265 +277,6 @@ function deliveryTargetStillValid(c) {
   return !!c._deliveryTarget
     && G.buildings.includes(c._deliveryTarget)
     && (c.carrying !== 'food' || canDepositFood(c._deliveryTarget, 1));
-}
-
-const MEAL_INTERRUPTIBLE_ACTIVITIES = new Set([
-  'idle', 'find_job', 'walk_to_work', 'working', 'leisure',
-]);
-const FOOD_RETRY_BASE_TICKS = 72;
-const FOOD_RETRY_SPREAD_TICKS = 37;
-
-function foodRetryTicks(c) {
-  return FOOD_RETRY_BASE_TICKS + (citizenHash(c) % FOOD_RETRY_SPREAD_TICKS);
-}
-
-function foodStoreApproaches(c, building) {
-  if (!isFoodStore(building)) return [];
-  const bx = Math.round(building.x);
-  const by = Math.round(building.y);
-  const candidates = [];
-  // A meal is served at the building's actual portal ring. Eight stable slots
-  // are enough to distribute a crowd without letting a citizen consume from
-  // several tiles away merely because that outer tile was pathfindable.
-  for (let radius = 1; radius <= 1; radius++) {
-    for (let y = by - radius; y <= by + radius; y++) {
-      for (let x = bx - radius; x <= bx + radius; x++) {
-        if (Math.max(Math.abs(x - bx), Math.abs(y - by)) !== radius) continue;
-        if (!isWalkable(x, y)) continue;
-        const crowd = targetCrowdPenalty(c, x, y);
-        const fromHere = dist2(c.x, c.y, x, y);
-        const jitter = ((citizenHash(c) ^ (x * 1597334677) ^ (y * 3812015801)) >>> 0)
-          / 0xffffffff * 0.2;
-        candidates.push({
-          x,
-          y,
-          score: radius * 1.8 + fromHere * 0.12 + crowd * 5.5 + jitter,
-        });
-      }
-    }
-  }
-  candidates.sort((a, b) => a.score - b.score || a.y - b.y || a.x - b.x);
-  return candidates;
-}
-
-function reachableFoodRoute(c, building) {
-  if (isBlacklisted(c, building.x, building.y)) return null;
-  for (const approach of foodStoreApproaches(c, building)) {
-    const route = findPath(
-      Math.round(c.x),
-      Math.round(c.y),
-      approach.x,
-      approach.y,
-    );
-    if (route) return { approach, route };
-  }
-  return null;
-}
-
-function foodTargetStillValid(c) {
-  return !!c._foodTarget
-    && isFoodStore(c._foodTarget)
-    && storedFood(c._foodTarget) > 0;
-}
-
-function citizenAtFoodTarget(c, building = c._foodTarget) {
-  if (!building) return false;
-  const goal = c._pathGoal;
-  if (
-    goal
-    && Math.max(Math.abs(goal.x - building.x), Math.abs(goal.y - building.y)) <= 3
-    && Math.hypot(c.x - goal.x, c.y - goal.y) <= 0.82
-  ) {
-    return true;
-  }
-  return foodStoreApproaches(c, building)
-    .some(approach => Math.hypot(c.x - approach.x, c.y - approach.y) <= 0.82);
-}
-
-function waitForFood(c, reason = 'food-shortage') {
-  const wasWaiting = c.activity.kind === 'waiting_for_food';
-  c._foodTarget = null;
-  clearPath(c);
-  c.tx = c.x;
-  c.ty = c.y;
-  setActivity(c, 'waiting_for_food', { reason, timer: foodRetryTicks(c) });
-  if (!wasWaiting) {
-    G.particles.push({
-      tx: c.x, ty: c.y, offsetY: -25,
-      text: reason === 'food-source-empty' ? 'Pantry empty' : 'Need reachable food',
-      alpha: 1.3, vy: -0.12, decay: 0.016, type: 'speech',
-    });
-  }
-  return true;
-}
-
-function beginFoodRoute(c, shortageReason = 'food-shortage') {
-  if (c.carrying && c.carryAmount > 0) return false;
-  const routes = new Map();
-  const store = findReachableFoodStore(c, {
-    mode: 'withdraw',
-    isReachable: building => {
-      // A House pantry belongs to its residents. Public Granaries and
-      // Storehouses serve the whole settlement, but a citizen must never eat
-      // through somebody else's home inventory merely because it is nearer.
-      if (
-        building.type === 'house'
-        && (c.home !== building || !citizenHasValidResidence(c))
-      ) return false;
-      const route = reachableFoodRoute(c, building);
-      if (route) routes.set(building, route);
-      return !!route;
-    },
-  });
-  if (!store) return waitForFood(c, shortageReason);
-
-  const route = routes.get(store);
-  c._foodTarget = store;
-  clearPath(c);
-  setActivity(c, 'walk_to_eat', { reason: 'route-to-food' });
-  // Reuse pathTo so all movement metadata, topology invalidation, and save
-  // continuity stay on the same route authority as work and deliveries.
-  if (route && pathTo(c, route.approach.x, route.approach.y, { exact: true })) return true;
-  blacklistTarget(c, store.x, store.y);
-  c._foodTarget = null;
-  return beginFoodRoute(c, shortageReason);
-}
-
-function resumeAfterMeal(c) {
-  c._foodTarget = null;
-  clearPath(c);
-  const workplace = assignedBuilding(c);
-  if (workplace && G.buildings.includes(workplace)) {
-    setActivity(c, 'walk_to_work', { reason: 'route-to-work' });
-    pathToWork(c);
-  } else {
-    setActivity(c, 'find_job', { reason: 'seek-work', timer: 5 });
-  }
-}
-
-// Preferred spacing keeps painted bodies readable, while the smaller hard
-// floor permits brief shoulder overlap at doors and crossings. Local traffic
-// resolves toward the preferred radius; post-move separation enforces only the
-// safety floor so a dense queue cannot become an immovable 0.6-tile wall.
-const PREFERRED_SPACE = 0.55;
-const HARD_ACTOR_SPACE = 0.31;
-
-function tileWalkable(x, y) {
-  const mx = Math.round(x), my = Math.round(y);
-  return isWalkable(mx, my);
-}
-
-function terrainWalkable(x, y) {
-  const mx = Math.round(x), my = Math.round(y);
-  if (mx < 0 || mx >= MAP_W || my < 0 || my >= MAP_H) return false;
-  const t = G.map[my]?.[mx];
-  return t !== undefined && t !== TILE.WATER && t !== TILE.MOUNTAIN;
-}
-
-function resourceWorkTarget(c, b, tileType, radius = 7) {
-  const bx = Math.round(b.x), by = Math.round(b.y);
-  let best = null, bestScore = Infinity;
-  for (let y = by - radius; y <= by + radius; y++) {
-    for (let x = bx - radius; x <= bx + radius; x++) {
-      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
-      if (G.map[y]?.[x] !== tileType) continue;
-      if (G.buildingGrid[y]?.[x] && G.buildingGrid[y][x].type !== 'road') continue;
-      if (!terrainWalkable(x, y) || !isWalkable(x, y)) continue;
-      const fromMill = dist2(x, y, bx, by);
-      if (fromMill > radius) continue;
-      const fromCitizen = dist2(c.x, c.y, x, y);
-      const crowd = targetCrowdPenalty(c, x, y);
-      const jitter = ((citizenHash(c) ^ (x * 374761393) ^ (y * 668265263)) >>> 0) / 0xffffffff * 0.2;
-      const score = fromMill * 2.2 + fromCitizen * 0.16 + crowd * 3.5 + jitter;
-      if (score < bestScore) {
-        bestScore = score;
-        best = { x, y, resource: tileType };
-      }
-    }
-  }
-  return best;
-}
-
-function buildingEdgeWorkTarget(c, b, radius = 2) {
-  const bx = Math.round(b.x), by = Math.round(b.y);
-  let best = null, bestScore = Infinity;
-  for (let y = by - radius; y <= by + radius; y++) {
-    for (let x = bx - radius; x <= bx + radius; x++) {
-      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
-      if (!isWalkable(x, y)) continue;
-      const ring = dist2(x, y, bx, by);
-      if (ring < 1 || ring > radius) continue;
-      const crowd = targetCrowdPenalty(c, x, y);
-      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -0.45 : 0;
-      const jitter = ((citizenHash(c) ^ (x * 83492791) ^ (y * 2654435761)) >>> 0) / 0xffffffff * 0.18;
-      const score = ring * 1.7 + dist2(c.x, c.y, x, y) * 0.16 + crowd * 3.8 + roadBonus + jitter;
-      if (score < bestScore) {
-        bestScore = score;
-        best = { x, y };
-      }
-    }
-  }
-  return best;
-}
-
-function workTargetForBuilding(c, b) {
-  if (!b) return { x: c.x, y: c.y };
-  if (isWorkforceConstructionSite(b)) return buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
-  if (b.type === 'lumber') return resourceWorkTarget(c, b, TILE.FOREST, 7) || buildingEdgeWorkTarget(c, b, 3) || { x: b.x, y: b.y };
-  if (b.type === 'quarry') return resourceWorkTarget(c, b, TILE.STONE, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
-  if (b.type === 'mine') return resourceWorkTarget(c, b, TILE.IRON, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
-  const def = BUILDINGS[b.type];
-  if (def?.workers || def?.prod) return buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
-  return { x: b.x, y: b.y };
-}
-
-function pathToWork(c) {
-  const target = workTargetForBuilding(c, assignedBuilding(c));
-  c.workTarget = target;
-  pathTo(c, target.x, target.y);
-}
-
-function settlementAnchor(c) {
-  return nearestBuilding(c, 'house') ||
-    nearestBuilding(c, 'storehouse') ||
-    nearestBuilding(c, 'granary') ||
-    nearestBuilding(c, null) ||
-    { x: Math.round(MAP_W / 2), y: Math.round(MAP_H / 2) };
-}
-
-function idleLoiterTarget(c) {
-  const anchor = settlementAnchor(c);
-  const ax = Math.round(anchor.x), ay = Math.round(anchor.y);
-  let best = null, bestScore = Infinity;
-  for (let y = ay - 5; y <= ay + 5; y++) {
-    for (let x = ax - 5; x <= ax + 5; x++) {
-      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
-      if (!isWalkable(x, y)) continue;
-      const ring = dist2(x, y, ax, ay);
-      if (ring < 1 || ring > 5) continue;
-      const fromHere = dist2(c.x, c.y, x, y);
-      const crowd = targetCrowdPenalty(c, x, y);
-      // Idle life gathers where towns live: on roads and by doorsteps —
-      // not in a loose mob in an open field.
-      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -1.0 : 0;
-      const doorstep = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([ax, ay]) => G.buildingGrid[y + ay]?.[x + ax]?.type === 'house') ? -0.6 : 0;
-      const jitter = ((citizenHash(c) ^ (x * 92837111) ^ (y * 689287499)) >>> 0) / 0xffffffff * 0.22;
-      const score = Math.abs(ring - 3) * 1.6 + fromHere * 0.18 + crowd * 4 + roadBonus + doorstep + jitter;
-      if (score < bestScore) {
-        bestScore = score;
-        best = { x, y };
-      }
-    }
-  }
-  return best || chooseCrowdAwareTarget(c, ax, ay);
-}
-
-function standingOnBlockedTile(c) {
-  const mx = Math.round(c.x), my = Math.round(c.y);
-  if (mx < 0 || mx >= MAP_W || my < 0 || my >= MAP_H) return false;
-  const t = G.map[my]?.[mx];
-  const b = G.buildingGrid[my]?.[mx];
-  return t !== TILE.WATER && t !== TILE.MOUNTAIN && !!b && b.type !== 'road';
 }
 
 function evacuateBlockedCitizen(c) {
@@ -707,564 +337,20 @@ function evacuateBlockedCitizen(c) {
   return true;
 }
 
-function canStepCitizen(c, nx, ny) {
-  const rx = Math.round(nx), ry = Math.round(ny);
-  const cx = Math.round(c.x), cy = Math.round(c.y);
-  if (tileWalkable(nx, ny)) {
-    // Mirror the A* no-corner-cut rule: a diagonal tile transition needs
-    // both orthogonal neighbours open too, or citizens slip between two
-    // diagonally adjacent buildings placed after the path was planned.
-    if (rx !== cx && ry !== cy && (!tileWalkable(rx, cy) || !tileWalkable(cx, ry))) return false;
-    return true;
-  }
-  // If a player drops a building onto/against a citizen, their rounded
-  // current tile can be blocked for several frames. Let them shuffle within
-  // that one tile toward the exit — but never cross into a DIFFERENT
-  // blocked tile (buildings are 1x1, so any further blocked tile is another
-  // building, and crossing it is the tunnelling bug).
-  return standingOnBlockedTile(c) && rx === cx && ry === cy && terrainWalkable(nx, ny);
-}
-
-const TRAFFIC_BUCKET_SIZE = 1.2;
-const TRAFFIC_BUCKET_STRIDE = Math.ceil(MAP_W / TRAFFIC_BUCKET_SIZE) + 4;
-let trafficBucketsTick = -1;
-let trafficBucketsCitizens = null;
-let trafficBucketsCount = -1;
-let trafficBuckets = new Map();
-let trafficReservationsTick = -1;
-let trafficReservations = [];
-
-function currentTrafficBuckets() {
-  if (
-    trafficBucketsTick === G.gameTick
-    && trafficBucketsCitizens === G.citizens
-    && trafficBucketsCount === G.citizens.length
-  ) return trafficBuckets;
-
-  trafficBucketsTick = G.gameTick;
-  trafficBucketsCitizens = G.citizens;
-  trafficBucketsCount = G.citizens.length;
-  trafficBuckets = new Map();
-  for (const citizen of G.citizens) {
-    if (citizenIsIndoors(citizen)) continue;
-    const cellX = Math.floor(citizen.x / TRAFFIC_BUCKET_SIZE);
-    const cellY = Math.floor(citizen.y / TRAFFIC_BUCKET_SIZE);
-    const key = cellY * TRAFFIC_BUCKET_STRIDE + cellX;
-    const bucket = trafficBuckets.get(key);
-    if (bucket) bucket.push(citizen);
-    else trafficBuckets.set(key, [citizen]);
-  }
-  return trafficBuckets;
-}
-
-function trafficUrgency(c) {
-  if (c.activity.kind === 'seek_shelter' || c.activity.kind === 'flee') return 6;
-  if (c.carrying && c.carryAmount > 0) return 5;
-  if (c.assignment?.reason === 'player-command') return 4;
-  if (c.activity.kind === 'walk_to_eat') return 3;
-  if (c.activity.kind === 'walk_to_work') return 2;
-  return 1;
-}
-
-function trafficPriorityWins(a, b) {
-  const urgencyDelta = trafficUrgency(a) - trafficUrgency(b);
-  if (urgencyDelta !== 0) return urgencyDelta > 0;
-  const waitA = Math.floor((a._stuckTicks || 0) / 4);
-  const waitB = Math.floor((b._stuckTicks || 0) / 4);
-  if (waitA !== waitB) return waitA > waitB;
-  const span = Math.max(1, G.citizens.length);
-  const epoch = Math.floor(G.gameTick / 24);
-  const rankA = ((a.actorId || 0) + epoch) % span;
-  const rankB = ((b.actorId || 0) + epoch) % span;
-  if (rankA !== rankB) return rankA < rankB;
-  return (a.actorId || 0) < (b.actorId || 0);
-}
-
-function citizenTravelSpeed(c) {
-  let speed = c.speed * getSeasonData().speedMult * getCitizenSpeedMult();
-  const gx = Math.round(c.x), gy = Math.round(c.y);
-  if (G.buildingGrid[gy]?.[gx]?.type === 'road') speed *= 2;
-  if (c.hunger > 60) speed *= 1 - Math.min(0.4, (c.hunger - 60) / 100);
-  if ((c.rest ?? 100) < 30) speed *= 0.75 + ((c.rest ?? 100) / 30) * 0.25;
-  if (c._fleeing) speed *= 1.35;
-  return speed;
-}
-
-function projectedCitizenStep(c) {
-  const direction = activeMovementDirection(c);
-  if (!direction) return { x: c.x, y: c.y };
-  const target = c.path[c.pathIdx];
-  const distance = Math.hypot(target.x - c.x, target.y - c.y);
-  const step = Math.min(citizenTravelSpeed(c), distance);
-  return { x: c.x + direction.x * step, y: c.y + direction.y * step };
-}
-
-function trafficConflict(c, nx, ny) {
-  const direction = activeMovementDirection(c);
-  if (!direction) return null;
-  const buckets = currentTrafficBuckets();
-  const cellX = Math.floor(c.x / TRAFFIC_BUCKET_SIZE);
-  const cellY = Math.floor(c.y / TRAFFIC_BUCKET_SIZE);
-  for (let y = cellY - 1; y <= cellY + 1; y++) {
-    for (let x = cellX - 1; x <= cellX + 1; x++) {
-      for (const other of buckets.get(y * TRAFFIC_BUCKET_STRIDE + x) || []) {
-        if (other === c) continue;
-        const currentDistance = Math.hypot(c.x - other.x, c.y - other.y);
-        if (currentDistance >= TRAFFIC_BUCKET_SIZE + 0.15) continue;
-        // The actor already processed this tick has an accepted destination;
-        // otherwise right of way decides whether this actor may treat the
-        // other as yielding in place. Projecting both unconditionally made a
-        // head-on pair symmetrically reject the same gap forever.
-        const accepted = trafficReservationsTick === G.gameTick
-          ? trafficReservations.find(reservation => reservation.citizen === other)
-          : null;
-        const hasRightOfWay = !accepted && trafficPriorityWins(c, other);
-        const otherNext = accepted
-          ? accepted
-          : hasRightOfWay
-            ? other
-            : projectedCitizenStep(other);
-        const nextDistance = Math.hypot(nx - otherNext.x, ny - otherNext.y);
-        if (nextDistance >= PREFERRED_SPACE) continue;
-        if (nextDistance >= currentDistance - 0.002 && nextDistance >= HARD_ACTOR_SPACE) continue;
-        if (nextDistance < HARD_ACTOR_SPACE) {
-          // A winner may enter the correction band against an actor that has
-          // not committed this tick. Post-move separation then shares the
-          // displacement. Without this bounded give, a fully packed merge has
-          // no geometrically legal first move even though the lane ahead is
-          // opening. Accepted reservations always remain hard obstacles.
-          if (hasRightOfWay) continue;
-          return {
-            yield: !accepted && !!activeMovementDirection(other),
-            other,
-          };
-        }
-        // Between the preferred and hard radii the overlap is deliberately
-        // soft. Holding right of way throughout that whole band recreates a
-        // 0.55-tile wall at merge points; only a predicted hard penetration
-        // needs an actual yield/sidestep intent.
-      }
-    }
-  }
-
-  if (trafficReservationsTick !== G.gameTick) {
-    trafficReservationsTick = G.gameTick;
-    trafficReservations = [];
-  }
-  for (const reservation of trafficReservations) {
-    if (reservation.citizen === c) continue;
-    const distance = Math.hypot(nx - reservation.x, ny - reservation.y);
-    if (distance < HARD_ACTOR_SPACE) return { yield: false, other: reservation.citizen };
-  }
-  return null;
-}
-
-function reserveCitizenStep(c, x, y) {
-  if (trafficReservationsTick !== G.gameTick) {
-    trafficReservationsTick = G.gameTick;
-    trafficReservations = [];
-  }
-  trafficReservations.push({ citizen: c, x, y });
-}
-
-function opposingTrafficNearby(c, direction) {
-  return G.citizens.some(other => {
-    if (other === c || citizenIsIndoors(other)) return false;
-    if (Math.hypot(c.x - other.x, c.y - other.y) > 2.2) return false;
-    const otherDirection = activeMovementDirection(other);
-    return !!otherDirection
-      && direction.x * otherDirection.x + direction.y * otherDirection.y < -0.4;
-  });
-}
-
-function opposingLaneIntent(c, nx, ny) {
-  const direction = activeMovementDirection(c);
-  if (!direction || !opposingTrafficNearby(c, direction)) return null;
-  const waypoint = c.path?.[c.pathIdx];
-  if (!waypoint) return null;
-  const horizontal = Math.abs(direction.x) >= Math.abs(direction.y);
-  // Right-hand lanes remain inside the same rounded walkable tile. Opposing
-  // horizontal flows hold y +/- 0.21; vertical flows use x -/+ 0.21. The
-  // offset is released immediately when no opposing mover remains nearby.
-  const laneTarget = horizontal
-    ? { x: waypoint.x, y: waypoint.y + (Math.sign(direction.x) || 1) * 0.21 }
-    : { x: waypoint.x - (Math.sign(direction.y) || 1) * 0.21, y: waypoint.y };
-  const dx = laneTarget.x - c.x;
-  const dy = laneTarget.y - c.y;
-  const distance = Math.hypot(dx, dy);
-  if (distance <= 0.0001) return null;
-  const step = Math.min(Math.hypot(nx - c.x, ny - c.y), distance);
-  const x = c.x + dx / distance * step;
-  const y = c.y + dy / distance * step;
-  if (!canStepCitizen(c, x, y) || trafficConflict(c, x, y)) return null;
-  reserveCitizenStep(c, x, y);
-  return { x, y, trafficWait: false, lane: true };
-}
-
-function resolveCitizenStep(c, nx, ny) {
-  const laneIntent = opposingLaneIntent(c, nx, ny);
-  if (laneIntent) return laneIntent;
-  const directConflict = canStepCitizen(c, nx, ny) ? trafficConflict(c, nx, ny) : null;
-  if (canStepCitizen(c, nx, ny) && !directConflict) {
-    reserveCitizenStep(c, nx, ny);
-    return { x: nx, y: ny, trafficWait: false };
-  }
-  // An earlier, lower-priority actor must not reserve a sidestep that seals
-  // the very lane promised to an uncommitted winner later in this tick.
-  if (directConflict?.yield) return null;
-  const dx = nx - c.x;
-  const dy = ny - c.y;
-  const length = Math.hypot(dx, dy);
-  if (length <= 0.0001) return null;
-  const forwardX = dx / length;
-  const forwardY = dy / length;
-  // Keep-right is expressed in the dominant world axis rather than from the
-  // continuously rotating vector to a waypoint. That lets clearance build
-  // over several ticks instead of alternating sides as the actor offsets.
-  const lateral = Math.abs(forwardX) >= Math.abs(forwardY)
-    ? { x: 0, y: Math.sign(forwardX) || 1 }
-    : { x: -Math.sign(forwardY) || -1, y: 0 };
-  const waypoint = c.path?.[c.pathIdx] || { x: nx, y: ny };
-  const candidates = [
-    { forward: 0, side: 1 },
-    { forward: 0.6, side: 0.8 },
-    { forward: 0, side: -1 },
-    { forward: 0.6, side: -0.8 },
-  ].map((candidate, order) => {
-    const x = c.x + (forwardX * candidate.forward + lateral.x * candidate.side) * length;
-    const y = c.y + (forwardY * candidate.forward + lateral.y * candidate.side) * length;
-    return {
-      x,
-      y,
-      order,
-      goalDistance: Math.hypot(waypoint.x - x, waypoint.y - y),
-    };
-  }).sort((a, b) => a.goalDistance - b.goalDistance || a.order - b.order);
-  for (const candidate of candidates) {
-    // Pure lateral comes first: at a 0.30-tile head-on floor, even a small
-    // forward component would put the candidate inside the hard radius and
-    // make both actors reject every tick.
-    const sx = candidate.x;
-    const sy = candidate.y;
-    if (!canStepCitizen(c, sx, sy) || trafficConflict(c, sx, sy)) continue;
-    reserveCitizenStep(c, sx, sy);
-    return { x: sx, y: sy, trafficWait: true };
-  }
-  return null;
-}
-
-function noteCitizenTrafficWait(c) {
-  c._stuckTicks = Math.min(600, (c._stuckTicks || 0) + 1);
-  // A live local queue is not unreachable topology. Keep the route intent and
-  // prevent the universal watchdog from blacklisting a building or releasing
-  // an assignment merely because another body currently has right of way.
-  c._wdTicks = 0;
-  c._wdBest = Math.hypot(
-    (c._requestedTx ?? c.tx ?? c.x) - c.x,
-    (c._requestedTy ?? c.ty ?? c.y) - c.y,
-  );
-}
-
-function replanToRequestedTarget(c) {
-  const tx = Math.round(c._requestedTx ?? c.tx ?? c.x);
-  const ty = Math.round(c._requestedTy ?? c.ty ?? c.y);
-  pathTo(c, tx, ty);
-}
-
-function routeSegmentWalkable(fromX, fromY, toX, toY) {
-  const dx = toX - fromX;
-  const dy = toY - fromY;
-  const steps = Math.max(Math.abs(dx), Math.abs(dy));
-  if (steps === 0) return isWalkable(toX, toY);
-  let priorX = fromX;
-  let priorY = fromY;
-  for (let step = 1; step <= steps; step++) {
-    const x = Math.round(fromX + dx * step / steps);
-    const y = Math.round(fromY + dy * step / steps);
-    if (x === priorX && y === priorY) continue;
-    if (!isWalkable(x, y)) return false;
-    if (
-      x !== priorX
-      && y !== priorY
-      && (!isWalkable(x, priorY) || !isWalkable(priorX, y))
-    ) return false;
-    priorX = x;
-    priorY = y;
-  }
-  return true;
-}
-
-function remainingCitizenRouteWalkable(c) {
-  if (!c.path || c.pathIdx >= c.path.length) return true;
-  let x = Math.round(c.x);
-  let y = Math.round(c.y);
-  for (let index = c.pathIdx; index < c.path.length; index++) {
-    const waypoint = c.path[index];
-    if (!routeSegmentWalkable(x, y, waypoint.x, waypoint.y)) return false;
-    x = waypoint.x;
-    y = waypoint.y;
-  }
-  return true;
-}
-
-// ── Homes & schedule (Phase 3a) ─────────────────────────────────────
-// Citizens sleep in an assigned house at night. Assignment is lazy
-// (first nightfall, or when the old home is gone) and respects tier
-// capacity via the residence policy. Homeless citizens bed down near the
-// settlement anchor — visible pressure to build housing.
-function assignHome(c) {
-  return assignCitizenResidence(c);
-}
-
-function goHome(c) {
-  if (!citizenHasValidResidence(c)) assignHome(c);
-  clearPath(c);
-  setActivity(c, 'go_home');
-  if (c.home) {
-    const spot = nearestWalkableTile(Math.round(c.home.x), Math.round(c.home.y), 3) || { x: c.home.x, y: c.home.y };
-    if (!pathTo(c, spot.x, spot.y)) c.home = null;
-  } else {
-    const t = idleLoiterTarget(c);
-    pathTo(c, t.x, t.y);
-  }
-}
-
-const RAID_SHELTER_INTERRUPTIBLE = new Set([
-  'idle', 'find_job', 'walk_to_work', 'working', 'foraging', 'eating',
-  'walk_to_eat', 'waiting_for_food', 'go_home', 'sleep', 'leisure',
-  'seek_shelter', 'flee',
-]);
-const DELIVERY_OBLIGATION_ACTIVITIES = new Set([
-  'needs_delivery', 'walk_to_deliver', 'deliver',
-]);
-
-function hasDeliveryObligation(c) {
-  return !!(c.carrying && c.carryAmount > 0)
-    || DELIVERY_OBLIGATION_ACTIVITIES.has(c.activity.kind);
-}
-
-function nearestRaidEnemy(c) {
-  let nearest = null;
-  let bestDistance = Infinity;
-  for (const enemy of G.enemies) {
-    const distance = Math.hypot(c.x - enemy.x, c.y - enemy.y);
-    if (distance < bestDistance) {
-      nearest = enemy;
-      bestDistance = distance;
-    }
-  }
-  return nearest;
-}
-
-function beginOpenRaidFlight(c, reason = 'shelter-unreachable') {
-  const enemy = nearestRaidEnemy(c);
-  clearPath(c);
-  setActivity(c, 'flee', { reason, timer: 30 });
-  c._fleeing = true;
-  if (!enemy) {
-    c.tx = c.x;
-    c.ty = c.y;
-    return;
-  }
-  const dx = c.x - enemy.x;
-  const dy = c.y - enemy.y;
-  const length = Math.hypot(dx, dy) || 1;
-  c.tx = Math.max(1, Math.min(MAP_W - 2, c.x + (dx / length) * 6));
-  c.ty = Math.max(1, Math.min(MAP_H - 2, c.y + (dy / length) * 6));
-}
-
-function clearShelterInterruptedIntent(c) {
-  c.forageTarget = null;
-  c._foodTarget = null;
-  c._leisureTarget = null;
-  c.workTarget = null;
-  clearPath(c);
-}
-
-function enterRaidShelter(c) {
-  if (!citizenAtResidencePortal(c)) return false;
-  clearShelterInterruptedIntent(c);
-  c._fleeing = false;
-  setActivity(c, 'sheltered', { reason: 'shelter-entered', timer: 60 });
-  return true;
-}
-
-function seekRaidShelter(c) {
-  if (hasDeliveryObligation(c)) return false;
-  if (!RAID_SHELTER_INTERRUPTIBLE.has(c.activity.kind)) return false;
-  if (!citizenHasValidResidence(c) || isBlacklisted(c, c.home.x, c.home.y)) {
-    clearShelterInterruptedIntent(c);
-    beginOpenRaidFlight(c);
-    return true;
-  }
-  if (enterRaidShelter(c)) return true;
-
-  const portal = residencePortalForCitizen(c);
-  clearShelterInterruptedIntent(c);
-  setActivity(c, 'seek_shelter', { reason: 'raid-shelter' });
-  if (!portal || !pathTo(c, portal.x, portal.y, { exact: true })) {
-    blacklistTarget(c, c.home.x, c.home.y);
-    beginOpenRaidFlight(c);
-  }
-  return true;
-}
-
-function leaveRaidShelter(c) {
-  c._fleeing = false;
-  clearPath(c);
-  c.rest = Math.min(100, c.rest ?? 100);
-  if (getDayPeriod() === 'night' && citizenAtResidencePortal(c)) {
-    setActivity(c, 'sleep', { reason: 'raid-cleared', timer: 60 });
-  } else {
-    setActivity(c, 'find_job', { reason: 'raid-cleared', timer: rngInt(0, 40) });
-  }
-}
-
-// States that must not be interrupted by nightfall: carriers finish
-// their delivery first (goods in hand are an obligation), sleepers and
-// homeward walkers are already handled.
-const NIGHT_EXEMPT = new Set([
-  'sleep', 'go_home', 'walk_to_deliver', 'deliver', 'needs_delivery',
-  'walk_to_eat', 'eating',
-]);
-
-// Raid awareness for the schedule: a citizen with raiders nearby must
-// never be marched home into the fight (the flee response in combat.js
-// owns them), and sleepers wake when danger gets close.
-function enemyNear(c, r) {
-  for (const e of G.enemies) {
-    if (Math.abs(e.x - c.x) < r && Math.abs(e.y - c.y) < r) return true;
-  }
-  return false;
-}
-
-function clearPath(c) {
-  c.path = null;
-  c.pathIdx = 0;
-  c._pathStartedAt = null;
-  c._stuckTicks = 0;
-}
-
-function startWorking(c, activityTimer) {
-  // Preserve the final approach direction for the complete work beat. This
-  // keeps pick, axe, and hammer rows from flicking between directions when
-  // an otherwise-stationary worker has neighbours nearby.
-  c._workFaceX = c.faceX || 0;
-  c._workFaceZ = c.faceZ || 0;
-  setActivity(c, 'working', { timer: activityTimer });
-  clearPath(c);
-}
-
-function isActivelyMoving(c) {
-  return c.path && c.pathIdx < c.path.length;
-}
-
-function activeMovementDirection(c) {
-  if (!isActivelyMoving(c)) return null;
-  const target = c.path[c.pathIdx];
-  const dx = target.x - c.x;
-  const dy = target.y - c.y;
-  const length = Math.hypot(dx, dy);
-  return length > 0.0001 ? { x: dx / length, y: dy / length } : null;
-}
-
-function separationAxis(a, b, dx, dy, d2, pass) {
-  if (d2 >= 0.0004) {
-    const distance = Math.sqrt(d2);
-    return { x: dx / distance, y: dy / distance };
-  }
-  const angle = (
-    ((a.actorId || 0) * 37 + (b.actorId || 0) * 53 + pass * 97) % 360
-  ) * Math.PI / 180;
-  return { x: Math.cos(angle), y: Math.sin(angle) };
-}
-
-function applyCitizenSeparation() {
-  const cs = G.citizens;
-  const r2 = HARD_ACTOR_SPACE * HARD_ACTOR_SPACE;
-  const bucketSize = 1;
-  const bucketStride = MAP_W + 8;
-  for (let pass = 0; pass < 8; pass++) {
-    const buckets = new Map();
-    for (let index = 0; index < cs.length; index++) {
-      const citizen = cs[index];
-      if (citizenIsIndoors(citizen)) continue;
-      const key = Math.floor(citizen.y / bucketSize) * bucketStride
-        + Math.floor(citizen.x / bucketSize);
-      const bucket = buckets.get(key);
-      if (bucket) bucket.push(index);
-      else buckets.set(key, [index]);
-    }
-
-    for (let i = 0; i < cs.length; i++) {
-      const a = cs[i];
-      if (citizenIsIndoors(a)) continue;
-      const cellX = Math.floor(a.x / bucketSize);
-      const cellY = Math.floor(a.y / bucketSize);
-      for (let by = cellY - 2; by <= cellY + 2; by++) {
-        for (let bx = cellX - 2; bx <= cellX + 2; bx++) {
-          for (const j of buckets.get(by * bucketStride + bx) || []) {
-            if (j <= i) continue;
-            const b = cs[j];
-            if (citizenIsIndoors(b)) continue;
-            const dx = a.x - b.x;
-            const dy = a.y - b.y;
-            const d2 = dx * dx + dy * dy;
-            const axis = separationAxis(a, b, dx, dy, d2, pass);
-            if (d2 >= r2) continue;
-            const totalPush = HARD_ACTOR_SPACE - Math.sqrt(d2) + 0.0001;
-            const halfPush = totalPush * 0.5;
-            const nextA = {
-              x: a.x + axis.x * halfPush,
-              y: a.y + axis.y * halfPush,
-            };
-            const nextB = {
-              x: b.x - axis.x * halfPush,
-              y: b.y - axis.y * halfPush,
-            };
-            const canMoveA = canStepCitizen(a, nextA.x, nextA.y);
-            const canMoveB = canStepCitizen(b, nextB.x, nextB.y);
-            if (canMoveA && canMoveB) {
-              a.x = nextA.x; a.y = nextA.y;
-              b.x = nextB.x; b.y = nextB.y;
-            } else if (canMoveA) {
-              const fullX = a.x + axis.x * totalPush;
-              const fullY = a.y + axis.y * totalPush;
-              if (canStepCitizen(a, fullX, fullY)) { a.x = fullX; a.y = fullY; }
-            } else if (canMoveB) {
-              const fullX = b.x - axis.x * totalPush;
-              const fullY = b.y - axis.y * totalPush;
-              if (canStepCitizen(b, fullX, fullY)) { b.x = fullX; b.y = fullY; }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 export function updateCitizens() {
   // Keep wait age tied to net route progress after the shared separation
   // pass. Measuring only the actor's private movement branch made an orbiting
   // crowd look productive even when separation returned everyone to the same
   // place, so right of way never accumulated where it was actually needed.
-  const trafficProgressStart = new Map();
-  for (const citizen of G.citizens) {
-    if (!isActivelyMoving(citizen)) continue;
-    const gx = citizen._requestedTx ?? citizen.tx ?? citizen.x;
-    const gy = citizen._requestedTy ?? citizen.ty ?? citizen.y;
-    trafficProgressStart.set(citizen, {
-      distance: Math.hypot(gx - citizen.x, gy - citizen.y),
-      wait: citizen._stuckTicks || 0,
-    });
-  }
+  const trafficProgressStart = captureCitizenTrafficProgress();
   for (const c of G.citizens) {
     pruneExpiredNoGo(c);
+    if (advanceCitizenPathRequest(c) === 'pending') continue;
     const raidActive = G.enemies.length > 0;
     if (c.activity.kind === 'sheltered') {
       if (raidActive && citizenIsIndoors(c)) {
         c._fleeing = false;
-        c.rest = Math.min(100, (c.rest ?? 100) + 0.15);
+        restCitizenWhileSheltered(c);
         continue;
       }
       if (raidActive) beginOpenRaidFlight(c, 'shelter-unreachable');
@@ -1281,7 +367,7 @@ export function updateCitizens() {
       // keep priority; Crown and AI assignments remain owned while the body
       // walks to a physical pantry.
       if (
-        c.hunger > 70
+        c.hunger > CITIZEN_MEAL_HUNGER_THRESHOLD
         && !(c.carrying && c.carryAmount > 0)
         && MEAL_INTERRUPTIBLE_ACTIVITIES.has(c.activity.kind)
       ) {
@@ -1313,7 +399,7 @@ export function updateCitizens() {
           timer: threatened ? 0 : rngInt(0, 40),
         });
         clearPath(c);
-        c.rest = Math.min(100, c.rest ?? 100);
+        settleCitizenWakeRest(c);
         if (threatened) {
           G.particles.push({ tx: c.x, ty: c.y, offsetY: -24, text: '❗', alpha: 1.3, vy: -0.12, decay: 0.02, type: 'speech' });
         }
@@ -1322,17 +408,9 @@ export function updateCitizens() {
         setActivity(c, 'idle', { reason: 'threat-response' });
         clearPath(c);
       }
-      // Rest drains while awake and active; sleep restores it (below).
-      if (c.activity.kind !== 'sleep' && c.activity.kind !== 'idle') {
-        c.rest = Math.max(0, (c.rest ?? 100) - 0.35);
-      }
-
-      // ── Needs (Phase 3b) — joy and faith drain slowly; taverns and
-      // churches (via walkers or dusk visits) restore them. Mood feeds
-      // realm happiness with a bounded contribution (economy.js).
-      if (!c.needs) c.needs = { joy: 55, faith: 55 };
-      c.needs.joy = Math.max(0, c.needs.joy - 0.10);
-      c.needs.faith = Math.max(0, c.needs.faith - 0.06);
+      // Rest and social needs drain on this heartbeat. Their deterministic
+      // arithmetic lives in citizen-needs; scheduling remains here.
+      drainCitizenHeartbeatNeeds(c);
 
       // Food crisis (Phase 3c): when the larder runs under two days,
       // non-food workers start downing tools — into an open food job if
@@ -1440,7 +518,7 @@ export function updateCitizens() {
 
     // Hungry emote — derive the cadence from actor identity instead of
     // storing a presentation timer or advancing the simulation RNG.
-    if (c.hunger > 70) {
+    if (c.hunger > CITIZEN_MEAL_HUNGER_THRESHOLD) {
       const emoteInterval = 120; // every 2 seconds at 1x
       if ((G.gameTick + citizenHash(c)) % emoteInterval === 0) {
         const emote = c.hunger >= 90 ? '❗' : '🍽️';
@@ -1582,15 +660,7 @@ export function updateCitizens() {
   }
   // After all movement — apply personal-space separation
   applyCitizenSeparation();
-  for (const [citizen, start] of trafficProgressStart) {
-    if (!G.citizens.includes(citizen) || !isActivelyMoving(citizen)) continue;
-    const gx = citizen._requestedTx ?? citizen.tx ?? citizen.x;
-    const gy = citizen._requestedTy ?? citizen.ty ?? citizen.y;
-    const distance = Math.hypot(gx - citizen.x, gy - citizen.y);
-    citizen._stuckTicks = distance < start.distance - 0.005
-      ? 0
-      : Math.min(600, start.wait + 1);
-  }
+  finishCitizenTrafficProgress(trafficProgressStart);
 }
 
 function runStateMachine(c) {
@@ -1607,7 +677,7 @@ function runStateMachine(c) {
       }
       // Hunger resolves through a reachable physical pantry. The compatibility
       // wallet is only a mirror and is never a remote meal source.
-      if (c.hunger > 70) {
+      if (c.hunger > CITIZEN_MEAL_HUNGER_THRESHOLD) {
         beginFoodRoute(c);
         break;
       }
@@ -1945,7 +1015,7 @@ function runStateMachine(c) {
         break;
       }
       G._dailyFoodConsumed = (G._dailyFoodConsumed || 0) + meal.taken;
-      c.hunger = Math.max(0, c.hunger - 60);
+      feedCitizenMeal(c);
       setActivity(c, 'eating', { reason: 'eat-food', timer: 20 });
       clearPath(c);
       G.particles.push({
@@ -1960,7 +1030,7 @@ function runStateMachine(c) {
         c._foodTarget = null;
         setActivity(c, 'needs_delivery', { reason: 'cargo-ready' });
         clearPath(c);
-      } else if (c.hunger <= 70) {
+      } else if (c.hunger <= CITIZEN_MEAL_HUNGER_THRESHOLD) {
         resumeAfterMeal(c);
       } else {
         beginFoodRoute(c);
@@ -2019,12 +1089,7 @@ function runStateMachine(c) {
       const venue = c._leisureTarget;
       c._leisureTarget = null;
       if (venue) {
-        if (!c.needs) c.needs = { joy: 55, faith: 55 };
-        if (venue.kind === 'tavern') {
-          c.needs.joy = Math.min(100, c.needs.joy + 40);
-        } else {
-          c.needs.faith = Math.min(100, c.needs.faith + 40);
-        }
+        satisfyCitizenLeisureNeed(c, venue.kind);
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -24,
           text: venue.kind === 'tavern' ? '🍺' : '🙏',
@@ -2043,7 +1108,7 @@ function runStateMachine(c) {
       // Sleep restores energy; the dawn heartbeat wakes us. Re-enter on
       // a slow cadence and breathe the occasional 💤 so night reads as
       // rest, not a freeze.
-      c.rest = Math.min(100, (c.rest ?? 100) + 0.15 * 60);
+      restoreCitizenSleepRest(c);
       if (visualJitter(c.x, c.y, 900 + citizenHash(c)) < 0.25) {
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -24,
