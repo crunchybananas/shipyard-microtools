@@ -165,6 +165,60 @@ export default async function (h) {
   ok('marks are pruned from the 1:240 model clone', seen.pruned === true, seen);
   ok('no mark is drawn under the waterline', seen.dry === seen.count, seen);
 
+  // --- slice 5: THE DRIFT — the dead wheel, then the sea moves anyway -----------
+  const armed = await h.evaluate(`(() => {
+    const W = ABYME.W, g = ABYME.game;
+    const hs = (id) => g.interact.hotspots.find(s => s.id === id);
+    W.onceKeys = (W.onceKeys || []).filter((k) => k !== 'drift');
+    g._driftT = null;
+    const before = +W.tideTarget.toFixed(4);
+    hs('valve').onClick();                       // dead down here — but it arms the drift
+    const armedNow = g._driftT === 0;
+    g.tick(3.0, 1); const midway = +W.tideTarget.toFixed(4);   // still nothing at 3s
+    g.tick(1.5, 1); const after = +W.tideTarget.toFixed(4);    // …and now the sea moves
+    return { before, midway, after, armedNow, draft: +ABYME.draft().toFixed(3),
+             once: W.onceKeys.includes('drift') };
+  })()`);
+  ok('the dead wheel arms the drift when a hand is really above you', armed.armedNow, armed);
+  ok('the drift WAITS — nothing moves while you are still watching', armed.midway === armed.before, armed);
+  ok('then the sea rises with nobody at the wheel', armed.after > armed.before, armed);
+  ok('the drift fires once per game', armed.once === true, armed);
+
+  // and it must NOT fire on a clean stack — the beat has to be true, not atmospheric
+  const quiet = await h.evaluate(`(() => {
+    const W = ABYME.W, g = ABYME.game;
+    ABYME.clearStack(); ABYME.goLevel(2);
+    W.onceKeys = (W.onceKeys || []).filter((k) => k !== 'drift');
+    g._driftT = null;
+    g.interact.hotspots.find(s => s.id === 'valve').onClick();
+    return { armed: g._driftT !== null, draft: ABYME.draft() };
+  })()`);
+  ok('no drift when nobody is upstream of you', quiet.armed === false && quiet.draft === 0, quiet);
+
+  // --- THE FIFTH RING: a goal one hand's work cannot reach ---------------------
+  const ring = await h.evaluate(`(() => {
+    const W = ABYME.W, g = ABYME.game, FIFTH = 4.83;
+    const wy = () => -4.2 * (1 - W.tide);
+    // one hand, whole chain, deepest rung: must fall SHORT of the ring
+    ABYME.goLevel(4);
+    const solo = { tide: +W.tide.toFixed(3), waterY: +wy().toFixed(3), draft: +ABYME.draft(4).toFixed(3) };
+    const soloReaches = wy() >= FIFTH;
+    // now stack a second hand's worth of marks on top of rung 1..3 and try again
+    const led = ABYME.ledger();
+    for (const kind of ['valve','crank','ruler','lens','chest','hatch','stones','plumb','dive']) {
+      led.marks.push({ k: kind, r: 1, h: 'otherhand', n: 0, at: null });
+      led.marks.push({ k: kind, r: 2, h: 'thirdhand', n: 0, at: null });
+    }
+    ABYME.goLevel(4);
+    W.onceKeys = (W.onceKeys || []).filter((k) => k !== 'fifthRing');
+    g.tick(0.05, 1);
+    return { solo, soloReaches, stacked: { tide: +W.tide.toFixed(3), waterY: +wy().toFixed(3),
+             draft: +ABYME.draft(4).toFixed(3) }, met: W.onceKeys.includes('fifthRing') };
+  })()`);
+  ok('one hand alone cannot reach the fifth ring', ring.soloReaches === false, ring);
+  ok('accumulated hands DO reach it', ring.stacked.waterY >= 4.83, ring);
+  ok('reaching it fires the beat', ring.met === true, ring);
+
   const errs = await h.evaluate(`window.__errs || []`);
   ok('no console errors', Array.isArray(errs) && errs.length === 0, errs);
 

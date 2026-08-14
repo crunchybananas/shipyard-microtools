@@ -392,6 +392,9 @@ export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 // live together as content.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
 export const SKETCHES = [
+  // THE FIFTH RING met (STACK.md §3.2): the graduated staff with the water finally
+  // over its top collar, and the tally of hands it took scratched beside it.
+  ['He cut the top ring', S('<path d="M48 4v32"/><path d="M41 30h14M41 24h14M41 18h14" opacity=".45"/><path d="M40 11h16" opacity=".95"/><path d="M8 14h80" opacity=".8"/><path d="M12 20h76" opacity=".4"/><path d="M16 26h68" opacity=".2"/><path d="M64 6v5M68 6v5M72 6v5M76 6v5" opacity=".55"/>')],
   ['gave up while I was down', S('<path d="M10 18h76" opacity=".7"/><path d="M34 12c4-5 16-6 22-3" opacity=".5"/><path d="M20 24l4 4M24 24l-4 4" opacity=".6"/><path d="M46 26l4 4M50 26l-4 4" opacity=".6"/><path d="M70 23l4 4M74 23l-4 4" opacity=".6"/><path d="M14 32q8 3 16 0t16 0t16 0t16 0" opacity=".25"/>')],
   ['no instrument on the requisition reads', S('<rect x="32" y="6" width="32" height="28" rx="1" opacity=".55"/><path d="M37 12h22M37 17h22M37 22h12" opacity=".4"/><path d="M37 28h22" opacity=".8"/><path d="M70 10l6 6M76 10l-6 6" opacity=".5"/>')],
   ['no room on the form for who', S('<rect x="30" y="8" width="36" height="24" rx="1" opacity=".55"/><path d="M35 14h26M35 19h26" opacity=".4"/><path d="M35 25h10" opacity=".4"/><path d="M48 25q6 4 12 0" opacity=".9"/><path d="M20 14q-6 8 0 16" opacity=".3"/>')],
@@ -506,6 +509,16 @@ export const SKETCHES = [
 // audit can finally see ALL the island's words. Keys are first-words slugs.
 export const T = {
   the_sea_no_longer: 'The sea no longer answers the wheel down here.',
+  // THE FIFTH RING (STACK.md §3.2) — the readout, then the payoff. The gap line is
+  // a progress meter for a goal one player cannot reach; the payoff re-reads the
+  // whole gauge: he was not predicting the sea, he was counting the people.
+  the_top_ring_stands: 'The top ring stands {gap} m clear of the water. Fresh-cut. Nothing has ever reached it.',
+  the_water_is_at: 'The water is at the fifth ring.',
+  he_cut_the_top: 'He cut the top ring before there was any water to cut it for. I thought he was guessing at the sea. He was counting how many of us there would be.',
+  // THE DRIFT (STACK.md §3.3) — arrives ~4s after the dead wheel, when you have
+  // usually turned away. It must not explain itself: the player has already been
+  // told the law once, and this is the law happening to them.
+  the_wheel_was_dead: 'The wheel was dead in your hands. The water has risen anyway — a hand’s width, all at once, with nobody at the wheel.',
   below_the_window_the: 'Below the window, the sea obeys.',
   a_valve_beside_the: 'A valve beside the chart table. Turn it, and the basin drains — and so does the bay. Someone built a machine to make the sea go back, and must have turned it, and turned it. As if, on some one day, holding the water back was the only thing left worth wanting.',
   the_crank_resists_as: 'The crank resists, as if the hours themselves have taken on water.',

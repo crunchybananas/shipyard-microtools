@@ -16,6 +16,12 @@ import { clamp, lerp, lerpAngle, TAU } from './util.js';
 const REC_IDS = Object.keys(LORE).filter((id) => LORE[id].record);
 import { KEEPER, LAMPBLACK, HAND_MARKS, CLIMBERS, CLIMBERS_CLOSE, CONGREGATION, CONGREGATION_CLOSE, LORE, T } from './content.js';
 
+// The tide gauge's top ring — cut by the keeper above every waterline the descent
+// has, "measured, not yet met". Under THE STACK it is the one mark in the world that
+// accumulated displacement can reach and a single player's work cannot. Mirrored from
+// props.js (the gauge's `top.position.y`); keep them together if either moves.
+const GAUGE_FIFTH_Y = 4.83;
+
 const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
 const CLIFF = new THREE.Vector3(57.5, 14, 50);
@@ -115,7 +121,17 @@ export class Game {
       id: 'valve', targets: [R.valveWheel], label: 'the brass valve',
       onClick: () => {
         // SEA-STRATA: below the surface the tide is the descent's, not yours — the wheel goes dead.
-        if (W.level > 1) { UI.whisper(T.the_sea_no_longer); return; }
+        if (W.level > 1) {
+          UI.whisper(T.the_sea_no_longer);
+          // THE DRIFT (STACK.md §3.3). The dead wheel was a flat refusal; under the
+          // stack it is the reveal. This water is not yours to move because it is not
+          // YOUR water — it is what the rungs above displaced onto you. So arm the
+          // proof: in a few seconds the sea moves anyway, with nobody at the wheel,
+          // because somebody upstream just turned theirs. Only ever when a hand really
+          // IS above you (draft > 0) — the beat has to be true, not atmospheric.
+          if (draft() > 0.03 && !W.onceKeys?.includes('drift') && this._driftT == null) this._driftT = 0;
+          return;
+        }
         W.tideTarget = W.tideTarget > 0.5 ? 0 : 1;
         if (this.flag('valveTurned')) {
           A.leitStrum();   // the first turn earns a stem — the island's own figure answers (#65)
@@ -521,6 +537,15 @@ export class Game {
           3: 'The third ring, to the inch. Whoever set these knew.',
           4: 'The fourth ring. One remains above the water — fresh-cut, pale, and waiting.',
         }[Math.min(W.level, 4)] || 'The rings keep their count.');
+        // THE FIFTH RING (STACK.md §3.2) — the gauge is also the READOUT of the one
+        // goal in the game you cannot reach alone. Its top ring sits at y4.83, which
+        // needs tide 2.15; a rung's deepest authored waterline is 1.9, and ONE hand's
+        // whole surface chain displaces about 0.134. So the fifth ring is only ever
+        // met by accumulated work — you plus somebody else, or you across runs. Every
+        // click reports the remaining gap, so the promise is legible long before it
+        // can be kept, and so the player can watch their own displacement close it.
+        const gap = GAUGE_FIFTH_Y - waterY();
+        if (gap > 0.02) UI.whisper(T.the_top_ring_stands.replace('{gap}', gap.toFixed(2)));
         this.once('tideGauge', () => UI.addJournal(T.off_the_low_shore, '', 'self'));
       },
     });
@@ -956,6 +981,8 @@ export class Game {
     const F = W.flags;
 
     this._tickHandMarks(dt);   // the other hand's scuffs speak when you stand in them
+    this._tickDrift(dt);       // …and the sea moves once with nobody at the wheel
+    this._tickFifthRing();     // the ring he cut for a level that did not exist yet
 
     // #129: the era threshold — the reframe said out loud exactly ONCE in the game,
     // in the first minute of the first descent (8s after splashdown, so the keeper's
@@ -1516,6 +1543,42 @@ export class Game {
     }
     im.count = n;
     im.instanceMatrix.needsUpdate = true;
+  }
+
+  // THE FIFTH RING met. Fires wherever the player is standing — it is the sea's
+  // announcement, not a room's. Once per game, and it cannot be reached by one
+  // hand's work, which is the entire point of putting it in the world.
+  _tickFifthRing() {
+    if (waterY() < GAUGE_FIFTH_Y || W.onceKeys?.includes('fifthRing')) return;
+    this.once('fifthRing', () => {
+      A.valveRush(true);
+      UI.whisper(T.the_water_is_at);
+      UI.addJournal(T.he_cut_the_top, '', 'keeper');
+    });
+  }
+
+  // THE DRIFT (STACK.md §3.3) — the one time the model is caught being out of date.
+  //
+  // The whole game teaches one law: the chart-table model tells the truth about the
+  // world. The drift is that law failing, and failing for a REASON — you turned a
+  // wheel that did nothing, and then the sea moved on its own, because the hand one
+  // rung up was turning theirs. The model was never lying; it was behind.
+  //
+  // Deliberately a delay and not a cutscene: the player has usually walked away and
+  // is looking at something else when the water shifts, which is the whole point —
+  // the cost arrives late and somewhere you are not watching. Fires once per game.
+  _tickDrift(dt) {
+    if (this._driftT == null) return;
+    this._driftT += dt;
+    if (this._driftT < 4.2) return;                 // long enough to have turned away
+    this._driftT = null;
+    this.once('drift', () => {
+      // a surge from above: a hand's width of water, arriving unasked. It eases in
+      // over the tide's normal ~13s, so it reads as the sea deciding, not as a jump.
+      W.tideTarget = Math.min(W.tideTarget + 0.06, 2);
+      A.valveRush(true);
+      UI.whisper(T.the_wheel_was_dead);
+    });
   }
 
   // Say what happened here, once, when the player is close enough to be standing
