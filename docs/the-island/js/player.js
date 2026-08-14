@@ -103,6 +103,10 @@ export class Player {
 
   spawn(pos, yaw, pitch = 0) {
     this.pos.copy(pos);
+    // An arrival has no "floor I was on" — resolve against the SURFACE explicitly so
+    // a spawn over a buried room (the stones pad, the bluff) lands on the ground and
+    // not in the basement, whatever y the caller happened to pass.
+    this.pos.y = walkableY(pos.x, pos.z);
     this.yaw = yaw;
     this.pitch = pitch;
     this.vel.set(0, 0, 0);
@@ -110,7 +114,10 @@ export class Player {
   }
 
   syncCamera() {
-    const groundY = walkableY(this.pos.x, this.pos.z);
+    // `this.pos.y` is the floor we were on last frame — it keeps us on it where a
+    // buried room shares our (x,z) with the ground above (spawn() clears it first,
+    // so an arrival always resolves to the surface).
+    const groundY = walkableY(this.pos.x, this.pos.z, this.pos.y);
     this.pos.y = groundY;
     this.camera.position.set(
       this.pos.x,
@@ -186,8 +193,10 @@ export class Player {
   // one walk-collision probe from the current position toward (nx,nz) — moved out of update()
   // so the closure is not rebuilt every frame (GC). Body is the former step() closure, verbatim.
   _step(nx, nz) {
-    const hereY = walkableY(this.pos.x, this.pos.z);
-    const thereY = walkableY(nx, nz);
+    // pass the floor we are ON, so a buried room under walkable ground (the drain
+    // chamber, the vault) only answers for somebody already down in it
+    const hereY = walkableY(this.pos.x, this.pos.z, this.pos.y);
+    const thereY = walkableY(nx, nz, hereY);
     if (thereY - hereY > 1.05) return false;          // too steep a step up
     if (hereY - thereY > 2.2) return false;           // no leaping off cliffs
     // natural slopes steeper than ~53° are unclimbable (cliffs, the bluff,

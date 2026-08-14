@@ -22,8 +22,15 @@ export const POSES = [
     note: 'nose to it' },
   { name: 'causeway-mid', at: [96, -118], look: [98, -121], tide: 0, time: 11,
     note: 'the r=1.80 collider pair at (98,-120..-122)' },
-  { name: 'stones-pad', at: [135, -140], look: [133, -150], tide: 0, time: 11,
-    note: 'the standing stones pad — the music puzzle' },
+  // the exact spot the drain chamber used to swallow: the centre of the stone ring,
+  // where you must stand to play the five-note arc (ring radius 6.5 — do NOT pose ON
+  // the ring or the camera ends up inside a stone)
+  { name: 'stones-centre', at: [135, -146], look: [135, -152.5], tide: 0, time: 11,
+    note: 'standing at the centre of the ring to play the music puzzle' },
+  { name: 'stones-raking', at: [135, -146], look: [128.5, -146], tide: 0, time: 7.6,
+    note: 'the same stones under a low raking sun — where relief either reads or does not' },
+  { name: 'stones-close', at: [133, -150], look: [135, -152.5], tide: 0, time: 16.5,
+    note: 'arm’s length: does the surface hold up close?' },
   { name: 'stones-drain-mouth', at: [139, -150], look: [131, -150], tide: 0, time: 11,
     note: 'the collapsed drain on the stones pad: the hole you can fall into' },
   { name: 'stones-drain-inside', at: [131, -150], look: [140, -150], tide: 0, time: 11,

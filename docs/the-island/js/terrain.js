@@ -166,7 +166,37 @@ export function clearColliders() { COLLIDERS.length = 0; }
 // you stand ON it instead of falling through to the seabed.
 const JETTY = { x: -18, z: -110.5, hx: 1.3, hz: 6.1, y: 1.16 };
 
-export function walkableY(x, z) {
+// TWO FLOORS, ONE (x,z) — why walkableY takes `fromY`.
+//
+// The buried spaces (the drain chamber under the standing-stones pad, the vault
+// under the bluff) sit DIRECTLY BENEATH ground the player also walks on. A pure 2-D
+// height field cannot express that: it has to return one number, and it was
+// returning the buried one. So the centre of the standing stones — where the player
+// must stand to play the five-note arc — reported the chamber floor 4.8 m down, and
+// walking to the music puzzle dropped you into a sealed room. (Owner-reported; the
+// wander probe reproduced it at exactly SPOTS.stones.)
+//
+// `fromY` is the height the caller is currently standing at. A BURIED floor is only
+// chosen when the caller is already down there; otherwise the surface wins. Omit it
+// — spawns, teleports, tooling, anything asking "what is the ground here" — and the
+// surface always wins, which is the safe default. The CONNECTORS (the drain ramp,
+// the hatch stair and its pit) are never ambiguous: they are the way between the two
+// floors, so they always answer for themselves.
+//
+// This is what lets the hub's planned tunnel NETWORK exist at all: every future
+// buried room under walkable ground is the same shape, and now it is one rule.
+function buriedFloorAt(x, z) {
+  // the vault under the bluff (reached by the hatch stair)
+  if (GATES.hatchOpen) {
+    const lx = x - SPOTS.hatch.x, lz = z - SPOTS.hatch.y;
+    if (lx > -4.5 && lx < 4.5 && lz < -8.6 && lz > -17) return HATCH_H - 5.2;
+  }
+  // the drain chamber under the standing-stones pad
+  if (x > 127.8 && x < 136.2 && z > -154.2 && z < -145.8) return 4.0;
+  return null;
+}
+
+export function walkableY(x, z, fromY) {
   // the lamp-room gallery: while up top, the lighthouse footprint IS the balcony floor (the climb)
   if (GATES.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 3.3) return GALLERY_H;
 
@@ -186,10 +216,11 @@ export function walkableY(x, z) {
     }
   }
 
-  // the vault under the bluff: enter THROUGH the open hole, stairs run south
+  // ---- CONNECTORS: the ways between the surface and the buried floors. These are
+  // never ambiguous — standing on a stair IS being on the stair — so they answer
+  // outright, before the two-floor test below.
   if (GATES.hatchOpen) {
-    const hx = SPOTS.hatch.x, hz = SPOTS.hatch.y;
-    const lx = x - hx, lz = z - hz;
+    const lx = x - SPOTS.hatch.x, lz = z - SPOTS.hatch.y;
     // stair ramp: top inside the hole's north half, descending southward
     if (lx > -1.6 && lx < 1.6 && lz < 1.0 && lz > -8.6) {
       const t = clamp((1.0 - lz) / 7.0, 0, 1);
@@ -197,21 +228,21 @@ export function walkableY(x, z) {
     }
     // remainder of the open hole is a pit, not invisible ground
     if (Math.hypot(lx, lz) < 1.25) return HATCH_H - 5.2;
-    // room
-    if (lx > -4.5 && lx < 4.5 && lz < -8.6 && lz > -17) {
-      return HATCH_H - 5.2;
-    }
+  }
+  // the drain's throat: the ramp off the stones pad down into the chamber
+  if (x >= 136.2 && x <= 142 && z > -151.5 && z < -148.5) {
+    return 8.8 - clamp((142 - x) / 5.8, 0, 1) * 4.8;
   }
 
-  // the drain (Phase C, first tunnel): a ramp off the stones pad down to a buried flooding chamber
-  if (x > 127.5 && x < 142.5 && z > -154.5 && z < -145.5) {
-    if (x > 127.8 && x < 136.2 && z > -154.2 && z < -145.8) return 4.0;     // chamber floor
-    if (x >= 136.2 && x <= 142 && z > -151.5 && z < -148.5) {               // ramp 8.8 -> 4.0
-      return 8.8 - clamp((142 - x) / 5.8, 0, 1) * 4.8;
-    }
-  }
-
-  return heightAt(x, z);
+  // ---- TWO FLOORS: surface vs a buried room directly beneath it ----------------
+  const surface = heightAt(x, z);
+  const buried = buriedFloorAt(x, z);
+  if (buried === null) return surface;
+  // ABSOLUTE proximity, deliberately not "whichever floor is nearer": a fresh spawn
+  // carries y=0, which is nearer the chamber floor (4.0) than the pad above it (8.8)
+  // — nearest-of-two would drop every teleport into the basement. You are on the
+  // buried floor only if you are standing essentially AT it.
+  return Number.isFinite(fromY) && Math.abs(fromY - buried) < 2.0 ? buried : surface;
 }
 
 // Wall collision: the lighthouse and annex are rings with door gaps.
@@ -247,9 +278,33 @@ function ringBlockedGaps(x0, z0, x1, z1, cx, cz, r, gaps) {
 // doorway + its jambs, was 153..177 when the breach was wall-wide) and the annex doorway (az 5..25°)
 const LH_GAPS = [[deg(160), deg(170)], [deg(5), deg(25)]];
 
+// EDGES. A narrow walkable structure standing above its surroundings — the jetty
+// deck over the seabed, the drain's ramp trench cut into the stones pad — has SIDES,
+// and the player kept walking off them: a 2 m drop inside one 7 cm stride, and in the
+// jetty's case no way back up (the deck stands 2.2 m over the sand, and the climb
+// limit is 1.05 m, so stepping off the side stranded you beside your own pier).
+// Both are crossed lengthwise by design and never laterally, so block the long sides
+// and leave the ends open. Symmetric: this also stops you falling INTO the trench
+// from the pad above it.
+function edgeBlocked(x0, z0, x1, z1) {
+  // the jetty: walk along it (z), never off it (x)
+  const onDeck = (x, z) => Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz;
+  const inDeckSpan = (z) => Math.abs(z - JETTY.z) < JETTY.hz;
+  if (onDeck(x0, z0) !== onDeck(x1, z1) && inDeckSpan(z0) && inDeckSpan(z1)) return true;
+
+  // the drain ramp: enter from the pad at its east mouth, never over its long walls
+  const inRamp = (x, z) => x >= 136.2 && x <= 142 && z > -151.5 && z < -148.5;
+  const inRampSpan = (x) => x >= 136.2 && x <= 142;
+  if (inRamp(x0, z0) !== inRamp(x1, z1) && inRampSpan(x0) && inRampSpan(x1)) return true;
+
+  return false;
+}
+
 export function wallBlocked(x0, z0, x1, z1) {
   // up on the lamp-room gallery: the only wall is the balcony rail (keeps you from the 20m drop)
   if (GATES.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > 3.0;
+
+  if (edgeBlocked(x0, z0, x1, z1)) return true;
 
   // lighthouse wall: the beach door + the annex doorway
   if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;

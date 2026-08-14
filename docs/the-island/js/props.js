@@ -31,6 +31,31 @@ applyRelief(matStone, 'stone', { normalScale: 0.85, strength: 2.4 });   // grani
                                     // study/stones — multiplies the vertex colours (bone walls → granite,
                                     // the copper band stays coppery) + a derived normal map so the mortar
                                     // lines and block faces catch the raking sun and the keeper's lamp
+// MEGALITH — raw quarried granite, for stone nobody coursed. The standing stones
+// wore `matStone`, which is the LIGHTHOUSE's masonry: block faces and mortar lines.
+// So the five stones you must stare at for the whole music puzzle read as brickwork
+// — a tower's wall standing upright in a field. The manifest already carries the
+// answer and says so out loud: `rock` is "NATURAL cracked granite (no masonry seams,
+// unlike the lighthouse 'stone')".
+//
+// Relief ONLY (`colorMap: false`) and a big texel (repeat 0.35, larger than the
+// boulders' 0.6): the house rule is normal maps yes, tiled colour never — a tiled
+// albedo is what pixelates at arm's length, and on a 5 m monolith a small texel would
+// tile visibly along the whole face. Vertex colours still carry the hue, so the
+// bone-toward-the-crown gradient and the per-stone variation survive untouched.
+export const matMegalith = new THREE.MeshStandardMaterial({
+  vertexColors: true, flatShading: false, roughness: 0.96, metalness: 0.0, side: THREE.DoubleSide,
+});
+// normalScale/strength are deliberately MODEST. At 0.95/2.9 the derived relief was so
+// aggressive that it stopped reading as stone: the strata self-shadowed into parallel
+// dark streaks (wood grain, not granite), and because a strong normal swings each face
+// hard between the warm sun and the cool sky, one stone of five came out sandstone-tan
+// while its siblings went charcoal — from the same quarry, in the same light. Relief
+// should describe the surface, not repaint it.
+applyRelief(matMegalith, 'rock', {
+  normalScale: 0.5, strength: 1.8, colorMap: false, repeat: [0.32, 0.32], normalFrom: 'rock_height',
+});
+
 export const matBrass = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.38, metalness: 0.85, side: THREE.DoubleSide,
 });
@@ -198,6 +223,11 @@ export function buildWorld() {
 
   // ---------- bakers for merged statics ----------
   const stone = new Baker();
+  // NATURAL rock, batched apart from the masonry. The vault outcrop and the pool's
+  // rim rocks were baked into `stone`, which is built with matStone — the LIGHTHOUSE's
+  // coursed-block relief — so a boulder beside the standing stones wore mortar lines.
+  // Its own batch costs one draw group and lets it be granite.
+  const rockwork = new Baker();
   const brass = new Baker();
   const M = new THREE.Matrix4();
   const Q = new THREE.Quaternion();
@@ -1149,7 +1179,7 @@ export function buildWorld() {
         icols[v * 3] = cc.r; icols[v * 3 + 1] = cc.g; icols[v * 3 + 2] = cc.b;
       }
       ig.setAttribute('color', new THREE.BufferAttribute(icols, 3));
-      const slab = new THREE.Mesh(ig, matStone);
+      const slab = new THREE.Mesh(ig, matMegalith);   // a carved standing slab, not a course of the tower
       slab.name = 'inscribedStone';
       slab.position.set(ix, heightAt(ix, iz) + 0.62, iz);
       slab.rotation.y = -0.6;       // face turned toward the jetty / the one arriving
@@ -1360,7 +1390,7 @@ export function buildWorld() {
         }
       }
       g.computeVertexNormals();
-      const m = new THREE.Mesh(g, matStone);
+      const m = new THREE.Mesh(g, matMegalith);   // raw quarried granite, never coursed
       // vertex colors for the stone material
       const cols = new Float32Array(pa.count * 3);
       const cBase = vary(C.stoneOld, r, 0.02, 0.05, 0.06);
@@ -1444,7 +1474,7 @@ export function buildWorld() {
         cols[v * 3] = cc.r; cols[v * 3 + 1] = cc.g; cols[v * 3 + 2] = cc.b;
       }
       g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-      const m = new THREE.Mesh(g, matStone);
+      const m = new THREE.Mesh(g, matMegalith);   // the fallen sixth — same quarry as its five siblings
       // lying on its side, crown pointing out of the arc, sunk into the pad
       m.position.set(fx, heightAt(fx, fz) + 0.34, fz);
       m.rotation.set(0, fa + Math.PI + 0.3, Math.PI / 2 - 0.12);
@@ -1519,10 +1549,10 @@ export function buildWorld() {
     const oy = heightAt(ox, oz);
     // rock outcrop
     const rock = new THREE.IcosahedronGeometry(3.2, 2);
-    stone.add(rock, place(ox, oy + 1.2, oz, 0.7, 1.3, 0.9, 1.1), grad(C.stoneOld, C.boneDark));
+    rockwork.add(rock, place(ox, oy + 1.2, oz, 0.7, 1.3, 0.9, 1.1), grad(C.stoneOld, C.boneDark));
     rock.dispose();
     // sliding slab door (faces the stones)
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.2, 0.3), matStone);
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.2, 0.3), matMegalith);   // cut from the outcrop, facing the stones
     const scols = new Float32Array(slab.geometry.attributes.position.count * 3);
     for (let v = 0; v < scols.length / 3; v++) { scols[v * 3] = C.boneDark.r; scols[v * 3 + 1] = C.boneDark.g; scols[v * 3 + 2] = C.boneDark.b; }
     slab.geometry.setAttribute('color', new THREE.BufferAttribute(scols, 3));
@@ -2012,7 +2042,8 @@ export function buildWorld() {
   // inversion IS the puzzle: descending RAISES the sea — only at L4 (+3.78) does water
   // find the basin (floor 3.42) and float the phial free. Carried up, it dries on the
   // chart table and reads at the surface: see → take (bottom) → read (surface).
-  // Rocks + basin bake into staticStone (0 new draws); only the driven bits are named.
+  // The basin bakes into staticStone; its rim ROCKS bake into staticRock (granite,
+  // not masonry). Only the driven bits are named.
   {
     const PX = -75.5, PZ = -77.0;
     const FLOOR = 3.42;                       // basin floor: below L4 water, above L3's
@@ -2031,7 +2062,7 @@ export function buildWorld() {
       const a = (i / 9) * TAU + pr() * 0.35;
       const rx = PX + Math.sin(a) * 1.38, rz = PZ + Math.cos(a) * 1.38;
       const rock = new THREE.IcosahedronGeometry(0.36 + pr() * 0.2, 1);
-      stone.add(rock, place(rx, heightAt(rx, rz) + 0.16, rz, pr() * TAU, 1, 0.75 + pr() * 0.4, 1), grad(C.stoneOld, C.bone));
+      rockwork.add(rock, place(rx, heightAt(rx, rz) + 0.16, rz, pr() * TAU, 1, 0.75 + pr() * 0.4, 1), grad(C.stoneOld, C.bone));
       rock.dispose();
     }
     addCollider(PX, PZ - 1.4, 0.5);           // solid enough to lean on, open on the south side
@@ -2273,6 +2304,7 @@ export function buildWorld() {
     return grp;
   };
   mkStatic(stone, matStone, 'staticStone', true);
+  mkStatic(rockwork, matMegalith, 'staticRock', true);   // the outcrop + pool rim: granite, not masonry
   mkStatic(brass, matBrass, 'staticBrass', false);
 
   // =================== glow particles (NOT cloned into the model) ===========

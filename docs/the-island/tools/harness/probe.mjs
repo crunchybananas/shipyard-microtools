@@ -390,6 +390,88 @@ export default async function (h) {
   say(`  pre-fix rule would have dropped the player into a sub-floor room from ${wouldHave.hits} origin(s)` +
     (wouldHave.sample ? ` — e.g. (${wouldHave.sample.from}) → (${wouldHave.sample.to}), ${wouldHave.sample.gap}m under the terrain` : ''));
 
+  // ---- 7. the WANDER: drive the real player and see where it ends up ---------
+  // Tests 1-6 interrogate the rules. This one just plays: it walks from every
+  // interactive spot in every direction with the engine's own slide-resolution
+  // (try both axes, then x only, then z only — exactly what update() does), which
+  // is how a player actually squeezes into places nobody designed. It reports two
+  // things an owner would call bugs in the same words they used:
+  //   FELL THROUGH — ended under the terrain, inside a carved sub-floor
+  //   STUCK        — no heading of 16 will move you, and the wedge net can't help
+  say('== 7. the wander (real movement, real slide-resolution) ==');
+  const wander = await h.evaluate(`(() => {${HELPERS}
+    const STRIDE = 0.07;             // ~one frame of walking at 4 m/s
+    const SEEDS = [
+      ['study',        -85, -40], ['music box',   -88.6, -42.6], ['chart table', -82.7, -38.9],
+      ['annex',       -82.9, -32.2], ['plate',     -82.8, -41.4], ['lh outside',  -79, -46],
+      ['wake beach',     4, -104], ['jetty',       -18, -110.5], ['dory',         -26, -102],
+      ['stones',       135, -146], ['islet',       138, -141],   ['stones pad W', 130, -148],
+      ['drain mouth',  139, -150], ['chest',       118, -176],   ['causeway A',    48, -78],
+      ['causeway B',   112, -132], ['bluff',        97,  32],    ['bridge W',      36,  25],
+      ['cliff',       57.5,  50], ['forest',       -30,  40],
+    ];
+    const fell = [], stuck = [];
+    const seenFell = new Set(), seenStuck = new Set();
+    for (const [name, sx, sz] of SEEDS) {
+      for (let hdg = 0; hdg < 16; hdg++) {
+        const a = (hdg / 16) * Math.PI * 2;
+        const dx = Math.sin(a) * STRIDE, dz = Math.cos(a) * STRIDE;
+        let x = sx, z = sz, prevY = wY(sx, sz);
+        for (let s = 0; s < 500; s++) {
+          const nx = x + dx, nz = z + dz;
+          // the engine's slide-resolution, verbatim in spirit
+          let mx = x, mz = z;
+          if (step(x, z, nx, nz)) { mx = nx; mz = nz; }
+          else if (step(x, z, nx, z)) { mx = nx; }
+          else if (step(x, z, x, nz)) { mz = nz; }
+          else {
+            // pinned — is ANY heading open? (the engine's wedge ring test)
+            let out = false;
+            for (let i = 0; i < 16 && !out; i++) {
+              const b = (i / 16) * Math.PI * 2;
+              if (step(x, z, x + Math.cos(b) * 0.5, z + Math.sin(b) * 0.5)) out = true;
+            }
+            // only a spot the player WALKED to counts; a seed placed inside a
+            // collider or a locked room is an artefact of the probe, not a bug
+            // (and the engine's wedge net would rescue a real player anyway)
+            if (!out && s > 2) {
+              const k = (x | 0) + ':' + (z | 0);
+              if (!seenStuck.has(k)) { seenStuck.add(k); stuck.push({ from: name, at: [+x.toFixed(1), +z.toFixed(1)], y: +wY(x, z).toFixed(2) }); }
+            }
+            break;
+          }
+          x = mx; z = mz;
+          // A FALL is a DISCONTINUITY, not a low place: walking down the drain ramp
+          // or the hatch stair puts you under the terrain on purpose. What must never
+          // happen is the floor dropping out from under one 7 cm stride.
+          const curY = wY(x, z, prevY);
+          const drop = prevY - curY;
+          if (drop > 1.0) {
+            const k = (x | 0) + ':' + (z | 0);
+            if (!seenFell.has(k)) {
+              seenFell.add(k);
+              fell.push({ from: name, at: [+x.toFixed(1), +z.toFixed(1)],
+                          floor: +curY.toFixed(2), terrain: +TR.heightAt(x, z).toFixed(2), gap: +drop.toFixed(2) });
+            }
+            break;
+          }
+          prevY = curY;
+        }
+      }
+    }
+    return { fell, stuck };
+  })()`);
+  if (wander.fell.length) {
+    bad(`the wander walked UNDER the terrain at ${wander.fell.length} place(s) — the "fell through the world" class`);
+    for (const f of wander.fell.slice(0, 8)) {
+      say(`     from ${f.from}: (${f.at[0]}, ${f.at[1]}) floor ${f.floor} under terrain ${f.terrain} (${f.gap}m)`);
+    }
+  } else say('  never walked under the terrain — clean');
+  if (wander.stuck.length) {
+    bad(`the wander got fully pinned at ${wander.stuck.length} place(s) — the "got stuck" class`);
+    for (const s of wander.stuck.slice(0, 8)) say(`     from ${s.from}: (${s.at[0]}, ${s.at[1]}) y=${s.y}`);
+  } else say('  never fully pinned — clean');
+
   console.log(`PROBE ${anomalies.length} anomal${anomalies.length === 1 ? 'y' : 'ies'}`);
   if (anomalies.length && process.env.STRICT === '1') process.exitCode = 1;
   return { anomalies, out };
