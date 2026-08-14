@@ -377,6 +377,11 @@ export const hands = (level = W.level) => handsAbove(_source.load(), level);
 // The inherited marks worth SHOWING, for the evidence pass (slice 4).
 export const evidence = (level = W.level) => evidenceAt(_source.load(), level);
 
+// Forget the whole stack, in place. Deliberately NOT wired to "Begin again" — the
+// stack outliving your run is the thesis (STACK.md §3.1). This exists for the
+// playtest harness and the debug panel.
+export const clearStack = () => { _source.clear(); };
+
 export function wipe() {
   // Begin-anew safety net (#56): stash the outgoing payload one slot deep
   // before clearing, so a mistaken fresh start stays recoverable (a single-slot

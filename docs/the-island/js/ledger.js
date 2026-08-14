@@ -277,6 +277,14 @@ export function localSource(io) {
         /* private mode: the stack forgets, the island still works */
       }
     },
+    // Forget the stack in place — storage AND the in-memory cache. Without the
+    // second half, clearing the key looks like it worked and the old draft keeps
+    // being served from this closure until a reload. (Playtest tooling needs the
+    // no-reload path: a reload lands on the title screen, not the world.)
+    clear() {
+      led = emptyLedger();
+      try { io.set(LEDGER_KEY, JSON.stringify(packLedger(led))); } catch (_) { /* private mode */ }
+    },
   };
 }
 

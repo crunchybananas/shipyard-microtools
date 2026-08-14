@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack } from './world.js';
 import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs, NAMES } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
@@ -200,7 +200,10 @@ const modelRefs = collectRefs(modelRoot);
 // applyAtmosphere goes back to being about atmosphere. The scheduler runs them each frame.
 addDrive((w) => w.atTop, (dt, elapsed) => {
   // the foreshadow ring — the NEXT level's waterline, breathing like a premonition
-  const nextTide = LEVELS[Math.min(W.level + 1, MAX_DEPTH)].tide;
+  // the foreshadow ring shows the NEXT rung's real waterline — including the draft
+  // your own work on this one has already put there. The vista from the top is the
+  // first place the law is visible: you can see what you are about to leave someone.
+  const nextTide = tideAt(Math.min(W.level + 1, MAX_DEPTH));
   foreshadow.position.y = -TIDE_DROP * (1 - nextTide) + 0.06;
   foreshadow.material.opacity = 0.30 + Math.sin(elapsed * 0.9) * 0.08;
 });
@@ -747,12 +750,16 @@ function tickDive(dt) {
     W.level = Math.min(W.level + 1, MAX_DEPTH); // one recursion deeper each dive
     // SEA-STRATA: drop into THIS level's place — its spawn + raised tide (the same island, drowned further)
     const L = LEVELS[W.level];
-    if (W.level > 1) W.tide = W.tideTarget = L.tide;
+    // THE DRAFT (STACK.md §3.2): the rung's authored waterline PLUS everything the
+    // rungs above displaced onto it. Solve the surface efficiently and you land in
+    // a puddle; brute-force the whole chain and they inherit a flood — same island,
+    // same puzzles, less of it above water.
+    if (W.level > 1) W.tide = W.tideTarget = tideAt(W.level);
     if (W.level >= 2) W.regions.l2seen = true;
     if (W.level >= 3) W.regions.l3seen = true;
     if (W.level >= 4) W.regions.l4seen = true;
     save(player);
-    player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
+    player.spawn(spawnAboveWater(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2])), L.spawn.yaw, L.spawn.pitch);
   }
   if (f >= 1) {
     dive = null;
@@ -866,7 +873,7 @@ function landAscent() {
     }
   }
   // SEA-STRATA: arriving a level shallower, the sea recedes to that level's tide (surface = 1)
-  W.tide = W.tideTarget = (W.level > 1 ? LEVELS[W.level].tide : 1);
+  W.tide = W.tideTarget = (W.level > 1 ? tideAt(W.level) : 1);
   save(player);
   // rise out at the study / chart table of the level above (canon: you climb to the chart table)
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
@@ -1174,6 +1181,38 @@ const _introLookV = new THREE.Vector3();
 // flythrough decelerates into exactly where (and how) the player will stand, and
 // endIntro hands over with no cut. Before, the flight ended high over the water and
 // then SNAPPED to standing on the beach — that jump is what read as a pause.
+// Land the player where the water ACTUALLY is (STACK.md §3.2).
+//
+// Every LEVELS spawn was authored against that level's authored waterline, and the
+// L2 arrival is tuned fine: your eye clears the surface by about 27 cm, so you wade
+// in ankle-deep and can see. Under the DRAFT the sea can stand higher than the
+// author planned — and 0.56 m of inherited water was enough to spawn the camera
+// UNDERWATER, in a game with no swimming. (Found by playtesting the frame, not by
+// any assertion: the numbers were all correct.)
+//
+// Capping the draft would make the law toothless, so instead the arrival moves:
+// search outward from the authored point for the nearest gently-sloped, walkable
+// spot whose EYE clears the surface. With an empty stack the authored point already
+// qualifies and is returned untouched — a first-time player's arrival is unchanged.
+// It is also the right image: the more water you displaced, the further up the
+// shore the tide sets you down.
+function spawnAboveWater(pos, eye = 1.65) {
+  const clears = (x, z) => walkableY(x, z) + eye > waterY() + 0.3;
+  if (clears(pos.x, pos.z)) return pos;
+  const e = 0.7;
+  const gentle = (x, z) => Math.hypot(
+    heightAt(x + e, z) - heightAt(x - e, z),
+    heightAt(x, z + e) - heightAt(x, z - e)) / (2 * e) < 0.9;
+  for (let R = 1.5; R <= 40; R += 1.5) {
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2;
+      const x = pos.x + Math.cos(a) * R, z = pos.z + Math.sin(a) * R;
+      if (clears(x, z) && gentle(x, z)) return new THREE.Vector3(x, 0, z);
+    }
+  }
+  return pos;   // nowhere dry within 40 m: keep the authored point rather than teleport wildly
+}
+
 const SPAWN_POS = new THREE.Vector3(4, 0, -104);
 const SPAWN_YAW = 2.19, SPAWN_PITCH = 0.05;
 function setIntroLanding() {
@@ -1591,7 +1630,7 @@ player.onFootstep = (kind, pos) => {
       scene.add(g);
       return colliders().length;
     },
-    clearStack: () => { try { localStorage.removeItem('abyme-ledger-v1'); } catch (_) {} location.reload(); },
+    clearStack,   // forget the stack IN PLACE (no reload — a reload lands on the title screen)
     setIntroT: (t) => { if (intro) intro.t = t; },
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
     setMist: (m) => { mistCur = clamp(m, 0, 1); },
@@ -1615,11 +1654,11 @@ player.onFootstep = (kind, pos) => {
       n = Math.max(1, Math.min(n | 0, MAX_DEPTH));
       const L = LEVELS[n];
       W.level = n;
-      W.tide = W.tideTarget = L.tide;                  // raised tide (set both: skip the 13s ease)
+      W.tide = W.tideTarget = tideAt(n);               // raised tide + inherited draft (set both: skip the 13s ease)
       if (n >= 2) W.regions.l2seen = true;
       if (n >= 3) W.regions.l3seen = true;
       if (n >= 4) W.regions.l4seen = true;
-      player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
+      player.spawn(spawnAboveWater(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2])), L.spawn.yaw, L.spawn.pitch);
       save(player);
       beginVista(n);   // #135: instant jumps get the held first-sighting too (once)
       return { level: n, id: L.id, region: L.region, tide: L.tide, encounter: L.encounter };

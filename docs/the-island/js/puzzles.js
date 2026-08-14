@@ -3,7 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct } from './world.js';
+import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft } from './world.js';
 import { SPOTS, heightAt } from './terrain.js';
 import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
 import { Interactions } from './interact.js';
@@ -504,7 +504,18 @@ export class Game {
       id: 'tideGauge', targets: [R.tideGauge, R.gaugeTop].filter(Boolean), label: 'a graduated staff', maxDist: 36,
       onClick: () => {
         A.crankTick();
-        UI.whisper({
+        // THE DRAFT MADE READABLE (STACK.md §3.2): the gauge was authored for a world
+        // where each rung sat at exactly its ring. It doesn't any more — the rungs
+        // above displace water onto this one — so the instrument is where you can
+        // SEE that. The rings are the promise; the water over them is what was passed
+        // down. Under a hand's breadth reads as the authored line (rounding, not a lie).
+        const over = draft();
+        UI.whisper(over > 0.03 ? {
+          1: 'Five rings. The lowest sits at the old high-water; the top is fresh-cut, still pale.',
+          2: 'The water stands over the second ring. Not by much. But the ring was cut for a promise, and the promise is under it.',
+          3: 'The third ring is drowned by a hand’s width. Whoever set these knew the height — they did not know how many would come after.',
+          4: 'The fourth ring is gone under. Only the fresh-cut one is still in air, and the water is climbing to meet it.',
+        }[Math.min(W.level, 4)] : {
           1: 'Five rings. The lowest sits at the old high-water. The rest climb into air no tide should own — and the top ring is fresh-cut, still pale.',
           2: 'The water stands at the second ring, exact as a promise kept.',
           3: 'The third ring, to the inch. Whoever set these knew.',
@@ -953,6 +964,16 @@ export class Game {
         UI.whisper(T.everything_down_here_is);
         UI.addJournal(T.the_water_is_higher, '', 'self');
       });
+    }
+
+    // THE LAW, said out loud exactly ONCE in the game (STACK.md §2). It waits for
+    // the era line so the first descent isn't two statements in a row, and it only
+    // fires when the player has actually DISPLACED something — the sentence has to
+    // land on water they put there, or it is just a slogan. Whisper only, never
+    // repeated, never explained. Everything after this is shown.
+    if (W.level >= 2 && draft() > 0.03 && W.onceKeys?.includes('eraThreshold')) {
+      this._lawT = (this._lawT || 0) + dt;
+      if (this._lawT > 6) this.once('theLaw', () => UI.whisper('The water here stands higher than the ring he cut for it. It did not come from nowhere. It has to go somewhere.'));
     }
 
     // #130 era event L3: the CAPITALS BREACH — the only time the sea gives something

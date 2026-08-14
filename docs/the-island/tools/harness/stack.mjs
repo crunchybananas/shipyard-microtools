@@ -75,6 +75,51 @@ export default async function (h) {
   ok('the stack reloads from storage', reloaded.d2 > 0.08, reloaded);
   ok('the same hand persists across runs', reloaded.hand === fresh.hand, { a: fresh.hand, b: reloaded.hand });
 
+  // --- slice 3: the draft is FELT — the arrival tide carries it ----------------
+  const felt = await h.evaluate(`(() => {
+    const W = ABYME.W;
+    const base = 1.35, d = ABYME.draft(2);
+    ABYME.goLevel(2);
+    const withDraft = W.tide;
+    // …and with a clean stack the same rung sits exactly at its authored ring
+    localStorage.removeItem('abyme-ledger-v1');
+    return { d: +d.toFixed(4), withDraft: +withDraft.toFixed(4), base, level: W.level };
+  })()`);
+  ok('arriving at rung 2 lands on baseline + draft',
+    Math.abs(felt.withDraft - (felt.base + felt.d)) < 1e-6, felt);
+  ok('the draft actually raises the water (not a no-op)', felt.withDraft > felt.base + 0.05, felt);
+
+  // a clean stack must still land EXACTLY on the authored waterline — the feature
+  // must not drift the authored game for a first-time player
+  await h.navigate(URL); await ready();
+  await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
+  await h.wait(2);
+  await h.evaluate(`ABYME.setIntroT(99); 1`);
+  await h.wait(2);
+  const clean = await h.evaluate(`(() => { ABYME.goLevel(3); return { tide: +ABYME.W.tide.toFixed(4), draft: ABYME.draft(3) }; })()`);
+  ok('a clean stack lands exactly on the authored tide', clean.tide === 1.65 && clean.draft === 0, clean);
+
+  // --- the arrival must never spawn the camera underwater ----------------------
+  // The draft raises the sea; the authored spawns were tuned to the authored sea.
+  // At L2 the eye clears the surface by ~27 cm, so half a metre of inherited water
+  // put the camera UNDER it, in a game with no swimming. Every rung, worst case.
+  const dry = await h.evaluate(`(() => {
+    const W = ABYME.W, P = ABYME.player, out = [];
+    const chain = () => { const g = ABYME.game, hs = (id) => g.interact.hotspots.find(s => s.id === id);
+      hs('valve')?.onClick(); g.flag('crankUsed'); W.tide = W.tideTarget = 0;
+      hs('chest')?.onClick(); hs('chest')?.onClick(); hs('crack')?.onClick(); g.flag('birdSolved');
+      hs('lensItem')?.onClick(); hs('lensSlot')?.onClick(); g.flag('shadowRevealed');
+      g.flag('hatchOpen'); hs('plumb')?.onClick(); hs('hook')?.onClick(); };
+    ABYME.clearStack(); ABYME.goLevel(1); chain();       // one full hand's worth of displacement
+    for (const n of [2, 3, 4]) {
+      ABYME.goLevel(n);
+      const eye = P.pos.y + P.eye, sea = -4.2 * (1 - W.tide);
+      out.push({ n, clearance: +(eye - sea).toFixed(3), draft: +ABYME.draft(n).toFixed(3) });
+    }
+    return out;
+  })()`);
+  for (const r of dry) ok(`rung ${r.n} arrival keeps the eye above water (draft ${r.draft})`, r.clearance > 0.25, r);
+
   const errs = await h.evaluate(`window.__errs || []`);
   ok('no console errors', Array.isArray(errs) && errs.length === 0, errs);
 
