@@ -3,7 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS } from './world.js';
+import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct } from './world.js';
 import { SPOTS, heightAt } from './terrain.js';
 import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
 import { Interactions } from './interact.js';
@@ -70,6 +70,13 @@ export class Game {
   flag(name, value = true) {
     if (W.flags[name] === value) return false;
     W.flags[name] = value;
+    // THE LAW (STACK.md §2): the acts that reach through the model and change the
+    // world are displaced downward, never dissolved. recordAct is a no-op for the
+    // flags that cost nobody anything, which is most of them.
+    if (value) {
+      const act = actForFlag(name);
+      if (act) recordAct(act, this.player);
+    }
     save(this.player);
     return true;
   }
@@ -259,6 +266,9 @@ export class Game {
       when: () => W.flags.lensTaken && !W.lensPlaced,
       onClick: () => {
         W.lensPlaced = true;
+        // the one act of displacement that isn't a flag (lensPlaced is top-level),
+        // so it records here rather than through flag()/FLAG_MARKS
+        recordAct('lens', this.player);
         W.inventory = W.inventory.filter((s) => s !== 'lens');
         A.chime();
         UI.whisper(T.far_above_glass_settles);

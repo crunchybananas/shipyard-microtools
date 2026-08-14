@@ -49,6 +49,13 @@ echo "== saves schema =="
 node "$HERE/saves.spec.mjs" || exit 1
 echo "== coverage =="
 node "$HERE/coverage.mjs" || exit 1
+echo "== the stack =="
+# STACK.md slices 1-2: the ledger records the god-verbs, the draft accumulates
+# downward, and both survive a wiped save and a reload. Pure logic + storage — no
+# cinematics — so this is a hard gate on CI too.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/stack.mjs" | tee "$WORK/stack.out"
+grep -q "STACKWALK 12 / 12" "$WORK/stack.out" || { echo "STACK FAILED"; exit 1; }
+
 echo "== the walk =="
 # CI runs on software GL where 20s real-time cinematics cannot hit wall-clock, so
 # CI is the LOGIC GATE: the 33 pumped assertions must pass AND the failure list

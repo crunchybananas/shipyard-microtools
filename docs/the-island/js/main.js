@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence } from './world.js';
 import { SPOTS, heightAt, walkableY, syncGates } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs, NAMES } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
@@ -1565,6 +1565,12 @@ player.onFootstep = (kind, pos) => {
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
     gpuMode: () => (gpuTimer ? gpuTimer.mode : null),
     tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch),
+    // THE STACK (STACK.md) — inspect what the rungs above displaced onto this one.
+    // hand = who you are to the stack; ledger() = the raw marks; draft(n) = the
+    // inherited water in tide units; tideAt(n) = baseline + draft; evidence(n) =
+    // the inherited marks worth rendering (slice 4).
+    hand: HAND, ledger, draft, tideAt, hands, evidence,
+    clearStack: () => { try { localStorage.removeItem('abyme-ledger-v1'); } catch (_) {} location.reload(); },
     setIntroT: (t) => { if (intro) intro.t = t; },
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
     setMist: (m) => { mistCur = clamp(m, 0, 1); },
@@ -1711,6 +1717,13 @@ player.onFootstep = (kind, pos) => {
         beamDelta: +bd.toFixed(3),
         regions: { l2: W.regions.l2seen, l3: W.regions.l3seen, l4: W.regions.l4seen, fragments: W.regions.fragmentsFound.slice() },
         inventory: W.inventory.slice(), stems: W.stems, once: W.onceKeys.length,
+        // THE STACK (STACK.md §3.2): what the rungs above displaced onto this one.
+        // draft is in tide units — tideAt() is the tide this rung ACTUALLY sits at,
+        // its authored LEVELS baseline plus everything inherited.
+        stack: {
+          hand: HAND, draft: +draft().toFixed(3), tideAt: +tideAt().toFixed(3),
+          hands: hands(), marks: ledger().marks.length, evidence: evidence().length,
+        },
         flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'tideFigureSeen', 'bellRung', 'readGlass', 'phialTaken', 'phialDried', 'beamDeepSeen', 'keeperSong'].filter((k) => F[k]),
       };
     },

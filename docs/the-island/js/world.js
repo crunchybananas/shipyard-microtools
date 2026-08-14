@@ -5,6 +5,10 @@
 import * as THREE from 'three';
 import { clamp, lerp, lerpColor, smoothstep, TAU, mulberry32, SEED } from './util.js';
 import { SAVE_KEY, SAVE_KEY_PREV, packSave, applySave } from './save-schema.js';
+import {
+  FLAG_MARKS, localSource, loadHandId,
+  record as ledgerRecord, draftAt, tideFor, handsAbove, evidenceAt,
+} from './ledger.js';
 
 export const SCALE_MODEL = 1 / 240;
 
@@ -318,6 +322,60 @@ export function load() {
 export const hasSave = () => {
   try { return !!localStorage.getItem(SAVE_KEY); } catch (_) { return false; }
 };
+
+// ---------------- the stack's ledger (STACK.md §3.1/§3.2) ---------------------
+// The law: a solution is never dissolved, only displaced. The acts you perform on
+// a rung become the water — and the evidence — the rung below wakes up in.
+//
+// ledger.js is storage-free so node can test it; this is its I/O boundary, the
+// same split save-schema.js gets. The source is an INTERFACE: today it is local
+// (the hand one rung up is your own past self, so the whole thesis is playable
+// offline and single-player), and slice 8 swaps in an HTTP source without any
+// consumer changing.
+
+const _io = {
+  get: (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch (_) { /* private mode */ } },
+};
+
+export const HAND = loadHandId(_io);
+const _source = localSource(_io);
+
+export const ledger = () => _source.load();
+
+// Record one act on the CURRENT rung. Called from puzzles.js `flag()` — the single
+// choke point every progression flag passes through — so the recording surface is
+// FLAG_MARKS and nothing else. `player` supplies the position when there is one.
+// Returns the mark, or null when the flag costs nobody anything (most of them).
+export function recordAct(kind, player) {
+  const p = player && player.pos;
+  const mark = ledgerRecord(_source.load(), {
+    kind,
+    rung: W.level,
+    hand: HAND,
+    at: p ? [p.x, p.y, p.z] : null,
+  });
+  if (mark) _source.push(mark);
+  return mark;
+}
+
+// The flag→act lookup, so puzzles.js never has to know the mark vocabulary.
+export const actForFlag = (name) => FLAG_MARKS[name] || null;
+
+// THE DRAFT: the water everything above this rung displaces onto it. 0 at the
+// surface, always — nobody is upstream of the first island.
+export const draft = (level = W.level) => draftAt(_source.load(), level);
+
+// The tide a rung actually sits at: LEVELS[n].tide plus what it inherited.
+export const tideAt = (level = W.level) =>
+  tideFor(_source.load(), level, (LEVELS[level] || LEVELS[1]).tide);
+
+// How many distinct hands have worked at or above this rung (the chart tally's
+// new unit — hands, not levels).
+export const hands = (level = W.level) => handsAbove(_source.load(), level);
+
+// The inherited marks worth SHOWING, for the evidence pass (slice 4).
+export const evidence = (level = W.level) => evidenceAt(_source.load(), level);
 
 export function wipe() {
   // Begin-anew safety net (#56): stash the outgoing payload one slot deep
