@@ -34,17 +34,22 @@ export default async function (h) {
   const played = await h.evaluate(`(() => {
     const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find(s => s.id === id);
     W.timeDrift = 0;
-    hs('valve').onClick();                 // valve   — the sea moved
-    hs('crank').onDrag ? hs('crank').onDrag(0.5) : g.flag('crankUsed');
+    // WALK to each instrument before touching it. A mark records where the PLAYER
+    // stood, so invoking hotspots remotely from the spawn files the whole chain at
+    // the wake-up beach — which is under water one rung down, so every scuff would
+    // be skipped and slice 4 would look broken while being correct.
+    const at = (x, z) => ABYME.tp(x, z, 0, 0);
+    at(-82.7, -38.9); hs('valve').onClick();        // the sea moved
+    at(-86.7, -41.1); hs('crank').onDrag ? hs('crank').onDrag(0.5) : g.flag('crankUsed');
     W.tide = W.tideTarget = 0;
-    hs('chest').onClick(); hs('chest').onClick();   // chest + ruler
-    hs('crack').onClick();                 // ruler laid → the bridge
-    g.flag('birdSolved');                  // stones
-    hs('lensItem') && hs('lensItem').onClick();
-    hs('lensSlot') && hs('lensSlot').onClick();     // lens set in the model
-    g.flag('shadowRevealed'); g.flag('hatchOpen');  // hatch
-    hs('plumb') && hs('plumb').onClick();
-    hs('hook') && hs('hook').onClick();    // plumb hung
+    at(118, -176);    hs('chest').onClick(); hs('chest').onClick();   // chest + ruler
+    at(-85, -40);     hs('crack').onClick();        // ruler laid → the bridge
+    at(135, -146);    g.flag('birdSolved');         // the stones' five notes
+    at(124, -150);    hs('lensItem') && hs('lensItem').onClick();
+    at(-85, -40);     hs('lensSlot') && hs('lensSlot').onClick();     // lens set in the model
+    at(97, 32);       g.flag('shadowRevealed'); g.flag('hatchOpen');
+    at(97, 19.5);     hs('plumb') && hs('plumb').onClick();
+    at(-85, -40);     hs('hook') && hs('hook').onClick();             // plumb hung
     return ABYME.state().stack;
   })()`);
   ok('the chain recorded marks', played.marks >= 7, played);
@@ -105,11 +110,20 @@ export default async function (h) {
   // put the camera UNDER it, in a game with no swimming. Every rung, worst case.
   const dry = await h.evaluate(`(() => {
     const W = ABYME.W, P = ABYME.player, out = [];
+    // same rule as above: WALK to each instrument, or the whole chain files at the
+    // beach and slice 4 has nothing above water to show
     const chain = () => { const g = ABYME.game, hs = (id) => g.interact.hotspots.find(s => s.id === id);
-      hs('valve')?.onClick(); g.flag('crankUsed'); W.tide = W.tideTarget = 0;
-      hs('chest')?.onClick(); hs('chest')?.onClick(); hs('crack')?.onClick(); g.flag('birdSolved');
-      hs('lensItem')?.onClick(); hs('lensSlot')?.onClick(); g.flag('shadowRevealed');
-      g.flag('hatchOpen'); hs('plumb')?.onClick(); hs('hook')?.onClick(); };
+      const at = (x, z) => ABYME.tp(x, z, 0, 0);
+      at(-82.7, -38.9); hs('valve')?.onClick(); at(-86.7, -41.1); g.flag('crankUsed');
+      W.tide = W.tideTarget = 0;
+      at(118, -176); hs('chest')?.onClick(); hs('chest')?.onClick();
+      at(-85, -40); hs('crack')?.onClick();
+      at(135, -146); g.flag('birdSolved');
+      at(124, -150); hs('lensItem')?.onClick();
+      at(-85, -40); hs('lensSlot')?.onClick();
+      at(97, 32); g.flag('shadowRevealed'); g.flag('hatchOpen');
+      at(97, 19.5); hs('plumb')?.onClick();
+      at(-85, -40); hs('hook')?.onClick(); };
     ABYME.clearStack(); ABYME.goLevel(1); chain();       // one full hand's worth of displacement
     for (const n of [2, 3, 4]) {
       ABYME.goLevel(n);
@@ -119,6 +133,37 @@ export default async function (h) {
     return out;
   })()`);
   for (const r of dry) ok(`rung ${r.n} arrival keeps the eye above water (draft ${r.draft})`, r.clearance > 0.25, r);
+
+  // --- slice 4: the inherited marks are IN THE WORLD --------------------------
+  // _apply (which lays the marks out) runs in the rAF loop, NOT in game.tick — so
+  // change the rung, then let real frames happen before measuring.
+  await h.evaluate(`(() => { ABYME.goLevel(2); return 1; })()`);
+  await h.wait(1.2);
+  const seen = await h.evaluate(`(() => {
+    const W = ABYME.W, THREE = ABYME.THREE;
+    const im = ABYME.refs.handMarks;
+    if (!im) return { err: 'no handMarks mesh' };
+    const ev = ABYME.evidence(2).filter((m) => m.at);
+    // every instance must sit ON the ground at a recorded position
+    const m4 = new THREE.Matrix4(), v = new THREE.Vector3();
+    let onGround = 0;
+    for (let i = 0; i < im.count; i++) {
+      im.getMatrixAt(i, m4); v.setFromMatrixPosition(m4);
+      const g = ABYME.terrain.walkableY(v.x, v.z);
+      if (Math.abs(v.y - (g + 0.06)) < 0.05) onGround++;
+    }
+    const wy = -4.2 * (1 - W.tide);
+    let dry = 0;
+    for (let i = 0; i < im.count; i++) { im.getMatrixAt(i, m4); v.setFromMatrixPosition(m4); if (v.y > wy) dry++; }
+    return { count: im.count, evidence: ev.length, onGround, dry, cap: im.instanceMatrix.count,
+             pruned: !ABYME.scene.getObjectByName('modelIsland')?.getObjectByName('handMarks') };
+  })()`);
+  // count <= evidence, not ==: marks that fall under this rung's waterline are
+  // skipped on purpose (evidence you cannot find is not evidence)
+  ok('the inherited marks are placed in the world', seen.count > 0 && seen.count <= Math.min(seen.evidence, seen.cap), seen);
+  ok('every mark sits on the ground', seen.onGround === seen.count, seen);
+  ok('marks are pruned from the 1:240 model clone', seen.pruned === true, seen);
+  ok('no mark is drawn under the waterline', seen.dry === seen.count, seen);
 
   const errs = await h.evaluate(`window.__errs || []`);
   ok('no console errors', Array.isArray(errs) && errs.length === 0, errs);

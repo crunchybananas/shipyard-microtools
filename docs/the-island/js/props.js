@@ -586,6 +586,49 @@ export function buildWorld() {
     mk.name = 'lensMarkStudy';
     core.add(mk);
   }
+
+  // ===================== THE OTHER HAND'S MARKS (STACK.md §3.1) ===============
+  // Where a hand one rung up did something that cost you, they left a scuff: a
+  // patch of ground worn by somebody standing in one place long enough to work.
+  // Nothing labelled, nothing glowing — you find them the way you find anything
+  // on this island, by walking somewhere and looking down.
+  //
+  // ONE InstancedMesh, capacity 24, placed from world.evidence() on every level
+  // change (puzzles _apply). Capacity is well under the ledger's 64-per-rung cap
+  // on purpose: an old rung would otherwise carpet the island in stains, which
+  // reads as decoration instead of evidence — and costs draw calls for the
+  // privilege. Whichever 24 arrive first are the ones you meet.
+  {
+    // a soft radial smudge — a hard-edged quad reads as a sticker, and this has to
+    // read as wear. 64px is plenty for something you only ever see at grazing angle.
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 64;
+    const g2 = cv.getContext('2d');
+    const rg = g2.createRadialGradient(32, 32, 2, 32, 32, 31);
+    rg.addColorStop(0, 'rgba(255,255,255,0.85)');
+    rg.addColorStop(0.55, 'rgba(255,255,255,0.32)');
+    rg.addColorStop(1, 'rgba(255,255,255,0)');
+    g2.fillStyle = rg;
+    g2.fillRect(0, 0, 64, 64);
+    const tex = new THREE.CanvasTexture(cv);
+    const geo = new THREE.PlaneGeometry(1, 1);
+    geo.rotateX(-Math.PI / 2);                     // lie flat; per-instance matrices only translate/scale/spin
+    // PALE, not dark. The first pass used a dark smudge, which was invisible: the
+    // study flagstones are already near-black, so a dark patch on them is nothing at
+    // all. Wear is grime rubbed OFF — a path worn through a floor is the pale stone
+    // under the dirt, and a patch of trodden grass is the bare ground under it. A
+    // light patch reads on every surface this island has, and it reads as use rather
+    // than as a stain someone dropped on the world.
+    const mat = new THREE.MeshBasicMaterial({
+      map: tex, color: 0xd8cdb4, transparent: true, opacity: 0.34, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,   // never z-fight the ground
+    });
+    const im = new THREE.InstancedMesh(geo, mat, 24);
+    im.name = 'handMarks';
+    im.count = 0;                                  // nothing until a rung inherits something
+    im.frustumCulled = false;                      // instances move on level change, not per frame
+    core.add(im);
+  }
   // the phial from the high pool, set out to dry on the chart table's west margin after
   // the climb back out (#49 round trip) — appears once its sodden note has dried
   // (W.flags.phialDried, driven in puzzles _apply); click to finally read what he sealed.
@@ -2988,7 +3031,9 @@ function buildVegetation(core, r) {
 // shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
 // confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs']);
+// 'handMarks' is pruned from the 1:240 clone: a ground scuff is ~4 mm there, sub-pixel
+// at every angle, and the clone would double its instance cost for nothing.
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs', 'handMarks']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -3078,6 +3123,7 @@ export function defineProp(name, { prune = false } = {}) {
 
 // Collect state-driven object refs by name, for one island instance.
 export const NAMES = [
+  'handMarks',
   'water', 'lampLens', 'beamPivot', 'beamCone', 'shaftBeam', 'valveWheel',
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',

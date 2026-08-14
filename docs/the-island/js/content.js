@@ -341,6 +341,26 @@ export const CONGREGATION_CLOSE = {
 // micro-marks hide on the working things of the keeper's life — one line each, found in
 // any order, tallied diegetically in the journal ("the third of his small true things").
 // Words live here; geometry lives in props LAMPBLACK_SITES; gates live in puzzles.
+// THE OTHER HAND (STACK.md §3.1/§5) — what you find where somebody one rung up
+// did the thing that cost you. Said once, on approach, and never again.
+//
+// The register is the whole point: nobody here is a villain. Every line is an
+// ordinary person doing ordinary, careful work — and the harm is invisible from
+// where they were standing, which is exactly the harm. So: no accusation, no
+// gloating, no lesson. Just a scuff in the ground and the fact of somebody having
+// been there before you, wanting the same things.
+export const HAND_MARKS = {
+  valve:  'Salt dried in the shape of two hands, either side of the wheel. They drained it, and stood a while, and went in out of the wind.',
+  crank:  'The grass here is worn in a quarter-circle. Somebody stood and wound the hour back until the light was good enough to work by.',
+  ruler:  'A straight edge was laid down here and lifted again. The bridge you crossed this morning is theirs.',
+  lens:   'Glass was set from this spot. The beam you steered by last night was aimed by somebody you will never meet.',
+  chest:  'The lid was up before you got here. They took what they needed and left the rest, in case.',
+  hatch:  'Four dials, and the same four numbers. They stood here long enough to work it out, the same as you did.',
+  stones: 'Five notes were played from exactly here. The vault was already open when you arrived, and you thanked nobody.',
+  plumb:  'A weight hung and was taken down again. They wanted to know how deep it went as badly as you do.',
+  dive:   'They stood on the plate here, and went down. This is the water they left behind them.',
+};
+
 export const LAMPBLACK = [
   { id: 'lmValve', place: 'the brass valve',                      line: 'The sea always minded the wheel. It never once minded me.' },
   { id: 'lmBox',   place: 'the music box',                       line: 'Wound it again. The wrong note is the only part that sounds like me.' },

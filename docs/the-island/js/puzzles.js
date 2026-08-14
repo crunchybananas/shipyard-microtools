@@ -3,8 +3,8 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft } from './world.js';
-import { SPOTS, heightAt } from './terrain.js';
+import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft, evidence } from './world.js';
+import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
 import { Interactions } from './interact.js';
 import { UI } from './ui.js';
@@ -14,7 +14,7 @@ import { clamp, lerp, lerpAngle, TAU } from './util.js';
 // #132: the inspector's record — every LORE entry flagged record:true participates
 // in the FILE-or-KEEP economy (read → take → cabinet or source).
 const REC_IDS = Object.keys(LORE).filter((id) => LORE[id].record);
-import { KEEPER, LAMPBLACK, CLIMBERS, CLIMBERS_CLOSE, CONGREGATION, CONGREGATION_CLOSE, LORE, T } from './content.js';
+import { KEEPER, LAMPBLACK, HAND_MARKS, CLIMBERS, CLIMBERS_CLOSE, CONGREGATION, CONGREGATION_CLOSE, LORE, T } from './content.js';
 
 const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
@@ -955,6 +955,8 @@ export class Game {
     const an = this.anim;
     const F = W.flags;
 
+    this._tickHandMarks(dt);   // the other hand's scuffs speak when you stand in them
+
     // #129: the era threshold — the reframe said out loud exactly ONCE in the game,
     // in the first minute of the first descent (8s after splashdown, so the keeper's
     // arrival line has had its beat). Depth becomes time from here on.
@@ -1480,6 +1482,64 @@ export class Game {
   atBrink() { return !!this._brink; }
 
   // ---------------------------------------------------- state → scene graph
+  // Lay the inherited marks into the world. Each becomes a worn patch of ground at
+  // the spot the act was performed, sized and spun from the mark itself so two hands
+  // never leave identical scuffs — and so the layout is stable across reloads (a
+  // wandering stain would read as a bug, not as wear).
+  _placeHandMarks(im) {
+    const ev = evidence(W.level);
+    this._marks = [];
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), s = new THREE.Vector3();
+    let n = 0;
+    for (const mk of ev) {
+      if (n >= im.instanceMatrix.count) break;
+      if (!mk.at) continue;                       // an act with no place cannot be found
+      const [x, , z] = mk.at;
+      const y = walkableY(x, z);
+      // Evidence you cannot find is not evidence. A scuff records where somebody
+      // STOOD, on dry land — and the draft their work caused is exactly what drowns
+      // that spot on the rung below. So a mark under the waterline is skipped rather
+      // than drawn as a pale smear on the seabed. The ones that survive are the ones
+      // still above water, which is its own quiet statement about what gets kept.
+      if (y < waterY() + 0.15) continue;
+      // a deterministic per-mark jitter: the hand id + kind, not Math.random
+      let h = 0;
+      const key = mk.h + mk.k + mk.r;
+      for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+      const rot = ((h % 628) / 100);
+      const size = 1.5 + ((h >>> 8) % 90) / 100;  // 1.5 .. 2.4 m of worn ground
+      // +0.06 clears floor-mesh thickness (0.03 buried it in the study flagstones)
+      m4.compose(v.set(x, y + 0.06, z), q.setFromEuler(e.set(0, rot, 0)), s.set(size, 1, size * 0.82));
+      im.setMatrixAt(n, m4);
+      this._marks.push({ x, z, k: mk.k, id: key });
+      n++;
+    }
+    im.count = n;
+    im.instanceMatrix.needsUpdate = true;
+  }
+
+  // Say what happened here, once, when the player is close enough to be standing
+  // where the other hand stood. Session-scoped (not onceKeys): hearing it again on
+  // a later run is right — it is a place, not a cutscene — and it keeps the save
+  // from accreting an unbounded key per stranger.
+  _tickHandMarks(dt) {
+    if (!this._marks || !this._marks.length) return;
+    this._heardMarks = this._heardMarks || new Set();
+    this._markCool = Math.max(0, (this._markCool || 0) - dt);
+    if (this._markCool > 0) return;
+    const p = this.player.pos;
+    for (const m of this._marks) {
+      if (this._heardMarks.has(m.id)) continue;
+      if (Math.hypot(p.x - m.x, p.z - m.z) > 2.6) continue;
+      const line = HAND_MARKS[m.k];
+      if (!line) continue;
+      this._heardMarks.add(m.id);
+      UI.whisper(line);
+      this._markCool = 9;                         // never stack two strangers at once
+      break;
+    }
+  }
+
   _apply(R, isModel, elapsed) {
     if (!R.water) return;
     const an = this.anim;
@@ -1488,6 +1548,15 @@ export class Game {
     // SEA-STRATA (loop #117): show exactly the active level's region shell. Driven from
     // W.level every frame (not imperatively at dive time) so a reload restores the right
     // register. Guarded — the regions are pruned from the clone, so this no-ops on isModel.
+    // THE OTHER HAND'S MARKS (STACK.md §3.1): lay out the scuffs this rung inherited.
+    // Rebuilt only when the rung changes — the ledger is append-only and cannot grow
+    // beneath you, so there is nothing to do per frame. Island instance only (the
+    // clone prunes handMarks).
+    if (!isModel && R.handMarks && this._marksFor !== W.level) {
+      this._marksFor = W.level;
+      this._placeHandMarks(R.handMarks);
+    }
+
     if (R.region2) R.region2.visible = W.level === 2;
     if (R.region3) R.region3.visible = W.level === 3;
     if (R.region4) R.region4.visible = W.level === 4;

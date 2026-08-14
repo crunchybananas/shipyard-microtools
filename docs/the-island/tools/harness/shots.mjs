@@ -9,8 +9,13 @@
 //   SHOT_TIDE=<0..2> override the tide for every pose that doesn't set its own
 //
 // Pose fields: { name, at:[x,z], look:[x,z] | yaw, time, tide, flags, level, note }
-// `look` aims the camera at a world point — yaw = atan2(px-rx, pz-rz), matching
-// the engine's forward = (-sin yaw, -cos yaw).
+//
+// `look` aims the camera AT a world point. The engine's forward is
+// (-sin yaw, -cos yaw), so pointing it at (px,pz) from (rx,rz) needs
+//   -sin yaw = px-rx  and  -cos yaw = pz-rz   →   yaw = atan2(rx-px, rz-pz)
+// NOT atan2(px-rx, pz-rz), which is the negation and aims 180° the wrong way. That
+// sign error framed three "verification" shots at empty landscape while the thing
+// under test sat behind the camera — the exact way a visual pass lies to you.
 
 export const POSES = [
   // --- the reported bug sites -------------------------------------------------
@@ -58,6 +63,16 @@ export const POSES = [
     // chain played at L2 would cost L2 and inherit nothing.
     then: `ABYME.goLevel(1); PLAY_CHAIN(); ABYME.goLevel(2);`,
     note: 'rung 2 after one hand worked the whole surface chain above it' },
+
+  // --- the other hand's marks (STACK.md §3.1) ---------------------------------
+  // Stand where a stranger stood. These must read as WEAR — ground worn by somebody
+  // working in one spot — and never as a UI marker dropped on the world.
+  { name: 'hand-mark-valve', at: [-84.5, -38.2], look: [-82.7, -38.9], time: 11, tide: 'keep',
+    then: `ABYME.clearStack(); ABYME.goLevel(1); PLAY_CHAIN(); ABYME.goLevel(2); ABYME.game.tick(0.05, 1);`,
+    note: 'the study floor, where a hand above turned the valve' },
+  { name: 'hand-mark-chest', at: [121, -173], look: [118, -176], time: 16.6, tide: 'keep',
+    then: `ABYME.game.tick(0.05, 1);`,
+    note: 'the chest, under a low sun — wear reads or it does not' },
 ];
 
 export default async function (h) {
@@ -125,7 +140,7 @@ export default async function (h) {
       ${p.level ? `W.level = ${p.level};` : ''}
       ${p.flags ? Object.entries(p.flags).map(([k, v]) => `W.flags[${JSON.stringify(k)}] = ${JSON.stringify(v)};`).join('') : ''}
       ${p.at === 'spawn' ? '' : `
-      const yaw = ${yaw !== null ? yaw : `Math.atan2(${p.look[0]} - (${p.at[0]}), ${p.look[1]} - (${p.at[1]}))`};
+      const yaw = ${yaw !== null ? yaw : `Math.atan2((${p.at[0]}) - (${p.look[0]}), (${p.at[1]}) - (${p.look[1]}))`};
       ABYME.tp(${p.at[0]}, ${p.at[1]}, yaw, ${p.pitch ?? -0.06});`}
       return 1;
     })()`);
