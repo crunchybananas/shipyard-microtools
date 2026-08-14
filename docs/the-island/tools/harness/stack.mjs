@@ -219,6 +219,48 @@ export default async function (h) {
   ok('accumulated hands DO reach it', ring.stacked.waterY >= 4.83, ring);
   ok('reaching it fires the beat', ring.met === true, ring);
 
+  // --- slice 6: THE ERAS ARE RULESETS — obeys / lags / audited / refuses --------
+  const eras = await h.evaluate(`(() => {
+    const W = ABYME.W, g = ABYME.game;
+    const crank = g.interact.hotspots.find(s => s.id === 'crank');
+    const out = {};
+    const run = (lvl) => {
+      ABYME.goLevel(lvl);
+      W.onceKeys = (W.onceKeys || []).filter((k) => !['crankLag','crankDead'].includes(k));
+      g._pendHour = 0; g._pendHold = 0;
+      const t0 = W.time;
+      crank.onDrag(60);
+      const immediate = +(W.time - t0).toFixed(4);
+      g.tick(1.4, 1);                        // past the L2 hold
+      const settled = +(W.time - t0).toFixed(4);
+      return { immediate, settled };
+    };
+    out.l1 = run(1);   // obeys: moves at once
+    out.l2 = run(2);   // lags: nothing now, everything a beat later
+    out.l3 = run(3);   // heavy but immediate
+    out.l4 = run(4);   // refuses: never moves
+    return out;
+  })()`);
+  ok('L1 the model obeys — the hour moves at once', eras.l1.immediate !== 0, eras);
+  ok('L2 the model LAGS — nothing now…', eras.l2.immediate === 0, eras);
+  ok('…and the hour arrives a beat later', Math.abs(eras.l2.settled) > 0, eras);
+  ok('L3 still answers, heavier', eras.l3.immediate !== 0 && Math.abs(eras.l3.immediate) < Math.abs(eras.l1.immediate), eras);
+  ok('L4 the model REFUSES — only the plate is left', eras.l4.immediate === 0 && eras.l4.settled === 0, eras);
+
+  // L3's register reads the ledger, not the world
+  const reg = await h.evaluate(`(() => {
+    const W = ABYME.W, g = ABYME.game;
+    ABYME.goLevel(3);
+    W.onceKeys = (W.onceKeys || []).filter((k) => k !== 'register');
+    g._regT = 0;
+    ABYME.tp(-86.4, -39.3, 0, 0);
+    g.tick(1.0, 1); const early = W.onceKeys.includes('register');
+    g.tick(1.0, 1); const late = W.onceKeys.includes('register');
+    return { early, late, hands: ABYME.hands(3) };
+  })()`);
+  ok('L3 register waits for you to settle at the table', reg.early === false, reg);
+  ok('L3 register then reads the ledger', reg.late === true && reg.hands >= 1, reg);
+
   const errs = await h.evaluate(`window.__errs || []`);
   ok('no console errors', Array.isArray(errs) && errs.length === 0, errs);
 

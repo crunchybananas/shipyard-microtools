@@ -509,6 +509,11 @@ export const SKETCHES = [
 // audit can finally see ALL the island's words. Keys are first-words slugs.
 export const T = {
   the_sea_no_longer: 'The sea no longer answers the wheel down here.',
+  // THE ERAS AS RULESETS (STACK.md §3.4) — obeys → lags → is audited → refuses.
+  the_wheel_turns_and: 'The wheel turns and the sky does not. It will go where you put it. It will go there in its own time.',
+  the_hour_will_not: 'The hour will not move for you here. Nothing will, but the plate.',
+  the_register_has_one: 'One hand in the register, counting yours. Whatever came down before you did not sign.',
+  the_register_counts_the: 'The register counts {n} hands at this table. You had assumed you were the second.',
   // THE FIFTH RING (STACK.md §3.2) — the readout, then the payoff. The gap line is
   // a progress meter for a goal one player cannot reach; the payoff re-reads the
   // whole gauge: he was not predicting the sea, he was counting the people.

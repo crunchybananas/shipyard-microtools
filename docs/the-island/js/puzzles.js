@@ -3,7 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft, evidence } from './world.js';
+import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft, evidence, hands } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
 import { Interactions } from './interact.js';
@@ -149,10 +149,33 @@ export class Game {
     I.add({
       id: 'crank', targets: [R.crankHandle], label: 'the sun crank', type: 'drag',
       onDrag: (dx) => {
+        // THE ERAS ARE RULESETS (STACK.md §3.4). The strata were a colour grade; each
+        // one now changes what kind of place this is to hold an instrument in. The
+        // crank is the model verb that still reaches you at depth, so it carries the
+        // arc:  L1 obeys → L2 lags → L3 is audited → L4 refuses.
+        //
+        // L4, the last winter: the model refuses outright. The plate is the only
+        // instrument left, which is exactly the shape of that era.
+        if (W.level >= MAX_DEPTH) {
+          this.once('crankDead', () => UI.whisper(T.the_hour_will_not));
+          return;
+        }
         // SEA-STRATA depth response (#51): the hours drag heavy below the surface — the
         // same pull moves less sky the deeper you carry it
         const drag = W.level > 1 ? 1 / (1 + 0.5 * (W.level - 1)) : 1;
-        W.time = ((W.time + dx * 0.011 * drag) % 24 + 24) % 24;
+        const delta = dx * 0.011 * drag;
+        // L2, the arrival years: the model's edits land LATE. You pull, the sky does
+        // not move, and a moment after you stop it goes where you put it — the cost
+        // arriving after you caused it, which is the whole law in miniature.
+        if (W.level === 2) {
+          this._pendHour = (this._pendHour || 0) + delta;
+          this._pendHold = 0;
+          this._crankAcc = (this._crankAcc || 0) + Math.abs(dx);
+          if (this._crankAcc > 26) { this._crankAcc = 0; A.crankTick(); }
+          this.once('crankLag', () => UI.whisper(T.the_wheel_turns_and));
+          return;
+        }
+        W.time = ((W.time + delta) % 24 + 24) % 24;
         this._crankAcc = (this._crankAcc || 0) + Math.abs(dx);
         if (this._crankAcc > 26) { this._crankAcc = 0; A.crankTick(); }
         if (W.level > 1) this.once('crankDeep', () => UI.whisper(T.the_crank_resists_as));
@@ -983,6 +1006,8 @@ export class Game {
     this._tickHandMarks(dt);   // the other hand's scuffs speak when you stand in them
     this._tickDrift(dt);       // …and the sea moves once with nobody at the wheel
     this._tickFifthRing();     // the ring he cut for a level that did not exist yet
+    this._tickEraLag(dt);      // L2: the hour you asked for, arriving late
+    this._tickRegister(dt);    // L3: the era that measures, measuring the hands
 
     // #129: the era threshold — the reframe said out loud exactly ONCE in the game,
     // in the first minute of the first descent (8s after splashdown, so the keeper's
@@ -1543,6 +1568,35 @@ export class Game {
     }
     im.count = n;
     im.instanceMatrix.needsUpdate = true;
+  }
+
+  // L2 (the arrival years): release the hour the player already asked for. Held until
+  // their hand has been still a beat, then applied all at once — the sky catching up
+  // with a decision that was made a moment ago and somewhere else.
+  _tickEraLag(dt) {
+    if (!this._pendHour) return;
+    this._pendHold = (this._pendHold || 0) + dt;
+    if (this._pendHold < 1.1) return;
+    W.time = ((W.time + this._pendHour) % 24 + 24) % 24;
+    this._pendHour = 0;
+    this._pendHold = 0;
+    A.crankTick();
+    if (this.flag('crankUsed')) UI.addJournal(T.a_crank_turns_the);
+  }
+
+  // L3 (the inspection years): your ledger is READ. The era whose authority measures
+  // instead of protects finally measures the thing that matters — how many hands have
+  // been through here. Spoken once, at the chart table, where the counting is done.
+  _tickRegister(dt) {
+    if (W.level !== 3 || W.onceKeys?.includes('register')) return;
+    const p = this.player.pos;
+    if (Math.hypot(p.x - (-86.4), p.z - (-39.3)) > 3.2) return;
+    this._regT = (this._regT || 0) + dt;
+    if (this._regT < 1.6) return;
+    const n = hands();
+    this.once('register', () => {
+      UI.whisper(n <= 1 ? T.the_register_has_one : T.the_register_counts_the.replace('{n}', String(n)));
+    });
   }
 
   // THE FIFTH RING met. Fires wherever the player is standing — it is the sea's

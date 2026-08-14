@@ -237,14 +237,19 @@ Each slice ships standalone, verifiable in isolation, offline-complete.
 
 | # | Slice | State |
 |---|---|---|
-| **1** | **`ledger.js`** — the pure module: mark schema, append, per-rung query, draft accumulation, versioned payload, sanitation, pluggable source. Dependency-free, node-testable, mirroring `save-schema.js`. | **BUILDING** |
-| 2 | **Wiring** — a stable hand id; ledger storage at the world.js boundary; `flag()` records marks; `?debug` inspector. | next |
-| 3 | **The draft is felt** — inherited draft raises the level's tide; the gauge reads it; one whisper names it once. | |
-| 4 | **The evidence is seen** — inherited marks render as lampblack/props at their recorded positions (existing marginalia pipeline). | |
-| 5 | **The drift** — a model edit that fails, once, because the ledger above moved. | |
-| 6 | **Eras as rulesets** — §3.4, one rule per era. | |
-| 7 | **The endings** — the plate's four dispositions. | |
+| **1** | **`ledger.js`** — the pure module: mark schema, append, per-rung query, draft accumulation, versioned payload, sanitation, pluggable source. Dependency-free, node-testable, mirroring `save-schema.js`. | ✅ `33b2df60` |
+| **2** | **Wiring** — a stable hand id; ledger storage at the world.js boundary; `flag()` records marks; `?debug` inspector. | ✅ `33b2df60` |
+| **3** | **The draft is felt** — inherited draft raises the rung's tide at all three arrival paths; the gauge reads it; the law is whispered once. `spawnAboveWater()` keeps the rising sea from spawning the camera under it. | ✅ `ad9402f7` |
+| **4** | **The evidence is seen** — inherited marks render as pale worn ground (`handMarks`), one line each, skipped below the waterline. | ✅ `f23646ad` |
+| **5** | **The drift** — the dead wheel arms it; the sea rises with nobody at the wheel, once, and only when a hand really is above you. Plus **the fifth ring**: a goal one hand's work cannot reach. | ✅ `ce07fc77` |
+| **6** | **Eras as rulesets** — §3.4. The crank carries the arc: L1 **obeys** → L2 **lags** (the hour lands after you stop asking) → L3 **is audited** (the register reads the ledger at the chart table) → L4 **refuses** (only the plate is left). | ✅ |
+| 7 | **The endings** — the plate's four dispositions (§6). **Owner call first:** do TEND/CARRY/OPEN/CLOSE replace the shipped bell/oar terminals or sit alongside them? | next |
 | 8 | **The server** — swap the local source for HTTP. Everything above already works. | |
+
+**Slices 1–6 are shipped and gated** (30 stack assertions in `tools/harness/stack.mjs`,
+alongside the 45-assertion walk). The thesis is playable end to end offline: acts are
+recorded, the cost runs downhill, the water rises, a stranger's work is findable, the model
+is caught being out of date, and each era is a different kind of place to hold an instrument.
 
 **Slices 1–7 are entirely offline single-player.** The stack thesis is complete without a
 server; the server only replaces recordings with people.
