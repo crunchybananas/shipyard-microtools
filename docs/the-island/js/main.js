@@ -359,16 +359,49 @@ renderer.shadowMap.needsUpdate = true;   // …starting with one honest first dr
 // ---------------- gulls ----------------
 const gulls = [];
 {
-  const wingMat = new THREE.MeshStandardMaterial({ color: 0xe8e4da, flatShading: false, side: THREE.DoubleSide });
-  // ONE wing geometry and ONE merged body+head geometry shared by the whole flock
-  // (was 4 meshes and 2 fresh geometries per gull — now 3 draws each, smooth-shaded)
-  const wingGeo = new THREE.PlaneGeometry(1.4, 0.4);
+  // A gull is not a white shape — it is a WHITE BIRD WITH A GREY MANTLE AND BLACK
+  // WINGTIPS, and that contrast is the entire silhouette at any distance. The flock
+  // was one flat off-white on every surface, which is why it read as ovoids drifting
+  // over the island rather than as birds. Vertex colours fix it for zero extra draws
+  // and zero extra material state (the flock is still 3 meshes each).
+  const wingMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: false, side: THREE.DoubleSide });
+  const C_BODY = new THREE.Color(0xf2efe6);   // white, faintly warm
+  const C_MANTLE = new THREE.Color(0x9aa6ae); // the grey back
+  const C_TIP = new THREE.Color(0x2b2f36);    // the black primaries
+
+  // paint a wing root→tip. The two wings sit at x = ∓0.7 from one centred plane, so
+  // the tip is at local −x on the left and +x on the right — mirrored, which is why
+  // this needs a geometry per side. Still one mesh per wing, so draws are unchanged.
+  const mkWing = (tipAtNegX) => {
+    const g = new THREE.PlaneGeometry(1.4, 0.4, 6, 1);
+    const p = g.attributes.position, col = new Float32Array(p.count * 3), c = new THREE.Color();
+    for (let i = 0; i < p.count; i++) {
+      // 0 at the body, 1 at the tip
+      const t = tipAtNegX ? (0.7 - p.getX(i)) / 1.4 : (p.getX(i) + 0.7) / 1.4;
+      c.copy(C_BODY).lerp(C_MANTLE, Math.min(1, t * 1.5)).lerp(C_TIP, Math.max(0, (t - 0.72) / 0.28));
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    return g;
+  };
+  const wingGeoL = mkWing(true), wingGeoR = mkWing(false);
+
   const bodyCone = new THREE.ConeGeometry(0.13, 0.6, 8);
   bodyCone.rotateX(Math.PI / 2.15);                       // nose forward, tail riding up
   const headBall = new THREE.SphereGeometry(0.09, 8, 6);
   headBall.translate(0, 0.07, 0.33);
   const gullBodyGeo = mergeGeometries([bodyCone, headBall]);
   bodyCone.dispose(); headBall.dispose();
+  {
+    // the body is white underneath and grey along the back — the same read as the
+    // wings, so a gull seen from below is pale and from above is a grey shape on the sea
+    const p = gullBodyGeo.attributes.position, col = new Float32Array(p.count * 3), c = new THREE.Color();
+    for (let i = 0; i < p.count; i++) {
+      c.copy(C_BODY).lerp(C_MANTLE, Math.max(0, Math.min(1, (p.getY(i) + 0.02) / 0.14)) * 0.85);
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+    }
+    gullBodyGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  }
   // a WHEELING FLOCK over the island (loop: life). Varied radius/height/speed (some negative =
   // counter-wheeling) so it reads as a living gyre, not identical circles — and several fly LOW + CLOSE
   // so you actually see gulls pass overhead, not two specks at 50 m. gulls[0] still leaves the gyre to
@@ -385,9 +418,9 @@ const gulls = [];
   ];
   for (const f of FLOCK) {
     const g = new THREE.Group();
-    const l = new THREE.Mesh(wingGeo, wingMat);
+    const l = new THREE.Mesh(wingGeoL, wingMat);
     l.position.x = -0.7;
-    const r = new THREE.Mesh(wingGeo, wingMat);
+    const r = new THREE.Mesh(wingGeoR, wingMat);
     r.position.x = 0.7;
     // a body between the wings — songbird recipe, gull proportions —
     // so the dawn percher reads as a bird up close, not two cards
