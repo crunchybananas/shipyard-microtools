@@ -8,6 +8,29 @@ import { W, waterY } from './world.js';
 
 const _wish = new THREE.Vector2();   // scratch: the per-frame movement wish (no alloc in update())
 
+const CLIMB = 1.05;   // the most the player can step UP (the ascent limit)
+
+// Is a landing spot escapable — can the player get back to `needY` from it?
+// The step limits are deliberately asymmetric (you may drop 2.2 m but only climb
+// 1.05 m), so ANY drop past the climb limit can strand you in a bowl. Rather than
+// hardcode where the bowls are, walk short rays out from the landing and ask
+// whether some heading climbs back within reach. Called only on the rare step
+// that drops more than CLIMB, so it costs nothing while walking normally.
+function escapable(nx, nz, needY) {
+  const STEP = 0.75, RAYS = 8, STEPS = 8;   // 6 m of reach per heading
+  for (let i = 0; i < RAYS; i++) {
+    const a = (i / RAYS) * TAU, sx = Math.cos(a) * STEP, sz = Math.sin(a) * STEP;
+    let x = nx, z = nz, y = walkableY(nx, nz);
+    for (let s = 0; s < STEPS; s++) {
+      const x2 = x + sx, z2 = z + sz, y2 = walkableY(x2, z2);
+      if (y2 - y > CLIMB) break;              // this heading walls up — try the next
+      x = x2; z = z2; y = y2;
+      if (y >= needY - 0.05) return true;     // climbed back to where we came from
+    }
+  }
+  return false;
+}
+
 export class Player {
   constructor(camera, dom) {
     this.camera = camera;
@@ -185,10 +208,16 @@ export class Player {
         this.pos.x + (nx - this.pos.x) / stride * LOOK,
         this.pos.z + (nz - this.pos.z) / stride * LOOK);
       if ((tAhead - tHere) / LOOK > 1.35) return false;
-      // the drained bay still refuses you: below-tide basins (the chasm's drowned ends,
-      // bay-floor bowls) walk in but never out. Block the descent at the rim; upslope
-      // stays open so the causeway crest and a stale save below the line still pass.
-      if (tThere < -2.2 && tThere <= tHere + 0.02) return false;
+      // Irreversible descents only. This replaces a hardcoded "ground below −2.2 m
+      // is off-limits" rule that was blind to the valve: it refused every LEVEL or
+      // downhill step down there, so the instant you drained the bay the exposed
+      // seabed became a field of invisible walls you could only ever walk uphill
+      // through — the "walls that don't exist" right after the water goes down.
+      // The hazard was never the depth, it is the asymmetry between the drop limit
+      // (2.2 m) and the climb limit (1.05 m). So test that directly, at any tide:
+      // a drop past the climb limit is refused only when nothing near the landing
+      // climbs back. A drained bowl you can stroll out of is now yours to explore.
+      if (hereY - thereY > CLIMB && !escapable(nx, nz, hereY)) return false;
     }
     // the sea refuses you — but if the tide caught you, wade out
     if (thereY < waterY() - 0.5) {
@@ -211,6 +240,13 @@ export class Player {
       for (let i = 0; i < 24; i++) {
         const a = (i / 24) * TAU;
         const x = px + Math.cos(a) * R, z = pz + Math.sin(a) * R;
+        // The candidate is judged on the TERRAIN (heightAt) but the player is set
+        // down on the WALKABLE surface — and those diverge wherever a structure
+        // carves a floor below the ground: the drain chamber under the stones pad,
+        // the hatch pit, the vault room. Rescuing onto open terrain and landing in
+        // a sealed room 5 m below it is how you "fall through the world" into a
+        // room you cannot leave. Only rescue where the two agree.
+        if (Math.abs(walkableY(x, z) - heightAt(x, z)) > 0.5) continue;
         if (heightAt(x, z) > waterY() + 0.4 && grad(x, z) < 0.9) {
           this.pos.set(x, walkableY(x, z), z);
           this.vel.set(0, 0, 0);

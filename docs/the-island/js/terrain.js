@@ -156,6 +156,9 @@ function padFlatten(h, x, z, spot, r, target) {
 // Circular footprints props register (shore rocks, …) so the player can't walk THROUGH solid
 // scatter. props.js pushes via addCollider during buildWorld; wallBlocked() reads them.
 const COLLIDERS = [];
+// read-only view for the playtest probe (tools/harness/probe.mjs): blaming a
+// phantom wall needs to know whether a collider circle owns the cell.
+export const colliders = () => COLLIDERS;
 export function addCollider(x, z, r) { COLLIDERS.push({ x, z, r }); }
 export function clearColliders() { COLLIDERS.length = 0; }
 // the jetty deck — a walkable plank surface standing over the water off the wake-up beach
@@ -255,7 +258,10 @@ export function wallBlocked(x0, z0, x1, z1) {
   // you left them"): the surface after the descent keeps the quarters walkable.
   if (GATES.annexOpen) {
     if (ringBlocked(x0, z0, x1, z1, ANX, ANZ, 2.65, deg(185), deg(212))) return true;
-  } else if (Math.hypot(x1 - ANX, z1 - ANZ) < 2.65) {
+  } else if (Math.hypot(x1 - ANX, z1 - ANZ) < 2.8) {
+    // 2.8, not the wall's 2.65: the annex FLOOR disc is 2.8 (it has to be, to meet
+    // the drum at r5.4 without a gap to fall through), so a 2.65 lock left a ring
+    // of locked-room floor you could stand on at level 1. Lock the floor, not the wall.
     return true;
   }
   // solid scatter (shore rocks, …) — block stepping INTO a registered collider circle (the

@@ -6,7 +6,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence } from './world.js';
-import { SPOTS, heightAt, walkableY, syncGates } from './terrain.js';
+import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs, NAMES } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
 import { Player } from './player.js';
@@ -1570,6 +1570,27 @@ player.onFootstep = (kind, pos) => {
     // inherited water in tide units; tideAt(n) = baseline + draft; evidence(n) =
     // the inherited marks worth rendering (slice 4).
     hand: HAND, ledger, draft, tideAt, hands, evidence,
+    // collision oracle for tools/harness/probe.mjs — the playtest probe hunts
+    // phantom walls and fall-throughs, and blaming one needs the raw rules.
+    terrain: { walkableY, wallBlocked, heightAt, colliders, GATES, SPOTS },
+    // Draw every collider footprint as a red ring laid on the walkable surface.
+    // The playtest question "is this wall real?" is only answerable by seeing the
+    // collision and the geometry in the same frame. Debug-only, built on demand.
+    showColliders: (on = true) => {
+      let g = scene.getObjectByName('__colliderViz');
+      if (g) { scene.remove(g); g.traverse((o) => { o.geometry?.dispose(); o.material?.dispose(); }); }
+      if (!on) return 0;
+      g = new THREE.Group(); g.name = '__colliderViz';
+      const mat = new THREE.MeshBasicMaterial({ color: 0xff2244, wireframe: true, depthTest: false, transparent: true, opacity: 0.9 });
+      for (const c of colliders()) {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(c.r, c.r, 0.1, 20, 1, true), mat);
+        m.position.set(c.x, walkableY(c.x, c.z) + 0.6, c.z);
+        m.renderOrder = 999;
+        g.add(m);
+      }
+      scene.add(g);
+      return colliders().length;
+    },
     clearStack: () => { try { localStorage.removeItem('abyme-ledger-v1'); } catch (_) {} location.reload(); },
     setIntroT: (t) => { if (intro) intro.t = t; },
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
