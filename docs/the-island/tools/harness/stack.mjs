@@ -261,6 +261,64 @@ export default async function (h) {
   ok('L3 register waits for you to settle at the table', reg.early === false, reg);
   ok('L3 register then reads the ledger', reg.late === true && reg.hands >= 1, reg);
 
+  // --- slice 7: THE DISPOSITIONS — the endings write to the ledger --------------
+  const disp = await h.evaluate(`(() => {
+    const W = ABYME.W, g = ABYME.game;
+    const set = (kind) => { W.disposition = kind; W._dispDone = false; };
+    const seed = () => {
+      ABYME.clearStack(); ABYME.goLevel(1);
+      // flag() early-returns when the flag is ALREADY set, and by this point in the
+      // run they all are — so clearing the ledger without clearing the flags seeds
+      // nothing at all. Reset the three we are about to use.
+      W.flags.valveTurned = false; W.flags.birdSolved = false; W.flags.hatchOpen = false;
+      const hs = (id) => g.interact.hotspots.find(s => s.id === id);
+      ABYME.tp(-82.7, -38.9, 0, 0); hs('valve').onClick();
+      ABYME.tp(-85, -40, 0, 0); g.flag('birdSolved'); g.flag('hatchOpen');
+    };
+    const out = {};
+    // TEND leaves it alone
+    seed(); set('tend');
+    const beforeTend = ABYME.draft(2);
+    ABYME.ring();
+    out.tend = { before: +beforeTend.toFixed(4), after: +ABYME.draft(2).toFixed(4) };
+    // CARRY takes your marks back out
+    seed(); set('carry');
+    const beforeCarry = ABYME.draft(2);
+    ABYME.ring();
+    out.carry = { before: +beforeCarry.toFixed(4), after: +ABYME.draft(2).toFixed(4),
+                  marks: ABYME.ledger().marks.length };
+    // CLOSE seals the way down
+    seed(); set('close'); W.level = 2;
+    ABYME.ring();
+    out.close = { sealed: ABYME.ledger().sealed.slice(), draft3: +ABYME.draft(3).toFixed(4) };
+    // and it is applied ONCE, however many times a terminal is poked
+    seed(); set('carry');
+    ABYME.ring(); const once1 = ABYME.ledger().marks.length;
+    ABYME.ring(); const once2 = ABYME.ledger().marks.length;
+    out.once = { once1, once2 };
+    return out;
+  })()`);
+  ok('TEND changes nothing for the rung below', disp.tend.after === disp.tend.before, disp);
+  ok('CARRY takes your own marks back out', disp.carry.after < disp.carry.before && disp.carry.marks === 0, disp);
+  ok('CLOSE seals the rung — nothing reaches deeper', disp.close.sealed.includes(2) && disp.close.draft3 === 0, disp);
+  ok('a disposition is performed exactly once', disp.once.once1 === disp.once.once2, disp);
+
+  // the index only exists once the question does
+  const dial = await h.evaluate(`(() => {
+    const W = ABYME.W, g = ABYME.game;
+    const spot = g.interact.hotspots.find(s => s.id === 'dispSet');
+    ABYME.goLevel(2); W.flags.keeperRose = false;
+    const shallow = spot.when();
+    ABYME.goLevel(4); const deepNoTwist = spot.when();
+    W.flags.keeperRose = true; const deepTwist = spot.when();
+    W.disposition = 'tend'; spot.onClick(); const stepped = W.disposition;
+    return { shallow, deepNoTwist, deepTwist, stepped };
+  })()`);
+  ok('the index is absent before the bottom', dial.shallow === false, dial);
+  ok('…and before the twist has asked the question', dial.deepNoTwist === false, dial);
+  ok('…and present once both are true', dial.deepTwist === true, dial);
+  ok('touching it turns it one position', dial.stepped === 'carry', dial);
+
   const errs = await h.evaluate(`window.__errs || []`);
   ok('no console errors', Array.isArray(errs) && errs.length === 0, errs);
 

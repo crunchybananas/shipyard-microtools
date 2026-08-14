@@ -103,8 +103,50 @@ export const MAX_DRAFT = 0.75;
 
 // ---------------- construction ------------------------------------------------
 
+// THE DISPOSITIONS (STACK.md §6) — the last act of displacement.
+//
+// Every other verb in the game pushes cost downhill. These are the only four that
+// decide what happens to what you already pushed, and they are the one place a
+// player can pay a cost instead of passing it on. They are ledger operations, not
+// cards: an ending that only changes a line of text would be the same ending.
+//
+//   TEND   your marks stay. You add nothing further. (the default; costs nothing,
+//          helps nobody, and is an honest answer)
+//   CARRY  your marks are ERASED. The rung below inherits less water because you
+//          went back and undid your own work. The only generous ending, and it
+//          costs you the record of everything you did.
+//   OPEN   your marks stay AND the rung below's draft starts flowing back onto
+//          you. Connection, at cost, in both directions.
+//   CLOSE  your marks stay and the rung below is SEALED — nothing of yours reaches
+//          them, and nothing ever will. Peace, made smaller.
+export const DISPOSITIONS = ['tend', 'carry', 'open', 'close'];
+
 export function emptyLedger() {
-  return { v: LEDGER_VERSION, marks: [] };
+  return { v: LEDGER_VERSION, marks: [], sealed: [], open: [] };
+}
+
+// Perform a disposition on behalf of `hand`, standing on `rung`. Pure: it mutates
+// the ledger and returns what changed, so the caller can narrate it truthfully
+// (the coda says how many marks you took back, and it has to be the real number).
+export function dispose(led, { kind, rung, hand }) {
+  if (!DISPOSITIONS.includes(kind)) return null;
+  const r = rung | 0, h = String(hand || '?').slice(0, 16);
+  led.sealed = led.sealed || [];
+  led.open = led.open || [];
+  if (kind === 'carry') {
+    const before = led.marks.length;
+    led.marks = led.marks.filter((m) => m.h !== h);
+    return { kind, removed: before - led.marks.length };
+  }
+  if (kind === 'close') {
+    if (!led.sealed.includes(r)) led.sealed.push(r);
+    return { kind, sealedAt: r };
+  }
+  if (kind === 'open') {
+    if (!led.open.includes(r)) led.open.push(r);
+    return { kind, openAt: r };
+  }
+  return { kind };                                  // tend: the world is left as it is
 }
 
 // A mark is stored short because it is eventually a network payload:
@@ -170,7 +212,21 @@ export function marksAt(led, rung) {
 // so evidence from directly overhead reads as the freshest.
 export function inheritedAt(led, rung) {
   const r = rung | 0;
-  return led.marks.filter((m) => m.r < r).sort((a, b) => a.r - b.r || a.n - b.n);
+  // A CLOSE seals a rung: nothing from at-or-above it reaches anyone deeper. Take
+  // the DEEPEST seal above you — a later hand's seal supersedes an earlier one's,
+  // because the water has to get past the lowest closed door first.
+  const seals = (led.sealed || []).filter((s) => s < r);
+  const floor = seals.length ? Math.max(...seals) : 0;
+  return led.marks.filter((m) => m.r < r && m.r > floor).sort((a, b) => a.r - b.r || a.n - b.n);
+}
+
+// An OPEN rung also takes on what is BELOW it — the one disposition where cost runs
+// uphill. Only marks strictly deeper than the opened rung count, and only for the
+// rung that was opened, so opening does not leak the whole stack onto everybody.
+function openBackflowAt(led, rung) {
+  const r = rung | 0;
+  if (!(led.open || []).includes(r)) return [];
+  return led.marks.filter((m) => m.r > r);
 }
 
 // Only the inherited marks worth SHOWING (slice 4 places these in the world).
@@ -184,6 +240,9 @@ export function evidenceAt(led, rung) {
 export function draftAt(led, rung) {
   let d = 0;
   for (const m of inheritedAt(led, rung)) d += (MARK_KINDS[m.k] || { draft: 0 }).draft;
+  // an OPEN rung carries the water of everyone below it too, at half weight — the
+  // cost of connection is real but it must not exceed simply being downstream
+  for (const m of openBackflowAt(led, rung)) d += (MARK_KINDS[m.k] || { draft: 0 }).draft * 0.5;
   return Math.min(d, MAX_DRAFT);
 }
 
@@ -233,13 +292,28 @@ export function sanitizeLedger(raw) {
 
   // cap every rung AFTER the merge, not per source
   for (const rung of new Set(out.marks.map((m) => m.r))) pruneRung(out, rung);
+
+  // The disposition sets are as hostile a surface as the marks: a forged `sealed`
+  // could cut a player off from the whole stack, and a forged `open` could pile
+  // every rung's water onto them. Same treatment — known range, deduped, capped.
+  const rungList = (raw2) => {
+    if (!Array.isArray(raw2)) return [];
+    const seen2 = new Set();
+    for (const v of raw2) {
+      const n = Number(v) | 0;
+      if (n >= 1 && n <= 64) seen2.add(n);
+    }
+    return [...seen2].slice(0, 64);
+  };
+  out.sealed = rungList(raw.sealed);
+  out.open = rungList(raw.open);
   return out;
 }
 
 // ---------------- payload -----------------------------------------------------
 
 export function packLedger(led) {
-  return { v: LEDGER_VERSION, marks: led.marks };
+  return { v: LEDGER_VERSION, marks: led.marks, sealed: led.sealed || [], open: led.open || [] };
 }
 
 // Migrations get the save-schema treatment when there is a v2. Until then the

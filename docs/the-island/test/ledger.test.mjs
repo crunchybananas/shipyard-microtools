@@ -15,6 +15,7 @@ import {
   emptyLedger, record, marksAt, inheritedAt, evidenceAt,
   draftAt, tideFor, handsAbove,
   sanitizeLedger, packLedger, applyLedger, localSource, newHandId, loadHandId,
+  DISPOSITIONS, dispose,
 } from '../js/ledger.js';
 
 // ---------------- recording ---------------------------------------------------
@@ -313,4 +314,94 @@ test('a full clean surface chain displaces a real but survivable draft', () => {
   record(led, { kind: 'lens', rung: 1, hand: 'a' });
   const d = draftAt(led, 2);
   assert.ok(d > 0.1 && d < 0.25, `one hand's whole chain displaced ${d}`);
+});
+
+// ---------------- the dispositions (STACK.md §6) -------------------------------
+// The endings are LEDGER OPERATIONS, not cards. Each one is tested for the thing it
+// actually does to the next hand down, because that is the only part that matters.
+
+test('TEND leaves the stack exactly as it is', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'a' });
+  const before = draftAt(led, 2);
+  const r = dispose(led, { kind: 'tend', rung: 1, hand: 'a' });
+  assert.equal(r.kind, 'tend');
+  assert.equal(draftAt(led, 2), before, 'tend costs nothing and helps nobody');
+});
+
+test('CARRY erases your own marks and lightens the rung below', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'me' });
+  record(led, { kind: 'dive', rung: 1, hand: 'me' });
+  record(led, { kind: 'valve', rung: 1, hand: 'other' });
+  const before = draftAt(led, 2);
+  const r = dispose(led, { kind: 'carry', rung: 1, hand: 'me' });
+  assert.equal(r.removed, 2, 'it takes back exactly what you did');
+  assert.ok(draftAt(led, 2) < before, 'they inherit less water');
+  assert.equal(marksAt(led, 1).length, 1, "another hand's work is untouched");
+});
+
+test('CLOSE seals the rung — nothing above reaches anyone deeper', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'a' });
+  record(led, { kind: 'dive', rung: 2, hand: 'a' });
+  assert.ok(draftAt(led, 3) > 0);
+  dispose(led, { kind: 'close', rung: 2, hand: 'a' });
+  assert.equal(draftAt(led, 3), 0, 'the door is shut; no water, and no help either');
+  assert.deepEqual(inheritedAt(led, 3), [], 'and no evidence of anyone, ever');
+});
+
+test('the DEEPEST seal wins — a later hand supersedes an earlier one', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'a' });
+  record(led, { kind: 'valve', rung: 3, hand: 'b' });
+  dispose(led, { kind: 'close', rung: 1, hand: 'a' });
+  dispose(led, { kind: 'close', rung: 3, hand: 'b' });
+  assert.deepEqual(inheritedAt(led, 4), [], 'rung 4 is behind the lowest closed door');
+  assert.equal(inheritedAt(led, 2).length, 0, 'rung 2 is behind the rung-1 seal');
+});
+
+test('OPEN takes on the water of everyone below, at half weight', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'dive', rung: 4, hand: 'below' });   // 0.06, deeper than us
+  const plain = draftAt(led, 2);
+  dispose(led, { kind: 'open', rung: 2, hand: 'me' });
+  const opened = draftAt(led, 2);
+  assert.equal(plain, 0, 'normally nothing flows uphill');
+  assert.ok(Math.abs(opened - 0.03) < 1e-9, 'opened, it flows back at half weight');
+});
+
+test('OPEN only affects the rung that opened', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'dive', rung: 4, hand: 'below' });
+  dispose(led, { kind: 'open', rung: 2, hand: 'me' });
+  assert.equal(draftAt(led, 3), 0, 'opening rung 2 does not leak the stack onto rung 3');
+});
+
+test('an unknown disposition does nothing', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'a' });
+  assert.equal(dispose(led, { kind: 'burn', rung: 1, hand: 'a' }), null);
+  assert.equal(led.marks.length, 1);
+});
+
+test('a hostile ledger cannot forge seals or opens', () => {
+  const led = sanitizeLedger({
+    marks: [{ k: 'valve', r: 1, h: 'a', n: 0 }],
+    sealed: [0, -5, 9999, 'x', null, 2, 2, 2],
+    open: Array.from({ length: 500 }, (_, i) => i),
+  });
+  assert.deepEqual(led.sealed, [2], 'out-of-range and duplicate seals are dropped');
+  assert.ok(led.open.length <= 64, 'and open is capped');
+  assert.ok(led.open.every((n) => n >= 1 && n <= 64));
+});
+
+test('dispositions survive the payload round-trip', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'a' });
+  dispose(led, { kind: 'close', rung: 2, hand: 'a' });
+  dispose(led, { kind: 'open', rung: 3, hand: 'a' });
+  const back = applyLedger(JSON.parse(JSON.stringify(packLedger(led))));
+  assert.deepEqual(back.sealed, [2]);
+  assert.deepEqual(back.open, [3]);
 });

@@ -39,6 +39,10 @@ export const SAVE_KEY_PREV = 'abyme-save-v1-prev';
 //           semantics exactly — do not tighten them casually, partial/old
 //           payloads flow through here).
 export const SAVE_FIELDS = [
+  // THE DISPOSITION (STACK.md §6): the intent selected at the plate. Persisted so a
+  // reload before the ending does not silently reset your answer to the default.
+  { key: 'disposition', pack: (W) => W.disposition,
+    apply: (W, v) => { W.disposition = ['tend', 'carry', 'open', 'close'].includes(v) ? v : 'tend'; } },
   { key: 'time',       pack: (W) => W.time,       apply: (W, v) => { W.time = v ?? W.time; } },
   // tide saves the TARGET (a mid-drain save should finish where it was headed)
   // and loads into both current + target so the water doesn't animate on boot.

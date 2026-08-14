@@ -6,9 +6,11 @@ import * as THREE from 'three';
 import { clamp, lerp, lerpColor, smoothstep, TAU, mulberry32, SEED } from './util.js';
 import { SAVE_KEY, SAVE_KEY_PREV, packSave, applySave } from './save-schema.js';
 import {
-  FLAG_MARKS, localSource, loadHandId,
-  record as ledgerRecord, draftAt, tideFor, handsAbove, evidenceAt,
+  FLAG_MARKS, DISPOSITIONS, localSource, loadHandId,
+  record as ledgerRecord, dispose as ledgerDispose,
+  draftAt, tideFor, handsAbove, evidenceAt,
 } from './ledger.js';
+export { DISPOSITIONS };
 
 export const SCALE_MODEL = 1 / 240;
 
@@ -91,6 +93,9 @@ export const W = {
   // SEA-STRATA (loop #117): persisted explored-state per drowned region — which deeper
   // levels you have reached + the fragments found, so the Meow-Wolf map stays "grown".
   regions: { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] },
+  // THE DISPOSITION (STACK.md §6): which of the four the player has selected at the
+  // plate. Not applied until they take an ending — until then it is only an intent.
+  disposition: 'tend',
 };
 
 // ---------------- celestial mechanics (fantasy sky, art-directed) -------------
@@ -381,6 +386,19 @@ export const evidence = (level = W.level) => evidenceAt(_source.load(), level);
 // stack outliving your run is the thesis (STACK.md §3.1). This exists for the
 // playtest harness and the debug panel.
 export const clearStack = () => { _source.clear(); };
+
+// THE DISPOSITIONS (STACK.md §6) — the last act of displacement, performed on the
+// rung you are standing on. Returns what actually changed so the coda can say the
+// true number ("you took back seven marks"), and persists immediately: this is the
+// one write in the game that outlives the ending it belongs to.
+export function disposeStack(kind) {
+  const led = _source.load();
+  const res = ledgerDispose(led, { kind, rung: W.level, hand: HAND });
+  if (res) _source.push(res);   // any non-null result forces the ledger to disk
+  return res;
+}
+
+export const disposition = () => W.disposition || 'tend';
 
 export function wipe() {
   // Begin-anew safety net (#56): stash the outgoing payload one slot deep

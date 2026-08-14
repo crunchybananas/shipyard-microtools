@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack, disposeStack } from './world.js';
 import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs, NAMES } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
@@ -1036,8 +1036,24 @@ function beginVista(lv) {
 addDrive(() => vistaT != null, (dt) => { vistaT += dt; if (vistaT > 2.4) releaseVista(); });
 
 // ---------------- the finale ----------------
+// THE DISPOSITION IS PERFORMED HERE (STACK.md §6). Both terminals route through
+// this: whatever the player set on the brass index is applied to the LEDGER at the
+// moment they take an ending, and the coda says what actually happened using the
+// real numbers. Applied once — an ending is terminal, but a double-fire would
+// double-seal or double-count the marks it took back.
+function performDisposition() {
+  if (W._dispDone) return null;
+  W._dispDone = true;
+  const kind = W.disposition || 'tend';
+  const res = disposeStack(kind);
+  const line = T['coda_' + kind];
+  if (line) UI.addJournal(line.replace('{n}', String(res && res.removed != null ? res.removed : 0)), '', 'self');
+  return res;
+}
+
 function startFinale() {
   MODE = 'finale';
+  performDisposition();
   player.locked = true;
   interact.enabled = false;
   A.musicStop();   // the bell finale owns the soundscape (the era bed fades out)
@@ -1068,6 +1084,7 @@ let oarSea = null;   // a dark water disc filling the farSea ring's centre hole 
 function startOarFinale() {
   if (MODE === 'finale') return;   // idempotent: never stack a second terminal / sea disc
   MODE = 'finale';
+  performDisposition();
   player.locked = true;
   interact.enabled = false;
   A.musicStop();   // leaving owns the soundscape from here

@@ -3,7 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft, evidence, hands } from './world.js';
+import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft, evidence, hands, DISPOSITIONS } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
 import { Interactions } from './interact.js';
@@ -535,6 +535,23 @@ export class Game {
       id: 'galleryHatch', targets: [R.galleryHatch], label: 'the way down', maxDist: 3.0,
       when: () => W.atTop,
       onClick: () => { if (this.onClimb) this.onClimb(false); },
+    });
+
+    // THE SETTING (STACK.md §6) — the four-position brass index beside the plate.
+    // Only at the bottom, and only after the twist: until you have met the thing at
+    // the end of the descent, the question "what do you owe the one below you" has
+    // not been asked yet. Each touch turns it one position and names that position's
+    // cost. Nothing is committed here — the plate performs it when you take an end.
+    if (R.dispDial) I.add({
+      id: 'dispSet', targets: [R.dispDial], label: 'a brass index, four positions', maxDist: 2.6,
+      when: () => W.level >= MAX_DEPTH && W.flags.keeperRose,
+      onClick: () => {
+        const i = DISPOSITIONS.indexOf(W.disposition || 'tend');
+        W.disposition = DISPOSITIONS[(i + 1) % DISPOSITIONS.length];
+        A.crankTick();
+        UI.whisper(T['disp_' + W.disposition]);
+        save(this.player);
+      },
     });
 
     // #52 — the tide gauge: a look-read landmark. Clicking names the CURRENT ring;
@@ -1672,6 +1689,17 @@ export class Game {
     if (!isModel && R.handMarks && this._marksFor !== W.level) {
       this._marksFor = W.level;
       this._placeHandMarks(R.handMarks);
+    }
+
+    // THE SETTING: the index only exists once the question does — at the bottom,
+    // after the twist. Its pointer reads the selection so the choice is visible in
+    // the world and not only in a whisper you may have missed.
+    if (R.dispDial) {
+      R.dispDial.visible = W.level >= MAX_DEPTH && !!W.flags.keeperRose;
+      if (R.dispPointer) {
+        const di = Math.max(0, DISPOSITIONS.indexOf(W.disposition || 'tend'));
+        R.dispPointer.parent.rotation.y = di * Math.PI / 2;
+      }
     }
 
     if (R.region2) R.region2.visible = W.level === 2;

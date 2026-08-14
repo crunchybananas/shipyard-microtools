@@ -509,6 +509,16 @@ export const SKETCHES = [
 // audit can finally see ALL the island's words. Keys are first-words slugs.
 export const T = {
   the_sea_no_longer: 'The sea no longer answers the wheel down here.',
+  // THE DISPOSITIONS (STACK.md §6) — named as you turn the index, then the codas.
+  // No option is scored and none is called right; each names its own cost plainly.
+  disp_tend: 'TEND. Hold the water here. Add nothing, undo nothing, and keep the light for whoever comes.',
+  disp_carry: 'CARRY. Go back over your own work and take it out again. They will never know it was there.',
+  disp_open: 'OPEN. Leave your ledger unlocked, and take on what rises from below. Both directions, at cost.',
+  disp_close: 'CLOSE. Seal the way down. Nothing of yours reaches them. Nothing of yours helps them either.',
+  coda_tend: 'You held the water where it was. It was not nothing. It was not enough. Both of those are true.',
+  coda_carry: 'You went back over every mark you left and took it out again — {n} of them. Somebody below you will wake on a drier shore and never know why.',
+  coda_open: 'You left it unlocked. What rises from below is yours now too. That is what it costs, and you knew.',
+  coda_close: 'You sealed it behind you. Nobody follows. Nobody is helped. The light is still lit, and it is lit for no one.',
   // THE ERAS AS RULESETS (STACK.md §3.4) — obeys → lags → is audited → refuses.
   the_wheel_turns_and: 'The wheel turns and the sky does not. It will go where you put it. It will go there in its own time.',
   the_hour_will_not: 'The hour will not move for you here. Nothing will, but the plate.',

@@ -837,6 +837,34 @@ export function buildWorld() {
     plateRing.rotation.x = Math.PI / 2;
     plateRing.position.set(LH.x + 2.2, LH.y + 0.06, LH.z - 1.4);
     core.add(plateRing);
+
+    // THE SETTING (STACK.md §6) — a small brass index sunk in the floor beside the
+    // plate, with four positions. It is how the player DECLARES what happens to
+    // what they displaced, before they take an ending; the plate then performs it.
+    // Deliberately an instrument and not a menu: everything else in this game is
+    // touched, and the last decision should be too. Hidden until the bottom, where
+    // it is the only thing left to decide.
+    {
+      const dial = new THREE.Group();
+      dial.name = 'dispDial';
+      const face = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.03, 16), matBrassSolid);
+      dial.add(face);
+      // four notches around the rim — the positions, readable as a count before the
+      // player knows what any of them mean
+      for (let i = 0; i < 4; i++) {
+        const n = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.035, 0.06), matBrassSolid);
+        n.position.set(Math.sin(i * Math.PI / 2) * 0.13, 0.02, Math.cos(i * Math.PI / 2) * 0.13);
+        dial.add(n);
+      }
+      // the pointer — rotated to the selected disposition in puzzles _apply
+      const ptr = new THREE.Mesh(new THREE.BoxGeometry(0.028, 0.02, 0.15), matWood);
+      ptr.position.set(0, 0.035, 0.055);
+      ptr.name = 'dispPointer';
+      dial.add(ptr);
+      dial.position.set(LH.x + 2.2, LH.y + 0.04, LH.z - 2.25);   // floor-side of the plate
+      dial.visible = false;
+      core.add(dial);
+    }
     // a soft amber glow that wakes on the plate ONLY at the bottom (Panel #4 #1, the visual
     // half of discoverability): when there is nowhere further down, the way back GLINTS, so a
     // player who came to ring the bell still sees the plate is live. A Sprite (clone-safe; a
@@ -3123,7 +3151,7 @@ export function defineProp(name, { prune = false } = {}) {
 
 // Collect state-driven object refs by name, for one island instance.
 export const NAMES = [
-  'handMarks',
+  'handMarks', 'dispDial', 'dispPointer',
   'water', 'lampLens', 'beamPivot', 'beamCone', 'shaftBeam', 'valveWheel',
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
