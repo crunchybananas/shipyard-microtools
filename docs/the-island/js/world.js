@@ -344,7 +344,35 @@ const _io = {
 };
 
 export const HAND = loadHandId(_io);
-const _source = localSource(_io);
+
+// THE SOURCE (STACK.md §8). Local by default and ALWAYS: the island must be whole
+// with the wire cut, so the game boots on the local stack and never waits for a
+// network. If — and only if — a `stack-config.js` exists beside this file, the
+// source is upgraded in place to the shared one. A missing config is not an error,
+// it is the normal build; the dynamic import simply fails and is swallowed.
+let _source = localSource(_io);
+let _shared = false;
+
+import('./stack-config.js')
+  .then(async (cfg) => {
+    if (!cfg || !cfg.FIREBASE_CONFIG) return;
+    const { firestoreSource } = await import('./ledger-firebase.js');
+    const src = firestoreSource(cfg.FIREBASE_CONFIG, _io);
+    src.load();          // seed from the same local mirror, so nothing is lost in the swap
+    _source = src;
+    _shared = true;
+    syncStack(W.level); // and pull whoever is above us right now
+  })
+  .catch(() => { /* no config, offline build, or blocked — the local stack stands */ });
+
+export const isShared = () => _shared;
+
+// Pull the rungs above this one. A no-op on the local source, and never awaited by
+// the game: the draft and the evidence re-read the ledger every rung change, so
+// results simply appear when they arrive.
+export function syncStack(level = W.level) {
+  if (_source.sync) { try { _source.sync(level); } catch (_) { /* offline */ } }
+}
 
 export const ledger = () => _source.load();
 
@@ -357,7 +385,10 @@ export function recordAct(kind, player) {
   const mark = ledgerRecord(_source.load(), {
     kind,
     rung: W.level,
-    hand: HAND,
+    // once anonymous auth resolves, the uid IS the hand — unique per player and
+    // proof against impersonation (the rules require h == uid). Until then, the
+    // local id; a mark made in the first second is still attributed, just offline.
+    hand: (_source.uid && _source.uid()) || HAND,
     at: p ? [p.x, p.y, p.z] : null,
   });
   if (mark) _source.push(mark);
@@ -393,7 +424,7 @@ export const clearStack = () => { _source.clear(); };
 // one write in the game that outlives the ending it belongs to.
 export function disposeStack(kind) {
   const led = _source.load();
-  const res = ledgerDispose(led, { kind, rung: W.level, hand: HAND });
+  const res = ledgerDispose(led, { kind, rung: W.level, hand: (_source.uid && _source.uid()) || HAND });
   if (res) _source.push(res);   // any non-null result forces the ledger to disk
   return res;
 }

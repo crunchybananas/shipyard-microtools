@@ -1,0 +1,80 @@
+rules_version = '2';
+
+// THE ISLAND / ABYME — the stack's shared ledger (docs/the-island/loop/STACK.md §8).
+//
+// THESE RULES ARE THE ENTIRE SERVER. There is no backend code, no Cloud Function,
+// no trusted client. Everything the game relies on — that a mark has a known kind,
+// a sane rung, clamped coordinates, and belongs to whoever wrote it — is enforced
+// here or it is not enforced at all. They deliberately mirror sanitizeLedger() in
+// js/ledger.js field for field; if that table changes, this file changes with it.
+//
+// The threat model is not "a griefer" but "the client is a text editor". Anyone can
+// open devtools and call addDoc with anything. The specific harms to prevent:
+//   * DROWNING     — forging enough marks (or a huge rung) to push a stranger's
+//                    island under water. Bounded by kind, by rung, and by the
+//                    client's own MAX_DRAFT clamp on read.
+//   * IMPERSONATION— writing marks as somebody else's hand. `h` must equal the uid.
+//   * GEOMETRY     — coordinates far outside the island, which the evidence pass
+//                    would place as scenery in the void.
+//   * ERASURE      — deleting or rewriting other people's history. The log is
+//                    APPEND-ONLY: no update, no delete, for anyone, ever.
+//   * COST         — unbounded writes running up a bill. Marks are small, capped in
+//                    field count, and one per (hand, rung, kind) by document id.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // the shared world. `stack` is a season/cohort id so a fresh pool can be opened
+    // without touching game code or migrating anything.
+    match /stacks/{stack}/marks/{markId} {
+
+      // Exactly the nine costed acts in MARK_KINDS. An unknown kind has no draft
+      // and no meaning, so it must never reach a player's client at all.
+      function knownKind(k) {
+        return k in ['valve', 'crank', 'ruler', 'lens', 'chest', 'hatch', 'stones', 'plumb', 'dive'];
+      }
+
+      // The island's playable extent (BOUND_XZ 400 / BOUND_Y 120 in ledger.js).
+      // `at` is optional — an act with no place is legal, it simply cannot be found.
+      function okAt(at) {
+        return at == null || (
+          at is list && at.size() == 3
+          && at[0] is number && at[0] >= -400 && at[0] <= 400
+          && at[1] is number && at[1] >= -120 && at[1] <= 120
+          && at[2] is number && at[2] >= -400 && at[2] <= 400
+        );
+      }
+
+      function validMark(d) {
+        return d.keys().hasOnly(['k', 'r', 'h', 'n', 'at'])
+          && d.keys().hasAll(['k', 'r', 'h'])
+          && d.k is string && knownKind(d.k)
+          && d.r is int && d.r >= 1 && d.r <= 64
+          && d.h is string && d.h == request.auth.uid          // no impersonation
+          && (!('n' in d) || (d.n is int && d.n >= 0 && d.n <= 100000))
+          && okAt(d.at);
+      }
+
+      // Anyone signed in (anonymously) may READ the shared stack. There is nothing
+      // private in it: a random uid, a rung, a kind, and game coordinates.
+      allow read: if request.auth != null;
+
+      // APPEND ONLY. One document per (hand, rung, kind) via a deterministic id,
+      // which makes re-turning the same valve idempotent on the server exactly as
+      // it is in the client, and caps how much any single hand can ever write.
+      allow create: if request.auth != null
+        && validMark(request.resource.data)
+        && markId == request.auth.uid + '_' + string(request.resource.data.r) + '_' + request.resource.data.k;
+
+      // History is not editable and not erasable — not by its author, not by anyone.
+      // A CARRY disposition takes your marks out of YOUR view of the stack; it does
+      // not reach across and rewrite the shared record, and it must not be able to.
+      allow update, delete: if false;
+    }
+
+    // nothing else in the project is reachable from the game
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

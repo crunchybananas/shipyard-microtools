@@ -35,3 +35,4 @@ docs/morphogen/
 
 # Realm sprite tooling virtualenv (docs/realm/assets/sprites/README.md)
 docs/realm/scripts/.venv/
+firebase/node_modules/

@@ -1,0 +1,28 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "../docs",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [],
+    "headers": [
+      {
+        "//": "the game is static ES modules with no build step; never serve a stale one",
+        "source": "**/*.@(js|mjs|html|webmanifest)",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
+        "//": "textures and audio are content-addressed by name and change rarely",
+        "source": "**/*.@(png|jpg|webp|mp3|ogg)",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+      }
+    ]
+  },
+  "emulators": {
+    "firestore": { "port": 8080 },
+    "auth": { "port": 9099 },
+    "ui": { "enabled": false }
+  }
+}

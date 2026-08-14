@@ -1,0 +1,5 @@
+{
+  "//": "The stack's only query is `where r < top, orderBy r, limit N` — a single-field inequality with a matching sort, which Firestore serves from the automatic single-field index. No composite index is needed, and this file exists so a deploy never invents one.",
+  "indexes": [],
+  "fieldOverrides": []
+}

@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack, disposeStack } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack, disposeStack, syncStack, isShared } from './world.js';
 import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs, NAMES } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
@@ -783,6 +783,9 @@ function tickDive(dt) {
     W.level = Math.min(W.level + 1, MAX_DEPTH); // one recursion deeper each dive
     // SEA-STRATA: drop into THIS level's place — its spawn + raised tide (the same island, drowned further)
     const L = LEVELS[W.level];
+    // Pull whoever is above this rung (a no-op offline, and never awaited — the
+    // draft and the evidence re-read the ledger, so strangers appear when they land)
+    syncStack(W.level);
     // THE DRAFT (STACK.md §3.2): the rung's authored waterline PLUS everything the
     // rungs above displaced onto it. Solve the surface efficiently and you land in
     // a puddle; brute-force the whole chain and they inherit a flood — same island,
@@ -1658,7 +1661,7 @@ player.onFootstep = (kind, pos) => {
     // hand = who you are to the stack; ledger() = the raw marks; draft(n) = the
     // inherited water in tide units; tideAt(n) = baseline + draft; evidence(n) =
     // the inherited marks worth rendering (slice 4).
-    hand: HAND, ledger, draft, tideAt, hands, evidence,
+    hand: HAND, ledger, draft, tideAt, hands, evidence, clearStack, syncStack, isShared,
     // collision oracle for tools/harness/probe.mjs — the playtest probe hunts
     // phantom walls and fall-throughs, and blaming one needs the raw rules.
     terrain: { walkableY, wallBlocked, heightAt, colliders, GATES, SPOTS },
@@ -1680,7 +1683,6 @@ player.onFootstep = (kind, pos) => {
       scene.add(g);
       return colliders().length;
     },
-    clearStack,   // forget the stack IN PLACE (no reload — a reload lands on the title screen)
     setIntroT: (t) => { if (intro) intro.t = t; },
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
     setMist: (m) => { mistCur = clamp(m, 0, 1); },
@@ -1704,6 +1706,7 @@ player.onFootstep = (kind, pos) => {
       n = Math.max(1, Math.min(n | 0, MAX_DEPTH));
       const L = LEVELS[n];
       W.level = n;
+      syncStack(n);
       W.tide = W.tideTarget = tideAt(n);               // raised tide + inherited draft (set both: skip the 13s ease)
       if (n >= 2) W.regions.l2seen = true;
       if (n >= 3) W.regions.l3seen = true;
