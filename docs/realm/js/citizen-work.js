@@ -4,22 +4,22 @@
 // the workplace; these helpers only turn that authoritative assignment into a
 // deterministic physical destination.
 
-import { BUILDINGS, G, MAP_H, MAP_W, TILE } from './state.js?realm=193';
-import { isWalkable } from './pathfinding.js?realm=193';
-import { isWorkforceConstructionSite } from './workforce-policy.js?realm=193';
+import { BUILDINGS, G, MAP_H, MAP_W, TILE } from './state.js?realm=195';
+import { isWalkable } from './pathfinding.js?realm=195';
+import { isWorkforceConstructionSite } from './workforce-policy.js?realm=195';
 import {
   assignedCitizenBuilding,
   citizenStableHash,
   setCitizenActivity,
-} from './citizen-activity.js?realm=193';
+} from './citizen-activity.js?realm=195';
 import {
   chooseCitizenCrowdAwareTarget,
   citizenManhattanDistance,
   citizenTargetCrowdPenalty,
   clearCitizenPath,
   pathCitizenTo,
-} from './citizen-navigation.js?realm=193';
-import { citizenTerrainIsWalkable } from './citizen-traffic.js?realm=193';
+} from './citizen-navigation.js?realm=195';
+import { citizenTerrainIsWalkable } from './citizen-traffic.js?realm=195';
 
 function nearestBuilding(citizen, typeOrNull) {
   let best = null;

@@ -160,7 +160,8 @@ export const G = {
   weather: 'clear',
   season: 'spring',
   rallyPoint: null,
-  armyStance: 'defend', // defend | rally | patrol — the army is a posture, not units to drive
+  armyGuardPoint: null,
+  armyStance: 'defend', // defend | rally | patrol | guard | explore
   won: false,
   era: 1,                   // The Three Ages (tech.js ERAS): 1 Hearth · 2 Charter · 3 Crown
   eraStartDay: { 1: 1 },    // era id -> G.day it began

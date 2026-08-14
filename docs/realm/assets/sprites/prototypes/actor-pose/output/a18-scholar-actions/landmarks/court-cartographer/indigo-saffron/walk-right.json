@@ -1,0 +1,1068 @@
+{
+  "frames": [
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          32,
+          40
+        ],
+        "near": [
+          32,
+          41
+        ]
+      },
+      "far": {
+        "ankle": [
+          24,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          21,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          25,
+          64
+        ],
+        "sole_run": [
+          21,
+          26
+        ],
+        "toe": [
+          26,
+          79
+        ]
+      },
+      "frame": 0,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          33,
+          49
+        ],
+        "near": [
+          31,
+          49
+        ]
+      },
+      "head": [
+        33,
+        16
+      ],
+      "near": {
+        "ankle": [
+          40,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          39,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          40,
+          64
+        ],
+        "sole_run": [
+          39,
+          45
+        ],
+        "toe": [
+          45,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        53
+      ],
+      "phase": "near-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          33
+        ],
+        "near": [
+          34,
+          34
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          51
+        ],
+        "left_hand": [
+          33,
+          49
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          31,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          32,
+          44
+        ],
+        "near": [
+          32,
+          45
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          32,
+          42
+        ],
+        "near": [
+          34,
+          42
+        ]
+      },
+      "far": {
+        "ankle": [
+          25,
+          73
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          21,
+          75
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          32,
+          66
+        ],
+        "sole_run": null,
+        "toe": [
+          27,
+          75
+        ]
+      },
+      "frame": 1,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          32,
+          50
+        ],
+        "near": [
+          34,
+          50
+        ]
+      },
+      "head": [
+        34,
+        17
+      ],
+      "near": {
+        "ankle": [
+          39,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          36,
+          79
+        ],
+        "hip": [
+          34,
+          54
+        ],
+        "knee": [
+          42,
+          65
+        ],
+        "sole_run": [
+          36,
+          42
+        ],
+        "toe": [
+          42,
+          79
+        ]
+      },
+      "pelvis": [
+        33,
+        54
+      ],
+      "phase": "near-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          31,
+          34
+        ],
+        "near": [
+          35,
+          35
+        ]
+      },
+      "sockets": {
+        "belt": [
+          33,
+          52
+        ],
+        "left_hand": [
+          32,
+          50
+        ],
+        "load": [
+          33,
+          53
+        ],
+        "right_hand": [
+          34,
+          50
+        ]
+      },
+      "wrists": {
+        "far": [
+          32,
+          46
+        ],
+        "near": [
+          34,
+          46
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          30,
+          42
+        ],
+        "near": [
+          36,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          39,
+          71
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          38,
+          73
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          42,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          43,
+          73
+        ]
+      },
+      "frame": 2,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          28,
+          51
+        ],
+        "near": [
+          38,
+          49
+        ]
+      },
+      "head": [
+        34,
+        16
+      ],
+      "near": {
+        "ankle": [
+          34,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          31,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          37,
+          65
+        ],
+        "sole_run": [
+          31,
+          36
+        ],
+        "toe": [
+          36,
+          79
+        ]
+      },
+      "pelvis": [
+        33,
+        53
+      ],
+      "phase": "near-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          31,
+          34
+        ],
+        "near": [
+          35,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          33,
+          51
+        ],
+        "left_hand": [
+          28,
+          51
+        ],
+        "load": [
+          33,
+          52
+        ],
+        "right_hand": [
+          38,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          29,
+          46
+        ],
+        "near": [
+          37,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          27,
+          40
+        ],
+        "near": [
+          37,
+          39
+        ]
+      },
+      "far": {
+        "ankle": [
+          40,
+          67
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          41,
+          70
+        ],
+        "hip": [
+          30,
+          51
+        ],
+        "knee": [
+          42,
+          58
+        ],
+        "sole_run": null,
+        "toe": [
+          46,
+          70
+        ]
+      },
+      "frame": 3,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          24,
+          48
+        ],
+        "near": [
+          40,
+          48
+        ]
+      },
+      "head": [
+        33,
+        15
+      ],
+      "near": {
+        "ankle": [
+          28,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          24,
+          79
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          30,
+          65
+        ],
+        "sole_run": [
+          24,
+          30
+        ],
+        "toe": [
+          30,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        52
+      ],
+      "phase": "near-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          34
+        ],
+        "near": [
+          34,
+          31
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          50
+        ],
+        "left_hand": [
+          24,
+          48
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          40,
+          48
+        ]
+      },
+      "wrists": {
+        "far": [
+          26,
+          44
+        ],
+        "near": [
+          38,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          28,
+          42
+        ],
+        "near": [
+          36,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          40,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          40,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          36,
+          64
+        ],
+        "sole_run": [
+          40,
+          45
+        ],
+        "toe": [
+          45,
+          79
+        ]
+      },
+      "frame": 4,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          25,
+          49
+        ],
+        "near": [
+          39,
+          49
+        ]
+      },
+      "head": [
+        33,
+        16
+      ],
+      "near": {
+        "ankle": [
+          24,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          21,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          30,
+          65
+        ],
+        "sole_run": [
+          21,
+          25
+        ],
+        "toe": [
+          25,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        53
+      ],
+      "phase": "far-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          35
+        ],
+        "near": [
+          34,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          51
+        ],
+        "left_hand": [
+          25,
+          49
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          39,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          26,
+          46
+        ],
+        "near": [
+          38,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          28,
+          42
+        ],
+        "near": [
+          34,
+          41
+        ]
+      },
+      "far": {
+        "ankle": [
+          40,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          38,
+          79
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          35,
+          65
+        ],
+        "sole_run": [
+          38,
+          43
+        ],
+        "toe": [
+          43,
+          79
+        ]
+      },
+      "frame": 5,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          26,
+          50
+        ],
+        "near": [
+          36,
+          50
+        ]
+      },
+      "head": [
+        32,
+        17
+      ],
+      "near": {
+        "ankle": [
+          28,
+          73
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          23,
+          75
+        ],
+        "hip": [
+          34,
+          54
+        ],
+        "knee": [
+          36,
+          67
+        ],
+        "sole_run": null,
+        "toe": [
+          29,
+          75
+        ]
+      },
+      "pelvis": [
+        31,
+        54
+      ],
+      "phase": "far-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          29,
+          36
+        ],
+        "near": [
+          33,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          31,
+          52
+        ],
+        "left_hand": [
+          26,
+          50
+        ],
+        "load": [
+          31,
+          53
+        ],
+        "right_hand": [
+          36,
+          50
+        ]
+      },
+      "wrists": {
+        "far": [
+          27,
+          46
+        ],
+        "near": [
+          35,
+          46
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          30,
+          42
+        ],
+        "near": [
+          32,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          34,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          31,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          32,
+          65
+        ],
+        "sole_run": [
+          31,
+          36
+        ],
+        "toe": [
+          36,
+          79
+        ]
+      },
+      "frame": 6,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          30,
+          51
+        ],
+        "near": [
+          32,
+          49
+        ]
+      },
+      "head": [
+        32,
+        16
+      ],
+      "near": {
+        "ankle": [
+          40,
+          71
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          39,
+          73
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          45,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          45,
+          73
+        ]
+      },
+      "pelvis": [
+        31,
+        53
+      ],
+      "phase": "far-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          29,
+          34
+        ],
+        "near": [
+          33,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          31,
+          51
+        ],
+        "left_hand": [
+          30,
+          51
+        ],
+        "load": [
+          31,
+          52
+        ],
+        "right_hand": [
+          32,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          30,
+          46
+        ],
+        "near": [
+          32,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          32,
+          40
+        ],
+        "near": [
+          32,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          28,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          25,
+          79
+        ],
+        "hip": [
+          30,
+          51
+        ],
+        "knee": [
+          27,
+          64
+        ],
+        "sole_run": [
+          25,
+          30
+        ],
+        "toe": [
+          30,
+          79
+        ]
+      },
+      "frame": 7,
+      "gait_authority": "cartographer-measured-step-v1",
+      "hands": {
+        "far": [
+          34,
+          48
+        ],
+        "near": [
+          30,
+          48
+        ]
+      },
+      "head": [
+        33,
+        15
+      ],
+      "near": {
+        "ankle": [
+          43,
+          67
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          43,
+          70
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          46,
+          59
+        ],
+        "sole_run": null,
+        "toe": [
+          48,
+          70
+        ]
+      },
+      "pelvis": [
+        32,
+        52
+      ],
+      "phase": "far-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          32
+        ],
+        "near": [
+          34,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          50
+        ],
+        "left_hand": [
+          34,
+          48
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          30,
+          48
+        ]
+      },
+      "wrists": {
+        "far": [
+          33,
+          44
+        ],
+        "near": [
+          31,
+          44
+        ]
+      }
+    }
+  ],
+  "schema": "realm.actor-pose.a18-landmarks.v1",
+  "scope": {
+    "action": "walk",
+    "direction": "right",
+    "garment": "indigo-saffron",
+    "identity": "court-cartographer",
+    "role": "scholar"
+  }
+}

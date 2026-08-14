@@ -263,7 +263,13 @@ node docs/realm/scripts/verify-determinism.mjs     # golden-master hash gate
 node docs/realm/scripts/verify-engine-v2-save.mjs  # strict clean-epoch schema/load
 node docs/realm/scripts/verify-save-continuity.mjs # fresh-process continuation
 node docs/realm/scripts/verify-building-lifecycle.mjs
+node docs/realm/scripts/verify-building-use.mjs
+node docs/realm/scripts/verify-army-orders.mjs
+node docs/realm/scripts/verify-a17-innkeeper-actions.mjs
+node docs/realm/scripts/verify-a18-scholar-actions.mjs
+node docs/realm/scripts/verify-a19-forager-actions.mjs
 node docs/realm/scripts/verify-citizen-transition-ledger.mjs
+node docs/realm/scripts/verify-first-muster-playthrough.mjs
 node docs/realm/scripts/verify-pathfinding-service.mjs
 node docs/realm/scripts/verify-pathfinding-worker-browser.mjs
 node docs/realm/scripts/verify-navigation-crowd-baseline.mjs --require-correct

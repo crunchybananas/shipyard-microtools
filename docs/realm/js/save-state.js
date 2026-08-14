@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=193';
-import { missions } from './missions.js?realm=193';
+} from './state.js?realm=195';
+import { missions } from './missions.js?realm=195';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=193';
+} from './save-schema.js?realm=195';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,11 +22,11 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=193';
-import { houseResidentCapacity } from './residences.js?realm=193';
-import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=193';
-import { foodCapacity } from './building-inventory.js?realm=193';
-import { makePathfindingRequest } from './pathfinding-service.js?realm=193';
+} from './citizen-ownership.js?realm=195';
+import { houseResidentCapacity } from './residences.js?realm=195';
+import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=195';
+import { foodCapacity } from './building-inventory.js?realm=195';
+import { makePathfindingRequest } from './pathfinding-service.js?realm=195';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization
@@ -36,7 +36,7 @@ const RESET_ON_LOAD_G_KEY_SET = new Set(RESET_ON_LOAD_G_KEYS);
 const PREPARED = new WeakMap();
 const SEASONS = new Set(['spring', 'summer', 'autumn', 'winter']);
 const DIFFICULTIES = new Set(['easy', 'normal', 'hard']);
-const ARMY_STANCES = new Set(['defend', 'rally', 'patrol']);
+const ARMY_STANCES = new Set(['defend', 'rally', 'patrol', 'guard', 'explore']);
 const SPEEDS = new Set([0, 1, 2, 4]);
 const WEATHER = new Set(['clear', 'rain']);
 const SCENARIOS = new Set(['peaceful_start', 'military_rise', 'merchant_kingdom', 'seafaring', 'industrial']);
@@ -99,7 +99,7 @@ const ALLOWED_GAME_KEYS = new Set([
   '_patrolPosts', '_patrolPostsBuildingCount', '_raidSide', '_raidSpawnCount',
   '_raidStolen', '_raidWarningGiven', '_refreshPanelFor', '_renderAlpha',
   '_renderDeltaMs', '_scenarioWon',
-  '_undoStack', 'acorns', 'activeEvent', 'animals', 'armyStance', 'avatar',
+  '_undoStack', 'acorns', 'activeEvent', 'animals', 'armyGuardPoint', 'armyStance', 'avatar',
   'bats', 'bigSnow', 'birds', 'boats', 'bolts', 'buildingGrid',
   'buildings', 'bunnies', 'camStart', 'camera', 'cameraShake', 'caravans',
   'carts', 'chronicle', 'citizens', 'clouds', 'crabs', 'currentResearch', 'day',
@@ -125,7 +125,7 @@ const REQUIRED_GAME_KEYS = new Set([
   'camera', 'nextRaidDay',
   'raidInterval', 'researchedTechs', 'currentResearch', 'caravans', 'walkers',
   'raidFlash', 'activeEvent', 'eventModifiers', 'weather', 'season', 'rallyPoint',
-  'armyStance', 'won', 'era', 'eraStartDay', 'wonder', 'clouds', 'cameraShake',
+  'armyGuardPoint', 'armyStance', 'won', 'era', 'eraStartDay', 'wonder', 'clouds', 'cameraShake',
   'tileWear', 'difficulty', 'scenario', 'kingdomName', 'resourceRates',
   'notificationLog', 'lastResources', 'stats', 'avatar', 'chronicle',
   'storyFlags', 'storyState', 'namedCharacters', 'debug',
@@ -352,6 +352,7 @@ const ROOT_FIELD_VALIDATORS = new Map([
   ['_scenarioWon', booleanRule],
   ['_undoStack', denseArrayRule],
   ['activeEvent', nullableObjectRule],
+  ['armyGuardPoint', nullableObjectRule],
   ['armyStance', enumRule(ARMY_STANCES, 'army stance')],
   ['avatar', ordinaryObjectRule],
   ['buildingGrid', denseArrayRule],
@@ -647,6 +648,8 @@ function validateRootStructures(game) {
     if (game[key] !== null && game[key] > game.day) return failure('out-of-range', `$.state.game.${key}`, `${key} cannot be later than the current day.`);
   }
   if (game.armyStance === 'rally' && game.rallyPoint === null) return failure('inconsistent-state', '$.state.game.armyStance', 'Rally stance requires a rally point.');
+  if (game.armyStance === 'guard' && game.armyGuardPoint === null) return failure('inconsistent-state', '$.state.game.armyStance', 'Guard stance requires a building target.');
+  if (game.armyStance === 'explore' && game.avatar === null) return failure('inconsistent-state', '$.state.game.armyStance', 'Explore stance requires the Founder.');
   if (game._scenarioWon !== game.stats.scenariosWon.includes(game.scenario)) return failure('inconsistent-state', '$.state.game._scenarioWon', 'Scenario win flag must agree with the canonical scenario ledger.');
 
   const cameraSurface = validateObjectSurface(game.camera, new Set(['x', 'y', 'zoom']), new Set(['x', 'y', 'zoom']), '$.state.game.camera');
@@ -698,6 +701,14 @@ function validateRootStructures(game) {
   if (game.rallyPoint !== null) {
     const point = validateExactPoint(game.rallyPoint, '$.state.game.rallyPoint');
     if (!point.ok) return point;
+  }
+  if (game.armyGuardPoint !== null) {
+    const point = validateExactPoint(game.armyGuardPoint, '$.state.game.armyGuardPoint');
+    if (!point.ok) return point;
+    const target = game.buildingGrid[game.armyGuardPoint.y]?.[game.armyGuardPoint.x] || null;
+    if (!target || !game.buildings.includes(target) || target.buildProgress < 1) {
+      return failure('invalid-reference', '$.state.game.armyGuardPoint', 'Guard target must be a completed live building.');
+    }
   }
   const eraKeys = new Set(['1', '2', '3']);
   const eraRequired = new Set(Array.from({ length: game.era }, (_, i) => String(i + 1)));

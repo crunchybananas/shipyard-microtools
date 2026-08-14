@@ -1,0 +1,1068 @@
+{
+  "frames": [
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          32,
+          40
+        ],
+        "near": [
+          32,
+          41
+        ]
+      },
+      "far": {
+        "ankle": [
+          23,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          20,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          24,
+          64
+        ],
+        "sole_run": [
+          20,
+          25
+        ],
+        "toe": [
+          25,
+          79
+        ]
+      },
+      "frame": 0,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          33,
+          49
+        ],
+        "near": [
+          31,
+          49
+        ]
+      },
+      "head": [
+        33,
+        16
+      ],
+      "near": {
+        "ankle": [
+          41,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          40,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          41,
+          64
+        ],
+        "sole_run": [
+          40,
+          46
+        ],
+        "toe": [
+          46,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        53
+      ],
+      "phase": "near-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          32
+        ],
+        "near": [
+          34,
+          33
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          51
+        ],
+        "left_hand": [
+          33,
+          49
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          31,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          32,
+          44
+        ],
+        "near": [
+          32,
+          45
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          31,
+          42
+        ],
+        "near": [
+          35,
+          42
+        ]
+      },
+      "far": {
+        "ankle": [
+          24,
+          73
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          20,
+          74
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          32,
+          66
+        ],
+        "sole_run": null,
+        "toe": [
+          26,
+          74
+        ]
+      },
+      "frame": 1,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          31,
+          51
+        ],
+        "near": [
+          35,
+          49
+        ]
+      },
+      "head": [
+        34,
+        17
+      ],
+      "near": {
+        "ankle": [
+          40,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          36,
+          79
+        ],
+        "hip": [
+          34,
+          54
+        ],
+        "knee": [
+          43,
+          65
+        ],
+        "sole_run": [
+          36,
+          43
+        ],
+        "toe": [
+          43,
+          79
+        ]
+      },
+      "pelvis": [
+        33,
+        54
+      ],
+      "phase": "near-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          31,
+          33
+        ],
+        "near": [
+          35,
+          34
+        ]
+      },
+      "sockets": {
+        "belt": [
+          33,
+          52
+        ],
+        "left_hand": [
+          31,
+          51
+        ],
+        "load": [
+          33,
+          53
+        ],
+        "right_hand": [
+          35,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          31,
+          46
+        ],
+        "near": [
+          35,
+          46
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          29,
+          42
+        ],
+        "near": [
+          37,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          40,
+          69
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          39,
+          71
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          43,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          45,
+          71
+        ]
+      },
+      "frame": 2,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          27,
+          51
+        ],
+        "near": [
+          39,
+          49
+        ]
+      },
+      "head": [
+        34,
+        16
+      ],
+      "near": {
+        "ankle": [
+          34,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          30,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          38,
+          65
+        ],
+        "sole_run": [
+          30,
+          36
+        ],
+        "toe": [
+          36,
+          79
+        ]
+      },
+      "pelvis": [
+        33,
+        53
+      ],
+      "phase": "near-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          31,
+          33
+        ],
+        "near": [
+          35,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          33,
+          51
+        ],
+        "left_hand": [
+          27,
+          51
+        ],
+        "load": [
+          33,
+          52
+        ],
+        "right_hand": [
+          39,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          28,
+          46
+        ],
+        "near": [
+          38,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "near"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          26,
+          41
+        ],
+        "near": [
+          38,
+          38
+        ]
+      },
+      "far": {
+        "ankle": [
+          41,
+          65
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          42,
+          68
+        ],
+        "hip": [
+          30,
+          51
+        ],
+        "knee": [
+          43,
+          58
+        ],
+        "sole_run": null,
+        "toe": [
+          48,
+          68
+        ]
+      },
+      "frame": 3,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          23,
+          49
+        ],
+        "near": [
+          41,
+          47
+        ]
+      },
+      "head": [
+        33,
+        15
+      ],
+      "near": {
+        "ankle": [
+          27,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          23,
+          79
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          29,
+          65
+        ],
+        "sole_run": [
+          23,
+          29
+        ],
+        "toe": [
+          29,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        52
+      ],
+      "phase": "near-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          33
+        ],
+        "near": [
+          34,
+          30
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          50
+        ],
+        "left_hand": [
+          23,
+          49
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          41,
+          47
+        ]
+      },
+      "wrists": {
+        "far": [
+          24,
+          45
+        ],
+        "near": [
+          40,
+          42
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "near",
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          28,
+          42
+        ],
+        "near": [
+          36,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          41,
+          75
+        ],
+        "foot_state": "heel-contact",
+        "heel": [
+          41,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          37,
+          64
+        ],
+        "sole_run": [
+          41,
+          47
+        ],
+        "toe": [
+          47,
+          79
+        ]
+      },
+      "frame": 4,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          25,
+          49
+        ],
+        "near": [
+          39,
+          49
+        ]
+      },
+      "head": [
+        33,
+        16
+      ],
+      "near": {
+        "ankle": [
+          23,
+          75
+        ],
+        "foot_state": "trailing-toe",
+        "heel": [
+          19,
+          79
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          29,
+          65
+        ],
+        "sole_run": [
+          19,
+          24
+        ],
+        "toe": [
+          24,
+          79
+        ]
+      },
+      "pelvis": [
+        32,
+        53
+      ],
+      "phase": "far-contact",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          34
+        ],
+        "near": [
+          34,
+          31
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          51
+        ],
+        "left_hand": [
+          25,
+          49
+        ],
+        "load": [
+          32,
+          52
+        ],
+        "right_hand": [
+          39,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          26,
+          46
+        ],
+        "near": [
+          38,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          28,
+          43
+        ],
+        "near": [
+          34,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          41,
+          76
+        ],
+        "foot_state": "flat-support",
+        "heel": [
+          39,
+          79
+        ],
+        "hip": [
+          30,
+          53
+        ],
+        "knee": [
+          36,
+          65
+        ],
+        "sole_run": [
+          39,
+          45
+        ],
+        "toe": [
+          45,
+          79
+        ]
+      },
+      "frame": 5,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          27,
+          51
+        ],
+        "near": [
+          35,
+          49
+        ]
+      },
+      "head": [
+        32,
+        17
+      ],
+      "near": {
+        "ankle": [
+          27,
+          73
+        ],
+        "foot_state": "toe-off-clear",
+        "heel": [
+          22,
+          74
+        ],
+        "hip": [
+          34,
+          54
+        ],
+        "knee": [
+          36,
+          67
+        ],
+        "sole_run": null,
+        "toe": [
+          28,
+          74
+        ]
+      },
+      "pelvis": [
+        31,
+        54
+      ],
+      "phase": "far-down",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          29,
+          35
+        ],
+        "near": [
+          33,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          31,
+          52
+        ],
+        "left_hand": [
+          27,
+          51
+        ],
+        "load": [
+          31,
+          53
+        ],
+        "right_hand": [
+          35,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          28,
+          47
+        ],
+        "near": [
+          34,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": 0,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          30,
+          42
+        ],
+        "near": [
+          32,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          35,
+          76
+        ],
+        "foot_state": "mid-stance",
+        "heel": [
+          31,
+          79
+        ],
+        "hip": [
+          30,
+          52
+        ],
+        "knee": [
+          32,
+          65
+        ],
+        "sole_run": [
+          31,
+          37
+        ],
+        "toe": [
+          37,
+          79
+        ]
+      },
+      "frame": 6,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          31,
+          51
+        ],
+        "near": [
+          31,
+          49
+        ]
+      },
+      "head": [
+        32,
+        16
+      ],
+      "near": {
+        "ankle": [
+          41,
+          69
+        ],
+        "foot_state": "swing-clear",
+        "heel": [
+          40,
+          71
+        ],
+        "hip": [
+          34,
+          53
+        ],
+        "knee": [
+          46,
+          62
+        ],
+        "sole_run": null,
+        "toe": [
+          46,
+          71
+        ]
+      },
+      "pelvis": [
+        31,
+        53
+      ],
+      "phase": "far-pass",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          29,
+          33
+        ],
+        "near": [
+          33,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          31,
+          51
+        ],
+        "left_hand": [
+          31,
+          51
+        ],
+        "load": [
+          31,
+          52
+        ],
+        "right_hand": [
+          31,
+          49
+        ]
+      },
+      "wrists": {
+        "far": [
+          30,
+          46
+        ],
+        "near": [
+          32,
+          44
+        ]
+      }
+    },
+    {
+      "body_dy": -1,
+      "contacts": [
+        "far"
+      ],
+      "direction": "right",
+      "elbows": {
+        "far": [
+          32,
+          40
+        ],
+        "near": [
+          32,
+          40
+        ]
+      },
+      "far": {
+        "ankle": [
+          28,
+          75
+        ],
+        "foot_state": "terminal-stance",
+        "heel": [
+          24,
+          79
+        ],
+        "hip": [
+          30,
+          51
+        ],
+        "knee": [
+          26,
+          64
+        ],
+        "sole_run": [
+          24,
+          30
+        ],
+        "toe": [
+          30,
+          79
+        ]
+      },
+      "frame": 7,
+      "gait_authority": "trail-quick-step-v1",
+      "hands": {
+        "far": [
+          35,
+          49
+        ],
+        "near": [
+          29,
+          47
+        ]
+      },
+      "head": [
+        33,
+        15
+      ],
+      "near": {
+        "ankle": [
+          44,
+          65
+        ],
+        "foot_state": "forward-swing",
+        "heel": [
+          44,
+          68
+        ],
+        "hip": [
+          34,
+          52
+        ],
+        "knee": [
+          47,
+          59
+        ],
+        "sole_run": null,
+        "toe": [
+          50,
+          68
+        ]
+      },
+      "pelvis": [
+        32,
+        52
+      ],
+      "phase": "far-up",
+      "root": [
+        32,
+        79
+      ],
+      "shoulders": {
+        "far": [
+          30,
+          31
+        ],
+        "near": [
+          34,
+          32
+        ]
+      },
+      "sockets": {
+        "belt": [
+          32,
+          50
+        ],
+        "left_hand": [
+          35,
+          49
+        ],
+        "load": [
+          32,
+          51
+        ],
+        "right_hand": [
+          29,
+          47
+        ]
+      },
+      "wrists": {
+        "far": [
+          34,
+          44
+        ],
+        "near": [
+          30,
+          44
+        ]
+      }
+    }
+  ],
+  "schema": "realm.actor-pose.a19-landmarks.v1",
+  "scope": {
+    "action": "walk",
+    "direction": "right",
+    "garment": "moss-ochre",
+    "identity": "trail-forager",
+    "role": "forager"
+  }
+}

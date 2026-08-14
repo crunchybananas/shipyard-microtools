@@ -1,0 +1,13 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "quill-ink",
+  "generated_at": "2026-08-13",
+  "generator": {"mode": "built-in image_gen", "source_output": "/Users/cloken/.codex/generated_images/019fe2f0-9123-7373-88f8-c24bae292751/exec-623b2efb-899f-4a91-88c5-208157ad29a8.png"},
+  "references": [{"path": "assets/sprites/prototypes/actor-pose/references/a17-source/pewter-tankard-keyed.png", "sha256": "d7d0c9354e1254b4d0896fb96fd2712baefda96a58699611225e014ce72eadc7", "purpose": "four-direction tool-board layout only; rejected as scholar tool"}],
+  "prompt": "Create one Realm strategy-game SCHOLAR HAND TOOL component board: an oversized readable goose-feather quill with a dark bronze nib, a small capped inkwell, and one compact rolled parchment pointer. Use the attached pewter-tankard board only for four-direction component layout, scale, crisp painterly raster treatment, warm upper-left lighting, and chroma-key setup; do not reuse its object shape. One large board containing four independently authored directional quill-and-ink arrangements for front/down, rear/up, left, and right, spaced far apart. The quill must remain readable after reduction to roughly 12x16 pixels, with a strong ivory feather silhouette and dark tip; inkwell should be a compact dark-blue glass/brass shape. Every object fully visible and uncropped. Perfect flat solid #ff00ff background; no hands, person, book, lectern, table, scenery, labels, borders, UI, extra props, duplicates, shadows, or watermark.",
+  "postprocess": {"tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py", "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"], "key_color_detected": "#ec0be2"},
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a18-source/quill-ink-keyed.png",
+  "keyed_sha256": "37a62cdff5427c12e0cced1c0683a8b67081c42b938d287d91e26fc21e675bcb",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a18-source/quill-ink.png",
+  "alpha_sha256": "2318759520c4c120d19cbf199503761606b5decbc3a9edf55a0abafdb352ae16"
+}

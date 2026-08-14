@@ -2,12 +2,17 @@
 // Soldiers — AI update for soldier units
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=193';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=193';
-import { spawnClashFX } from './fx.js?realm=193';
-import { sfx as playSound } from './log.js?realm=193';
-import { recordDeathMarker } from './death-markers.js?realm=193';
-import { workersForBuilding } from './citizen-ownership.js?realm=193';
+import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=195';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=195';
+import { spawnClashFX } from './fx.js?realm=195';
+import { sfx as playSound } from './log.js?realm=195';
+import { recordDeathMarker } from './death-markers.js?realm=195';
+import { workersForBuilding } from './citizen-ownership.js?realm=195';
+import {
+  armyMayEngage,
+  armyOrderAnchor,
+  refreshEscortTarget,
+} from './army-orders.js?realm=195';
 
 function soldierDamage(s) {
   let damage = 5;
@@ -17,35 +22,6 @@ function soldierDamage(s) {
     if (d < 8) { damage *= 1.5; break; }
   }
   return damage;
-}
-
-// Where does this soldier want to stand? The army stance is a posture:
-// defend = spread around home barracks, rally = hold at the flag,
-// patrol = walk the wall/tower line.
-function armyAnchor(s) {
-  if (G.armyStance === 'rally' && G.rallyPoint) {
-    return { x: G.rallyPoint.x + (rng() * 4 - 2), y: G.rallyPoint.y + (rng() * 4 - 2) };
-  }
-  if (G.armyStance === 'patrol') {
-    if (!G._patrolPosts || G._patrolPostsBuildingCount !== G.buildings.length) {
-      G._patrolPosts = G.buildings.filter(b => b.type === 'wall' || b.type === 'tower');
-      G._patrolPostsBuildingCount = G.buildings.length;
-    }
-    const posts = G._patrolPosts;
-    if (posts.length) {
-      s._postIdx = ((s._postIdx ?? (G.soldiers.indexOf(s) * 7)) + 1) % posts.length;
-      const p = posts[s._postIdx];
-      return { x: p.x + rngRange(-1, 1), y: p.y + rngRange(-1, 1) };
-    }
-    if (!G._patrolEmptyNotified) {
-      G._patrolEmptyNotified = true;
-      G.particles.push({ tx: s.x, ty: s.y, offsetY: -14, text: 'No walls to patrol', alpha: 1.3, vy: -0.12, decay: 0.014, type: 'speech' });
-    }
-  }
-  if (s.homeBuilding) {
-    return { x: s.homeBuilding.x + rngRange(-3, 3), y: s.homeBuilding.y + rngRange(-3, 3) };
-  }
-  return null;
 }
 
 export function updateSoldiers() {
@@ -73,17 +49,17 @@ export function updateSoldiers() {
       }
     }
 
-    // Find nearest enemy
+    refreshEscortTarget(s);
+
+    // Find the nearest enemy allowed by this order's leash. Guard, rally,
+    // and escort companies protect their objective instead of chasing bait.
     let nearestEnemy = null, nearestDist = Infinity;
     for (const e of G.enemies) {
       const d = Math.sqrt((e.x-s.x)**2 + (e.y-s.y)**2);
-      if (d < nearestDist) { nearestEnemy = e; nearestDist = d; }
+      if (d < nearestDist && armyMayEngage(s, e)) { nearestEnemy = e; nearestDist = d; }
     }
 
-    // Rally stance keeps soldiers on a tight leash: they hold the line at
-    // the flag instead of chasing anything that moves across the map.
-    const engageRadius = G.armyStance === 'rally' ? 8 : 12;
-    if (nearestEnemy && nearestDist < engageRadius) {
+    if (nearestEnemy) {
       // Archer AI — ranged unit stays at distance and fires arrows
       if (s.type === 'archer') {
         const idealRange = 5;
@@ -144,7 +120,7 @@ export function updateSoldiers() {
       s.stateTimer--;
       if (s.stateTimer <= 0) {
         s.stateTimer = 60 + Math.floor(rng() * 120);
-        const anchor = armyAnchor(s);
+        const anchor = armyOrderAnchor(s);
         if (anchor) { s.tx = anchor.x; s.ty = anchor.y; }
       }
     }

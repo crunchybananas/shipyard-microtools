@@ -1,0 +1,31 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-oxblood-moss",
+  "generated_at": "2026-08-12",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f0-9123-7373-88f8-c24bae292751/exec-213e8451-6d88-4063-bb51-a22a3cfc9bb9.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a17-source/identity-alehouse-matron-keyed.png",
+      "sha256": "03c2a544cbeda2914988e8d7fa80927cc9136c8ae6422042f5a577b907670950",
+      "purpose": "A17 identity scale and stout body fit"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/garment-madder-teal-keyed.png",
+      "sha256": "a0c9b886e1d3a68a251f53187dd6f3540fb1a68a3f2174b7c772497e434b9511",
+      "purpose": "separated hollow-component layout only; rejected as garment identity"
+    }
+  ],
+  "prompt": "Create a hollow modular GARMENT board for the older broad-shouldered woman innkeeper reference. Warm cream rolled-sleeve blouse, fitted deep oxblood waistcoat, broad moss-green cross-back tavern apron with split front hem, walnut utility belt with one folded service cloth and small iron key ring, charcoal skirt-trousers, sturdy brown ankle boots, and a cream linen coif/headband. No person, face, skin, hair, hands, body fill, tools, mugs, tray, barrel, cargo, counter, armor, or scenery. All neck, face, cuff, waist, leg, boot, apron, and coif interiors must be genuine flat #ff00ff holes. Compact painterly pixel-art source material with crisp clusters, warm upper-left lighting, classic strategy-game readability. One large board with generously separated front/down, rear/up, left, and right components, fully visible and uncropped. Perfectly flat solid #ff00ff background; no gradient, floor, shadows, labels, borders, text, UI, watermark, or duplicate props.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"],
+    "key_color_detected": "#d606cb"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a17-source/garment-oxblood-moss-keyed.png",
+  "keyed_sha256": "96328c81bf16b49a6151951bafaea4aa9fb4e6a3ab19668b65e45aca0b27afac",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a17-source/garment-oxblood-moss.png",
+  "alpha_sha256": "363b14816a1ebe39ade75a6c8e36530e1daf102b8304c04d3b99ebc2495fbb3b"
+}

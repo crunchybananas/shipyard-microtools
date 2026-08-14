@@ -1,7 +1,7 @@
 // Native module Worker entry. It owns only cloned grid snapshots and delegates
 // all route semantics to the same pure kernel used on the main thread.
 
-import { findPathOnGrid } from './pathfinding-kernel.js?realm=193';
+import { findPathOnGrid } from './pathfinding-kernel.js?realm=195';
 
 let activeGeneration = 0;
 let grids = new Map();

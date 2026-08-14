@@ -60,7 +60,7 @@ try {
     actions,
     roles,
   }) => {
-    const render = await import('./js/render.js?realm=193');
+    const render = await import('./js/render.js?realm=195');
     const game = window.G;
     game.debug.pauseRendering = true;
     const events = [];

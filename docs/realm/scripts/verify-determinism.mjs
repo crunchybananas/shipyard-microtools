@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import runtimeContract from '../runtime-contract.json?realm=193' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=195' with { type: 'json' };
 import {
   CORE_SYSTEM_ORDER,
   canonicalJson,
@@ -207,6 +207,7 @@ equal(changedApplication, {
   spot: null,
 }, 'changed control command is accepted');
 equal(d.changedCommandState, {
+  armyGuardPoint: null,
   armyStance: 'rally',
   rallyPoint: { x: 31, y: 37 },
 }, 'accepted changed command has an asserted world-state consequence');

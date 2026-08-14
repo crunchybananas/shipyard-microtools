@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, TILE } from '../js/state.js?realm=193';
+import { G, MAP_H, MAP_W, TILE } from '../js/state.js?realm=195';
 import {
   findPath,
   getPathfindingDiagnostics,
-} from '../js/pathfinding.js?realm=193';
-import { resolveGroundTraffic } from '../js/ground-traffic.js?realm=193';
+} from '../js/pathfinding.js?realm=195';
+import { resolveGroundTraffic } from '../js/ground-traffic.js?realm=195';
 
 function configureWorld(fill = TILE.GRASS) {
   G.map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(fill));

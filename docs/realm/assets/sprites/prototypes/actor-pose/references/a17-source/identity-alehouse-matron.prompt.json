@@ -1,0 +1,26 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-alehouse-matron",
+  "generated_at": "2026-08-12",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f0-9123-7373-88f8-c24bae292751/exec-4b582b39-86b8-4640-90cf-dda1997af8cc.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/identity-factor-keyed.png",
+      "sha256": "06cd793ce522581e0a4d44f5abd9e73f1c43d78ba3899a531cc16fc6b4ce3d59",
+      "purpose": "component layout, source scale, and painterly strategy-game treatment only; rejected as innkeeper identity"
+    }
+  ],
+  "prompt": "Create one brand-new Realm strategy-game INNKEEPER identity board, using the attached factor board only as a layout, scale, and painterly raster reference. Subject: a distinct older woman tavern keeper, broad-shouldered and heavyset with powerful forearms, fair weathered freckled skin, round cheerful face, strong chin, and copper-red hair streaked gray in a thick crown braid and low bun. No hat, apron, outer garment, armor, tools, mug, barrel, tray, cargo, or scenery. Base clothing only: plain close-fitting neutral linen undershirt and dark neutral trousers and boots. Compact painterly pixel-art source material with crisp clustered forms, warm upper-left lighting, classic 1990s strategy-game readability. One large board with separately spaced directional heads, torso, arms, hands, legs, and boots for front/down, rear/up, left profile, and right profile; consistent stout identity; every component fully visible and uncropped. Perfectly flat solid #ff00ff chroma-key background; no gradient, floor, shadow, labels, borders, text, UI, other characters, duplicate fragments, or watermark.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"],
+    "key_color_detected": "#eb04e3"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a17-source/identity-alehouse-matron-keyed.png",
+  "keyed_sha256": "03c2a544cbeda2914988e8d7fa80927cc9136c8ae6422042f5a577b907670950",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a17-source/identity-alehouse-matron.png",
+  "alpha_sha256": "b51b248d07732913488fa2456b4adeb7ad56671f91b3ffaca818a869d2f39bf2"
+}

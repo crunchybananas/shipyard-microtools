@@ -36,8 +36,8 @@ try {
   await page.waitForTimeout(900);
 
   const observed = await page.evaluate(async () => {
-    const render = await import('./js/render.js?realm=193');
-    const contract = await import('./js/enemy-sprite-contract.js?realm=193');
+    const render = await import('./js/render.js?realm=195');
+    const contract = await import('./js/enemy-sprite-contract.js?realm=195');
     const game = window.G;
     game.speed = 0;
     game.debug.pauseRendering = true;

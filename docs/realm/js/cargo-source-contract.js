@@ -20,6 +20,9 @@ export const CARGO_OWNER_ROWS = Object.freeze([
   'fisher/carry',
   'settler/carry',
   'trader/carry',
+  'innkeeper/carry',
+  'scholar/carry',
+  'forager/carry',
 ]);
 export const CARGO_FRAMES = 8;
 

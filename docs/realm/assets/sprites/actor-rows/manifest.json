@@ -2818,705 +2818,705 @@
     },
     "forager/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:11Z",
-        "file": "forager/carry-down.png",
-        "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/carry-down-06960b30e038.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              92.1,
-              70.65,
-              45.25
+              85.95,
+              59.15,
+              30.75
             ],
-            "paletteDelta": 12.04
+            "paletteDelta": 4.85
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.026,
+          "maxBodyCenterJump": 1.27,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.58,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.2,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            100.35,
-            79.35,
-            46.35
+            90.4,
+            61.05,
+            30.45
           ],
-          "medianColorCount": 523.5,
-          "medianShadingRatio": 0.5989,
+          "medianColorCount": 430.0,
+          "medianShadingRatio": 0.6932,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "406b885a1b799d5dfdfdf075f409993afcc13f4e91c4f022b78c44c01b839b10",
+        "sha256": "06960b30e03839dd91e95ec3b449a575875c6b75df343f48f7ef592946f192de",
         "status": "accepted"
       }
     },
     "forager/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:13Z",
-        "file": "forager/carry-left.png",
-        "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/carry-left-40ec69948799.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.1,
-              78.5,
-              45.25
+              85.95,
+              59.15,
+              30.45
             ],
-            "paletteDelta": 7.85
+            "paletteDelta": 1.64
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.086,
+          "maxBodyCenterJump": 1.91,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.19,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 3.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            92.1,
-            70.65,
-            45.25
+            87.25,
+            59.6,
+            31.35
           ],
-          "medianColorCount": 411.5,
-          "medianShadingRatio": 0.6466,
+          "medianColorCount": 448.0,
+          "medianShadingRatio": 0.6624,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "122487a0bdb5cb98b2b45c0e9049edc096f3002f8e34b59cc735da4da5d393e7",
+        "sha256": "40ec69948799d0c1ec67c4e68b2586d51b4fe024bdfc92a53b4735cfdf912d15",
         "status": "accepted"
       }
     },
     "forager/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:14Z",
-        "file": "forager/carry-right.png",
-        "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/carry-right-e1ea42f7a76c.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.1,
-              78.5,
-              45.25
+              87.25,
+              59.6,
+              30.45
             ],
-            "paletteDelta": 7.85
+            "paletteDelta": 1.41
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.086,
+          "maxBodyCenterJump": 1.58,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.19,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.97,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            92.1,
-            70.65,
-            45.25
+            85.95,
+            59.15,
+            30.75
           ],
-          "medianColorCount": 411.5,
-          "medianShadingRatio": 0.6458,
+          "medianColorCount": 416.5,
+          "medianShadingRatio": 0.6774,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "daa8741573e6b73ead1bb97bf74b313d8e59d83e7c04b76ea3a4f1db53e2bd12",
+        "sha256": "e1ea42f7a76c71d30be692b7de2924956bec67dec2862646faa43b5b0fb25254",
         "status": "accepted"
       }
     },
     "forager/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:12Z",
-        "file": "forager/carry-up.png",
-        "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/carry-up-8e96a4710920.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              92.1,
-              70.65,
-              45.25
+              87.25,
+              59.6,
+              30.75
             ],
-            "paletteDelta": 12.2
+            "paletteDelta": 7.66
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.027,
+          "maxBodyCenterJump": 1.41,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.92,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.12,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            84.55,
-            78.5,
-            39.75
+            80.0,
+            57.5,
+            29.45
           ],
-          "medianColorCount": 469.5,
-          "medianShadingRatio": 0.6543,
+          "medianColorCount": 393.0,
+          "medianShadingRatio": 0.6538,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "6096ce8b61423a7f86b505e1a85288b7eeb12aa2a6943ad0a1a8f68c1fb8281a",
+        "sha256": "8e96a47109209951eec5cb0e73d0088c19ac8c685986ddb968d3e83d977befe0",
         "status": "accepted"
       }
     },
     "forager/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:03Z",
-        "file": "forager/idle-down.png",
-        "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/idle-down-f5fd5429fcc1.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              93.65,
-              78.9,
-              48.9
+              81.95,
+              58.55,
+              30.9
             ],
-            "paletteDelta": 5.99
+            "paletteDelta": 3.22
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.038,
+          "maxBodyCenterJump": 1.43,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.54,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 0.97,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            98.65,
-            82.15,
-            48.35
+            84.85,
+            59.95,
+            30.8
           ],
-          "medianColorCount": 565.5,
-          "medianShadingRatio": 0.64,
+          "medianColorCount": 389.5,
+          "medianShadingRatio": 0.6968,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "46966dcd0c1c09de597a738509e03b104dac1171a1000acd0cce2034176296a9",
+        "sha256": "f5fd5429fcc187683047a6577ed8dc93c4720813eef130eb1368ceb987f55119",
         "status": "accepted"
       }
     },
     "forager/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:04Z",
-        "file": "forager/idle-left.png",
-        "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/idle-left-ace9c62479fc.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              93.65,
-              78.9,
-              48.35
+              81.95,
+              58.55,
+              30.8
             ],
-            "paletteDelta": 0.55
+            "paletteDelta": 2.47
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.67,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.81,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.67,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            93.65,
-            78.9,
-            48.9
+            84.1,
+            59.25,
+            31.8
           ],
-          "medianColorCount": 448.5,
-          "medianShadingRatio": 0.686,
+          "medianColorCount": 409.0,
+          "medianShadingRatio": 0.6508,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "4d202367cbcd8dc72f5996c5e887ebc45352bce7d6c16ab282dd42a0a70d4279",
+        "sha256": "ace9c62479fce01961a05e55cd6d420e879425056167ee17e65d12202b774617",
         "status": "accepted"
       }
     },
     "forager/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:05Z",
-        "file": "forager/idle-right.png",
-        "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/idle-right-b86583286cb2.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              93.65,
-              78.9,
-              48.35
+              84.1,
+              59.25,
+              30.8
             ],
-            "paletteDelta": 0.55
+            "paletteDelta": 2.26
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.021,
+          "maxBodyCenterJump": 0.75,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.81,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.78,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            93.65,
-            78.9,
-            48.9
+            81.95,
+            58.55,
+            30.9
           ],
-          "medianColorCount": 448.5,
-          "medianShadingRatio": 0.686,
+          "medianColorCount": 369.0,
+          "medianShadingRatio": 0.6604,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a6762d1a25c71947284b1e3cfcbfe07f6d8b503fd15e20dfd72d04ebed15b725",
+        "sha256": "b86583286cb2841105a53d7f5492d15518d9e28171d399fb571f9828d53f02f3",
         "status": "accepted"
       }
     },
     "forager/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:04Z",
-        "file": "forager/idle-up.png",
-        "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/idle-up-db69ce80bcf1.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              93.65,
-              78.9,
-              48.9
+              84.1,
+              59.25,
+              30.9
             ],
-            "paletteDelta": 18.94
+            "paletteDelta": 8.91
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.04,
+          "maxBodyCenterJump": 1.65,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.55,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 0.91,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            78.0,
-            77.35,
-            38.35
+            75.5,
+            57.3,
+            29.65
           ],
-          "medianColorCount": 492.5,
-          "medianShadingRatio": 0.7036,
+          "medianColorCount": 353.5,
+          "medianShadingRatio": 0.6471,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "4754b4ff50bc17580965f92256ce233c675af6ca00102505277fbb45744636eb",
+        "sha256": "db69ce80bcf1d7f1bfb3b2e1ccf80ed0e57b8fabae0f7efe8c81dbd57887cd09",
         "status": "accepted"
       }
     },
     "forager/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:06Z",
-        "file": "forager/walk-down.png",
-        "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/walk-down-4365482d01a4.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              86.5,
-              69.05,
-              45.9
+              81.7,
+              58.3,
+              30.8
             ],
-            "paletteDelta": 15.92
+            "paletteDelta": 3.53
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.043,
+          "maxBodyCenterJump": 1.66,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.29,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.75,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            97.85,
-            80.1,
-            47.5
+            84.85,
+            59.9,
+            30.8
           ],
-          "medianColorCount": 560.5,
-          "medianShadingRatio": 0.6383,
+          "medianColorCount": 392.0,
+          "medianShadingRatio": 0.6911,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "6bc2675e8398ff4f6a7417a9b81b3c285e61c114b73ce543edbd8835c8d22873",
+        "sha256": "4365482d01a4847cd83d6e0d25bbd783db433d0a8498def433dc2417b5455440",
         "status": "accepted"
       }
     },
     "forager/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:07Z",
-        "file": "forager/walk-left.png",
-        "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/walk-left-38128c6dfd66.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 4,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              86.5,
-              77.9,
-              45.9
+              81.7,
+              58.3,
+              30.8
             ],
-            "paletteDelta": 8.85
+            "paletteDelta": 2.21
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 8.8,
+          "maxAlphaRatio": 1.083,
+          "maxBodyCenterJump": 1.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.95,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 6.11,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            86.5,
-            69.05,
-            45.9
+            83.65,
+            58.9,
+            31.65
           ],
-          "medianColorCount": 419.0,
-          "medianShadingRatio": 0.7052,
+          "medianColorCount": 402.0,
+          "medianShadingRatio": 0.6583,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "7c6988697f981b619fd2cd2aa82dd44f9b593b4079f36db7b54051a6c906f980",
+        "sha256": "38128c6dfd66e54d16d6dcc8ff7dffb61d2eb9745c30b8e918b34bd9ccf43f29",
         "status": "accepted"
       }
     },
     "forager/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:08Z",
-        "file": "forager/walk-right.png",
-        "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/walk-right-0e0e34fad720.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 4,
           "directionReference": {
-            "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              86.5,
-              77.9,
-              45.9
+              83.65,
+              58.9,
+              30.8
             ],
-            "paletteDelta": 8.85
+            "paletteDelta": 2.04
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 8.8,
+          "maxAlphaRatio": 1.087,
+          "maxBodyCenterJump": 1.54,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.95,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 5.28,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 28.5,
           "medianColor": [
-            86.5,
-            69.05,
-            45.9
+            81.7,
+            58.3,
+            30.8
           ],
-          "medianColorCount": 419.0,
-          "medianShadingRatio": 0.7052,
+          "medianColorCount": 364.5,
+          "medianShadingRatio": 0.6591,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "49ac0712d693d5135f2fdc8d8ff2fde1ccee455029a33fd90859469ba7a426db",
+        "sha256": "0e0e34fad7206158d49b1259f452c4e45c9322964344a7a6ca5d9d44ad0766de",
         "status": "accepted"
       }
     },
     "forager/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:07Z",
-        "file": "forager/walk-up.png",
-        "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/walk-up-d725e39db712.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              86.5,
-              69.05,
-              45.9
+              83.65,
+              58.9,
+              30.8
             ],
-            "paletteDelta": 12.33
+            "paletteDelta": 7.37
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.042,
+          "maxBodyCenterJump": 1.89,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.48,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.63,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            80.45,
-            77.9,
-            39.8
+            76.4,
+            57.85,
+            30.0
           ],
-          "medianColorCount": 490.0,
-          "medianShadingRatio": 0.6962,
+          "medianColorCount": 361.0,
+          "medianShadingRatio": 0.6448,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "6af8cccc604bfa9e96bb4234c6dbf709749ef0290fc6fd4c4e6cf3b0d238489b",
+        "sha256": "d725e39db7124949545d1f33e2e45c2c1f0c0025eadcfeb01e90ab6385508975",
         "status": "accepted"
       }
     },
     "forager/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:09Z",
-        "file": "forager/work-down.png",
-        "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/work-down-cbf26b4eb52f.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 9.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 40.0,
             "medianColor": [
-              93.65,
-              78.95,
-              48.9
+              77.65,
+              60.4,
+              27.75
             ],
-            "paletteDelta": 5.96
+            "paletteDelta": 8.19
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.027,
+          "maxBodyCenterJump": 0.79,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.54,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 1.81,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            98.65,
-            82.15,
-            48.35
+            84.75,
+            64.45,
+            28.25
           ],
-          "medianColorCount": 566.5,
-          "medianShadingRatio": 0.6403,
+          "medianColorCount": 567.0,
+          "medianShadingRatio": 0.7328,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "7106e15c0207c8f5d898296fb7b9b4b7496fa5b09de1b68f978c115e2eaa173c",
+        "sha256": "cbf26b4eb52f7fab877e2e507d0c76c2c9f6ad6b1e745965d9584ee24e8a9c84",
         "status": "accepted"
       }
     },
     "forager/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:10Z",
-        "file": "forager/work-left.png",
-        "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/work-left-154b1d3151c3.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 40.0,
             "medianColor": [
-              93.65,
-              78.95,
-              48.35
+              77.65,
+              60.7,
+              27.75
             ],
-            "paletteDelta": 0.55
+            "paletteDelta": 1.31
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.009,
+          "maxBodyCenterJump": 0.61,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.72,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 3.47,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 40.0,
           "medianColor": [
-            93.65,
-            78.95,
-            48.9
+            78.9,
+            60.4,
+            28.0
           ],
-          "medianColorCount": 447.5,
-          "medianShadingRatio": 0.6858,
+          "medianColorCount": 577.5,
+          "medianShadingRatio": 0.6835,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ef65e7f4814736ff7e023727320bc7a6a758408541b8b5b416b87f15b322e6e8",
+        "sha256": "154b1d3151c3994c80df77a743a3d9519bf4468e18eca57e4587f51f4b518b7f",
         "status": "accepted"
       }
     },
     "forager/work/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:11Z",
-        "file": "forager/work-right.png",
-        "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/work-right-f79d09b019fc.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 40.0,
             "medianColor": [
-              93.65,
-              78.95,
-              48.35
+              78.9,
+              60.7,
+              28.0
             ],
-            "paletteDelta": 0.55
+            "paletteDelta": 1.44
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.01,
+          "maxBodyCenterJump": 0.69,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.72,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 2.69,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 40.0,
           "medianColor": [
-            93.65,
-            78.95,
-            48.9
+            77.65,
+            60.1,
+            27.6
           ],
-          "medianColorCount": 447.5,
-          "medianShadingRatio": 0.6858,
+          "medianColorCount": 540.0,
+          "medianShadingRatio": 0.6865,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "9ef64dee7b23eea951217453a73091018528af64958a8bf8af1845caec82f06e",
+        "sha256": "f79d09b019fc7212c622768345d96118164d6fa9d99e63e59b81b966aebd0f5b",
         "status": "accepted"
       }
     },
     "forager/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:09Z",
-        "file": "forager/work-up.png",
-        "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T05:05:54Z",
+        "file": "production/forager/work-up-8fdcf05a0a64.png",
+        "note": "A19 release forager: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 40.0,
             "medianColor": [
-              93.65,
-              78.95,
-              48.9
+              78.9,
+              60.4,
+              28.0
             ],
-            "paletteDelta": 18.94
+            "paletteDelta": 3.17
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 1.4,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.64,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.71,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 41.0,
           "medianColor": [
-            78.0,
-            77.35,
-            38.35
+            75.75,
+            60.7,
+            27.75
           ],
-          "medianColorCount": 491.0,
-          "medianShadingRatio": 0.7045,
+          "medianColorCount": 558.0,
+          "medianShadingRatio": 0.6754,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d648cdfc217f794f7154007229457fed6635589579869bcd77d66d789e08bec2",
+        "sha256": "8fdcf05a0a643f233588b478e75cf69e3fed0cb9e9f3afa9f15f541786dfe160",
         "status": "accepted"
       }
     },
@@ -4226,705 +4226,705 @@
     },
     "innkeeper/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:49Z",
-        "file": "innkeeper/carry-down.png",
-        "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/carry-down-429efdd8da99.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 35.0,
             "medianColor": [
-              98.35,
-              64.1,
-              43.2
+              117.45,
+              86.8,
+              59.0
             ],
-            "paletteDelta": 11.65
+            "paletteDelta": 6.08
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.032,
+          "maxBodyCenterJump": 1.88,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.46,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 2.57,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            109.35,
-            67.9,
-            43.75
+            120.3,
+            84.5,
+            54.15
           ],
-          "medianColorCount": 494.5,
-          "medianShadingRatio": 0.5978,
+          "medianColorCount": 511.0,
+          "medianShadingRatio": 0.6534,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "75c50ee7b9086af6bf322374ad19d103840455c19aa14e91205394659ecb11cc",
+        "sha256": "429efdd8da9901daf58cd185cc90005efd213b016bba89af9a55b0c3a93a9883",
         "status": "accepted"
       }
     },
     "innkeeper/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:50Z",
-        "file": "innkeeper/carry-left.png",
-        "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/carry-left-d3990835945b.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              102.55,
-              64.1,
-              43.2
+              117.45,
+              84.5,
+              54.15
             ],
-            "paletteDelta": 4.2
+            "paletteDelta": 5.71
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.075,
+          "maxBodyCenterJump": 2.12,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.1,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 6.91,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 35.0,
           "medianColor": [
-            98.35,
-            64.1,
-            43.25
+            118.0,
+            87.2,
+            59.15
           ],
-          "medianColorCount": 385.0,
-          "medianShadingRatio": 0.6416,
+          "medianColorCount": 482.5,
+          "medianShadingRatio": 0.639,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2ca415e11f190df2cd7091e9ea3853badbb79e3930c55c815e32bbdfd2cd2458",
+        "sha256": "d3990835945b1bc2aee1c1ff819ccaddfe29e069c263bbaace367597badd0e4d",
         "status": "accepted"
       }
     },
     "innkeeper/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:51Z",
-        "file": "innkeeper/carry-right.png",
-        "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/carry-right-db19e7df4cc8.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              102.55,
-              64.1,
-              43.25
+              118.0,
+              84.5,
+              54.15
             ],
-            "paletteDelta": 4.2
+            "paletteDelta": 5.4
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.075,
+          "maxBodyCenterJump": 1.98,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.13,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 6.78,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 35.0,
           "medianColor": [
-            98.35,
-            64.1,
-            43.2
+            117.45,
+            86.8,
+            59.0
           ],
-          "medianColorCount": 385.0,
-          "medianShadingRatio": 0.6406,
+          "medianColorCount": 486.5,
+          "medianShadingRatio": 0.6335,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "fa1256ae5eac274dc0e7bbaa8a5f22df9ecff0dcd0b83965144879c0bf4639a4",
+        "sha256": "db19e7df4cc858b5a4010691c3cc9376e95c3ac784ea860a836c95219682568b",
         "status": "accepted"
       }
     },
     "innkeeper/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:50Z",
-        "file": "innkeeper/carry-up.png",
-        "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/carry-up-e0659bde0d39.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 35.0,
             "medianColor": [
-              98.35,
-              64.1,
-              43.25
+              118.0,
+              86.8,
+              59.0
             ],
-            "paletteDelta": 11.56
+            "paletteDelta": 12.71
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.032,
+          "maxBodyCenterJump": 1.51,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.84,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 2.31,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            102.55,
-            59.85,
-            33.35
+            110.75,
+            79.2,
+            51.85
           ],
-          "medianColorCount": 442.0,
-          "medianShadingRatio": 0.6583,
+          "medianColorCount": 470.0,
+          "medianShadingRatio": 0.6618,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "512cf3e4b5b63ade2799a40f83f62a4ccb8c37286ba7cce7bf3aef19208ff5f9",
+        "sha256": "e0659bde0d39b4e2ac108fa29d704a6ea5d96882c9e25690fb554c8cb88b83c8",
         "status": "accepted"
       }
     },
     "innkeeper/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:40Z",
-        "file": "innkeeper/idle-down.png",
-        "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/idle-down-4f9a94896a4d.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              102.55,
-              67.9,
-              46.1
+              113.9,
+              85.8,
+              58.85
             ],
-            "paletteDelta": 7.94
+            "paletteDelta": 5.62
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.051,
+          "maxBodyCenterJump": 1.94,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.41,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 2.14,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            110.4,
-            67.8,
-            44.9
+            114.25,
+            82.9,
+            54.05
           ],
-          "medianColorCount": 525.0,
-          "medianShadingRatio": 0.6415,
+          "medianColorCount": 480.5,
+          "medianShadingRatio": 0.6437,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "6c29174d995e7ff81c8c28133809f8c2249371f27e6814fcb86cad33f07b9498",
+        "sha256": "4f9a94896a4d001c7c1803f995559b68d1814d4521a584de68ef7ee110d27387",
         "status": "accepted"
       }
     },
     "innkeeper/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:42Z",
-        "file": "innkeeper/idle-left.png",
-        "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/idle-left-34a90ad204da.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              102.55,
-              67.8,
-              44.9
+              113.9,
+              82.9,
+              54.05
             ],
-            "paletteDelta": 1.2
+            "paletteDelta": 6.07
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.018,
+          "maxBodyCenterJump": 0.75,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.11,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 1.15,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            102.55,
-            67.9,
-            46.1
+            114.6,
+            86.2,
+            59.1
           ],
-          "medianColorCount": 428.5,
-          "medianShadingRatio": 0.6776,
+          "medianColorCount": 453.0,
+          "medianShadingRatio": 0.6363,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "25af3c8d865ebd6caf3b8cd89dfe2771305eecd7ee28bfd3c172b602dc8db544",
+        "sha256": "34a90ad204da3e177cd876c869730ca286f5a4bea7ab4f35aad5df245e550d8d",
         "status": "accepted"
       }
     },
     "innkeeper/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:42Z",
-        "file": "innkeeper/idle-right.png",
-        "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/idle-right-5399e0edbe34.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              102.55,
-              67.8,
-              44.9
+              114.25,
+              82.9,
+              54.05
             ],
-            "paletteDelta": 1.2
+            "paletteDelta": 5.62
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.02,
+          "maxBodyCenterJump": 0.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.11,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 1.12,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            102.55,
-            67.9,
-            46.1
+            113.9,
+            85.8,
+            58.85
           ],
-          "medianColorCount": 428.5,
-          "medianShadingRatio": 0.6776,
+          "medianColorCount": 455.0,
+          "medianShadingRatio": 0.635,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d50e32e2490e72b04bf42dd252ed911884833ab860058d7a12de08759698fb49",
+        "sha256": "5399e0edbe34d27da8e5eda738a0dde59d48836c963e0f64e9ba35ca5bfd3ae1",
         "status": "accepted"
       }
     },
     "innkeeper/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:41Z",
-        "file": "innkeeper/idle-up.png",
-        "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/idle-up-04c701716fac.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              102.55,
-              67.9,
-              46.1
+              114.25,
+              85.8,
+              58.85
             ],
-            "paletteDelta": 19.4
+            "paletteDelta": 13.65
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.052,
+          "maxBodyCenterJump": 1.69,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.79,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.82,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            99.05,
-            56.3,
-            30.95
+            105.6,
+            77.85,
+            51.9
           ],
-          "medianColorCount": 453.0,
-          "medianShadingRatio": 0.6997,
+          "medianColorCount": 440.0,
+          "medianShadingRatio": 0.6535,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "9dddeb1d908fc622c7ed6896a5e6ed5132f0a574b56a29e9a1c9d6fd06da6672",
+        "sha256": "04c701716facba4932518ce189cba5210c4098a9525593bcda0a3c203adeefa8",
         "status": "accepted"
       }
     },
     "innkeeper/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:43Z",
-        "file": "innkeeper/walk-down.png",
-        "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/walk-down-b2a05650cad7.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              94.05,
-              61.0,
-              43.65
+              112.75,
+              84.7,
+              58.1
             ],
-            "paletteDelta": 15.52
+            "paletteDelta": 4.99
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.038,
+          "maxBodyCenterJump": 1.99,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.24,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 4.1,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            108.55,
-            66.5,
-            44.35
+            114.85,
+            83.0,
+            53.9
           ],
-          "medianColorCount": 521.0,
-          "medianShadingRatio": 0.6376,
+          "medianColorCount": 482.5,
+          "medianShadingRatio": 0.6431,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "5be22afd25548f8148a7b9889cfa712362270a6e66402b30e419fdfdf19ec996",
+        "sha256": "b2a05650cad706af6bef9407adb749c329cb067f3f09bcf7fce46348d03976cf",
         "status": "accepted"
       }
     },
     "innkeeper/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:44Z",
-        "file": "innkeeper/walk-left.png",
-        "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/walk-left-7d804565adbd.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 3,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              100.1,
-              61.0,
-              43.65
+              112.75,
+              83.0,
+              53.9
             ],
-            "paletteDelta": 6.05
+            "paletteDelta": 4.84
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 7.6,
+          "maxAlphaRatio": 1.067,
+          "maxBodyCenterJump": 1.66,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.26,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 9.29,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            94.05,
-            61.0,
-            43.65
+            113.25,
+            84.95,
+            58.3
           ],
-          "medianColorCount": 387.5,
-          "medianShadingRatio": 0.7052,
+          "medianColorCount": 450.5,
+          "medianShadingRatio": 0.6371,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "5594ceb54f69a924d64c061619e40a4a4b49ddd8613b84ea527cf9f6f0819c07",
+        "sha256": "7d804565adbdabf059fc84cce3270daea2f1c0e17fe611fb9f95710a27364185",
         "status": "accepted"
       }
     },
     "innkeeper/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:45Z",
-        "file": "innkeeper/walk-right.png",
-        "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/walk-right-c3a32a84447f.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 3,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              100.1,
-              61.0,
-              43.65
+              113.25,
+              83.0,
+              53.9
             ],
-            "paletteDelta": 6.05
+            "paletteDelta": 4.56
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 7.6,
+          "maxAlphaRatio": 1.069,
+          "maxBodyCenterJump": 1.57,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.26,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 9.23,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            94.05,
-            61.0,
-            43.65
+            112.75,
+            84.7,
+            58.1
           ],
-          "medianColorCount": 387.5,
-          "medianShadingRatio": 0.7052,
+          "medianColorCount": 450.0,
+          "medianShadingRatio": 0.6284,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a723b471cba96fc040de20d28ff829851abdda8dc48f83641986500deb6d0278",
+        "sha256": "c3a32a84447f7856997f7befd736ebfe3038062d1bafdadb62cc02f75ccffe2d",
         "status": "accepted"
       }
     },
     "innkeeper/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:44Z",
-        "file": "innkeeper/walk-up.png",
-        "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/walk-up-6d7fdbfc44d1.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              94.05,
-              61.0,
-              43.65
+              113.25,
+              84.7,
+              58.1
             ],
-            "paletteDelta": 12.89
+            "paletteDelta": 12.09
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.039,
+          "maxBodyCenterJump": 1.85,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.37,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.97,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            100.1,
-            57.4,
-            32.85
+            105.75,
+            77.7,
+            51.7
           ],
-          "medianColorCount": 458.0,
-          "medianShadingRatio": 0.7017,
+          "medianColorCount": 438.0,
+          "medianShadingRatio": 0.6525,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "5ff984543fe96643e787011ced2743cf22baa05c3060422a585eb288bc1f5858",
+        "sha256": "6d7fdbfc44d136433ae8491a223a8cd02c96f07541f2512e9afba2d575a21c54",
         "status": "accepted"
       }
     },
     "innkeeper/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:46Z",
-        "file": "innkeeper/work-down.png",
-        "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/work-down-1f76d3739479.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 10.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              102.6,
-              67.9,
-              46.1
+              106.55,
+              77.65,
+              50.6
             ],
-            "paletteDelta": 7.94
+            "paletteDelta": 12.7
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.017,
+          "maxBodyCenterJump": 0.96,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.36,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 3.46,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 33.0,
           "medianColor": [
-            110.45,
-            67.8,
-            44.9
+            117.85,
+            83.3,
+            51.85
           ],
-          "medianColorCount": 527.0,
-          "medianShadingRatio": 0.6411,
+          "medianColorCount": 594.5,
+          "medianShadingRatio": 0.6753,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "5c9d9a0f06b8f93c84604b7be2602e80e9acf2827a650504328d67a08890f692",
+        "sha256": "1f76d3739479e9d844c06015dc161e7e0b9205384f6c197c4a245c167da44fe3",
         "status": "accepted"
       }
     },
     "innkeeper/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:47Z",
-        "file": "innkeeper/work-left.png",
-        "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/work-left-009e94199df6.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              102.6,
-              67.8,
-              44.9
+              106.55,
+              77.75,
+              50.8
             ],
-            "paletteDelta": 1.2
+            "paletteDelta": 0.22
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.012,
+          "maxBodyCenterJump": 0.57,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.18,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 3.84,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 43.0,
           "medianColor": [
-            102.6,
-            67.9,
-            46.1
+            106.55,
+            77.65,
+            50.6
           ],
-          "medianColorCount": 428.5,
-          "medianShadingRatio": 0.6786,
+          "medianColorCount": 557.5,
+          "medianShadingRatio": 0.6543,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "dbeb8c1c0c7ad36dcaaa2799673c3933e4254f50b21b2a5ba4ac8221de7ea655",
+        "sha256": "009e94199df68d7528d9708c6e9a6f24bf298e14dc92375c831322c6ca0ba5af",
         "status": "accepted"
       }
     },
     "innkeeper/work/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:48Z",
-        "file": "innkeeper/work-right.png",
-        "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/work-right-088085206ba8.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              102.6,
-              67.8,
-              44.9
+              106.55,
+              77.65,
+              50.6
             ],
-            "paletteDelta": 1.2
+            "paletteDelta": 0.22
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.012,
+          "maxBodyCenterJump": 0.58,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.18,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 3.75,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 43.0,
           "medianColor": [
-            102.6,
-            67.9,
-            46.1
+            106.55,
+            77.75,
+            50.8
           ],
-          "medianColorCount": 428.5,
-          "medianShadingRatio": 0.6786,
+          "medianColorCount": 550.5,
+          "medianShadingRatio": 0.6458,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "e1ff181aa06004f23efce10d1b4e3dcdff4d986e5f4132dbd4499209c3225009",
+        "sha256": "088085206ba85f1db6f5e022575e8d6254843da1f375b9a935501a735f49122b",
         "status": "accepted"
       }
     },
     "innkeeper/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:47Z",
-        "file": "innkeeper/work-up.png",
-        "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:09:01Z",
+        "file": "production/innkeeper/work-up-9daa1c066c2d.png",
+        "note": "A17 release innkeeper: distinct alehouse matron, custom steady gait, grounded cask service, baked cargo crate",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              102.6,
-              67.9,
-              46.1
+              106.55,
+              77.75,
+              50.8
             ],
-            "paletteDelta": 19.41
+            "paletteDelta": 12.01
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.03,
+          "maxBodyCenterJump": 1.27,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.8,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 3.64,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 45.0,
           "medianColor": [
-            99.05,
-            56.3,
-            30.95
+            98.6,
+            70.7,
+            45.2
           ],
-          "medianColorCount": 450.5,
-          "medianShadingRatio": 0.7006,
+          "medianColorCount": 517.5,
+          "medianShadingRatio": 0.6705,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "66d6af37bb446b6cea55535391d3e30b81b2a4af3f93cc7d9f7dfbc45ab742f3",
+        "sha256": "9daa1c066c2d1eac4ba5807e7fd9004d69128f259dfbfb00bfbfeab3a25d780e",
         "status": "accepted"
       }
     },
@@ -7042,705 +7042,705 @@
     },
     "scholar/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:00Z",
-        "file": "scholar/carry-down.png",
-        "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/carry-down-9ac68e5b9007.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              93.7,
-              65.45,
-              53.4
+              77.6,
+              57.0,
+              46.7
             ],
-            "paletteDelta": 10.47
+            "paletteDelta": 5.71
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.025,
+          "maxBodyCenterJump": 1.3,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.63,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.45,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            101.0,
-            71.0,
-            58.45
+            82.25,
+            58.05,
+            43.55
           ],
-          "medianColorCount": 463.0,
-          "medianShadingRatio": 0.594,
+          "medianColorCount": 412.0,
+          "medianShadingRatio": 0.6456,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "28b90a2c31b558ba58780fe634e532ebe7afaf92b30c99a42dc020577d50e393",
+        "sha256": "9ac68e5b9007668e5a10ef764695048de965badcae00b011997cd7476470db64",
         "status": "accepted"
       }
     },
     "scholar/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:02Z",
-        "file": "scholar/carry-left.png",
-        "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/carry-left-934c454762dd.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 3,
+          "bodyHeightRange": 5,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              93.7,
-              65.45,
-              58.45
+              80.5,
+              57.35,
+              46.7
             ],
-            "paletteDelta": 5.05
+            "paletteDelta": 3.58
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 16.0,
+          "maxAlphaRatio": 1.069,
+          "maxBodyCenterJump": 1.85,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.48,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.85,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            93.7,
-            65.45,
-            53.4
+            77.05,
+            56.55,
+            46.15
           ],
-          "medianColorCount": 359.5,
-          "medianShadingRatio": 0.6334,
+          "medianColorCount": 390.5,
+          "medianShadingRatio": 0.625,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "1b9fb8d01a181c5ebf33eb21383de348565f0a2c3a60fdff8c1fc9a19eac69ab",
+        "sha256": "934c454762ddc3f93128a66a09d78733dc7defc3a239029077cc343220224c99",
         "status": "accepted"
       }
     },
     "scholar/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:02Z",
-        "file": "scholar/carry-right.png",
-        "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/carry-right-e413702861b2.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              93.7,
-              65.45,
-              58.45
+              80.5,
+              57.35,
+              46.15
             ],
-            "paletteDelta": 5.05
+            "paletteDelta": 2.97
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.067,
+          "maxBodyCenterJump": 1.67,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.48,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.97,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            93.7,
-            65.45,
-            53.4
+            77.6,
+            57.0,
+            46.7
           ],
-          "medianColorCount": 359.5,
-          "medianShadingRatio": 0.633,
+          "medianColorCount": 396.5,
+          "medianShadingRatio": 0.636,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "0e8490c209bdbd5e3c31f7bc8d903e735d853a81bf1ed10079b3e43f08895b67",
+        "sha256": "e413702861b2ee39e7d9ba65ef1c7b7a289def8b3d8de009b5cc73935f7b8a86",
         "status": "accepted"
       }
     },
     "scholar/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:56:01Z",
-        "file": "scholar/carry-up.png",
-        "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/carry-up-95c8b11e7b0b.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              93.7,
-              65.45,
-              53.4
+              77.6,
+              57.0,
+              46.15
             ],
-            "paletteDelta": 10.54
+            "paletteDelta": 3.24
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.027,
+          "maxBodyCenterJump": 1.31,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.82,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.27,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            90.8,
-            64.65,
-            63.5
+            80.5,
+            57.35,
+            47.55
           ],
-          "medianColorCount": 394.5,
-          "medianShadingRatio": 0.6411,
+          "medianColorCount": 386.0,
+          "medianShadingRatio": 0.6205,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "cb217016af88b1f3f17bce989e7054f1dc5f71151a6bf898f2f12ac1933b3517",
+        "sha256": "95c8b11e7b0bd25ae40ad42f63be9a264410b6c947302af63ffea23c6b22232a",
         "status": "accepted"
       }
     },
     "scholar/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:52Z",
-        "file": "scholar/idle-down.png",
-        "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/idle-down-fac857454c88.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              94.65,
-              70.95,
-              61.05
+              74.55,
+              56.6,
+              48.35
             ],
-            "paletteDelta": 6.24
+            "paletteDelta": 3.18
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.038,
+          "maxBodyCenterJump": 1.3,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.28,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 1.88,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            100.05,
-            71.6,
-            64.1
+            74.5,
+            55.3,
+            45.45
           ],
-          "medianColorCount": 499.0,
-          "medianShadingRatio": 0.6304,
+          "medianColorCount": 403.0,
+          "medianShadingRatio": 0.6406,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "36951b7b968406af07317c4052ca480e3995742075a24da9bcf01365a1dfb4f6",
+        "sha256": "fac857454c88ba846b71b2cc3d4e082fe831ceab97dc61a031f12606a057efa3",
         "status": "accepted"
       }
     },
     "scholar/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:53Z",
-        "file": "scholar/idle-left.png",
-        "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/idle-left-b19581d3c2fa.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              94.65,
-              70.95,
-              64.1
+              74.5,
+              55.3,
+              48.35
             ],
-            "paletteDelta": 3.05
+            "paletteDelta": 1.38
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.77,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.17,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.91,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            94.65,
-            70.95,
-            61.05
+            74.55,
+            56.6,
+            47.9
           ],
-          "medianColorCount": 387.0,
-          "medianShadingRatio": 0.6739,
+          "medianColorCount": 385.0,
+          "medianShadingRatio": 0.6054,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "dd470ab560ae6c044a72b426210d6c64f916412eda61787c6f989a2b151eb178",
+        "sha256": "b19581d3c2fa761820860c8723763ef48ba9fb6fcacef0e32b1865b07c59473d",
         "status": "accepted"
       }
     },
     "scholar/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:54Z",
-        "file": "scholar/idle-right.png",
-        "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/idle-right-e4b1fb507a44.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              94.65,
-              70.95,
-              64.1
+              74.5,
+              55.3,
+              47.9
             ],
-            "paletteDelta": 3.05
+            "paletteDelta": 2.07
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.76,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.17,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.83,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            94.65,
-            70.95,
-            61.05
+            75.3,
+            57.15,
+            48.35
           ],
           "medianColorCount": 387.0,
-          "medianShadingRatio": 0.6739,
+          "medianShadingRatio": 0.6038,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "420c89abf44dc634a1b3bb29bbad92d9bd2f31604c6c1bf582ac36f21350f544",
+        "sha256": "e4b1fb507a44e6fc72b74f146050aace61d2091fcef57292be22de205d5d6817",
         "status": "accepted"
       }
     },
     "scholar/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:52Z",
-        "file": "scholar/idle-up.png",
-        "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/idle-up-076537934713.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              94.65,
-              70.95,
-              61.05
+              74.55,
+              56.6,
+              47.9
             ],
-            "paletteDelta": 13.77
+            "paletteDelta": 3.2
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.041,
+          "maxBodyCenterJump": 1.28,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.79,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.16,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            86.15,
-            61.5,
-            66.35
+            72.75,
+            54.45,
+            49.45
           ],
-          "medianColorCount": 414.0,
-          "medianShadingRatio": 0.6925,
+          "medianColorCount": 372.5,
+          "medianShadingRatio": 0.6097,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "39b4b334d63a61b81e52dbd188238b8cc2a8fb0b4f13fd4f285ff32e6bdaf911",
+        "sha256": "07653793471379c0f1439fd39fa7faeadf227b657c7f36a944a273656ee07702",
         "status": "accepted"
       }
     },
     "scholar/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:55Z",
-        "file": "scholar/walk-down.png",
-        "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/walk-down-dcb13a82b997.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              88.4,
-              62.6,
-              56.1
+              73.4,
+              55.5,
+              47.9
             ],
-            "paletteDelta": 14.04
+            "paletteDelta": 2.94
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.034,
+          "maxBodyCenterJump": 1.6,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.83,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.66,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            98.55,
-            70.1,
-            62.25
+            73.45,
+            54.6,
+            45.1
           ],
-          "medianColorCount": 489.5,
-          "medianShadingRatio": 0.63,
+          "medianColorCount": 398.0,
+          "medianShadingRatio": 0.6411,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "dd523bfa7e963a145a2ecd6ad84fb4bf90065bf60262baf6b06ca643cd67147f",
+        "sha256": "dcb13a82b997525a894eaee1b321d691490166063b4a0a2c65245a2a96264573",
         "status": "accepted"
       }
     },
     "scholar/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:56Z",
-        "file": "scholar/walk-left.png",
-        "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/walk-left-84e689cabe9e.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 4,
+          "bodyHeightRange": 6,
+          "bodyWidthRange": 3,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              88.4,
-              62.75,
-              62.25
+              73.45,
+              54.6,
+              47.9
             ],
-            "paletteDelta": 6.15
+            "paletteDelta": 1.03
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 23.6,
+          "maxAlphaRatio": 1.068,
+          "maxBodyCenterJump": 1.92,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.61,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 4.34,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            88.4,
-            62.6,
-            56.1
+            73.4,
+            55.5,
+            47.4
           ],
-          "medianColorCount": 362.0,
-          "medianShadingRatio": 0.6932,
+          "medianColorCount": 383.0,
+          "medianShadingRatio": 0.6113,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "f5cb4206645a34d7ac59398bc255b5c502e0d4e9f4ac45d991657cf857a25b06",
+        "sha256": "84e689cabe9e003b07b9572ea35b5e855d4d7deb06ba3b52895b3fec5d3e72d0",
         "status": "accepted"
       }
     },
     "scholar/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:57Z",
-        "file": "scholar/walk-right.png",
-        "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/walk-right-6bb94715edf6.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 4,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              88.4,
-              62.75,
-              62.25
+              73.4,
+              54.6,
+              47.4
             ],
-            "paletteDelta": 6.15
+            "paletteDelta": 1.48
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 8.8,
+          "maxAlphaRatio": 1.071,
+          "maxBodyCenterJump": 1.74,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.61,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 4.84,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            88.4,
-            62.6,
-            56.1
+            73.9,
+            55.9,
+            47.9
           ],
-          "medianColorCount": 362.0,
-          "medianShadingRatio": 0.6932,
+          "medianColorCount": 384.5,
+          "medianShadingRatio": 0.6225,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "075e07585fc2d51683be86ae13d305dace89a4f55a06e7f05a1000e61f0a85a4",
+        "sha256": "6bb94715edf67985e378d8fb5483712029a50daff8fd834d5d69a5c3fba79383",
         "status": "accepted"
       }
     },
     "scholar/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:55Z",
-        "file": "scholar/walk-up.png",
-        "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/walk-up-76dce130cf94.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              88.4,
-              62.6,
-              56.1
+              73.45,
+              55.5,
+              47.4
             ],
-            "paletteDelta": 9.87
+            "paletteDelta": 2.44
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.043,
+          "maxBodyCenterJump": 1.82,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.37,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.97,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            87.2,
-            62.75,
-            65.9
+            72.25,
+            53.9,
+            48.8
           ],
-          "medianColorCount": 418.5,
-          "medianShadingRatio": 0.6815,
+          "medianColorCount": 367.5,
+          "medianShadingRatio": 0.612,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "0a33dc5a2f518402d9d3e5bd0c82d05ee2fcc63fa37b8ba67e841c69647ab2f7",
+        "sha256": "76dce130cf94ec3bf3ab11f44393d8f3b54084e66343c92f920307baa965085f",
         "status": "accepted"
       }
     },
     "scholar/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:57Z",
-        "file": "scholar/work-down.png",
-        "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/work-down-56c17cc14a62.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 9.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.0,
             "medianColor": [
-              94.65,
-              70.95,
-              61.1
+              77.6,
+              56.7,
+              42.1
             ],
-            "paletteDelta": 6.21
+            "paletteDelta": 19.49
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.033,
+          "maxBodyCenterJump": 0.65,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.28,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 3.18,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            100.05,
-            71.6,
-            64.1
+            92.05,
+            68.05,
+            48.6
           ],
-          "medianColorCount": 499.5,
-          "medianShadingRatio": 0.6298,
+          "medianColorCount": 487.5,
+          "medianShadingRatio": 0.6605,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "08d6767ba3213710d29e176e2f2a487f5ae98369175efba90795d3ea8fb4e377",
+        "sha256": "56c17cc14a62d908c8e364ab0a42a0322bdf5ac72a4738725f0a94ff7daed8bd",
         "status": "accepted"
       }
     },
     "scholar/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:59Z",
-        "file": "scholar/work-left.png",
-        "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/work-left-881cfd906b52.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.0,
             "medianColor": [
-              94.65,
-              70.95,
-              64.1
+              78.35,
+              57.5,
+              42.85
             ],
-            "paletteDelta": 3.0
+            "paletteDelta": 1.33
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.009,
+          "maxBodyCenterJump": 0.73,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.14,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 3.03,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 39.0,
           "medianColor": [
-            94.65,
-            70.95,
-            61.1
+            77.6,
+            56.7,
+            42.1
           ],
-          "medianColorCount": 388.0,
-          "medianShadingRatio": 0.6744,
+          "medianColorCount": 453.0,
+          "medianShadingRatio": 0.6057,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ca26278f68eab1e8771d77ec5e365293de7de6b6980f6dcb99cb9ace32634b5f",
+        "sha256": "881cfd906b5269f95090a8525f0ad8cc35a4b02404b29b3829390e789df8fe5b",
         "status": "accepted"
       }
     },
     "scholar/work/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:59Z",
-        "file": "scholar/work-right.png",
-        "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/work-right-9eb78d4b83db.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.0,
             "medianColor": [
-              94.65,
-              70.95,
-              64.1
+              77.6,
+              56.7,
+              42.1
             ],
-            "paletteDelta": 3.0
+            "paletteDelta": 1.33
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.009,
+          "maxBodyCenterJump": 0.58,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.14,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 2.88,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 39.0,
           "medianColor": [
-            94.65,
-            70.95,
-            61.1
+            78.35,
+            57.5,
+            42.85
           ],
-          "medianColorCount": 388.0,
-          "medianShadingRatio": 0.6744,
+          "medianColorCount": 473.5,
+          "medianShadingRatio": 0.6207,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "5d477f0a8779182ba8fa4f64773ea4b5cce04c0332280afb002071a333904f16",
+        "sha256": "9eb78d4b83db164f4e075b51c11ac3382c6ac8d5fd99405c3d399dddd1676641",
         "status": "accepted"
       }
     },
     "scholar/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:58Z",
-        "file": "scholar/work-up.png",
-        "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-08-13T04:33:44Z",
+        "file": "production/scholar/work-up-7dfcb48d0d8e.png",
+        "note": "A18 release scholar: uniform-family restage clean in all 16 directions/actions",
+        "provenance": "imagegen-modular-source",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.0,
             "medianColor": [
-              94.65,
-              70.95,
-              61.1
+              78.35,
+              57.5,
+              42.85
             ],
-            "paletteDelta": 13.75
+            "paletteDelta": 9.84
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.033,
+          "maxBodyCenterJump": 1.44,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.84,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 2.07,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 41.0,
           "medianColor": [
-            86.15,
-            61.5,
-            66.35
+            71.2,
+            51.15,
+            40.55
           ],
-          "medianColorCount": 412.5,
-          "medianShadingRatio": 0.6932,
+          "medianColorCount": 445.5,
+          "medianShadingRatio": 0.6264,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "52de3f0823d808544130033903a033d02234147430fe25ae5aec081256840bee",
+        "sha256": "7dfcb48d0d8ee227b18c28ac8d67a06cfffa6f42698a13b4eb382943570384de",
         "status": "accepted"
       }
     },
@@ -9857,6 +9857,6 @@
       }
     }
   },
-  "updatedAt": "2026-08-09T00:13:30Z",
+  "updatedAt": "2026-08-13T05:05:54Z",
   "version": 2
 }

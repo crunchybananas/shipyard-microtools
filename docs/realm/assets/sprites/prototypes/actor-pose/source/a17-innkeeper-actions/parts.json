@@ -1,0 +1,212 @@
+{
+  "schema": "realm.actor-pose.a17-innkeeper-actions.v1",
+  "stage": "innkeeper-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "alehouse-matron",
+    "path": "assets/sprites/prototypes/actor-pose/references/a17-source/identity-alehouse-matron.png",
+    "sha256": "b51b248d07732913488fa2456b4adeb7ad56671f91b3ffaca818a869d2f39bf2",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a17-source/identity-alehouse-matron-keyed.png",
+      "sha256": "03c2a544cbeda2914988e8d7fa80927cc9136c8ae6422042f5a577b907670950"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a17-source/identity-alehouse-matron.prompt.json",
+    "parts": {
+      "down": {
+        "head": [300, 8, 500, 235],
+        "torso": [310, 235, 680, 570],
+        "arm_screen_left": [110, 235, 285, 625],
+        "arm_screen_right": [1200, 235, 1390, 625],
+        "leg": [310, 545, 640, 1010]
+      },
+      "up": {
+        "head": [555, 8, 760, 235],
+        "torso": [670, 255, 980, 545],
+        "arm_screen_left": [1200, 235, 1390, 625],
+        "arm_screen_right": [1200, 235, 1390, 625],
+        "leg": [650, 545, 970, 1010]
+      },
+      "left": {
+        "head": [775, 8, 995, 240],
+        "torso": [970, 250, 1170, 540],
+        "arm": [1200, 235, 1390, 625],
+        "leg": [960, 545, 1210, 1010]
+      },
+      "right": {
+        "head": [775, 8, 995, 240],
+        "torso": [970, 250, 1170, 540],
+        "arm": [1200, 235, 1390, 625],
+        "leg": [960, 545, 1210, 1010]
+      }
+    }
+  },
+  "garment": {
+    "key": "oxblood-moss",
+    "path": "assets/sprites/prototypes/actor-pose/references/a17-source/garment-oxblood-moss.png",
+    "sha256": "363b14816a1ebe39ade75a6c8e36530e1daf102b8304c04d3b99ebc2495fbb3b",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a17-source/garment-oxblood-moss-keyed.png",
+      "sha256": "96328c81bf16b49a6151951bafaea4aa9fb4e6a3ab19668b65e45aca0b27afac"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a17-source/garment-oxblood-moss.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [335, 5, 510, 145],
+        "tunic": [320, 160, 690, 580],
+        "sleeve_screen_left": [105, 195, 275, 440],
+        "sleeve_screen_right": [1250, 205, 1420, 455],
+        "belt": [315, 555, 665, 690],
+        "boot": [315, 660, 655, 1023]
+      },
+      "up": {
+        "headgear": [600, 5, 770, 145],
+        "tunic": [690, 170, 1050, 580],
+        "sleeve_screen_left": [1250, 205, 1420, 455],
+        "sleeve_screen_right": [1250, 205, 1420, 455],
+        "belt": [680, 555, 1025, 690],
+        "boot": [680, 660, 1025, 1023]
+      },
+      "left": {
+        "headgear": [810, 5, 990, 145],
+        "tunic": [1040, 190, 1260, 580],
+        "sleeve": [1250, 205, 1420, 455],
+        "belt": [1015, 555, 1270, 690],
+        "boot": [1030, 660, 1260, 1023]
+      },
+      "right": {
+        "headgear": [810, 5, 990, 145],
+        "tunic": [1040, 190, 1260, 580],
+        "sleeve": [1250, 205, 1420, 455],
+        "belt": [1015, 555, 1270, 690],
+        "boot": [1030, 660, 1260, 1023]
+      }
+    },
+    "crop_margin_exception": {
+      "parts": ["down/belt", "up/belt", "left/belt", "right/belt", "down/boot", "up/boot", "left/boot", "right/boot"],
+      "minimum_transparent_pixels": 0,
+      "reason": "semantic waist and ankle cut zones are component boundaries; hollow head, neck, cuff, apron, and leg cavities remain enforced"
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "up": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "left": {"size": [14, 15], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "right": {"size": [14, 15], "offset": [0, 1], "transform": "flip-x", "occlusion": "far-hand < cargo < near-hand"}
+    }
+  },
+  "tool": {
+    "key": "pewter-tankard",
+    "path": "assets/sprites/prototypes/actor-pose/references/a17-source/pewter-tankard.png",
+    "sha256": "eec9683554b19d59fd55200f580a7688926695142f7e7e9a00d1b51684e332f8",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a17-source/pewter-tankard-keyed.png",
+      "sha256": "d7d0c9354e1254b4d0896fb96fd2712baefda96a58699611225e014ce72eadc7"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a17-source/pewter-tankard.prompt.json",
+    "parts": {
+      "down": [185, 55, 665, 515],
+      "up": [900, 55, 1325, 515],
+      "left": [135, 535, 640, 990],
+      "right": [880, 535, 1365, 990]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "render_size": [12, 14],
+      "occlusion": "body < tankard < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "ale-cask-stand",
+    "path": "assets/sprites/prototypes/actor-pose/references/a17-source/ale-cask-stand.png",
+    "sha256": "f4dab5f95e1066a2af0dd1bcb9c6b4293136b607e705643729305b2ac4476ae1",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a17-source/ale-cask-stand-keyed.png",
+      "sha256": "4b265cb79d3fc21a941c2c0ccd7b222113cf1cf58fd88985ca00d23effa62ce0"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a17-source/ale-cask-stand.prompt.json",
+    "parts": {
+      "down": [205, 40, 710, 510],
+      "up": [800, 40, 1360, 510],
+      "left": [245, 520, 680, 960],
+      "right": [850, 520, 1310, 960]
+    },
+    "render": {
+      "down": {"size": [31, 24], "center": [34, 67], "occlusion": "body < cask < tankard < near hand"},
+      "up": {"size": [31, 24], "center": [18, 67], "occlusion": "cask < body < tankard < near hand"},
+      "left": {"size": [27, 24], "center": [17, 67], "occlusion": "body < cask < tankard < near hand"},
+      "right": {"size": [27, 24], "center": [47, 67], "occlusion": "body < cask < tankard < near hand"}
+    },
+    "authority": {"ground_y": 79, "work_socket": "tap_socket", "finished_frame_or_row_mirroring": false}
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "gait_authority": {
+      "key": "matron-steady-step-v1",
+      "shared_a5_walk_pose": false,
+      "contact_chronology": ["near-contact", "near-down", "near-pass", "near-up", "far-contact", "far-down", "far-pass", "far-up"],
+      "traits": ["weighty planted stride", "apron-side shoulder roll", "clear boot lift", "tankard-arm counterweight"]
+    }
+  },
+  "render_profile": {
+    "key": "alehouse-matron",
+    "build": "broad-shouldered heavyset older tavern keeper with powerful forearms and grounded work boots",
+    "identity_leg_far_width": 6.4,
+    "identity_leg_near_width": 7.2,
+    "garment_leg_far_width": 7.4,
+    "garment_leg_near_width": 8.4,
+    "upper_arm_far_width": 5.6,
+    "upper_arm_near_width": 6.5,
+    "forearm_far_width": 5.2,
+    "forearm_near_width": 6.0,
+    "identity_torso_size": [25, 32],
+    "garment_tunic_size": [32, 37],
+    "garment_belt_size": [31, 7],
+    "identity_head_size": [22, 24],
+    "garment_headgear_size": [25, 14]
+  },
+  "actions": {
+    "idle": {"equipment": "off", "motion": "planted tavern-keeper breathing and apron weight shift", "contacts": "both boots planted"},
+    "walk": {"equipment": "off", "motion": "matron-steady-step-v1", "contacts": "grounded contact chronology with no flight frames"},
+    "work": {"equipment": ["pewter-tankard", "ale-cask-stand"], "motion": "take tankard, reach tap, fill, inspect, wipe, set, serve, recover", "contacts": "both boots planted"},
+    "carry": {"equipment": "cargo-crate", "motion": "shared A3 carry sockets on the distinct matron body", "contacts": "grounded contact chronology with no flight frames"}
+  },
+  "scope": {
+    "role": "innkeeper",
+    "identity": "alehouse-matron",
+    "garment": "oxblood-moss",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "four independent hash-locked ImageGen authorities: distinct innkeeper identity, hollow tavern garment, pewter tankard, and grounded cask stand; cargo is the shared A3 crate",
+    "rejected_identity_authority": "prior innkeeper rows are settler-derived palette transfers and remain cadence evidence only",
+    "animation_unit": "one 512x84 eight-frame row per action and direction; all 16 promote atomically",
+    "runtime": "flattened exact-size raster tiers; no live skeletal renderer",
+    "scale": "76px body height on ground row 79 with rows 80-83 clear"
+  }
+}

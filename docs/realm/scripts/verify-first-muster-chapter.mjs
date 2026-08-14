@@ -1,20 +1,21 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, setSeed } from '../js/state.js?realm=193';
-import { generateWorld } from '../js/world.js?realm=193';
+import { G, setSeed } from '../js/state.js?realm=195';
+import { generateWorld } from '../js/world.js?realm=195';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
-} from '../js/citizen-ownership.js?realm=193';
+  transitionCitizenActivity,
+} from '../js/citizen-ownership.js?realm=195';
 import {
   FIRST_MUSTER_STATE_PATH,
   FIRST_MUSTER_STEPS,
   getFirstMusterReport,
   updateFirstMusterChapter,
-} from '../js/first-muster.js?realm=193';
-import { checkScenarioComplete, getActiveScenario } from '../js/scenarios.js?realm=193';
-import { on, off } from '../js/bus.js?realm=193';
+} from '../js/first-muster.js?realm=195';
+import { checkScenarioComplete, getActiveScenario } from '../js/scenarios.js?realm=195';
+import { on, off } from '../js/bus.js?realm=195';
 
 function finishedBuilding(type, x) {
   return {
@@ -66,6 +67,10 @@ assert.equal(checkScenarioComplete(), false);
 const farm = finishedBuilding('farm', 42);
 G.buildings.push(farm);
 updateFirstMusterChapter();
+assert.equal(G.storyFlags.firstMusterStep, 0, 'completed but unstaffed food source advanced the chapter');
+claimCitizenAssignment(G.citizens[0], farm, { reason: 'job-market' });
+transitionCitizenActivity(G.citizens[0], 'working', 'arrived-at-work');
+updateFirstMusterChapter();
 assert.equal(G.storyFlags.firstMusterStep, 1);
 assert.deepEqual(
   { completed: advances[0].completed.id, next: advances[0].next.id, currentIndex: advances[0].currentIndex, total: advances[0].total },
@@ -107,10 +112,14 @@ const approach = ['north', 'east', 'south', 'west'][G._raidSide];
 assert.match(rally.primary.detail, new RegExp(`from the ${approach}`), 'rally objective did not expose the charted approach');
 assert.equal(advances.at(-1).approach, approach, 'shell event did not receive the Founder intelligence');
 
+G.day = 2;
+G.nextRaidDay = 8;
 G.rallyPoint = { x: 52, y: 40 };
 G.armyStance = 'rally';
 updateFirstMusterChapter();
 assertSinglePrimary('survive_raid');
+assert.equal(G.storyFlags.firstRaidMobilizedDay, 2, 'rally did not record the mobilization day');
+assert.equal(G.nextRaidDay, 5, 'rally did not replace dead air with the three-dawn war clock');
 
 G.stats.raidsFaced = 1;
 G.enemies = [];
@@ -149,10 +158,14 @@ G.rallyPoint = { x: 50, y: 50 };
 G.stats.raidsFaced = 1;
 G.stats.raidsSurvived = 1;
 resetCitizenOwnershipRuntime();
+claimCitizenAssignment(G.citizens[0], farm, { reason: 'job-market' });
+transitionCitizenActivity(G.citizens[0], 'working', 'arrived-at-work');
+updateFirstMusterChapter();
+assert.equal(G.storyFlags.firstMusterStep, 1, 'operational food source did not advance the prepared chapter');
 claimCitizenAssignment(G.citizens[0], barracks, { reason: 'player-command' });
 claimCitizenAssignment(G.citizens[1], barracks, { reason: 'player-command' });
 updateFirstMusterChapter();
-assert.equal(G.storyFlags.firstMusterStep, 1, 'chapter skipped multiple primary objectives in one cadence');
+assert.equal(G.storyFlags.firstMusterStep, 2, 'chapter skipped multiple primary objectives in one cadence');
 off('first-muster-advanced', captureAdvance);
 
 console.log('[first-muster-chapter] PASS — sequential primary objective, Founder scouting beat, latched save cursor, and raid completion');

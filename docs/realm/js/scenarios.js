@@ -2,16 +2,16 @@
 // Scenarios — structured objective-based campaigns
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=193';
+import { G } from './state.js?realm=195';
 import {
   FIRST_MUSTER_CHAPTER_ID,
   getFirstMusterScenarioObjectives,
   isFirstMusterComplete,
-} from './first-muster.js?realm=193';
+} from './first-muster.js?realm=195';
 import {
   getPostRaidRecoveryScenarioObjectives,
   isPostRaidRecoveryComplete,
-} from './post-raid-recovery.js?realm=193';
+} from './post-raid-recovery.js?realm=195';
 
 export const SCENARIOS = [
   {
@@ -29,7 +29,7 @@ export const SCENARIOS = [
   {
     id: 'military_rise',
     name: '⚔️ Rise of the Sword',
-    desc: 'A military frontier. Barracks are available immediately; every recruit is your order.',
+    desc: 'A hungry military frontier. Establish food, raise a company, scout the warband, and hold the line.',
     chapterId: FIRST_MUSTER_CHAPTER_ID,
     get objectives() {
       if (!isFirstMusterComplete(G)) {
@@ -37,7 +37,10 @@ export const SCENARIOS = [
       }
       return getPostRaidRecoveryScenarioObjectives(G);
     },
-    startResources: { wood: 60, stone: 80, food: 80, gold: 50, iron: 20, planks: 20 },
+    // Six opening ration-days force food production to become real before the
+    // three-recruit muster, while still leaving enough runway to recover from
+    // a placement mistake or one interrupted work shift.
+    startResources: { wood: 60, stone: 80, food: 18, gold: 50, iron: 20, planks: 20 },
     startEra: 2,
     startResearch: ['agriculture', 'forestry', 'masonry', 'metallurgy', 'military'],
     raidStart: 8,

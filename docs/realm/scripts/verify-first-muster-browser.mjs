@@ -19,16 +19,17 @@ try {
   await page.locator('#title-screen .title-btn.primary').click();
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(() => window.setSpeed(0));
-  await page.waitForFunction(() => document.querySelector('#mission-list')?.textContent.includes('Complete a food source'));
+  await page.waitForFunction(() => document.querySelector('#mission-list')?.textContent.includes('Operate a food source'));
   assert.equal(await page.locator('#mission-list').getByText('Side Goals').count(), 0, 'chapter was buried under unrelated side goals');
   assert.equal(await page.locator('#mission-list .mission-next').count(), 1, 'chapter exposed more than one primary objective');
   assert.match(await page.locator('#mission-list .mission-next').innerText(), /Place food source/, 'primary objective had no direct action');
+  assert.match(await page.locator('#mission-list .mission-next').innerText(), /18 rations · about 6 days/, 'military opening did not communicate its ration runway');
   assert.ok((await page.locator('.mission-chapter-action').boundingBox()).height >= 44, 'chapter action missed touch target size');
   const barracksBuildButton = page.locator('#build-bar button', { hasText: 'Barracks' });
   await barracksBuildButton.waitFor({ state: 'visible' });
   assert.equal(await barracksBuildButton.isEnabled(), true, 'military scenario advertised barracks but could not afford one');
   const immediateSave = await page.evaluate(async () => {
-    const saveState = await import('./js/save-state.js?realm=193');
+    const saveState = await import('./js/save-state.js?realm=195');
     const prepared = saveState.prepareSave(saveState.serializeGame({ savedAt: 189 }));
     return {
       ok: prepared.ok,
@@ -44,9 +45,9 @@ try {
   );
 
   const setup = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=193');
-    const ownership = await import('./js/citizen-ownership.js?realm=193');
-    const ui = await import('./js/ui.js?realm=193');
+    const state = await import('./js/state.js?realm=195');
+    const ownership = await import('./js/citizen-ownership.js?realm=195');
+    const ui = await import('./js/ui.js?realm=195');
     const g = window.G;
     Object.assign(g.resources, { wood: 100, stone: 100, food: 20, gold: 50, iron: 20, planks: 20 });
     for (const row of g.fog) row.fill(true);

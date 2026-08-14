@@ -333,10 +333,12 @@ body.title-active #hud,body.title-active #build-bar,body.title-active #missions,
 .ip-perday{color:rgba(255,255,255,0.4);font-size:0.68rem}
 .ip-defense{color:#93c5fd}
 .ip-happy{color:#86efac}
-#army-stance{gap:2px;padding:2px 4px}
-.stance-btn{background:none;border:1px solid rgba(255,255,255,0.12);border-radius:4px;padding:1px 5px;cursor:pointer;font-size:12px;opacity:0.45;line-height:1.4}
+#army-stance{gap:3px;padding:2px 4px}
+.army-order-label{min-width:3.5rem;color:rgba(255,255,255,0.72);font-size:0.68rem;font-weight:700;text-align:center}
+.stance-btn{background:none;border:1px solid rgba(255,255,255,0.12);border-radius:5px;min-width:28px;min-height:28px;padding:2px 5px;cursor:pointer;font-size:13px;opacity:0.45;line-height:1.4}
 .stance-btn.active{opacity:1;border-color:#d6a864;background:rgba(214,168,100,0.15)}
 .stance-btn.dimmed{opacity:0.2;cursor:default}
+@media(max-width:600px){.stance-btn{min-width:44px;min-height:44px;font-size:16px}.army-order-label{font-size:0.72rem}}
 .ip-hpbar{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden}
 .ip-hpfill{height:100%;border-radius:3px;transition:width 0.3s}
 .ip-hpval{font-size:0.7rem;color:rgba(255,255,255,0.5);min-width:36px;text-align:right}
@@ -843,8 +845,8 @@ body.photo-mode #wonder-chip{display:none!important}
   <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens"><span class="res-img res-pop" aria-label="Population"></span>3</span>
   <button class="hud-btn" id="btn-founder" onclick="toggleFounderFollow()" title="Select the Founder and scout beyond the known map (F)">🚶 Founder</button>
   <div class="res" title="Soldiers under your command"><span class="res-emoji res-img res-soldier" aria-label="Soldiers"></span><span class="val" id="soldier-count">0</span></div>
-  <div class="res" id="army-stance" title="Army stance — g to cycle. Defend: hold near barracks. Rally: hold at the flag (shift+right-click to plant). Patrol: walk the walls." style="display:none">
-    <button class="stance-btn" data-stance="defend" onclick="window.setArmyStance&&window.setArmyStance('defend')">🛡️</button><button class="stance-btn" data-stance="rally" onclick="window.setArmyStance&&window.setArmyStance('rally')">🚩</button><button class="stance-btn" data-stance="patrol" onclick="window.setArmyStance&&window.setArmyStance('patrol')">🧱</button>
+  <div class="res" id="army-stance" title="Army orders — G to cycle. Defend the yard, rally at a flag, patrol fortifications, guard a selected building, or escort the Founder." style="display:none">
+    <span class="army-order-label" id="army-order-label" aria-live="polite">Defend</span><button class="stance-btn" data-stance="defend" title="Defend the company yard" aria-label="Defend" onclick="window.setArmyStance&&window.setArmyStance('defend')">🛡️</button><button class="stance-btn" data-stance="rally" title="Rally at the planted flag" aria-label="Rally" onclick="window.setArmyStance&&window.setArmyStance('rally')">🚩</button><button class="stance-btn" data-stance="patrol" title="Patrol completed walls and towers" aria-label="Patrol" onclick="window.setArmyStance&&window.setArmyStance('patrol')">🧱</button><button class="stance-btn" data-stance="guard" title="Guard the selected building" aria-label="Guard building" onclick="window.setArmyStance&&window.setArmyStance('guard')">👁️</button><button class="stance-btn" data-stance="explore" title="Escort the Founder while exploring" aria-label="Explore with Founder" onclick="window.setArmyStance&&window.setArmyStance('explore')">🧭</button>
   </div>
   <div class="res threat-display" id="threat-display" style="display:none"><span class="res-emoji">💀</span><span class="val" id="enemy-count">0</span></div>
   <span id="kingdom-display"></span>
@@ -996,7 +998,7 @@ body.photo-mode #wonder-chip{display:none!important}
       <div class="help-grid">
         <span class="help-section-title">Army</span>
         <span class="hk">Barracks</span><span>Open a staffed training yard and issue a Muster order</span>
-        <span class="hk">G</span><span>Cycle army stance: defend → rally → patrol</span>
+        <span class="hk">G</span><span>Cycle army orders: defend → rally → patrol → guard → explore</span>
         <span class="hk">🚩 then tap</span><span>Plant a rally flag on mouse or touch</span>
         <span class="hk">Click tower</span><span>Garrison soldiers (+range, faster volleys)</span>
         <span class="help-section-title">Founder</span>
@@ -1147,6 +1149,6 @@ const params = new URLSearchParams(location.search);
 const devTools = params.has('devtools') || params.has('spritelab') || params.has('spritemuster');
 document.body.classList.toggle('devtools', devTools);
 </script>
-<script type="module" src="js/main.js?realm=193"></script>
+<script type="module" src="js/main.js?realm=195"></script>
 </body>
 </html>

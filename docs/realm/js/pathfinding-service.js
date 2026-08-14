@@ -3,7 +3,7 @@
 // messages and injects plain results; headless simulation simply uses the
 // synchronous kernel fallback at the same authoritative ready tick.
 
-import { findPathOnGrid } from './pathfinding-kernel.js?realm=193';
+import { findPathOnGrid } from './pathfinding-kernel.js?realm=195';
 
 // Five ticks crosses at least one browser event-loop boundary even when the
 // visible shell advances four simulation ticks in one 4x-speed frame.

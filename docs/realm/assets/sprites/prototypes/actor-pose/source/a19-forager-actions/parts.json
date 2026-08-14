@@ -1,0 +1,212 @@
+{
+  "schema": "realm.actor-pose.a19-forager-actions.v1",
+  "stage": "forager-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "trail-forager",
+    "path": "assets/sprites/prototypes/actor-pose/references/a19-source/identity-trail-forager.png",
+    "sha256": "34f682cdcf9e2ca024fafdc97e9e78293afa23773a34946e54c3913fc8b04469",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a19-source/identity-trail-forager-keyed.png",
+      "sha256": "ba3ab68569cdcb8b2cbf258e81af460560ec0ce36f7a06f9225e65581cd272ac"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a19-source/identity-trail-forager.prompt.json",
+    "parts": {
+      "down": {
+        "head": [335, 5, 488, 250],
+        "torso": [330, 260, 645, 548],
+        "arm_screen_left": [150, 270, 290, 635],
+        "arm_screen_right": [1235, 270, 1375, 640],
+        "leg": [330, 555, 625, 1015]
+      },
+      "up": {
+        "head": [600, 5, 750, 245],
+        "torso": [660, 265, 965, 548],
+        "arm_screen_left": [1235, 270, 1375, 640],
+        "arm_screen_right": [1235, 270, 1375, 640],
+        "leg": [675, 555, 935, 1010]
+      },
+      "left": {
+        "head": [800, 5, 990, 250],
+        "torso": [995, 260, 1160, 545],
+        "arm": [1235, 270, 1375, 640],
+        "leg": [972, 547, 1153, 1023]
+      },
+      "right": {
+        "head": [1035, 5, 1220, 250],
+        "torso": [995, 260, 1160, 545],
+        "arm": [1235, 270, 1375, 640],
+        "leg": [972, 547, 1153, 1023]
+      }
+    }
+  },
+  "garment": {
+    "key": "moss-ochre",
+    "path": "assets/sprites/prototypes/actor-pose/references/a19-source/garment-moss-ochre.png",
+    "sha256": "e293e11686cb52de97019b0c427c88516d3a9225ce6d25e7c6ed6a1e7083711d",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a19-source/garment-moss-ochre-keyed.png",
+      "sha256": "4922a1c030336de9be07461951d5706dee291731196d06f36d0cccecb9bed8fc"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a19-source/garment-moss-ochre.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [295, 15, 470, 130],
+        "tunic": [215, 125, 580, 510],
+        "sleeve_screen_left": [55, 185, 195, 510],
+        "sleeve_screen_right": [1340, 185, 1480, 510],
+        "belt": [225, 500, 555, 665],
+        "boot": [195, 870, 585, 1023]
+      },
+      "up": {
+        "headgear": [570, 15, 730, 160],
+        "tunic": [590, 130, 940, 510],
+        "sleeve_screen_left": [55, 185, 195, 510],
+        "sleeve_screen_right": [1340, 185, 1480, 510],
+        "belt": [610, 500, 925, 665],
+        "boot": [620, 870, 900, 1023]
+      },
+      "left": {
+        "headgear": [825, 20, 980, 105],
+        "tunic": [940, 135, 1120, 505],
+        "sleeve": [1340, 185, 1480, 510],
+        "belt": [940, 500, 1125, 665],
+        "boot": [910, 870, 1095, 1023]
+      },
+      "right": {
+        "headgear": [1055, 15, 1230, 135],
+        "tunic": [1125, 135, 1310, 505],
+        "sleeve": [1340, 185, 1480, 510],
+        "belt": [1125, 500, 1320, 665],
+        "boot": [1115, 870, 1295, 1023]
+      }
+    },
+    "crop_margin_exception": {
+      "parts": ["up/headgear", "up/tunic", "down/belt", "up/belt", "left/belt", "right/belt", "down/boot", "up/boot", "left/boot", "right/boot"],
+      "minimum_transparent_pixels": 0,
+      "reason": "semantic waist and ankle cut zones are component boundaries; hollow scarf, neck, cuff, jerkin split, and leg cavities remain enforced"
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "up": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "left": {"size": [14, 15], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "right": {"size": [14, 15], "offset": [0, 1], "transform": "flip-x", "occlusion": "far-hand < cargo < near-hand"}
+    }
+  },
+  "tool": {
+    "key": "gathering-knife",
+    "path": "assets/sprites/prototypes/actor-pose/references/a19-source/gathering-knife.png",
+    "sha256": "6081593b9dc3a5d507591eec38b2dbcb5dd095c11500ad1cdc7adc3f04f3c037",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a19-source/gathering-knife-keyed.png",
+      "sha256": "5fc324228c84433ebf512375feb147de312900cd740ec72afee4a2dc9b345e8d"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a19-source/gathering-knife.prompt.json",
+    "parts": {
+      "down": [230, 80, 580, 445],
+      "up": [1030, 70, 1350, 445],
+      "left": [160, 650, 650, 875],
+      "right": [865, 655, 1360, 875]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "render_size": [13, 14],
+      "occlusion": "body < gathering knife < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "herb-berry-patch",
+    "path": "assets/sprites/prototypes/actor-pose/references/a19-source/herb-berry-patch.png",
+    "sha256": "939c52dc3324040ccf3c8ceaf355537a086269744da8a6ee5caac1c30853647a",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a19-source/herb-berry-patch-keyed.png",
+      "sha256": "0770fffc7a1f956520187fc21ed921b3a9f66bceb8fbd634aa6dd119133d619d"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a19-source/herb-berry-patch.prompt.json",
+    "parts": {
+      "down": [185, 100, 735, 445],
+      "up": [845, 55, 1395, 445],
+      "left": [170, 560, 720, 930],
+      "right": [845, 525, 1395, 930]
+    },
+    "render": {
+      "down": {"size": [29, 21], "center": [36, 69], "occlusion": "body < herb patch < knife < near hand"},
+      "up": {"size": [29, 21], "center": [18, 69], "occlusion": "herb patch < body < knife < near hand"},
+      "left": {"size": [27, 21], "center": [18, 69], "occlusion": "body < herb patch < knife < near hand"},
+      "right": {"size": [27, 21], "center": [46, 69], "occlusion": "body < herb patch < knife < near hand"}
+    },
+    "authority": {"ground_y": 79, "work_socket": "herb_socket", "finished_frame_or_row_mirroring": false}
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "gait_authority": {
+      "key": "trail-quick-step-v1",
+      "shared_a5_walk_pose": false,
+      "contact_chronology": ["near-contact", "near-down", "near-pass", "near-up", "far-contact", "far-down", "far-pass", "far-up"],
+      "traits": ["quick uneven-ground stride", "low athletic center", "clear boot lift", "compact arm counterweight"]
+    }
+  },
+  "render_profile": {
+    "key": "trail-forager",
+    "build": "short wiry young trail forager with a compact jerkin silhouette and rugged boots",
+    "identity_leg_far_width": 5.7,
+    "identity_leg_near_width": 6.4,
+    "garment_leg_far_width": 6.4,
+    "garment_leg_near_width": 7.2,
+    "upper_arm_far_width": 4.8,
+    "upper_arm_near_width": 5.4,
+    "forearm_far_width": 4.4,
+    "forearm_near_width": 5.0,
+    "identity_torso_size": [22, 30],
+    "garment_tunic_size": [28, 32],
+    "garment_belt_size": [27, 7],
+    "identity_head_size": [21, 23],
+    "garment_headgear_size": [21, 6]
+  },
+  "actions": {
+    "idle": {"equipment": "off", "motion": "alert field breathing with a low ready weight shift", "contacts": "both boots planted"},
+    "walk": {"equipment": "off", "motion": "trail-quick-step-v1", "contacts": "grounded contact chronology with no flight frames"},
+    "work": {"equipment": ["gathering-knife", "herb-berry-patch"], "motion": "draw knife, inspect, cut sprig, gather berries, sort, basket, scan, recover", "contacts": "both boots planted"},
+    "carry": {"equipment": "cargo-crate", "motion": "shared A3 carry sockets on the distinct forager body", "contacts": "grounded contact chronology with no flight frames"}
+  },
+  "scope": {
+    "role": "forager",
+    "identity": "trail-forager",
+    "garment": "moss-ochre",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "four independent hash-locked ImageGen authorities: distinct trail-forager identity, hollow moss-ochre field kit, hooked gathering knife, and grounded herb-and-berry patch; cargo is the shared A3 crate",
+    "rejected_identity_authority": "prior forager rows are settler-derived palette transfers and remain cadence evidence only",
+    "animation_unit": "one 512x84 eight-frame row per action and direction; all 16 promote atomically",
+    "runtime": "flattened exact-size raster tiers; no live skeletal renderer",
+    "scale": "76px body height on ground row 79 with rows 80-83 clear"
+  }
+}

@@ -58,11 +58,11 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async ({ tickLimit: limit }) => {
-    const state = await import('./js/state.js?realm=193');
-    const pathfinding = await import('./js/pathfinding.js?realm=193');
-    const citizens = await import('./js/citizens.js?realm=193');
-    const ownership = await import('./js/citizen-ownership.js?realm=193');
-    const render = await import('./js/render.js?realm=193');
+    const state = await import('./js/state.js?realm=195');
+    const pathfinding = await import('./js/pathfinding.js?realm=195');
+    const citizens = await import('./js/citizens.js?realm=195');
+    const ownership = await import('./js/citizen-ownership.js?realm=195');
+    const render = await import('./js/render.js?realm=195');
     const g = window.G;
     if (state.G !== g) throw new Error('dense fixture imported a split runtime state identity');
     const center = { x: 40, y: 40 };

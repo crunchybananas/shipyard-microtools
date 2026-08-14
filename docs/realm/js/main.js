@@ -2,41 +2,41 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, TH, createResourceStock, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, resetRuntimeTransientState, tintCurve, setSeed } from './state.js?realm=193';
-import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=193';
-import { generateWorld } from './world.js?realm=193';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=193';
-import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=193';
-import { dispatch } from './commands.js?realm=193';
-import { coreTick } from './sim.js?realm=193';
-import { on } from './bus.js?realm=193';
-import { updateParticles, updateSmokeEmitters } from './particles.js?realm=193';
-import { setupInput } from './input.js?realm=193';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, resetTutorial, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=193';
-import { ERAS } from './tech.js?realm=193';
-import { saveGame, loadGame, getSaveSummary, getLastLoadedSavedAt } from './save.js?realm=193';
-import { updateAmbient, toggleAmbient, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=193';
-import { toggleNotificationLog, notify, notifyTransient } from './notifications.js?realm=193';
-import { loadAchievements, checkAchievements, renderAchievementsPanel } from './achievements.js?realm=193';
-import { getActiveScenario, SCENARIOS } from './scenarios.js?realm=193';
-import { missions } from './missions.js?realm=193';
-import { updateAnimals } from './animals.js?realm=193';
-import { checkAdvisor } from './advisor.js?realm=193';
-import { updateBoats, updateFlocks, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=193';
-import { chronicle, initChronicle } from './log.js?realm=193';
-import { realWorldDreamLens, setChronicleFilter, toggleChroniclePanel } from './story-ui.js?realm=193';
-import { initSpriteLab } from './sprite-lab.js?realm=193';
-import { initSpriteMuster } from './sprite-muster.js?realm=193';
-import { initCitizenInspector, resetCitizenTransitionLedger } from './citizen-inspector.js?realm=193';
-import { updatePresentationCues } from './presentation-cues.js?realm=193';
-import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=193';
-import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=193';
-import { authoredBuildingCount, establishFounderStockpile } from './building-inventory.js?realm=193';
+import { G, MAP_W, MAP_H, TH, createResourceStock, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, resetRuntimeTransientState, tintCurve, setSeed } from './state.js?realm=195';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=195';
+import { generateWorld } from './world.js?realm=195';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=195';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=195';
+import { dispatch } from './commands.js?realm=195';
+import { coreTick } from './sim.js?realm=195';
+import { on } from './bus.js?realm=195';
+import { updateParticles, updateSmokeEmitters } from './particles.js?realm=195';
+import { setupInput } from './input.js?realm=195';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, resetTutorial, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=195';
+import { ERAS } from './tech.js?realm=195';
+import { saveGame, loadGame, getSaveSummary, getLastLoadedSavedAt } from './save.js?realm=195';
+import { updateAmbient, toggleAmbient, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=195';
+import { toggleNotificationLog, notify, notifyTransient } from './notifications.js?realm=195';
+import { loadAchievements, checkAchievements, renderAchievementsPanel } from './achievements.js?realm=195';
+import { getActiveScenario, SCENARIOS } from './scenarios.js?realm=195';
+import { missions } from './missions.js?realm=195';
+import { updateAnimals } from './animals.js?realm=195';
+import { checkAdvisor } from './advisor.js?realm=195';
+import { updateBoats, updateFlocks, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=195';
+import { chronicle, initChronicle } from './log.js?realm=195';
+import { realWorldDreamLens, setChronicleFilter, toggleChroniclePanel } from './story-ui.js?realm=195';
+import { initSpriteLab } from './sprite-lab.js?realm=195';
+import { initSpriteMuster } from './sprite-muster.js?realm=195';
+import { initCitizenInspector, resetCitizenTransitionLedger } from './citizen-inspector.js?realm=195';
+import { updatePresentationCues } from './presentation-cues.js?realm=195';
+import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=195';
+import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=195';
+import { authoredBuildingCount, establishFounderStockpile } from './building-inventory.js?realm=195';
 import {
   pumpPathfindingWorkerClient,
   resetPathfindingWorkerClient,
   startPathfindingWorkerClient,
-} from './pathfinding-client.js?realm=193';
+} from './pathfinding-client.js?realm=195';
 
 
 // ── Core → shell effect wiring (ENGINE.md rule 4) ───────────────────
@@ -309,10 +309,10 @@ function beginGame({ resume = false } = {}) {
   setTimeout(() => { titleEl.style.display = 'none'; }, 500);
 
   setupInput(canvas);
-  // A fresh realm waits for the player's explicit Start building action.
-  // The old live clock consumed days and auto-foraged resources underneath
-  // the welcome card while a first-time player was still reading it.
-  if (!resume) setSpeed(0);
+  // New Game is the player's start action. Do not require a second tutorial
+  // click before the realm begins moving; that made a successful start look
+  // frozen. Continue still preserves the speed stored in the save.
+  if (!resume) setSpeed(1);
   initChronicle();
   resetCitizenTransitionLedger();
   if (G.chronicle.length === 0) {
@@ -451,6 +451,7 @@ function resetRealmForNewGame({ kingdomName = G.kingdomName } = {}) {
     weather: 'clear',
     season: 'spring',
     rallyPoint: null,
+    armyGuardPoint: null,
     armyStance: 'defend',
     won: false,
     era: startEra,
@@ -574,7 +575,7 @@ window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
   resetTutorial();
   resetRealmForNewGame();
-  setSpeed(0);
+  setSpeed(1);
   renderBuildBar(); renderMissions(); updateUI(); updateTutorialTip();
   notify('New game started!');
 };

@@ -1,0 +1,13 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-indigo-saffron",
+  "generated_at": "2026-08-13",
+  "generator": {"mode": "built-in image_gen", "source_output": "/Users/cloken/.codex/generated_images/019fe2f0-9123-7373-88f8-c24bae292751/exec-9e68a939-a215-4dbd-8bbf-ae4451c59d58.png"},
+  "references": [{"path": "assets/sprites/prototypes/actor-pose/references/a17-source/garment-oxblood-moss-keyed.png", "sha256": "96328c81bf16b49a6151951bafaea4aa9fb4e6a3ab19668b65e45aca0b27afac", "purpose": "component layout and hollow-garment strategy only; rejected as scholar costume"}],
+  "prompt": "Create one brand-new Realm strategy-game SCHOLAR GARMENT component board, using the referenced tavern garment board only for separate-component layout, scale, crisp painterly raster treatment, and flat chroma-key setup. This is clothing only, with absolutely no person, face, skin, hair, beard, eyes, hands, or body baked into any opening. Design: a learned court cartographer's deep indigo knee-length academic robe, narrow saffron-gold stole with subtle geometric map marks, muted parchment linen sleeves, dark leather belt with a small scroll case, soft square indigo scholar cap, and dark ankle boots. Silhouette should be tall, lean, scholarly, and distinct from a merchant or tavern keeper. One large component board with separately spaced hollow directional cap/headgear, front/down robe, rear/up robe, left and right profile robe sections, separate sleeves, belt/stole pieces, and boots; every neck, face, cuff, waist, robe split, and leg cavity must remain completely transparent flat magenta so an independently generated identity can show through. Four directional sets: front/down, rear/up, left profile, right profile. Every component fully visible and uncropped. Perfectly flat solid #ff00ff chroma-key background; no gradient, floor, shadow, labels, borders, text, UI, person, mannequin, tool, book, quill, lectern, cargo, scenery, duplicate fragments, or watermark.",
+  "postprocess": {"tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py", "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"], "key_color_detected": "#ef03f2"},
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a18-source/garment-indigo-saffron-keyed.png",
+  "keyed_sha256": "7874e7fe25c0cf917fae9750be78995b04330ae95183b4a2f61e384b2f9f70ad",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a18-source/garment-indigo-saffron.png",
+  "alpha_sha256": "ce05180ab9b53b6489e9b6f382189d499c954561f26fefa832a9d3b6787ee9a0"
+}

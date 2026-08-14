@@ -1,0 +1,31 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "ale-cask-stand",
+  "generated_at": "2026-08-12",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f0-9123-7373-88f8-c24bae292751/exec-93bba683-936c-461e-9b60-7d5711d0fb83.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/trade-counter-keyed.png",
+      "sha256": "8e2e5ba10e49761b8daec4e87c69ff7aae1af5400bfe850eefa032705da56421",
+      "purpose": "grounded directional workstation-board layout only; rejected as innkeeper workstation"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a17-source/garment-oxblood-moss-keyed.png",
+      "sha256": "96328c81bf16b49a6151951bafaea4aa9fb4e6a3ab19668b65e45aca0b27afac",
+      "purpose": "A17 palette compatibility"
+    }
+  ],
+  "prompt": "Create a modular INNKEEPER workstation board: a compact dark-walnut ale cask mounted horizontally on a stout low trestle behind a narrow serving shelf. The cask has three bold brass hoops and one large readable brass tap. Exactly two clean pewter tankards and one folded cream service cloth sit on the attached shelf. It must read beside a 35x46 actor as one coherent grounded unit. Four large, separated views: front/down three-quarter, rear/up three-quarter, left side, right side; consistent identity, scale, and ground alignment. Compact painterly pixel-art source material with crisp bold clusters, warm upper-left light, classic strategy-game readability. Perfectly flat solid #ff00ff chroma-key background. No person, garment, hands, loose carried tankard, ledger, food, foam, liquid, room, building, floor, cast shadow, text, labels, border, UI, watermark, duplicate fragments, or extra objects.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"],
+    "key_color_detected": "#f103e4"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a17-source/ale-cask-stand-keyed.png",
+  "keyed_sha256": "4b265cb79d3fc21a941c2c0ccd7b222113cf1cf58fd88985ca00d23effa62ce0",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a17-source/ale-cask-stand.png",
+  "alpha_sha256": "f4dab5f95e1066a2af0dd1bcb9c6b4293136b607e705643729305b2ac4476ae1"
+}

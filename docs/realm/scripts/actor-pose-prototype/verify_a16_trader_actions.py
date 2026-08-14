@@ -358,11 +358,14 @@ def main() -> int:
                 # files. The three surviving palette peers had the same
                 # byte-identical alpha geometry as the rejected trader rows.
                 for peer in ("innkeeper", "scholar", "forager"):
+                    legacy_path = (
+                        ROOT / "assets/sprites/actor-rows" / peer
+                        / f"{action}-{direction}.png"
+                    )
+                    if not legacy_path.is_file():
+                        continue
                     legacy = rgba(
-                        ROOT
-                        / "assets/sprites/actor-rows"
-                        / peer
-                        / f"{action}-{direction}.png",
+                        legacy_path,
                         ROW_SIZE,
                     )
                     if candidate_alpha == legacy.getchannel("A").tobytes():

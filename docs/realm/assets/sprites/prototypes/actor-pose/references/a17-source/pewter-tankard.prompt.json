@@ -1,0 +1,26 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "pewter-tankard",
+  "generated_at": "2026-08-12",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f0-9123-7373-88f8-c24bae292751/exec-e9dc86be-09d8-4e80-b017-18aae4d8e3e1.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a16-source/merchant-steelyard-keyed.png",
+      "sha256": "09941490f1b9428a3bb52a000af01ad2b62cc2a8a81109cda11210c992fc3fc4",
+      "purpose": "directional equipment-board layout only; rejected as innkeeper equipment"
+    }
+  ],
+  "prompt": "Create a modular INNKEEPER equipment board: one oversized dark-pewter tankard with a thick readable handle, broad rim, two brass bands, and a folded cream polishing cloth wrapped partly around the body. It must remain unmistakable beside a 35x46 actor. Four large, generously separated directional views: front/down, rear/up, left side, right side; one consistent tool identity, handle side, scale, and cloth placement. Compact painterly pixel-art source material with crisp bold clusters, warm upper-left light, dark edge contrast, classic strategy-game readability. Perfectly flat solid #ff00ff chroma-key background. No person, hands, garment, tray, barrel, counter, cargo, liquid, foam, scenery, text, labels, border, floor, shadow, UI, watermark, duplicate fragments, or extra objects.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"],
+    "key_color_detected": "#f307eb"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a17-source/pewter-tankard-keyed.png",
+  "keyed_sha256": "d7d0c9354e1254b4d0896fb96fd2712baefda96a58699611225e014ce72eadc7",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a17-source/pewter-tankard.png",
+  "alpha_sha256": "eec9683554b19d59fd55200f580a7688926695142f7e7e9a00d1b51684e332f8"
+}

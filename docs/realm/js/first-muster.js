@@ -2,10 +2,10 @@
 // military frontier. The compact step cursor lives in storyFlags so existing
 // saves can address it without adding another root-state surface.
 
-import { G, BUILDINGS, rngInt } from './state.js?realm=193';
-import { isBuildingComplete } from './building-operation.js?realm=193';
-import { staffingCount } from './citizen-ownership.js?realm=193';
-import { emit } from './bus.js?realm=193';
+import { G, BUILDINGS, getDifficulty, rngInt } from './state.js?realm=195';
+import { isBuildingComplete, isBuildingOperational } from './building-operation.js?realm=195';
+import { staffingCount } from './citizen-ownership.js?realm=195';
+import { emit } from './bus.js?realm=195';
 
 export const FIRST_MUSTER_CHAPTER_ID = 'first_muster';
 export const FIRST_MUSTER_STATE_PATH = 'storyFlags.firstMusterStep';
@@ -18,8 +18,8 @@ const RAID_DIRECTIONS = Object.freeze(['north', 'east', 'south', 'west']);
 export const FIRST_MUSTER_STEPS = Object.freeze([
   Object.freeze({
     id: 'food_source',
-    text: 'Complete a food source',
-    detail: 'Finish a Farm, Fisherman\'s Hut, Chicken Coop, Cow Pen, or Bakery.',
+    text: 'Operate a food source',
+    detail: 'Finish and staff a Farm, Fisherman\'s Hut, Chicken Coop, Cow Pen, or Bakery.',
     focus: 'build-food',
   }),
   Object.freeze({
@@ -81,7 +81,9 @@ function staffedBarracksProgress(state) {
 }
 
 const STEP_PROGRESS = Object.freeze([
-  state => [Math.min(1, completedBuildingCount(state, building => FOOD_SOURCE_TYPES.has(building.type))), 1],
+  state => [Math.min(1, (state.buildings || []).filter(building => (
+    FOOD_SOURCE_TYPES.has(building.type) && isBuildingOperational(building)
+  )).length), 1],
   state => [Math.min(1, completedBuildingCount(state, building => building.type === 'house')), 1],
   staffedBarracksProgress,
   state => [Math.min(3, state.soldiers?.length || 0), 3],
@@ -112,9 +114,15 @@ export function getFirstMusterReport(state = G) {
   const steps = FIRST_MUSTER_STEPS.map((definition, index) => {
     const progress = progressFor(index, state);
     const knownApproach = RAID_DIRECTIONS[state._raidSide];
-    const detail = definition.id === 'plant_rally' && knownApproach
+    let detail = definition.id === 'plant_rally' && knownApproach
       ? `Raiders will enter from the ${knownApproach}. Plant the flag where your defenders should gather.`
       : definition.detail;
+    if (definition.id === 'food_source') {
+      const dailyRations = Math.max(1, Math.ceil((state.population || 0) * getDifficulty().foodMult));
+      const stored = Math.max(0, Math.floor(state.resources?.food || 0));
+      const days = Math.floor(stored / dailyRations);
+      detail = `${definition.detail} Founder Stockpile: ${stored} rations · about ${days} day${days === 1 ? '' : 's'} at the current population.`;
+    }
     return Object.freeze({
       ...definition,
       detail,
@@ -151,6 +159,16 @@ export function updateFirstMusterChapter(state = G) {
       }
       if (before === 4 && validRaidSide(state._raidSide)) {
         state.storyFlags.firstRaidApproach = state._raidSide;
+      }
+      // Planting the rally flag begins the war clock. A fast player should
+      // not finish every authored preparation on Day 2 and then stare at an
+      // inherited Day 8 calendar. Three dawns preserve the complete two-day
+      // warning cadence while turning the wait into visible anticipation.
+      if (before === 5 && (state.stats?.raidsFaced || 0) === 0) {
+        const readyDay = Number.isSafeInteger(state.day) && state.day > 0 ? state.day : 1;
+        state.storyFlags.firstRaidMobilizedDay = readyDay;
+        state.nextRaidDay = readyDay + 3;
+        state._raidWarningGiven = false;
       }
       state.storyFlags.firstMusterStep = before + 1;
       if (state === G) {

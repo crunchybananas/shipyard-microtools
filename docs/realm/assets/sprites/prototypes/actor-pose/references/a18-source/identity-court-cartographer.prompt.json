@@ -1,0 +1,20 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-court-cartographer",
+  "generated_at": "2026-08-13",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fe2f0-9123-7373-88f8-c24bae292751/exec-90863219-85c8-44a6-bb87-63da20f62861.png"
+  },
+  "references": [{
+    "path": "assets/sprites/prototypes/actor-pose/references/a17-source/identity-alehouse-matron-keyed.png",
+    "sha256": "03c2a544cbeda2914988e8d7fa80927cc9136c8ae6422042f5a577b907670950",
+    "purpose": "component layout, source scale, and painterly treatment only; rejected as scholar identity"
+  }],
+  "prompt": "Create one brand-new Realm strategy-game SCHOLAR identity component board, using the referenced innkeeper board only for the component-board layout, scale, crisp painterly raster treatment, and flat chroma-key setup—not for identity, body shape, face, hair, or costume. Subject: a distinct elderly Black male scholar and court cartographer, tall and slender with a gently stooped thoughtful posture, long narrow face, warm dark-brown skin, high cheekbones, close white side hair around a bald crown, short forked white beard, and alert kind eyes. No hat, spectacles, robe, stole, armor, tools, book, quill, lectern, cargo, or scenery. Base clothing only: plain close-fitting neutral linen shirt, dark neutral trousers, and ankle boots. Compact painted pixel-art source material with crisp clustered forms, warm upper-left lighting, classic 1990s strategy-game readability. One large component board with separately spaced directional heads, torso, arms, hands, long legs, and boots for front/down, rear/up, left profile, and right profile; consistent slender elderly identity; every component fully visible and uncropped. Perfectly flat solid #ff00ff chroma-key background; no gradient, floor, shadow, labels, borders, text, UI, other characters, duplicated fragments, or watermark.",
+  "postprocess": {"tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py", "arguments": ["--auto-key", "border", "--soft-matte", "--transparent-threshold", "12", "--opaque-threshold", "220", "--despill"], "key_color_detected": "#f203e8"},
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a18-source/identity-court-cartographer-keyed.png",
+  "keyed_sha256": "b5e3a4f1fff94c8e6f1914ef509e2dfdff1afe4b9547e8b3a4430cc5aae16ca7",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a18-source/identity-court-cartographer.png",
+  "alpha_sha256": "5b1d3e8b4dbc4ef63c52792fbc36b08ae8f6546b85e73721a87ce60a64c21a2a"
+}

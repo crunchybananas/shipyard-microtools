@@ -1,0 +1,218 @@
+{
+  "authority": "cartographer-measured-step-v1",
+  "directions": {
+    "down": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "5f5310850f8e965d202ad823c6f7167ffbd226aac8d1a507c3dd192a85bd6a6a"
+    },
+    "left": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "d79b5849d037033c4880e129e7580d7d07161c620d7a9d0cbef1fb741e97a2b8"
+    },
+    "right": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "e670a31c81b4f7ff195ffdc7128039ca34b9aa4d5852d9c554893151c8ce8a54"
+    },
+    "up": {
+      "changed_frame_count": 8,
+      "changed_frames_from_shared_a5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "contacts": [
+        [
+          "near",
+          "far"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near"
+        ],
+        [
+          "near",
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ],
+        [
+          "far"
+        ]
+      ],
+      "phases": [
+        "near-contact",
+        "near-down",
+        "near-pass",
+        "near-up",
+        "far-contact",
+        "far-down",
+        "far-pass",
+        "far-up"
+      ],
+      "trajectory_sha256": "6e6968a64865b64689173b444cc2f0f062f45d222b5b5c218477706f28ea6a64"
+    }
+  },
+  "distinct_direction_trajectories": 4,
+  "failures": [],
+  "mechanical_passed": true,
+  "schema": "realm.actor-pose.a18-scholar-gait-authority.v1",
+  "shared_a5_walk_pose": false
+}

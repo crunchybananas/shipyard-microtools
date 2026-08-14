@@ -1,37 +1,37 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=193';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=193';
-import { coreTick } from '../js/sim.js?realm=193';
-import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=193';
-import { missions } from '../js/missions.js?realm=193';
-import { initChronicle } from '../js/log.js?realm=193';
+import { G, getSeed, setSeed } from '../js/state.js?realm=195';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=195';
+import { coreTick } from '../js/sim.js?realm=195';
+import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=195';
+import { missions } from '../js/missions.js?realm=195';
+import { initChronicle } from '../js/log.js?realm=195';
 import {
   commitGameLoad,
   commitGameLoadForTest,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=193';
-import { hasSave, loadGame, saveGame } from '../js/save.js?realm=193';
-import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=193';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=193';
+} from '../js/save-state.js?realm=195';
+import { hasSave, loadGame, saveGame } from '../js/save.js?realm=195';
+import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=195';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=195';
 import {
   claimCitizenAssignment,
   renameCitizen,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=193';
+} from '../js/citizen-ownership.js?realm=195';
 import {
   citizenRenderCacheSize,
   citizenRenderRecord,
   resetCitizenRenderCache,
-} from '../js/citizen-render-cache.js?realm=193';
+} from '../js/citizen-render-cache.js?realm=195';
 import {
   getCitizenTransitionLedger,
   initCitizenInspector,
   resetCitizenTransitionLedger,
-} from '../js/citizen-inspector.js?realm=193';
+} from '../js/citizen-inspector.js?realm=195';
 
 function clone(value) {
   return structuredClone(value);
@@ -145,6 +145,8 @@ const building = {
 };
 G.buildings.push(building);
 G.buildingGrid[building.y][building.x] = building;
+G.armyGuardPoint = { x: building.x, y: building.y };
+G.armyStance = 'guard';
 establishFounderStockpile();
 assert.equal(claimCitizenAssignment(citizen, building, { reason: 'job-market' }), true);
 assert.deepEqual(workersForBuilding(building), [citizen]);
@@ -197,7 +199,7 @@ for (const [key, encoded] of nodeFor(golden, gameRef).entries) {
   assert.equal(result.ok, false, `${key}: wrong root kind bypassed its validator`);
   rootWrongKindRejections++;
 }
-assert.equal(rootWrongKindRejections, 72, 'authoritative root validator coverage changed without updating the gate');
+assert.equal(rootWrongKindRejections, 73, 'authoritative root validator coverage changed without updating the gate');
 
 const fixtures = [];
 function fixture(name, mutate) {
@@ -508,6 +510,8 @@ assert.equal(getSeed(), golden.state.roots.rngSeed);
 assert.equal(missions[0].done, true);
 assert.equal(missions[0]._celebratedTick, 42);
 assert.equal(G.buildingGrid[building.y][building.x], G.buildings[0]);
+assert.deepEqual(G.armyGuardPoint, { x: building.x, y: building.y });
+assert.equal(G.armyStance, 'guard');
 assert.equal(Object.hasOwn(G.buildings[0], 'workers'), false);
 assert.equal(G.citizens[0].assignment.building, G.buildings[0]);
 assert.deepEqual(workersForBuilding(G.buildings[0]), [G.citizens[0]]);
@@ -580,6 +584,8 @@ assert.equal(G.carts.length, 0);
 assert.equal(G.selectedBuilding, null);
 assert.equal(G._refreshPanelFor, null);
 assert.equal(G._patrolPosts, null);
+assert.equal(G.armyGuardPoint, null);
+assert.equal(G.armyStance, 'defend');
 assert.equal(G._undoStack.length, 1);
 assert.equal(G._undoStack[0].b, retainedBuilding, 'destruction should remove only its own stale undo entry');
 assert.equal(undoLastBuildingPlacement(), true, 'UNDO after demolition should reach the newest still-live build');
@@ -775,4 +781,4 @@ assert.deepEqual(
   );
 }
 
-console.log(`[engine-v2-save] OK — ${rootWrongKindRejections}/72 root-kind rejections, ${fixtures.length} strict preparation rejections, ${publicLoadFixtures.length} atomic public-load rejections, detached commit, clean storage epoch, and bounded 41-death round-trip`);
+console.log(`[engine-v2-save] OK — ${rootWrongKindRejections}/73 root-kind rejections, ${fixtures.length} strict preparation rejections, ${publicLoadFixtures.length} atomic public-load rejections, detached commit, clean storage epoch, and bounded 41-death round-trip`);

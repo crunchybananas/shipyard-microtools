@@ -2,14 +2,14 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=193';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=193';
-import { canAfford } from './economy.js?realm=193';
-import { dispatch } from './commands.js?realm=193';
-import { notify } from './notifications.js?realm=193';
-import { initAudio } from './audio.js?realm=193';
-import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=193';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=193';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=195';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=195';
+import { canAfford } from './economy.js?realm=195';
+import { dispatch } from './commands.js?realm=195';
+import { notify } from './notifications.js?realm=195';
+import { initAudio } from './audio.js?realm=195';
+import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=195';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=195';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -345,16 +345,18 @@ export function setupInput(canvas) {
   };
   C.addEventListener('wheel', onWheel, { passive: false });
 
-  // 'g' cycles army stance (defend -> rally -> patrol); rally is skipped
-  // when no flag is planted.
+  // 'g' cycles army orders; target-dependent orders are skipped until their
+  // target exists, so the shortcut never issues a command that cannot work.
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'g' && e.key !== 'G') return;
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
-    const order = ['defend', 'rally', 'patrol'];
+    const order = ['defend', 'rally', 'patrol', 'guard', 'explore'];
     let idx = order.indexOf(G.armyStance);
     for (let hop = 0; hop < order.length; hop++) {
       idx = (idx + 1) % order.length;
       if (order[idx] === 'rally' && !G.rallyPoint) continue;
+      if (order[idx] === 'guard' && !G.armyGuardPoint) continue;
+      if (order[idx] === 'explore' && !G.avatar) continue;
       break;
     }
     dispatch({ type: 'SET_STANCE', stance: order[idx] });

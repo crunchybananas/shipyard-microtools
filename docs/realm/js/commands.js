@@ -15,38 +15,27 @@
 //   NOT commands.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, rngRange } from './state.js?realm=193';
-import { placeBuilding, upgradeBuilding } from './economy.js?realm=193';
-import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=193';
-import { startResearch } from './tech.js?realm=193';
-import { executeTrade } from './trade.js?realm=193';
-import { avatarMove, avatarGoto } from './avatar.js?realm=193';
-import { queueRecruit } from './military.js?realm=193';
-import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=193';
-import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=193';
+import { G, BUILDINGS } from './state.js?realm=195';
+import { placeBuilding, upgradeBuilding } from './economy.js?realm=195';
+import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=195';
+import { startResearch } from './tech.js?realm=195';
+import { executeTrade } from './trade.js?realm=195';
+import { avatarMove, avatarGoto } from './avatar.js?realm=195';
+import { queueRecruit } from './military.js?realm=195';
+import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=195';
+import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=195';
+import {
+  applyArmyStance,
+  applyGuardOrder,
+  applyRallyOrder,
+} from './army-orders.js?realm=195';
 import {
   commandAssignCitizen,
   commandReleaseCitizen,
-} from './citizen-ownership.js?realm=193';
+} from './citizen-ownership.js?realm=195';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;
-}
-
-// Snap every soldier's wander target to its stance anchor immediately so a
-// stance change FEELS instant instead of waiting out each wander timer.
-// (Moved from input.js — it mutates sim state, so it lives command-side.)
-export function setArmyTargets() {
-  for (const s of G.soldiers) {
-    if (G.armyStance === 'rally' && G.rallyPoint) {
-      s.tx = G.rallyPoint.x + rngRange(-2, 2);
-      s.ty = G.rallyPoint.y + rngRange(-2, 2);
-    } else if (G.armyStance === 'defend' && s.homeBuilding) {
-      s.tx = s.homeBuilding.x + rngRange(-3, 3);
-      s.ty = s.homeBuilding.y + rngRange(-3, 3);
-    }
-    s.stateTimer = 1; // re-anchor (incl. patrol posts) on next tick
-  }
 }
 
 const HANDLERS = {
@@ -118,23 +107,15 @@ const HANDLERS = {
   },
 
   SET_RALLY({ x, y }) {
-    if (x == null || y == null) {
-      G.rallyPoint = null;
-      G.armyStance = 'defend';
-    } else {
-      G.rallyPoint = { x, y };
-      G.armyStance = 'rally';
-    }
-    setArmyTargets();
-    return { ok: true };
+    return applyRallyOrder(x, y);
+  },
+
+  SET_GUARD({ x, y }) {
+    return applyGuardOrder(x, y);
   },
 
   SET_STANCE({ stance }) {
-    if (!['defend', 'rally', 'patrol'].includes(stance)) return { ok: false, reason: 'bad-stance' };
-    if (stance === 'rally' && !G.rallyPoint) return { ok: false, reason: 'no-rally-point' };
-    G.armyStance = stance;
-    setArmyTargets();
-    return { ok: true };
+    return applyArmyStance(stance);
   },
 
   GARRISON({ x, y }) {
@@ -248,6 +229,7 @@ const COMMAND_SCHEMAS = Object.freeze({
     ['x', FIELD.nullableSafeInteger],
     ['y', FIELD.nullableSafeInteger],
   ),
+  SET_GUARD: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
   SET_STANCE: schema(['stance', FIELD.string]),
   GARRISON: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
   AVATAR_MOVE: schema(['dx', FIELD.finiteNumber], ['dy', FIELD.finiteNumber]),

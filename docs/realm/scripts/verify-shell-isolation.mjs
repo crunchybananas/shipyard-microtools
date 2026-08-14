@@ -52,10 +52,10 @@ async function run(mode, nativeSeed) {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForFunction(() => typeof window.startNewGame === 'function' && window.G?.debug?.step);
     const result = await page.evaluate(async ({ mode, ticks }) => {
-      const economy = await import('./js/economy.js?realm=193');
-      const sim = await import('./js/sim.js?realm=193');
-      const stateModule = await import('./js/state.js?realm=193');
-      const missionModule = await import('./js/missions.js?realm=193');
+      const economy = await import('./js/economy.js?realm=195');
+      const sim = await import('./js/sim.js?realm=195');
+      const stateModule = await import('./js/state.js?realm=195');
+      const missionModule = await import('./js/missions.js?realm=195');
       const name = document.getElementById('kingdom-name-input');
       if (name) name.value = 'Shell Isolation Realm';
       window.startNewGame();

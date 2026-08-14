@@ -15,7 +15,7 @@ import { ensureServer } from './_serve.mjs';
 const realmRoot = fileURLToPath(new URL('..', import.meta.url));
 const proofDir = join(realmRoot, 'tmp', 'opening-build-tutorial');
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 193, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 195, 'Update this gate together with current browser module URLs');
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 
@@ -63,6 +63,7 @@ async function openingState(page) {
       farmOutline: farmStyle?.outlineColor || '',
       cancelPresent: !!document.querySelector('.build-cancel'),
       tutorialText: tip?.textContent?.replace(/\s+/g, ' ').trim() || '',
+      speed: window.G.speed,
       titlePointerEvents: title ? getComputedStyle(title).pointerEvents : '',
       titleInert: title?.inert || false,
       startHeight: tip?.querySelector('.tut-next')?.getBoundingClientRect().height || 0,
@@ -85,11 +86,6 @@ async function startFresh(page, name, touch = false) {
     await newGame.click();
   }
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
-  await page.evaluate(async () => {
-    window.setSpeed(0);
-    const ui = await import('./js/ui.js?realm=193');
-    ui.updateTutorialTip();
-  });
   const welcome = await openingState(page);
   assert.equal(welcome.titlePointerEvents, 'none', 'fading title still intercepts the first game interaction');
   assert.equal(welcome.titleInert, true, 'fading title remains keyboard-interactive');
@@ -97,7 +93,8 @@ async function startFresh(page, name, touch = false) {
   assert.equal(welcome.founderStockpiles, 1, 'fresh realm lacked its physical founder food store');
   assert.equal(welcome.farmActive, false);
   assert.equal(welcome.farmGuided, false);
-  assert.match(welcome.tutorialText, /Start building/);
+  assert.equal(welcome.speed, 1, 'New Game left the realm frozen behind the tutorial welcome');
+  assert.match(welcome.tutorialText, /realm is live/i);
   return welcome;
 }
 
@@ -105,7 +102,7 @@ async function acknowledgeWelcome(page, touch = false) {
   const start = page.locator('.tut-next');
   if (touch) {
     const box = await start.boundingBox();
-    assert.ok(box, 'Start building touch target is not visible');
+    assert.ok(box, 'Tutorial continue touch target is not visible');
     await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
   } else {
     await start.click();
@@ -194,7 +191,8 @@ try {
   assert.equal(restarted.selectedBuild, null);
   assert.equal(restarted.farmActive, false);
   assert.equal(restarted.farmGuided, false);
-  assert.match(restarted.tutorialText, /Start building/);
+  assert.equal(restarted.speed, 1, 'in-game New did not restart the live simulation');
+  assert.match(restarted.tutorialText, /realm is live/i);
   assert.deepEqual(desktopErrors, [], desktopErrors.join(' | '));
 
   const phoneContext = await browser.newContext({
@@ -211,7 +209,7 @@ try {
   });
   try {
     const phoneWelcome = await startFresh(phone, 'Opening Touch Gate', true);
-    assert.ok(phoneWelcome.startHeight >= 44, `phone Start building target is ${phoneWelcome.startHeight}px high`);
+    assert.ok(phoneWelcome.startHeight >= 44, `phone tutorial continue target is ${phoneWelcome.startHeight}px high`);
     const phoneGuided = await acknowledgeWelcome(phone, true);
     assert.equal(phoneGuided.selectedBuild, null);
     assert.equal(phoneGuided.farmGuided, true);

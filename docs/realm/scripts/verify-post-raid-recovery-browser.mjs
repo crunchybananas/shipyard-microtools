@@ -19,8 +19,8 @@ try {
   await page.locator('#title-screen .title-btn.primary').click();
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(async () => {
-    const firstMuster = await import('./js/first-muster.js?realm=193');
-    const ui = await import('./js/ui.js?realm=193');
+    const firstMuster = await import('./js/first-muster.js?realm=195');
+    const ui = await import('./js/ui.js?realm=195');
     window.setSpeed(0);
     window.G.gameTick = 240;
     window.G.enemies = [];
@@ -67,10 +67,10 @@ try {
   await mobile.locator('#title-screen .title-btn.primary').click();
   await mobile.waitForFunction(() => !document.body.classList.contains('title-active'));
   const foodTargets = await mobile.evaluate(async () => {
-    const state = await import('./js/state.js?realm=193');
-    const firstMuster = await import('./js/first-muster.js?realm=193');
-    const ownership = await import('./js/citizen-ownership.js?realm=193');
-    const ui = await import('./js/ui.js?realm=193');
+    const state = await import('./js/state.js?realm=195');
+    const firstMuster = await import('./js/first-muster.js?realm=195');
+    const ownership = await import('./js/citizen-ownership.js?realm=195');
+    const ui = await import('./js/ui.js?realm=195');
     const g = window.G;
     window.setSpeed(0);
     g.gameTick = 240;

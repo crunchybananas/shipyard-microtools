@@ -2,36 +2,38 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=193';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=193';
-import { getWonderReport } from './wonder.js?realm=193';
-import { panCameraTo } from './render.js?realm=193';
-import { dispatch } from './commands.js?realm=193';
-import { missions } from './missions.js?realm=193';
-import { getActiveScenario } from './scenarios.js?realm=193';
-import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=193';
-import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=193';
-import { saveGame, loadGame } from './save.js?realm=193';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=193';
-import { notify } from './notifications.js?realm=193';
-import { TRADE_PARTNERS } from './trade.js?realm=193';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=195';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=195';
+import { getWonderReport } from './wonder.js?realm=195';
+import { panCameraTo } from './render.js?realm=195';
+import { dispatch } from './commands.js?realm=195';
+import { missions } from './missions.js?realm=195';
+import { getActiveScenario } from './scenarios.js?realm=195';
+import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=195';
+import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=195';
+import { saveGame, loadGame } from './save.js?realm=195';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=195';
+import { notify } from './notifications.js?realm=195';
+import { TRADE_PARTNERS } from './trade.js?realm=195';
 import {
   citizenStaffingCapacity,
   onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=193';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=193';
-import { residentsForHouse } from './residences.js?realm=193';
-import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=193';
+} from './citizen-ownership.js?realm=195';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=195';
+import { residentsForHouse } from './residences.js?realm=195';
+import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=195';
 import {
   authoredBuildingCount,
   foodCapacity,
   foodStores,
   isFoodStore,
   storedFood,
-} from './building-inventory.js?realm=193';
-import { recruitmentStatus } from './military.js?realm=193';
-import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=193';
+} from './building-inventory.js?realm=195';
+import { recruitmentStatus } from './military.js?realm=195';
+import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=195';
+import { buildingUseReport } from './building-use.js?realm=195';
+import { armyOrderMeta, liveGuardBuilding } from './army-orders.js?realm=195';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -208,9 +210,33 @@ if (typeof window !== 'undefined') {
       notify('🚩 Rally order ready — tap open ground to plant the flag.', 'info', { chronicle: false });
       return;
     }
+    if (stance === 'guard' && !G.armyGuardPoint) {
+      const building = G.selectedBuilding;
+      if (building?.buildProgress >= 1) {
+        window.guardSelectedBuilding();
+      } else {
+        notify('👁️ Select a completed building, then give the Guard order.', 'info', { chronicle: false });
+      }
+      return;
+    }
     G._placingRally = false;
-    dispatch({ type: 'SET_STANCE', stance });
-    notify(`Army stance: ${stance === 'defend' ? '🛡️ Defend' : stance === 'rally' ? '🚩 Rally' : '🧱 Patrol'}`, 'info');
+    const result = dispatch({ type: 'SET_STANCE', stance });
+    if (!result.ok) {
+      notify(result.reason === 'no-founder' ? 'The Founder must be present to lead an expedition.' : 'That army order is not available.', 'warn', { chronicle: false });
+      return;
+    }
+    const meta = armyOrderMeta(stance);
+    notify(`Army order: ${meta.icon} ${meta.label}`, 'info');
+    updateUI();
+  };
+  window.guardSelectedBuilding = () => {
+    const building = G.selectedBuilding;
+    if (!building || building.buildProgress < 1) return;
+    const result = dispatch({ type: 'SET_GUARD', x: building.x, y: building.y });
+    if (!result.ok) return;
+    G._placingRally = false;
+    notify(`👁️ Guard order: protect the ${BUILDINGS[building.type]?.name || building.type}.`, 'info');
+    showInfoPanel(building);
     updateUI();
   };
   window.recruitSelectedUnit = () => {
@@ -423,9 +449,20 @@ export function updateUI() {
   const stanceEl = document.getElementById('army-stance');
   if (stanceEl) {
     stanceEl.style.display = armyVisible ? 'flex' : 'none';
+    const meta = armyOrderMeta();
+    const orderLabel = document.getElementById('army-order-label');
+    if (orderLabel) orderLabel.textContent = meta.label;
+    const guard = liveGuardBuilding();
+    const target = G.armyStance === 'guard' && guard
+      ? ` Target: ${BUILDINGS[guard.type]?.name || guard.type}.`
+      : G.armyStance === 'rally' && G.rallyPoint
+        ? ` Flag: ${G.rallyPoint.x}, ${G.rallyPoint.y}.`
+        : '';
+    stanceEl.title = `${meta.icon} ${meta.label} — ${meta.detail}${target}`;
     for (const btn of stanceEl.querySelectorAll('.stance-btn')) {
       btn.classList.toggle('active', btn.dataset.stance === G.armyStance);
       btn.classList.toggle('dimmed', btn.dataset.stance === 'rally' && !G.rallyPoint);
+      btn.classList.toggle('dimmed', btn.dataset.stance === 'guard' && !G.armyGuardPoint);
     }
   }
   const threatEl = $('threat-display');
@@ -909,6 +946,11 @@ export function showInfoPanel(b) {
     html += `<div class="ip-desc">${def.desc}</div>`;
   }
   html += `<div class="ip-row"><span class="ip-label">Status</span><span class="ip-val">${escapeHtml(buildingOperationLabel(b))}</span></div>`;
+  const use = buildingUseReport(b);
+  html += `
+    <div class="ip-row ip-use-row"><span class="ip-label">People</span><span class="ip-val">${escapeHtml(use.people)}</span></div>
+    <div class="ip-row ip-use-row"><span class="ip-label">Activity</span><span class="ip-val">${escapeHtml(use.activity)}</span></div>
+    <div class="ip-row ip-use-row"><span class="ip-label">Why it matters</span><span class="ip-val">${escapeHtml(use.strategic)}</span></div>`;
   if (isFoodStore(b)) {
     const stockLabel = b.founderStockpile === true
       ? 'Founder Stockpile'
@@ -1054,6 +1096,15 @@ export function showInfoPanel(b) {
   // Defense
   if (def.defense) {
     html += `<div class="ip-row"><span class="ip-label">Defense</span><span class="ip-val ip-defense">🛡 +${def.defense}</span></div>`;
+  }
+
+  // Army intent is attached to the thing being protected, so players can
+  // issue a meaningful order from the same panel that explains the building.
+  if (G.soldiers.length > 0 && b.type !== 'road') {
+    const guarded = G.armyGuardPoint?.x === b.x && G.armyGuardPoint?.y === b.y;
+    html += guarded
+      ? '<button class="upgrade-btn disabled" disabled>👁️ Guard order active here</button>'
+      : '<button class="upgrade-btn" onclick="window.guardSelectedBuilding&&window.guardSelectedBuilding()">👁️ Guard this building</button>';
   }
 
   // Military training is an explicit order. The building supplies capacity
@@ -1392,8 +1443,8 @@ const TUTORIAL_STEPS = [
   {
     id: 'welcome',
     text: '👋 Welcome to Realm! You have 3 settlers on an island. Let\'s build a settlement.',
-    action: 'Choose Start building when you are ready.',
-    continueLabel: 'Start building',
+    action: 'The realm is live. Continue for your first building objective.',
+    continueLabel: 'Show me how',
     check: () => tutorialWelcomeAcknowledged,
   },
   {
@@ -1492,7 +1543,7 @@ export function updateTutorialTip() {
   const tipEl = document.getElementById('tutorial-tip');
   if (!tipEl) return;
   // Rise of the Sword has its own sequential, action-backed First Muster
-  // chapter. Keep the truthful paused welcome, then hand guidance to that
+  // chapter. Keep the brief welcome, then hand guidance to that
   // campaign instead of sending military players through the generic lumber
   // and research tutorial in parallel.
   if (G.scenario === 'military_rise' && tutorialWelcomeAcknowledged) {
@@ -1534,7 +1585,6 @@ export function updateTutorialTip() {
 
   tipEl.querySelector('.tut-next')?.addEventListener('click', () => {
     tutorialWelcomeAcknowledged = true;
-    if (G.speed === 0) setSpeed(1);
     updateTutorialTip();
   });
 
@@ -1565,7 +1615,6 @@ export function resetTutorial() {
 }
 
 export function dismissTutorial() {
-  if (!tutorialWelcomeAcknowledged && G.speed === 0) setSpeed(1);
   tutorialDismissed = true;
   document.querySelectorAll('.tut-highlight').forEach(e => {
     e.classList.remove('tut-highlight');

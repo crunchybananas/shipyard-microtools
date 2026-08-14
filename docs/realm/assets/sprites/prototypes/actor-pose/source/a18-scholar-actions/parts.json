@@ -1,0 +1,212 @@
+{
+  "schema": "realm.actor-pose.a18-scholar-actions.v1",
+  "stage": "scholar-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "court-cartographer",
+    "path": "assets/sprites/prototypes/actor-pose/references/a18-source/identity-court-cartographer.png",
+    "sha256": "5b1d3e8b4dbc4ef63c52792fbc36b08ae8f6546b85e73721a87ce60a64c21a2a",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a18-source/identity-court-cartographer-keyed.png",
+      "sha256": "b5e3a4f1fff94c8e6f1914ef509e2dfdff1afe4b9547e8b3a4430cc5aae16ca7"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a18-source/identity-court-cartographer.prompt.json",
+    "parts": {
+      "down": {
+        "head": [300, 8, 500, 235],
+        "torso": [320, 245, 645, 555],
+        "arm_screen_left": [110, 235, 285, 625],
+        "arm_screen_right": [1208, 237, 1388, 628],
+        "leg": [320, 555, 625, 1010]
+      },
+      "up": {
+        "head": [555, 8, 760, 235],
+        "torso": [665, 245, 955, 555],
+        "arm_screen_left": [1208, 237, 1388, 628],
+        "arm_screen_right": [1208, 237, 1388, 628],
+        "leg": [655, 555, 940, 1010]
+      },
+      "left": {
+        "head": [775, 8, 995, 240],
+        "torso": [965, 242, 1170, 550],
+        "arm": [1208, 237, 1388, 628],
+        "leg": [970, 555, 1160, 1010]
+      },
+      "right": {
+        "head": [775, 8, 995, 240],
+        "torso": [965, 242, 1170, 550],
+        "arm": [1208, 237, 1388, 628],
+        "leg": [970, 555, 1160, 1010]
+      }
+    }
+  },
+  "garment": {
+    "key": "indigo-saffron",
+    "path": "assets/sprites/prototypes/actor-pose/references/a18-source/garment-indigo-saffron.png",
+    "sha256": "ce05180ab9b53b6489e9b6f382189d499c954561f26fefa832a9d3b6787ee9a0",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a18-source/garment-indigo-saffron-keyed.png",
+      "sha256": "7874e7fe25c0cf917fae9750be78995b04330ae95183b4a2f61e384b2f9f70ad"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a18-source/garment-indigo-saffron.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [290, 10, 480, 135],
+        "tunic": [195, 145, 565, 710],
+        "sleeve_screen_left": [20, 190, 180, 500],
+        "sleeve_screen_right": [1345, 190, 1525, 500],
+        "belt": [210, 705, 555, 835],
+        "boot": [205, 825, 550, 1023]
+      },
+      "up": {
+        "headgear": [545, 10, 745, 135],
+        "tunic": [595, 145, 950, 710],
+        "sleeve_screen_left": [20, 190, 180, 500],
+        "sleeve_screen_right": [1345, 190, 1525, 500],
+        "belt": [600, 705, 915, 835],
+        "boot": [600, 825, 915, 1023]
+      },
+      "left": {
+        "headgear": [825, 10, 1020, 135],
+        "tunic": [950, 145, 1145, 710],
+        "sleeve": [1345, 190, 1525, 500],
+        "belt": [930, 705, 1120, 835],
+        "boot": [925, 825, 1125, 1023]
+      },
+      "right": {
+        "headgear": [1080, 10, 1260, 135],
+        "tunic": [1150, 145, 1365, 710],
+        "sleeve": [1345, 190, 1525, 500],
+        "belt": [1150, 705, 1350, 835],
+        "boot": [1145, 825, 1360, 1023]
+      }
+    },
+    "crop_margin_exception": {
+      "parts": ["up/tunic", "left/tunic", "down/belt", "up/belt", "left/belt", "right/belt", "down/boot", "up/boot", "left/boot", "right/boot"],
+      "minimum_transparent_pixels": 0,
+      "reason": "semantic waist and ankle cut zones are component boundaries; hollow cap, neck, cuff, robe split, and leg cavities remain enforced"
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "up": {"size": [19, 14], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "left": {"size": [14, 15], "offset": [0, 1], "transform": "none", "occlusion": "far-hand < cargo < near-hand"},
+      "right": {"size": [14, 15], "offset": [0, 1], "transform": "flip-x", "occlusion": "far-hand < cargo < near-hand"}
+    }
+  },
+  "tool": {
+    "key": "quill-ink",
+    "path": "assets/sprites/prototypes/actor-pose/references/a18-source/quill-ink.png",
+    "sha256": "2318759520c4c120d19cbf199503761606b5decbc3a9edf55a0abafdb352ae16",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a18-source/quill-ink-keyed.png",
+      "sha256": "37a62cdff5427c12e0cced1c0683a8b67081c42b938d287d91e26fc21e675bcb"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a18-source/quill-ink.prompt.json",
+    "parts": {
+      "down": [220, 45, 630, 535],
+      "up": [900, 45, 1255, 525],
+      "left": [120, 680, 700, 970],
+      "right": [825, 680, 1390, 970]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "render_size": [15, 16],
+      "occlusion": "body < quill < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "cartography-lectern",
+    "path": "assets/sprites/prototypes/actor-pose/references/a18-source/cartography-lectern.png",
+    "sha256": "4534ca1111b363180abf95bff1779c99aa18ca09bff580a3f43a0d28c6fa1205",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a18-source/cartography-lectern-keyed.png",
+      "sha256": "bad8130e50f653498672ad3d796e3f0e797f40f277af6613370f4fd212411273"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a18-source/cartography-lectern.prompt.json",
+    "parts": {
+      "down": [205, 35, 650, 510],
+      "up": [820, 35, 1250, 510],
+      "left": [280, 510, 585, 975],
+      "right": [890, 510, 1225, 975]
+    },
+    "render": {
+      "down": {"size": [30, 26], "center": [36, 66], "occlusion": "body < lectern < quill < near hand"},
+      "up": {"size": [30, 26], "center": [17, 66], "occlusion": "lectern < body < quill < near hand"},
+      "left": {"size": [25, 26], "center": [18, 66], "occlusion": "body < lectern < quill < near hand"},
+      "right": {"size": [25, 26], "center": [46, 66], "occlusion": "body < lectern < quill < near hand"}
+    },
+    "authority": {"ground_y": 79, "work_socket": "map_socket", "finished_frame_or_row_mirroring": false}
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "gait_authority": {
+      "key": "cartographer-measured-step-v1",
+      "shared_a5_walk_pose": false,
+      "contact_chronology": ["near-contact", "near-down", "near-pass", "near-up", "far-contact", "far-down", "far-pass", "far-up"],
+      "traits": ["measured heel-toe stride", "slight learned stoop", "clear boot lift", "restrained quill-hand counterweight"]
+    }
+  },
+  "render_profile": {
+    "key": "court-cartographer",
+    "build": "tall slender elderly cartographer with a narrow robe silhouette and grounded ankle boots",
+    "identity_leg_far_width": 5.0,
+    "identity_leg_near_width": 5.8,
+    "garment_leg_far_width": 6.0,
+    "garment_leg_near_width": 6.8,
+    "upper_arm_far_width": 4.4,
+    "upper_arm_near_width": 5.0,
+    "forearm_far_width": 4.0,
+    "forearm_near_width": 4.6,
+    "identity_torso_size": [20, 33],
+    "garment_tunic_size": [27, 39],
+    "garment_belt_size": [25, 6],
+    "identity_head_size": [20, 24],
+    "garment_headgear_size": [24, 12]
+  },
+  "actions": {
+    "idle": {"equipment": "off", "motion": "quiet scholarly breathing with a slight learned stoop", "contacts": "both boots planted"},
+    "walk": {"equipment": "off", "motion": "cartographer-measured-step-v1", "contacts": "grounded contact chronology with no flight frames"},
+    "work": {"equipment": ["quill-ink", "cartography-lectern"], "motion": "take quill, mark map, measure, compare, annotate, dip ink, review, recover", "contacts": "both boots planted"},
+    "carry": {"equipment": "cargo-crate", "motion": "shared A3 carry sockets on the distinct cartographer body", "contacts": "grounded contact chronology with no flight frames"}
+  },
+  "scope": {
+    "role": "scholar",
+    "identity": "court-cartographer",
+    "garment": "indigo-saffron",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "four independent hash-locked ImageGen authorities: distinct scholar identity, hollow indigo-saffron robe, quill and ink, and grounded map lectern; cargo is the shared A3 crate",
+    "rejected_identity_authority": "prior scholar rows are settler-derived palette transfers and remain cadence evidence only",
+    "animation_unit": "one 512x84 eight-frame row per action and direction; all 16 promote atomically",
+    "runtime": "flattened exact-size raster tiers; no live skeletal renderer",
+    "scale": "76px body height on ground row 79 with rows 80-83 clear"
+  }
+}

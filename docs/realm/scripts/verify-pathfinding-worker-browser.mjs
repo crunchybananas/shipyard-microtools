@@ -93,10 +93,10 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=193');
-    const kernel = await import('./js/pathfinding-kernel.js?realm=193');
-    const service = await import('./js/pathfinding-service.js?realm=193');
-    const client = await import('./js/pathfinding-client.js?realm=193');
+    const state = await import('./js/state.js?realm=195');
+    const kernel = await import('./js/pathfinding-kernel.js?realm=195');
+    const service = await import('./js/pathfinding-service.js?realm=195');
+    const client = await import('./js/pathfinding-client.js?realm=195');
     const g = window.G;
     if (state.G !== g) throw new Error('Worker verifier imported a split runtime state identity');
 
