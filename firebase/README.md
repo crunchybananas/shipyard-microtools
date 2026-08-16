@@ -54,15 +54,18 @@ Optional: `firebase deploy --only hosting` serves the whole static game from
 - **`rules.test.mjs`** — 18 tests, all passing against the Firestore emulator. Every
   one is an attack the trust model depends on failing.
 
+You do not need to run these — they already pass, and nothing here is needed to
+deploy or to play. Re-run them if you edit `firestore.rules`:
+
 ```bash
-cd shipyard-microtools/firebase
-npm i --no-save @firebase/rules-unit-testing firebase
-PATH="/opt/homebrew/opt/openjdk/bin:$PATH" \
-  firebase emulators:exec --only firestore --project abyme-rules-test "node --test rules.test.mjs"
+cd shipyard-microtools/firebase && npm i --no-save @firebase/rules-unit-testing firebase && npm test
 ```
 
-(The emulator needs a real JDK. macOS ships a stub that reports "Unable to locate a
-Java Runtime" — Homebrew's `openjdk` is keg-only, hence the explicit PATH.)
+*Nothing to install.* The Firestore emulator happens to be a Java program, and
+macOS's `/usr/bin/java` is a stub that reports "Unable to locate a Java Runtime" —
+but this machine already has Homebrew's `openjdk`, which is keg-only (deliberately
+kept off PATH so it doesn't clash with Apple's stub). The `npm test` script points
+at it, so this is a footnote rather than a step.
 
 ---
 

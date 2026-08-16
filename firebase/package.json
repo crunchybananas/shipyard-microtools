@@ -2,11 +2,12 @@
   "name": "abyme-stack-firebase",
   "private": true,
   "type": "module",
-  "description": "The Island / ABYME — the shared stack (STACK.md slice 8). Rules are the server.",
+  "description": "The Island / ABYME \u2014 the shared stack (STACK.md slice 8). Rules are the server.",
   "scripts": {
-    "test": "firebase emulators:exec --only firestore \"node --test rules.test.mjs\"",
+    "test": "PATH=\"/opt/homebrew/opt/openjdk/bin:$PATH\" firebase emulators:exec --only firestore --project abyme-rules-test \"node --test rules.test.mjs\"",
     "deploy:rules": "firebase deploy --only firestore:rules",
-    "deploy:hosting": "firebase deploy --only hosting"
+    "deploy:hosting": "firebase deploy --only hosting",
+    "//test": "The Firestore emulator is a Java program. macOS's /usr/bin/java is a stub, and Homebrew keeps openjdk keg-only (off PATH, to avoid clashing with Apple's). So we point at the existing install here rather than making anyone think about it. A missing dir on PATH is ignored, so this is harmless on machines that don't need it."
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.4",
