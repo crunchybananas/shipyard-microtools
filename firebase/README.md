@@ -10,38 +10,50 @@ below is optional.
 
 ---
 
-## What you have to do (I can't do these — they need your account)
+## Status: LIVE, except one console click
 
-1. **Create the project** at <https://console.firebase.google.com> — any name.
-2. **Enable Anonymous auth**: Authentication → Sign-in method → Anonymous → Enable.
-   Nothing else. We never ask for, store or transmit anything about who anyone is.
-3. **Create Firestore**: Firestore Database → Create → *production mode* (the rules
-   in this folder replace the default deny-all; don't pick test mode, it's open).
-4. **Register a web app** (Project settings → General → Your apps → Web) and copy the
-   `firebaseConfig` object.
-5. **Paste it** into `docs/the-island/js/stack-config.js`, replacing the `null`.
-   The file already exists as a placeholder; the EXPORT is the switch, not the file.
+The project exists and is configured. Done via CLI/API on 2026-08-18:
 
-   ```js
-   export const FIREBASE_CONFIG = {
-     apiKey: '…', authDomain: '…', projectId: '…',
-     appId: '…', storageBucket: '…', messagingSenderId: '…',
-   };
-   ```
+| | |
+|---|---|
+| Project | `abyme-stack` — [console](https://console.firebase.google.com/project/abyme-stack/overview) |
+| Web app | `1:592720465800:web:06be6c3d7d11c323c0343d` |
+| Config | wired into `docs/the-island/js/stack-config.js` |
+| Firestore | `(default)`, Native mode, `nam5`, free tier |
+| APIs | firestore, identitytoolkit, firebaserules — enabled |
+| **Rules** | **deployed and live** (ruleset `c3a7ad65…`, release `cloud.firestore`) |
 
-6. **Deploy the rules** — do this *before* the first player ever connects:
+Verified against the **live** project, not just the emulator: an unauthenticated
+read of the marks collection returns `403 PERMISSION_DENIED`, and an
+unauthenticated write of a forged mark returns `403 PERMISSION_DENIED`. The
+database is not open, and never was — no ruleset existed before mine, which
+Firestore treats as deny-all.
 
-   ```bash
-   cd shipyard-microtools/firebase && firebase deploy --only firestore:rules
-   ```
+### The one thing left (3 clicks, free)
 
-7. **Turn on App Check** (recommended, not required): App Check → Register →
-   reCAPTCHA v3, then enforce on Firestore. This is what stops someone scripting
-   writes outside the game. The rules already bound *what* can be written; App Check
-   bounds *who* is writing.
+**Enable Anonymous sign-in.** Firebase Auth is not provisioned on the project yet,
+and there is no free API path to provision it: the public
+`identityPlatform:initializeAuth` endpoint returns
+`BILLING_NOT_ENABLED : Identity Platform feature requires billing`, and the admin
+config endpoint returns `CONFIGURATION_NOT_FOUND` until Auth exists. The console
+does it for free through an internal endpoint I am not going to reverse-engineer.
 
-Optional: `firebase deploy --only hosting` serves the whole static game from
-`docs/` — no build step, so it's one command.
+1. <https://console.firebase.google.com/project/abyme-stack/authentication>
+2. **Get started**
+3. **Anonymous** → Enable → Save
+
+Until then the shared stack simply stays off: `signInAnonymously` fails, every call
+times out at 4s, and the game runs on the local stack. That path is gate-verified
+green, so nothing is broken in the meantime — the island is just the island.
+
+### Recommended before it is public
+
+**App Check** (App Check → Register → reCAPTCHA v3, then enforce on Firestore).
+The rules bound *what* can be written; App Check bounds *who* is writing — i.e. it
+is what stops someone scripting writes outside the game entirely.
+
+Optional: `firebase deploy --only hosting` serves the static game from `docs/`.
+(The Firebase CLI's own token has since gone stale — `firebase login --reauth`.)
 
 ---
 
