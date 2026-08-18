@@ -29,22 +29,36 @@ unauthenticated write of a forged mark returns `403 PERMISSION_DENIED`. The
 database is not open, and never was — no ruleset existed before mine, which
 Firestore treats as deny-all.
 
-### The one thing left (3 clicks, free)
+### Anonymous sign-in: ON
 
-**Enable Anonymous sign-in.** Firebase Auth is not provisioned on the project yet,
-and there is no free API path to provision it: the public
-`identityPlatform:initializeAuth` endpoint returns
-`BILLING_NOT_ENABLED : Identity Platform feature requires billing`, and the admin
-config endpoint returns `CONFIGURATION_NOT_FOUND` until Auth exists. The console
-does it for free through an internal endpoint I am not going to reverse-engineer.
+Verified end to end against the **live** project (not the emulator):
 
-1. <https://console.firebase.google.com/project/abyme-stack/authentication>
-2. **Get started**
-3. **Anonymous** → Enable → Save
+| | |
+|---|---|
+| anonymous sign-in | works — `accounts:signUp` returns a uid + token |
+| valid mark, `at` present | ALLOW |
+| valid mark, `at` omitted | ALLOW |
+| read the stack, signed in | ALLOW |
+| impersonate another hand | DENY |
+| unknown kind · rung 0 · rung 9999 | DENY |
+| out-of-bounds coordinates | DENY |
+| doc id that lies about the mark | DENY |
+| rewrite history · delete | DENY |
+| unauthenticated read · write | DENY |
 
-Until then the shared stack simply stays off: `signInAnonymously` fails, every call
-times out at 4s, and the game runs on the local stack. That path is gate-verified
-green, so nothing is broken in the meantime — the island is just the island.
+And the game itself connects: `isShared() === true`, sync clean, zero page errors.
+
+**A rule bug the live test caught that the emulator did not.** `at` is documented
+optional, but the rule called `okAt(d.at)` unguarded — and reading a field that is
+NOT PRESENT is an error in rules rather than null, so a mark omitting `at` was
+denied. The emulator tests all sent an explicit `null` (which is present), so they
+never exercised it. Fixed (`!('at' in d) || okAt(d.at)`), redeployed, and three
+regression tests added. This is the argument for testing against the real thing:
+21/21 green in the emulator while production rejected a valid write.
+
+Live probe writes were aimed at `stacks/probe-live/`, never `stacks/v1/`. The rules
+forbid deletes, so anything written to the real stack would be permanent evidence
+in the world players inherit — a test must not put it there.
 
 ### Recommended before it is public
 

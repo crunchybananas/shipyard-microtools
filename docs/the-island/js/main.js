@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack, disposeStack, syncStack, isShared } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack, disposeStack, syncStack, isShared, handId } from './world.js';
 import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs, NAMES } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
@@ -1834,7 +1834,7 @@ player.onFootstep = (kind, pos) => {
         // draft is in tide units — tideAt() is the tide this rung ACTUALLY sits at,
         // its authored LEVELS baseline plus everything inherited.
         stack: {
-          hand: HAND, draft: +draft().toFixed(3), tideAt: +tideAt().toFixed(3),
+          hand: handId(), shared: isShared(), draft: +draft().toFixed(3), tideAt: +tideAt().toFixed(3),
           hands: hands(), marks: ledger().marks.length, evidence: evidence().length,
         },
         flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'tideFigureSeen', 'bellRung', 'readGlass', 'phialTaken', 'phialDried', 'beamDeepSeen', 'keeperSong'].filter((k) => F[k]),

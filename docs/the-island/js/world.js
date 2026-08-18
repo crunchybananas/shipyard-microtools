@@ -367,6 +367,12 @@ import('./stack-config.js')
 
 export const isShared = () => _shared;
 
+// The hand id ACTUALLY in use. Once anonymous auth resolves this is the Firebase
+// uid (which the rules require marks to carry); before that, and offline forever,
+// it is the local id. The debug readout must report this rather than the constant
+// HAND, or it claims marks are being filed under a hand that is not writing them.
+export const handId = () => (_source.uid && _source.uid()) || HAND;
+
 // Pull the rungs above this one. A no-op on the local source, and never awaited by
 // the game: the draft and the evidence re-read the ledger every rung change, so
 // results simply appear when they arrive.

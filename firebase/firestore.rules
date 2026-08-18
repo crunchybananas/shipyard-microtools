@@ -36,6 +36,11 @@ service cloud.firestore {
 
       // The island's playable extent (BOUND_XZ 400 / BOUND_Y 120 in ledger.js).
       // `at` is optional — an act with no place is legal, it simply cannot be found.
+      // Note the caller guards with `'at' in d` BEFORE calling this: reading a field
+      // that is not present is an ERROR in rules, not null, so `okAt(d.at)` on a
+      // document with no `at` key fails the whole condition and denies a perfectly
+      // valid mark. Found against the live database, not the emulator — the emulator
+      // test sent an explicit null, which is present, so it never exercised this.
       function okAt(at) {
         return at == null || (
           at is list && at.size() == 3
@@ -52,7 +57,7 @@ service cloud.firestore {
           && d.r is int && d.r >= 1 && d.r <= 64
           && d.h is string && d.h == request.auth.uid          // no impersonation
           && (!('n' in d) || (d.n is int && d.n >= 0 && d.n <= 100000))
-          && okAt(d.at);
+          && (!('at' in d) || okAt(d.at));
       }
 
       // Anyone signed in (anonymously) may READ the shared stack. There is nothing

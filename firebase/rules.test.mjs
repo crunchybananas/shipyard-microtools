@@ -159,3 +159,28 @@ test('nothing outside the marks collection is reachable', async () => {
   await assertFails(getDoc(doc(db, 'secrets/whatever')));
   await assertFails(setDoc(doc(db, `stacks/${STACK}`), { a: 1 }));
 });
+
+// ---------------- the absent-field trap ----------------------------------------
+// `at` is documented optional, and OMITTING it must be as legal as sending null.
+// The original rule called okAt(d.at) unguarded, and reading a field that is not
+// present is an ERROR in rules rather than null — so it denied a valid mark. The
+// emulator missed it because these tests sent an explicit null (which is present).
+// Caught against the live database; this is the regression that keeps it caught.
+
+test('a mark that OMITS at entirely is legal', async () => {
+  const db = env.authenticatedContext('handA').firestore();
+  await assertSucceeds(setDoc(doc(db, markPath('handA', 5, 'valve')),
+    { k: 'valve', r: 5, h: 'handA', n: 0 }));
+});
+
+test('…and omitting n as well is still legal', async () => {
+  const db = env.authenticatedContext('handA').firestore();
+  await assertSucceeds(setDoc(doc(db, markPath('handA', 6, 'crank')),
+    { k: 'crank', r: 6, h: 'handA' }));
+});
+
+test('but a PRESENT malformed at is still refused', async () => {
+  const db = env.authenticatedContext('handA').firestore();
+  await assertFails(setDoc(doc(db, markPath('handA', 7, 'valve')),
+    { k: 'valve', r: 7, h: 'handA', at: [1e9, 0, 0] }));
+});
