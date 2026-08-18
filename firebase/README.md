@@ -60,6 +60,18 @@ Live probe writes were aimed at `stacks/probe-live/`, never `stacks/v1/`. The ru
 forbid deletes, so anything written to the real stack would be permanent evidence
 in the world players inherit — a test must not put it there.
 
+### Hosting: LIVE at <https://abyme-stack.web.app>
+
+Deployed via the Hosting REST API. `firebase.json` scopes `public` to
+`../docs/the-island` and ignores `tools/`, `loop/`, `test/`, `release/` and `*.md`
+— **54 files, 4.2 MB**. Two traps worth remembering:
+
+- the repo's `docs/` root holds 30+ unrelated projects (6496 files, 705 MB);
+  pointing hosting there publishes all of them
+- `docs/the-island` is 467 MB, of which 457 MB is `tools/` (trailer renders + the
+  harness). Hosting's free tier is 360 MB/day of transfer — that alone would
+  exhaust it on a couple of visitors
+
 ### App Check — off, and that is a considered choice
 
 Current state: API enabled, `firestore` and `identitytoolkit` registered but
@@ -78,17 +90,22 @@ requires billing.)
   no island can be drowned past that
 - a sync reads at most 256 marks
 
-So forged marks cannot break the *game*. What is unbounded without App Check is
-**cost** — scripted anonymous sign-ups, 576 docs each, running up storage and write
-volume. A billing problem, not an integrity one, and currently zero because nothing
-is public.
+So forged marks cannot break the *game*.
 
-**When it goes public:** create a reCAPTCHA v3 site key, then register the provider
-and set both services to `ENFORCED` via the App Check API
+**And it cannot run up a bill either.** `billingEnabled: false`, no billing account
+attached — the project is on the free Spark plan, so it is incapable of charging.
+Exhausting the free tier makes Firestore refuse requests until quota resets, and the
+game degrades to the local stack (gate-verified). Worst case is a quiet day, not an
+invoice. (An earlier version of this file called the cost exposure "unbounded"; that
+was wrong for this project, and is corrected here rather than quietly deleted.)
+
+What App Check actually buys, then, is **availability**: without it, someone
+scripting anonymous sign-ups could burn the daily free quota and take the shared
+tide offline for everyone until it resets.
+
+**To turn it on:** create a reCAPTCHA v3 site key, then register the provider and set
+both services to `ENFORCED` via the App Check API
 (`projects/{p}/webApps/{app}/recaptchaV3Config`, then `services.patch`).
-
-Optional: `firebase deploy --only hosting` serves the static game from `docs/`.
-(The Firebase CLI's own token has since gone stale — `firebase login --reauth`.)
 
 ---
 
