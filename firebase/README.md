@@ -10,7 +10,7 @@ below is optional.
 
 ---
 
-## Status: LIVE, except one console click
+## Status: LIVE
 
 The project exists and is configured. Done via CLI/API on 2026-08-18:
 
@@ -60,11 +60,32 @@ Live probe writes were aimed at `stacks/probe-live/`, never `stacks/v1/`. The ru
 forbid deletes, so anything written to the real stack would be permanent evidence
 in the world players inherit — a test must not put it there.
 
-### Recommended before it is public
+### App Check — off, and that is a considered choice
 
-**App Check** (App Check → Register → reCAPTCHA v3, then enforce on Firestore).
-The rules bound *what* can be written; App Check bounds *who* is writing — i.e. it
-is what stops someone scripting writes outside the game entirely.
+Current state: API enabled, `firestore` and `identitytoolkit` registered but
+**UNENFORCED**, no attestation provider on the web app.
+
+It is the one step that cannot be done from here: reCAPTCHA v3 needs a **site key**
+from <https://www.google.com/recaptcha/admin>, a separate console tied to the
+owner's account, with no gcloud path. (reCAPTCHA Enterprise is the alternative and
+requires billing.)
+
+**What is already bounded without it**, by the ledger's own caps:
+
+- one anonymous uid can ever write **576 documents** — 9 kinds × 64 rungs, with
+  deterministic ids and `update` denied
+- however many forged marks exist, the water is clamped to `MAX_DRAFT` (0.75 tide);
+  no island can be drowned past that
+- a sync reads at most 256 marks
+
+So forged marks cannot break the *game*. What is unbounded without App Check is
+**cost** — scripted anonymous sign-ups, 576 docs each, running up storage and write
+volume. A billing problem, not an integrity one, and currently zero because nothing
+is public.
+
+**When it goes public:** create a reCAPTCHA v3 site key, then register the provider
+and set both services to `ENFORCED` via the App Check API
+(`projects/{p}/webApps/{app}/recaptchaV3Config`, then `services.patch`).
 
 Optional: `firebase deploy --only hosting` serves the static game from `docs/`.
 (The Firebase CLI's own token has since gone stale — `firebase login --reauth`.)
