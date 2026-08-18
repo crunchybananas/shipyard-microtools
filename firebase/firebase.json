@@ -1,12 +1,22 @@
 {
+  "//": "Hosting publishes THE GAME ONLY. The repo's docs/ root holds 30+ unrelated projects (realm, harbor-master, the microtools) — pointing hosting at it would publish all of them, which is not what shipping the island means.",
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "../docs",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [],
+    "public": "../docs/the-island",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "tools/**",
+      "loop/**",
+      "test/**",
+      "release/**",
+      "*.md"
+    ],
+    "//ignore": "tools/ alone is 457 MB of trailer renders and the test harness; loop/ is design docs; release/ is a packaged build; test/ is the node suite. None of it is the game, and Hosting's free tier is 360 MB/day of transfer — shipping them would exhaust it on a couple of visitors.",
     "headers": [
       {
         "//": "the game is static ES modules with no build step; never serve a stale one",

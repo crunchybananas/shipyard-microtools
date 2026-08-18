@@ -22,7 +22,7 @@
 // slow, unreachable, unconfigured, or blocked by an extension, you get the local
 // stack and play on. The island must be complete with the wire cut.
 
-import { emptyLedger, sanitizeLedger, packLedger, LEDGER_KEY, MAX_MARKS_PER_RUNG } from './ledger.js';
+import { emptyLedger, sanitizeLedger, packLedger, LEDGER_KEY, HAND_KEY, MAX_MARKS_PER_RUNG } from './ledger.js';
 
 // The one place the shared world is named. Everybody's rung 2 is the SAME pool —
 // one ocean, which is the thesis. Bump this to fork a fresh stack (a new season,
@@ -91,10 +91,29 @@ export function firestoreSource(config, io) {
     return connecting;
   };
 
+  // CONNECT EAGERLY. The uid IS the hand id, and an act recorded before auth
+  // resolves gets filed locally under the offline id while flush() stamps the real
+  // uid on the server — the same act under two identities, which double-counts its
+  // draft on the next merge and makes CARRY unable to find its own marks. Rung 1
+  // never syncs (the surface inherits nothing), so waiting for a read to force the
+  // connection meant the ENTIRE surface chain was recorded under the wrong hand.
+  // Caught by playing the deployed build, not by any assertion.
+  ensure().then(() => reconcileHand()).catch(() => { /* offline: the local id stands */ });
+
+  // Any mark already recorded under the offline id belongs to this uid — it was the
+  // same person, the same session, seconds ago. Rewrite them once the uid lands.
+  function reconcileHand() {
+    if (!conn || !led) return;
+    const local = io.get(HAND_KEY);
+    if (!local || local === conn.uid) return;
+    let changed = 0;
+    for (const m of led.marks) if (m.h === local) { m.h = conn.uid; changed++; }
+    if (changed) writeMirror();
+  }
+
   return {
-    // The hand id, once we have one. Before auth resolves this is null and world.js
-    // keeps using the local id — a mark recorded in the first second of a cold start
-    // is still correctly attributed, just to the offline hand.
+    // The hand id, once we have one. Null only in the moments before auth resolves
+    // (or forever, offline), and world.js falls back to the local id there.
     uid: () => (conn ? conn.uid : null),
 
     // Synchronous: returns the mirror immediately so the game can start rendering.

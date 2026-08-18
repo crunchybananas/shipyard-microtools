@@ -28,7 +28,15 @@ export default async function (h) {
 
   const fresh = await h.evaluate(`(() => ABYME.state().stack)()`);
   ok('fresh run: surface is dry, no marks', fresh.draft === 0 && fresh.marks === 0, fresh);
-  ok('fresh run: a hand id was minted', /^[0-9a-f]{8}$/.test(fresh.hand), fresh);
+  // The hand is the LOCAL 8-hex id offline, and the Firebase uid once the shared
+  // stack connects — eagerly, before any act, so the same act is never filed under
+  // two identities (that bug double-counted its draft and hid it from CARRY).
+  ok('fresh run: a hand id exists',
+    typeof fresh.hand === 'string' && fresh.hand.length >= 8, fresh);
+  ok('shared ⇒ the hand is the Firebase uid, not the offline id',
+    !fresh.shared || (fresh.hand.length > 8 && !/^[0-9a-f]{8}$/.test(fresh.hand)), fresh);
+  ok('offline ⇒ the hand is the local 8-hex id',
+    fresh.shared || /^[0-9a-f]{8}$/.test(fresh.hand), fresh);
 
   // play the real surface chain through real hotspots
   const played = await h.evaluate(`(() => {

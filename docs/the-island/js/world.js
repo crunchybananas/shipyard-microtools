@@ -361,6 +361,8 @@ import('./stack-config.js')
     src.load();          // seed from the same local mirror, so nothing is lost in the swap
     _source = src;
     _shared = true;
+    // tell the player, on the title screen, before they can displace anything
+    try { const n = document.getElementById('title-shared'); if (n) n.hidden = false; } catch (_) {}
     syncStack(W.level); // and pull whoever is above us right now
   })
   .catch(() => { /* no config, offline build, or blocked — the local stack stands */ });
