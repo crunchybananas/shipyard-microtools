@@ -851,18 +851,64 @@ export function buildWorld() {
   // music box on a wall shelf
   {
     const shelf = new THREE.BoxGeometry(1.2, 0.08, 0.5);
-    stone.add(shelf, place(LH.x - 3.6, LH.y + 1.25, LH.z - 2.6, deg(35)), grad(C.woodDark, C.wood));
+    // joinery, not masonry — this board was baked into `stone` with the books and read
+    // as a near-black slab of wall with mortar courses on it
+    joinery.add(shelf, place(LH.x - 3.6, LH.y + 1.25, LH.z - 2.6, deg(35)), grad(C.woodDark, C.wood));
     shelf.dispose();
     const box = new THREE.Group();
     box.position.set(LH.x - 3.6, LH.y + 1.42, LH.z - 2.6);
     box.rotation.y = deg(35);
     box.name = 'musicBox';
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.2, 0.3), matBrassSolid);
+    // THE MUSIC BOX carries the five-note tune the whole stones puzzle turns on, and it
+    // was a featureless cream box with one tan rectangle stuck to the front — the most
+    // story-laden object in the room and the least made. A music box is a CASE: a
+    // plinth, banded corners, a wound key, and a mechanism you can see once it is open.
+    const caseW = 0.42, caseD = 0.3, caseH = 0.17;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(caseW, caseH, caseD), matWood);
+    body.position.y = -0.015;
     box.add(body);
-    const lid = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.04, 0.3), matWood);
-    lid.position.set(0, 0.12, -0.0);
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(caseW + 0.035, 0.022, caseD + 0.035), matWood);
+    plinth.position.y = -0.11;
+    box.add(plinth);
+    // brass banding at the four uprights, the way a travelling case is protected
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      const band = new THREE.Mesh(new THREE.BoxGeometry(0.018, caseH + 0.01, 0.018), matBrassSolid);
+      band.position.set(sx * (caseW / 2 - 0.009), -0.015, sz * (caseD / 2 - 0.009));
+      box.add(band);
+    }
+    // the escutcheon, and the key still in it
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.008), matBrassSolid);
+    plate.position.set(0.0, -0.02, caseD / 2 + 0.002);
+    box.add(plate);
+    const keyShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.05, 6), matBrassSolid);
+    keyShaft.rotation.x = Math.PI / 2;
+    keyShaft.position.set(0, -0.02, caseD / 2 + 0.03);
+    box.add(keyShaft);
+    const keyWing = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.016, 0.006), matBrassSolid);
+    keyWing.position.set(0, -0.02, caseD / 2 + 0.055);
+    box.add(keyWing);
+    // THE LID, HINGED AT ITS BACK EDGE. It was a plank whose pivot sat at its own
+    // centre, so `rotation.x` swung half the lid down THROUGH the case — the same
+    // mistake as the tower doors, in miniature: a hinge is an edge, not a middle.
+    const lid = new THREE.Group();
+    lid.position.set(0, caseH / 2 - 0.015, -caseD / 2);
     lid.name = 'musicBoxLid';
+    const lidPlank = new THREE.Mesh(new THREE.BoxGeometry(caseW, 0.028, caseD), matWood);
+    lidPlank.position.z = caseD / 2;
+    lid.add(lidPlank);
+    const lidInlay = new THREE.Mesh(new THREE.BoxGeometry(caseW - 0.09, 0.004, caseD - 0.09), matBrassSolid);
+    lidInlay.position.set(0, 0.016, caseD / 2);
+    lid.add(lidInlay);
     box.add(lid);
+    // the mechanism under it: the pinned cylinder and the comb it plucks. Only ever
+    // seen once the lid is up, which is the point of opening it.
+    const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.22, 10), matBrassSolid);
+    drum.rotation.z = Math.PI / 2;
+    drum.position.set(-0.04, 0.03, 0.01);
+    box.add(drum);
+    const comb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.006, 0.05), matBrassSolid);
+    comb.position.set(-0.04, 0.045, 0.08);
+    box.add(comb);
     core.add(box);
 
     // a folded note resting on the shelf beside the music box — a readable fragment (music_note)
@@ -2477,6 +2523,12 @@ export function buildWorld() {
         g2.strokeStyle = ink + '0.5)'; g2.lineWidth = 1.5;
         g2.beginPath(); g2.moveTo(24, H - 34); g2.lineTo(W - 70, H - 34); g2.stroke();
         const t = new THREE.CanvasTexture(cv);
+        // A COLOUR map must declare sRGB. three defaults a CanvasTexture to linear, so
+        // an sRGB-authored image is read as if already linearised and comes out washed
+        // out and far too bright — which is exactly how this sheet kept reappearing as
+        // a white slab after the material was already correct. Every other colour map
+        // in this project sets it (assets.js, `colorSpace: 'srgb'`); this one didn't.
+        t.colorSpace = THREE.SRGBColorSpace;
         t.anisotropy = 4;
         return t;
       })();
