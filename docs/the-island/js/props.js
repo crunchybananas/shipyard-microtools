@@ -43,6 +43,19 @@ applyRelief(matStone, 'stone', { normalScale: 0.85, strength: 2.4 });   // grani
 // albedo is what pixelates at arm's length, and on a 5 m monolith a small texel would
 // tile visibly along the whole face. Vertex colours still carry the hue, so the
 // bone-toward-the-crown gradient and the per-stone variation survive untouched.
+// The study's JOINERY AND BINDINGS — the wall shelves and every book on them. They
+// were baked into `stone` and therefore wore matStone, which is the LIGHTHOUSE's
+// coursed masonry: the keeper's library had brick courses and mortar lines running
+// across the spines of its books, and the shelf boards were made of wall. It is the
+// same bug the rockwork split already fixed for boulders, one room further in — it
+// simply hid longer, because every book was the same teal and you cannot see a mortar
+// line on a slab of one colour. A cloth weave at low relief reads as binding on a
+// spine and as grain on a board, and the batch costs one more draw group.
+export const matJoinery = new THREE.MeshStandardMaterial({
+  vertexColors: true, flatShading: false, roughness: 0.94, metalness: 0.0,
+});
+applyRelief(matJoinery, 'cloth', { normalScale: 0.35, strength: 1.2, colorMap: false, repeat: [1.6, 1.6] });
+
 export const matMegalith = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.96, metalness: 0.0, side: THREE.DoubleSide,
 });
@@ -228,6 +241,8 @@ export function buildWorld() {
   // coursed-block relief — so a boulder beside the standing stones wore mortar lines.
   // Its own batch costs one draw group and lets it be granite.
   const rockwork = new Baker();
+  // shelves + books: wood and cloth, not masonry (see matJoinery)
+  const joinery = new Baker();
   const brass = new Baker();
   const M = new THREE.Matrix4();
   const Q = new THREE.Quaternion();
@@ -867,19 +882,68 @@ export function buildWorld() {
       const a0 = deg(285 + s * 38);
       for (let sh = 0; sh < 3; sh++) {
         const shelf = new THREE.BoxGeometry(2.0, 0.07, 0.45);
-        stone.add(shelf, place(LH.x + Math.sin(a0) * 4.4, LH.y + 0.6 + sh * 0.62, LH.z + Math.cos(a0) * 4.4, a0), grad(C.woodDark, C.wood));
+        joinery.add(shelf, place(LH.x + Math.sin(a0) * 4.4, LH.y + 0.6 + sh * 0.62, LH.z + Math.cos(a0) * 4.4, a0), grad(C.woodDark, C.wood));
         shelf.dispose();
+        // THE SHELVES. Every book used to be an upright box of identical depth drawn
+        // from ONE of two colours, so a whole wall of them read as a single teal slab —
+        // the "basic geometry" tell. A real shelf is legible from across a room because
+        // of what is IRREGULAR about it: bindings from different decades, volumes shoved
+        // back or left proud, a gap where something was taken out, the neighbours leaning
+        // into it, and a few laid flat because they were too tall to stand. All of that
+        // is per-book arithmetic on geometry that was already here — same one baked
+        // batch, same draw call, no new material.
+        const SPINES = [
+          0x355560,   // the old cloth blue that used to be half the wall
+          0x3e7a6a,   // faded green board
+          0x6e3630,   // oxblood
+          0x7d6740,   // tan calf
+          0x2f3a44,   // near-black buckram
+          0x8a7250,   // vellum, sun-bleached
+          0x4a3a52,   // dull plum
+        ];
+        const shelfY = LH.y + 0.64 + sh * 0.62;
+        // unit vectors along the shelf (tangent) and into the wall (radial)
+        const tx = Math.cos(a0), tz = -Math.sin(a0);
+        const nx = Math.sin(a0), nz = Math.cos(a0);
+        const at = (bx, by, depth) => [
+          LH.x + nx * (4.4 + depth) + tx * bx, by, LH.z + nz * (4.4 + depth) + tz * bx,
+        ];
         let bx = -0.85;
         while (bx < 0.85) {
-          const bw = 0.07 + r() * 0.09, bh = 0.3 + r() * 0.22;
-          const book = new THREE.BoxGeometry(bw, bh, 0.3);
-          const bc = vary(r() > 0.5 ? C.cloth : C.copperDark, r, 0.1, 0.2, 0.16);
-          stone.add(book, place(
-            LH.x + Math.sin(a0) * 4.4 + Math.cos(a0) * bx,
-            LH.y + 0.64 + sh * 0.62 + bh / 2,
-            LH.z + Math.cos(a0) * 4.4 - Math.sin(a0) * bx, a0), () => bc);
+          // a gap: something was borrowed and never came back
+          if (r() < 0.07) { bx += 0.03 + r() * 0.05; continue; }
+
+          // a flat stack, for the volumes too tall to stand up in a keeper's shelf
+          if (r() < 0.10 && bx < 0.6) {
+            const sw = 0.20 + r() * 0.12;
+            let sy = shelfY;
+            const n = 2 + Math.floor(r() * 2);
+            for (let k = 0; k < n; k++) {
+              const th = 0.035 + r() * 0.03;
+              const lay = new THREE.BoxGeometry(sw, th, 0.26 + r() * 0.05);
+              const lc = vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.18, 0.14);
+              // each one shoved a little out of true with the one under it
+              joinery.add(lay, place(...at(bx + sw / 2 + (r() - 0.5) * 0.02, sy + th / 2, -0.02 + (r() - 0.5) * 0.04),
+                a0 + (r() - 0.5) * 0.09), () => lc);
+              lay.dispose();
+              sy += th;
+            }
+            bx += sw + 0.02;
+            continue;
+          }
+
+          const bw = 0.055 + r() * 0.10, bh = 0.28 + r() * 0.24;
+          const depth = -0.03 + r() * 0.07;           // shoved back, or left proud
+          const book = new THREE.BoxGeometry(bw, bh, 0.24 + r() * 0.09);
+          const bc = vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.20, 0.16);
+          // a lean, tipped into the gap its neighbour left. Rotating about the box's
+          // centre lifts the low corner off the shelf, so drop it back by the sagitta.
+          const lean = r() < 0.13 ? (r() - 0.5) * 0.5 : 0;
+          const drop = lean ? (bh / 2) * (1 - Math.cos(lean)) + (bw / 2) * Math.abs(Math.sin(lean)) : 0;
+          joinery.add(book, place(...at(bx + bw / 2, shelfY + bh / 2 - drop, depth),
+            a0, 1, 1, 1, 0, lean), () => bc);
           book.dispose();
-          bx += bw + 0.015;
+          bx += bw * Math.cos(lean) + 0.012;
         }
       }
     }
@@ -2531,6 +2595,7 @@ export function buildWorld() {
   };
   mkStatic(stone, matStone, 'staticStone', true);
   mkStatic(rockwork, matMegalith, 'staticRock', true);   // the outcrop + pool rim: granite, not masonry
+  mkStatic(joinery, matJoinery, 'staticJoinery', true); // the study's shelves + books: cloth and board, not wall
   mkStatic(brass, matBrass, 'staticBrass', false);
 
   // =================== glow particles (NOT cloned into the model) ===========
