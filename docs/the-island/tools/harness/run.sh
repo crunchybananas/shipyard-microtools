@@ -63,6 +63,12 @@ echo "== the doors =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/doors.mjs" | tee "$WORK/doors.out"
 grep -q "DOORS 6 / 6" "$WORK/doors.out" || { echo "DOORS FAILED"; exit 1; }
 
+echo "== bloom =="
+# Guards the ceiling on the bloom threshold. Raising it is the tempting fix for anything
+# that looks blown out, and it kills the dimmest real light sources silently.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/bloom.mjs" | tee "$WORK/bloom.out"
+grep -q "BLOOM 3 / 3" "$WORK/bloom.out" || { echo "BLOOM FAILED"; exit 1; }
+
 echo "== the walk =="
 # CI runs on software GL where 20s real-time cinematics cannot hit wall-clock, so
 # CI is the LOGIC GATE: the 33 pumped assertions must pass AND the failure list

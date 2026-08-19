@@ -117,8 +117,16 @@ composer.addPass(new RenderPass(scene, camera));
 const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 1.05); // strength, radius, threshold (only bright things bloom) — WOW pass: softer, dreamier glow on the lamp/sun-sparkle/highlights.
 // threshold runs on the LINEAR pre-tonemap buffer: at 0.85 the noon sun on pale brass
 // (the valve wheel — the hub's main interactable) blew past it and the whole prop
-// torched white. 1.05 keeps every intended bloomer (emissives run 1.4-4.5) and returns
-// sunlit brass to brass. (#54 verification catch — pre-existing since the WOW pass.)
+// torched white. 1.05 returns sunlit brass to brass. (#54 verification catch.)
+//
+// DO NOT RAISE THIS to fix something looking blown out. I tried, for the sunlit chart
+// paper, and measured my way back: the ceiling is 1.25 (the quarters lamp bulb sits at
+// 1.311 and the tiny figure's glow at 1.251, and both must keep blooming), and at
+// every value up to 1.25 the paper clipped exactly as hard — 12.1% of the crop above
+// 245 at 1.05, 1.20 AND 1.25. Those pixels are already white BEFORE the bloom pass;
+// bloom was only adding the halo around them. A surface that reads as blown is an
+// ALBEDO problem, not a threshold problem — fix the material. tools/harness/bloom.mjs
+// pins the 1.25 ceiling so this cannot be quietly raised past the glows later.
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
 // Post-processing safety net: some browser/GPU combos render the bloom composer's half-float

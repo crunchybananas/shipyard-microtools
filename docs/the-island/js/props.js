@@ -324,6 +324,12 @@ export function buildWorld() {
     infill(159.5, 170.5, 2.62, baseH - 1.3);       // …and the transom over the leaf
     infill(95, 103.5, 1.15, 2.825);                // window: side cheeks between sill and header
     infill(116.5, 125, 1.15, 2.825);
+    // ANNEX DOORWAY: the wall gap is az 3-27, but the throat's jambs only stand at
+    // 6.5 and 23.5 — so 3.5° of wall was simply missing either side of them, and from
+    // the study you saw daylight and sand through two slots beside the keeper's door.
+    // Cheek them in to the jambs, same recipe, so the throat is the only way through.
+    infill(3, 6.5, 0, baseH - 1.3);
+    infill(23.5, 27, 0, baseH - 1.3);
   }
   // floor + ceiling ring (oculus for the light shaft)
   {
@@ -542,11 +548,38 @@ export function buildWorld() {
     const fstep = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.16, 0.7), matWood); fstep.position.y = 0.08; foot.add(fstep);
     const newel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 1.15, 8), matBrassSolid); newel.position.set(0.42, 0.6, 0.28); foot.add(newel);
     lhGroup.add(foot);
-    // the rope across the foot — the gate; hangs until the lamp is lit (puzzles _apply)
-    const rope = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.035, 6, 12, Math.PI), new THREE.MeshStandardMaterial({ color: 0x6b5a3a, roughness: 1 }));
-    rope.rotation.x = Math.PI / 2; rope.rotation.z = footAng;
-    rope.position.set(flx, 0.95, flz); rope.name = 'stairRope';
-    lhGroup.add(rope);
+    // the rope across the foot — the gate; hangs until the lamp is lit (puzzles _apply).
+    // It WAS a half-torus: a rigid semicircular hoop, hexagonal in section, standing up
+    // off the step like a croquet wicket. Owner: "the rope thing seems weird". A rope
+    // does one thing that reads instantly as rope, and a torus cannot do it — it HANGS.
+    // So: a catenary strung between two eyes, sagging under its own weight, swept as a
+    // tube along the curve. Cheap (one mesh, ~200 tris) and it finally reads as a line
+    // slung across a stair rather than a piece of hardware bolted to it.
+    {
+      const HALF = 0.45, TOPY = 1.02, SAG = 0.19, RZ = 0.28;   // to the newel's z
+      const pts = [];
+      for (let i = 0; i <= 8; i++) {
+        const t = i / 8, x = -HALF + t * (HALF * 2);
+        // a real catenary, normalised so the ends sit exactly on the eyes
+        const a = 1.9, k = (Math.cosh(a * (t * 2 - 1)) - 1) / (Math.cosh(a) - 1);
+        pts.push(new THREE.Vector3(x, TOPY - SAG * (1 - k), RZ));
+      }
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const rope = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 20, 0.019, 5, false),
+        new THREE.MeshStandardMaterial({ color: 0x8a7a52, roughness: 1 }),   // hemp, not bitumen
+      );
+      rope.name = 'stairRope';
+      rope.position.set(flx, 0.02, flz);
+      lhGroup.add(rope);
+      // the two eyes it is made off to, so the ends terminate on something
+      for (const ex of [-HALF, HALF]) {
+        const eye = new THREE.Mesh(new THREE.TorusGeometry(0.028, 0.008, 5, 10), matBrassSolid);
+        eye.position.set(flx + ex, 0.02 + TOPY, flz + RZ);
+        eye.rotation.y = Math.PI / 2;
+        lhGroup.add(eye);
+      }
+    }
     // the DESCEND point — a brass trap-ring on the gallery, where the stair tops out
     const topAng = startAng + (N - 1) * (2.5 * TAU / N);
     const hatch = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 6, 16), matBrassSolid);
@@ -583,7 +616,22 @@ export function buildWorld() {
   // island's own 1:240 model standing on it. A thin plane just above the table top, inside the
   // brass rim and below the model, so the chart paper shows in the border around the model.
   {
-    const sheetMat = new THREE.MeshStandardMaterial({ color: 0xd2ccbe, roughness: 0.96, flatShading: true });
+    // 0xd2ccbe was a near-white sheet 2.95m across lying flat under the study window.
+    // It clipped to pure white in sun, and because it is the whole background the chart
+    // model and the logbook sit on, everything ON it lost contrast — the day's return
+    // beside the book stopped reading as a document at all. Chart vellum is a warm buff,
+    // not typing paper; this keeps its fibre relief and gives the props something to
+    // read against. (Measured, not guessed: the clipping was identical at every bloom
+    // threshold up to the 1.25 ceiling, so it was never the bloom pass.)
+    // PAPER IS LAMBERTIAN, and that is the whole fix. MeshStandardMaterial keeps a 4%
+    // dielectric specular lobe even at roughness 1, so a flat sheet under the study sun
+    // mirrors it straight into the camera and clips to pure white — which is what the
+    // owner saw as "a white box next to the book". Measured: swapping these two paper
+    // surfaces to Lambert took the clipped-white pixels in that view from 11.3% to 0.0%
+    // and the ruled form on the return became readable for the first time. It was never
+    // the bloom threshold (identical clipping at 1.05, 1.20 and 1.25) and never really
+    // the albedo. Lambert also costs less to shade than Standard.
+    const sheetMat = new THREE.MeshLambertMaterial({ color: 0xb3a888, flatShading: true });
     applyRelief(sheetMat, 'chart_vellum', { normalScale: 0.3, strength: 1.2 });   // faint paper-fibre relief
     const sheet = new THREE.Mesh(new THREE.PlaneGeometry(2.95, 2.95), sheetMat);
     sheet.rotation.x = -Math.PI / 2;
@@ -2305,10 +2353,73 @@ export function buildWorld() {
     }
     const book = core.getObjectByName('logbook');
     if (book) {
-      const sheet = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.34),
-        new THREE.MeshStandardMaterial({ color: 0xd6cdb2, roughness: 0.95, side: THREE.DoubleSide }));
-      sheet.rotation.x = -Math.PI / 2; sheet.rotation.z = -0.25;
-      sheet.position.set(0.4, 0.03, 0.08);
+      // THE DAY'S RETURN. This was a zero-thickness plane in near-white with no map:
+      // lying flat under the sun it clipped to pure white and read, in the owner's
+      // words, as "a white box next to the book" — a placeholder, not a document. Two
+      // things were wrong. A sheet of paper has an EDGE (a plane has none, so nothing
+      // ever catches its thickness and it reads as a decal), and a blank pale rectangle
+      // has nothing for the eye to land on, so it renders as the brightest, emptiest
+      // thing on the table. Now it is a thin slab carrying the actual printed return:
+      // column rules, ruled rows, his hand in the filled ones — and the last line left
+      // clean, which is the whole point of the prop ("the day's return, unsigned").
+      const sheetTex = (() => {
+        const W = 200, H = 262;                       // 0.26 x 0.34 at ~770px/m
+        const cv = document.createElement('canvas');
+        cv.width = W; cv.height = H;
+        const g2 = cv.getContext('2d');
+        // NOT near-white. Sun through the study window puts a 0.6-luminance surface
+        // clean past the display range — it clips to 255 before bloom is even in the
+        // picture. Aged manila sits under it and still reads unmistakably as paper.
+        g2.fillStyle = '#a89a78'; g2.fillRect(0, 0, W, H);
+        // a little unevenness so it is not a flat swatch — old paper is never one tone
+        for (let i = 0; i < 90; i++) {
+          const r = 8 + Math.random() * 26;
+          g2.fillStyle = `rgba(${Math.random() < 0.5 ? '150,138,110' : '214,205,178'},0.05)`;
+          g2.beginPath(); g2.arc(Math.random() * W, Math.random() * H, r, 0, 6.283); g2.fill();
+        }
+        const ink = 'rgba(58,46,32,';
+        g2.strokeStyle = ink + '0.55)'; g2.lineWidth = 1.5;
+        g2.strokeRect(11, 11, W - 22, H - 22);                       // the form's border
+        g2.beginPath(); g2.moveTo(11, 46); g2.lineTo(W - 11, 46); g2.stroke();   // heading rule
+        g2.beginPath(); g2.moveTo(W - 62, 46); g2.lineTo(W - 62, H - 46); g2.stroke(); // value column
+        // the heading, and the ruled rows beneath it
+        g2.fillStyle = ink + '0.5)';
+        g2.fillRect(24, 26, 96, 5); g2.fillRect(W - 54, 26, 30, 5);
+        g2.strokeStyle = ink + '0.28)'; g2.lineWidth = 1;
+        for (let r = 0; r < 8; r++) {
+          const y = 68 + r * 20;
+          g2.beginPath(); g2.moveTo(16, y); g2.lineTo(W - 16, y); g2.stroke();
+        }
+        // his hand: short ink strokes on the filled rows, and a reading in the column.
+        // Abstract marks, not letters — at this size real glyphs turn to mush, and a
+        // suggestion of a steady hand reads truer than unreadable type.
+        g2.strokeStyle = ink + '0.8)'; g2.lineWidth = 2;
+        for (let r = 0; r < 6; r++) {
+          const y = 68 + r * 20 - 5;
+          let x = 22;
+          const words = 2 + ((r * 7) % 3);
+          for (let w = 0; w < words; w++) {
+            const len = 14 + ((r * 13 + w * 29) % 26);
+            g2.beginPath(); g2.moveTo(x, y);
+            g2.bezierCurveTo(x + len * 0.3, y - 4, x + len * 0.7, y + 3, x + len, y - 1);
+            g2.stroke();
+            x += len + 7;
+            if (x > W - 76) break;
+          }
+          const v = 16 + ((r * 11) % 14);              // the reading, in the column
+          g2.beginPath(); g2.moveTo(W - 54, y); g2.lineTo(W - 54 + v, y - 1); g2.stroke();
+        }
+        // the signature line: ruled, and EMPTY
+        g2.strokeStyle = ink + '0.5)'; g2.lineWidth = 1.5;
+        g2.beginPath(); g2.moveTo(24, H - 34); g2.lineTo(W - 70, H - 34); g2.stroke();
+        const t = new THREE.CanvasTexture(cv);
+        t.anisotropy = 4;
+        return t;
+      })();
+      const sheet = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.004, 0.34),
+        new THREE.MeshLambertMaterial({ map: sheetTex }));   // matte paper: no specular lobe
+      sheet.rotation.y = -0.25;                       // laid down slightly askew, as dropped
+      sheet.position.set(0.4, 0.032, 0.08);
       sheet.name = 'returnSheet';
       defineProp('returnSheet');
       book.add(sheet);
