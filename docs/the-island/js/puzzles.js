@@ -1739,7 +1739,12 @@ export class Game {
     if (R.valveWheel) R.valveWheel.rotation.z = an.valveSpin;
 
     if (R.musicBoxLid) R.musicBoxLid.rotation.x = -an.boxLid * 1.1;
-    if (R.innerDoor) R.innerDoor.rotation.y = an.innerDoor * 1.5;
+    // swing FROM the closed angle props.js derived from the doorway chord. Driving
+    // rotation.y from 0 ignored that baseline and swung the leaf through the jamb.
+    if (R.innerDoor) {
+      const ud = R.innerDoor.userData;
+      R.innerDoor.rotation.y = (ud.closedY || 0) + an.innerDoor * (ud.swingY ?? 1.5);
+    }
 
     if (R.chestLid) R.chestLid.rotation.x = -this.anim.chest * 1.6;
     if (R.rulerItem) R.rulerItem.visible = !F.rulerTaken;

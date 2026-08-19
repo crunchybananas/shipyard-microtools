@@ -239,6 +239,34 @@ export function buildWorld() {
   };
   const grad = (a, b) => (t) => a.clone().lerp(b, t);
 
+  // hangDoor — hang a leaf in a doorway cut through a CURVED wall.
+  //
+  // A door group's origin is its hinge and the leaf extends along local +x, so the
+  // closed leaf must lie along the doorway's CHORD. Deriving that angle from the
+  // RADIUS instead is the bug the owner hit ("the door goes through the wall"): a
+  // leaf hinged at az 170.5° and rotated `az - 90°` points straight out of the
+  // tower, and swinging it 52° put its far edge at r 5.81 — half a metre beyond the
+  // wall's outer face (5.35) and buried in the stone cheek beside the opening.
+  //
+  // The derivation, once, here: the chord from jamb `ah` to jamb `af` (same radius)
+  // runs along ±(cos m, -sin m) where m is the doorway's mid-azimuth, and three.js
+  // Ry(t) maps local +x to (cos t, -sin t). So the closed angle is m when the leaf
+  // reaches anticlockwise and m + PI when it reaches clockwise — and `ajar` then
+  // swings toward the wall's own axis (inward) for either hand.
+  //
+  // Returns LH-LOCAL x/z: lhGroup is translated to LH, and the callers that build in
+  // world space add LH themselves.
+  const hangDoor = (ah, af, r, ajar = 0) => {
+    const m = (ah + af) / 2;
+    return {
+      x: Math.sin(ah) * r,
+      z: Math.cos(ah) * r,
+      closed: af > ah ? m : m + Math.PI,
+      rotY: (af > ah ? m : m + Math.PI) + Math.sign(af - ah) * ajar,
+      swing: Math.sign(af - ah),
+    };
+  };
+
   // =================== THE LIGHTHOUSE =======================================
   const LH = new THREE.Vector3(SPOTS.lighthouse.x, 13.5, SPOTS.lighthouse.y);
   const lhGroup = new THREE.Group();
@@ -419,8 +447,14 @@ export function buildWorld() {
     lhGroup.add(lintel);
     // the leaf: planked door + three battens + a brass pull, hinged at the north jamb
     const hingeOff = new THREE.Group();
-    hingeOff.position.set(Math.sin(da1) * (baseR - 0.05), 1.26, Math.cos(da1) * (baseR - 0.05));
-    hingeOff.rotation.y = da1 - Math.PI / 2 + deg(52);   // closed = -90° from the jamb azimuth; +52° = ajar into the study
+    const hung = hangDoor(da1, da0, baseR - 0.05, deg(52));   // hinged at the da1 jamb, ajar into the study
+    hingeOff.position.set(hung.x, 1.26, hung.z);
+    hingeOff.rotation.y = hung.rotY;
+    // Declared so the gate can sweep the whole arc this leaf occupies. This one never
+    // moves in play — it stands forever ajar — but the bug WAS an orientation error,
+    // and an orientation error hides at whatever single pose you happen to check.
+    hingeOff.userData.closedY = hung.closed;
+    hingeOff.userData.swingY = hung.swing * deg(52);
     hingeOff.name = 'studyDoor';
     const door = new THREE.Mesh(new THREE.BoxGeometry(0.98, 2.44, 0.085), matWood);
     door.position.x = 0.49;
@@ -900,8 +934,8 @@ export function buildWorld() {
     // the threshold throat — a short stone doorway bridging the drum wall (r5.2) and the annex
     // (r5.3) so the two read as ONE connected structure, not two buildings kissing. Baked into
     // `stone` (clone-safe); the jambs sit inside the drum's az-15° gap so nothing z-fights.
+    const hw = deg(8.5);                         // doorway half-width (~0.8m of clear opening here)
     {
-      const hw = deg(8.5);                       // doorway half-width (~0.8m of clear opening here)
       for (const s of [-1, 1]) {                 // two radial jamb slabs flanking the opening
         const ja = aa + s * hw;
         const jamb = new THREE.BoxGeometry(0.22, 3.4, 0.95);
@@ -913,10 +947,20 @@ export function buildWorld() {
       lintel.dispose();
     }
 
-    // inner door between study and annex
+    // inner door between study and annex — hung in the THROAT above, on the same
+    // chord derivation as the study door. It had the same defect: the leaf sat at
+    // rotation.y = 0 (axis-aligned with world +x) while its doorway runs at az 15°,
+    // so its far edge stood ~0.39m out of line and pushed into the jamb. The old
+    // position carried a bare `- 0.8` world-x nudge hand-tuned to land near the
+    // jamb; hangDoor puts it exactly on it.
     const innerDoor = new THREE.Group();
-    const da = aa + Math.PI; // facing the study
-    innerDoor.position.set(ax + Math.sin(da) * 2.55 - 0.8, LH.y + 1.55, az + Math.cos(da) * 2.55);
+    const ihung = hangDoor(aa - hw, aa + hw, 5.3, 0);   // hinged at the near jamb of the throat
+    innerDoor.position.set(LH.x + ihung.x, LH.y + 1.55, LH.z + ihung.z);
+    innerDoor.rotation.y = ihung.rotY;
+    // puzzles.js swings this one open; give it the closed baseline to swing FROM,
+    // and the hand to swing toward, instead of overwriting rotation.y from zero.
+    innerDoor.userData.closedY = ihung.closed;
+    innerDoor.userData.swingY = ihung.swing * 1.5;
     innerDoor.name = 'innerDoor';
     const idoor = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3.1, 0.1), matWood);
     idoor.position.x = 0.75;

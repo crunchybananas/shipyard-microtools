@@ -56,6 +56,13 @@ echo "== the stack =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/stack.mjs" | tee "$WORK/stack.out"
 grep -q "STACKWALK 47 / 47" "$WORK/stack.out" || { echo "STACK FAILED"; exit 1; }
 
+echo "== the doors =="
+# The owner watched a door pass through the tower wall. Nothing in the gate looked at
+# where props END UP — the walk proves you can get THROUGH a doorway, not that the
+# door hung in it is inside the building. Pure geometry, so it gates on CI too.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/doors.mjs" | tee "$WORK/doors.out"
+grep -q "DOORS 6 / 6" "$WORK/doors.out" || { echo "DOORS FAILED"; exit 1; }
+
 echo "== the walk =="
 # CI runs on software GL where 20s real-time cinematics cannot hit wall-clock, so
 # CI is the LOGIC GATE: the 33 pumped assertions must pass AND the failure list
