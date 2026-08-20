@@ -62,9 +62,13 @@ in the world players inherit — a test must not put it there.
 
 ### Hosting: LIVE at <https://abyme-stack.web.app>
 
-Deployed via the Hosting REST API. `firebase.json` scopes `public` to
-`../docs/the-island` and ignores `tools/`, `loop/`, `test/`, `release/` and `*.md`
-— **54 files, 4.2 MB**. Two traps worth remembering:
+`firebase deploy --only hosting` from the SUBMODULE ROOT. That is also where
+`firebase.json` and `.firebaserc` now live, and it is not cosmetic: the CLI refuses a
+`public` path outside the directory holding firebase.json, so while the config sat in
+`firebase/` pointing at `../docs/the-island` the only way to ship was to drive the
+Hosting REST API by hand (create version → populateFiles → upload blobs → finalize →
+release). It scopes `public` to `docs/the-island` and ignores `tools/`, `loop/`,
+`test/`, `release/` and `*.md` — **54 files, 4.1 MB**. Two traps worth remembering:
 
 - the repo's `docs/` root holds 30+ unrelated projects (6496 files, 705 MB);
   pointing hosting there publishes all of them

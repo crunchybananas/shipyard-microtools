@@ -1,11 +1,11 @@
 {
-  "//": "Hosting publishes THE GAME ONLY. The repo's docs/ root holds 30+ unrelated projects (realm, harbor-master, the microtools) — pointing hosting at it would publish all of them, which is not what shipping the island means.",
+  "//": "This lives at the SUBMODULE ROOT, not in firebase/, because the Firebase CLI refuses a `public` path outside the directory holding firebase.json — with it in firebase/ the only deployable route was the REST API by hand. Hosting publishes THE GAME ONLY. The repo's docs/ root holds 30+ unrelated projects (realm, harbor-master, the microtools) — pointing hosting at it would publish all of them, which is not what shipping the island means.",
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "rules": "firebase/firestore.rules",
+    "indexes": "firebase/firestore.indexes.json"
   },
   "hosting": {
-    "public": "../docs/the-island",
+    "public": "docs/the-island",
     "ignore": [
       "firebase.json",
       "**/.*",
