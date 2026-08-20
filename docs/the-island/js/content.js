@@ -680,7 +680,7 @@ export const T = {
   the_bench_faces_the: 'The bench faces the sea from inside it now. The seat goes awash with every third wave. The water holds it now.',
   the_skiff_is_off: 'The skiff is off its blocks and rides at the old anchor, half a gunwale under. The water holds it now.',
   three_things_the_island: 'Three things the island gave up while I was down in the years: the jetty’s furthest arm, the bench at the shallows, the skiff off its blocks. The chart in the study will say the shore moved. What moved is everything the shore was for. And I understand the tide gauge’s fifth ring now — the fresh-cut one, above all the others. It was never a measurement. It was a forecast.',
-  field_report_taken_copied: 'Field report taken — copied, downloaded, and remembered.',
+  field_report_taken_copied: 'Note sent — position, view, state and a screenshot went with it.',
 };
 
 // ---- the finale codas (#134, AAA-A6): the ending re-reads THIS player's walk ------

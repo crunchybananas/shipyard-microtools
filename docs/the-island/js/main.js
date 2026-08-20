@@ -1979,11 +1979,52 @@ function buildDebugPanel() {
   addEventListener('keydown', (e) => {
     if (e.code === 'Backquote') { e.preventDefault(); el.style.display = (el.style.display === 'none') ? '' : 'none'; }
     // the field report works from ANYWHERE, panel open or not (debug-together).
-    // NO prompt(): embedded browser panes block modal dialogs silently, which ate the
-    // whole click handler before report() ever ran — the note travels by chat instead.
-    if (e.code === 'F8') { e.preventDefault(); A.report(''); }
+    if (e.code === 'F8') { e.preventDefault(); askNote(); }
   });
-  el.querySelector('#dbg-report')?.addEventListener('click', () => A.report(''));
+  el.querySelector('#dbg-report')?.addEventListener('click', () => askNote());
+  // --- LEAVING A NOTE ---------------------------------------------------------
+  // The report payload has carried a `note` field since it was written, and until now
+  // NOTHING COULD FILL IT: both triggers passed a hardcoded ''. The original attempt
+  // used prompt(), embedded browser panes block modal dialogs silently, and the fix
+  // was to drop the note rather than replace the input — so the one field that says
+  // what is actually wrong always arrived empty, and the owner reasonably could not
+  // find where to type. This is that input, as a DOM overlay we own and no pane can
+  // swallow.
+  //
+  // The screenshot is unaffected by the overlay: toDataURL reads the WebGL canvas,
+  // and this is DOM on top of it. So the report can be assembled on submit and still
+  // shows the world exactly as it looked when F8 was pressed.
+  const noteEl = document.getElementById('note-overlay');
+  const noteText = document.getElementById('note-text');
+  let noteWasLocked = false;
+  const closeNote = () => {
+    if (!noteEl) return;
+    noteEl.hidden = true;
+    player.locked = noteWasLocked;          // hand movement back exactly as we found it
+  };
+  const askNote = () => {
+    if (!noteEl || !noteText) { A.report(''); return; }   // never lose a report to a missing overlay
+    if (!noteEl.hidden) return;
+    noteWasLocked = player.locked;
+    player.locked = true;                   // freeze the world while they type
+    try { document.exitPointerLock?.(); } catch (_) {}
+    noteText.value = '';
+    noteEl.hidden = false;
+    setTimeout(() => noteText.focus(), 0);
+  };
+  const sendNote = () => {
+    const note = (noteText?.value || '').trim();
+    closeNote();
+    A.report(note);
+  };
+  noteEl?.querySelector('#note-send')?.addEventListener('click', sendNote);
+  noteEl?.querySelector('#note-cancel')?.addEventListener('click', closeNote);
+  noteText?.addEventListener('keydown', (e) => {
+    e.stopPropagation();                    // never let W/A/S/D typed into the note walk the player
+    if (e.code === 'Enter' && !e.shiftKey) { e.preventDefault(); sendNote(); }
+    if (e.code === 'Escape') { e.preventDefault(); closeNote(); }
+  });
+
   const tslider = el.querySelector('#dbg-time'); tslider.value = W.time;
   tslider.addEventListener('input', () => { W.time = parseFloat(tslider.value); });
   const dslider = el.querySelector('#dbg-tide'); dslider.value = W.tide;

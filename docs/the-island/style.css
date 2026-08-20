@@ -567,3 +567,41 @@ html, body {
 #journal-entries .entry { font-size: calc(0.95rem * var(--text-scale, 1)); }
 /* calm the flashes: the white curtain never snaps, even on its fast path */
 .calm-flash #curtain, .calm-flash #curtain.fast { transition-duration: 1.4s; }
+
+/* ---- THE NOTE OVERLAY (F8) -------------------------------------------------
+   Reachable from anywhere in play. Styled off the game's own palette rather than
+   the debug panel's, because this is a PLAYER surface: the person who hits F8 is
+   telling you something is broken, and the last thing they should meet is a
+   developer console. */
+#note-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 12, 14, 0.55); backdrop-filter: blur(3px);
+}
+#note-overlay[hidden] { display: none; }
+#note-card {
+  width: min(30rem, calc(100vw - 2.5rem));
+  padding: 1.15rem 1.25rem 1rem;
+  background: #16181b; border: 1px solid #33383d; border-radius: 6px;
+  box-shadow: 0 1.4rem 3rem rgba(0, 0, 0, 0.55);
+  font-family: Georgia, 'Times New Roman', serif; color: #e8e2d4;
+}
+#note-title { font-size: 1.05rem; letter-spacing: 0.02em; margin-bottom: 0.3rem; }
+#note-sub { font-size: 0.78rem; line-height: 1.45; color: #9aa0a6; margin-bottom: 0.75rem; }
+#note-text {
+  width: 100%; box-sizing: border-box; resize: vertical;
+  padding: 0.55rem 0.6rem; border-radius: 4px;
+  background: #0e1012; border: 1px solid #3a4046; color: #e8e2d4;
+  font: 0.85rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+#note-text:focus { outline: none; border-color: #6d7a84; }
+#note-text::placeholder { color: #666d73; }
+#note-row { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.7rem; }
+#note-row button {
+  padding: 0.38rem 0.9rem; border-radius: 4px; cursor: pointer;
+  font-family: Georgia, 'Times New Roman', serif; font-size: 0.85rem;
+  background: #23272b; border: 1px solid #3a4046; color: #cfd4d8;
+}
+#note-row button:hover { background: #2c3136; }
+#note-send { background: #3d4d3f !important; border-color: #55694f !important; color: #e6efe2 !important; }
+#note-send:hover { background: #47593f !important; }
