@@ -31,6 +31,17 @@ const POSES = [
   // The owner's exact camera from the F8 report, 2026-08-21 — looking up past the
   // annex door at the lintel band. This is the frame the tear was found in.
   { name: 'up past the annex door (the reported frame)', at: [-81.95, -38.37], yaw: 3.006, pitch: 0.312, allowSky: false },
+  // Reported 2026-08-21 22:47 — "I can see behind the frame". The beach door's jambs
+  // were 12 cm deep at r 5.18 while the wall shell over their height runs r 5.267-5.350,
+  // so the frame floated inside the reveal and you saw daylight past it.
+  // This eye also looks straight INTO the open doorway, which is legitimately sky — so
+  // the whole-view assertion cannot be "none". Narrow the rays to the screen band
+  // holding the frame/wall junction (the doorway sits at gx < -0.25 from here, the gap
+  // was at gx -0.10..-0.08, so the band starts at -0.13: any wider and the doorway
+  // itself leaks in at the edge). Isolating the junction is the difference between a test
+  // that measures the bug and one that measures the door being open.
+  { name: 'past the beach door frame (the reported frame)', at: [-81.49, -43.21], yaw: 6.989, pitch: -0.202,
+    allowSky: false, ndc: { x0: -0.13, x1: 0.05, y0: -0.45, y1: 0.10 } },
   { name: 'the window wall lintel band', at: [-83.5, -41.5], yaw: 1.05, pitch: 0.30, allowSky: false },
   { name: 'the beach door lintel band', at: [-84.0, -38.0], yaw: 3.30, pitch: 0.34, allowSky: false },
   // …and one that SHOULD see sky, so a test that never finds anything cannot pass by
@@ -81,8 +92,9 @@ export default async function (h) {
       });
       let sky = 0, tot = 0;
       const where = [];
-      for (let gx = -0.6; gx <= 0.6; gx += 0.01) {
-        for (let gy = -0.2; gy <= 0.9; gy += 0.05) {
+      const B = ${JSON.stringify(p.ndc || { x0: -0.6, x1: 0.6, y0: -0.2, y1: 0.9 })};
+      for (let gx = B.x0; gx <= B.x1; gx += 0.01) {
+        for (let gy = B.y0; gy <= B.y1; gy += 0.05) {
           rc.setFromCamera(new T.Vector2(gx, gy), cam);
           const hit = rc.intersectObjects(solids, true).filter((i) => i.distance > 0.3);
           tot++;

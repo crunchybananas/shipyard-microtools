@@ -468,16 +468,28 @@ export function buildWorld() {
   {
     const da0 = deg(159.5), da1 = deg(170.5);      // the narrowed doorway's edges
     // frame: jambs against the stone cheeks + a lintel board under the transom
+    // THE JAMBS MUST STRADDLE THE WALL, not float inside it. These were 12 cm deep at
+    // r 5.18, so they spanned r 5.12-5.24 — while the wall shell over their height runs
+    // r 5.267 (at the head) to 5.350 (at the foot). The frame therefore stopped 3-11 cm
+    // short of the masonry and you could see daylight PAST it, between post and stone,
+    // at eye height beside the door. Owner, by F8: "I can see behind the frame."
+    //
+    // The drum is a single zero-thickness shell, so there is no reveal for a slim frame
+    // to sit in: the jamb IS the reveal, and it has to cross the shell at every height
+    // it spans. 0.37 deep centred at r 5.235 does that with margin at both ends (5.05
+    // to 5.42), and reads correctly — a deep stone-wall reveal is what this doorway is.
     const jamb = (az) => {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.55, 0.18), matWood);
-      b.position.set(Math.sin(az) * (baseR - 0.02), 1.275, Math.cos(az) * (baseR - 0.02));
-      b.rotation.y = az + Math.PI / 2;
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.37, 2.55, 0.18), matWood);
+      b.position.set(Math.sin(az) * 5.235, 1.275, Math.cos(az) * 5.235);
+      b.rotation.y = az + Math.PI / 2;   // local x is RADIAL under this rotation, local z tangential
       lhGroup.add(b);
     };
     jamb(da0); jamb(da1);
-    const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.14, 0.12, 0.2), matWood);
+    // same reasoning as the jambs: at y 2.58 the shell is at r 5.266 and a 0.2-deep board
+    // at r 5.18 reached only 5.28 — sealing by 14 mm, which is not sealing, it is luck.
+    const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.14, 0.12, 0.37), matWood);
     const mid = (da0 + da1) / 2;
-    lintel.position.set(Math.sin(mid) * (baseR - 0.02), 2.58, Math.cos(mid) * (baseR - 0.02));
+    lintel.position.set(Math.sin(mid) * 5.235, 2.58, Math.cos(mid) * 5.235);
     lintel.rotation.y = mid;
     lhGroup.add(lintel);
     // the leaf: planked door + three battens + a brass pull, hinged at the north jamb

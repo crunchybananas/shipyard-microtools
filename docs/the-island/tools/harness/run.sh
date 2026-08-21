@@ -73,7 +73,7 @@ echo "== the shell =="
 # The lighthouse is a building; you should not see sky through its walls. Two holes
 # have shipped and nothing else in the gate could catch either.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/shell.mjs" | tee "$WORK/shell.out"
-grep -q "SHELL 4 / 4" "$WORK/shell.out" || { echo "SHELL FAILED"; exit 1; }
+grep -q "SHELL 5 / 5" "$WORK/shell.out" || { echo "SHELL FAILED"; exit 1; }
 
 echo "== the walk =="
 # CI runs on software GL where 20s real-time cinematics cannot hit wall-clock, so
