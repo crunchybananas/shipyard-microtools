@@ -693,6 +693,47 @@ btnContinue.addEventListener('click', () => {
   }
 });
 
+// ---- REHYDRATE FROM A REPORT ------------------------------------------------
+// ?report=last  ·  ?report=<the report's ISO t>  ·  ?report=<index into the ring>
+//
+// Land straight back in a reported bug: same save, same level, same spot, same
+// facing, no title and no intro. It survives a REFRESH, which is the whole point —
+// the owner keeps hunting while a fix is being written, then reloads the same URL to
+// check whether the thing they reported is gone. Sending a note stamps the URL for
+// you (history.replaceState below), so F8 → send → refresh already works.
+//
+// Addressed by TIMESTAMP rather than position in the ring, because the ring is a
+// last-10 and keeps moving: `last` is convenient, `t` is stable, and a stable handle
+// is what makes "reload and check" mean the same thing an hour later.
+function rehydrateFromReport() {
+  const q = new URLSearchParams(location.search).get('report');
+  if (!q) return false;
+  let ring = [];
+  try { ring = JSON.parse(localStorage.getItem('abyme-reports') || '[]'); } catch (_) { ring = []; }
+  if (!ring.length) { console.warn('[abyme] ?report= but no reports in this browser'); return false; }
+  const rep = q === 'last' ? ring[ring.length - 1]
+    : (/^\d+$/.test(q) ? ring[+q] : ring.find((r) => r.t === q || (r.t || '').startsWith(q)));
+  if (!rep) { console.warn('[abyme] no report matching', q); return false; }
+  // `A` in this module is the AUDIO import, not the game API — A.init() really is
+  // "start audio" (which the Begin and Continue paths both call), but the game's own
+  // surface lives on window.ABYME and is not assigned until the debug block near the
+  // bottom of this file. Calling A.applyReport() threw during module evaluation and
+  // took window.ABYME down with it, so `?report=` produced a page with no game on it
+  // at all. Hence: audio through A, everything else through the real API, and this
+  // runs AFTER that assignment (see the call site at the end of the module).
+  const G = window.ABYME;
+  if (!G || !G.applyReport) { console.warn('[abyme] ?report= ran before the game was ready'); return false; }
+  titleEl.style.display = 'none';        // no title flash, no Begin gate
+  A.init();                              // audio
+  UI.fadeIn();
+  const out = G.applyReport(rep);        // save, stems, level, pose — all of it
+  UI.showHint();
+  if (rep.state && rep.state.time !== undefined) W.time = rep.state.time;
+  console.log('[abyme] rehydrated report', rep.t, out);
+  if (rep.note) setTimeout(() => UI.whisper('Back at: ' + rep.note), 900);
+  return true;
+}
+
 if (sessionStorage.getItem('abyme-autostart')) {
   sessionStorage.removeItem('abyme-autostart');
   titleEl.style.display = 'none';   // a replay reload ('begin again') must not flash the title
@@ -2015,7 +2056,15 @@ function buildDebugPanel() {
   const sendNote = () => {
     const note = (noteText?.value || '').trim();
     closeNote();
-    A.report(note);
+    const rep = A.report(note);
+    // stamp the URL so a plain REFRESH lands back in this exact frame. This is what
+    // makes the loop work: report a bug, keep playing, and when a fix ships just
+    // reload to check the same spot rather than trying to walk back to it.
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set('report', rep.t);
+      history.replaceState(null, '', u);
+    } catch (_) {}
   };
   noteEl?.querySelector('#note-send')?.addEventListener('click', sendNote);
   noteEl?.querySelector('#note-cancel')?.addEventListener('click', closeNote);
@@ -2203,3 +2252,9 @@ renderer.setAnimationLoop((tMs) => {
   else renderer.render(scene, camera);
   if (gpuTimer) gpuTimer.endFrame();
 });
+
+// ---- and finally: ?report= --------------------------------------------------
+// Deliberately the LAST thing this module does. window.ABYME is assigned in the debug
+// block above, so rehydrating any earlier means reaching for a game surface that does
+// not exist yet — which is exactly how the first version of this broke the page.
+rehydrateFromReport();
