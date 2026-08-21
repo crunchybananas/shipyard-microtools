@@ -302,16 +302,30 @@ export function buildWorld() {
     stone.add(geo, place(0, baseH / 2, 0).clone().premultiply(new THREE.Matrix4().makeTranslation(LH.x, LH.y, LH.z)), grad(C.boneDark, C.bone));
     geo.dispose();
   }
-  // lintels over the gaps
-  for (const [a0, a1] of gaps) {
-    const len = a1 - a0;
-    const geo = new THREE.CylinderGeometry(baseR, baseR, 1.3, 8, 1, true, a0, len);
-    stone.add(geo, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH - 0.65, LH.z), grad(C.bone, C.bone));
-    geo.dispose();
-  }
   // partial wall pieces must sit ON the wall's own taper (radius at height y), or their
   // open arc ends step off the neighbouring full-height arcs as visible seam slits
   const wallRAt = (y) => baseR + 0.15 * (1 - y / baseH);
+  // lintels over the gaps.
+  //
+  // THESE WERE STRAIGHT CYLINDERS IN A BATTERED WALL — the one thing the comment
+  // directly above says not to do. The drum tapers 5.35 at the foot to 5.20 at the
+  // head; a lintel built at a constant baseR therefore sits up to 4.2 cm INSIDE the
+  // wall face at the bottom of its band, and since these are open-ended shells the
+  // 4.2 cm between the two surfaces is nothing at all. At the seam where the lintel
+  // meets the neighbouring full-height arc that nothing becomes a vertical slit you
+  // can see daylight through, standing in the study looking up past the annex door.
+  // Owner, by F8: "There is a small tear in the all."
+  //
+  // Every other partial piece here already rides wallRAt — the infills, the window
+  // sill and header. The lintels were simply missed. Segment count matched to the
+  // wall's own formula too, so the facets line up either side of the seam.
+  for (const [a0, a1] of gaps) {
+    const len = a1 - a0;
+    const y0 = baseH - 1.3, y1 = baseH;
+    const geo = new THREE.CylinderGeometry(wallRAt(y1), wallRAt(y0), 1.3, Math.max(8, Math.round(len * 16)), 1, true, a0, len);
+    stone.add(geo, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH - 0.65, LH.z), grad(C.bone, C.bone));
+    geo.dispose();
+  }
   // the window gets a sill and a header — it is a window, not a breach
   {
     const [w0, w1] = gaps[1];

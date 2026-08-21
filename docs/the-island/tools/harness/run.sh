@@ -69,6 +69,12 @@ echo "== bloom =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/bloom.mjs" | tee "$WORK/bloom.out"
 grep -q "BLOOM 3 / 3" "$WORK/bloom.out" || { echo "BLOOM FAILED"; exit 1; }
 
+echo "== the shell =="
+# The lighthouse is a building; you should not see sky through its walls. Two holes
+# have shipped and nothing else in the gate could catch either.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/shell.mjs" | tee "$WORK/shell.out"
+grep -q "SHELL 4 / 4" "$WORK/shell.out" || { echo "SHELL FAILED"; exit 1; }
+
 echo "== the walk =="
 # CI runs on software GL where 20s real-time cinematics cannot hit wall-clock, so
 # CI is the LOGIC GATE: the 33 pumped assertions must pass AND the failure list
