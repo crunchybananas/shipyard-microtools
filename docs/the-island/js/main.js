@@ -113,6 +113,10 @@ const BLOOM_RES = () => new THREE.Vector2(Math.max(1, innerWidth >> 1), Math.max
 const composer = new EffectComposer(renderer);
 composer.setPixelRatio(BASE_DPR);
 composer.setSize(innerWidth, innerHeight);
+// the chart-table model's terrain is cropped with clipping planes (props.js) so the
+// island fills the table instead of a square of open sea. Local clipping is per-material
+// and off by default.
+renderer.localClippingEnabled = true;
 composer.addPass(new RenderPass(scene, camera));
 const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 1.05); // strength, radius, threshold (only bright things bloom) — WOW pass: softer, dreamier glow on the lamp/sun-sparkle/highlights.
 // threshold runs on the LINEAR pre-tonemap buffer: at 0.85 the noon sun on pale brass

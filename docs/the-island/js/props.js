@@ -373,7 +373,7 @@ export function buildWorld() {
     {
       const FEET = [
         [0, 0, 1.9, 0.14],                                              // chart table's soft under-shadow
-        [-1.25, -1.25, 0.4, 0.42], [1.25, -1.25, 0.4, 0.42],            // its four legs
+        [-1.0, -1.0, 0.4, 0.42], [1.0, -1.0, 0.4, 0.42],                // its four legs
         [-1.25, 1.25, 0.4, 0.42], [1.25, 1.25, 0.4, 0.42],
         [2.3, 1.1, 0.36, 0.4],                                          // valve pedestal
         [2.2, -1.4, 0.78, 0.2],                                         // brass plate, seated
@@ -636,19 +636,28 @@ export function buildWorld() {
   study.position.copy(LH);
   core.add(study);
 
-  // chart table: 3.0 × 3.0 m, brass-rimmed basin holding the model
+  // chart table: brass-rimmed basin holding the model.
+  //
+  // BROUGHT IN FROM 3.1 m TO 2.5. At 3.1 the table half-extent was 1.55 and the stair
+  // foot stands at r 1.95 with its step reaching 1.6 — they overlapped by a centimetre,
+  // so the newel rose through the table's near rail and the room read as furniture
+  // crammed into a tube. Owner: "This stair seems out of place… Do we need to take a
+  // big swing and resize the tower or shrink the table?" The tower is load-bearing —
+  // its radius sets the wall gaps, the annex throat, the gallery and the whole exterior
+  // silhouette — and the table is one prop with one job. So: the table. Half-extent
+  // 1.25 now, which gives the stair 0.35 m of daylight.
   {
-    const topG = new THREE.BoxGeometry(3.1, 0.14, 3.1);
+    const topG = new THREE.BoxGeometry(2.5, 0.14, 2.5);
     stone.add(topG, place(LH.x, LH.y + 0.88, LH.z), grad(C.woodDark, C.wood));
     topG.dispose();
-    for (const [lx, lz] of [[-1.25, -1.25], [1.25, -1.25], [-1.25, 1.25], [1.25, 1.25]]) {
+    for (const [lx, lz] of [[-1.0, -1.0], [1.0, -1.0], [-1.0, 1.0], [1.0, 1.0]]) {
       const leg = new THREE.BoxGeometry(0.18, 0.9, 0.18);
       stone.add(leg, place(LH.x + lx, LH.y + 0.45, LH.z + lz), grad(C.woodDark, C.wood));
       leg.dispose();
     }
-    // brass rim
-    const rim = new THREE.BoxGeometry(3.3, 0.18, 0.12);
-    for (const [dx, dz, ry] of [[0, 1.6, 0], [0, -1.6, 0], [1.6, 0, Math.PI / 2], [-1.6, 0, Math.PI / 2]]) {
+    // brass rim — it also hides the cut edge where the model's terrain is clipped
+    const rim = new THREE.BoxGeometry(2.7, 0.18, 0.12);
+    for (const [dx, dz, ry] of [[0, 1.28, 0], [0, -1.28, 0], [1.28, 0, Math.PI / 2], [-1.28, 0, Math.PI / 2]]) {
       brass.add(rim, place(LH.x + dx, LH.y + 0.97, LH.z + dz, ry), grad(C.brassDark, C.brass));
     }
     rim.dispose();
@@ -674,7 +683,7 @@ export function buildWorld() {
     // the albedo. Lambert also costs less to shade than Standard.
     const sheetMat = new THREE.MeshLambertMaterial({ color: 0xb3a888, flatShading: true });
     applyRelief(sheetMat, 'chart_vellum', { normalScale: 0.3, strength: 1.2 });   // faint paper-fibre relief
-    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(2.95, 2.95), sheetMat);
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(2.35, 2.35), sheetMat);
     sheet.rotation.x = -Math.PI / 2;
     sheet.position.set(LH.x, LH.y + 0.953, LH.z);
     sheet.name = 'chartSheet';
@@ -3416,6 +3425,65 @@ export function instantiateModel(core, modelAnchor) {
     if (o.isPoints || MODEL_PRUNE.has(o.name)) prune.push(o);
   });
   for (const o of prune) o.removeFromParent();
+  // ---- CROP THE MODEL, do not shrink it --------------------------------------
+  // Owner: "when the table is shrinked we could also show less water. It is a lot of
+  // the space." They are right — the model spanned 2.58 m and the island itself is
+  // barely half of that, so most of the chart table was open sea.
+  //
+  // The tempting fix is to scale the model down to fit the smaller table, and it is
+  // the wrong one: at a fixed 1:240 a smaller table means a smaller ISLAND and exactly
+  // the same proportion of water. What actually shows less water is showing LESS OF
+  // THE WORLD — cropping the domain — which keeps 1:240 intact. And 1:240 has to stay:
+  // it is the ratio the dive animation scales by (main.js, log(1/SCALE_MODEL)), so it
+  // is mechanism, not just the line in the journal that quotes it.
+  //
+  // The terrain clips (MeshStandardMaterial supports clipping planes natively) and the
+  // sea is a flat plane, so scaling it in x/z crops it without distorting anything. The
+  // sea CANNOT be clipped the same way — it is a ShaderMaterial shared with the real
+  // island's ocean, and a custom shader has to opt into the clipping chunks; cloning it
+  // to add them would mean maintaining a second copy of the water shader for a prop.
+  // Scaling the plane gets the same result for nothing.
+  //
+  // Both are cropped to the SAME extent or the seabed shows dry beyond the water line.
+  {
+    const CROP = 0.95;                        // half-extent in metres: the model shows 1.9m
+    const mw = modelRoot.getObjectByName('water');
+    if (mw) {
+      // MEASURE IN THE MODEL'S OWN UNITS. Box3.setFromObject here returns ISLAND units,
+      // not metres: instantiateModel runs before the clone is parented under the anchor
+      // that scales it by SCALE_MODEL. Dividing the metres I wanted by the island units
+      // I measured scaled the sea to 1 cm and the chart table lost its ocean entirely.
+      mw.geometry.computeBoundingBox();
+      const bb = mw.geometry.boundingBox;
+      const span = Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z) * (mw.scale.x || 1);
+      const wantLocal = (CROP * 2) / SCALE_MODEL;      // metres -> island units
+      const k = span > 0 ? wantLocal / span : 1;
+      mw.scale.x *= k; mw.scale.z *= k;
+      // NOTE: keep this mesh and its NAME. puzzles._apply opens with `if (!R.water)
+      // return`, so a model without a ref called 'water' stops being driven at all —
+      // no tide, no era, nothing. Scaling is why this is safe; replacing would not be.
+    }
+    const mt = modelRoot.getObjectByName('terrain');
+    if (mt && mt.material) {
+      // `LH` is local to buildWorld and does NOT exist in here — reaching for it threw a
+      // ReferenceError and the page booted with no game on it at all. The model's own
+      // anchor is the table's axis, and it is right there in the signature.
+      const c = new THREE.Vector3();
+      modelAnchor.getWorldPosition(c);
+      const P = THREE.Plane;
+      mt.material = mt.material.clone();      // shared with the real island; do not clip that
+      // World-space planes around the table's axis, written out rather than derived so
+      // the sign of each is obvious: keep the half-space that contains the model.
+      mt.material.clippingPlanes = [
+        new P(new THREE.Vector3(-1, 0, 0), c.x + CROP),
+        new P(new THREE.Vector3(1, 0, 0), -(c.x - CROP)),
+        new P(new THREE.Vector3(0, 0, -1), c.z + CROP),
+        new P(new THREE.Vector3(0, 0, 1), -(c.z - CROP)),
+      ];
+      mt.material.needsUpdate = true;
+    }
+  }
+
   // the model's meadow: at 1:240 a grass blade is ~0.2 mm wide — sub-pixel even leaning all the
   // way in. Keep a light speckle for colour (the planting order is spatially random, so a prefix
   // stays spread across the island) and drop the rest: ~-115k triangles nobody could ever see.
