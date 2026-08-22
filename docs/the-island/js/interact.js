@@ -21,7 +21,11 @@ export class Interactions {
     this.hovered = null;
     this.activeDrag = null;
     this.enabled = false;
-    this._glinted = new Map(); // material → original emissive intensity
+    // the glint runs as eased GROUPS, not one flat set: _live rises, and anything the
+    // cursor has left decays in _fading rather than snapping back (see tickGlint)
+    this._live = null;
+    this._fading = [];
+    this.glintStyle = 'rim';    // 'rim' | 'wash' | 'pulse' — see _applyGlint
 
     this.iris = document.getElementById('iris');
     // the dwell caption (#57): rest on a hotspot ~700ms and its authored label surfaces
@@ -165,14 +169,167 @@ export class Interactions {
     if (this.labelEl) this.labelEl.classList.remove('show');
   }
 
+  // ---- the hover glint -------------------------------------------------------
+  //
+  // It used to be a binary step: cross a hotspot and the prop was instantly amber,
+  // leave and it was instantly not. Everything else in this UI eases — the iris ring
+  // over 0.22s, the dwell caption over 0.35s — and the glint was the one hard cut in
+  // the game, which is why it read as jarring. Worse, sweeping the crosshair along a
+  // bookshelf STROBED: each spine hit full intensity for the frame or two the ray was
+  // on it. A ramp fixes both at once, because a fast pass never reaches full.
+  //
+  // Groups, not one set. A→B hover changes push the old set into _fading and let it
+  // decay while the new one rises, so brushing past three props leaves three settling
+  // embers rather than three cuts.
+
+  // THE CHARACTER, and why it is a rim. Switchable live via ABYME.glintStyle('wash'),
+  // and tools/harness/glint.mjs photographs all three on the same prop from the same
+  // camera so the choice is a look rather than an argument. What the photographs showed:
+  //
+  //   wash  — the old behaviour, warm the whole body. It does not highlight the prop,
+  //           it REPLACES it. The rosewood music box became a featureless cream block
+  //           with its brass escutcheon and grain gone; the brass valve wheel lost all
+  //           its specular shading and read as a flat cutout. This is the same failure
+  //           as #147 ("the music box banding unreadable"), self-inflicted on hover.
+  //   pulse — wash that breathes. Same problem, now moving.
+  //   rim   — a fresnel on the silhouette. The prop still looks like itself; only its
+  //           edge warms. Kept the wood grain, the brass, the label, all of it.
+  //
+  // wash and pulse stay switchable on purpose: "why not just brighten it" is the
+  // obvious next suggestion, and it is one console line away from being answered.
+  _captureGlint(spot) {
+    const mats = new Map();
+    // size-aware (#44 catch): a fixed intensity reads as a catch-light on a fist-sized
+    // ruler and as a FLOODLIT SLAB on a 3.4m standing stone. Scale by measured radius.
+    const gain = Math.min(1.5, Math.max(0.14, 0.65 / Math.max(spot._cullR ?? 0.5, 0.3)));
+    for (const t of spot.targets) {
+      t.traverse((o) => {
+        if (!(o.material && o.material.emissive !== undefined)) return;
+        // clone a private glint material the first time this mesh is hovered (lazily, so any
+        // async texture is already on the shared material) — so the highlight can't bleed
+        // across other props sharing a module-level material
+        if (!o.userData.glintMat) { o.material = o.material.clone(); o.userData.glintMat = true; }
+        const mat = o.material;
+        if (mats.has(mat)) return;
+        // The base is stored ONCE, on the material, and never re-read from a value this
+        // code may itself have written. Re-hovering a prop mid-fade would otherwise
+        // capture the half-lit value as "normal" and the prop would never return.
+        if (!mat.userData._glintBase) {
+          mat.userData._glintBase = { hex: mat.emissive.getHex(), intensity: mat.emissiveIntensity ?? 1 };
+        }
+        if (this.glintStyle === 'rim') this._patchRim(mat);
+        mats.set(mat, mat.userData._glintBase);
+      });
+    }
+    return { mats, t: 0, dir: 1, gain };
+  }
+
+  // A fresnel rim, injected into whichever lit shader the prop already uses. The body
+  // colour is left alone entirely — only the silhouette warms.
+  //
+  // customProgramCacheKey is NOT optional here. three caches compiled programs by
+  // material type + defines, and onBeforeCompile's edits are invisible to that key —
+  // so a patched and an unpatched MeshStandardMaterial with identical parameters share
+  // one program, and whichever compiles second gets the other's shader. An unpatched
+  // material would then run the rim code against a uniform it does not own.
+  _patchRim(mat) {
+    if (mat.userData._rimPatched) return;
+    mat.userData._rimPatched = true;
+    mat.userData._rimU = { value: 0 };
+    mat.userData._rimC = { value: new THREE.Color(0xffc270) };
+    mat.onBeforeCompile = (s) => {
+      s.uniforms.uRim = mat.userData._rimU;
+      s.uniforms.uRimC = mat.userData._rimC;
+      s.fragmentShader = s.fragmentShader
+        .replace('void main() {', 'uniform float uRim;\nuniform vec3 uRimC;\nvoid main() {')
+        // after <emissivemap_fragment> both `normal` (from normal_fragment_begin) and
+        // `totalEmissiveRadiance` are in scope, and vViewPosition is a varying on every
+        // lit material — standard, physical, phong and lambert alike.
+        .replace('#include <emissivemap_fragment>',
+          '#include <emissivemap_fragment>\n\tfloat rimF = 1.0 - abs(dot(normalize(vViewPosition), normal));\n\ttotalEmissiveRadiance += uRimC * uRim * pow(rimF, 3.2);');
+    };
+    mat.customProgramCacheKey = () => 'abyme-rim';
+    mat.needsUpdate = true;
+  }
+
+  _releaseGlint(g) {
+    for (const [mat, base] of g.mats) {
+      mat.emissive.setHex(base.hex);
+      mat.emissiveIntensity = base.intensity;
+      if (mat.userData._rimU) mat.userData._rimU.value = 0;
+      mat.userData._glintWrote = null;
+    }
+  }
+
+  tickGlint(dt, elapsed) {
+    const IN = 5.5, OUT = 3.2;                        // 1/seconds: ~0.18s up, ~0.31s down
+    for (let i = this._fading.length - 1; i >= 0; i--) {
+      const g = this._fading[i];
+      g.t = Math.max(0, g.t - dt * OUT);
+      if (g.t <= 0) { this._releaseGlint(g); this._fading.splice(i, 1); }
+      else this._applyGlint(g, elapsed);
+    }
+    const live = this._live;
+    if (!live) return;
+    live.t = Math.min(1, live.t + dt * IN);
+    this._applyGlint(live, elapsed);
+  }
+
+  _applyGlint(g, elapsed) {
+    // smoothstep, so the ramp has no corner at either end
+    const e = g.t * g.t * (3 - 2 * g.t);
+    // 'pulse' only breathes once it has arrived, so the rise itself stays clean
+    const beat = this.glintStyle === 'pulse' ? 1 + 0.13 * e * Math.sin(elapsed * 3.1) : 1;
+    for (const [mat, base] of g.mats) {
+      // If something ELSE wrote this material since our last frame — a puzzle drive
+      // pulsing a lamp — adopt its value as the base for this frame instead of
+      // stomping it. game.tick runs before interact.update, so the drive is always
+      // this frame's truth and we are the layer on top of it.
+      const w = mat.userData._glintWrote;
+      let bh = base.hex, bi = base.intensity;
+      if (w && (mat.emissive.getHex() !== w.hex || mat.emissiveIntensity !== w.intensity)) {
+        bh = mat.emissive.getHex(); bi = mat.emissiveIntensity ?? 1;
+      }
+      // RIM is the shipped one, and the body lift beside it is not decoration.
+      // A fresnel term is zero wherever the surface faces you, so a flat prop seen
+      // head-on — a sheet of paper on the desk, a notice on the wall — gets no rim at
+      // all: 1 - cos(40 deg) raised to 2.2 is 0.036, which is nothing. The floor of
+      // body lift is what those props run on, and it is ~4x gentler than the wash was,
+      // so on a solid prop it never reaches "different material".
+      const rim = this.glintStyle === 'rim';
+      if (rim && mat.userData._rimU) mat.userData._rimU.value = e * beat * 1.25;
+      if (bh < 0x030303) {
+        // glint-from-dark: give it the amber and ride the intensity up from nothing.
+        // NOT size-scaled under rim. g.gain exists because a body wash grows with the
+        // prop's AREA, so one number is a catch-light on a ruler and a floodlit slab on
+        // a standing stone. A rim is edge-only and scales itself, and running the lift
+        // through gain made it worst exactly where it was least wanted: both the paper
+        // notice and the music box clamp to gain 1.5, which is barely a tint on white
+        // paper and a wash on dark rosewood.
+        mat.emissive.setHex(0xffb454);
+        mat.emissiveIntensity = (rim ? 0.12 : g.gain * 0.72) * e * beat;
+      } else {
+        // already-lit props keep their own colour and merely warm
+        mat.emissiveIntensity = bi * (1 + (rim ? 0.10 : 0.55) * e * beat);
+      }
+      mat.userData._glintWrote = { hex: mat.emissive.getHex(), intensity: mat.emissiveIntensity };
+    }
+  }
+
+  setGlintStyle(style) {
+    if (style === this.glintStyle) return style;
+    if (this._live) { this._releaseGlint(this._live); this._live = null; }
+    for (const g of this._fading) this._releaseGlint(g);
+    this._fading.length = 0;
+    this.glintStyle = style;
+    this.hovered = null;        // so the next update re-captures under the new style
+    return style;
+  }
+
   _setHover(spot) {
     if (spot === this.hovered) return;
-    // restore old glint: both the emissive color and its intensity
-    for (const [mat, orig] of this._glinted) {
-      mat.emissive.setHex(orig.hex);
-      mat.emissiveIntensity = orig.intensity;
-    }
-    this._glinted.clear();
+    // the outgoing set does not snap back — it decays while the new one rises
+    if (this._live) { this._live.dir = -1; this._fading.push(this._live); this._live = null; }
     this.hovered = spot;
     this.iris.classList.toggle('hot', !!spot);
     // drag affordance (#57): chevrons flank the iris over a drag hotspot — turn, not tap
@@ -186,30 +343,6 @@ export class Interactions {
         this.labelEl.classList.add('show');
       }, 700);
     }
-    if (spot && !spot.noGlint) {
-      // size-aware glint (#44 catch): a fixed 1.6 emissive reads as a catch-light on a
-      // fist-sized ruler and as a FLOODLIT SLAB on a 3.4m standing stone. Scale by the
-      // spot's measured bounding radius — small things pop, monuments merely warm.
-      const glintI = Math.min(1.5, Math.max(0.14, 0.65 / Math.max(spot._cullR ?? 0.5, 0.3)));
-      for (const t of spot.targets) {
-        t.traverse((o) => {
-          if (!(o.material && o.material.emissive !== undefined)) return;
-          // clone a private glint material the first time this mesh is hovered (lazily, so any
-          // async texture is already on the shared material) — so the highlight can't bleed
-          // across other props sharing a module-level material
-          if (!o.userData.glintMat) { o.material = o.material.clone(); o.userData.glintMat = true; }
-          const mat = o.material;
-          if (!this._glinted.has(mat)) {
-            this._glinted.set(mat, { hex: mat.emissive.getHex(), intensity: mat.emissiveIntensity ?? 1 });
-            if (mat.emissive.r + mat.emissive.g + mat.emissive.b < 0.01) {
-              mat.emissive.setHex(0xffb454);
-              mat.emissiveIntensity = glintI;                                   // glint-from-dark: size-scaled
-            } else {
-              mat.emissiveIntensity = Math.max(0.25, (mat.emissiveIntensity ?? 1) * 1.6);   // already-lit props keep the boost
-            }
-          }
-        });
-      }
-    }
+    if (spot && !spot.noGlint) this._live = this._captureGlint(spot);
   }
 }

@@ -1715,6 +1715,11 @@ player.onFootstep = (kind, pos) => {
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
     gpuMode: () => (gpuTimer ? gpuTimer.mode : null),
     tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch),
+    // the hover glint's character, switchable live so it can be judged in the frame
+    // rather than in the abstract: 'wash' warms the whole prop, 'pulse' breathes,
+    // 'rim' lights only the silhouette and leaves the body colour alone.
+    glintStyle: (v) => (v === undefined ? interact.glintStyle : interact.setGlintStyle(v)),
+    interact,   // hotspots + hover state, for tools/harness/glint.mjs
     // THE STACK (STACK.md) — inspect what the rungs above displaced onto this one.
     // hand = who you are to the stack; ledger() = the raw marks; draft(n) = the
     // inherited water in tide units; tideAt(n) = baseline + draft; evidence(n) =
@@ -2248,6 +2253,7 @@ renderer.setAnimationLoop((tMs) => {
     core.userData.treeLod(player.pos.x, player.pos.z);
   }
   interact.update();
+  interact.tickGlint(dt, elapsed);   // the hover glint eases in and out (see interact.js)
   applyAtmosphere(elapsed, dt);
   tickGulls(elapsed, dt);
   tickPerched(elapsed, dt);

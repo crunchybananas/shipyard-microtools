@@ -75,6 +75,13 @@ echo "== the shell =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/shell.mjs" | tee "$WORK/shell.out"
 grep -q "SHELL 5 / 5" "$WORK/shell.out" || { echo "SHELL FAILED"; exit 1; }
 
+echo "== the hover glint =="
+# The highlight must mark a prop, not replace it. The full-body wash it used to be
+# turned the music box into a cream block and flared the desk notice past the bloom
+# threshold, and it stepped rather than eased. Both are pinned here.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/glint.mjs" | tee "$WORK/glint.out"
+grep -q "GLINT 25 / 25" "$WORK/glint.out" || { echo "GLINT FAILED"; exit 1; }
+
 echo "== the walk =="
 # CI runs on software GL where 20s real-time cinematics cannot hit wall-clock, so
 # CI is the LOGIC GATE: the 33 pumped assertions must pass AND the failure list
