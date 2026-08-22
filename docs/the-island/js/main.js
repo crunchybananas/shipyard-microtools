@@ -710,10 +710,15 @@ function rehydrateFromReport() {
   if (!q) return false;
   let ring = [];
   try { ring = JSON.parse(localStorage.getItem('abyme-reports') || '[]'); } catch (_) { ring = []; }
-  if (!ring.length) { console.warn('[abyme] ?report= but no reports in this browser'); return false; }
-  const rep = q === 'last' ? ring[ring.length - 1]
-    : (/^\d+$/.test(q) ? ring[+q] : ring.find((r) => r.t === q || (r.t || '').startsWith(q)));
-  if (!rep) { console.warn('[abyme] no report matching', q); return false; }
+  const rep = !ring.length ? null
+    : (q === 'last' ? ring[ring.length - 1]
+      : (/^\d+$/.test(q) ? ring[+q] : ring.find((r) => r.t === q || (r.t || '').startsWith(q))));
+  if (!rep) {
+    // LOUD, not a console warning nobody reads. Silently showing the title screen is
+    // indistinguishable from a broken link, and that is exactly how it read.
+    offerImport(q, ring.length);
+    return false;
+  }
   // `A` in this module is the AUDIO import, not the game API — A.init() really is
   // "start audio" (which the Begin and Continue paths both call), but the game's own
   // surface lives on window.ABYME and is not assigned until the debug block near the
@@ -1844,6 +1849,22 @@ player.onFootstep = (kind, pos) => {
       player.locked = false; interact.enabled = true; MODE = 'play';
       return { at: rep.pos, level: W.level, note: rep.note || '' };
     },
+    // Reports live in localStorage, which is scoped PER ORIGIN — one filed on the
+    // deployed site is invisible on localhost and vice versa. This is the way across:
+    // paste the blob F8 put on your clipboard (or the contents of the downloaded
+    // JSON) and it joins this browser's ring, addressable by ?report=<t> like any
+    // other. Screenshots are dropped: the ring has never stored them.
+    importReport: (x) => {
+      let rep = x;
+      if (typeof rep === 'string') rep = JSON.parse(rep);
+      if (!rep || !rep.pos || !rep.t) throw new Error('that does not look like a field report');
+      delete rep.shot;
+      const ring = JSON.parse(localStorage.getItem('abyme-reports') || '[]');
+      if (!ring.some((r) => r.t === rep.t)) ring.push(rep);
+      while (ring.length > 10) ring.shift();
+      localStorage.setItem('abyme-reports', JSON.stringify(ring));
+      return rep.t;
+    },
     reports: () => JSON.parse(localStorage.getItem('abyme-reports') || '[]'),
     resetFlags: () => {                                 // in-world soft reset (no reload) for replaying chains
       Object.keys(W.flags).forEach((k) => { W.flags[k] = false; });
@@ -2252,6 +2273,41 @@ renderer.setAnimationLoop((tMs) => {
   else renderer.render(scene, camera);
   if (gpuTimer) gpuTimer.endFrame();
 });
+
+// The card that comes up when ?report= finds nothing. Kept next to rehydrateFromReport
+// because they are one feature: the URL either lands you in the frame, or it tells you
+// precisely why it could not and hands you the way through.
+function offerImport(asked, ringSize) {
+  const el = document.getElementById('import-overlay');
+  const ta = document.getElementById('import-text');
+  const why = document.getElementById('import-why');
+  if (!el || !ta) { console.warn('[abyme] ?report=' + asked + ' matched nothing'); return; }
+  why.textContent = ringSize === 0
+    ? `This browser has no reports at all, and ?report=${asked} asked for one. Reports are stored per site — one you filed on a different address (the deployed site vs. localhost) is not visible here.`
+    : `No report here matches "${asked}". This browser holds ${ringSize}; try ?report=last, or paste the one you want.`;
+  el.hidden = false;
+  setTimeout(() => ta.focus(), 0);
+  const close = () => { el.hidden = true; };
+  const go = () => {
+    const raw = (ta.value || '').trim();
+    if (!raw) { close(); return; }
+    try {
+      const t = window.ABYME.importReport(raw);
+      const u = new URL(location.href);
+      u.searchParams.set('report', t);
+      location.replace(u.toString());        // reload straight into it
+    } catch (e) {
+      why.textContent = 'That did not parse as a field report: ' + e.message;
+    }
+  };
+  el.querySelector('#import-go').addEventListener('click', go);
+  el.querySelector('#import-skip').addEventListener('click', close);
+  ta.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.code === 'Enter' && !e.shiftKey) { e.preventDefault(); go(); }
+    if (e.code === 'Escape') { e.preventDefault(); close(); }
+  });
+}
 
 // ---- and finally: ?report= --------------------------------------------------
 // Deliberately the LAST thing this module does. window.ABYME is assigned in the debug

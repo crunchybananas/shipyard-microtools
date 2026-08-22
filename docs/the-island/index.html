@@ -71,6 +71,23 @@
        is wrong with it. It is a DOM overlay and not prompt(), deliberately: embedded
        browser panes block modal dialogs silently, which is how the note field ended up
        existing in the report payload with nothing able to fill it. -->
+  <!-- WHEN ?report= CANNOT BE RESOLVED. Reports live in localStorage, which is scoped
+       PER ORIGIN: one filed on abyme-stack.web.app simply does not exist on localhost,
+       and the first version of this failed silently — it dropped you on the title screen
+       with a console warning nobody sees, which read as "the link is broken". Say what
+       happened, and offer the way through: paste the report and go. -->
+  <div id="import-overlay" hidden>
+    <div id="import-card" class="sheet-card">
+      <div class="sheet-title">That report isn&rsquo;t in this browser</div>
+      <div class="sheet-sub" id="import-why"></div>
+      <textarea id="import-text" rows="4" placeholder="Paste a report here &mdash; F8 copies one to your clipboard, or open the JSON that was downloaded&#10;&#10;Enter to load it &middot; Esc to dismiss"></textarea>
+      <div class="sheet-row">
+        <button id="import-skip" type="button">Just play</button>
+        <button id="import-go" type="button" class="sheet-go">Load it</button>
+      </div>
+    </div>
+  </div>
+
   <div id="note-overlay" hidden>
     <div id="note-card">
       <div id="note-title">Leave a note</div>
