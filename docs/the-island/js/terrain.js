@@ -276,7 +276,18 @@ function ringBlockedGaps(x0, z0, x1, z1, cx, cz, r, gaps) {
 }
 // the drum's two openings: the beach door (az 160..170° — matches the right-sized visual
 // doorway + its jambs, was 153..177 when the breach was wall-wide) and the annex doorway (az 5..25°)
-const LH_GAPS = [[deg(160), deg(170)], [deg(5), deg(25)]];
+// The drum's walkable openings. THE ANNEX DOORWAY IS ONLY AN OPENING WHEN THE DOOR
+// IS OPEN. With it in the list unconditionally you could walk the annex gap at level 1
+// — through the drum wall line at r 5.2 and on to r 5.30, which is where the SHUT inner
+// door stands, so you ended up with your face inside a door the journal calls "shut
+// fast" and the hotspot calls "a shut door". The only thing that stopped you was the
+// annex FLOOR lock 10 cm further on, which is invisible. Owner, by F8: "I was trying
+// to walk into the attached room, but walked thrugh the wall."
+//
+// The floor lock stays — it still guards the approach from outside, where there is no
+// drum wall to stop you — but the door now stops you at the door.
+const LH_GAPS_OPEN = [[deg(160), deg(170)], [deg(5), deg(25)]];
+const LH_GAPS_SHUT = [[deg(160), deg(170)]];
 
 // EDGES. A narrow walkable structure standing above its surroundings — the jetty
 // deck over the seabed, the drain's ramp trench cut into the stones pad — has SIDES,
@@ -307,7 +318,7 @@ export function wallBlocked(x0, z0, x1, z1) {
   if (edgeBlocked(x0, z0, x1, z1)) return true;
 
   // lighthouse wall: the beach door + the annex doorway
-  if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;
+  if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, GATES.annexOpen ? LH_GAPS_OPEN : LH_GAPS_SHUT)) return true;
   // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2 —
   // and it STAYS open once you have returned from the bottom ("the door, the coat — all as
   // you left them"): the surface after the descent keeps the quarters walkable.
