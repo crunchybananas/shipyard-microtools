@@ -684,16 +684,54 @@ export function buildWorld() {
   // first readable fragment (the reading surface). Click it to open and read his account:
   // the lens-grinding, the rising sea, the model built to hold one whole day back.
   {
+    // THE LOGBOOK. Owner, by F8: "This wood box seems to be a log book? not sure wht I
+    // am looking at." It was a wood box. The cover was 0.30 x 0.072 x 0.42 and the page
+    // block 0.272 x 0.052 x 0.392 sitting INSIDE it on every axis — so the pages were
+    // never visible from anywhere and the prop rendered as one solid brown slab.
+    //
+    // A closed book is legible from across a room because of three things, none of
+    // which it had: boards that OVERHANG the page block (the squares), a page block
+    // showing as a pale stripe along the fore-edge and the head and tail, and a spine
+    // standing proud on the bound side. Built that way now, and matte — Lambert, for
+    // the same reason the chart paper is: a specular lobe on pale paper under the study
+    // window clips it to white and the detail disappears again.
     const book = new THREE.Group();
     book.name = 'logbook';
-    const cover = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.072, 0.42), matWood);
-    book.add(cover);
+    const W = 0.30, D = 0.42, H = 0.075, BOARD = 0.009, SQUARE = 0.008;
+    const leather = new THREE.MeshLambertMaterial({ color: 0x5a4632 });
+    const paper = new THREE.MeshLambertMaterial({ color: 0xc9bda0 });
+    for (const sy of [-1, 1]) {                       // the two boards
+      const bd = new THREE.Mesh(new THREE.BoxGeometry(W, BOARD, D), leather);
+      bd.position.y = sy * (H / 2 - BOARD / 2);
+      book.add(bd);
+    }
+    // the page block: flush at the spine, inset everywhere else so it reads as paper
+    // held between boards rather than as the boards themselves
     const leaves = new THREE.Mesh(
-      new THREE.BoxGeometry(0.272, 0.052, 0.392),
-      new THREE.MeshStandardMaterial({ color: 0xded3ba, roughness: 0.95, flatShading: true }),
-    );
-    leaves.position.y = 0.006;
+      new THREE.BoxGeometry(W - SQUARE, H - BOARD * 2 - 0.004, D - SQUARE * 2), paper);
+    leaves.position.x = -SQUARE / 2;
     book.add(leaves);
+    // the spine, standing proud of the boards, with the two raised cords of a sewn binding
+    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.02, H, D), leather);
+    spine.position.x = -(W / 2) - 0.004;
+    book.add(spine);
+    for (const cz of [-0.11, 0.11]) {
+      const cord = new THREE.Mesh(new THREE.BoxGeometry(0.026, H * 0.86, 0.022), leather);
+      cord.position.set(-(W / 2) - 0.005, 0, cz);
+      book.add(cord);
+    }
+    // a label pasted on the upper board — enough to say "this is a book that is written
+    // in" without pretending to legible type at 4 cm
+    const label = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.002, 0.09),
+      new THREE.MeshLambertMaterial({ color: 0xbfb49a }));
+    label.position.y = H / 2 + 0.001;
+    book.add(label);
+    for (const ly of [-0.018, 0, 0.018]) {           // three ruled strokes of a written title
+      const ink = new THREE.Mesh(new THREE.BoxGeometry(0.09 - Math.abs(ly) * 1.6, 0.001, 0.006),
+        new THREE.MeshLambertMaterial({ color: 0x4a3b28 }));
+      ink.position.set(-0.01, H / 2 + 0.0025, ly);
+      book.add(ink);
+    }
     book.position.set(LH.x - 1.40, LH.y + 0.99, LH.z + 0.66);
     book.rotation.y = 0.22;
     core.add(book);
