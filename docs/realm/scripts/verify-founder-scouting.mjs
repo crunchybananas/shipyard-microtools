@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=195';
-import { generateWorld } from '../js/world.js?realm=195';
-import { updateAvatar } from '../js/avatar.js?realm=195';
+import { G, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=196';
+import { generateWorld } from '../js/world.js?realm=196';
+import { updateAvatar } from '../js/avatar.js?realm=196';
 
 setSeed(22551);
 generateWorld();

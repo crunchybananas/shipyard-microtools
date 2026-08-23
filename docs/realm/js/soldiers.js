@@ -2,17 +2,26 @@
 // Soldiers — AI update for soldier units
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=195';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=195';
-import { spawnClashFX } from './fx.js?realm=195';
-import { sfx as playSound } from './log.js?realm=195';
-import { recordDeathMarker } from './death-markers.js?realm=195';
-import { workersForBuilding } from './citizen-ownership.js?realm=195';
+import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=196';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=196';
+import { spawnClashFX } from './fx.js?realm=196';
+import { sfx as playSound } from './log.js?realm=196';
+import { recordDeathMarker } from './death-markers.js?realm=196';
+import { workersForBuilding } from './citizen-ownership.js?realm=196';
 import {
   armyMayEngage,
   armyOrderAnchor,
+  companyObjective,
+  moveSoldierToTarget,
   refreshEscortTarget,
-} from './army-orders.js?realm=195';
+  resetCompanyCommandRuntime,
+  updateCompanyMovement,
+} from './army-orders.js?realm=196';
+import { readinessMultipliers } from './company-supply.js?realm=196';
+
+function companyMultipliers() {
+  return readinessMultipliers(G.armySupply?.readiness);
+}
 
 function soldierDamage(s) {
   let damage = 5;
@@ -21,7 +30,7 @@ function soldierDamage(s) {
     const d = Math.sqrt((b.x - s.x) ** 2 + (b.y - s.y) ** 2);
     if (d < 8) { damage *= 1.5; break; }
   }
-  return damage;
+  return damage * companyMultipliers().damage;
 }
 
 export function updateSoldiers() {
@@ -65,7 +74,7 @@ export function updateSoldiers() {
         const idealRange = 5;
         if (nearestDist < idealRange - 1) {
           // Too close — back up (collision-checked, slides along buildings)
-          stepEntityToward(s, s.x - (nearestEnemy.x - s.x), s.y - (nearestEnemy.y - s.y), 0.02 * Math.max(1, nearestDist));
+          stepEntityToward(s, s.x - (nearestEnemy.x - s.x), s.y - (nearestEnemy.y - s.y), 0.02 * Math.max(1, nearestDist) * companyMultipliers().movement);
         } else if (nearestDist < idealRange + 2) {
           // In range — fire arrow
           s.attackTimer = (s.attackTimer || 0) - 1;
@@ -81,7 +90,7 @@ export function updateSoldiers() {
           }
         } else {
           // Close the gap
-          stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.035);
+          moveSoldierToTarget(s, nearestEnemy, G, 0.035 * companyMultipliers().movement);
         }
         continue; // skip default melee logic
       }
@@ -90,7 +99,7 @@ export function updateSoldiers() {
       const dx = nearestEnemy.x - s.x, dy = nearestEnemy.y - s.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.5) {
-        stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.04);
+        moveSoldierToTarget(s, nearestEnemy, G, 0.04 * companyMultipliers().movement);
       } else {
         // Attack cooldown
         s.attackTimer = (s.attackTimer || 0) - 1;
@@ -107,11 +116,17 @@ export function updateSoldiers() {
       continue;
     }
 
+    // Company Command v1 owns movement while an Advance/Attack-move objective
+    // is active. This route is A* planned and formation-slot specific; it must
+    // consume the tick even when the unit has arrived so the legacy random
+    // patrol fallback cannot pull the company away from its objective.
+    if (companyObjective(G) && updateCompanyMovement(s, G, 0.035 * companyMultipliers().movement)) continue;
+
     // No enemy — patrol
     const dx = s.tx - s.x, dy = s.ty - s.y;
     const d = Math.sqrt(dx*dx + dy*dy);
     if (d > 0.1) {
-      if (!stepEntityToward(s, s.tx, s.ty, 0.03)) {
+      if (!stepEntityToward(s, s.tx, s.ty, 0.03 * companyMultipliers().movement)) {
         // Blocked — pick a fresh reachable patrol point instead of grinding
         const t = nearestWalkableTile(Math.round(s.x + rngRange(-4, 4)), Math.round(s.y + rngRange(-4, 4)), 4);
         if (t) { s.tx = t.x; s.ty = t.y; }
@@ -137,5 +152,8 @@ export function updateSoldiers() {
       // Loop 77: gravestone marker at soldier's actual falling spot
       recordDeathMarker({ x: s.x, y: s.y, name: s.name || 'Soldier', cause: 'battle' });
     }
+  }
+  if (G.soldiers.length === 0 && companyObjective(G)) {
+    resetCompanyCommandRuntime(G, { clearObjective: true });
   }
 }

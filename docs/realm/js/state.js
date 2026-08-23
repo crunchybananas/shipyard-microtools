@@ -2,6 +2,8 @@
 // Shared game state — imported by all modules
 // ════════════════════════════════════════════════════════════
 
+import { createCompanySupplyState } from './company-supply.js?realm=196';
+
 export const TILE = { WATER:0, SAND:1, GRASS:2, FOREST:3, STONE:4, IRON:5, MOUNTAIN:6 };
 export const TW = 64, TH = 32;
 export const MAP_W = 80, MAP_H = 80;
@@ -161,7 +163,9 @@ export const G = {
   season: 'spring',
   rallyPoint: null,
   armyGuardPoint: null,
+  armyObjective: null,
   armyStance: 'defend', // defend | rally | patrol | guard | explore
+  armySupply: createCompanySupplyState(1),
   won: false,
   era: 1,                   // The Three Ages (tech.js ERAS): 1 Hearth · 2 Charter · 3 Crown
   eraStartDay: { 1: 1 },    // era id -> G.day it began

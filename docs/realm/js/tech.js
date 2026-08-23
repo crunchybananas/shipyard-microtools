@@ -2,13 +2,13 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=195';
-import { withdrawFoodFromStores } from './building-inventory.js?realm=195';
-import { sfx as playSound } from './log.js?realm=195';
-import { emit } from './bus.js?realm=195';
-import { staffingCount } from './citizen-ownership.js?realm=195';
-import { chronicle } from './log.js?realm=195';
-import { announce as notify } from './log.js?realm=195';
+import { G, BUILDINGS } from './state.js?realm=196';
+import { withdrawFoodFromStores } from './building-inventory.js?realm=196';
+import { sfx as playSound } from './log.js?realm=196';
+import { emit } from './bus.js?realm=196';
+import { staffingCount } from './citizen-ownership.js?realm=196';
+import { chronicle } from './log.js?realm=196';
+import { announce as notify } from './log.js?realm=196';
 
 export const TECHS = {
   agriculture: {

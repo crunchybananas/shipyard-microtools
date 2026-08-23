@@ -46,13 +46,13 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const ownership = await import('./js/citizen-ownership.js?realm=195');
-    const presentation = await import('./js/citizen-presentation.js?realm=195');
-    const inventory = await import('./js/building-inventory.js?realm=195');
-    const navigation = await import('./js/citizen-navigation.js?realm=195');
-    const render = await import('./js/render.js?realm=195');
-    const state = await import('./js/state.js?realm=195');
-    const ui = await import('./js/ui.js?realm=195');
+    const ownership = await import('./js/citizen-ownership.js?realm=196');
+    const presentation = await import('./js/citizen-presentation.js?realm=196');
+    const inventory = await import('./js/building-inventory.js?realm=196');
+    const navigation = await import('./js/citizen-navigation.js?realm=196');
+    const render = await import('./js/render.js?realm=196');
+    const state = await import('./js/state.js?realm=196');
+    const ui = await import('./js/ui.js?realm=196');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -378,7 +378,9 @@ try {
       phase('eat');
 
       // The night schedule owns go-home and sleep. Sleep restores rest; dawn
-      // owns the recovery transition back to find_job.
+      // owns the recovery transition back to find_job. A completed House is
+      // required: outdoor or unreachable "sleep" must never grant recovery.
+      placeComplete('house', 42, 42);
       setPosition(target, 47, 40);
       target.home = null;
       target.hunger = 0;
@@ -388,7 +390,17 @@ try {
       g.dayPhase = Math.floor(g.dayLength * 0.8);
       forceHeartbeatNextTick(target);
       g.debug.step(1);
-      requireCondition(target.activity.kind === 'go_home', 'Night schedule did not route the miner home');
+      requireCondition(
+        target.activity.kind === 'go_home',
+        `Night schedule did not route the miner home: ${JSON.stringify({
+          activity: target.activity,
+          home: target.home && { x: target.home.x, y: target.home.y, type: target.home.type, progress: target.home.buildProgress },
+          pathRequest: target._pathRequest,
+          requested: [target._requestedTx, target._requestedTy],
+          pathFailedAt: target._pathFailedAt,
+          tick: g.gameTick,
+        })}`,
+      );
       const sleepApproachTicks = stepUntil(
         'night route reaching sleep',
         () => target.activity.kind === 'sleep',
@@ -436,7 +448,16 @@ try {
 
       // Select through the real canvas hit-test. The info panel must be built
       // from the immutable presentation shape and carry the stable actor ID,
-      // never a list index or display name.
+      // never a list index or display name. Sleeping residents are truthfully
+      // indoors and therefore not canvas-selectable, so wake the subject into
+      // the visible daytime world before exercising exterior hit testing.
+      g.dayPhase = Math.floor(g.dayLength * 0.2);
+      ownership.transitionCitizenActivity(target, 'idle', 'idle-wait');
+      setPosition(target, 47, 40);
+      target.activityTimer = 100;
+      avoidHeartbeatNextTick(target);
+      g.debug.step(1);
+      window.forceRender();
       const selectedSnapshot = presentation.buildCitizenPresentation(target, {
         selectedActorId: target.actorId,
       });

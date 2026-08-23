@@ -29,7 +29,7 @@ try {
   await barracksBuildButton.waitFor({ state: 'visible' });
   assert.equal(await barracksBuildButton.isEnabled(), true, 'military scenario advertised barracks but could not afford one');
   const immediateSave = await page.evaluate(async () => {
-    const saveState = await import('./js/save-state.js?realm=195');
+    const saveState = await import('./js/save-state.js?realm=196');
     const prepared = saveState.prepareSave(saveState.serializeGame({ savedAt: 189 }));
     return {
       ok: prepared.ok,
@@ -45,9 +45,9 @@ try {
   );
 
   const setup = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=195');
-    const ownership = await import('./js/citizen-ownership.js?realm=195');
-    const ui = await import('./js/ui.js?realm=195');
+    const state = await import('./js/state.js?realm=196');
+    const ownership = await import('./js/citizen-ownership.js?realm=196');
+    const ui = await import('./js/ui.js?realm=196');
     const g = window.G;
     Object.assign(g.resources, { wood: 100, stone: 100, food: 20, gold: 50, iron: 20, planks: 20 });
     for (const row of g.fog) row.fill(true);
@@ -109,8 +109,52 @@ try {
     };
   });
   assert.deepEqual(trained, { soldiers: 1, name: queued.name, queued: false });
-  await page.evaluate(() => window.G.debug.step(900));
+  await page.evaluate(async () => {
+    window.G.debug.step(900);
+    const ui = await import('./js/ui.js?realm=196');
+    ui.updateUI();
+  });
   assert.equal(await page.evaluate(() => window.G.soldiers.length), 1, 'browser barracks auto-trained a second unit');
+
+  assert.match(await page.locator('#soldier-count').innerText(), /READY/, 'company HUD omitted supply readiness');
+  const companyTitle = await page.locator('#soldier-count').evaluate(element => element.closest('.res')?.title || '');
+  assert.match(companyTitle, /Next dawn: −1 food, −1 iron/, 'company HUD omitted visible upkeep');
+  const advanceButton = page.locator('[data-company-objective]');
+  await advanceButton.click();
+  assert.equal(await page.evaluate(() => document.body.classList.contains('company-objective-placement')), true, 'Advance control did not enter ground placement');
+  const advance = await page.evaluate(async () => {
+    const render = await import('./js/render.js?realm=196');
+    const pathfinding = await import('./js/pathfinding.js?realm=196');
+    const g = window.G;
+    const soldier = g.soldiers[0];
+    let target = null;
+    for (let radius = 3; radius <= 8 && !target; radius++) {
+      for (let dy = -radius; dy <= radius && !target; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== radius) continue;
+          const x = Math.round(soldier.x) + dx;
+          const y = Math.round(soldier.y) + dy;
+          if (pathfinding.isWalkable(x, y)) { target = { x, y }; break; }
+        }
+      }
+    }
+    if (!target) throw new Error('No nearby open company objective');
+    const canvas = document.getElementById('game');
+    const rect = canvas.getBoundingClientRect();
+    const world = render.toScreen(target.x, target.y);
+    const canvasX = (world.x - g.camera.x) * g.camera.zoom + canvas.width / 2;
+    const canvasY = (world.y - g.camera.y) * g.camera.zoom + canvas.height / 2;
+    canvas.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      button: 0,
+      clientX: rect.left + canvasX * (rect.width / canvas.width),
+      clientY: rect.top + canvasY * (rect.height / canvas.height),
+    }));
+    window.forceRender();
+    return { target, objective: g.armyObjective };
+  });
+  assert.deepEqual(advance.objective, { ...advance.target, mode: 'attack-move' }, 'ground tap did not issue the strict company objective');
+  assert.equal(await page.locator('#army-order-label').innerText(), 'Attack-move', 'HUD did not expose the active company order');
 
   await page.locator('#btn-founder').click();
   assert.equal(await page.locator('#btn-founder').getAttribute('aria-pressed'), 'true');
@@ -122,7 +166,7 @@ try {
   });
   assert.equal(await page.evaluate(() => window.G._placingRally), true, 'touch rally control did not enter placement mode');
   assert.deepEqual(errors, [], `browser errors: ${errors.join(' | ')}`);
-  console.log('[first-muster-browser] PASS — military scenario, explicit named queue, Founder HUD, and touch rally mode');
+  console.log('[first-muster-browser] PASS — military scenario, explicit named queue, supply HUD, touch Advance, Founder controls, and rally mode');
 } finally {
   await browser.close();
   await server.stop();

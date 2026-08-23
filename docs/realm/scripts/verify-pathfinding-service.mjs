@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {
   createPathfindingGridSnapshot,
   findPathOnGrid,
-} from '../js/pathfinding-kernel.js?realm=195';
+} from '../js/pathfinding-kernel.js?realm=196';
 import {
   PATHFINDING_MODES,
   PATHFINDING_READY_DELAY_TICKS,
@@ -19,11 +19,11 @@ import {
   resetPathfindingService,
   takePathfindingResult,
   useSynchronousPathfindingService,
-} from '../js/pathfinding-service.js?realm=195';
+} from '../js/pathfinding-service.js?realm=196';
 import {
   pathfindingWorkerClientActive,
   startPathfindingWorkerClient,
-} from '../js/pathfinding-client.js?realm=195';
+} from '../js/pathfinding-client.js?realm=196';
 
 function makeGrid(obstacleEpoch = 1) {
   const width = 24;

@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import runtimeContract from '../runtime-contract.json?realm=195' with { type: 'json' };
-import { CORE_SYSTEM_ORDER } from '../js/sim.js?realm=195';
+import runtimeContract from '../runtime-contract.json?realm=196' with { type: 'json' };
+import { CORE_SYSTEM_ORDER } from '../js/sim.js?realm=196';
 import {
   REALM_ROOT,
   analyzeRuntimeGraph,

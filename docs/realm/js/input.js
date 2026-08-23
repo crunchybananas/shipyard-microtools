@@ -2,14 +2,14 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=195';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=195';
-import { canAfford } from './economy.js?realm=195';
-import { dispatch } from './commands.js?realm=195';
-import { notify } from './notifications.js?realm=195';
-import { initAudio } from './audio.js?realm=195';
-import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=195';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=195';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=196';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=196';
+import { canAfford } from './economy.js?realm=196';
+import { dispatch } from './commands.js?realm=196';
+import { notify } from './notifications.js?realm=196';
+import { initAudio } from './audio.js?realm=196';
+import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=196';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=196';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -213,6 +213,37 @@ export function setupInput(canvas) {
   window.toggleFounderFollow = toggleFounderFollow;
 
   function handlePrimaryTap(clientX, clientY) {
+    if (document.body.classList.contains('company-objective-placement')) {
+      const t = pickTile(clientX, clientY);
+      if (!t) return true;
+      const result = dispatch({ type: 'SET_COMPANY_OBJECTIVE', x: t.x, y: t.y, mode: 'attack-move' });
+      document.body.classList.remove('company-objective-placement');
+      if (result.ok) {
+        G.particles.push({
+          tx: result.objective.x,
+          ty: result.objective.y,
+          offsetY: -12,
+          text: '⚔️ Advance',
+          alpha: 1.5,
+          vy: -0.15,
+          decay: 0.01,
+          type: 'text',
+        });
+        notify(`⚔️ Company attack-move: ${result.members} soldier${result.members === 1 ? '' : 's'} advancing to ${result.objective.x},${result.objective.y}.`, 'info', { chronicle: false });
+      } else {
+        const reason = {
+          'company-point-out-of-bounds': 'That objective is outside the realm.',
+          'company-point-unwalkable': 'Choose open ground; the company needs a reachable objective.',
+          'no-company': 'Muster a free soldier before giving the company an objective.',
+          'no-route': 'The company cannot find a route to that objective.',
+          'company-starving': 'The company is starving and must be supplied before it can advance.',
+          'bad-company-mode': 'That company order is unavailable.',
+        }[result.reason] || 'The company could not take that objective.';
+        notify(`⚠️ ${reason}`, 'warn', { chronicle: false });
+      }
+      updateUI();
+      return true;
+    }
     if (G._placingRally) {
       const t = pickTile(clientX, clientY);
       if (!t) return true;

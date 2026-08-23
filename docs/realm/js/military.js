@@ -1,16 +1,16 @@
 // Player-authored military recruitment. Barracks and ranges provide a
 // training place; they never mint troops or spend resources on their own.
 
-import { G } from './state.js?realm=195';
-import { emit } from './bus.js?realm=195';
+import { G } from './state.js?realm=196';
+import { emit } from './bus.js?realm=196';
 import {
   activeStaffingCount,
   isBuildingComplete,
   isBuildingOperational,
-} from './building-operation.js?realm=195';
-import { removeCitizenFromWorld } from './citizen-ownership.js?realm=195';
-import { nearestWalkableTile } from './pathfinding.js?realm=195';
-import { withdrawFoodFromStores } from './building-inventory.js?realm=195';
+} from './building-operation.js?realm=196';
+import { removeCitizenFromWorld } from './citizen-ownership.js?realm=196';
+import { nearestWalkableTile } from './pathfinding.js?realm=196';
+import { withdrawFoodFromStores } from './building-inventory.js?realm=196';
 
 export const RECRUITMENT = Object.freeze({
   barracks: Object.freeze({
@@ -117,6 +117,12 @@ export function recruitmentStatus(building) {
   if (!isBuildingComplete(building)) return { ok: false, reason: 'under-construction', spec, count };
   if (building.recruitType) return { ok: false, reason: 'queue-busy', spec, count };
   if (count >= spec.cap) return { ok: false, reason: 'unit-cap', spec, count };
+  // Keep one civilian in the realm. This deliberately still allows the
+  // authored First Muster to enlist from four citizens down to one, while
+  // making the final civilian a hard, visible workforce floor thereafter.
+  if (G.population <= 1) {
+    return { ok: false, reason: 'minimum-civilian', spec, count, candidate: null };
+  }
   if (!isBuildingOperational(building)) return { ok: false, reason: 'needs-workers', spec, count };
   const candidate = recruitmentCandidatePreview(building);
   if (!candidate) return { ok: false, reason: 'no-candidate', spec, count, candidate: null };
@@ -124,7 +130,7 @@ export function recruitmentStatus(building) {
     .filter(([resource, amount]) => (G.resources[resource] || 0) < amount)
     .map(([resource]) => resource);
   if (missing.length) return { ok: false, reason: 'insufficient-resources', spec, count, candidate, missing };
-  return { ok: true, spec, count, candidate };
+  return { ok: true, spec, count, candidate, lastLevy: G.population === 2 };
 }
 
 export function queueRecruit(building) {
@@ -159,6 +165,7 @@ export function queueRecruit(building) {
     candidate: status.candidate,
     unit: status.spec.type,
     duration: status.spec.duration,
+    lastLevy: status.lastLevy,
   };
 }
 

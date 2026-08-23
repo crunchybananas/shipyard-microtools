@@ -6,16 +6,16 @@
 // statistics, and feedback; structural teardown is deliberately identical.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=195';
-import { nearestWalkableTile } from './pathfinding.js?realm=195';
-import { announce, chronicle, sfx } from './log.js?realm=195';
+import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=196';
+import { nearestWalkableTile } from './pathfinding.js?realm=196';
+import { announce, chronicle, sfx } from './log.js?realm=196';
 import {
   releaseAssignmentsForBuilding,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=195';
-import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=195';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=195';
-import { clearGuardOrderForBuilding } from './army-orders.js?realm=195';
+} from './citizen-ownership.js?realm=196';
+import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=196';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=196';
+import { clearGuardOrderForBuilding } from './army-orders.js?realm=196';
 
 const REMOVAL_CAUSES = new Set(['manual', 'fire', 'raid', 'undo']);
 const ASSIGNMENT_BOUND_ACTIVITIES = new Set(['idle', 'find_job', 'walk_to_work', 'working']);

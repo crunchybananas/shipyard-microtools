@@ -13,7 +13,7 @@ import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
 const REVISION = contract.moduleRevision;
-assert.equal(REVISION, 193, 'Update this gate together with current browser module URLs');
+assert.equal(REVISION, 196, 'Update this gate together with current browser module URLs');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -43,13 +43,13 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=195');
-    const ownership = await import('./js/citizen-ownership.js?realm=195');
-    const presentation = await import('./js/citizen-presentation.js?realm=195');
-    const render = await import('./js/render.js?realm=195');
-    const residences = await import('./js/residences.js?realm=195');
-    const state = await import('./js/state.js?realm=195');
-    const ui = await import('./js/ui.js?realm=195');
+    const economy = await import('./js/economy.js?realm=196');
+    const ownership = await import('./js/citizen-ownership.js?realm=196');
+    const presentation = await import('./js/citizen-presentation.js?realm=196');
+    const render = await import('./js/render.js?realm=196');
+    const residences = await import('./js/residences.js?realm=196');
+    const state = await import('./js/state.js?realm=196');
+    const ui = await import('./js/ui.js?realm=196');
     const g = window.G;
 
     const requireCondition = (condition, message) => {

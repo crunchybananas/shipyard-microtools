@@ -148,8 +148,8 @@ the core neither knows nor cares.
 ## Save format
 
 - Realm is in development and uses one strict Engine v2 save epoch. The current
-  contract is module revision `193`, schema `realm.engine-v2`, key
-  `realm-engine-v2-save`, save version `4`, simulation version `6`, and core
+  contract is module revision `196`, schema `realm.engine-v2`, key
+  `realm-engine-v2-save`, save version `6`, simulation version `8`, and core
   order
   `sha256:14621d8fcd8b94594989a9bc8b98e0e67c7f654687e80cdab8cafd940c19c014`.
   These values come only from `runtime-contract.json`; the order identifier is

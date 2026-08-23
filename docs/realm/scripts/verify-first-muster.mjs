@@ -1,26 +1,26 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, createResourceStock, setSeed } from '../js/state.js?realm=195';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=195';
-import { dispatch } from '../js/commands.js?realm=195';
-import { trySpawnSettlers } from '../js/economy.js?realm=195';
+import { G, createResourceStock, setSeed } from '../js/state.js?realm=196';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=196';
+import { dispatch } from '../js/commands.js?realm=196';
+import { trySpawnSettlers } from '../js/economy.js?realm=196';
 import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   resetCitizenOwnershipRuntime,
   staffingCount,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=195';
+} from '../js/citizen-ownership.js?realm=196';
 import {
   recruitmentCandidatePreview,
   recruitmentForBuilding,
   recruitmentStatus,
   updateRecruitment,
-} from '../js/military.js?realm=195';
-import { residentsForHouse } from '../js/residences.js?realm=195';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=195';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=195';
+} from '../js/military.js?realm=196';
+import { residentsForHouse } from '../js/residences.js?realm=196';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=196';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=196';
 
 function finishedBuilding(type, x, y = 40) {
   const building = {
@@ -230,6 +230,20 @@ assert.equal(new Set(enlistedActorIds).size, 3, 'sequential orders consumed a ci
 assert.equal(G.soldiers.length, 3);
 assert.equal(G.population, 1);
 assert.equal(staffingCount(scenarioBarracks), 1);
+const lastCivilianBeforeRejectedRecruit = {
+  population: G.population,
+  iron: G.resources.iron,
+  food: G.resources.food,
+  soldiers: G.soldiers.length,
+};
+assert.equal(recruitmentStatus(scenarioBarracks).reason, 'minimum-civilian');
+assert.equal(dispatch({ type: 'RECRUIT_UNIT', x: scenarioBarracks.x, y: scenarioBarracks.y }).reason, 'minimum-civilian');
+assert.deepEqual({
+  population: G.population,
+  iron: G.resources.iron,
+  food: G.resources.food,
+  soldiers: G.soldiers.length,
+}, lastCivilianBeforeRejectedRecruit, 'minimum-civilian failure mutated the realm');
 assert.equal(prepareSave(serializeGame({ savedAt: 189 })).ok, true, 'three-enlistment scenario state failed Save/Continue validation');
 
 console.log('[first-muster] PASS — deterministic citizen enlistment, Crown/named protection, labor and housing loss, exact-once cost, one-instructor drill, Save/Continue, and the four-person post-House triple muster');
