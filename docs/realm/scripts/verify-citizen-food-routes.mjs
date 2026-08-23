@@ -3,21 +3,21 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=195';
-import { makeCitizen } from '../js/world.js?realm=195';
-import { makeAvatar } from '../js/avatar.js?realm=195';
-import { updateCitizens } from '../js/citizens.js?realm=195';
+} from '../js/state.js?realm=196';
+import { makeCitizen } from '../js/world.js?realm=196';
+import { makeAvatar } from '../js/avatar.js?realm=196';
+import { updateCitizens } from '../js/citizens.js?realm=196';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=195';
+} from '../js/citizen-ownership.js?realm=196';
 import {
   foodConservationReport,
   storedFood,
-} from '../js/building-inventory.js?realm=195';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=195';
-import { resetPathfindingService } from '../js/pathfinding-service.js?realm=195';
+} from '../js/building-inventory.js?realm=196';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=196';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=196';
 
 function resetCore(seed = 190_501) {
   resetPathfindingService();

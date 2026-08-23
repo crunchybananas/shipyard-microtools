@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=195';
-import { missions } from './missions.js?realm=195';
+} from './state.js?realm=196';
+import { missions } from './missions.js?realm=196';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=195';
+} from './save-schema.js?realm=196';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,11 +22,11 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=195';
-import { houseResidentCapacity } from './residences.js?realm=195';
-import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=195';
-import { foodCapacity } from './building-inventory.js?realm=195';
-import { makePathfindingRequest } from './pathfinding-service.js?realm=195';
+} from './citizen-ownership.js?realm=196';
+import { houseResidentCapacity } from './residences.js?realm=196';
+import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=196';
+import { foodCapacity } from './building-inventory.js?realm=196';
+import { makePathfindingRequest } from './pathfinding-service.js?realm=196';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization
@@ -37,6 +37,9 @@ const PREPARED = new WeakMap();
 const SEASONS = new Set(['spring', 'summer', 'autumn', 'winter']);
 const DIFFICULTIES = new Set(['easy', 'normal', 'hard']);
 const ARMY_STANCES = new Set(['defend', 'rally', 'patrol', 'guard', 'explore']);
+const COMPANY_OBJECTIVE_MODES = new Set(['advance', 'attack-move']);
+const COMPANY_READINESS = new Set(['ready', 'strained', 'starving']);
+const COMPANY_SHORTAGES = new Set(['none', 'food', 'iron', 'both']);
 const SPEEDS = new Set([0, 1, 2, 4]);
 const WEATHER = new Set(['clear', 'rain']);
 const SCENARIOS = new Set(['peaceful_start', 'military_rise', 'merchant_kingdom', 'seafaring', 'industrial']);
@@ -99,7 +102,8 @@ const ALLOWED_GAME_KEYS = new Set([
   '_patrolPosts', '_patrolPostsBuildingCount', '_raidSide', '_raidSpawnCount',
   '_raidStolen', '_raidWarningGiven', '_refreshPanelFor', '_renderAlpha',
   '_renderDeltaMs', '_scenarioWon',
-  '_undoStack', 'acorns', 'activeEvent', 'animals', 'armyGuardPoint', 'armyStance', 'avatar',
+  '_undoStack', 'acorns', 'activeEvent', 'animals', 'armyGuardPoint', 'armyObjective',
+  'armyStance', 'armySupply', 'avatar',
   'bats', 'bigSnow', 'birds', 'boats', 'bolts', 'buildingGrid',
   'buildings', 'bunnies', 'camStart', 'camera', 'cameraShake', 'caravans',
   'carts', 'chronicle', 'citizens', 'clouds', 'crabs', 'currentResearch', 'day',
@@ -125,7 +129,8 @@ const REQUIRED_GAME_KEYS = new Set([
   'camera', 'nextRaidDay',
   'raidInterval', 'researchedTechs', 'currentResearch', 'caravans', 'walkers',
   'raidFlash', 'activeEvent', 'eventModifiers', 'weather', 'season', 'rallyPoint',
-  'armyGuardPoint', 'armyStance', 'won', 'era', 'eraStartDay', 'wonder', 'clouds', 'cameraShake',
+  'armyGuardPoint', 'armyObjective', 'armyStance', 'armySupply', 'won', 'era',
+  'eraStartDay', 'wonder', 'clouds', 'cameraShake',
   'tileWear', 'difficulty', 'scenario', 'kingdomName', 'resourceRates',
   'notificationLog', 'lastResources', 'stats', 'avatar', 'chronicle',
   'storyFlags', 'storyState', 'namedCharacters', 'debug',
@@ -353,7 +358,9 @@ const ROOT_FIELD_VALIDATORS = new Map([
   ['_undoStack', denseArrayRule],
   ['activeEvent', nullableObjectRule],
   ['armyGuardPoint', nullableObjectRule],
+  ['armyObjective', nullableObjectRule],
   ['armyStance', enumRule(ARMY_STANCES, 'army stance')],
+  ['armySupply', ordinaryObjectRule],
   ['avatar', ordinaryObjectRule],
   ['buildingGrid', denseArrayRule],
   ['buildings', denseArrayRule],
@@ -650,6 +657,44 @@ function validateRootStructures(game) {
   if (game.armyStance === 'rally' && game.rallyPoint === null) return failure('inconsistent-state', '$.state.game.armyStance', 'Rally stance requires a rally point.');
   if (game.armyStance === 'guard' && game.armyGuardPoint === null) return failure('inconsistent-state', '$.state.game.armyStance', 'Guard stance requires a building target.');
   if (game.armyStance === 'explore' && game.avatar === null) return failure('inconsistent-state', '$.state.game.armyStance', 'Explore stance requires the Founder.');
+  if (game.armyObjective !== null) {
+    const objectiveKeys = new Set(['x', 'y', 'mode']);
+    const objectiveSurface = validateObjectSurface(game.armyObjective, objectiveKeys, objectiveKeys, '$.state.game.armyObjective');
+    if (!objectiveSurface.ok) return objectiveSurface;
+    if (
+      !Number.isSafeInteger(game.armyObjective.x)
+      || !Number.isSafeInteger(game.armyObjective.y)
+      || game.armyObjective.x < 0 || game.armyObjective.x >= MAP_W
+      || game.armyObjective.y < 0 || game.armyObjective.y >= MAP_H
+    ) return failure('out-of-range', '$.state.game.armyObjective', 'Company objective must be a map tile.');
+    if (!COMPANY_OBJECTIVE_MODES.has(game.armyObjective.mode)) {
+      return failure('invalid-enum', '$.state.game.armyObjective.mode', 'Unknown company objective mode.');
+    }
+  }
+  const supplyKeys = new Set(['version', 'lastProcessedDay', 'missedDawns', 'shortage', 'readiness', 'lastCharge']);
+  const supplySurface = validateObjectSurface(game.armySupply, supplyKeys, supplyKeys, '$.state.game.armySupply');
+  if (!supplySurface.ok) return supplySurface;
+  if (game.armySupply.version !== 1) return failure('wrong-version', '$.state.game.armySupply.version', 'Unknown company supply version.');
+  if (!Number.isSafeInteger(game.armySupply.lastProcessedDay) || game.armySupply.lastProcessedDay < 0 || game.armySupply.lastProcessedDay > game.day) {
+    return failure('out-of-range', '$.state.game.armySupply.lastProcessedDay', 'Company supply day must not exceed the current day.');
+  }
+  if (!Number.isSafeInteger(game.armySupply.missedDawns) || game.armySupply.missedDawns < 0 || game.armySupply.missedDawns > 2) {
+    return failure('out-of-range', '$.state.game.armySupply.missedDawns', 'Company missed dawns must be 0 through 2.');
+  }
+  if (!COMPANY_SHORTAGES.has(game.armySupply.shortage)) return failure('invalid-enum', '$.state.game.armySupply.shortage', 'Unknown company supply shortage.');
+  if (!COMPANY_READINESS.has(game.armySupply.readiness)) return failure('invalid-enum', '$.state.game.armySupply.readiness', 'Unknown company readiness.');
+  const expectedReadiness = game.armySupply.missedDawns === 0 ? 'ready'
+    : game.armySupply.missedDawns === 1 ? 'strained' : 'starving';
+  if (game.armySupply.readiness !== expectedReadiness || ((game.armySupply.shortage === 'none') !== (game.armySupply.missedDawns === 0))) {
+    return failure('inconsistent-state', '$.state.game.armySupply', 'Company readiness, shortage, and missed dawns disagree.');
+  }
+  const chargeKeys = new Set(['food', 'iron']);
+  const chargeSurface = validateObjectSurface(game.armySupply.lastCharge, chargeKeys, chargeKeys, '$.state.game.armySupply.lastCharge');
+  if (!chargeSurface.ok) return chargeSurface;
+  if (!Number.isSafeInteger(game.armySupply.lastCharge.food) || game.armySupply.lastCharge.food < 0
+    || !Number.isSafeInteger(game.armySupply.lastCharge.iron) || game.armySupply.lastCharge.iron < 0) {
+    return failure('out-of-range', '$.state.game.armySupply.lastCharge', 'Company supply charges must be non-negative integers.');
+  }
   if (game._scenarioWon !== game.stats.scenariosWon.includes(game.scenario)) return failure('inconsistent-state', '$.state.game._scenarioWon', 'Scenario win flag must agree with the canonical scenario ledger.');
 
   const cameraSurface = validateObjectSurface(game.camera, new Set(['x', 'y', 'zoom']), new Set(['x', 'y', 'zoom']), '$.state.game.camera');

@@ -4,22 +4,21 @@
 // only coordinates the citizen activity/path fields needed to physically
 // reach, enter, and leave that owned home.
 
-import { G, MAP_H, MAP_W, getDayPeriod, rngInt } from './state.js?realm=195';
-import { nearestWalkableTile } from './pathfinding.js?realm=195';
+import { G, MAP_H, MAP_W, getDayPeriod, rngInt } from './state.js?realm=196';
 import {
   assignCitizenResidence,
   citizenAtResidencePortal,
   citizenHasValidResidence,
   residencePortalForCitizen,
-} from './residences.js?realm=195';
-import { setCitizenActivity } from './citizen-activity.js?realm=195';
+} from './residences.js?realm=196';
+import { setCitizenActivity } from './citizen-activity.js?realm=196';
 import {
   blacklistCitizenTarget,
   citizenTargetIsBlacklisted,
   clearCitizenPath,
   pathCitizenTo,
-} from './citizen-navigation.js?realm=195';
-import { citizenIdleLoiterTarget } from './citizen-work.js?realm=195';
+} from './citizen-navigation.js?realm=196';
+import { citizenIdleLoiterTarget } from './citizen-work.js?realm=196';
 
 const RAID_SHELTER_INTERRUPTIBLE = new Set([
   'idle', 'find_job', 'walk_to_work', 'working', 'foraging', 'eating',
@@ -75,9 +74,8 @@ export function sendCitizenHome(citizen) {
   clearCitizenPath(citizen);
   setCitizenActivity(citizen, 'go_home');
   if (citizen.home) {
-    const spot = nearestWalkableTile(Math.round(citizen.home.x), Math.round(citizen.home.y), 3)
-      || { x: citizen.home.x, y: citizen.home.y };
-    if (!pathCitizenTo(citizen, spot.x, spot.y)) citizen.home = null;
+    const portal = residencePortalForCitizen(citizen);
+    if (!portal || !pathCitizenTo(citizen, portal.x, portal.y, { exact: true })) citizen.home = null;
   } else {
     const target = citizenIdleLoiterTarget(citizen);
     pathCitizenTo(citizen, target.x, target.y);

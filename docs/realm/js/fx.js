@@ -6,7 +6,7 @@
 // Particle UPDATE/decay lives shell-side (particles.js).
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=195';
+import { G } from './state.js?realm=196';
 
 export function visualJitter(tx, ty, salt) {
   let value = Math.imul(Math.round(tx * 4096), 0x45d9f3b);

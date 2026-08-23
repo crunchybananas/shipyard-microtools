@@ -28,7 +28,7 @@ const CORE = new Set([
   'story.js', 'raid-summary.js', 'first-muster.js', 'post-raid-recovery.js',
   'building-lifecycle.js', 'building-operation.js', 'citizen-ownership.js',
   'building-inventory.js', 'building-use.js', 'army-orders.js', 'residences.js',
-  'workforce-policy.js', 'death-markers.js',
+  'workforce-policy.js', 'death-markers.js', 'company-supply.js',
   'citizen-activity.js', 'citizen-navigation.js', 'citizen-traffic.js',
   'citizen-work.js', 'citizen-shelter.js', 'citizen-food.js', 'citizen-needs.js',
   'citizen-route-state.js',

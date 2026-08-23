@@ -23,7 +23,7 @@ const runtimeContract = JSON.parse(
 );
 assert.equal(
   runtimeContract.moduleRevision,
-  193,
+  196,
   'Update pathfinding Worker browser imports with the runtime revision',
 );
 
@@ -81,7 +81,7 @@ page.on('console', message => {
 
 try {
   await mkdir(reportDir, { recursive: true });
-  await page.goto(`${server.gameUrl}?verifyPathfindingWorker=193`);
+  await page.goto(`${server.gameUrl}?verifyPathfindingWorker=196`);
   await page.waitForLoadState('domcontentloaded');
   await page.waitForFunction(() => (
     typeof window.startNewGame === 'function'
@@ -93,10 +93,10 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=195');
-    const kernel = await import('./js/pathfinding-kernel.js?realm=195');
-    const service = await import('./js/pathfinding-service.js?realm=195');
-    const client = await import('./js/pathfinding-client.js?realm=195');
+    const state = await import('./js/state.js?realm=196');
+    const kernel = await import('./js/pathfinding-kernel.js?realm=196');
+    const service = await import('./js/pathfinding-service.js?realm=196');
+    const client = await import('./js/pathfinding-client.js?realm=196');
     const g = window.G;
     if (state.G !== g) throw new Error('Worker verifier imported a split runtime state identity');
 
@@ -588,7 +588,7 @@ try {
 
     const workerProof = window.__pathfindingWorkerProof;
     const nativeConstructors = workerProof.constructors.filter(entry => (
-      entry.url.includes('/js/pathfinding-worker.js?realm=193')
+      entry.url.includes('/js/pathfinding-worker.js?realm=196')
       && entry.type === 'module'
     ));
     requireCondition(nativeConstructors.length >= 1, 'Production client did not construct the revisioned native module Worker');

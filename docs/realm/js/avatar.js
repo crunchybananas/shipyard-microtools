@@ -11,10 +11,10 @@
 // shell owns the follow-camera and key handling.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=195';
-import { findPath, stepEntityToward } from './pathfinding.js?realm=195';
-import { revealAround } from './world.js?realm=195';
-import { emit } from './bus.js?realm=195';
+import { G, MAP_W, MAP_H } from './state.js?realm=196';
+import { findPath, stepEntityToward } from './pathfinding.js?realm=196';
+import { revealAround } from './world.js?realm=196';
+import { emit } from './bus.js?realm=196';
 
 const SCOUT_TILES_PER_FIND = 24;
 

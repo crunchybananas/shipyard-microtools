@@ -2,26 +2,26 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=195';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=195';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=195';
-import { revealAround, makeCitizen } from './world.js?realm=195';
-import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=195';
-import { spawnDust, visualJitter } from './fx.js?realm=195';
-import { emit } from './bus.js?realm=195';
-import { isBuildingUnlocked } from './tech.js?realm=195';
-import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=195';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=196';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=196';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=196';
+import { revealAround, makeCitizen } from './world.js?realm=196';
+import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=196';
+import { spawnDust, visualJitter } from './fx.js?realm=196';
+import { emit } from './bus.js?realm=196';
+import { isBuildingUnlocked } from './tech.js?realm=196';
+import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=196';
 import {
   citizenConstructionRequiresStaff,
   releaseCitizenAssignment,
   removeCitizenFromWorld,
   transitionCitizenActivity,
   workersForBuilding,
-} from './citizen-ownership.js?realm=195';
-import { activeStaffingCount, isBuildingOperational } from './building-operation.js?realm=195';
-import { updateRecruitment } from './military.js?realm=195';
-import { isFirstMusterRaidReady } from './first-muster.js?realm=195';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=195';
+} from './citizen-ownership.js?realm=196';
+import { activeStaffingCount, isBuildingOperational } from './building-operation.js?realm=196';
+import { updateRecruitment } from './military.js?realm=196';
+import { isFirstMusterRaidReady } from './first-muster.js?realm=196';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=196';
 
 const CONSTRUCTION_TICKS = {
   road: 45,

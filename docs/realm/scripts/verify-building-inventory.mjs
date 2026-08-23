@@ -3,8 +3,8 @@
 import assert from 'node:assert/strict';
 import {
   G, BUILDINGS, MAP_W, MAP_H, createResourceStock, setSeed,
-} from '../js/state.js?realm=195';
-import { generateWorld } from '../js/world.js?realm=195';
+} from '../js/state.js?realm=196';
+import { generateWorld } from '../js/world.js?realm=196';
 import {
   depositFood,
   establishFounderStockpile,
@@ -15,14 +15,14 @@ import {
   storedFood,
   withdrawFood,
   withdrawFoodFromStores,
-} from '../js/building-inventory.js?realm=195';
-import { getFirstMusterReport } from '../js/first-muster.js?realm=195';
-import { plunderBuildingFood, updateEnemies } from '../js/combat.js?realm=195';
-import { removeBuilding } from '../js/building-lifecycle.js?realm=195';
-import { serializeGame, prepareSave, commitGameLoad } from '../js/save-state.js?realm=195';
-import { executeTrade } from '../js/trade.js?realm=195';
-import { startResearch } from '../js/tech.js?realm=195';
-import { decodeGraphState, encodeGraphState, makeEnvelope } from '../js/save-schema.js?realm=195';
+} from '../js/building-inventory.js?realm=196';
+import { getFirstMusterReport } from '../js/first-muster.js?realm=196';
+import { plunderBuildingFood, updateEnemies } from '../js/combat.js?realm=196';
+import { removeBuilding } from '../js/building-lifecycle.js?realm=196';
+import { serializeGame, prepareSave, commitGameLoad } from '../js/save-state.js?realm=196';
+import { executeTrade } from '../js/trade.js?realm=196';
+import { startResearch } from '../js/tech.js?realm=196';
+import { decodeGraphState, encodeGraphState, makeEnvelope } from '../js/save-schema.js?realm=196';
 
 function completeBuilding(type, x, y, extras = {}) {
   return {

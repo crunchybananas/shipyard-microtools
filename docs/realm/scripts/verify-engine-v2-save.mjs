@@ -1,37 +1,37 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=195';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=195';
-import { coreTick } from '../js/sim.js?realm=195';
-import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=195';
-import { missions } from '../js/missions.js?realm=195';
-import { initChronicle } from '../js/log.js?realm=195';
+import { G, getSeed, setSeed } from '../js/state.js?realm=196';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=196';
+import { coreTick } from '../js/sim.js?realm=196';
+import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=196';
+import { missions } from '../js/missions.js?realm=196';
+import { initChronicle } from '../js/log.js?realm=196';
 import {
   commitGameLoad,
   commitGameLoadForTest,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=195';
-import { hasSave, loadGame, saveGame } from '../js/save.js?realm=195';
-import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=195';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=195';
+} from '../js/save-state.js?realm=196';
+import { hasSave, loadGame, saveGame } from '../js/save.js?realm=196';
+import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=196';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=196';
 import {
   claimCitizenAssignment,
   renameCitizen,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=195';
+} from '../js/citizen-ownership.js?realm=196';
 import {
   citizenRenderCacheSize,
   citizenRenderRecord,
   resetCitizenRenderCache,
-} from '../js/citizen-render-cache.js?realm=195';
+} from '../js/citizen-render-cache.js?realm=196';
 import {
   getCitizenTransitionLedger,
   initCitizenInspector,
   resetCitizenTransitionLedger,
-} from '../js/citizen-inspector.js?realm=195';
+} from '../js/citizen-inspector.js?realm=196';
 
 function clone(value) {
   return structuredClone(value);
@@ -147,6 +147,7 @@ G.buildings.push(building);
 G.buildingGrid[building.y][building.x] = building;
 G.armyGuardPoint = { x: building.x, y: building.y };
 G.armyStance = 'guard';
+G.armyObjective = { x: 42, y: 42, mode: 'attack-move' };
 establishFounderStockpile();
 assert.equal(claimCitizenAssignment(citizen, building, { reason: 'job-market' }), true);
 assert.deepEqual(workersForBuilding(building), [citizen]);
@@ -199,7 +200,7 @@ for (const [key, encoded] of nodeFor(golden, gameRef).entries) {
   assert.equal(result.ok, false, `${key}: wrong root kind bypassed its validator`);
   rootWrongKindRejections++;
 }
-assert.equal(rootWrongKindRejections, 73, 'authoritative root validator coverage changed without updating the gate');
+assert.equal(rootWrongKindRejections, 75, 'authoritative root validator coverage changed without updating the gate');
 
 const fixtures = [];
 function fixture(name, mutate) {
@@ -363,6 +364,14 @@ fixture('building active wrong scalar type', value => {
 fixture('army stance enum', value => {
   replaceObjectValue(value, value.state.roots.game, 'armyStance', 'retreat');
 });
+fixture('company objective mode', value => {
+  const objective = objectValue(value, value.state.roots.game, 'armyObjective');
+  replaceObjectValue(value, objective, 'mode', 'teleport');
+});
+fixture('company supply readiness mismatch', value => {
+  const supply = objectValue(value, value.state.roots.game, 'armySupply');
+  replaceObjectValue(value, supply, 'readiness', 'starving');
+});
 fixture('sparse nested stats collection', value => {
   const stats = objectValue(value, value.state.roots.game, 'stats');
   const scenariosWon = nodeFor(value, objectValue(value, stats, 'scenariosWon'));
@@ -512,6 +521,15 @@ assert.equal(missions[0]._celebratedTick, 42);
 assert.equal(G.buildingGrid[building.y][building.x], G.buildings[0]);
 assert.deepEqual(G.armyGuardPoint, { x: building.x, y: building.y });
 assert.equal(G.armyStance, 'guard');
+assert.deepEqual(G.armyObjective, { x: 42, y: 42, mode: 'attack-move' });
+assert.deepEqual(G.armySupply, {
+  version: 1,
+  lastProcessedDay: 1,
+  missedDawns: 0,
+  shortage: 'none',
+  readiness: 'ready',
+  lastCharge: { food: 0, iron: 0 },
+});
 assert.equal(Object.hasOwn(G.buildings[0], 'workers'), false);
 assert.equal(G.citizens[0].assignment.building, G.buildings[0]);
 assert.deepEqual(workersForBuilding(G.buildings[0]), [G.citizens[0]]);
@@ -781,4 +799,4 @@ assert.deepEqual(
   );
 }
 
-console.log(`[engine-v2-save] OK — ${rootWrongKindRejections}/73 root-kind rejections, ${fixtures.length} strict preparation rejections, ${publicLoadFixtures.length} atomic public-load rejections, detached commit, clean storage epoch, and bounded 41-death round-trip`);
+console.log(`[engine-v2-save] OK — ${rootWrongKindRejections}/75 root-kind rejections, ${fixtures.length} strict preparation rejections, ${publicLoadFixtures.length} atomic public-load rejections, detached commit, clean storage epoch, and bounded 41-death round-trip`);

@@ -12,8 +12,8 @@
 //   import { sfx as playSound } from './log.js?realm=159';
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=195';
-import { emit } from './bus.js?realm=195';
+import { G, BUILDINGS } from './state.js?realm=196';
+import { emit } from './bus.js?realm=196';
 
 // ── Chronicle (moved verbatim from story.js — pure data logic) ──────
 const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem', 'era']);

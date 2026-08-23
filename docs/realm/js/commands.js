@@ -15,24 +15,25 @@
 //   NOT commands.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=195';
-import { placeBuilding, upgradeBuilding } from './economy.js?realm=195';
-import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=195';
-import { startResearch } from './tech.js?realm=195';
-import { executeTrade } from './trade.js?realm=195';
-import { avatarMove, avatarGoto } from './avatar.js?realm=195';
-import { queueRecruit } from './military.js?realm=195';
-import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=195';
-import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=195';
+import { G, BUILDINGS } from './state.js?realm=196';
+import { placeBuilding, upgradeBuilding } from './economy.js?realm=196';
+import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=196';
+import { startResearch } from './tech.js?realm=196';
+import { executeTrade } from './trade.js?realm=196';
+import { avatarMove, avatarGoto } from './avatar.js?realm=196';
+import { queueRecruit } from './military.js?realm=196';
+import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=196';
+import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=196';
 import {
   applyArmyStance,
   applyGuardOrder,
+  applyCompanyObjective,
   applyRallyOrder,
-} from './army-orders.js?realm=195';
+} from './army-orders.js?realm=196';
 import {
   commandAssignCitizen,
   commandReleaseCitizen,
-} from './citizen-ownership.js?realm=195';
+} from './citizen-ownership.js?realm=196';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;
@@ -116,6 +117,10 @@ const HANDLERS = {
 
   SET_STANCE({ stance }) {
     return applyArmyStance(stance);
+  },
+
+  SET_COMPANY_OBJECTIVE({ x, y, mode }) {
+    return applyCompanyObjective(x, y, mode);
   },
 
   GARRISON({ x, y }) {
@@ -231,6 +236,11 @@ const COMMAND_SCHEMAS = Object.freeze({
   ),
   SET_GUARD: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
   SET_STANCE: schema(['stance', FIELD.string]),
+  SET_COMPANY_OBJECTIVE: schema(
+    ['x', FIELD.safeInteger],
+    ['y', FIELD.safeInteger],
+    ['mode', FIELD.string],
+  ),
   GARRISON: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
   AVATAR_MOVE: schema(['dx', FIELD.finiteNumber], ['dy', FIELD.finiteNumber]),
   AVATAR_GOTO: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),

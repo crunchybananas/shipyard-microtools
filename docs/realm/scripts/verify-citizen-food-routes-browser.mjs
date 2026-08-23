@@ -6,7 +6,7 @@ import { chromium } from '@playwright/test';
 import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 195, 'Update food-route browser imports with the runtime revision');
+assert.equal(contract.moduleRevision, 196, 'Update food-route browser imports with the runtime revision');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -35,12 +35,12 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=195');
-    const inventory = await import('./js/building-inventory.js?realm=195');
-    const ownership = await import('./js/citizen-ownership.js?realm=195');
-    const render = await import('./js/render.js?realm=195');
-    const state = await import('./js/state.js?realm=195');
-    const ui = await import('./js/ui.js?realm=195');
+    const economy = await import('./js/economy.js?realm=196');
+    const inventory = await import('./js/building-inventory.js?realm=196');
+    const ownership = await import('./js/citizen-ownership.js?realm=196');
+    const render = await import('./js/render.js?realm=196');
+    const state = await import('./js/state.js?realm=196');
+    const ui = await import('./js/ui.js?realm=196');
     const g = window.G;
 
     const requireCondition = (condition, message) => {

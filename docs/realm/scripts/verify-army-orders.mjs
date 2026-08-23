@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=195';
-import { dispatch } from '../js/commands.js?realm=195';
+import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=196';
+import { dispatch } from '../js/commands.js?realm=196';
 import {
   armyMayEngage,
   armyOrderAnchor,
   armyOrderMeta,
+  companyObjective,
   liveGuardBuilding,
-} from '../js/army-orders.js?realm=195';
-import { updateSoldiers } from '../js/soldiers.js?realm=195';
-import { removeBuilding } from '../js/building-lifecycle.js?realm=195';
+  resetCompanyCommandRuntime,
+  updateCompanyMovement,
+} from '../js/army-orders.js?realm=196';
+import { updateSoldiers } from '../js/soldiers.js?realm=196';
+import { removeBuilding } from '../js/building-lifecycle.js?realm=196';
 
 function building(type, x, y, buildProgress = 1) {
   const value = {
@@ -39,6 +42,8 @@ Object.assign(G, {
   buildings: [], soldiers: [], enemies: [], projectiles: [], particles: [],
   citizens: [], walkers: [], caravans: [], animals: [], carts: [], schoolKids: [],
   armyStance: 'defend', rallyPoint: null, armyGuardPoint: null,
+  armyObjective: null,
+  armySupply: { readiness: 'ready' },
   _patrolPosts: null, _patrolPostsBuildingCount: -1, _patrolEmptyNotified: false,
   avatar: { x: 40, y: 40 }, gameTick: 1, _commandLog: [],
   resources: { wood: 0, stone: 0, food: 0, gold: 0, iron: 0, wheat: 0, flour: 0, planks: 0, tools: 0 },
@@ -110,4 +115,47 @@ removeBuilding(farm, { cause: 'manual' });
 assert.equal(G.armyGuardPoint, null, 'demolished guard target remained authoritative');
 assert.equal(G.armyStance, 'defend', 'demolished guard target did not return the company to defend');
 
-console.log('[army-orders] PASS — strict commands, immediate rally/guard, local threat leash, wall patrol, Founder escort, and demolition recovery');
+// Company Command v1: strict validation, deterministic wall обход, garrison
+// exclusion, and objective-local attack-move leash.
+resetCompanyCommandRuntime();
+Object.assign(G, {
+  map: Array.from({ length: MAP_H }, () => Array(MAP_W).fill(TILE.GRASS)),
+  buildingGrid: Array.from({ length: MAP_H }, () => Array(MAP_W).fill(null)),
+  buildings: [], soldiers: [], enemies: [], obstacleEpoch: 7,
+  armyStance: 'defend', rallyPoint: null, armyGuardPoint: null,
+  armyObjective: null, armySupply: { readiness: 'ready' },
+});
+for (let y = 1; y < MAP_H - 1; y++) {
+  G.buildingGrid[y][6] = { type: 'wall', buildProgress: 1 };
+}
+const freeCompany = soldier('Aster Pike', 5, 5, null);
+const freeWing = soldier('Bram Flint', 5, 7, null);
+const garrisoned = soldier('Cora Vale', 5, 6, { type: 'tower', x: 5, y: 6 });
+garrisoned.garrison = garrisoned.homeBuilding;
+G.soldiers = [freeCompany, freeWing, garrisoned];
+
+assert.equal(dispatch({ type: 'SET_COMPANY_OBJECTIVE', x: 8, y: 5, mode: 'retreat' }).reason, 'bad-company-mode');
+G.armySupply.readiness = 'starving';
+assert.equal(dispatch({ type: 'SET_COMPANY_OBJECTIVE', x: 8, y: 5, mode: 'attack-move' }).reason, 'company-starving');
+G.armySupply.readiness = 'ready';
+assert.equal(dispatch({ type: 'SET_COMPANY_OBJECTIVE', x: 6, y: 5, mode: 'attack-move' }).reason, 'company-point-unwalkable');
+G.soldiers = [];
+assert.equal(dispatch({ type: 'SET_COMPANY_OBJECTIVE', x: 8, y: 5, mode: 'attack-move' }).reason, 'no-company');
+G.soldiers = [freeCompany, freeWing, garrisoned];
+
+const companyOrder = dispatch({ type: 'SET_COMPANY_OBJECTIVE', x: 8, y: 5, mode: 'attack-move' });
+assert.equal(companyOrder.ok, true);
+assert.deepEqual(companyObjective(), { x: 8, y: 5, mode: 'attack-move' });
+for (let tick = 0; tick < 4_000; tick++) {
+  updateCompanyMovement(freeCompany, G);
+  updateCompanyMovement(freeWing, G);
+}
+assert.equal(Math.round(freeCompany.x), 8, 'company leader did not route around wall to objective');
+assert.equal(Math.round(freeCompany.y), 5, 'company leader did not complete objective route');
+assert.equal(garrisoned.x, 5, 'garrisoned soldier was moved by company objective');
+const localRaid = { x: 8, y: 6, hp: 20 };
+const distantRaid = { x: 20, y: 20, hp: 20 };
+assert.equal(armyMayEngage(freeCompany, localRaid), true, 'attack-move ignored threat at objective');
+assert.equal(armyMayEngage(freeCompany, distantRaid), false, 'attack-move abandoned objective for distant threat');
+
+console.log('[army-orders] PASS — strict commands, immediate rally/guard, local threat leash, wall patrol, Founder escort, demolition recovery, and Company Command A* routing');

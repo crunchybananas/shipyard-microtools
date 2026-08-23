@@ -60,7 +60,7 @@ try {
     actions,
     roles,
   }) => {
-    const render = await import('./js/render.js?realm=195');
+    const render = await import('./js/render.js?realm=196');
     const game = window.G;
     game.debug.pauseRendering = true;
     const events = [];
@@ -243,6 +243,9 @@ try {
       'fisher/carry',
       'settler/carry',
       'trader/carry',
+      'innkeeper/carry',
+      'scholar/carry',
+      'forager/carry',
     ],
   );
   for (const role of roles) {

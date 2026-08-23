@@ -31,13 +31,13 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const report = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=195');
-    const economy = await import('./js/economy.js?realm=195');
-    const firstMuster = await import('./js/first-muster.js?realm=195');
-    const military = await import('./js/military.js?realm=195');
-    const recovery = await import('./js/post-raid-recovery.js?realm=195');
-    const scenarios = await import('./js/scenarios.js?realm=195');
-    const ui = await import('./js/ui.js?realm=195');
+    const state = await import('./js/state.js?realm=196');
+    const economy = await import('./js/economy.js?realm=196');
+    const firstMuster = await import('./js/first-muster.js?realm=196');
+    const military = await import('./js/military.js?realm=196');
+    const recovery = await import('./js/post-raid-recovery.js?realm=196');
+    const scenarios = await import('./js/scenarios.js?realm=196');
+    const ui = await import('./js/ui.js?realm=196');
     const g = window.G;
     g.debug.disableEvents = true;
     const requireCondition = (condition, message) => {
@@ -146,6 +146,11 @@ try {
 
     const recruitedNames = [];
     for (let company = 1; company <= 3; company++) {
+      stepUntil(
+        `company order ${company} staffing window`,
+        () => military.recruitmentStatus(barracks).ok,
+        g.dayLength,
+      );
       const status = military.recruitmentStatus(barracks);
       requireEqual(status.ok, true, `company order ${company} unavailable: ${status.reason}`);
       const result = dispatch({ type: 'RECRUIT_UNIT', x: barracks.x, y: barracks.y });
@@ -310,7 +315,8 @@ try {
       return { width: box.width, height: box.height, label: button.getAttribute('aria-label') };
     }),
   }));
-  assert.equal(mobileArmy.controls.length, 5);
+  assert.equal(mobileArmy.controls.length, 6);
+  assert.ok(mobileArmy.controls.some(control => control.label === 'Advance company'), 'mobile HUD omitted Company Advance');
   assert.ok(mobileArmy.label, 'mobile army controls omitted the current-order label');
   for (const control of mobileArmy.controls) {
     assert.ok(control.width >= 44 && control.height >= 44, `${control.label} touch target is ${control.width}x${control.height}`);

@@ -5,19 +5,19 @@
 // visible walk/wait/resume activities; consumption itself stays with the
 // state machine so it happens only at physical arrival.
 
-import { G } from './state.js?realm=195';
-import { findPath, isWalkable } from './pathfinding.js?realm=195';
+import { G } from './state.js?realm=196';
+import { findPath, isWalkable } from './pathfinding.js?realm=196';
 import {
   findReachableFoodStore,
   isFoodStore,
   storedFood,
-} from './building-inventory.js?realm=195';
-import { citizenHasValidResidence } from './residences.js?realm=195';
+} from './building-inventory.js?realm=196';
+import { citizenHasValidResidence } from './residences.js?realm=196';
 import {
   assignedCitizenBuilding,
   citizenStableHash,
   setCitizenActivity,
-} from './citizen-activity.js?realm=195';
+} from './citizen-activity.js?realm=196';
 import {
   blacklistCitizenTarget,
   citizenManhattanDistance,
@@ -25,8 +25,8 @@ import {
   citizenTargetIsBlacklisted,
   clearCitizenPath,
   pathCitizenTo,
-} from './citizen-navigation.js?realm=195';
-import { pathCitizenToWork } from './citizen-work.js?realm=195';
+} from './citizen-navigation.js?realm=196';
+import { pathCitizenToWork } from './citizen-work.js?realm=196';
 
 export const CITIZEN_MEAL_INTERRUPTIBLE_ACTIVITIES = new Set([
   'idle', 'find_job', 'walk_to_work', 'working', 'leisure',

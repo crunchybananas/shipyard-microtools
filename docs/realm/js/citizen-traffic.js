@@ -3,10 +3,10 @@
 // This module owns one-tick reservations only. Durable route/activity intent
 // remains in existing citizen save fields and citizen-navigation.js.
 
-import { G, MAP_H, MAP_W, TILE, getSeasonData } from './state.js?realm=195';
-import { isWalkable } from './pathfinding.js?realm=195';
-import { getCitizenSpeedMult } from './events.js?realm=195';
-import { citizenIsIndoors } from './residences.js?realm=195';
+import { G, MAP_H, MAP_W, TILE, getSeasonData } from './state.js?realm=196';
+import { isWalkable } from './pathfinding.js?realm=196';
+import { getCitizenSpeedMult } from './events.js?realm=196';
+import { citizenIsIndoors } from './residences.js?realm=196';
 
 const PREFERRED_SPACE = 0.55;
 const HARD_ACTOR_SPACE = 0.31;

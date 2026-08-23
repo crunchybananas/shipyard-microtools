@@ -2,38 +2,39 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=195';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=195';
-import { getWonderReport } from './wonder.js?realm=195';
-import { panCameraTo } from './render.js?realm=195';
-import { dispatch } from './commands.js?realm=195';
-import { missions } from './missions.js?realm=195';
-import { getActiveScenario } from './scenarios.js?realm=195';
-import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=195';
-import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=195';
-import { saveGame, loadGame } from './save.js?realm=195';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=195';
-import { notify } from './notifications.js?realm=195';
-import { TRADE_PARTNERS } from './trade.js?realm=195';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=196';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=196';
+import { getWonderReport } from './wonder.js?realm=196';
+import { panCameraTo } from './render.js?realm=196';
+import { dispatch } from './commands.js?realm=196';
+import { missions } from './missions.js?realm=196';
+import { getActiveScenario } from './scenarios.js?realm=196';
+import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=196';
+import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=196';
+import { saveGame, loadGame } from './save.js?realm=196';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=196';
+import { notify } from './notifications.js?realm=196';
+import { TRADE_PARTNERS } from './trade.js?realm=196';
 import {
   citizenStaffingCapacity,
   onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=195';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=195';
-import { residentsForHouse } from './residences.js?realm=195';
-import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=195';
+} from './citizen-ownership.js?realm=196';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=196';
+import { residentsForHouse } from './residences.js?realm=196';
+import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=196';
 import {
   authoredBuildingCount,
   foodCapacity,
   foodStores,
   isFoodStore,
   storedFood,
-} from './building-inventory.js?realm=195';
-import { recruitmentStatus } from './military.js?realm=195';
-import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=195';
-import { buildingUseReport } from './building-use.js?realm=195';
-import { armyOrderMeta, liveGuardBuilding } from './army-orders.js?realm=195';
+} from './building-inventory.js?realm=196';
+import { recruitmentStatus } from './military.js?realm=196';
+import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=196';
+import { buildingUseReport } from './building-use.js?realm=196';
+import { armyOrderMeta, companyObjective, liveGuardBuilding } from './army-orders.js?realm=196';
+import { companySupplyReport } from './company-supply.js?realm=196';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -219,6 +220,7 @@ if (typeof window !== 'undefined') {
       }
       return;
     }
+    document.body.classList.remove('company-objective-placement');
     G._placingRally = false;
     const result = dispatch({ type: 'SET_STANCE', stance });
     if (!result.ok) {
@@ -227,6 +229,23 @@ if (typeof window !== 'undefined') {
     }
     const meta = armyOrderMeta(stance);
     notify(`Army order: ${meta.icon} ${meta.label}`, 'info');
+    updateUI();
+  };
+  window.beginCompanyObjectivePlacement = () => {
+    if (!G.soldiers?.some(soldier => !soldier.garrison)) {
+      notify('⚔️ Muster a free soldier before giving the company an objective.', 'warn', { chronicle: false });
+      return;
+    }
+    if (G.armySupply?.readiness === 'starving') {
+      notify('🚨 The starving company cannot advance. Supply food and iron at dawn to recover.', 'warn', { chronicle: false });
+      return;
+    }
+    cancelBuildMode();
+    document.body.classList.toggle('company-objective-placement');
+    const active = document.body.classList.contains('company-objective-placement');
+    notify(active
+      ? '⚔️ Advance order ready — tap open ground for the company objective.'
+      : 'Company order cancelled.', 'info', { chronicle: false });
     updateUI();
   };
   window.guardSelectedBuilding = () => {
@@ -247,13 +266,15 @@ if (typeof window !== 'undefined') {
       const source = result.candidate?.workplace
         ? ` leaves the ${BUILDINGS[result.candidate.workplace.type]?.name || result.candidate.workplace.type}`
         : ' leaves civilian life';
-      notify(`📯 ${result.name}${source} and enters drill. The realm has one fewer worker.`, 'info');
+      const levy = result.lastLevy ? ' Last levy: one civilian remains to run the realm.' : '';
+      notify(`📯 ${result.name}${source} and enters drill. The realm has one fewer worker.${levy}`, 'info');
     }
     else {
       const reason = {
         'needs-workers': 'The training yard needs its full staff first.',
         'queue-busy': 'This training yard already has a recruit in drill.',
         'unit-cap': 'This training yard is at its unit cap.',
+        'minimum-civilian': 'Cannot muster: at least one civilian must remain.',
         'no-candidate': 'No eligible civilian can enlist. Crown-ordered workers and protected characters will not be taken.',
         'insufficient-resources': 'The realm cannot afford this recruit.',
         'under-construction': 'Complete the training yard before mustering troops.',
@@ -441,19 +462,32 @@ export function updateUI() {
   const soldierEl = $('soldier-count');
   const armyVisible = maxSoldiers > 0 || (G.soldiers || []).length > 0;
   if (soldierEl) {
-    soldierEl.textContent = `${(G.soldiers || []).length}/${maxSoldiers}`;
+    const companyCount = (G.soldiers || []).length;
+    const supply = companySupplyReport(G.armySupply, { soldiers: G.soldiers });
+    const readiness = supply.readiness.toUpperCase();
+    soldierEl.textContent = `${companyCount}/${maxSoldiers}${companyCount ? ` · ${readiness}` : ''}`;
     // Hide soldier counter when no barracks exist and no soldiers — dead UI weight on Day 1
     const soldierRes = soldierEl.closest('.res');
-    if (soldierRes) soldierRes.style.display = armyVisible ? '' : 'none';
+    if (soldierRes) {
+      soldierRes.style.display = armyVisible ? '' : 'none';
+      soldierRes.title = companyCount
+        ? `Company ${companyCount} · ${readiness}. Next dawn: −${supply.cost.food} food, −${supply.cost.iron} iron.${supply.shortage !== 'none' ? ` Current shortage: ${supply.shortage}.` : ''}`
+        : 'No soldiers mustered.';
+    }
   }
   const stanceEl = document.getElementById('army-stance');
   if (stanceEl) {
     stanceEl.style.display = armyVisible ? 'flex' : 'none';
     const meta = armyOrderMeta();
+    const objective = companyObjective();
     const orderLabel = document.getElementById('army-order-label');
-    if (orderLabel) orderLabel.textContent = meta.label;
+    if (orderLabel) orderLabel.textContent = objective
+      ? (objective.mode === 'attack-move' ? 'Attack-move' : 'Advance')
+      : meta.label;
     const guard = liveGuardBuilding();
-    const target = G.armyStance === 'guard' && guard
+    const target = objective
+      ? ` Objective: ${objective.mode === 'attack-move' ? 'Attack-move' : 'Advance'} at ${objective.x}, ${objective.y}.`
+      : G.armyStance === 'guard' && guard
       ? ` Target: ${BUILDINGS[guard.type]?.name || guard.type}.`
       : G.armyStance === 'rally' && G.rallyPoint
         ? ` Flag: ${G.rallyPoint.x}, ${G.rallyPoint.y}.`
@@ -463,6 +497,12 @@ export function updateUI() {
       btn.classList.toggle('active', btn.dataset.stance === G.armyStance);
       btn.classList.toggle('dimmed', btn.dataset.stance === 'rally' && !G.rallyPoint);
       btn.classList.toggle('dimmed', btn.dataset.stance === 'guard' && !G.armyGuardPoint);
+    }
+    const objectiveButton = stanceEl.querySelector('[data-company-objective]');
+    if (objectiveButton) {
+      objectiveButton.classList.toggle('active', !!objective || document.body.classList.contains('company-objective-placement'));
+      objectiveButton.classList.toggle('dimmed', G.armySupply?.readiness === 'starving');
+      objectiveButton.setAttribute('aria-pressed', objective || document.body.classList.contains('company-objective-placement') ? 'true' : 'false');
     }
   }
   const threatEl = $('threat-display');
@@ -1126,6 +1166,7 @@ export function showInfoPanel(b) {
       const disabled = enlist.ok ? '' : ' disabled';
       const reason = enlist.reason === 'needs-workers' ? ' — full staff required'
         : enlist.reason === 'unit-cap' ? ' — company full'
+          : enlist.reason === 'minimum-civilian' ? ' — one civilian must remain'
           : enlist.reason === 'no-candidate' ? ' — no eligible civilian'
           : enlist.reason === 'insufficient-resources' ? ' — resources short'
             : enlist.reason === 'under-construction' ? ' — finish construction'
@@ -1136,7 +1177,8 @@ export function showInfoPanel(b) {
           ? `${candidate.profession} at ${BUILDINGS[candidate.workplace.type]?.name || candidate.workplace.type}`
           : `unassigned ${candidate.profession}`
         : 'No civilian available';
-      html += `<button class="upgrade-btn${disabled}" ${enlist.ok ? '' : 'disabled'} onclick="window.recruitSelectedUnit&&window.recruitSelectedUnit()">${spec.icon} ${candidate ? `Enlist ${escapeHtml(candidate.name)} → ${spec.label}` : `Muster ${spec.label}`}<br><small class="ip-hint">${escapeHtml(candidateRole)} leaves the workforce · ${cost}${reason}</small></button>`;
+      const levy = enlist.lastLevy ? ' · Last levy: leaves 1 civilian' : '';
+      html += `<button class="upgrade-btn${disabled}" ${enlist.ok ? '' : 'disabled'} onclick="window.recruitSelectedUnit&&window.recruitSelectedUnit()">${spec.icon} ${candidate ? `Enlist ${escapeHtml(candidate.name)} → ${spec.label}` : `Muster ${spec.label}`}<br><small class="ip-hint">${escapeHtml(candidateRole)} leaves the workforce · ${cost}${levy}${reason}</small></button>`;
     }
   }
 

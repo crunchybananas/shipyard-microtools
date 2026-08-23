@@ -2,14 +2,14 @@
 // A* Pathfinding — binary heap, 8-directional, road bonus
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=195';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=196';
 import {
   createPathfindingGridSnapshot,
   findPathOnGrid,
   isGridCellWalkable,
   nearestWalkableGridTile,
-} from './pathfinding-kernel.js?realm=195';
-import { resetPathfindingService } from './pathfinding-service.js?realm=195';
+} from './pathfinding-kernel.js?realm=196';
+import { resetPathfindingService } from './pathfinding-service.js?realm=196';
 
 let cachedGridSnapshot = null;
 let cachedMapIdentity = null;

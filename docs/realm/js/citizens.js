@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getDayPeriod, TILE } from './state.js?realm=195';
-import { isWalkable } from './pathfinding.js?realm=195';
-import { getCitizenSpeedMult } from './events.js?realm=195';
-import { revealAround } from './world.js?realm=195';
-import { visualJitter } from './fx.js?realm=195';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getDayPeriod, TILE } from './state.js?realm=196';
+import { isWalkable } from './pathfinding.js?realm=196';
+import { getCitizenSpeedMult } from './events.js?realm=196';
+import { revealAround } from './world.js?realm=196';
+import { visualJitter } from './fx.js?realm=196';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -14,20 +14,21 @@ import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   staffingCount,
-} from './citizen-ownership.js?realm=195';
+} from './citizen-ownership.js?realm=196';
 import {
+  citizenAtResidencePortal,
   citizenHasValidResidence,
   citizenIsIndoors,
   residencePortalForCitizen,
   residentsForHouse,
-} from './residences.js?realm=195';
-import { isBuildingOperational } from './building-operation.js?realm=195';
+} from './residences.js?realm=196';
+import { isBuildingOperational } from './building-operation.js?realm=196';
 import {
   canDepositFood,
   depositFood,
   findReachableFoodStore,
   withdrawFood,
-} from './building-inventory.js?realm=195';
+} from './building-inventory.js?realm=196';
 import {
   AUTO_REVIEW_INTERVAL_TICKS,
   buildingAcceptsAutomaticWorkers,
@@ -36,12 +37,12 @@ import {
   reviewAutomaticAssignment,
   scoreCitizenJob,
   workforceFoodDaysLeft,
-} from './workforce-policy.js?realm=195';
+} from './workforce-policy.js?realm=196';
 import {
   assignedCitizenBuilding as assignedBuilding,
   citizenStableHash as citizenHash,
   setCitizenActivity as setActivity,
-} from './citizen-activity.js?realm=195';
+} from './citizen-activity.js?realm=196';
 import {
   advanceCitizenPathRequest,
   blacklistCitizenTarget as blacklistTarget,
@@ -52,7 +53,7 @@ import {
   pruneCitizenNoGo as pruneExpiredNoGo,
   remainingCitizenRouteIsWalkable as remainingCitizenRouteWalkable,
   replanCitizenToRequestedTarget as replanToRequestedTarget,
-} from './citizen-navigation.js?realm=195';
+} from './citizen-navigation.js?realm=196';
 import {
   applyCitizenSeparation,
   canCitizenStep as canStepCitizen,
@@ -64,13 +65,13 @@ import {
   finishCitizenTrafficProgress,
   noteCitizenTrafficWait,
   resolveCitizenStep,
-} from './citizen-traffic.js?realm=195';
+} from './citizen-traffic.js?realm=196';
 import {
   citizenIdleLoiterTarget as idleLoiterTarget,
   citizenWorkTargetForBuilding as workTargetForBuilding,
   pathCitizenToWork as pathToWork,
   startCitizenWorking as startWorking,
-} from './citizen-work.js?realm=195';
+} from './citizen-work.js?realm=196';
 import {
   CITIZEN_NIGHT_EXEMPT_ACTIVITIES as NIGHT_EXEMPT,
   beginCitizenOpenRaidFlight as beginOpenRaidFlight,
@@ -79,7 +80,7 @@ import {
   leaveCitizenRaidShelter as leaveRaidShelter,
   seekCitizenRaidShelter as seekRaidShelter,
   sendCitizenHome as goHome,
-} from './citizen-shelter.js?realm=195';
+} from './citizen-shelter.js?realm=196';
 import {
   CITIZEN_MEAL_INTERRUPTIBLE_ACTIVITIES as MEAL_INTERRUPTIBLE_ACTIVITIES,
   beginCitizenFoodRoute as beginFoodRoute,
@@ -87,7 +88,7 @@ import {
   citizenFoodTargetStillValid as foodTargetStillValid,
   reachableCitizenFoodRoute as reachableFoodRoute,
   resumeCitizenAfterMeal as resumeAfterMeal,
-} from './citizen-food.js?realm=195';
+} from './citizen-food.js?realm=196';
 import {
   CITIZEN_MEAL_HUNGER_THRESHOLD,
   drainCitizenHeartbeatNeeds,
@@ -96,7 +97,7 @@ import {
   restoreCitizenSleepRest,
   satisfyCitizenLeisureNeed,
   settleCitizenWakeRest,
-} from './citizen-needs.js?realm=195';
+} from './citizen-needs.js?realm=196';
 
 // Chain targets win only within reach: a windmill across the island must
 // not beat the granary next door (AI-audit deferred fix). The carrier
@@ -178,7 +179,8 @@ function watchProgress(c) {
     c.activity.kind === 'walk_to_work' || c.activity.kind === 'walk_to_deliver' ||
     c.activity.kind === 'walk_to_eat' ||
     c.activity.kind === 'needs_delivery' || c.activity.kind === 'foraging' ||
-    c.activity.kind === 'seek_shelter';
+    c.activity.kind === 'seek_shelter' || c.activity.kind === 'leisure' ||
+    c.activity.kind === 'go_home';
   if (!goalActive) { c._wdBest = null; c._wdTicks = 0; return; }
   const gx = c._requestedTx ?? c.tx ?? c.x;
   const gy = c._requestedTy ?? c.ty ?? c.y;
@@ -218,6 +220,19 @@ function watchProgress(c) {
       c._wdTicks = 0;
       return;
     }
+    if (c.activity.kind === 'leisure') {
+      failCitizenLeisure(c, 'path-unreachable');
+      c._wdBest = null;
+      c._wdTicks = 0;
+      return;
+    }
+    if (c.activity.kind === 'go_home') {
+      clearPath(c);
+      setActivity(c, 'idle', { reason: 'path-unreachable', timer: 120 + rngInt(0, 60) });
+      c._wdBest = null;
+      c._wdTicks = 0;
+      return;
+    }
     if (assignedBuilding(c) && c.activity.kind === 'walk_to_work') {
       releaseJob(c, { unreachable: true });
       G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: "Can't reach it!", alpha: 1.25, vy: -0.12, decay: 0.016, type: 'speech' });
@@ -228,6 +243,25 @@ function watchProgress(c) {
     c._wdTicks = 0;
     // carrying is kept — the find_job/heartbeat guards route it to delivery
   }
+}
+
+function failCitizenLeisure(c, reason = 'path-unreachable') {
+  // Keep the failed visit visible in the activity ledger, but release the
+  // target so an unreachable venue cannot be mistaken for a completed visit.
+  c._leisureTarget = null;
+  c._leisureDay = G.day;
+  clearPath(c);
+  setActivity(c, 'idle', { reason, timer: 120 + rngInt(0, 60) });
+}
+
+function citizenAtLeisureTarget(c, target) {
+  if (!target || !c._pathGoal) return false;
+  const venue = G.buildingGrid[Math.round(target.y)]?.[Math.round(target.x)] || null;
+  if (!venue || venue.type !== target.kind || !isBuildingOperational(venue)) return false;
+  return Math.max(
+    Math.abs(c._pathGoal.x - target.x),
+    Math.abs(c._pathGoal.y - target.y),
+  ) <= 4 && Math.hypot(c.x - c._pathGoal.x, c.y - c._pathGoal.y) <= 0.82;
 }
 
 function routeDelivery(c, resKey) {
@@ -347,6 +381,13 @@ export function updateCitizens() {
     pruneExpiredNoGo(c);
     if (advanceCitizenPathRequest(c) === 'pending') continue;
     const raidActive = G.enemies.length > 0;
+    if (c.activity.kind === 'sleep' && !citizenIsIndoors(c)) {
+      // A removed house, stale save, or failed portal route must not leave an
+      // outdoor citizen presenting as asleep. Keep the body visible and let
+      // the nightly scheduler retry residence assignment.
+      setActivity(c, 'idle', { reason: 'path-unreachable', timer: 120 + rngInt(0, 60) });
+      clearPath(c);
+    }
     if (c.activity.kind === 'sheltered') {
       if (raidActive && citizenIsIndoors(c)) {
         c._fleeing = false;
@@ -612,7 +653,10 @@ export function updateCitizens() {
       continue; // still moving — next citizen
     }
 
-    if (c.path && c.pathIdx >= c.path.length) {
+    // An accepted pathfinding-service request uses an empty path as its
+    // durable pending marker. Do not cancel that request as a completed route
+    // on the same tick the AI authored it.
+    if (!c._pathRequest && c.path && c.pathIdx >= c.path.length) {
       clearPath(c);
     }
 
@@ -623,6 +667,9 @@ export function updateCitizens() {
       && c.activity.kind !== 'walk_to_deliver'
       && c.activity.kind !== 'walk_to_eat'
       && c.activity.kind !== 'foraging'
+      && c.activity.kind !== 'go_home'
+      && c.activity.kind !== 'sleep'
+      && c.activity.kind !== 'leisure'
     ) {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
@@ -1072,14 +1119,22 @@ function runStateMachine(c) {
       break;
 
     case 'go_home':
-      // Shared mover walks the path; when it's exhausted we're home.
+      // Shared mover walks the path; when it's exhausted, require the actual
+      // residence portal before granting indoor sleep. A failed/no-home route
+      // remains visible in the world and retries on the next night.
+      // A newly accepted service request owns an intentionally empty route
+      // until its fixed ready tick; that is transit, not a failed arrival.
+      if (c._pathRequest) break;
       if (c.path && c.pathIdx < c.path.length) break;
-      // A failed route is not indoor sleep. Release the unreachable home so
-      // the citizen remains visible sleeping rough and retries next night.
-      if (c.home && (
-        !citizenHasValidResidence(c)
-        || dist2(c.x, c.y, c.home.x, c.home.y) > 10
-      )) c.home = null;
+      if (!citizenHasValidResidence(c) || !citizenAtResidencePortal(c)) {
+        if (c.home && (
+          !citizenHasValidResidence(c)
+          || dist2(c.x, c.y, c.home.x, c.home.y) > 10
+        )) c.home = null;
+        clearPath(c);
+        setActivity(c, 'idle', { reason: 'path-unreachable', timer: 120 + rngInt(0, 60) });
+        break;
+      }
       setActivity(c, 'sleep', { timer: 60 });
       clearPath(c);
       break;
@@ -1087,6 +1142,10 @@ function runStateMachine(c) {
     case 'leisure': {
       if (c.path && c.pathIdx < c.path.length) break;
       const venue = c._leisureTarget;
+      if (!citizenAtLeisureTarget(c, venue)) {
+        failCitizenLeisure(c, 'path-unreachable');
+        break;
+      }
       c._leisureTarget = null;
       if (venue) {
         satisfyCitizenLeisureNeed(c, venue.kind);
@@ -1105,9 +1164,15 @@ function runStateMachine(c) {
     }
 
     case 'sleep':
-      // Sleep restores energy; the dawn heartbeat wakes us. Re-enter on
-      // a slow cadence and breathe the occasional 💤 so night reads as
-      // rest, not a freeze.
+      // Sleep restores energy only at the owned residence portal; an old or
+      // failed route can never turn an outdoor idle body into indoor rest.
+      if (!citizenIsIndoors(c)) {
+        setActivity(c, 'idle', { reason: 'path-unreachable', timer: 120 + rngInt(0, 60) });
+        clearPath(c);
+        break;
+      }
+      // The dawn heartbeat wakes us. Re-enter on a slow cadence and breathe
+      // the occasional 💤 so night reads as rest, not a freeze.
       restoreCitizenSleepRest(c);
       if (visualJitter(c.x, c.y, 900 + citizenHash(c)) < 0.25) {
         G.particles.push({

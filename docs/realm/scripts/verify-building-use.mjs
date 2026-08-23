@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, BUILDINGS } from '../js/state.js?realm=195';
+import { G, BUILDINGS } from '../js/state.js?realm=196';
 import {
   buildingUseReport,
   verifyBuildingUseCoverage,
-} from '../js/building-use.js?realm=195';
+} from '../js/building-use.js?realm=196';
 import {
   claimCitizenAssignment,
   createCitizenOwnership,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=195';
+} from '../js/citizen-ownership.js?realm=196';
 
 function building(type, x, y, extra = {}) {
   return {

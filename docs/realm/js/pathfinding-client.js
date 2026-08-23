@@ -9,14 +9,14 @@ import {
   promotePathfindingWorkerAuthority,
   resetPathfindingService,
   useSynchronousPathfindingService,
-} from './pathfinding-service.js?realm=195';
+} from './pathfinding-service.js?realm=196';
 
 let worker = null;
 
 export function startPathfindingWorkerClient() {
   if (worker) return true;
   if (typeof Worker !== 'function') return false;
-  worker = new Worker(new URL('./pathfinding-worker.js?realm=195', import.meta.url), { type: 'module', name: 'realm-pathfinding' });
+  worker = new Worker(new URL('./pathfinding-worker.js?realm=196', import.meta.url), { type: 'module', name: 'realm-pathfinding' });
   worker.addEventListener('message', event => {
     if (acceptPathfindingWorkerMessage(event.data)) {
       // The core service permits promotion only after at least one exact
