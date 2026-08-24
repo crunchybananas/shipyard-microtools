@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=196';
-import { missions } from './missions.js?realm=196';
+} from './state.js?realm=197';
+import { missions } from './missions.js?realm=197';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=196';
+} from './save-schema.js?realm=197';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,11 +22,11 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=196';
-import { houseResidentCapacity } from './residences.js?realm=196';
-import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=196';
-import { foodCapacity } from './building-inventory.js?realm=196';
-import { makePathfindingRequest } from './pathfinding-service.js?realm=196';
+} from './citizen-ownership.js?realm=197';
+import { houseResidentCapacity } from './residences.js?realm=197';
+import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=197';
+import { foodCapacity } from './building-inventory.js?realm=197';
+import { makePathfindingRequest } from './pathfinding-service.js?realm=197';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization

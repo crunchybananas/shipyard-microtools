@@ -31,13 +31,13 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const report = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=196');
-    const economy = await import('./js/economy.js?realm=196');
-    const firstMuster = await import('./js/first-muster.js?realm=196');
-    const military = await import('./js/military.js?realm=196');
-    const recovery = await import('./js/post-raid-recovery.js?realm=196');
-    const scenarios = await import('./js/scenarios.js?realm=196');
-    const ui = await import('./js/ui.js?realm=196');
+    const state = await import('./js/state.js?realm=197');
+    const economy = await import('./js/economy.js?realm=197');
+    const firstMuster = await import('./js/first-muster.js?realm=197');
+    const military = await import('./js/military.js?realm=197');
+    const recovery = await import('./js/post-raid-recovery.js?realm=197');
+    const scenarios = await import('./js/scenarios.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
     const g = window.G;
     g.debug.disableEvents = true;
     const requireCondition = (condition, message) => {
@@ -274,7 +274,7 @@ try {
         value: row.querySelector('.ip-val')?.textContent?.trim() || '',
       }));
       const grounded = Object.fromEntries(rows
-        .filter(row => ['People', 'Activity', 'Why it matters'].includes(row.label))
+        .filter(row => ['People', 'Activity', 'Realm effect'].includes(row.label))
         .map(row => [row.label, row.value]));
       requireEqual(Object.keys(grounded).length, 3, `${structure.type} panel omitted grounded use rows`);
       requireCondition(Object.values(grounded).every(Boolean), `${structure.type} panel exposed an empty grounded use row`);

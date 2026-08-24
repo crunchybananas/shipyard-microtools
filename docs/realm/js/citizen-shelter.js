@@ -4,21 +4,21 @@
 // only coordinates the citizen activity/path fields needed to physically
 // reach, enter, and leave that owned home.
 
-import { G, MAP_H, MAP_W, getDayPeriod, rngInt } from './state.js?realm=196';
+import { G, MAP_H, MAP_W, getDayPeriod, rngInt } from './state.js?realm=197';
 import {
   assignCitizenResidence,
   citizenAtResidencePortal,
   citizenHasValidResidence,
   residencePortalForCitizen,
-} from './residences.js?realm=196';
-import { setCitizenActivity } from './citizen-activity.js?realm=196';
+} from './residences.js?realm=197';
+import { setCitizenActivity } from './citizen-activity.js?realm=197';
 import {
   blacklistCitizenTarget,
   citizenTargetIsBlacklisted,
   clearCitizenPath,
   pathCitizenTo,
-} from './citizen-navigation.js?realm=196';
-import { citizenIdleLoiterTarget } from './citizen-work.js?realm=196';
+} from './citizen-navigation.js?realm=197';
+import { citizenIdleLoiterTarget } from './citizen-work.js?realm=197';
 
 const RAID_SHELTER_INTERRUPTIBLE = new Set([
   'idle', 'find_job', 'walk_to_work', 'working', 'foraging', 'eating',

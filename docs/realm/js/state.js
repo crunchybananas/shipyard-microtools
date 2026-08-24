@@ -2,7 +2,7 @@
 // Shared game state — imported by all modules
 // ════════════════════════════════════════════════════════════
 
-import { createCompanySupplyState } from './company-supply.js?realm=196';
+import { createCompanySupplyState } from './company-supply.js?realm=197';
 
 export const TILE = { WATER:0, SAND:1, GRASS:2, FOREST:3, STONE:4, IRON:5, MOUNTAIN:6 };
 export const TW = 64, TH = 32;

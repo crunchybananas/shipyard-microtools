@@ -12,7 +12,7 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from '../js/cargo-source-contract.js?realm=196';
+} from '../js/cargo-source-contract.js?realm=197';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 

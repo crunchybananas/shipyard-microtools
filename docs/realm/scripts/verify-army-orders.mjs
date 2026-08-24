@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=196';
-import { dispatch } from '../js/commands.js?realm=196';
+import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=197';
+import { dispatch } from '../js/commands.js?realm=197';
 import {
   armyMayEngage,
   armyOrderAnchor,
@@ -11,9 +11,9 @@ import {
   liveGuardBuilding,
   resetCompanyCommandRuntime,
   updateCompanyMovement,
-} from '../js/army-orders.js?realm=196';
-import { updateSoldiers } from '../js/soldiers.js?realm=196';
-import { removeBuilding } from '../js/building-lifecycle.js?realm=196';
+} from '../js/army-orders.js?realm=197';
+import { updateSoldiers } from '../js/soldiers.js?realm=197';
+import { removeBuilding } from '../js/building-lifecycle.js?realm=197';
 
 function building(type, x, y, buildProgress = 1) {
   const value = {

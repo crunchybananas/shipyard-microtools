@@ -6,7 +6,7 @@ import { chromium } from '@playwright/test';
 import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 196, 'Update food-route browser imports with the runtime revision');
+assert.equal(contract.moduleRevision, 197, 'Update food-route browser imports with the runtime revision');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -18,7 +18,7 @@ page.on('console', message => {
 });
 
 try {
-  await page.goto(`${server.gameUrl}?v=citizen-food-routes-browser-193`);
+  await page.goto(`${server.gameUrl}?v=citizen-food-routes-browser-${contract.moduleRevision}`);
   await page.waitForLoadState('domcontentloaded');
   await page.waitForFunction(() => (
     typeof window.startNewGame === 'function'
@@ -35,12 +35,12 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=196');
-    const inventory = await import('./js/building-inventory.js?realm=196');
-    const ownership = await import('./js/citizen-ownership.js?realm=196');
-    const render = await import('./js/render.js?realm=196');
-    const state = await import('./js/state.js?realm=196');
-    const ui = await import('./js/ui.js?realm=196');
+    const economy = await import('./js/economy.js?realm=197');
+    const inventory = await import('./js/building-inventory.js?realm=197');
+    const ownership = await import('./js/citizen-ownership.js?realm=197');
+    const render = await import('./js/render.js?realm=197');
+    const state = await import('./js/state.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -147,6 +147,20 @@ try {
     g.dayPhase = Math.floor(g.dayLength * 0.35);
 
     const worker = g.citizens[0];
+    // This fixture measures one citizen's physical withdrawal. Keep the two
+    // unrelated settlers in a long non-routing activity so their autonomous
+    // foraging cannot change the realm-wide mirrored food total mid-assertion.
+    for (const bystander of g.citizens.slice(1)) {
+      ownership.releaseCitizenAssignment(bystander, 'player-command');
+      ownership.transitionCitizenActivity(bystander, 'eating', 'eat-food');
+      setPosition(bystander, 30, 30);
+      bystander.activityTimer = 100_000;
+      bystander.hunger = 0;
+      bystander.rest = 100;
+      bystander.speed = 0;
+      bystander.carrying = null;
+      bystander.carryAmount = 0;
+    }
     ownership.renameCitizen(worker, 'Crown Supper Worker', 'player-rename');
     const founderStore = g.buildings.find(building => building.founderStockpile === true);
     requireCondition(founderStore && inventory.storedFood(founderStore) > 1, 'Fresh game lacked a stocked founder Storehouse');

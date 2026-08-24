@@ -2,8 +2,8 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=196';
-import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=196';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=197';
+import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=197';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
@@ -43,7 +43,10 @@ function maybeIgnite(b, notifyFn) {
 }
 
 function closeRaidStolenLedger(outcome) {
-  if (G.enemies.length > 0 || !G._raidStolen) return false;
+  if (G.enemies.length > 0 || !G._raidStolen) {
+    if (G.enemies.length === 0) G._raidSide = null;
+    return false;
+  }
   const parts = Object.entries(G._raidStolen)
     .filter(([, amount]) => amount > 0)
     .map(([resource, amount]) => `${amount} ${resource}`)
@@ -55,28 +58,58 @@ function closeRaidStolenLedger(outcome) {
     notify(message, 'danger');
   }
   G._raidStolen = null;
+  G._raidSide = null;
   return true;
 }
-import { stepEntityToward } from './pathfinding.js?realm=196';
-import { spawnClashFX, visualJitter } from './fx.js?realm=196';
+
+function clearRaidApproachWhenEmpty() {
+  if (G.enemies.length === 0) G._raidSide = null;
+}
+import { stepEntityToward } from './pathfinding.js?realm=197';
+import { spawnClashFX, visualJitter } from './fx.js?realm=197';
+import { raidTargetForIndex } from './raid-targeting.js?realm=197';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=196';
-import { removeBuilding } from './building-lifecycle.js?realm=196';
-import { announce as notify } from './log.js?realm=196';
-import { chronicle } from './log.js?realm=196';
-import { recordDeathMarker } from './death-markers.js?realm=196';
+
+function assignedRaidTarget(enemy) {
+  const x = Math.round(enemy.tx), y = Math.round(enemy.ty);
+  const building = G.buildingGrid[y]?.[x] || null;
+  return building
+    && G.buildings.includes(building)
+    && building.active === true
+    && building.buildProgress >= 1
+    && building.hp > 0
+    && building.type !== 'road'
+    ? building
+    : null;
+}
+
+function ensureRaidTarget(enemy) {
+  const current = assignedRaidTarget(enemy);
+  if (current) return current;
+  const index = Math.max(0, G.enemies.indexOf(enemy));
+  const target = raidTargetForIndex(index, G, G._raidSide, MAP_W, MAP_H);
+  if (!target) return null;
+  enemy.tx = target.x;
+  enemy.ty = target.y;
+  return target;
+}
+import { sfx as playSound } from './log.js?realm=197';
+import { removeBuilding } from './building-lifecycle.js?realm=197';
+import { announce as notify } from './log.js?realm=197';
+import { chronicle } from './log.js?realm=197';
+import { recordDeathMarker } from './death-markers.js?realm=197';
 import {
   removeCitizenFromWorld,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=196';
+} from './citizen-ownership.js?realm=197';
 import {
   citizenHasValidResidence,
   citizenIsIndoors,
-} from './residences.js?realm=196';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=196';
+} from './residences.js?realm=197';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=197';
 
 function detachProjectileTargets(enemy) {
   let snapshot = null;
@@ -92,6 +125,7 @@ function resolveEnemyDeathAt(index) {
   if (!e || e.hp > 0) return false;
   detachProjectileTargets(e);
   G.enemies.splice(index, 1);
+  clearRaidApproachWhenEmpty();
   if (G.stats) G.stats.enemiesKilled++;
   // Loop 209 (the-fixer, 206 filed): rival's symmetric +reward arm.
   // A named rival makes raids larger and every slain raider worth 5 gold.
@@ -183,6 +217,11 @@ export function updateEnemies() {
         }
         continue; // locked in melee — no movement this tick
       }
+      // Preserve the assigned building through combat. A destroyed target is
+      // replaced deterministically before the next movement step; tx/ty are
+      // already part of the strict enemy save surface, so no new field is
+      // required.
+      ensureRaidTarget(e);
     }
     // Check if there's a wall in path — enemies must go around walls
     const nx = Math.round(e.x), ny = Math.round(e.y);
@@ -234,24 +273,25 @@ export function updateEnemies() {
           }
           if (blocker.hp <= 0) removeBuilding(blocker, { cause: 'raid' });
         } else {
-          // Boxed in with nothing to hit — skirt sideways
-          e.tx += (rng() - 0.5) * 5;
-          e.ty += (rng() - 0.5) * 5;
+          // Boxed in with nothing to hit — take a deterministic one-tile
+          // sidestep while preserving tx/ty as the strategic target.
+          const side = ((G.gameTick + Math.max(0, G.enemies.indexOf(e))) & 1) ? 1 : -1;
+          stepEntityToward(e, e.x + side * 2, e.y, marchSpd, raiderOpen);
         }
       }
     } else if (e.retreating) {
       // Reached the retreat edge — gone, with whatever they carried.
       detachProjectileTargets(e);
       G.enemies.splice(i, 1);
+      clearRaidApproachWhenEmpty();
       closeRaidStolenLedger('escape');
       continue;
     } else {
-      // Arrived at town center — attack nearest building
-      const target = G.buildings.reduce((best, b) => {
-        if (!b.hp || b.hp <= 0) return best;
-        const bd = Math.abs(b.x - e.x) + Math.abs(b.y - e.y);
-        return !best || bd < best.d ? { b, d: bd } : best;
-      }, null);
+      // Arrived at the assigned building — attack it, then deterministically
+      // retarget if it was destroyed. Roads are never selected; walls are
+      // selected only when no other structure remains.
+      const targetBuilding = ensureRaidTarget(e);
+      const target = targetBuilding ? { b: targetBuilding } : null;
       if (target) {
         e.attackTimer = (e.attackTimer || 0) - 1;
         if (e.attackTimer > 0) continue;

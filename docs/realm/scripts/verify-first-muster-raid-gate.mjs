@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, createResourceStock, setSeed } from '../js/state.js?realm=196';
-import { generateWorld } from '../js/world.js?realm=196';
-import { checkRaids, getRaidCountdown } from '../js/economy.js?realm=196';
+import { G, MAP_H, createResourceStock, setSeed } from '../js/state.js?realm=197';
+import { generateWorld } from '../js/world.js?realm=197';
+import { checkRaids, getRaidCountdown } from '../js/economy.js?realm=197';
 
 setSeed(189_061);
 generateWorld();
@@ -69,6 +69,6 @@ assert.ok(G.enemies.length > 0, 'deferred first raid never spawned');
 assert.equal(G.stats.raidsFaced, 1);
 assert.ok(G.enemies.every(enemy => enemy.y === MAP_H - 1), 'wave ignored the Founder\'s south approach');
 assert.equal(G.storyFlags.firstRaidApproach, 2, 'spawn consumed durable scouting intelligence');
-assert.equal(G._raidSide, null, 'live raid side was not consumed at spawn');
+assert.equal(G._raidSide, 2, 'live raid did not retain its scouted approach for deterministic retargeting');
 
-console.log('[first-muster-raid-gate] PASS — no pre-rally wave, two-warning-day runway, and scouted approach survives spawn');
+console.log('[first-muster-raid-gate] PASS — no pre-rally wave, two-warning-day runway, and scouted approach persists through the live raid');

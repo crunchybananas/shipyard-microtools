@@ -1,26 +1,27 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, createResourceStock, setSeed } from '../js/state.js?realm=196';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=196';
-import { dispatch } from '../js/commands.js?realm=196';
-import { trySpawnSettlers } from '../js/economy.js?realm=196';
+import { G, createResourceStock, setSeed } from '../js/state.js?realm=197';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=197';
+import { dispatch } from '../js/commands.js?realm=197';
+import { trySpawnSettlers } from '../js/economy.js?realm=197';
 import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   resetCitizenOwnershipRuntime,
   staffingCount,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=196';
+} from '../js/citizen-ownership.js?realm=197';
 import {
   recruitmentCandidatePreview,
   recruitmentForBuilding,
   recruitmentStatus,
   updateRecruitment,
-} from '../js/military.js?realm=196';
-import { residentsForHouse } from '../js/residences.js?realm=196';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=196';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=196';
+} from '../js/military.js?realm=197';
+import { residentsForHouse } from '../js/residences.js?realm=197';
+import { commitGameLoad, prepareSave, serializeGame } from '../js/save-state.js?realm=197';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=197';
+import { effectiveActiveStaffingCount, isBuildingOperational } from '../js/building-operation.js?realm=197';
 
 function finishedBuilding(type, x, y = 40) {
   const building = {
@@ -172,7 +173,7 @@ assert.equal(barracks.trainTimer, 1, 'one remaining active instructor did not co
 const remainingInstructor = G.citizens.find(citizen => citizen.assignment?.building === barracks);
 transitionCitizenActivity(remainingInstructor, 'idle', 'player-command');
 for (let i = 0; i < 30; i++) updateRecruitment(barracks);
-assert.equal(barracks.trainTimer, 1, 'drill advanced with zero active instructors');
+assert.equal(barracks.trainTimer, 31, 'the live company did not keep the drill yard supplied with crew');
 transitionCitizenActivity(remainingInstructor, 'working', 'arrived-at-work');
 finishDrill(barracks, spec.duration);
 assert.equal(G.soldiers[2].name, third.name);
@@ -198,16 +199,19 @@ assert.deepEqual({
 }, noCandidateBefore, 'no-candidate failure mutated the realm');
 
 // Military scenario feasibility at the real post-House population: the
-// commissioned House brings the opening population from three to four. Two
-// unassigned settlers enlist first; the third comes from the AI-staffed yard
-// while one instructor remains to finish all three explicit orders.
+// commissioned House brings the opening population from three to four. The
+// realistic Farm + Barracks fixture proves the company preserves its own drill
+// yard crew so the last civilian can keep food production alive.
 resetFixture(189_004);
 const scenarioHouse = finishedBuilding('house', 44);
 const scenarioBarracks = finishedBuilding('barracks', 46);
+const scenarioFarm = finishedBuilding('farm', 48);
+const scenarioTower = finishedBuilding('tower', 50);
 G.maxPop = G.population + 4;
 trySpawnSettlers(1); // exact API used when commissionBuilding completes a House
 assert.equal(G.population, 4, 'completed military-scenario House did not provide the four-person muster pool');
 assert.equal(G.buildings.includes(scenarioHouse), true);
+assignActive(G.citizens[2], scenarioFarm);
 assignActive(G.citizens[0], scenarioBarracks);
 assignActive(G.citizens[1], scenarioBarracks);
 
@@ -229,7 +233,11 @@ for (let enlistment = 0; enlistment < 3; enlistment++) {
 assert.equal(new Set(enlistedActorIds).size, 3, 'sequential orders consumed a civilian more than once');
 assert.equal(G.soldiers.length, 3);
 assert.equal(G.population, 1);
-assert.equal(staffingCount(scenarioBarracks), 1);
+assert.equal(staffingCount(scenarioFarm), 1, 'the food worker was consumed before available drill-yard workers');
+assert.equal(isBuildingOperational(scenarioFarm), true, 'Farm closed after the First Muster');
+assert.equal(staffingCount(scenarioBarracks), 0, 'the company still consumed a civilian drill-yard worker');
+assert.equal(effectiveActiveStaffingCount(scenarioBarracks), 2, 'the live company did not fill the Barracks crew slots');
+assert.equal(isBuildingOperational(scenarioBarracks), true, 'Barracks closed despite its live company');
 const lastCivilianBeforeRejectedRecruit = {
   population: G.population,
   iron: G.resources.iron,
@@ -244,6 +252,26 @@ assert.deepEqual({
   food: G.resources.food,
   soldiers: G.soldiers.length,
 }, lastCivilianBeforeRejectedRecruit, 'minimum-civilian failure mutated the realm');
-assert.equal(prepareSave(serializeGame({ savedAt: 189 })).ok, true, 'three-enlistment scenario state failed Save/Continue validation');
 
-console.log('[first-muster] PASS — deterministic citizen enlistment, Crown/named protection, labor and housing loss, exact-once cost, one-instructor drill, Save/Continue, and the four-person post-House triple muster');
+// Garrisoning excludes soldiers from drill-yard crew. Removing a free soldier
+// and round-tripping through the real save graph preserve the derived result;
+// no staffing field is persisted or migrated.
+scenarioTower.active = true;
+G.soldiers[0].garrison = scenarioTower;
+assert.equal(effectiveActiveStaffingCount(scenarioBarracks), 2, 'one garrisoned soldier incorrectly removed all Barracks crew');
+G.soldiers.splice(1, 1);
+assert.equal(effectiveActiveStaffingCount(scenarioBarracks), 1, 'soldier removal did not reduce effective Barracks crew');
+const musterSave = prepareSave(serializeGame({ savedAt: 189 }));
+assert.equal(musterSave.ok, true, 'realistic Farm + Barracks state failed Save/Continue validation');
+assert.equal(commitGameLoad(musterSave.value).ok, true, 'realistic Farm + Barracks save failed to commit');
+resetCitizenOwnershipRuntime();
+const restoredBarracks = G.buildings.find(building => building.type === 'barracks');
+const restoredTower = G.buildings.find(building => building.type === 'tower');
+assert.equal(G.soldiers.filter(soldier => soldier.garrison === restoredTower).length, 1, 'garrison reference did not survive Save/Continue');
+assert.equal(effectiveActiveStaffingCount(restoredBarracks), 1, 'derived Barracks crew changed across Save/Continue');
+G.soldiers[0].garrison = restoredTower;
+G.soldiers[1].garrison = restoredTower;
+assert.equal(effectiveActiveStaffingCount(restoredBarracks), 0, 'garrisoned soldiers still counted as drill-yard crew');
+assert.equal(isBuildingOperational(restoredBarracks), false, 'Barracks remained operational with no free company crew');
+
+console.log('[first-muster] PASS — deterministic citizen enlistment, Crown/named protection, labor and housing loss, exact-once cost, company drill crew, Farm preservation, Save/Continue, and the four-person post-House triple muster');

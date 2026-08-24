@@ -2,16 +2,16 @@
 // Scenarios — structured objective-based campaigns
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=196';
+import { G } from './state.js?realm=197';
 import {
   FIRST_MUSTER_CHAPTER_ID,
   getFirstMusterScenarioObjectives,
   isFirstMusterComplete,
-} from './first-muster.js?realm=196';
+} from './first-muster.js?realm=197';
 import {
   getPostRaidRecoveryScenarioObjectives,
   isPostRaidRecoveryComplete,
-} from './post-raid-recovery.js?realm=196';
+} from './post-raid-recovery.js?realm=197';
 
 export const SCENARIOS = [
   {

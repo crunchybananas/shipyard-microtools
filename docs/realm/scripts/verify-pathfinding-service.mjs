@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {
   createPathfindingGridSnapshot,
   findPathOnGrid,
-} from '../js/pathfinding-kernel.js?realm=196';
+} from '../js/pathfinding-kernel.js?realm=197';
 import {
   PATHFINDING_MODES,
   PATHFINDING_READY_DELAY_TICKS,
@@ -19,11 +19,11 @@ import {
   resetPathfindingService,
   takePathfindingResult,
   useSynchronousPathfindingService,
-} from '../js/pathfinding-service.js?realm=196';
+} from '../js/pathfinding-service.js?realm=197';
 import {
   pathfindingWorkerClientActive,
   startPathfindingWorkerClient,
-} from '../js/pathfinding-client.js?realm=196';
+} from '../js/pathfinding-client.js?realm=197';
 
 function makeGrid(obstacleEpoch = 1) {
   const width = 24;
@@ -401,6 +401,20 @@ assert.equal(PATHFINDING_READY_DELAY_TICKS, 5);
 if (typeof globalThis.Worker === 'undefined') {
   assert.equal(startPathfindingWorkerClient(), false, 'headless Node must remain synchronous without Worker');
   assert.equal(pathfindingWorkerClientActive(), false);
+}
+
+const originalWorker = globalThis.Worker;
+globalThis.Worker = class RejectedWorker {
+  constructor() {
+    throw new Error('Worker construction rejected by browser policy');
+  }
+};
+try {
+  assert.equal(startPathfindingWorkerClient(), false, 'rejected Worker construction must use synchronous routing');
+  assert.equal(pathfindingWorkerClientActive(), false, 'failed Worker construction leaked an active transport');
+} finally {
+  if (typeof originalWorker === 'undefined') delete globalThis.Worker;
+  else globalThis.Worker = originalWorker;
 }
 
 console.log(`[pathfinding-service] VERIFIED delay=T+${first.delay}; deterministic IDs/order; shadow compare; Worker authority; sync fallback; late/stale generation rejection`);

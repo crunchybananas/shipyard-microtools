@@ -2,26 +2,27 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=196';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=196';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=196';
-import { revealAround, makeCitizen } from './world.js?realm=196';
-import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=196';
-import { spawnDust, visualJitter } from './fx.js?realm=196';
-import { emit } from './bus.js?realm=196';
-import { isBuildingUnlocked } from './tech.js?realm=196';
-import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=196';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=197';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=197';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=197';
+import { revealAround, makeCitizen } from './world.js?realm=197';
+import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=197';
+import { spawnDust, visualJitter } from './fx.js?realm=197';
+import { emit } from './bus.js?realm=197';
+import { isBuildingUnlocked } from './tech.js?realm=197';
+import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=197';
 import {
   citizenConstructionRequiresStaff,
   releaseCitizenAssignment,
   removeCitizenFromWorld,
   transitionCitizenActivity,
   workersForBuilding,
-} from './citizen-ownership.js?realm=196';
-import { activeStaffingCount, isBuildingOperational } from './building-operation.js?realm=196';
-import { updateRecruitment } from './military.js?realm=196';
-import { isFirstMusterRaidReady } from './first-muster.js?realm=196';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=196';
+} from './citizen-ownership.js?realm=197';
+import { activeStaffingCount, isBuildingOperational } from './building-operation.js?realm=197';
+import { updateRecruitment } from './military.js?realm=197';
+import { isFirstMusterRaidReady } from './first-muster.js?realm=197';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=197';
+import { raidTargetForIndex } from './raid-targeting.js?realm=197';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -584,7 +585,9 @@ export function checkRaids() {
     playSound('raid');
 
     const bandSide = G._raidSide ?? rngInt(0, 3);
-    G._raidSide = null;
+    // Retain the active approach through the live raid so deterministic
+    // retargeting keeps using the same frontier tie-break.
+    G._raidSide = bandSide;
     const bandDir = ['north', 'east', 'south', 'west'][bandSide];
     const report = [`⚔️ RAID: ${raiders} raiders approach from the ${bandDir}!`];
     if (G.defense > 0 || (G.soldiers && G.soldiers.length > 0)) {
@@ -613,12 +616,9 @@ export function checkRaids() {
     // (spawn + intercept + no-defenders hint). See 082 HIGH.
     for (const line of report) notify(line, 'danger', { chronicle: false });
 
-    // Attacked-area preview: shell pans the camera (ENGINE.md rule 4)
-    const firstBuilding = G.buildings.find(b => b.type !== 'road' && b.type !== 'wall');
-    if (firstBuilding) emit('raid-started', { x: firstBuilding.x, y: firstBuilding.y });
-
     G._raidSpawnCount = raiders; // morale-break baseline (combat.js)
     // Spawn enemy raiders that visibly approach the settlement
+    let primaryTarget = null;
     for (let i = 0; i < raiders; i++) {
       // One warband, one edge — spread along it so they arrive as a line.
       const side = bandSide;
@@ -628,8 +628,10 @@ export function checkRaids() {
       else if (side === 1) { ex = MAP_W - 1; ey = along; }
       else if (side === 2) { ex = along; ey = MAP_H - 1; }
       else { ex = 0; ey = along; }
+      const target = raidTargetForIndex(i, G, bandSide, MAP_W, MAP_H);
+      primaryTarget ||= target;
       G.enemies.push({
-        x: ex, y: ey, tx: MAP_W/2, ty: MAP_H/2,
+        x: ex, y: ey, tx: target?.x ?? MAP_W / 2, ty: target?.y ?? MAP_H / 2,
         hp: isFirstRaid ? 24 : 30,
         maxHp: isFirstRaid ? 24 : 30,
         damage: isFirstRaid ? 5 : 7,
@@ -638,6 +640,17 @@ export function checkRaids() {
         state: 'approach',
         // Sprite-only variation is derived without advancing gameplay RNG.
         variant: Math.floor(visualJitter(ex, ey, 1300 + i) * 3),
+      });
+    }
+
+    // Attacked-area preview: shell pans to the primary strategic target and
+    // names it so the player can answer with walls, towers, or Company Advance.
+    const firstBuilding = primaryTarget || G.buildings.find(b => b.type !== 'road' && b.type !== 'wall');
+    if (firstBuilding) {
+      emit('raid-started', {
+        x: firstBuilding.x,
+        y: firstBuilding.y,
+        targetName: BUILDINGS[firstBuilding.type]?.name || firstBuilding.type,
       });
     }
 

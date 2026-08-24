@@ -22,7 +22,7 @@ const runtimeContract = JSON.parse(
 );
 assert.equal(
   runtimeContract.moduleRevision,
-  196,
+  197,
   'Update dense-settlement browser imports with the runtime revision',
 );
 const viewport = { width: 1556, height: 736 };
@@ -58,11 +58,11 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async ({ tickLimit: limit }) => {
-    const state = await import('./js/state.js?realm=196');
-    const pathfinding = await import('./js/pathfinding.js?realm=196');
-    const citizens = await import('./js/citizens.js?realm=196');
-    const ownership = await import('./js/citizen-ownership.js?realm=196');
-    const render = await import('./js/render.js?realm=196');
+    const state = await import('./js/state.js?realm=197');
+    const pathfinding = await import('./js/pathfinding.js?realm=197');
+    const citizens = await import('./js/citizens.js?realm=197');
+    const ownership = await import('./js/citizen-ownership.js?realm=197');
+    const render = await import('./js/render.js?realm=197');
     const g = window.G;
     if (state.G !== g) throw new Error('dense fixture imported a split runtime state identity');
     const center = { x: 40, y: 40 };

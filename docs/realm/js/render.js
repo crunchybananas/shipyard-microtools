@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=196';
-import { renderBoats, renderFlocks, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=196';
-import { makeAtlasLoader } from './atlas-loader.js?realm=196';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=196';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=197';
+import { renderBoats, renderFlocks, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=197';
+import { makeAtlasLoader } from './atlas-loader.js?realm=197';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=197';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,7 +15,7 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=196';
+} from './sprite-source-contract.js?realm=197';
 import {
   CARGO_DIRECTIONS,
   CARGO_FRAMES,
@@ -24,7 +24,7 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from './cargo-source-contract.js?realm=196';
+} from './cargo-source-contract.js?realm=197';
 import {
   ENEMY_ACTIONS,
   ENEMY_DIRECTIONS,
@@ -32,21 +32,21 @@ import {
   ENEMY_RUNTIME_ATLASES,
   ENEMY_VARIANTS,
   enemyAtlasFrameRect,
-} from './enemy-sprite-contract.js?realm=196';
+} from './enemy-sprite-contract.js?realm=197';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=196';
+} from './render-resolution.js?realm=197';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=196';
+} from './citizen-presentation.js?realm=197';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=196';
-import { staffingCount } from './citizen-ownership.js?realm=196';
+} from './citizen-render-cache.js?realm=197';
+import { staffingCount } from './citizen-ownership.js?realm=197';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -2915,6 +2915,41 @@ export function render() {
       default:
         break;
     }
+  }
+
+  // Raid target telegraph: enemy tx/ty already carry the strategic building
+  // target, so show one clear reticle per target rather than a marker under
+  // every raider. This remains presentation-only and disappears as targets
+  // are destroyed or raiders retreat.
+  const raidTargets = new Map();
+  for (const enemy of G.enemies) {
+    if (enemy.retreating) continue;
+    const targetX = Math.round(enemy.tx), targetY = Math.round(enemy.ty);
+    const target = G.buildingGrid[targetY]?.[targetX] || null;
+    if (!target || target.type === 'road' || target.hp <= 0) continue;
+    raidTargets.set(`${target.x},${target.y}`, target);
+  }
+  if (raidTargets.size) {
+    const pulse = 0.78 + Math.sin(G.gameTick * 0.12) * 0.18;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0.7, daylight) * pulse;
+    ctx.strokeStyle = '#ff5544';
+    ctx.lineWidth = 1.8;
+    for (const target of raidTargets.values()) {
+      const targetScreen = toScreen(target.x, target.y);
+      ctx.beginPath();
+      ctx.ellipse(targetScreen.x, targetScreen.y + 2, 15, 6.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      const left = targetScreen.x - 11, right = targetScreen.x + 11;
+      const top = targetScreen.y - 5, bottom = targetScreen.y + 9;
+      ctx.beginPath();
+      ctx.moveTo(left, top + 4); ctx.lineTo(left, top); ctx.lineTo(left + 4, top);
+      ctx.moveTo(right, top + 4); ctx.lineTo(right, top); ctx.lineTo(right - 4, top);
+      ctx.moveTo(left, bottom - 4); ctx.lineTo(left, bottom); ctx.lineTo(left + 4, bottom);
+      ctx.moveTo(right, bottom - 4); ctx.lineTo(right, bottom); ctx.lineTo(right - 4, bottom);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   // ── Founder marker (Phase 3d) ─────────────────────────────

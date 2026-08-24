@@ -3,16 +3,16 @@
 // All fields written here are existing Engine-v2 citizen save fields. The
 // caller owns activity decisions and failure policy.
 
-import { G, MAP_H, MAP_W } from './state.js?realm=196';
-import { getPathfindingGridSnapshot, isWalkable } from './pathfinding.js?realm=196';
+import { G, MAP_H, MAP_W } from './state.js?realm=197';
+import { getPathfindingGridSnapshot, isWalkable } from './pathfinding.js?realm=197';
 import {
   enqueuePathfindingRequest,
   makePathfindingRequest,
   takePathfindingResult,
-} from './pathfinding-service.js?realm=196';
-import { citizenIsIndoors } from './residences.js?realm=196';
-import { citizenStableHash } from './citizen-activity.js?realm=196';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=196';
+} from './pathfinding-service.js?realm=197';
+import { citizenIsIndoors } from './residences.js?realm=197';
+import { citizenStableHash } from './citizen-activity.js?realm=197';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=197';
 
 const BLACKLIST_TICKS = 600;
 

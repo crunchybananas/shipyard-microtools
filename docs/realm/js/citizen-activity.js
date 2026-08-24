@@ -3,7 +3,7 @@
 // This module owns causal activity defaults and stable actor hashing. It does
 // not schedule decisions; citizens.js remains the authoritative tick driver.
 
-import { transitionCitizenActivity } from './citizen-ownership.js?realm=196';
+import { transitionCitizenActivity } from './citizen-ownership.js?realm=197';
 
 export const DEFAULT_CITIZEN_ACTIVITY_REASON = Object.freeze({
   idle: 'idle-wait',

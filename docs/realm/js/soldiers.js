@@ -2,12 +2,12 @@
 // Soldiers — AI update for soldier units
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=196';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=196';
-import { spawnClashFX } from './fx.js?realm=196';
-import { sfx as playSound } from './log.js?realm=196';
-import { recordDeathMarker } from './death-markers.js?realm=196';
-import { workersForBuilding } from './citizen-ownership.js?realm=196';
+import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=197';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=197';
+import { spawnClashFX } from './fx.js?realm=197';
+import { sfx as playSound } from './log.js?realm=197';
+import { recordDeathMarker } from './death-markers.js?realm=197';
+import { workersForBuilding } from './citizen-ownership.js?realm=197';
 import {
   armyMayEngage,
   armyOrderAnchor,
@@ -16,8 +16,8 @@ import {
   refreshEscortTarget,
   resetCompanyCommandRuntime,
   updateCompanyMovement,
-} from './army-orders.js?realm=196';
-import { readinessMultipliers } from './company-supply.js?realm=196';
+} from './army-orders.js?realm=197';
+import { readinessMultipliers } from './company-supply.js?realm=197';
 
 function companyMultipliers() {
   return readinessMultipliers(G.armySupply?.readiness);

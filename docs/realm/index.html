@@ -116,6 +116,8 @@ body.sprite-muster-open #postfx{display:none!important}
 #kingdom-name-input:focus { outline: none; border-color: var(--accent); }
 .title-btn.primary{border-color:var(--gold);color:var(--gold);background:rgba(24,16,4,0.62)}
 .title-btn.primary:hover{background:rgba(255,209,102,0.12);box-shadow:0 4px 20px rgba(255,209,102,0.2)}
+#title-startup-status{min-height:1.2rem;margin-top:0.55rem;color:rgba(255,255,255,0.72);font-size:0.72rem;letter-spacing:0.02em}
+#title-startup-status[data-state="error"]{color:#ffb0a6}
 #title-version{position:absolute;bottom:1rem;right:1.2rem;font-size:var(--fs-xs);color:rgba(255,255,255,0.34);font-variant-numeric:tabular-nums;letter-spacing:0.05em}
 @media (max-height:720px){
   .title-name{font-size:2.75rem}
@@ -810,11 +812,12 @@ body.photo-mode #wonder-chip{display:none!important}
       <input type="text" id="kingdom-name-input" placeholder="Name your kingdom..." maxlength="20" />
     </div>
     <div class="title-buttons">
-      <button class="title-btn primary" onclick="startNewGame()">New Game</button>
+      <button class="title-btn primary" id="title-new-game" type="button">New Game</button>
       <button class="title-btn" id="title-load" onclick="loadAndStart()" style="display:none">Continue</button>
       <button class="title-btn dev-tool" onclick="openSpriteLab()">Sprite Lab</button>
       <button class="title-btn dev-tool" onclick="openSpriteMuster()">Actor Muster</button>
     </div>
+    <div id="title-startup-status" role="status" aria-live="polite"></div>
   </div>
   <div id="title-version">v1.0</div>
 </div>
@@ -1149,7 +1152,57 @@ body.photo-mode #wonder-chip{display:none!important}
 const params = new URLSearchParams(location.search);
 const devTools = params.has('devtools') || params.has('spritelab') || params.has('spritemuster');
 document.body.classList.toggle('devtools', devTools);
+
+// The title is interactive before the module graph has necessarily finished
+// loading. Queue an eager New Game click instead of throwing because the real
+// entrypoint is not installed yet, and make startup failures visible/retryable.
+const startupButton = document.getElementById('title-new-game');
+const startupStatus = document.getElementById('title-startup-status');
+const realmStartup = {
+  run: null,
+  pending: false,
+  failed: false,
+  request() {
+    if (this.failed) {
+      location.reload();
+      return;
+    }
+    if (!this.run) {
+      this.pending = true;
+      startupButton.disabled = true;
+      startupStatus.textContent = 'Preparing your realm…';
+      return;
+    }
+    this.start();
+  },
+  start() {
+    try {
+      this.run();
+    } catch (error) {
+      console.error('Realm failed to start:', error);
+      this.fail();
+    }
+  },
+  ready(run) {
+    this.run = run;
+    startupButton.disabled = false;
+    startupStatus.textContent = '';
+    if (this.pending) {
+      this.pending = false;
+      this.start();
+    }
+  },
+  fail() {
+    this.failed = true;
+    startupButton.disabled = false;
+    startupButton.textContent = 'Reload Realm';
+    startupStatus.dataset.state = 'error';
+    startupStatus.textContent = 'Realm could not finish loading. Reload to try again.';
+  },
+};
+globalThis.realmStartup = realmStartup;
+startupButton.addEventListener('click', () => realmStartup.request());
 </script>
-<script type="module" src="js/main.js?realm=196"></script>
+<script type="module" src="js/main.js?realm=197" onerror="globalThis.realmStartup.fail()"></script>
 </body>
 </html>

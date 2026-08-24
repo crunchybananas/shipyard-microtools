@@ -1,13 +1,19 @@
 // Post-raid recovery doctrine — a deterministic, reward-free player choice
 // that turns the First Muster victory into one concrete follow-up action.
 
-import { G, BUILDINGS, MAP_H, MAP_W } from './state.js?realm=196';
-import { isBuildingComplete, isBuildingOperational } from './building-operation.js?realm=196';
-import { isFirstMusterComplete } from './first-muster.js?realm=196';
+import { G, BUILDINGS, MAP_H, MAP_W } from './state.js?realm=197';
+import { isBuildingComplete, isBuildingOperational } from './building-operation.js?realm=197';
+import { isFirstMusterComplete } from './first-muster.js?realm=197';
+import {
+  citizenAtResidencePortal,
+  citizenHasValidResidence,
+  residentsForHouse,
+} from './residences.js?realm=197';
 
 export const POST_RAID_RECOVERY_ID = 'post_raid_recovery';
 export const POST_RAID_DOCTRINE_PATH = 'storyFlags.postRaidDoctrine';
 export const POST_RAID_DOCTRINES = Object.freeze(['rebuild', 'fortify', 'explore']);
+export const STABILIZE_HOUSEHOLD_ID = 'stabilize_household';
 
 const DOCTRINE_SET = new Set(POST_RAID_DOCTRINES);
 const FOOD_WORKPLACES = new Set(['farm', 'fisherman', 'chickencoop', 'cowpen', 'bakery']);
@@ -153,10 +159,61 @@ function exploreProgress(state) {
   });
 }
 
+// Recovery is not complete when the chosen policy merely changes a counter.
+// A survivor must make a real post-choice night: their own completed House
+// must still own them, and their sleep transition must begin strictly after
+// the doctrine choice. The portal check keeps a stale/outdoor `sleep` state
+// from satisfying the objective.
+function stabilizeHouseholdProgress(state) {
+  const selectedAt = choiceTick(state);
+  const buildings = state.buildings || [];
+  const citizens = state.citizens || [];
+  const eligibleResidents = [];
+  for (const house of buildings) {
+    if (!isBuildingComplete(house) || house.type !== 'house') continue;
+    for (const citizen of residentsForHouse(house, citizens)) {
+      if (!citizenHasValidResidence(citizen, { buildings, citizens })) continue;
+      eligibleResidents.push(citizen);
+    }
+  }
+  const sleepingResident = eligibleResidents.find(citizen => (
+    citizen.activity?.kind === 'sleep'
+      && Number.isSafeInteger(citizen.activity?.sinceTick)
+      && citizen.activity.sinceTick > selectedAt
+      && citizenAtResidencePortal(citizen, { buildings, citizens })
+  ));
+  return Object.freeze({
+    current: sleepingResident ? 1 : 0,
+    target: 1,
+    choiceTick: selectedAt,
+    eligibleResidents: eligibleResidents.length,
+    resident: sleepingResident ? Object.freeze({
+      actorId: sleepingResident.actorId,
+      name: sleepingResident.identity?.name || sleepingResident.name || 'Resident',
+      home: Object.freeze({ x: sleepingResident.home.x, y: sleepingResident.home.y }),
+      sinceTick: sleepingResident.activity.sinceTick,
+    }) : null,
+  });
+}
+
 function objectiveProgress(doctrine, state) {
   if (doctrine === 'rebuild') return rebuildProgress(state);
   if (doctrine === 'fortify') return fortifyProgress(state);
   return exploreProgress(state);
+}
+
+function stabilizationObjective(state, stabilization, complete = false) {
+  return Object.freeze({
+    id: STABILIZE_HOUSEHOLD_ID,
+    doctrine: selectedDoctrine(state),
+    text: 'Stabilize one household',
+    detail: 'Let a surviving resident reach their own completed House and sleep there after choosing the recovery doctrine.',
+    focus: 'household',
+    action: 'open-house',
+    status: complete ? 'completed' : 'current',
+    satisfied: complete || stabilization.current >= stabilization.target,
+    progress: stabilization,
+  });
 }
 
 function objectiveDetail(doctrine, state) {
@@ -172,6 +229,13 @@ export function getPostRaidRecoveryReport(state = G) {
   const selected = selectedDoctrine(state);
   const lockedReason = unlockReason(state);
   const unlocked = lockedReason === null;
+  const doctrineObserved = selected ? objectiveProgress(selected, state) : null;
+  const doctrineSatisfied = !!doctrineObserved && doctrineObserved.current >= doctrineObserved.target;
+  const stabilization = selected ? stabilizeHouseholdProgress(state) : null;
+  // Completion is a deliberate latch. The transition into this flag is
+  // guarded by both doctrine progress and a qualifying physical sleep in
+  // updatePostRaidRecovery; after that, waking or later damage must not make
+  // the completed scenario regress.
   const complete = !!selected && state.storyFlags?.postRaidRecoveryComplete === true;
   const choices = POST_RAID_DOCTRINES.map(doctrine => {
     const card = DOCTRINE_CARDS[doctrine];
@@ -187,21 +251,24 @@ export function getPostRaidRecoveryReport(state = G) {
   let primary = null;
   if (selected) {
     const card = DOCTRINE_CARDS[selected];
-    const observedProgress = objectiveProgress(selected, state);
-    const progress = complete && observedProgress.current < observedProgress.target
-      ? Object.freeze({ ...observedProgress, current: observedProgress.target })
-      : observedProgress;
-    primary = Object.freeze({
+    const observedProgress = doctrineObserved;
+    const doctrinePrimary = Object.freeze({
       id: card.objectiveId,
       doctrine: selected,
       text: card.objective,
       detail: objectiveDetail(selected, state),
       focus: card.focus,
       action: card.action,
-      status: complete ? 'completed' : 'current',
-      satisfied: complete || progress.current >= progress.target,
-      progress,
+      status: doctrineSatisfied ? 'completed' : 'current',
+      satisfied: doctrineSatisfied,
+      progress: observedProgress,
     });
+    const latchedStabilization = complete && stabilization.current < stabilization.target
+      ? Object.freeze({ ...stabilization, current: stabilization.target })
+      : stabilization;
+    primary = doctrineSatisfied || complete
+      ? stabilizationObjective(state, latchedStabilization, complete)
+      : doctrinePrimary;
   }
   const approach = rememberedApproach(state);
   return Object.freeze({
@@ -213,6 +280,12 @@ export function getPostRaidRecoveryReport(state = G) {
     selected,
     choiceTick: selected ? choiceTick(state) : null,
     complete,
+    doctrine: selected ? Object.freeze({
+      id: DOCTRINE_CARDS[selected].objectiveId,
+      satisfied: doctrineSatisfied,
+      progress: doctrineObserved,
+    }) : null,
+    stabilization,
     approach: approach === null ? null : Object.freeze({
       side: approach,
       label: APPROACH_LABELS[approach],
@@ -268,13 +341,17 @@ export function choosePostRaidDoctrine(doctrine, state = G) {
 export function updatePostRaidRecovery(state = G) {
   if (state.scenario !== 'military_rise') return getPostRaidRecoveryReport(state);
   const report = getPostRaidRecoveryReport(state);
-  if (!report.selected || report.complete || !report.primary?.satisfied) return report;
+  if (report.complete) return report;
+  const recoverySatisfied = !!report.selected
+    && report.doctrine?.satisfied === true
+    && report.stabilization?.current >= report.stabilization?.target;
+  if (!recoverySatisfied) return report;
   state.storyFlags.postRaidRecoveryComplete = true;
   return getPostRaidRecoveryReport(state);
 }
 
 export function isPostRaidRecoveryComplete(state = G) {
-  return !!selectedDoctrine(state) && state.storyFlags?.postRaidRecoveryComplete === true;
+  return getPostRaidRecoveryReport(state).complete;
 }
 
 export function getPostRaidRecoveryScenarioObjectives(state = G) {

@@ -13,7 +13,7 @@ import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
 const REVISION = contract.moduleRevision;
-assert.equal(REVISION, 196, 'Update this gate together with current browser module URLs');
+assert.equal(REVISION, 197, 'Update this gate together with current browser module URLs');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -40,10 +40,10 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const ownership = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=196');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=196');
-    const presentation = await import('./js/citizen-presentation.js?realm=196');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=196');
+    const economy = await import('./js/economy.js?realm=197');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=197');
+    const presentation = await import('./js/citizen-presentation.js?realm=197');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=197');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -185,8 +185,8 @@ try {
     // Byte equality here is therefore at least as strict as the RFC's
     // authoritative-state equality requirement. The hash makes the exact
     // evidence compact enough to report without returning the full graph.
-    const saveState = await import('./js/save-state.js?realm=196');
-    const stateModule = await import('./js/state.js?realm=196');
+    const saveState = await import('./js/save-state.js?realm=197');
+    const stateModule = await import('./js/state.js?realm=197');
     const hashText = async text => {
       const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
       return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
@@ -336,8 +336,8 @@ try {
   assert.equal(released.duplicateProfession, 'settler');
 
   const removal = await page.evaluate(async ({ actorId }) => {
-    const economy = await import('./js/economy.js?realm=196');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=196');
+    const economy = await import('./js/economy.js?realm=197');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=197');
     const g = window.G;
     const events = [];
     const off = ownershipModule.onCitizenTransition(event => events.push(event));
@@ -398,9 +398,9 @@ try {
   assert.ok(removal.causalReasons.includes('activity:building-removed'));
 
   const actorCacheLifecycle = await page.evaluate(async ({ victimActorId }) => {
-    const combat = await import('./js/combat.js?realm=196');
-    const economy = await import('./js/economy.js?realm=196');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=196');
+    const combat = await import('./js/combat.js?realm=197');
+    const economy = await import('./js/economy.js?realm=197');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=197');
     const g = window.G;
     const requireCondition = (condition, message) => {
       if (!condition) throw new Error(message);
@@ -499,9 +499,9 @@ try {
   assert.ok(actorCacheLifecycle.cacheSize <= actorCacheLifecycle.population);
 
   const midpoint = await page.evaluate(async ({ actorId, farm }) => {
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=196');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=196');
-    const save = await import('./js/save.js?realm=196');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=197');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=197');
+    const save = await import('./js/save.js?realm=197');
     const g = window.G;
     const result = g.debug.dispatch({ type: 'ASSIGN_CITIZEN', actorId, x: farm.x, y: farm.y });
     if (!result.ok) throw new Error(`Midpoint assignment failed: ${result.reason}`);
@@ -559,9 +559,9 @@ try {
   assert.equal(midpoint.saveHasWorkerAuthority, false);
 
   const inGameLoadLedger = await page.evaluate(async ({ actorId, savedName }) => {
-    const inspector = await import('./js/citizen-inspector.js?realm=196');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=196');
-    const save = await import('./js/save.js?realm=196');
+    const inspector = await import('./js/citizen-inspector.js?realm=197');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=197');
+    const save = await import('./js/save.js?realm=197');
     window.realmNpcDebug.enable(true);
     inspector.resetCitizenTransitionLedger();
     const citizen = window.G.citizens.find(value => value.actorId === actorId);
@@ -587,7 +587,7 @@ try {
   await page.waitForFunction(() => typeof window.loadAndStart === 'function');
 
   const continued = await page.evaluate(async ({ actorId }) => {
-    const renderCache = await import('./js/citizen-render-cache.js?realm=196');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=197');
     const staleActorId = Number.MAX_SAFE_INTEGER - 2;
     renderCache.citizenRenderRecord(staleActorId).animationKey = 'continue-reset-browser-probe';
     const cacheBeforeLoad = renderCache.citizenRenderCacheSize();
@@ -642,9 +642,9 @@ try {
   assert.equal(continued.noBuildingWorkers, true);
 
   const reset = await page.evaluate(async () => {
-    const inspector = await import('./js/citizen-inspector.js?realm=196');
-    const ownershipModule = await import('./js/citizen-ownership.js?realm=196');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=196');
+    const inspector = await import('./js/citizen-inspector.js?realm=197');
+    const ownershipModule = await import('./js/citizen-ownership.js?realm=197');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=197');
     window.realmNpcDebug.enable(true);
     inspector.resetCitizenTransitionLedger();
     ownershipModule.renameCitizen(window.G.citizens[0], 'New Game Ledger Sentinel', 'player-rename');

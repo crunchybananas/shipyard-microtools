@@ -5,14 +5,16 @@
 // no simulation data and returns a frozen, reference-free snapshot for UI and
 // verification consumers.
 
-import { G, BUILDINGS } from './state.js?realm=196';
+import { G, BUILDINGS } from './state.js?realm=197';
 import {
   activeStaffingCount,
+  effectiveActiveStaffingCount,
   isBuildingComplete,
-} from './building-operation.js?realm=196';
-import { workersForBuilding } from './citizen-ownership.js?realm=196';
-import { residentsForHouse } from './residences.js?realm=196';
-import { foodCapacity, isFoodStore, storedFood } from './building-inventory.js?realm=196';
+  militaryCrewForBuilding,
+} from './building-operation.js?realm=197';
+import { workersForBuilding } from './citizen-ownership.js?realm=197';
+import { residentsForHouse } from './residences.js?realm=197';
+import { foodCapacity, isFoodStore, storedFood } from './building-inventory.js?realm=197';
 
 const STRATEGIC_ROLE = Object.freeze({
   house: 'Adds four beds, a private eight-ration pantry, nightly sleep, raid shelter, and taxable household growth.',
@@ -22,7 +24,7 @@ const STRATEGIC_ROLE = Object.freeze({
   quarry: 'Extracts stone for storage, fortification, and durable civic buildings.',
   mine: 'Extracts iron for recruitment, tools, towers, and advanced construction.',
   market: 'Turns an attended trade floor into gold and improves nearby homes.',
-  barracks: 'Converts named civilians, iron, and stored food into swordsmen; at least one instructor must remain on duty.',
+  barracks: 'Converts named civilians, iron, and stored food into swordsmen; its own company can keep the drill yard operational between levies.',
   tower: 'Reveals terrain and attacks raiders; a soldier garrison extends range and increases its firing rate.',
   well: 'Improves nearby households and gives firefighters a chance to extinguish burning buildings.',
   tavern: 'Gives citizens a physical leisure destination and raises happiness around nearby homes.',
@@ -41,7 +43,7 @@ const STRATEGIC_ROLE = Object.freeze({
   cowpen: 'Uses one rancher to create two direct rations per production cycle.',
   fisherman: 'Uses one fisher at the shoreline to create three direct rations per cycle.',
   blacksmith: 'Consumes iron to forge production tools and increases nearby soldier damage.',
-  archery: 'Converts named civilians, wood, and stored food into ranged soldiers.',
+  archery: 'Converts named civilians, wood, and stored food into ranged soldiers; its own company can keep the range operational between levies.',
   townhall: 'Adds civic housing and happiness under the realm\'s named mayor.',
 });
 
@@ -75,6 +77,13 @@ function peopleSummary(building, state) {
   if (building.type === 'road') return 'Citizens, the Founder, soldiers, carts, and raiders';
   if (building.type === 'wall') return 'Builders raise it · no permanent crew';
   const workers = workersForBuilding(building);
+  if (building.type === 'barracks' || building.type === 'archery') {
+    const company = militaryCrewForBuilding(building);
+    const crewNames = company.length ? `Company: ${names(company)}` : '';
+    if (workers.length && crewNames) return `${names(workers)} · ${crewNames}`;
+    if (workers.length) return names(workers);
+    if (crewNames) return crewNames;
+  }
   if (workers.length) return names(workers);
   if (isFoodStore(building, state)) {
     const visitors = peopleAtFoodStore(building, state);
@@ -118,16 +127,24 @@ function activitySummary(building, state) {
     return nearby > 0 ? `Holding ${nearby} raider${nearby === 1 ? '' : 's'} at the frontier` : 'Standing barrier · no work shift required';
   }
   if (building.recruitType) {
-    const active = activeStaffingCount(building);
+    const active = effectiveActiveStaffingCount(building);
+    const civilian = activeStaffingCount(building);
+    const military = militaryCrewForBuilding(building).length;
+    const crew = military > 0
+      ? `${civilian} civilian + ${military} soldier crew`
+      : `${active} instructor${active === 1 ? '' : 's'}`;
     return active > 0
-      ? `${active} instructor${active === 1 ? '' : 's'} drilling ${building.recruitName}`
+      ? `${crew} drilling ${building.recruitName}`
       : `Drill for ${building.recruitName} paused until an instructor returns`;
   }
   const required = BUILDINGS[building.type]?.workers || 0;
   if (required > 0) {
     const assigned = workersForBuilding(building).length;
     const active = activeStaffingCount(building);
-    if (active >= required) return `${active}/${required} workers performing the building's service now`;
+    const effective = effectiveActiveStaffingCount(building);
+    const military = militaryCrewForBuilding(building).length;
+    if (effective >= required && military > 0) return `${active} civilian + ${military} soldier crew operating (${required}/${required} slots)`;
+    if (effective >= required) return `${active}/${required} workers performing the building's service now`;
     if (assigned >= required) return `${assigned}/${required} assigned · ${active} currently on duty`;
     const missing = required - assigned;
     return `Closed until ${missing} more worker${missing === 1 ? '' : 's'} ${missing === 1 ? 'arrives' : 'arrive'}`;
