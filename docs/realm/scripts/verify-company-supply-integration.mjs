@@ -3,12 +3,12 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=196';
-import { applyCompanyObjective, companyObjective, resetCompanyCommandRuntime } from '../js/army-orders.js?realm=196';
-import { createCompanySupplyState } from '../js/company-supply.js?realm=196';
-import { processCompanySupplyAtDawn } from '../js/sim.js?realm=196';
-import { updateSoldiers } from '../js/soldiers.js?realm=196';
-import { resetPathfindingService } from '../js/pathfinding-service.js?realm=196';
+} from '../js/state.js?realm=197';
+import { applyCompanyObjective, companyObjective, resetCompanyCommandRuntime } from '../js/army-orders.js?realm=197';
+import { createCompanySupplyState } from '../js/company-supply.js?realm=197';
+import { processCompanySupplyAtDawn } from '../js/sim.js?realm=197';
+import { updateSoldiers } from '../js/soldiers.js?realm=197';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=197';
 
 function soldier(name, x, y) {
   return {

@@ -8,7 +8,7 @@ import {
   createCompanySupplyState,
   readinessMultipliers,
   updateCompanySupply,
-} from '../js/company-supply.js?realm=196';
+} from '../js/company-supply.js?realm=197';
 
 const soldiers = [{ hp: 75 }, { hp: 75 }, { hp: 0 }, { hp: 30 }];
 const resources = { food: 10, iron: 4 };

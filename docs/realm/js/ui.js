@@ -2,39 +2,45 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=196';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=196';
-import { getWonderReport } from './wonder.js?realm=196';
-import { panCameraTo } from './render.js?realm=196';
-import { dispatch } from './commands.js?realm=196';
-import { missions } from './missions.js?realm=196';
-import { getActiveScenario } from './scenarios.js?realm=196';
-import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=196';
-import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=196';
-import { saveGame, loadGame } from './save.js?realm=196';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=196';
-import { notify } from './notifications.js?realm=196';
-import { TRADE_PARTNERS } from './trade.js?realm=196';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=197';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=197';
+import { getWonderReport } from './wonder.js?realm=197';
+import { panCameraTo } from './render.js?realm=197';
+import { dispatch } from './commands.js?realm=197';
+import { missions } from './missions.js?realm=197';
+import { getActiveScenario } from './scenarios.js?realm=197';
+import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=197';
+import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=197';
+import { saveGame, loadGame } from './save.js?realm=197';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=197';
+import { notify } from './notifications.js?realm=197';
+import { TRADE_PARTNERS } from './trade.js?realm=197';
 import {
   citizenStaffingCapacity,
   onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=196';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=196';
-import { residentsForHouse } from './residences.js?realm=196';
-import { activeStaffingCount, buildingOperationLabel, isBuildingOperational } from './building-operation.js?realm=196';
+} from './citizen-ownership.js?realm=197';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=197';
+import { residentsForHouse } from './residences.js?realm=197';
+import {
+  activeStaffingCount,
+  buildingOperationLabel,
+  effectiveActiveStaffingCount,
+  isBuildingOperational,
+  militaryCrewForBuilding,
+} from './building-operation.js?realm=197';
 import {
   authoredBuildingCount,
   foodCapacity,
   foodStores,
   isFoodStore,
   storedFood,
-} from './building-inventory.js?realm=196';
-import { recruitmentStatus } from './military.js?realm=196';
-import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=196';
-import { buildingUseReport } from './building-use.js?realm=196';
-import { armyOrderMeta, companyObjective, liveGuardBuilding } from './army-orders.js?realm=196';
-import { companySupplyReport } from './company-supply.js?realm=196';
+} from './building-inventory.js?realm=197';
+import { recruitmentStatus } from './military.js?realm=197';
+import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=197';
+import { buildingUseReport } from './building-use.js?realm=197';
+import { armyOrderMeta, companyObjective, liveGuardBuilding } from './army-orders.js?realm=197';
+import { companySupplyReport } from './company-supply.js?realm=197';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -154,6 +160,19 @@ if (typeof window !== 'undefined') {
       }
     } else if (focus === 'defensive-building') {
       activateBuildMode('wall');
+    } else if (focus === 'household') {
+      const houses = G.buildings.filter(building => building.type === 'house');
+      const house = houses.find(building => (
+        building.buildProgress >= 1 && residentsForHouse(building).length > 0
+      )) || houses.find(building => building.buildProgress >= 1) || houses[0];
+      if (house) {
+        cancelBuildMode();
+        G.selectedBuilding = house;
+        panCameraTo(house.x, house.y, 500);
+        showInfoPanel(house);
+      } else {
+        activateBuildMode('house');
+      }
     }
     updateUI();
   };
@@ -990,7 +1009,7 @@ export function showInfoPanel(b) {
   html += `
     <div class="ip-row ip-use-row"><span class="ip-label">People</span><span class="ip-val">${escapeHtml(use.people)}</span></div>
     <div class="ip-row ip-use-row"><span class="ip-label">Activity</span><span class="ip-val">${escapeHtml(use.activity)}</span></div>
-    <div class="ip-row ip-use-row"><span class="ip-label">Why it matters</span><span class="ip-val">${escapeHtml(use.strategic)}</span></div>`;
+    <div class="ip-row ip-use-row"><span class="ip-label">Realm effect</span><span class="ip-val">${escapeHtml(use.strategic)}</span></div>`;
   if (isFoodStore(b)) {
     const stockLabel = b.founderStockpile === true
       ? 'Founder Stockpile'
@@ -1157,11 +1176,17 @@ export function showInfoPanel(b) {
       .map(([resource, amount]) => `${resourceEmoji(resource)} ${amount}`)
       .join(' · ') : '';
     html += `<div class="ip-row"><span class="ip-label">Company</span><span class="ip-val">${enlist.count || 0}/${spec?.cap || 0} mustered</span></div>`;
+    const civilianCrew = activeStaffingCount(b);
+    const companyCrew = militaryCrewForBuilding(b).length;
+    const effectiveCrew = effectiveActiveStaffingCount(b);
+    const neededCrew = BUILDINGS[b.type]?.workers || 0;
+    const crewBreakdown = companyCrew > 0
+      ? `${civilianCrew} civilian${civilianCrew === 1 ? '' : 's'} + ${companyCrew} company soldier${companyCrew === 1 ? '' : 's'}`
+      : `${civilianCrew} civilian${civilianCrew === 1 ? '' : 's'}`;
+    html += `<div class="ip-row"><span class="ip-label">Drill crew</span><span class="ip-val${effectiveCrew >= neededCrew ? ' ip-happy' : ' ip-defense'}">${effectiveCrew}/${neededCrew} · ${crewBreakdown}</span></div>`;
     if (queued) {
       const progress = Math.min(100, Math.round(((b.trainTimer || 0) / spec.duration) * 100));
-      const instructors = activeStaffingCount(b);
       html += `<div class="ip-row"><span class="ip-label">In drill</span><span class="ip-val ip-happy">${escapeHtml(b.recruitName)} · ${progress}%</span></div>`;
-      html += `<div class="ip-row"><span class="ip-label">Instructor</span><span class="ip-val${instructors > 0 ? '' : ' ip-defense'}">${instructors > 0 ? `${instructors} on duty` : 'Training paused — none on duty'}</span></div>`;
     } else if (spec) {
       const disabled = enlist.ok ? '' : ' disabled';
       const reason = enlist.reason === 'needs-workers' ? ' — full staff required'
@@ -2154,6 +2179,7 @@ export function renderMissions() {
           rally: 'Plant rally flag',
           'food-workplace': 'Open food workplace',
           'defensive-building': 'Place Wall',
+          household: 'Open House',
         };
         const actionLabel = actionLabels[obj.focus];
         row.innerHTML = `<span class="check"></span><span class="mission-chapter-copy"><span class="mission-chapter-title">${escapeHtml(obj.text)}${progressText}</span><span class="mission-chapter-detail">${escapeHtml(obj.detail)}</span>${actionLabel ? `<button type="button" class="mission-chapter-action" onclick="window.runFirstMusterAction&&window.runFirstMusterAction('${escapeHtml(obj.focus)}')">${actionLabel}</button>` : ''}</span>`;

@@ -3,20 +3,20 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=196';
-import { makeCitizen } from '../js/world.js?realm=196';
-import { updateCitizens } from '../js/citizens.js?realm=196';
-import { sendCitizenHome } from '../js/citizen-shelter.js?realm=196';
+} from '../js/state.js?realm=197';
+import { makeCitizen } from '../js/world.js?realm=197';
+import { updateCitizens } from '../js/citizens.js?realm=197';
+import { sendCitizenHome } from '../js/citizen-shelter.js?realm=197';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=196';
+} from '../js/citizen-ownership.js?realm=197';
 import {
   assignCitizenResidence,
   citizenIsIndoors,
-} from '../js/residences.js?realm=196';
-import { resetPathfindingService } from '../js/pathfinding-service.js?realm=196';
+} from '../js/residences.js?realm=197';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=197';
 
 function resetCore() {
   resetPathfindingService();

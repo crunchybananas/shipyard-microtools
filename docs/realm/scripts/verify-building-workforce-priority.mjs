@@ -1,26 +1,26 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=196';
-import { generateWorld } from '../js/world.js?realm=196';
-import { canPlace } from '../js/economy.js?realm=196';
-import { dispatch } from '../js/commands.js?realm=196';
+import { G, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=197';
+import { generateWorld } from '../js/world.js?realm=197';
+import { canPlace } from '../js/economy.js?realm=197';
+import { dispatch } from '../js/commands.js?realm=197';
 import {
   claimCitizenAssignment,
   createCitizenOwnership,
   resetCitizenOwnershipRuntime,
   staffingCount,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=196';
+} from '../js/citizen-ownership.js?realm=197';
 import {
   AUTO_REASSIGN_COOLDOWN_TICKS,
   buildingAcceptsAutomaticWorkers,
   reviewAutomaticAssignment,
   scoreCitizenJob,
   workforcePolicySnapshot,
-} from '../js/workforce-policy.js?realm=196';
-import { commitGameLoad, prepareSave, serializeGame } from '../js/save-state.js?realm=196';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=196';
+} from '../js/workforce-policy.js?realm=197';
+import { commitGameLoad, prepareSave, serializeGame } from '../js/save-state.js?realm=197';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=197';
 
 // Save/Continue proof over the real current graph.
 setSeed(731_991);

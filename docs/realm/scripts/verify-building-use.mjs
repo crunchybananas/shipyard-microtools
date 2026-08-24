@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, BUILDINGS } from '../js/state.js?realm=196';
+import { G, BUILDINGS } from '../js/state.js?realm=197';
 import {
   buildingUseReport,
   verifyBuildingUseCoverage,
-} from '../js/building-use.js?realm=196';
+} from '../js/building-use.js?realm=197';
 import {
   claimCitizenAssignment,
   createCitizenOwnership,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=196';
+} from '../js/citizen-ownership.js?realm=197';
 
 function building(type, x, y, extra = {}) {
   return {
@@ -91,7 +91,15 @@ assert.match(houseReport.strategic, /raid shelter/);
 const barracksReport = buildingUseReport(barracks);
 assert.match(barracksReport.people, /Bram Drill/);
 assert.match(barracksReport.activity, /2 instructors drilling Mara Reed/);
-assert.match(barracksReport.strategic, /one instructor must remain/);
+assert.match(barracksReport.strategic, /own company can keep/);
+
+G.soldiers = [{
+  name: 'Mara Reed', type: 'swordsman', hp: 75, maxHp: 75,
+  homeBuilding: barracks, garrison: null,
+}];
+const companyBarracksReport = buildingUseReport(barracks);
+assert.match(companyBarracksReport.people, /Company: Mara Reed/);
+assert.match(companyBarracksReport.activity, /soldier crew drilling Mara Reed/);
 
 const wallReport = buildingUseReport(wall);
 assert.match(wallReport.people, /no permanent crew/i);

@@ -4,8 +4,8 @@
 // player gives them intent rather than steering individual units.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_H, MAP_W, rngRange } from './state.js?realm=196';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=196';
+import { G, MAP_H, MAP_W, rngRange } from './state.js?realm=197';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=197';
 
 export const ARMY_ORDERS = Object.freeze(['defend', 'rally', 'patrol', 'guard', 'explore']);
 

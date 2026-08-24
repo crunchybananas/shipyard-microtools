@@ -4,7 +4,7 @@
 // stable actor ownership. Preferred personal space is soft under congestion.
 
 import assert from 'node:assert/strict';
-import runtimeContract from '../runtime-contract.json?realm=196' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=197' with { type: 'json' };
 import {
   G,
   MAP_H,
@@ -12,23 +12,23 @@ import {
   TILE,
   createResourceStock,
   setSeed,
-} from '../js/state.js?realm=196';
-import { findPath } from '../js/pathfinding.js?realm=196';
-import { resetPathfindingService } from '../js/pathfinding-service.js?realm=196';
-import { updateCitizens } from '../js/citizens.js?realm=196';
-import { updateSoldiers } from '../js/soldiers.js?realm=196';
-import { updateWalkers } from '../js/walkers.js?realm=196';
-import { updateAnimals } from '../js/animals.js?realm=196';
+} from '../js/state.js?realm=197';
+import { findPath } from '../js/pathfinding.js?realm=197';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=197';
+import { updateCitizens } from '../js/citizens.js?realm=197';
+import { updateSoldiers } from '../js/soldiers.js?realm=197';
+import { updateWalkers } from '../js/walkers.js?realm=197';
+import { updateAnimals } from '../js/animals.js?realm=197';
 import {
   createCitizenOwnership,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=196';
-import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=196';
+} from '../js/citizen-ownership.js?realm=197';
+import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=197';
 
-const RECORDED_REVISION = 196;
+const RECORDED_REVISION = 197;
 const RECORDED_SAVE_VERSION = 6;
-const RECORDED_SIMULATION_VERSION = 8;
+const RECORDED_SIMULATION_VERSION = 9;
 const MINIMUM_ACTOR_SEPARATION = 0.295;
 
 function rounded(value, digits = 12) {

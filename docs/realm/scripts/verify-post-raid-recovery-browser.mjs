@@ -19,8 +19,10 @@ try {
   await page.locator('#title-screen .title-btn.primary').click();
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(async () => {
-    const firstMuster = await import('./js/first-muster.js?realm=196');
-    const ui = await import('./js/ui.js?realm=196');
+    const state = await import('./js/state.js?realm=197');
+    const firstMuster = await import('./js/first-muster.js?realm=197');
+    const residences = await import('./js/residences.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
     window.setSpeed(0);
     window.G.gameTick = 240;
     window.G.enemies = [];
@@ -29,6 +31,18 @@ try {
       firstMusterStep: firstMuster.FIRST_MUSTER_STEPS.length,
       firstRaidApproach: 1,
     };
+    const x = 44, y = 40;
+    window.G.map[y][x] = state.TILE.GRASS;
+    window.G.fog[y][x] = true;
+    const placed = window.G.debug.dispatch({ type: 'PLACE_BUILDING', building: 'house', x, y });
+    if (!placed.ok) throw new Error(`recovery House placement failed: ${placed.reason}`);
+    const house = window.G.buildingGrid[y][x];
+    house.buildProgress = 1;
+    house.completeTick = window.G.gameTick;
+    if (!residences.assignCitizenResidence(window.G.citizens[0])) {
+      throw new Error('recovery resident did not receive the completed House');
+    }
+    window.__recoveryHouse = { x, y, actorId: window.G.citizens[0].actorId };
     ui.renderMissions();
     ui.updateUI();
   });
@@ -54,6 +68,69 @@ try {
   await action.click();
   assert.equal(await page.evaluate(() => window.G.selectedBuild), 'wall', 'Fortify action did not enter Wall placement');
 
+  const aftermath = await page.evaluate(async () => {
+    const state = await import('./js/state.js?realm=197');
+    const recovery = await import('./js/post-raid-recovery.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
+    const x = state.MAP_W - 6, y = 40;
+    window.G.map[y][x] = state.TILE.GRASS;
+    window.G.fog[y][x] = true;
+    const placed = window.G.debug.dispatch({ type: 'PLACE_BUILDING', building: 'wall', x, y });
+    if (!placed.ok) throw new Error(`recovery Wall placement failed: ${placed.reason}`);
+    const wall = window.G.buildingGrid[y][x];
+    wall.buildProgress = 1;
+    wall.completeTick = ++window.G.gameTick;
+    const report = recovery.updatePostRaidRecovery();
+    ui.renderMissions();
+    ui.updateUI();
+    return {
+      complete: report.complete,
+      doctrineSatisfied: report.doctrine.satisfied,
+      primary: report.primary.id,
+    };
+  });
+  assert.deepEqual(aftermath, {
+    complete: false,
+    doctrineSatisfied: true,
+    primary: 'stabilize_household',
+  }, 'Fortify did not hand off to physical household recovery');
+  const household = page.locator('#mission-list .mission-next');
+  assert.match(await household.innerText(), /Stabilize one household/i);
+  assert.match(await household.innerText(), /\(0\/1\)/);
+  const houseAction = household.locator('.mission-chapter-action');
+  assert.match(await houseAction.innerText(), /Open House/);
+  assert.ok((await houseAction.boundingBox()).height >= 44);
+  await houseAction.click();
+  assert.deepEqual(
+    await page.evaluate(() => ({
+      type: window.G.selectedBuilding?.type,
+      x: window.G.selectedBuilding?.x,
+      panelVisible: getComputedStyle(document.getElementById('info-panel')).display !== 'none',
+    })),
+    { type: 'house', x: 44, panelVisible: true },
+    'household CTA did not open the resident House',
+  );
+  const householdComplete = await page.evaluate(async () => {
+    const ownership = await import('./js/citizen-ownership.js?realm=197');
+    const recovery = await import('./js/post-raid-recovery.js?realm=197');
+    const residences = await import('./js/residences.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
+    const resident = window.G.citizens.find(citizen => citizen.actorId === window.__recoveryHouse.actorId);
+    const portal = residences.residencePortalForCitizen(resident);
+    window.G.gameTick++;
+    resident.x = portal.x;
+    resident.y = portal.y;
+    resident.tx = portal.x;
+    resident.ty = portal.y;
+    ownership.transitionCitizenActivity(resident, 'sleep', 'sleep-rest');
+    const report = recovery.updatePostRaidRecovery();
+    ui.renderMissions();
+    ui.updateUI();
+    return { complete: report.complete, progress: report.primary.progress.current };
+  });
+  assert.deepEqual(householdComplete, { complete: true, progress: 1 });
+  assert.match(await page.locator('#mission-list .scen-progress').innerText(), /8\/8/);
+
   // Phone acceptance: the collapsed mission surface is a real 44px button,
   // recovery cards remain reachable, and Rebuild opens the food workplace
   // that can actually increase the post-choice operational baseline.
@@ -67,10 +144,10 @@ try {
   await mobile.locator('#title-screen .title-btn.primary').click();
   await mobile.waitForFunction(() => !document.body.classList.contains('title-active'));
   const foodTargets = await mobile.evaluate(async () => {
-    const state = await import('./js/state.js?realm=196');
-    const firstMuster = await import('./js/first-muster.js?realm=196');
-    const ownership = await import('./js/citizen-ownership.js?realm=196');
-    const ui = await import('./js/ui.js?realm=196');
+    const state = await import('./js/state.js?realm=197');
+    const firstMuster = await import('./js/first-muster.js?realm=197');
+    const ownership = await import('./js/citizen-ownership.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
     const g = window.G;
     window.setSpeed(0);
     g.gameTick = 240;
@@ -120,7 +197,7 @@ try {
   await mobile.close();
 
   assert.deepEqual(errors, [], `browser errors: ${errors.join(' | ')}`);
-  console.log('[post-raid-recovery-browser] PASS — desktop Fortify, phone-accessible doctrine cards, and truthful Rebuild workplace targeting');
+  console.log('[post-raid-recovery-browser] PASS — desktop Fortify-to-household recovery, Open House control, phone-accessible doctrine cards, and truthful Rebuild targeting');
 } finally {
   await browser.close();
   await server.stop();

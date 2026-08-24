@@ -29,7 +29,7 @@ try {
   await barracksBuildButton.waitFor({ state: 'visible' });
   assert.equal(await barracksBuildButton.isEnabled(), true, 'military scenario advertised barracks but could not afford one');
   const immediateSave = await page.evaluate(async () => {
-    const saveState = await import('./js/save-state.js?realm=196');
+    const saveState = await import('./js/save-state.js?realm=197');
     const prepared = saveState.prepareSave(saveState.serializeGame({ savedAt: 189 }));
     return {
       ok: prepared.ok,
@@ -45,9 +45,9 @@ try {
   );
 
   const setup = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=196');
-    const ownership = await import('./js/citizen-ownership.js?realm=196');
-    const ui = await import('./js/ui.js?realm=196');
+    const state = await import('./js/state.js?realm=197');
+    const ownership = await import('./js/citizen-ownership.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
     const g = window.G;
     Object.assign(g.resources, { wood: 100, stone: 100, food: 20, gold: 50, iron: 20, planks: 20 });
     for (const row of g.fog) row.fill(true);
@@ -111,10 +111,24 @@ try {
   assert.deepEqual(trained, { soldiers: 1, name: queued.name, queued: false });
   await page.evaluate(async () => {
     window.G.debug.step(900);
-    const ui = await import('./js/ui.js?realm=196');
+    const ownership = await import('./js/citizen-ownership.js?realm=197');
+    const ui = await import('./js/ui.js?realm=197');
+    const barracks = window.G.buildingGrid[40][46];
+    const activeCivilians = window.G.citizens.filter(citizen => citizen.assignment?.building === barracks);
+    ownership.transitionCitizenActivity(activeCivilians[0], 'idle', 'idle-wait');
+    window.G.selectedBuilding = barracks;
+    ui.showInfoPanel(barracks);
     ui.updateUI();
   });
   assert.equal(await page.evaluate(() => window.G.soldiers.length), 1, 'browser barracks auto-trained a second unit');
+  const drillCrewRow = page.locator('#info-panel .ip-row', { hasText: 'Drill crew' });
+  assert.match(
+    await drillCrewRow.innerText(),
+    /2\/2.*1 civilian.*1 company soldier/i,
+    'Barracks panel did not explain how its company replaces an off-duty instructor',
+  );
+  const operationRow = page.locator('#info-panel .ip-row', { hasText: 'Operating' }).first();
+  assert.match(await operationRow.innerText(), /1 civilian.*1 soldier/i, 'Barracks status hid the effective company crew');
 
   assert.match(await page.locator('#soldier-count').innerText(), /READY/, 'company HUD omitted supply readiness');
   const companyTitle = await page.locator('#soldier-count').evaluate(element => element.closest('.res')?.title || '');
@@ -123,8 +137,8 @@ try {
   await advanceButton.click();
   assert.equal(await page.evaluate(() => document.body.classList.contains('company-objective-placement')), true, 'Advance control did not enter ground placement');
   const advance = await page.evaluate(async () => {
-    const render = await import('./js/render.js?realm=196');
-    const pathfinding = await import('./js/pathfinding.js?realm=196');
+    const render = await import('./js/render.js?realm=197');
+    const pathfinding = await import('./js/pathfinding.js?realm=197');
     const g = window.G;
     const soldier = g.soldiers[0];
     let target = null;
@@ -166,7 +180,7 @@ try {
   });
   assert.equal(await page.evaluate(() => window.G._placingRally), true, 'touch rally control did not enter placement mode');
   assert.deepEqual(errors, [], `browser errors: ${errors.join(' | ')}`);
-  console.log('[first-muster-browser] PASS — military scenario, explicit named queue, supply HUD, touch Advance, Founder controls, and rally mode');
+  console.log('[first-muster-browser] PASS — military scenario, explicit named queue, visible company drill crew, supply HUD, touch Advance, Founder controls, and rally mode');
 } finally {
   await browser.close();
   await server.stop();

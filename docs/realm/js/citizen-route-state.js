@@ -4,7 +4,7 @@
 // through this leaf without creating a dependency cycle back through the
 // citizen navigation planner.
 
-import { cancelPathfindingRequest } from './pathfinding-service.js?realm=196';
+import { cancelPathfindingRequest } from './pathfinding-service.js?realm=197';
 
 export function clearCitizenRouteState(citizen) {
   cancelPathfindingRequest(citizen._pathRequest?.requestId);

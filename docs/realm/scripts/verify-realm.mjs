@@ -40,6 +40,7 @@ const checks = [
   ['physical building food inventory and plunder', 'verify-building-inventory.mjs'],
   ['building lifecycle', 'verify-building-lifecycle.mjs'],
   ['grounded building use', 'verify-building-use.mjs'],
+  ['deterministic raid target contracts and breach lanes', 'verify-raid-target-contract.mjs'],
   ['army orders', 'verify-army-orders.mjs'],
   ['company supply rules', 'verify-company-supply.mjs'],
   ['physical company supply and readiness', 'verify-company-supply-integration.mjs'],
@@ -63,6 +64,7 @@ const checks = [
   ['citizen presentation', 'verify-engine-v2-citizen-presentation.mjs'],
   ['pathfinding liveness and reachable approaches', 'verify-pathfinding-liveness.mjs'],
   ['deterministic pathfinding service', 'verify-pathfinding-service.mjs'],
+  ['browser startup queue and Worker fallback', 'verify-startup-shell-browser.mjs'],
   ['browser native pathfinding Worker', 'verify-pathfinding-worker-browser.mjs'],
   ['citizen congestion and physical service queues', 'verify-citizen-congestion.mjs'],
   ['navigation and crowding', 'verify-navigation-crowd-baseline.mjs', '--require-correct'],
@@ -94,7 +96,16 @@ const checks = [
   ['browser logic', 'verify-logic.mjs'],
 ];
 
-for (const [label, script, ...args] of checks) {
+const fromFlag = process.argv.indexOf('--from');
+const fromLabel = fromFlag >= 0 ? process.argv[fromFlag + 1] : null;
+const fromIndex = fromLabel ? checks.findIndex(([label]) => label === fromLabel) : 0;
+if (fromLabel && fromIndex < 0) {
+  console.error(`[realm:check] Unknown --from label: ${fromLabel}`);
+  process.exit(2);
+}
+const selectedChecks = checks.slice(fromIndex);
+
+for (const [label, script, ...args] of selectedChecks) {
   console.log(`\n[realm:check] ${label}`);
   const result = spawnSync(
     process.execPath,
@@ -108,4 +119,4 @@ for (const [label, script, ...args] of checks) {
   }
 }
 
-console.log(`\n[realm:check] PASS — ${checks.length} checks completed`);
+console.log(`\n[realm:check] PASS — ${selectedChecks.length} checks completed`);

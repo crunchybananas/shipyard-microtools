@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getDayPeriod, TILE } from './state.js?realm=196';
-import { isWalkable } from './pathfinding.js?realm=196';
-import { getCitizenSpeedMult } from './events.js?realm=196';
-import { revealAround } from './world.js?realm=196';
-import { visualJitter } from './fx.js?realm=196';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getDayPeriod, TILE } from './state.js?realm=197';
+import { isWalkable } from './pathfinding.js?realm=197';
+import { getCitizenSpeedMult } from './events.js?realm=197';
+import { revealAround } from './world.js?realm=197';
+import { visualJitter } from './fx.js?realm=197';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -14,21 +14,21 @@ import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   staffingCount,
-} from './citizen-ownership.js?realm=196';
+} from './citizen-ownership.js?realm=197';
 import {
   citizenAtResidencePortal,
   citizenHasValidResidence,
   citizenIsIndoors,
   residencePortalForCitizen,
   residentsForHouse,
-} from './residences.js?realm=196';
-import { isBuildingOperational } from './building-operation.js?realm=196';
+} from './residences.js?realm=197';
+import { isBuildingOperational } from './building-operation.js?realm=197';
 import {
   canDepositFood,
   depositFood,
   findReachableFoodStore,
   withdrawFood,
-} from './building-inventory.js?realm=196';
+} from './building-inventory.js?realm=197';
 import {
   AUTO_REVIEW_INTERVAL_TICKS,
   buildingAcceptsAutomaticWorkers,
@@ -37,12 +37,12 @@ import {
   reviewAutomaticAssignment,
   scoreCitizenJob,
   workforceFoodDaysLeft,
-} from './workforce-policy.js?realm=196';
+} from './workforce-policy.js?realm=197';
 import {
   assignedCitizenBuilding as assignedBuilding,
   citizenStableHash as citizenHash,
   setCitizenActivity as setActivity,
-} from './citizen-activity.js?realm=196';
+} from './citizen-activity.js?realm=197';
 import {
   advanceCitizenPathRequest,
   blacklistCitizenTarget as blacklistTarget,
@@ -53,7 +53,7 @@ import {
   pruneCitizenNoGo as pruneExpiredNoGo,
   remainingCitizenRouteIsWalkable as remainingCitizenRouteWalkable,
   replanCitizenToRequestedTarget as replanToRequestedTarget,
-} from './citizen-navigation.js?realm=196';
+} from './citizen-navigation.js?realm=197';
 import {
   applyCitizenSeparation,
   canCitizenStep as canStepCitizen,
@@ -65,13 +65,13 @@ import {
   finishCitizenTrafficProgress,
   noteCitizenTrafficWait,
   resolveCitizenStep,
-} from './citizen-traffic.js?realm=196';
+} from './citizen-traffic.js?realm=197';
 import {
   citizenIdleLoiterTarget as idleLoiterTarget,
   citizenWorkTargetForBuilding as workTargetForBuilding,
   pathCitizenToWork as pathToWork,
   startCitizenWorking as startWorking,
-} from './citizen-work.js?realm=196';
+} from './citizen-work.js?realm=197';
 import {
   CITIZEN_NIGHT_EXEMPT_ACTIVITIES as NIGHT_EXEMPT,
   beginCitizenOpenRaidFlight as beginOpenRaidFlight,
@@ -80,7 +80,7 @@ import {
   leaveCitizenRaidShelter as leaveRaidShelter,
   seekCitizenRaidShelter as seekRaidShelter,
   sendCitizenHome as goHome,
-} from './citizen-shelter.js?realm=196';
+} from './citizen-shelter.js?realm=197';
 import {
   CITIZEN_MEAL_INTERRUPTIBLE_ACTIVITIES as MEAL_INTERRUPTIBLE_ACTIVITIES,
   beginCitizenFoodRoute as beginFoodRoute,
@@ -88,7 +88,7 @@ import {
   citizenFoodTargetStillValid as foodTargetStillValid,
   reachableCitizenFoodRoute as reachableFoodRoute,
   resumeCitizenAfterMeal as resumeAfterMeal,
-} from './citizen-food.js?realm=196';
+} from './citizen-food.js?realm=197';
 import {
   CITIZEN_MEAL_HUNGER_THRESHOLD,
   drainCitizenHeartbeatNeeds,
@@ -97,7 +97,7 @@ import {
   restoreCitizenSleepRest,
   satisfyCitizenLeisureNeed,
   settleCitizenWakeRest,
-} from './citizen-needs.js?realm=196';
+} from './citizen-needs.js?realm=197';
 
 // Chain targets win only within reach: a windmill across the island must
 // not beat the granary next door (AI-audit deferred fix). The carrier

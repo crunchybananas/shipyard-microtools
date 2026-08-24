@@ -9,14 +9,24 @@ import {
   promotePathfindingWorkerAuthority,
   resetPathfindingService,
   useSynchronousPathfindingService,
-} from './pathfinding-service.js?realm=196';
+} from './pathfinding-service.js?realm=197';
 
 let worker = null;
 
 export function startPathfindingWorkerClient() {
   if (worker) return true;
   if (typeof Worker !== 'function') return false;
-  worker = new Worker(new URL('./pathfinding-worker.js?realm=196', import.meta.url), { type: 'module', name: 'realm-pathfinding' });
+  try {
+    worker = new Worker(new URL('./pathfinding-worker.js?realm=197', import.meta.url), { type: 'module', name: 'realm-pathfinding' });
+  } catch (error) {
+    // Some private/restricted browser sessions expose Worker but reject its
+    // construction. Routing remains correct on the deterministic synchronous
+    // service, so an optional performance feature must not abort game startup.
+    worker = null;
+    useSynchronousPathfindingService();
+    console.warn('Pathfinding Worker unavailable; using synchronous routing.', error);
+    return false;
+  }
   worker.addEventListener('message', event => {
     if (acceptPathfindingWorkerMessage(event.data)) {
       // The core service permits promotion only after at least one exact

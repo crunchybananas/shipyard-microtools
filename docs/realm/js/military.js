@@ -1,16 +1,19 @@
 // Player-authored military recruitment. Barracks and ranges provide a
 // training place; they never mint troops or spend resources on their own.
 
-import { G } from './state.js?realm=196';
-import { emit } from './bus.js?realm=196';
+import { G } from './state.js?realm=197';
+import { emit } from './bus.js?realm=197';
 import {
   activeStaffingCount,
+  effectiveActiveStaffingCount,
+  militaryCrewForBuilding,
   isBuildingComplete,
   isBuildingOperational,
-} from './building-operation.js?realm=196';
-import { removeCitizenFromWorld } from './citizen-ownership.js?realm=196';
-import { nearestWalkableTile } from './pathfinding.js?realm=196';
-import { withdrawFoodFromStores } from './building-inventory.js?realm=196';
+} from './building-operation.js?realm=197';
+import { removeCitizenFromWorld } from './citizen-ownership.js?realm=197';
+import { nearestWalkableTile } from './pathfinding.js?realm=197';
+import { withdrawFoodFromStores } from './building-inventory.js?realm=197';
+import { isFoodWorkplace } from './workforce-policy.js?realm=197';
 
 export const RECRUITMENT = Object.freeze({
   barracks: Object.freeze({
@@ -58,20 +61,30 @@ export function isCitizenProtectedFromRecruitment(citizen) {
     && protectedRecruitmentNames().has(citizen.identity.name);
 }
 
+function companyHasStarted(building) {
+  return recruitmentCount(building) > 0;
+}
+
 function recruitmentCandidateRank(citizen, building, protectedNames) {
   if (!citizen?.identity || protectedNames.has(citizen.identity.name)) return null;
   const assignment = citizen.assignment;
   if (!assignment) return 0;
   if (assignment.reason === 'player-command') return null;
-  if (assignment.building !== building) return 1;
+  if (assignment.building !== building) {
+    // Once the first soldier exists, preserve an AI food worker behind
+    // unassigned, non-food, and same-yard candidates. This protects the
+    // opening Farm without changing named or Crown enlistment rules.
+    if (companyHasStarted(building) && isFoodWorkplace(assignment.building)) return 3;
+    return 1;
+  }
 
   // A yard hand may enlist only when a real instructor remains on the drill
   // floor. An off-duty yard hand does not reduce the active count when they
   // leave, but still requires somebody else to be actively teaching.
   const candidateIsActive = citizen.activity?.kind === 'working';
-  const instructorsAfterEnlistment = activeStaffingCount(building)
-    - (candidateIsActive ? 1 : 0);
-  return instructorsAfterEnlistment >= 1 ? 2 : null;
+  const civilianActiveAfter = activeStaffingCount(building) - (candidateIsActive ? 1 : 0);
+  const militaryCrewAfter = militaryCrewForBuilding(building).length;
+  return civilianActiveAfter + militaryCrewAfter >= 1 ? 2 : null;
 }
 
 function selectRecruitmentCandidate(building) {
@@ -175,7 +188,7 @@ export function updateRecruitment(building) {
     !spec
     || !building.recruitType
     || !isBuildingComplete(building)
-    || activeStaffingCount(building) < 1
+    || effectiveActiveStaffingCount(building) < 1
   ) return false;
   // A save with mismatched queue data fails closed instead of spawning the
   // wrong unit from the wrong training building.
