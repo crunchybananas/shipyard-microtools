@@ -247,7 +247,7 @@ export const LORE = {
   // bottom alone can read what the notice actually is.
   closure_notice: { record: true, era: 'lastwinter',
     kind: 'letter', hand: 'inspector', title: 'A notice of review, folded small',
-    place: { pos: [-83.55, 14.40, -41.35], ry: 0.35, prop: 'fold', label: 'a paper, folded small', maxDist: 2.8 },
+    place: { pos: [-84.45, 14.475, -41.06], ry: 0.35, prop: 'fold', label: 'a paper, folded small', maxDist: 2.8 },
     pages: [
       'NOTICE OF REVIEW — DISTRICT OF LIGHTS. The Board, having considered the returns of the island station, finds the cost of its keeping to exceed the traffic served. The light is to be extinguished and the station struck from the list, effective the turn of the quarter. The keeper will present himself at the mainland office with the log, the instruments, and the great lens.',
     ],

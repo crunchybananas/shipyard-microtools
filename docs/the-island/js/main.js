@@ -131,6 +131,41 @@ const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 1.05); // strengt
 // bloom was only adding the halo around them. A surface that reads as blown is an
 // ALBEDO problem, not a threshold problem — fix the material. tools/harness/bloom.mjs
 // pins the 1.25 ceiling so this cannot be quietly raised past the glows later.
+// BLOOM CLAMP — the piece UnrealBloomPass does not have, and the reason the study
+// washes out under the window sun (#147).
+//
+// The high-pass keeps every pixel above the threshold AT FULL VALUE and hands it to a
+// five-mip blur at radius 0.68. A specular highlight on the chart table's brass rim is
+// a mirror image of a 3.5-intensity sun, so it arrives at the blur an order of magnitude
+// brighter than any emissive in the game, and a wide blur spreads that energy across the
+// whole near half of the table. Measured from the owner's own reported frame: with bloom
+// at strength 0 the same frame is completely clean — brass rail, buff vellum, the
+// logbook's label legible — and with it on, all of it is white.
+//
+// The threshold is NOT the lever here, and raising it is the trap the comment above
+// warns about: the rim's specular is far above any threshold this game could use, so it
+// would still bloom, and the dimmest emissive that must glow sits at 1.251. Nor is it an
+// albedo problem — the surfaces are already correct, as the strength-0 frame proves.
+// What is missing is the clamp every engine puts on its bright-pass: a bound on how much
+// energy ONE pixel may contribute to the blur. Above it the highlight still blooms, it
+// just stops being able to light the room.
+//
+// 4.0 sits above every intended emissive in the game (bloom.mjs measures them at
+// 0.055-3.863) so no authored glow is touched, and far below a sun-mirror specular.
+const BLOOM_CLAMP = 4.0;
+{
+  const hp = bloomPass.materialHighPassFilter;
+  hp.uniforms.uBloomClamp = { value: BLOOM_CLAMP };
+  const before = hp.fragmentShader;
+  hp.fragmentShader = before
+    .replace('uniform float smoothWidth;', 'uniform float smoothWidth;\n\t\tuniform float uBloomClamp;')
+    .replace('gl_FragColor = mix( outputColor, texel, alpha );',
+      'gl_FragColor = mix( outputColor, texel, alpha );\n\t\t\tgl_FragColor.rgb = min( gl_FragColor.rgb, vec3( uBloomClamp ) );');
+  // if three ever rewords that shader the replace silently does nothing and the glare
+  // comes back with no error, so say so out loud
+  if (hp.fragmentShader === before) console.warn('bloom clamp NOT applied — LuminosityHighPassShader changed shape');
+  hp.needsUpdate = true;
+}
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
 // Post-processing safety net: some browser/GPU combos render the bloom composer's half-float

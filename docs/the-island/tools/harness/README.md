@@ -26,6 +26,13 @@ gate that has guarded every fire since the walk was born:
   walls. Casts from the eye positions bugs were REPORTED from, because an axis sweep
   cannot see a radial seam (see the file's header — I watched a sweep pass with the
   bug reinstated). 5 assertions.
+- **`tabletop.mjs`** — everything that lies on the chart table lies ON it: inside the
+  vellum, clear of the model's footprint, with a working margin between them. The table
+  shrank and six props were left out past the brass rim; the owner found one of them.
+- **`glare.mjs`** — nothing in the study clips to white under the window sun (#147).
+  Counts pixels at near-max LUMINANCE, not neutral white: the glare is a warm reflection
+  off amber brass, and a white test reported 0.00% against a frame that was a white-out.
+  6 assertions, including a floor so a frame cannot pass by being dark.
 - **`spines.mjs`** — the eighteen gilt-lettered volumes in the study spell the one line
   of canon the game says aloud once, read top board down and left to right. Nothing else
   can see the MESSAGE: the geometry, the atlas and the draw call are all fine when it is

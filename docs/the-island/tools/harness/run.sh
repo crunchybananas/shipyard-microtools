@@ -75,6 +75,18 @@ echo "== the shell =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/shell.mjs" | tee "$WORK/shell.out"
 grep -q "SHELL 5 / 5" "$WORK/shell.out" || { echo "SHELL FAILED"; exit 1; }
 
+echo "== the tabletop =="
+# Everything that lies on the chart table has to lie ON it. The table came down from
+# 3.1 m to 2.5 m and six props were left out past the rim, one of which the owner found.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/tabletop.mjs" | tee "$WORK/tabletop.out"
+grep -q "TABLETOP OK" "$WORK/tabletop.out" || { echo "TABLETOP FAILED"; exit 1; }
+
+echo "== the glare =="
+# "The study props wash out under window sun" has been reported three times and nothing
+# could see it, because it is a question about pixels. This one counts them.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/glare.mjs" | tee "$WORK/glare.out"
+grep -q "GLARE 6 / 6" "$WORK/glare.out" || { echo "GLARE FAILED"; exit 1; }
+
 echo "== the lettered spines =="
 # The eighteen gilt volumes in the study spell the one line of canon the game says aloud
 # once. Nothing else in the gate can see the MESSAGE — the geometry is fine either way.

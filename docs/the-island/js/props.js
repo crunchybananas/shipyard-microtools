@@ -183,8 +183,24 @@ applyRelief(matMegalith, 'rock', {
   normalScale: 0.5, strength: 1.8, colorMap: false, repeat: [0.32, 0.32], normalFrom: 'rock_height',
 });
 
+// ROUGHNESS 0.55, up from 0.38 — this is the fix for #147, the study washing out under
+// the window sun, and it is a material bug rather than a bloom one.
+//
+// At 0.38/0.85 the chart table's brass rim is very nearly a MIRROR, and what it mirrors
+// is a directional light of intensity 3.5. That puts a long strip of pixels along the
+// table's edge an order of magnitude above anything else in the game, and the bloom's
+// five-mip blur at radius 0.68 spreads that strip across the whole near half of the
+// table: the vellum, the logbook, the day's return and the model's sea all go white.
+// Measured from the owner's own reported frame — with bloom at strength 0 the identical
+// frame is completely clean, so it was never the props' albedo and never the threshold.
+// At 0.55 the rail keeps a warm sun-glint that reads as sunlight on brass, and every
+// paper on the table becomes legible again.
+//
+// This is the BAKED brass (the table's rim, the valve pedestal, the floor plate).
+// matBrassSolid below is a separate, smaller set (the pulley, the hook) that does not
+// present a long flat face to the window, and it is left alone deliberately.
 export const matBrass = new THREE.MeshStandardMaterial({
-  vertexColors: true, flatShading: false, roughness: 0.38, metalness: 0.85, side: THREE.DoubleSide,
+  vertexColors: true, flatShading: false, roughness: 0.55, metalness: 0.85, side: THREE.DoubleSide,
 });
 const matBrassSolid = new THREE.MeshStandardMaterial({
   color: 0xb08d4f, flatShading: false, roughness: 0.35, metalness: 0.9,
@@ -489,7 +505,7 @@ export function buildWorld() {
       const FEET = [
         [0, 0, 1.9, 0.14],                                              // chart table's soft under-shadow
         [-1.0, -1.0, 0.4, 0.42], [1.0, -1.0, 0.4, 0.42],                // its four legs
-        [-1.25, 1.25, 0.4, 0.42], [1.25, 1.25, 0.4, 0.42],
+        [-1.0, 1.0, 0.4, 0.42], [1.0, 1.0, 0.4, 0.42],                  // (these two were left at 1.25)
         [2.3, 1.1, 0.36, 0.4],                                          // valve pedestal
         [2.2, -1.4, 0.78, 0.2],                                         // brass plate, seated
         [Math.sin(deg(285)) * 4.4, Math.cos(deg(285)) * 4.4, 1.2, 0.26],  // bookshelf bays
@@ -798,7 +814,12 @@ export function buildWorld() {
     // the albedo. Lambert also costs less to shade than Standard.
     const sheetMat = new THREE.MeshLambertMaterial({ color: 0xb3a888, flatShading: true });
     applyRelief(sheetMat, 'chart_vellum', { normalScale: 0.3, strength: 1.2 });   // faint paper-fibre relief
-    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(2.35, 2.35), sheetMat);
+    // 2.44, not 2.35: the rim's inner face is at 1.22 and the vellum stopped at 1.175,
+    // leaving a 4.5 cm strip of bare wood for no reason. The chart runs to the rim now,
+    // which is where a chart runs to, and the 4.5 cm goes into the WORKING MARGIN —
+    // the band of clear paper outside the model where his logbook and the day's return
+    // actually lie. See CROP in instantiateModel: margin = 1.22 - CROP.
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(2.44, 2.44), sheetMat);
     sheet.rotation.x = -Math.PI / 2;
     sheet.position.set(LH.x, LH.y + 0.953, LH.z);
     sheet.name = 'chartSheet';
@@ -821,7 +842,12 @@ export function buildWorld() {
     // window clips it to white and the detail disappears again.
     const book = new THREE.Group();
     book.name = 'logbook';
-    const W = 0.30, D = 0.42, H = 0.075, BOARD = 0.009, SQUARE = 0.008;
+    // 0.21 x 0.29, down from 0.30 x 0.42. That was a folio ledger 42 cm long, and when
+    // the table came down from 3.1 m to 2.5 m it stopped fitting on the clear margin at
+    // all: at dx -1.40 it hung right off the near edge, BELOW the brass rim, which is
+    // what the owner saw — "The journal still looks like it is inside the table." It was
+    // not inside the table, it was past it. A keeper's log is an 8x11 volume anyway.
+    const W = 0.21, D = 0.29, H = 0.055, BOARD = 0.007, SQUARE = 0.006;
     const leather = new THREE.MeshLambertMaterial({ color: 0x5a4632 });
     const paper = new THREE.MeshLambertMaterial({ color: 0xc9bda0 });
     for (const sy of [-1, 1]) {                       // the two boards
@@ -839,25 +865,27 @@ export function buildWorld() {
     const spine = new THREE.Mesh(new THREE.BoxGeometry(0.02, H, D), leather);
     spine.position.x = -(W / 2) - 0.004;
     book.add(spine);
-    for (const cz of [-0.11, 0.11]) {
+    for (const cz of [-D * 0.26, D * 0.26]) {          // relative, so the book can be resized
       const cord = new THREE.Mesh(new THREE.BoxGeometry(0.026, H * 0.86, 0.022), leather);
       cord.position.set(-(W / 2) - 0.005, 0, cz);
       book.add(cord);
     }
     // a label pasted on the upper board — enough to say "this is a book that is written
     // in" without pretending to legible type at 4 cm
-    const label = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.002, 0.09),
+    const label = new THREE.Mesh(new THREE.BoxGeometry(W * 0.50, 0.002, D * 0.214),
       new THREE.MeshLambertMaterial({ color: 0xbfb49a }));
     label.position.y = H / 2 + 0.001;
     book.add(label);
-    for (const ly of [-0.018, 0, 0.018]) {           // three ruled strokes of a written title
-      const ink = new THREE.Mesh(new THREE.BoxGeometry(0.09 - Math.abs(ly) * 1.6, 0.001, 0.006),
+    for (const ly of [-D * 0.043, 0, D * 0.043]) {   // three ruled strokes of a written title
+      const ink = new THREE.Mesh(new THREE.BoxGeometry(W * 0.30 - Math.abs(ly) * 1.6, 0.001, D * 0.014),
         new THREE.MeshLambertMaterial({ color: 0x4a3b28 }));
-      ink.position.set(-0.01, H / 2 + 0.0025, ly);
+      ink.position.set(-W * 0.033, H / 2 + 0.0025, ly);
       book.add(ink);
     }
-    book.position.set(LH.x - 1.40, LH.y + 0.99, LH.z + 0.66);
-    book.rotation.y = 0.22;
+    // ON the working margin: clear of the model's footprint on the inside and inside the
+    // vellum on the outside. tools/harness/tabletop.mjs holds both ends of that.
+    book.position.set(LH.x - 1.04, LH.y + 0.953 + H / 2, LH.z + 0.55);
+    book.rotation.y = 0.06;
     core.add(book);
   }
   // a line of the keeper's lampblack on the chart margin, too fine to read by eye — INVISIBLE
@@ -867,7 +895,8 @@ export function buildWorld() {
     const mk = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.1),
       new THREE.MeshBasicMaterial({ color: 0x6f5630, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
     mk.rotation.x = -Math.PI / 2;
-    mk.position.set(LH.x - 1.40, LH.y + 0.957, LH.z + 0.05);
+    mk.rotation.z = Math.PI / 2;                       // its 34 cm runs ALONG the margin
+    mk.position.set(LH.x - 1.06, LH.y + 0.957, LH.z - 0.35);
     mk.name = 'lensMarkStudy';
     core.add(mk);
   }
@@ -919,8 +948,8 @@ export function buildWorld() {
   // (W.flags.phialDried, driven in puzzles _apply); click to finally read what he sealed.
   {
     const dp = phialProp('phialDesk');
-    dp.position.set(LH.x - 1.40, LH.y + 1.02, LH.z + 0.18);
-    dp.rotation.y = 0.5;
+    dp.position.set(LH.x - 1.05, LH.y + 0.985, LH.z + 0.90);
+    dp.rotation.y = 1.35;                              // lying along the margin, not across it
     dp.visible = false;
     core.add(dp);
   }
@@ -974,7 +1003,9 @@ export function buildWorld() {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.026), tMat);
       m.rotation.x = -Math.PI / 2;
       m.rotation.z = rz;
-      m.position.set(LH.x + 1.43 + dx, LH.y + 0.9575, LH.z - 0.18 + i * 0.18);
+      // 1.06, not 1.43: the east margin runs 0.90..1.22 now and the strokes were
+      // scratched out past the rim entirely (tools/harness/tabletop.mjs found this one)
+      m.position.set(LH.x + 1.06 + dx, LH.y + 0.9575, LH.z - 0.18 + i * 0.18);
       m.visible = false;       // revealed one-per-descent by _apply
       tally.add(m);
     }
@@ -2789,10 +2820,12 @@ export function buildWorld() {
         t.anisotropy = 4;
         return t;
       })();
-      const sheet = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.004, 0.34),
+      const sheet = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.004, 0.29),
         new THREE.MeshLambertMaterial({ map: sheetTex }));   // matte paper: no specular lobe
-      sheet.rotation.y = -0.25;                       // laid down slightly askew, as dropped
-      sheet.position.set(0.4, 0.032, 0.08);
+      sheet.rotation.y = -0.10;                       // laid down slightly askew, as dropped
+      // BESIDE the book along the margin, not 0.4 m across it. Offset in local +x it
+      // used to land back over the model's sea the moment the book moved inward.
+      sheet.position.set(0, 0.032 - 0.010, -0.40);
       sheet.name = 'returnSheet';
       defineProp('returnSheet');
       book.add(sheet);
@@ -3634,7 +3667,17 @@ export function instantiateModel(core, modelAnchor) {
   //
   // Both are cropped to the SAME extent or the seabed shows dry beyond the water line.
   {
-    const CROP = 0.95;                        // half-extent in metres: the model shows 1.9m
+    // 0.90, down from 0.95: the model shows a 1.8 m square of the world. The last 5 cm
+    // per side is not about water, it is about the WORKING MARGIN — the band of clear
+    // vellum outside the model where the logbook, the day's return and the phial lie.
+    // At 0.95 that band was 0.225 m and the props on it were 0.26-0.42 m wide, so they
+    // simply could not fit and had been left out past the rim entirely. It is 0.32 m now
+    // (vellum 1.22 - CROP), which every one of them fits inside with slack.
+    // The island survives the tighter crop: measured, land covers 5% of the square ring
+    // at 220 m from the lighthouse and 3% at 240 m, so cutting at 216 m instead of 228 m
+    // clips essentially the same nothing. Below ~200 m it would start slicing real
+    // shoreline (20% of the ring at 200 m, 33% at 140 m) — that is the floor, not taste.
+    const CROP = 0.90;                        // half-extent in metres: the model shows 1.8m
     const mw = modelRoot.getObjectByName('water');
     if (mw) {
       // MEASURE IN THE MODEL'S OWN UNITS. Box3.setFromObject here returns ISLAND units,

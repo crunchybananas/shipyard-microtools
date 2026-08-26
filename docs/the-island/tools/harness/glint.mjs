@@ -173,9 +173,16 @@ export default async function (h) {
     const drift = before.map((b, i) => [b, after[i]])
       .filter(([b, a]) => !a || a.hex !== b.hex || Math.abs(a.i - b.i) > 1e-6 || a.rim !== b.rim)
       .slice(0, 4).map(([b, a]) => ({ n: b.n, was: [b.hex, b.i, b.rim], now: a ? [a.hex, a.i, a.rim] : null }));
-    const idle = await h.evaluate(`JSON.stringify({ fading: ABYME.interact._fading.length, live: !!ABYME.interact._live })`).then(JSON.parse);
+    const idle = await h.evaluate(`JSON.stringify({ fading: ABYME.interact._fading.length,
+      live: ABYME.interact.hovered ? (ABYME.interact.hovered.id || '?') : null })`).then(JSON.parse);
     ok(`${name}: every material returns to base after a mid-fade re-hover`, drift.length === 0, { drift, ...idle });
-    ok(`${name}: nothing is left running once the cursor has moved off`, idle.fading === 0 && !idle.live, idle);
+    // NOT "nothing is hovered": that assumed the screen corner this looks away to points
+    // at empty space, which is a fact about the room and not about the glint. Moving the
+    // folded notice to a new spot on the chart table put a different hotspot behind that
+    // corner and the check failed on a system that was working correctly. What matters
+    // is that the fades have DRAINED and this prop is no longer the live one.
+    ok(`${name}: the fades drain and this prop is released`,
+      idle.fading === 0 && idle.live !== settled.hovered, idle);
   }
 
   const errs = await h.evaluate(`JSON.stringify(window.__err.filter(s => /shader|GLSL|program|WebGL/i.test(s)).slice(0, 3))`).then(JSON.parse);
