@@ -11,7 +11,7 @@ import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.j
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { buildRegions } from './regions/index.js';
 import { applyRelief, getTexture } from './assets.js';
-import { LORE } from './content.js';
+import { LORE, SHELF_TITLES } from './content.js';
 
 export const GLYPHS = 8;
 export const GLYPH_CODE = [3, 7, 1, 5];
@@ -55,6 +55,116 @@ export const matJoinery = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.94, metalness: 0.0,
 });
 applyRelief(matJoinery, 'cloth', { normalScale: 0.35, strength: 1.2, colorMap: false, repeat: [1.6, 1.6] });
+
+
+// THE SPINE ATLAS — every piece of lettering in the keeper's library, on one canvas.
+//
+// It rides on matJoinery as an EMISSIVE map, which solves three problems at once and is
+// worth spelling out because none of them is obvious:
+//
+//   Why emissive and not a colour map. A colour map MULTIPLIES, and gilt has to be
+//   brighter than the cloth under it — you cannot multiply a dark blue buckram up to
+//   gold. Emissive ADDS, over whatever vertex colour the book already has, so one atlas
+//   letters a plum spine and a near-black one identically. It is also how gilt actually
+//   behaves: it is the thing in a dark room that catches the lamp.
+//   Why channel 1. Baker's uvs are box-projected in WORLD METRES so the cloth relief
+//   holds one scale across the whole bake — right for a tiling normal map, useless for
+//   an atlas cell. uv1 carries the cells; uv keeps the projection. Nothing moves.
+//   Why no new batch. The shelves, the books, the door boards and the jambs all share
+//   matJoinery. Everything that asks for no cell lands on cell 0, which is black, which
+//   adds nothing — so the whole batch can carry the map for the cost of the map.
+//
+// 128x256 cells: a spine is ~9cm wide and ~40cm tall, about 80 screen pixels across at
+// reading distance, so 128 texels across it is already generous and 256 along it is the
+// honest limit of what a title can be. The lettering is CONDENSED to fit, which is what
+// a real binder does with a long title on a narrow spine.
+const SPINE_COLS = 8, SPINE_ROWS = 4, SPINE_CW = 128, SPINE_CH = 256, SPINE_PAD = 3;
+const SPINE_AW = SPINE_COLS * SPINE_CW, SPINE_AH = SPINE_ROWS * SPINE_CH;
+// cell 0 is BLANK and is the Baker's default. Its uv is the cell's inset rect and the
+// pieces that use it sample its centre — a uv of exactly (0,0) sits on the atlas edge,
+// where mipmapping bleeds in from whatever is beside it.
+export const spineCell = (i) => {
+  const col = i % SPINE_COLS, row = Math.floor(i / SPINE_COLS);
+  return [
+    (col * SPINE_CW + SPINE_PAD) / SPINE_AW,
+    1 - ((row + 1) * SPINE_CH - SPINE_PAD) / SPINE_AH,
+    ((col + 1) * SPINE_CW - SPINE_PAD) / SPINE_AW,
+    1 - (row * SPINE_CH + SPINE_PAD) / SPINE_AH,
+  ];
+};
+export const SPINE_TITLE0 = 1;                              // cells 1..18: the lettered volumes
+export const SPINE_BAND0 = 1 + SHELF_TITLES.length;         // cells 19..24: tooling, no letters
+export const SPINE_BANDS = 6;
+
+// WHERE EACH LETTERED VOLUME ACTUALLY LANDED. The acrostic is the one thing on this
+// shelf that no other check can see: the geometry is fine, the texture is fine, the
+// draw call is fine, and the message is scrambled. One line in the placement loop is
+// enough to do it — I shipped it bottom-up and mirrored on the first pass. So the
+// build records its own reading order and tools/harness/spines.mjs spells it back.
+export const SHELF_MARKS = [];
+
+let _spineTex = null;
+export function spineAtlas() {
+  if (_spineTex) return _spineTex;
+  const cv = document.createElement('canvas');
+  cv.width = SPINE_AW; cv.height = SPINE_AH;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#000'; g.fillRect(0, 0, SPINE_AW, SPINE_AH);   // cell 0, and every unused cell
+  const at = (i) => [(i % SPINE_COLS) * SPINE_CW, Math.floor(i / SPINE_COLS) * SPINE_CH];
+
+  // the pair of gilt rules a bound spine is tooled with, above and below the label.
+  // The middle band is for UNLETTERED spines only: struck across a lettered one it
+  // runs straight through the title — MOR|TAR, HYDROG|RAPHY, TWIL|GHTS, ESTIM|ATES,
+  // every cell whose style landed on 2, which is a third of them.
+  const tooling = (x, y, style, lettered) => {
+    const inset = Math.round(SPINE_CW * (0.16 + 0.04 * (style % 3)));
+    g.fillStyle = '#fff';
+    const rule = (f, th) => g.fillRect(x + inset, y + Math.round(SPINE_CH * f), SPINE_CW - inset * 2, th);
+    rule(0.125, 3); rule(0.152, 2);
+    rule(0.836, 2); rule(0.863, 3);
+    if (!lettered && style % 3 === 2) { rule(0.47, 2); rule(0.492, 2); }
+  };
+  // the label reads BOTTOM TO TOP, which is the British convention and the one a
+  // District of Lights binder would have used
+  const label = (x, y, title) => {
+    g.save();
+    g.translate(x + SPINE_CW / 2, y + SPINE_CH / 2);
+    g.rotate(-Math.PI / 2);
+    const px = Math.round(SPINE_CW * 0.42);
+    g.font = `600 ${px}px Georgia, 'Times New Roman', serif`;
+    if ('letterSpacing' in g) g.letterSpacing = `${Math.round(px * 0.09)}px`;
+    const avail = SPINE_CH * 0.60;
+    const w = g.measureText(title).width;
+    if (w > avail) g.scale(avail / w, 1);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = '#fff';
+    g.fillText(title, 0, 0);
+    g.restore();
+  };
+
+  // gilt WEARS. A shelf where all eighteen titles are struck at identical brightness
+  // reads as printed, not stamped; a few rubbed-back ones are what makes the rest look
+  // like metal. Deterministic per cell so the shelf is the same shelf every session.
+  SHELF_TITLES.forEach((t, n) => {
+    const [x, y] = at(SPINE_TITLE0 + n);
+    g.globalAlpha = 0.68 + 0.32 * (((n * 37) % 11) / 10);
+    tooling(x, y, n, true); label(x, y, t);
+    g.globalAlpha = 1;
+  });
+  for (let k = 0; k < SPINE_BANDS; k++) {
+    const [x, y] = at(SPINE_BAND0 + k);
+    g.globalAlpha = 0.5 + 0.5 * (((k * 29) % 7) / 6);
+    tooling(x, y, k, false);
+    g.globalAlpha = 1;
+  }
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.channel = 1;                       // read uv1, not the world-projected uv
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  _spineTex = tex;
+  return tex;
+}
 
 export const matMegalith = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.96, metalness: 0.0, side: THREE.DoubleSide,
@@ -241,8 +351,9 @@ export function buildWorld() {
   // coursed-block relief — so a boulder beside the standing stones wore mortar lines.
   // Its own batch costs one draw group and lets it be granite.
   const rockwork = new Baker();
-  // shelves + books: wood and cloth, not masonry (see matJoinery)
-  const joinery = new Baker();
+  // shelves + books: wood and cloth, not masonry (see matJoinery). uv1 carries the
+  // spine atlas; everything that asks for no cell lands on cell 0, which is black.
+  const joinery = new Baker({ uv1: true, blank: spineCell(0) });
   const brass = new Baker();
   const M = new THREE.Matrix4();
   const Q = new THREE.Quaternion();
@@ -997,8 +1108,12 @@ export function buildWorld() {
 
   // bookshelves (baked)
   {
+    const PER_SHELF = SHELF_TITLES.length / 3;   // 18 volumes over the lettered bay's three boards
+    let titled = 0;
+    SHELF_MARKS.length = 0;
     for (let s = 0; s < 2; s++) {
       const a0 = deg(285 + s * 38);
+      const lettered = s === 0;                  // the near bay: his working library
       for (let sh = 0; sh < 3; sh++) {
         const shelf = new THREE.BoxGeometry(2.0, 0.07, 0.45);
         joinery.add(shelf, place(LH.x + Math.sin(a0) * 4.4, LH.y + 0.6 + sh * 0.62, LH.z + Math.cos(a0) * 4.4, a0), grad(C.woodDark, C.wood));
@@ -1027,45 +1142,94 @@ export function buildWorld() {
         const at = (bx, by, depth) => [
           LH.x + nx * (4.4 + depth) + tx * bx, by, LH.z + nz * (4.4 + depth) + tz * bx,
         ];
+
+        // PLAN THE SHELF BEFORE PLACING IT. The eighteen lettered volumes have to land
+        // in acrostic order, evenly spread so the message is not bunched at one end —
+        // and you cannot choose positions in a list you are still generating. So the
+        // first pass decides what stands where and the second pass builds it. Bay 0 is
+        // the lettered bay: his working library, kept in order. Bay 1 is where things
+        // got shoved, which is why the flat stacks live there.
+        const plan = [];
         let bx = -0.85;
         while (bx < 0.85) {
           // a gap: something was borrowed and never came back
           if (r() < 0.07) { bx += 0.03 + r() * 0.05; continue; }
 
           // a flat stack, for the volumes too tall to stand up in a keeper's shelf
-          if (r() < 0.10 && bx < 0.6) {
+          if (r() < (lettered ? 0.03 : 0.12) && bx < 0.6) {
             const sw = 0.20 + r() * 0.12;
-            let sy = shelfY;
             const n = 2 + Math.floor(r() * 2);
+            const lay = [];
             for (let k = 0; k < n; k++) {
-              const th = 0.035 + r() * 0.03;
-              const lay = new THREE.BoxGeometry(sw, th, 0.26 + r() * 0.05);
-              const lc = vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.18, 0.14);
-              // each one shoved a little out of true with the one under it
-              joinery.add(lay, place(...at(bx + sw / 2 + (r() - 0.5) * 0.02, sy + th / 2, -0.02 + (r() - 0.5) * 0.04),
-                a0 + (r() - 0.5) * 0.09), () => lc);
-              lay.dispose();
-              sy += th;
+              lay.push({ th: 0.035 + r() * 0.03, d: 0.26 + r() * 0.05,
+                c: vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.18, 0.14),
+                jx: (r() - 0.5) * 0.02, jz: (r() - 0.5) * 0.04, ja: (r() - 0.5) * 0.09 });
             }
+            plan.push({ k: 'stack', bx, sw, lay });
             bx += sw + 0.02;
             continue;
           }
 
           const bw = 0.055 + r() * 0.10, bh = 0.28 + r() * 0.24;
-          const depth = -0.03 + r() * 0.07;           // shoved back, or left proud
-          const book = new THREE.BoxGeometry(bw, bh, 0.24 + r() * 0.09);
-          const bc = vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.20, 0.16);
           // a lean, tipped into the gap its neighbour left. Rotating about the box's
           // centre lifts the low corner off the shelf, so drop it back by the sagitta.
           const lean = r() < 0.13 ? (r() - 0.5) * 0.5 : 0;
-          const drop = lean ? (bh / 2) * (1 - Math.cos(lean)) + (bw / 2) * Math.abs(Math.sin(lean)) : 0;
-          joinery.add(book, place(...at(bx + bw / 2, shelfY + bh / 2 - drop, depth),
-            a0, 1, 1, 1, 0, lean), () => bc);
-          book.dispose();
+          plan.push({ k: 'book', bx, bw, bh, lean, d: 0.24 + r() * 0.09,
+            depth: -0.03 + r() * 0.07,                 // shoved back, or left proud
+            c: vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.20, 0.16),
+            // an ornamented but unlettered binding, which most of a keeper's shelf is
+            cell: r() < 0.42 ? SPINE_BAND0 + Math.floor(r() * SPINE_BANDS) : 0 });
           bx += bw * Math.cos(lean) + 0.012;
+        }
+
+        if (lettered) {
+          // READ IT THE WAY A SHELF IS READ: top board down, left to right. Neither axis
+          // runs that way on its own. `sh` counts UPWARD from the floor, and bx runs along
+          // the tangent (cos a0, -sin a0), which from inside the room looking at the wall
+          // runs right to left on screen. Placed naively the message came out bottom-up
+          // and mirrored — every letter present, in an order nobody would ever try.
+          const stand = plan.map((b, i) => (b.k === 'book' ? i : -1)).filter((i) => i >= 0);
+          const want = Math.min(PER_SHELF, stand.length);
+          const base = (2 - sh) * PER_SHELF;                    // top board carries the first six
+          for (let k = 0; k < want; k++) {
+            const slot = stand[Math.round((k * (stand.length - 1)) / (want - 1 || 1))];
+            const n = base + (want - 1 - k);
+            plan[slot].cell = SPINE_TITLE0 + n;
+            SHELF_MARKS.push({ n, shelf: sh, bx: plan[slot].bx });
+            titled++;
+          }
+        }
+
+        for (const b of plan) {
+          if (b.k === 'stack') {
+            let sy = shelfY;
+            for (const l of b.lay) {
+              const lay = new THREE.BoxGeometry(b.sw, l.th, l.d);
+              // each one shoved a little out of true with the one under it
+              joinery.add(lay, place(...at(b.bx + b.sw / 2 + l.jx, sy + l.th / 2, -0.02 + l.jz), a0 + l.ja), () => l.c);
+              lay.dispose();
+              sy += l.th;
+            }
+            continue;
+          }
+          const book = new THREE.BoxGeometry(b.bw, b.bh, b.d);
+          const drop = b.lean ? (b.bh / 2) * (1 - Math.cos(b.lean)) + (b.bw / 2) * Math.abs(Math.sin(b.lean)) : 0;
+          // the SPINE is the -z face: `place` turns local +z onto the outward radial, and
+          // the shelf stands against the wall, so -z is the face looking into the room.
+          const rect = b.cell ? spineCell(b.cell) : null;
+          joinery.add(book, place(...at(b.bx + b.bw / 2, shelfY + b.bh / 2 - drop, b.depth),
+            a0, 1, 1, 1, 0, b.lean), () => b.c, rect && ((_nx, _ny, nz) => (nz < -0.5 ? rect : null)));
+          book.dispose();
         }
       }
     }
+    // the lettering itself, and the gilt it is struck in
+    const atlas = spineAtlas();
+    matJoinery.emissiveMap = atlas;
+    matJoinery.emissive = new THREE.Color(0xd8b26a);
+    matJoinery.emissiveIntensity = 0.45;
+    matJoinery.needsUpdate = true;
+    if (titled !== SHELF_TITLES.length) console.warn('shelf: only', titled, 'of', SHELF_TITLES.length, 'titles placed');
   }
 
   // plumb mechanism over the table + brass floor plate (the dive spot)

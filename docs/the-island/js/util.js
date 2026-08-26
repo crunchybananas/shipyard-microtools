@@ -95,17 +95,37 @@ export function lerpAngle(a, b, t) {
 // merges them into one BufferGeometry per material bucket. This is how the
 // whole static island ends up in a handful of draw calls.
 export class Baker {
-  constructor() {
+  // opts.uv1 — bake a SECOND uv set alongside the world-projected one.
+  //
+  // The uvs below are deliberately NOT the source geometry's: they are box-projected in
+  // world metres so one masonry scale runs across the whole bake (see the comment on the
+  // uv pass). That is right for a tiling surface and useless for an ATLAS, where a piece
+  // needs to land on one specific cell. Rather than choose, a Baker can carry both: uv
+  // stays the triplanar projection every material here already relies on, and uv1 carries
+  // atlas cells for whichever pieces ask for one. three selects between them per texture
+  // via `texture.channel = 1`, so one material can tile a normal map on uv and stamp a
+  // decal from an atlas on uv1 — which is how the keeper's books get lettered spines
+  // without a second draw call and without disturbing the cloth relief on the boards.
+  //
+  // Pieces that pass no cell get the CENTRE of the blank cell, not its corner: a uv of
+  // exactly (0,0) sits on the atlas edge where mipmapping bleeds in from whatever is
+  // beside it.
+  constructor(opts = {}) {
     this.positions = [];
     this.normals = [];
     this.colors = [];
     this.uvs = [];
+    this.uv1 = opts.uv1 ? [] : null;
+    this.blank = opts.blank || [0, 0, 1, 1];    // the default cell, in atlas uv
     this.ranges = [];   // #34: per-add() vertex ranges + anchor, so buildChunks can bucket regionally
   }
 
   // geo: BufferGeometry, matrix: Matrix4, color: THREE.Color | (y01, worldPos)=>Color
   // (the callback's 2nd arg is the WORLD-space vertex — contact-AO bakes key off it, #43)
-  add(geo, matrix, color) {
+  // cell: [u0,v0,u1,v1] in atlas uv, or (nx,ny,nz)=>rect|null given the piece's LOCAL
+  // face normal, so one box can letter its spine and leave its other five faces blank.
+  // Ignored unless the Baker was constructed with { uv1: true }.
+  add(geo, matrix, color, cell) {
     const src = geo.index ? geo.toNonIndexed() : geo;
     const pos = src.attributes.position;
     // #34: remember where this piece lands in the flat arrays + where it stands in the
@@ -159,6 +179,32 @@ export class Baker {
         else this.uvs.push(px, py);                             // ±z faces: v = height
       }
     }
+    // uv1: the atlas pass. Uses the source geometry's OWN parametric uvs (a BoxGeometry's
+    // 0..1 per face), remapped into the chosen cell — the one place the source uvs are
+    // exactly what is wanted, because a cell is a per-face decal and not a tiling.
+    if (this.uv1) {
+      const suv = src.attributes.uv;
+      const bu = (this.blank[0] + this.blank[2]) / 2, bv = (this.blank[1] + this.blank[3]) / 2;
+      const lp = src.attributes.position;
+      for (let i = 0; i + 2 < pos.count; i += 3) {
+        let rect = cell || null;
+        if (rect && typeof rect === 'function') {
+          // the face normal in LOCAL space (before `matrix`), which is what a caller
+          // means by "the spine is the -z face"
+          const ax = lp.getX(i), ay = lp.getY(i), az = lp.getZ(i);
+          const e1x = lp.getX(i + 1) - ax, e1y = lp.getY(i + 1) - ay, e1z = lp.getZ(i + 1) - az;
+          const e2x = lp.getX(i + 2) - ax, e2y = lp.getY(i + 2) - ay, e2z = lp.getZ(i + 2) - az;
+          let nx = e1y * e2z - e1z * e2y, ny = e1z * e2x - e1x * e2z, nz = e1x * e2y - e1y * e2x;
+          const L = Math.hypot(nx, ny, nz) || 1;
+          rect = cell(nx / L, ny / L, nz / L);
+        }
+        for (let k = 0; k < 3; k++) {
+          if (!rect || !suv) { this.uv1.push(bu, bv); continue; }
+          const u = suv.getX(i + k), v = suv.getY(i + k);
+          this.uv1.push(rect[0] + u * (rect[2] - rect[0]), rect[1] + v * (rect[3] - rect[1]));
+        }
+      }
+    }
     if (src !== geo) src.dispose();
   }
 
@@ -168,6 +214,7 @@ export class Baker {
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.normals, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.colors, 3));
     g.setAttribute('uv', new THREE.Float32BufferAttribute(this.uvs, 2));
+    if (this.uv1) g.setAttribute('uv1', new THREE.Float32BufferAttribute(this.uv1, 2));
     return g;
   }
 
@@ -188,6 +235,7 @@ export class Baker {
       for (const r of list) total += r.count;
       const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3);
       const col = new Float32Array(total * 3), uv = new Float32Array(total * 2);
+      const uv1 = this.uv1 ? new Float32Array(total * 2) : null;
       let off = 0;
       for (const r of list) {
         for (let i = 0; i < r.count * 3; i++) {
@@ -195,7 +243,10 @@ export class Baker {
           nor[off * 3 + i] = this.normals[r.start * 3 + i];
           col[off * 3 + i] = this.colors[r.start * 3 + i];
         }
-        for (let i = 0; i < r.count * 2; i++) uv[off * 2 + i] = this.uvs[r.start * 2 + i];
+        for (let i = 0; i < r.count * 2; i++) {
+          uv[off * 2 + i] = this.uvs[r.start * 2 + i];
+          if (uv1) uv1[off * 2 + i] = this.uv1[r.start * 2 + i];
+        }
         off += r.count;
       }
       const g = new THREE.BufferGeometry();
@@ -203,6 +254,7 @@ export class Baker {
       g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
       g.setAttribute('color', new THREE.BufferAttribute(col, 3));
       g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+      if (uv1) g.setAttribute('uv1', new THREE.BufferAttribute(uv1, 2));
       g.computeBoundingSphere();
       out.push(g);
     }

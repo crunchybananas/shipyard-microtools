@@ -293,6 +293,47 @@ export const LORE = {
 // is someone who stood here, went down, and came back up far enough to add a mark."
 // Five marks in five visibly different hands, one per depth along the descent's spine.
 // Written hands only; none of them knows the player — the keeper stays the only I/you.
+// ---- the keeper's shelf ------------------------------------------------------
+// THE LETTERED SPINES. The study's near bay carries eighteen gilt-lettered volumes,
+// and their initials, read the way a shelf is read — top board down, left to right —
+// spell the one line of canon the game says aloud exactly once:
+//
+//     I T H A S T O G O S O M E W H E R E
+//
+// STACK.md §2: "a solution is never dissolved, only displaced." The keeper knew it
+// long before the player does, and he did what a man does with a thing he knows and
+// cannot use: he shelved it. So it is not a hint dropped for the player — it is HIS,
+// filed in his own library, in his own hand, where he had to walk past it every day.
+//
+// Every title is a plausible volume in a District of Lights keeper's library, and a
+// good half of them are about moving water — ENGINES (of relief), HYDROGRAPHY,
+// OBSERVATIONS (of the sea's level), MORTAR (and the sea wall). The library of a man
+// working the same problem from every side and never once naming it.
+//
+// Short forms on purpose: a spine is ~9cm wide and ~40cm tall, which at reading
+// distance is about 80 screen pixels across. Twelve characters is the ceiling before
+// the lettering stops being legible and becomes texture.
+export const SHELF_TITLES = [
+  'INSTRUCTIONS',   // I
+  'TIDE TABLES',    // T
+  'HYDROGRAPHY',    // H
+  'ATTENDANCE',     // A
+  'SAILINGS',       // S
+  'TWILIGHTS',      // T
+  'ON LENSES',      // O
+  'GLASSWORK',      // G
+  'OBSERVATIONS',   // O
+  'SIGNALS',        // S
+  'OPTICS',         // O
+  'MORTAR',         // M
+  'ELEMENTS',       // E
+  'WINDS',          // W
+  'HARBOURS',       // H
+  'ENGINES',        // E
+  'ROPE WORK',      // R
+  'ESTIMATES',      // E
+];
+
 export const CLIMBERS = [
   { id: 'cmTallies',
     whisper: 'Under the hair-fine letters, just as they said: tally strokes — dozens, in fists of five — and one place where a hand rested so many times the stone has gone smooth.',
