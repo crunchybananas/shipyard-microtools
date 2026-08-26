@@ -36,3 +36,7 @@ docs/morphogen/
 # Realm sprite tooling virtualenv (docs/realm/assets/sprites/README.md)
 docs/realm/scripts/.venv/
 firebase/node_modules/
+
+# the Firebase CLI's per-deploy upload cache — a local artifact that changes
+# every time anyone deploys, so tracking it means every status is dirty
+.firebase/
