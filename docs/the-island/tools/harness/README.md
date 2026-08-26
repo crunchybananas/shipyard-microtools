@@ -29,7 +29,9 @@ gate that has guarded every fire since the walk was born:
 - **`spines.mjs`** — the eighteen gilt-lettered volumes in the study spell the one line
   of canon the game says aloud once, read top board down and left to right. Nothing else
   can see the MESSAGE: the geometry, the atlas and the draw call are all fine when it is
-  scrambled, and the first pass shipped it bottom-up and mirrored. 8 assertions.
+  scrambled, and the first pass shipped it bottom-up and mirrored. Also gates the way IN:
+  the bay is a reader, and hovering it lifts the gilt lettering and nothing else.
+  14 assertions.
 - **`glint.mjs`** — the hover highlight marks a prop, it does not replace it: it ramps
   rather than steps, it cannot manufacture a light source, and it restores even from a
   re-hover that lands mid-fade. 25 assertions. `SHOT_DIR=` also photographs each style

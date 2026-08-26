@@ -24,17 +24,27 @@
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const PAGE = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
 
-  await h.navigate(URL);
-  for (let i = 0; i < 40; i++) {
-    if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) break;
-    await h.wait(1);
-  }
+  // START CLEAN. run.sh drives every gate through ONE browser, so whatever the gate
+  // before this one left in localStorage is still there — and a restored save comes
+  // back at a different level with the player somewhere else entirely. This passed on
+  // its own and failed inside the full run for exactly that reason: the shelf was
+  // built and lit, and the crosshair was in another room.
+  const ready = async () => {
+    for (let i = 0; i < 40; i++) {
+      if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) return;
+      await h.wait(1);
+    }
+    throw new Error('app never booted');
+  };
+  await h.navigate(PAGE); await ready();
+  await h.evaluate(`localStorage.removeItem('abyme-save-v1'); localStorage.setItem('abyme-muted','1'); 1`);
+  await h.navigate(PAGE); await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
   await h.wait(2);
   await h.evaluate(`ABYME.setIntroT(99); 1`);
-  await h.wait(2);
+  await h.wait(2.5);
 
   const m = await h.evaluate(`JSON.stringify({
     marks: ABYME.SHELF_MARKS, titles: ABYME.SHELF_TITLES,
@@ -88,6 +98,46 @@ export default async function (h) {
   // gilt is a MARK, not a light: this rides on the same material as the shelves and the
   // door boards, so a heavy hand here would set the whole study glowing (see bloom.mjs)
   ok('the gilt stays well under the bloom threshold', !!wired.mat && wired.mat.ei <= 0.6, wired.mat);
+
+  // THE WAY IN. An acrostic nobody can get at is decoration. The bay is a reader — its
+  // pages transcribe the eighteen titles into the journal so they can be worked on at
+  // leisure — and hovering it lifts the GILT and nothing else, because every lettered
+  // spine is the only thing on matJoinery reading a non-blank atlas cell.
+  await h.evaluate(`ABYME.W.time = 11; ABYME.W.sunFrozen = true; 1`);
+  const a = 285 * Math.PI / 180, d = 2.4;
+  await h.evaluate(`ABYME.tp(${-85 + Math.sin(a) * d}, ${-40 + Math.cos(a) * d}, ${a + Math.PI}, 0.02); 1`);
+  await h.wait(1.2);
+  const gilt = `(() => { let v = null; ABYME.scene.traverse((o) => {
+    let q = o, j = false; while (q) { if (q.name === 'staticJoinery') { j = true; break; } q = q.parent; }
+    if (j && o.isMesh && v === null) v = o.material.emissiveIntensity; }); return v; })()`;
+  await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9); 1`); await h.wait(1.0);
+  const rest = await h.evaluate(gilt);
+  await h.evaluate(`ABYME.interact.mouse.set(0, 0); 1`); await h.wait(1.3);
+  const hov = await h.evaluate(`(() => { const s = ABYME.interact.hovered;
+    return JSON.stringify({ id: s && s.id, gilt: ${gilt} }); })()`).then(JSON.parse);
+  ok('the crosshair on the bay finds the reader', hov.id === 'lore_lettered_shelf',
+    { ...hov, enabled: await h.evaluate(`ABYME.interact.enabled`), locked: await h.evaluate(`ABYME.player.locked`),
+      level: await h.evaluate(`ABYME.W.level`), at: await h.evaluate(`[+ABYME.player.pos.x.toFixed(1), +ABYME.player.pos.z.toFixed(1)]`) });
+  ok('hovering lifts the gilt', hov.gilt > rest + 0.05, { rest, hovered: hov.gilt });
+  await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9); 1`); await h.wait(1.4);
+  ok('and the gilt settles back', Math.abs((await h.evaluate(gilt)) - rest) < 1e-6, { rest, after: await h.evaluate(gilt) });
+
+  // content.js is pure data and imports cleanly in node, the way coverage.mjs reads it
+  // (the page url above is PAGE, not URL: shadowing the global URL constructor here
+  // breaks this import with 'URL is not a constructor')
+  const { LORE, SHELF_TITLES } = await import(new URL('../../js/content.js', import.meta.url).pathname);
+  const L = LORE.lettered_shelf;
+  ok('the bay reads as three boards with a deep reading',
+    !!L && L.pages.length === 3 && (L.deep || []).length >= 1 && !!L.journal && !!L.journalDeep,
+    L && { pages: L.pages.length, deep: (L.deep || []).length });
+  // the deep page must give the METHOD, never the sentence: STACK.md's guardrail is that
+  // the line is said aloud once, ever, and printing it here would be the second time
+  const said = [...L.pages, ...(L.deep || []), L.journal, L.journalDeep].join(' ').toUpperCase().replace(/[^A-Z]/g, '');
+  ok('no page says the line outright', !said.includes(CANON), { where: said.indexOf(CANON) });
+  // and every title the pages transcribe must be a title that is actually on the shelf
+  const printed = L.pages.join(' ');
+  ok('the pages transcribe the real titles', SHELF_TITLES.every((t) => printed.includes(t)),
+    SHELF_TITLES.filter((t) => !printed.includes(t)));
 
   console.log(`SPINES ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   console.log(`  reads: ${spelled}`);

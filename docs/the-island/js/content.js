@@ -58,6 +58,28 @@ export const LORE = {
     journal: 'Found the keeper’s logbook on the chart table. He ground lenses to keep a light for someone out on the water — and when the sea began to rise, he started building the island again, small, to hold one whole day back.',
     journalDeep: 'Read again from the deep, the logbook’s last page turns colder, the hand no longer steady: there is no bottom — he has looked. Each room built to be safe becomes the next room he is afraid in. You do not drown all at once; you drown a little, and call it keeping busy.',
   },
+  // The bay itself is the readable. Its pages are the shelf, transcribed board by
+  // board, so the player can carry the eighteen titles into the journal and work on
+  // them at leisure instead of standing in a tower squinting at gilt.
+  //
+  // The deep reading gives the METHOD and never the sentence. STACK.md's guardrail is
+  // that the line is said aloud once, ever — spelling it out here would be the second
+  // time, and it would also take the only thing this puzzle has to give away.
+  lettered_shelf: { era: 'spanning', eraDeep: 'inspection',
+    kind: 'shelf', hand: 'keeper', title: 'The lettered shelf',
+    place: { prop: 'none', label: 'the lettered spines', maxDist: 3.0, glow: 'gilt' },
+    pages: [
+      'The near bay is lettered in gilt, every volume of it. The far bay is not lettered at all.\n\nTop board, left to right:\n\nINSTRUCTIONS · TIDE TABLES · HYDROGRAPHY\nATTENDANCE · SAILINGS · TWILIGHTS',
+      'Middle board:\n\nON LENSES · GLASSWORK · OBSERVATIONS\nSIGNALS · OPTICS · MORTAR',
+      'Bottom board:\n\nELEMENTS · WINDS · HARBOURS\nENGINES · ROPE WORK · ESTIMATES\n\nEighteen. Half of them are about water, and not one of them says so.',
+    ],
+    deepFrom: 3,
+    deep: [
+      '(from down here the shelf stops being a shelf. He lettered eighteen spines and left the other bay bare, which is not how a man who is merely tidy keeps books. Take them in the order a man reads his own shelf — top board down, left to right — and take only the first letter of each. He struck it in gilt, at eye height, and walked past it every day of his life. He knew before any of us. He shelved it.)',
+    ],
+    journal: 'The near bay of his shelf is lettered in gilt — eighteen volumes — and the far bay not at all. Instructions, Tide Tables, Hydrography, Attendance, Sailings, Twilights; On Lenses, Glasswork, Observations, Signals, Optics, Mortar; Elements, Winds, Harbours, Engines, Rope Work, Estimates. Half of them are about water, and not one of them says so.',
+    journalDeep: 'Read again from further down, the shelf gives up its arrangement: eighteen lettered spines, one bay left bare, and the initials taken in the order a man reads his own shelf — top board down, left to right. He struck it in gilt at eye height and walked past it every day.',
+  },
   coat_letter: { era: 'spanning', eraDeep: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A letter, folded small',
     pages: [
@@ -433,6 +455,12 @@ export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 // live together as content.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
 export const SKETCHES = [
+  // THE LETTERED SHELF (SHELF_TITLES): a board of standing spines, a few struck with
+  // their gilt band — and, for the deep reading, the same bay with the first volume of
+  // each board picked out and an arrow saying which way to read. The marginalia shows
+  // the METHOD and never the sentence, exactly as the deep page does.
+  ['lettered in gilt', S('<path d="M8 33h80"/><path d="M14 33V15h6v18M22 33V11h5v22M29 33V17h7v16M38 33V12h5v21M45 33V19h6v14M53 33V13h6v20M62 33V16h5v17M69 33V10h6v23M77 33V18h6v15" opacity=".7"/><path d="M15 20h4M23 16h3M39 17h3M46 24h4M54 18h4M70 15h4" opacity=".95"/>')],
+  ['the shelf gives up its arrangement', S('<path d="M8 14h48M8 25h48M8 36h48" opacity=".6"/><path d="M18 14V8M24 14V7M30 14V9M36 14V7M42 14V8" opacity=".3"/><path d="M18 25v-6M24 25v-7M30 25v-5M36 25v-7M42 25v-6" opacity=".3"/><path d="M18 36v-6M24 36v-7M30 36v-5M36 36v-7M42 36v-6" opacity=".3"/><path d="M12 14V6M12 25v-8M12 36v-8"/><path d="M66 7v22M63 26l3 4 3-4"/><path d="M72 7h16M72 18h16M72 29h16" opacity=".3"/>')],
   // THE FIFTH RING met (STACK.md §3.2): the graduated staff with the water finally
   // over its top collar, and the tally of hands it took scratched beside it.
   ['He cut the top ring', S('<path d="M48 4v32"/><path d="M41 30h14M41 24h14M41 18h14" opacity=".45"/><path d="M40 11h16" opacity=".95"/><path d="M8 14h80" opacity=".8"/><path d="M12 20h76" opacity=".4"/><path d="M16 26h68" opacity=".2"/><path d="M64 6v5M68 6v5M72 6v5M76 6v5" opacity=".55"/>')],

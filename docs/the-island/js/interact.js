@@ -221,7 +221,7 @@ export class Interactions {
         mats.set(mat, mat.userData._glintBase);
       });
     }
-    return { mats, t: 0, dir: 1, gain };
+    return { mats, t: 0, dir: 1, gain, spot };
   }
 
   // A fresnel rim, injected into whichever lit shader the prop already uses. The body
@@ -253,6 +253,7 @@ export class Interactions {
   }
 
   _releaseGlint(g) {
+    g.spot?.onGlint?.(0);
     for (const [mat, base] of g.mats) {
       mat.emissive.setHex(base.hex);
       mat.emissiveIntensity = base.intensity;
@@ -280,6 +281,14 @@ export class Interactions {
     const e = g.t * g.t * (3 - 2 * g.t);
     // 'pulse' only breathes once it has arrived, so the rise itself stays clean
     const beat = this.glintStyle === 'pulse' ? 1 + 0.13 * e * Math.sin(elapsed * 3.1) : 1;
+    // A hotspot whose right response is not "light this mesh up" gets the EASED value
+    // and does its own thing with it. The keeper's shelf is the case that wanted it:
+    // its books are baked into a merged batch it shares with the boards and the doors,
+    // so there is no mesh to glint — but every gilt letter on that batch is the only
+    // thing reading a non-blank atlas cell, so nudging one emissive lifts the LETTERING
+    // and nothing else. It arrives eased for free, which is the whole point of routing
+    // it through here rather than through a raw hover boolean.
+    g.spot?.onGlint?.(e * beat);
     for (const [mat, base] of g.mats) {
       // If something ELSE wrote this material since our last frame — a puzzle drive
       // pulsing a lamp — adopt its value as the base for this frame instead of

@@ -102,6 +102,10 @@ export const SPINE_BANDS = 6;
 // enough to do it — I shipped it bottom-up and mirrored on the first pass. So the
 // build records its own reading order and tools/harness/spines.mjs spells it back.
 export const SHELF_MARKS = [];
+// what the gilt sits at normally, and what hovering the shelf lifts it to. Every gilt
+// letter in the study is the only thing on matJoinery reading a non-blank atlas cell,
+// so this one number moves the LETTERING and leaves the boards, doors and jambs alone.
+export const GILT_REST = 0.45, GILT_HOVER = 0.75;
 
 let _spineTex = null;
 export function spineAtlas() {
@@ -1223,11 +1227,27 @@ export function buildWorld() {
         }
       }
     }
+    // A READER FOR THE BAY. The proxy is built HERE rather than by the fragment factory
+    // because its placement is derived from the same LH and a0 the boards are, and a
+    // hand-copied position in content.js would drift the first time a shelf moves.
+    // content.js still owns everything a writer owns — the label, the reach, the pages.
+    {
+      const a0 = deg(285);
+      const rr = 4.15;                                    // just in front of the spines
+      const box = new THREE.Mesh(new THREE.BoxGeometry(1.95, 1.95, 0.34),
+        new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+      box.position.set(LH.x + Math.sin(a0) * rr, LH.y + 1.5, LH.z + Math.cos(a0) * rr);
+      box.rotation.y = a0;
+      box.name = 'lore_lettered_shelf';
+      defineProp('lore_lettered_shelf');
+      core.add(box);
+    }
+
     // the lettering itself, and the gilt it is struck in
     const atlas = spineAtlas();
     matJoinery.emissiveMap = atlas;
     matJoinery.emissive = new THREE.Color(0xd8b26a);
-    matJoinery.emissiveIntensity = 0.45;
+    matJoinery.emissiveIntensity = GILT_REST;
     matJoinery.needsUpdate = true;
     if (titled !== SHELF_TITLES.length) console.warn('shelf: only', titled, 'of', SHELF_TITLES.length, 'titles placed');
   }
@@ -3034,6 +3054,10 @@ export function buildWorld() {
     for (const [id, lore] of Object.entries(LORE)) {
       const pl = lore.place;
       if (!pl) continue;
+      // prop 'none': the object is built where its geometry is derived (the lettered
+      // shelf's proxy comes off the same LH and a0 as the boards). The entry still gets
+      // its reader hotspot from puzzles' half of the factory.
+      if (pl.prop === 'none') continue;
       const mesh = (STOCK[pl.prop] || STOCK.sheet)();
       mesh.position.set(pl.pos[0], pl.pos[1], pl.pos[2]);
       if (pl.rx) mesh.rotation.x = pl.rx;

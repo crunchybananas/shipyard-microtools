@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft, evidence, hands, DISPOSITIONS } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
-import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
+import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS, matJoinery, GILT_REST, GILT_HOVER } from './props.js';
 import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
@@ -851,6 +851,13 @@ export class Game {
           ? () => (W.readKeys.includes(id) ? (pl.label || lore.title) + ' — take it' : pl.label || lore.title)
           : pl.label || lore.title,
         maxDist: pl.maxDist ?? 2.8,
+        // glow 'gilt': there is no mesh to light — the books are baked into a batch they
+        // share with the boards and the doors — but every gilt letter in the study is the
+        // only thing on that batch reading a non-blank atlas cell, so lifting one emissive
+        // lifts the LETTERING alone. Arrives eased from interact's glint ramp.
+        onGlint: pl.glow === 'gilt'
+          ? (v) => { matJoinery.emissiveIntensity = GILT_REST + (GILT_HOVER - GILT_REST) * v; }
+          : undefined,
         when: () => (!gate || gate()) && !W.recDisp[id],
         onClick: () => {
           if (lore.record && W.readKeys.includes(id)) {
