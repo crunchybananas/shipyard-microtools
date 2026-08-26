@@ -58,27 +58,37 @@ export const LORE = {
     journal: 'Found the keeper’s logbook on the chart table. He ground lenses to keep a light for someone out on the water — and when the sea began to rise, he started building the island again, small, to hold one whole day back.',
     journalDeep: 'Read again from the deep, the logbook’s last page turns colder, the hand no longer steady: there is no bottom — he has looked. Each room built to be safe becomes the next room he is afraid in. You do not drown all at once; you drown a little, and call it keeping busy.',
   },
-  // The bay itself is the readable. Its pages are the shelf, transcribed board by
-  // board, so the player can carry the eighteen titles into the journal and work on
-  // them at leisure instead of standing in a tower squinting at gilt.
+  // The bay itself is the readable, and it must NOT hand the puzzle over.
   //
-  // The deep reading gives the METHOD and never the sentence. STACK.md's guardrail is
-  // that the line is said aloud once, ever — spelling it out here would be the second
-  // time, and it would also take the only thing this puzzle has to give away.
+  // Two drafts got this wrong in the same direction. The first transcribed the eighteen
+  // message volumes straight into the journal — correct when they were the only lettered
+  // spines in the room, and the whole puzzle printed once every spine carries a title.
+  // The second replaced that with a page saying the rule is DOUBLED on some volumes,
+  // which is the same mistake wearing a hat: owner, "the letter even gives it completely
+  // away. we don\u2019t want to hand the puzzle to the person, or not immediately."
+  //
+  // So the surface pages make you LOOK without saying what at. The last line of the last
+  // page is the whole nudge — it says something is different and refuses to say what.
+  // The method waits for the deep reading, which is gated at rung 3 and is a long way in;
+  // that is the "not immediately".
+  //
+  // Even the deep page never says the sentence. STACK.md\u2019s guardrail is that the line
+  // is said aloud once, ever. spines.mjs asserts both: no page says the line outright,
+  // and no page names a message volume.
   lettered_shelf: { era: 'spanning', eraDeep: 'inspection',
     kind: 'shelf', hand: 'keeper', title: 'The lettered shelf',
     place: { prop: 'none', label: 'the lettered spines', maxDist: 3.0, glow: 'gilt' },
     pages: [
-      'The near bay is lettered in gilt, every volume of it. The far bay is not lettered at all.\n\nTop board, left to right:\n\nINSTRUCTIONS · TIDE TABLES · HYDROGRAPHY\nATTENDANCE · SAILINGS · TWILIGHTS',
-      'Middle board:\n\nON LENSES · GLASSWORK · OBSERVATIONS\nSIGNALS · OPTICS · MORTAR',
-      'Bottom board:\n\nELEMENTS · WINDS · HARBOURS\nENGINES · ROPE WORK · ESTIMATES\n\nEighteen. Half of them are about water, and not one of them says so.',
+      'Every volume in this bay is lettered, and so is the far bay, and so is every shelf in the tower. Tide tables. Buoyage. Regulations. Psalms. Whatever a man needs to keep a light, and a few things he needed for himself.\n\nHe was not someone who left a spine blank.',
+      'The gilt is worn where he went back. BUOYAGE is rubbed almost to the board. PSALMS is not touched at all.\n\nHalf of this library is about water. None of it says so.',
+      'He had them bound the same way, by the same hand, over a great many years \u2014 and tooled the same way too, which is the sort of habit a man keeps without deciding to.\n\nAlmost the same way.',
     ],
     deepFrom: 3,
     deep: [
-      '(from down here the shelf stops being a shelf. He lettered eighteen spines and left the other bay bare, which is not how a man who is merely tidy keeps books. Take them in the order a man reads his own shelf — top board down, left to right — and take only the first letter of each. He struck it in gilt, at eye height, and walked past it every day of his life. He knew before any of us. He shelved it.)',
+      '(from down here the shelf stops being a shelf. Look at what is struck above each title, and count the volumes where there are two lines instead of one: eighteen, and eighteen is not a number that happens to a man\u2019s binding habits. Take those eighteen in the order a man reads his own shelf \u2014 top board down, left to right \u2014 and take only the first letter of each. He struck it in gilt at eye height and walked past it every day of his life. He knew before any of us. He shelved it.)',
     ],
-    journal: 'The near bay of his shelf is lettered in gilt — eighteen volumes — and the far bay not at all. Instructions, Tide Tables, Hydrography, Attendance, Sailings, Twilights; On Lenses, Glasswork, Observations, Signals, Optics, Mortar; Elements, Winds, Harbours, Engines, Rope Work, Estimates. Half of them are about water, and not one of them says so.',
-    journalDeep: 'Read again from further down, the shelf gives up its arrangement: eighteen lettered spines, one bay left bare, and the initials taken in the order a man reads his own shelf — top board down, left to right. He struck it in gilt at eye height and walked past it every day.',
+    journal: 'His shelf is lettered end to end \u2014 not a blank spine in the tower, and half the library about water without once saying so. He had them all bound and tooled the same way, by the same hand, over a great many years. Almost the same way.',
+    journalDeep: 'Read again from further down, the shelf gives up its arrangement: eighteen volumes are tooled with two lines above the title where the rest have one, and eighteen is not a number that happens. Taken in the order a man reads his own shelf \u2014 top board down, left to right \u2014 their initials are not an accident.',
   },
   coat_letter: { era: 'spanning', eraDeep: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A letter, folded small',
@@ -322,6 +332,9 @@ export const LORE = {
 //
 //     I T H A S T O G O S O M E W H E R E
 //
+// THE KEY IS THE RULE, not the lettering. Every spine in the study carries a title (see
+// SHELF_DECOYS); these eighteen are the ones tooled with a DOUBLED rule above and below.
+//
 // STACK.md §2: "a solution is never dissolved, only displaced." The keeper knew it
 // long before the player does, and he did what a man does with a thing he knows and
 // cannot use: he shelved it. So it is not a hint dropped for the player — it is HIS,
@@ -335,6 +348,33 @@ export const LORE = {
 // Short forms on purpose: a spine is ~9cm wide and ~40cm tall, which at reading
 // distance is about 80 screen pixels across. Twelve characters is the ceiling before
 // the lettering stops being legible and becomes texture.
+// THE DECOYS. Every spine in the study is lettered, in both bays — so "which books have
+// titles" is no longer the question, and the KEY moved into the tooling: a volume in the
+// message carries a DOUBLED gilt rule above the title and below it, and every other
+// volume carries a single rule. Owner: "that way all the books seem useful and the lines
+// are the key."
+//
+// Which means these have to be real. A shelf of obvious filler beside eighteen real
+// titles would give the game away by tone alone, so this is an actual keeper's library:
+// district paperwork, optics, weather, the sea, and a few volumes that are plainly his
+// rather than the Board's. Several are about water on purpose — SOUNDINGS, THE SWELL,
+// CURRENTS, SPRING TIDES — so the message's own water titles cannot be picked out by
+// theme either. The only thing that separates them is the rule.
+//
+// 45 of them, cycled through a seeded shuffle so no two neighbours repeat and the whole
+// set is used before any title comes round again. With 1 blank + 18 + 45 = 64 they fill
+// the atlas exactly (8 x 8 cells of 128 x 256 in a 1024 x 2048 canvas).
+export const SHELF_DECOYS = [
+  'LOGS 1881', 'LOGS 1882', 'LOGS 1883', 'THE COAST', 'SOUNDINGS', 'ALMANAC',
+  'SEA BIRDS', 'LICHENS', 'KNOTS', 'CHARTS I', 'CHARTS II', 'BUOYAGE',
+  'FOG SIGNALS', 'OIL & WICK', 'CLOCKWORK', 'BAROMETRY', 'THE MOON', 'STAR TABLES',
+  'LATITUDE', 'THE SWELL', 'SALVAGE', 'WRECKS', 'LIFEBOAT', 'CURRENTS',
+  'THE GARDEN', 'PSALMS', 'VERSES', 'LETTERS', 'ACCOUNTS', 'STORES',
+  'RELIEFS', 'PENSIONS', 'REGULATIONS', 'THE BOARD', 'INSPECTIONS', 'CIRCULARS',
+  'SPECTACLES', 'MIRRORS', 'PRISMS', 'PARAFFIN', 'SPRING TIDES', 'NEAP TIDES',
+  'FIRST AID', 'RATIONS', 'THE ARC LAMP',
+];
+
 export const SHELF_TITLES = [
   'INSTRUCTIONS',   // I
   'TIDE TABLES',    // T
@@ -459,7 +499,7 @@ export const SKETCHES = [
   // their gilt band — and, for the deep reading, the same bay with the first volume of
   // each board picked out and an arrow saying which way to read. The marginalia shows
   // the METHOD and never the sentence, exactly as the deep page does.
-  ['lettered in gilt', S('<path d="M8 33h80"/><path d="M14 33V15h6v18M22 33V11h5v22M29 33V17h7v16M38 33V12h5v21M45 33V19h6v14M53 33V13h6v20M62 33V16h5v17M69 33V10h6v23M77 33V18h6v15" opacity=".7"/><path d="M15 20h4M23 16h3M39 17h3M46 24h4M54 18h4M70 15h4" opacity=".95"/>')],
+  ['lettered end to end', S('<path d="M8 33h80"/><path d="M14 33V15h6v18M22 33V11h5v22M29 33V17h7v16M38 33V12h5v21M45 33V19h6v14M53 33V13h6v20M62 33V16h5v17M69 33V10h6v23M77 33V18h6v15" opacity=".7"/><path d="M15 19h4M15 30h4M30 21h5M30 29h5M46 23h4M46 30h4M63 20h3M63 29h3M78 22h4M78 30h4" opacity=".55"/><path d="M23 15h3M23 17h3M23 27h3M23 29h3M39 16h3M39 18h3M39 27h3M39 29h3M70 14h4M70 16h4M70 27h4M70 29h4" opacity="1"/>')],
   ['the shelf gives up its arrangement', S('<path d="M8 14h48M8 25h48M8 36h48" opacity=".6"/><path d="M18 14V8M24 14V7M30 14V9M36 14V7M42 14V8" opacity=".3"/><path d="M18 25v-6M24 25v-7M30 25v-5M36 25v-7M42 25v-6" opacity=".3"/><path d="M18 36v-6M24 36v-7M30 36v-5M36 36v-7M42 36v-6" opacity=".3"/><path d="M12 14V6M12 25v-8M12 36v-8"/><path d="M66 7v22M63 26l3 4 3-4"/><path d="M72 7h16M72 18h16M72 29h16" opacity=".3"/>')],
   // THE FIFTH RING met (STACK.md §3.2): the graduated staff with the water finally
   // over its top collar, and the tally of hands it took scratched beside it.

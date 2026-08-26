@@ -3,9 +3,11 @@
 // (Named spines, not shelf: the neighbouring gate is shell.mjs and prints SHELL. One
 // character apart in both the filename and the marker is a mistake waiting to be made.)
 //
-// The study's near bay carries eighteen gilt-lettered volumes whose initials, read the
-// way a shelf is read — top board down, left to right — spell the one line of canon the
-// game says aloud exactly once (STACK.md §2):
+// EVERY spine in the study is lettered. Eighteen of them, in the near bay, are struck
+// with a DOUBLED gilt rule above the title and below it while every other volume in the
+// tower carries a single rule — and those eighteen, read the way a shelf is read (top
+// board down, left to right), spell the one line of canon the game says aloud exactly
+// once (STACK.md §2):
 //
 //     I T H A S T O G O S O M E W H E R E
 //
@@ -63,6 +65,53 @@ export default async function (h) {
   ok('the spines spell the line, read top-down and left-to-right', spelled === CANON, { spelled, CANON });
   ok('the volumes are shelved in title order', read.every((x, i) => x.n === i),
     read.map((x) => x.n).join(','));
+
+  // EVERY VOLUME IS LETTERED. A blank spine among lettered ones is a tell: it makes
+  // "has a title" the answer again, which is exactly what the doubled rule replaced.
+  const st = await h.evaluate(`JSON.stringify(ABYME.SHELF_STATS)`).then(JSON.parse);
+  ok('every standing volume carries a title', st.books > 0 && st.lettered === st.books, st);
+
+  // THE KEY ITSELF, read off the atlas. Everything else here checks WHERE volumes are;
+  // this checks what actually distinguishes them, by counting the gilt rules struck above
+  // each title. Two means the volume is in the message and one means it is not, and if
+  // that ever stops being true the shelf still looks perfect and the puzzle is gone.
+  const rules = await h.evaluate(`(() => {
+    const cv = ABYME.spineAtlas().image;
+    const g = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+    g.canvas.width = cv.width; g.canvas.height = cv.height;
+    g.drawImage(cv, 0, 0);
+    const COLS = 8, ROWS = 8, CW = cv.width / COLS, CH = cv.height / ROWS;
+    const out = [];
+    for (let i = 0; i < COLS * ROWS; i++) {
+      const cx = (i % COLS) * CW + Math.round(CW / 2), cy = Math.floor(i / COLS) * CH;
+      // The band above the title, where the tooling lives and the lettering does not —
+      // and 0.19 is not arbitrary. The label is centred at 0.5 and condensed to fit
+      // 0.60 of the cell, so the earliest a letter can start is 0.20. At 0.22 this scan
+      // caught the top of the ascenders and counted them as a rule: every message volume
+      // read 3 and half the decoys read 2, off by exactly one, on an atlas that was
+      // correct.
+      const y0 = Math.round(cy + CH * 0.05), y1 = Math.round(cy + CH * 0.19);
+      const d = g.getImageData(cx, y0, 1, y1 - y0).data;
+      let runs = 0, on = false;
+      for (let k = 0; k < d.length; k += 4) {
+        // the gilt WEARS per volume (globalAlpha), so this is a presence test, not a level
+        const lit = d[k] > 60;
+        if (lit && !on) runs++;
+        on = lit;
+      }
+      out.push(runs);
+    }
+    return JSON.stringify(out);
+  })()`).then(JSON.parse);
+  const msg = rules.slice(1, 1 + m.titles.length);
+  const decoy = rules.slice(1 + m.titles.length);
+  ok('every message volume is struck with a DOUBLED rule', msg.every((n) => n === 2),
+    msg.map((n, i) => (n === 2 ? null : m.titles[i] + ':' + n)).filter(Boolean));
+  ok('every other volume is struck with a SINGLE rule', decoy.every((n) => n === 1),
+    decoy.map((n, i) => (n === 1 ? null : 'decoy' + i + ':' + n)).filter(Boolean));
+  ok('the blank cell is blank', rules[0] === 0, { cell0: rules[0] });
+  ok('exactly the message volumes are doubled', rules.filter((n) => n === 2).length === m.titles.length,
+    { doubled: rules.filter((n) => n === 2).length, titles: m.titles.length });
 
   // the lettering has to actually reach the shader: uv1 on every joinery chunk, an
   // emissive map bound to channel 1, and cells that are not all the blank one
@@ -134,13 +183,31 @@ export default async function (h) {
   // the line is said aloud once, ever, and printing it here would be the second time
   const said = [...L.pages, ...(L.deep || []), L.journal, L.journalDeep].join(' ').toUpperCase().replace(/[^A-Z]/g, '');
   ok('no page says the line outright', !said.includes(CANON), { where: said.indexOf(CANON) });
-  // and every title the pages transcribe must be a title that is actually on the shelf
-  const printed = L.pages.join(' ');
-  ok('the pages transcribe the real titles', SHELF_TITLES.every((t) => printed.includes(t)),
-    SHELF_TITLES.filter((t) => !printed.includes(t)));
+  // ...and it must not hand over WHICH volumes carry the doubled rule. Listing the
+  // eighteen was right when they were the only lettered spines in the room; now that
+  // every spine is lettered it is the entire puzzle, printed.
+  const printed = [...L.pages, ...(L.deep || []), L.journal, L.journalDeep].join(' ');
+  const leaked = SHELF_TITLES.filter((t) => printed.includes(t));
+  ok('the reader does not name the message volumes', leaked.length === 0, leaked);
+
+  // THE SURFACE PAGES MUST NOT EXPLAIN THE KEY. Owner: "the letter even gives it
+  // completely away. we don't want to hand the puzzle to the person, or not
+  // immediately." Two drafts handed it over — one by transcribing the eighteen, one by
+  // stating outright that the rule is doubled on some volumes. The mechanism belongs in
+  // the DEEP reading, which is gated at rung 3; the surface may only make you look.
+  const TELLS = ['doubled', 'double rule', 'two lines', 'twice', 'first letter', 'initial',
+                 'left to right', 'top board down', 'eighteen', 'count'];
+  const surface = [...L.pages, L.journal].join(' ').toLowerCase();
+  const told = TELLS.filter((t) => surface.includes(t));
+  ok('the surface pages do not explain the key', told.length === 0, told);
+  // ...and the deep reading DOES, or the puzzle has no floor at all
+  const deepText = [...(L.deep || []), L.journalDeep].join(' ').toLowerCase();
+  ok('the deep reading gives the method', TELLS.filter((t) => deepText.includes(t)).length >= 3,
+    TELLS.filter((t) => deepText.includes(t)));
 
   console.log(`SPINES ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   console.log(`  reads: ${spelled}`);
+  console.log(`  ${st.lettered}/${st.books} volumes lettered · ${rules.filter((n) => n === 2).length} doubled · ${rules.filter((n) => n === 1).length} single`);
   console.log(`  ${wired.withUv1}/${wired.chunks} chunks with uv1 · ${wired.distinctCells} distinct cells sampled`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }

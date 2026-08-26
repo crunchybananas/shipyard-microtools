@@ -7,7 +7,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack, disposeStack, syncStack, isShared, handId } from './world.js';
 import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
-import { buildWorld, instantiateModel, collectRefs, NAMES, SHELF_MARKS } from './props.js';
+import { buildWorld, instantiateModel, collectRefs, NAMES, SHELF_MARKS, SHELF_STATS, spineAtlas } from './props.js';
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
@@ -1755,7 +1755,7 @@ player.onFootstep = (kind, pos) => {
     // 'rim' lights only the silhouette and leaves the body colour alone.
     glintStyle: (v) => (v === undefined ? interact.glintStyle : interact.setGlintStyle(v)),
     interact,   // hotspots + hover state, for tools/harness/glint.mjs
-    SHELF_MARKS, SHELF_TITLES,   // the lettered spines + their reading order, for tools/harness/shelf.mjs
+    SHELF_MARKS, SHELF_TITLES, SHELF_STATS, spineAtlas,   // the lettered spines, for tools/harness/spines.mjs
     // THE STACK (STACK.md) — inspect what the rungs above displaced onto this one.
     // hand = who you are to the stack; ledger() = the raw marks; draft(n) = the
     // inherited water in tide units; tideAt(n) = baseline + draft; evidence(n) =

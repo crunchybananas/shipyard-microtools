@@ -91,7 +91,7 @@ echo "== the lettered spines =="
 # The eighteen gilt volumes in the study spell the one line of canon the game says aloud
 # once. Nothing else in the gate can see the MESSAGE — the geometry is fine either way.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/spines.mjs" | tee "$WORK/spines.out"
-grep -q "SPINES 14 / 14" "$WORK/spines.out" || { echo "SPINES FAILED"; exit 1; }
+grep -q "SPINES 21 / 21" "$WORK/spines.out" || { echo "SPINES FAILED"; exit 1; }
 
 echo "== the hover glint =="
 # The highlight must mark a prop, not replace it. The full-body wash it used to be

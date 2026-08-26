@@ -11,7 +11,7 @@ import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.j
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { buildRegions } from './regions/index.js';
 import { applyRelief, getTexture } from './assets.js';
-import { LORE, SHELF_TITLES } from './content.js';
+import { LORE, SHELF_TITLES, SHELF_DECOYS } from './content.js';
 
 export const GLYPHS = 8;
 export const GLYPH_CODE = [3, 7, 1, 5];
@@ -78,7 +78,7 @@ applyRelief(matJoinery, 'cloth', { normalScale: 0.35, strength: 1.2, colorMap: f
 // reading distance, so 128 texels across it is already generous and 256 along it is the
 // honest limit of what a title can be. The lettering is CONDENSED to fit, which is what
 // a real binder does with a long title on a narrow spine.
-const SPINE_COLS = 8, SPINE_ROWS = 4, SPINE_CW = 128, SPINE_CH = 256, SPINE_PAD = 3;
+const SPINE_COLS = 8, SPINE_ROWS = 8, SPINE_CW = 128, SPINE_CH = 256, SPINE_PAD = 3;
 const SPINE_AW = SPINE_COLS * SPINE_CW, SPINE_AH = SPINE_ROWS * SPINE_CH;
 // cell 0 is BLANK and is the Baker's default. Its uv is the cell's inset rect and the
 // pieces that use it sample its centre — a uv of exactly (0,0) sits on the atlas edge,
@@ -92,9 +92,9 @@ export const spineCell = (i) => {
     1 - (row * SPINE_CH + SPINE_PAD) / SPINE_AH,
   ];
 };
-export const SPINE_TITLE0 = 1;                              // cells 1..18: the lettered volumes
-export const SPINE_BAND0 = 1 + SHELF_TITLES.length;         // cells 19..24: tooling, no letters
-export const SPINE_BANDS = 6;
+export const SPINE_TITLE0 = 1;                                // cells 1..18: the message
+export const SPINE_DECOY0 = 1 + SHELF_TITLES.length;          // cells 19..63: everything else
+// 1 blank + 18 + 45 = 64, which is the 8x8 grid exactly
 
 // WHERE EACH LETTERED VOLUME ACTUALLY LANDED. The acrostic is the one thing on this
 // shelf that no other check can see: the geometry is fine, the texture is fine, the
@@ -102,6 +102,10 @@ export const SPINE_BANDS = 6;
 // enough to do it — I shipped it bottom-up and mirrored on the first pass. So the
 // build records its own reading order and tools/harness/spines.mjs spells it back.
 export const SHELF_MARKS = [];
+// how many volumes were built and how many got a title. Every standing volume is meant
+// to be lettered now — the key is the doubled rule, and a shelf with blank spines on it
+// hands the puzzle away by making the lettered ones the answer.
+export const SHELF_STATS = { books: 0, lettered: 0, stacks: 0 };
 // what the gilt sits at normally, and what hovering the shelf lifts it to. Every gilt
 // letter in the study is the only thing on matJoinery reading a non-blank atlas cell,
 // so this one number moves the LETTERING and leaves the boards, doors and jambs alone.
@@ -116,17 +120,20 @@ export function spineAtlas() {
   g.fillStyle = '#000'; g.fillRect(0, 0, SPINE_AW, SPINE_AH);   // cell 0, and every unused cell
   const at = (i) => [(i % SPINE_COLS) * SPINE_CW, Math.floor(i / SPINE_COLS) * SPINE_CH];
 
-  // the pair of gilt rules a bound spine is tooled with, above and below the label.
-  // The middle band is for UNLETTERED spines only: struck across a lettered one it
-  // runs straight through the title — MOR|TAR, HYDROG|RAPHY, TWIL|GHTS, ESTIM|ATES,
-  // every cell whose style landed on 2, which is a third of them.
-  const tooling = (x, y, style, lettered) => {
+  // THE TOOLING IS THE PUZZLE. A volume in the message is struck with a DOUBLED rule —
+  // two lines above the title and two below — and every other volume on every shelf in
+  // the tower carries a single rule above and below. Nothing else distinguishes them:
+  // same binder's hand, same boards, same gilt, same kind of title.
+  //
+  // The inset still varies a little per volume, because a shelf where every rule starts
+  // at the same millimetre reads as printed rather than tooled. What must NOT vary is
+  // the count, so that is the one thing here that is not jittered.
+  const tooling = (x, y, style, keyed) => {
     const inset = Math.round(SPINE_CW * (0.16 + 0.04 * (style % 3)));
     g.fillStyle = '#fff';
     const rule = (f, th) => g.fillRect(x + inset, y + Math.round(SPINE_CH * f), SPINE_CW - inset * 2, th);
-    rule(0.125, 3); rule(0.152, 2);
-    rule(0.836, 2); rule(0.863, 3);
-    if (!lettered && style % 3 === 2) { rule(0.47, 2); rule(0.492, 2); }
+    if (keyed) { rule(0.118, 3); rule(0.148, 2); rule(0.840, 2); rule(0.870, 3); }
+    else       { rule(0.133, 3); /*             */ rule(0.855, 3); }
   };
   // the label reads BOTTOM TO TOP, which is the British convention and the one a
   // District of Lights binder would have used
@@ -155,12 +162,12 @@ export function spineAtlas() {
     tooling(x, y, n, true); label(x, y, t);
     g.globalAlpha = 1;
   });
-  for (let k = 0; k < SPINE_BANDS; k++) {
-    const [x, y] = at(SPINE_BAND0 + k);
-    g.globalAlpha = 0.5 + 0.5 * (((k * 29) % 7) / 6);
-    tooling(x, y, k, false);
+  SHELF_DECOYS.forEach((t, n) => {
+    const [x, y] = at(SPINE_DECOY0 + n);
+    g.globalAlpha = 0.68 + 0.32 * (((n * 23) % 11) / 10);
+    tooling(x, y, n, false); label(x, y, t);
     g.globalAlpha = 1;
-  }
+  });
 
   const tex = new THREE.CanvasTexture(cv);
   tex.channel = 1;                       // read uv1, not the world-projected uv
@@ -1143,12 +1150,21 @@ export function buildWorld() {
 
   // bookshelves (baked)
   {
-    const PER_SHELF = SHELF_TITLES.length / 3;   // 18 volumes over the lettered bay's three boards
+    const PER_SHELF = SHELF_TITLES.length / 3;   // 18 volumes over the message bay's three boards
     let titled = 0;
     SHELF_MARKS.length = 0;
+    SHELF_STATS.books = SHELF_STATS.lettered = SHELF_STATS.stacks = 0;
+    // EVERY standing volume gets a title, in both bays — the key is the doubled rule, not
+    // the lettering. Walk a seeded shuffle of the decoy library cyclically so no two
+    // neighbours carry the same title and the whole library is used before any volume
+    // comes round again; with ~75 standing books and 45 titles a few repeat, which is
+    // what a shelf holding two copies of the tide tables actually looks like.
+    const deck = SHELF_DECOYS.map((_, i) => i);
+    for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+    let deckN = 0;
     for (let s = 0; s < 2; s++) {
       const a0 = deg(285 + s * 38);
-      const lettered = s === 0;                  // the near bay: his working library
+      const lettered = s === 0;                  // the near bay carries the message
       for (let sh = 0; sh < 3; sh++) {
         const shelf = new THREE.BoxGeometry(2.0, 0.07, 0.45);
         joinery.add(shelf, place(LH.x + Math.sin(a0) * 4.4, LH.y + 0.6 + sh * 0.62, LH.z + Math.cos(a0) * 4.4, a0), grad(C.woodDark, C.wood));
@@ -1178,12 +1194,12 @@ export function buildWorld() {
           LH.x + nx * (4.4 + depth) + tx * bx, by, LH.z + nz * (4.4 + depth) + tz * bx,
         ];
 
-        // PLAN THE SHELF BEFORE PLACING IT. The eighteen lettered volumes have to land
-        // in acrostic order, evenly spread so the message is not bunched at one end —
-        // and you cannot choose positions in a list you are still generating. So the
-        // first pass decides what stands where and the second pass builds it. Bay 0 is
-        // the lettered bay: his working library, kept in order. Bay 1 is where things
-        // got shoved, which is why the flat stacks live there.
+        // PLAN THE SHELF BEFORE PLACING IT. The eighteen doubled-rule volumes have to
+        // land in acrostic order, evenly spread so the message is not bunched at one end
+        // — and you cannot choose positions in a list you are still generating. So the
+        // first pass decides what stands where and the second pass builds it. Both bays
+        // are fully lettered; bay 0 is the one the message runs across, and bay 1 is
+        // where things got shoved, which is why the flat stacks live there.
         const plan = [];
         let bx = -0.85;
         while (bx < 0.85) {
@@ -1212,8 +1228,7 @@ export function buildWorld() {
           plan.push({ k: 'book', bx, bw, bh, lean, d: 0.24 + r() * 0.09,
             depth: -0.03 + r() * 0.07,                 // shoved back, or left proud
             c: vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.20, 0.16),
-            // an ornamented but unlettered binding, which most of a keeper's shelf is
-            cell: r() < 0.42 ? SPINE_BAND0 + Math.floor(r() * SPINE_BANDS) : 0 });
+            cell: SPINE_DECOY0 + deck[deckN++ % deck.length] });
           bx += bw * Math.cos(lean) + 0.012;
         }
 
@@ -1236,6 +1251,8 @@ export function buildWorld() {
         }
 
         for (const b of plan) {
+          if (b.k === 'book') { SHELF_STATS.books++; if (b.cell) SHELF_STATS.lettered++; }
+          else SHELF_STATS.stacks++;
           if (b.k === 'stack') {
             let sy = shelfY;
             for (const l of b.lay) {

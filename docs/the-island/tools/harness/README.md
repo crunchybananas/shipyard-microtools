@@ -33,12 +33,14 @@ gate that has guarded every fire since the walk was born:
   Counts pixels at near-max LUMINANCE, not neutral white: the glare is a warm reflection
   off amber brass, and a white test reported 0.00% against a frame that was a white-out.
   6 assertions, including a floor so a frame cannot pass by being dark.
-- **`spines.mjs`** — the eighteen gilt-lettered volumes in the study spell the one line
-  of canon the game says aloud once, read top board down and left to right. Nothing else
-  can see the MESSAGE: the geometry, the atlas and the draw call are all fine when it is
-  scrambled, and the first pass shipped it bottom-up and mirrored. Also gates the way IN:
-  the bay is a reader, and hovering it lifts the gilt lettering and nothing else.
-  14 assertions.
+- **`spines.mjs`** — every spine in the study is lettered, and eighteen of them are
+  struck with a DOUBLED gilt rule where every other volume carries one. Those eighteen,
+  read top board down and left to right, spell the line of canon the game says aloud
+  once. Gates all three layers: the message reads (it shipped bottom-up and mirrored the
+  first time), the KEY holds (counted off the atlas pixels — two rules on the message,
+  one on everything else, and no blank spines to give the set away), and the reader does
+  not hand it over (the surface pages may make you look, never explain; the method waits
+  for the deep reading at rung 3). 21 assertions.
 - **`glint.mjs`** — the hover highlight marks a prop, it does not replace it: it ramps
   rather than steps, it cannot manufacture a light source, and it restores even from a
   re-hover that lands mid-fade. 25 assertions. `SHOT_DIR=` also photographs each style
