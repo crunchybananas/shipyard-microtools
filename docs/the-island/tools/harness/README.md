@@ -35,7 +35,7 @@ gate that has guarded every fire since the walk was born:
 - **`trees.mjs`** — the canopy's fray, needle grain, clump bump and tip-weighted sway are
   a custom vertex attribute plus three shader-chunk replacements, and both kinds fail
   SILENTLY: a dropped attribute reads as 0 in GLSL, a replace that matches nothing is a
-  no-op. Checks all four canopy geometries (near + far, both silhouettes). 7 assertions.
+  no-op. Checks all four canopy geometries (near + far, both silhouettes). 8 assertions.
 - **`tabletop.mjs`** — everything that lies on the chart table lies ON it: inside the
   vellum, clear of the model's footprint, with a working margin between them. The table
   shrank and six props were left out past the brass rim; the owner found one of them.

@@ -39,9 +39,10 @@ export default async function (h) {
     const geos = [], mats = new Set();
     ABYME.scene.traverse((o) => {
       if (!o.isInstancedMesh || !o.geometry) return;
-      // the canopies are the instanced meshes wearing the swaying vertex-coloured material
-      if (!o.material || !o.material.userData || !o.material.userData.shader) return;
-      if (!o.material.vertexColors) return;
+      // BY PARENT, not by material shape. "instanced + vertex colours + a patched shader"
+      // also describes the needle litter, which turned up as a ninth canopy the moment it
+      // existed. The canopies live in one group now, so ask that.
+      if (!o.parent || o.parent.name !== 'canopies') return;
       // the 1:240 chart-table clone carries its OWN four, on the same material — filter by
       // world scale, the way every other probe in this harness does
       if (Math.hypot(o.matrixWorld.elements[0], o.matrixWorld.elements[1], o.matrixWorld.elements[2]) < 0.5) return;
@@ -64,13 +65,17 @@ export default async function (h) {
       vert: sh ? { rimAttr: sh.vertexShader.includes('attribute float aRim'),
                    tipSway: sh.vertexShader.includes('(0.35 + aRim)') } : null,
       fringe: sh && sh.uniforms.uFringe ? sh.uniforms.uFringe.value : null,
+      variants: ABYME.core.userData.canopyVariants,
       trunkVerts: (() => { let n = null; ABYME.scene.traverse((o) => {
         if (o.isInstancedMesh && o.name === 'trunks' && n === null) n = o.geometry.attributes.position.count; }); return n; })(),
     });
   })()`).then(JSON.parse);
 
-  ok('all four canopy geometries are present (near + far, both silhouettes)', m.canopies.length === 4,
-    { found: m.canopies.length });
+  // one NEAR and one FAR geometry per silhouette. Derived from the table rather than
+  // written down, or the gate quietly stops covering the newest tree shape.
+  ok('every silhouette has both its LOD geometries', m.canopies.length === m.variants * 2,
+    { found: m.canopies.length, variants: m.variants, expected: m.variants * 2 });
+  ok('the stand has real silhouette variety', m.variants >= 4, { variants: m.variants });
   ok('every canopy carries aRim', m.canopies.length > 0 && m.canopies.every((g) => g.rim), m.canopies);
   // a dropped attribute reads as 0 in GLSL, so "present but all zero" is the same failure
   ok('aRim actually reaches the frond tips', m.canopies.every((g) => g.rimMax > 0.9), m.canopies.map((g) => g.rimMax));
@@ -81,6 +86,6 @@ export default async function (h) {
   ok('the trunk carries enough vertices for its root flare', m.trunkVerts >= 100, { trunkVerts: m.trunkVerts });
 
   console.log(`TREES ${R.pass.length} / ${R.pass.length + R.fail.length}`);
-  console.log(`  ${m.canopies.length} canopy geometries · ${m.canopies.map((g) => g.verts).join('/')} verts · trunk ${m.trunkVerts} · fringe ${m.fringe}`);
+  console.log(`  ${m.variants} silhouettes · ${m.canopies.length} geometries · ${m.canopies.map((g) => g.verts).join('/')} verts · trunk ${m.trunkVerts} · fringe ${m.fringe}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }

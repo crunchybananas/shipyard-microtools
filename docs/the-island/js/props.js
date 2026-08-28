@@ -3310,13 +3310,33 @@ function buildVegetation(core, r) {
   };
   // A: the broad fir (byte-identical to the loop-#125 canopy — same seed + params, so existing
   // trees don't move). B: a slimmer, taller spruce — narrower skirt, tighter taper, one more tier.
-  const canopyGeoA = makeCanopy({ n: 5, baseR: 1.75, taperK: 0.82, tierH: 1.55, spacing: 0.86, lean: 0.26, jag: 0.5, droop: 0.4, seedXor: 0x7a3c });
-  const canopyGeoB = makeCanopy({ n: 6, baseR: 1.28, taperK: 0.9, tierH: 1.5, spacing: 0.96, lean: 0.16, jag: 0.42, droop: 0.34, seedXor: 0x3b71 });
-  // #6: the FAR silhouettes — same builder, same tier stack, 6 radials × 1 ring (~63%
-  // fewer canopy verts). The swap lives at 120-130m, inside the haze melt (120→300m),
-  // where a facet is a dozen hazed pixels — the silhouette carries, the cost doesn't.
-  const canopyFarGeoA = makeCanopy({ n: 5, baseR: 1.75, taperK: 0.82, tierH: 1.55, spacing: 0.86, lean: 0.26, jag: 0.5, droop: 0.4, seedXor: 0x7a3c, seg: 6, hseg: 1 });
-  const canopyFarGeoB = makeCanopy({ n: 6, baseR: 1.28, taperK: 0.9, tierH: 1.5, spacing: 0.96, lean: 0.16, jag: 0.42, droop: 0.34, seedXor: 0x3b71, seg: 6, hseg: 1 });
+  // FOUR silhouettes, not two. A stand of two shapes plus a scale multiplier still reads
+  // as a grove of clones, because the eye reads OUTLINE first and there were only two
+  // outlines in the entire forest. The two new ones are not more of the same: a young
+  // tree is a different PROPORTION (dense, tight tiers, no bare trunk), and an old
+  // storm-worked one is a different HABIT (leaning hard downwind, tiers spaced apart so
+  // the sky shows between them the way a thinning crown does).
+  //
+  // `weight` is how much of the stand wears it, and `scale` is baked into the instance
+  // matrix so a sapling is genuinely a sapling and not a full-grown tree drawn small.
+  const CANOPY = [
+    { name: 'broad fir',  weight: 0.30, scale: 1.00, p: { n: 5, baseR: 1.75, taperK: 0.82, tierH: 1.55, spacing: 0.86, lean: 0.26, jag: 0.50, droop: 0.40, seedXor: 0x7a3c } },
+    { name: 'slim spruce', weight: 0.28, scale: 1.00, p: { n: 6, baseR: 1.28, taperK: 0.90, tierH: 1.50, spacing: 0.96, lean: 0.16, jag: 0.42, droop: 0.34, seedXor: 0x3b71 } },
+    { name: 'sapling',    weight: 0.24, scale: 0.52, p: { n: 4, baseR: 1.05, taperK: 0.62, tierH: 1.15, spacing: 0.62, lean: 0.08, jag: 0.58, droop: 0.24, seedXor: 0x21c9 } },
+    // lean is applied PER TIER (lean * i), so it compounds: 0.62 threw this one's crown
+    // 3.1 units sideways over six tiers and it read as falling over, not wind-worked
+    { name: 'storm elder', weight: 0.18, scale: 1.14, p: { n: 6, baseR: 1.62, taperK: 0.90, tierH: 1.70, spacing: 1.16, lean: 0.30, jag: 0.64, droop: 0.56, seedXor: 0x6f04 } },
+  ];
+  for (const c of CANOPY) {
+    c.geo = makeCanopy(c.p);
+    // #6: the FAR silhouette — same builder, same tier stack, 6 radials x 1 ring
+    c.farGeo = makeCanopy({ ...c.p, seg: 6, hseg: 1 });
+  }
+  const canopyGeoA = CANOPY[0].geo;   // kept as names for the comments below
+  const canopyGeoB = CANOPY[1].geo;
+  // the FAR pair is built from the same table above (6 radials x 1 ring, ~63% fewer
+  // canopy verts). The swap lives at 120-130m, inside the haze melt (120→300m), where a
+  // facet is a dozen hazed pixels — the silhouette carries, the cost doesn't.
 
   const spots = [];
   for (let i = 0; i < 600 && spots.length < 130; i++) {
@@ -3455,23 +3475,99 @@ function buildVegetation(core, r) {
       `);
   };
 
+  // NEEDLE LITTER. A trunk used to meet the grass at a hard cylinder edge with meadow
+  // running right up to it, which is the one thing no forest floor does: under a conifer
+  // there is a skirt of dropped needles where nothing much grows. Without it the trees
+  // read as PLACED — models standing on a lawn — however good the trees themselves are.
+  //
+  // A jagged disc per tree, domed slightly so it sits on a gentle slope without its rim
+  // digging in, and its edge DISSOLVES with the same fray the canopy uses. That matters:
+  // an opaque disc would just trade a hard trunk edge for a hard litter edge.
+  const litterGeo = (() => {
+    const SEG = 14, g = new THREE.BufferGeometry();
+    const lr = mulberry32(SEED ^ 0x1d7a);
+    const pos = [], col = [], rim = [];
+    // MUCH lighter than the first attempt. At 0x4a3a24 the patch read as a black plank
+    // laid on the grass — a flat decal already collapses to a bar at eye height, and a
+    // near-black one reads as a hole in the world rather than as ground.
+    const c0 = new THREE.Color(0x8d7a4e), c1 = new THREE.Color(0xa2955f);   // damp core → dry edge, both close to the turf
+    const ring = [];
+    for (let i = 0; i < SEG; i++) {
+      const a = (i / SEG) * TAU;
+      const rad = 0.60 + lr() * 0.42;                      // ragged, never a circle — and tight to the trunk
+      ring.push([Math.cos(a) * rad, 0.030, Math.sin(a) * rad, rad]);   // rim clear of the turf
+    }
+    for (let i = 0; i < SEG; i++) {
+      const a = ring[i], b = ring[(i + 1) % SEG];
+      pos.push(0, 0.040, 0, a[0], a[1], a[2], b[0], b[1], b[2]);   // barely domed — enough to clear a slope, not enough to show a side
+      col.push(c0.r, c0.g, c0.b, c1.r, c1.g, c1.b, c1.r, c1.g, c1.b);
+      rim.push(0, 1, 1);
+    }
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    g.setAttribute('aRim', new THREE.Float32BufferAttribute(rim, 1));
+    g.computeVertexNormals();
+    return g;
+  })();
+  const litterMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: false });
+  litterMat.onBeforeCompile = (sh) => {
+    litterMat.userData.shader = sh;
+    sh.vertexShader = sh.vertexShader
+      .replace('void main() {', 'attribute float aRim;\nvarying vec3 vLP;\nvarying float vR;\nvoid main() {')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n vLP = position; vR = aRim;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('void main() {', `varying vec3 vLP; varying float vR;
+        float lhash(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
+        float lnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);
+          float a=lhash(i),b=lhash(i+vec2(1,0)),c=lhash(i+vec2(0,1)),d=lhash(i+vec2(1,1));
+          return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
+        void main() {`)
+      .replace('#include <clipping_planes_fragment>', `
+        #include <clipping_planes_fragment>
+        float ln = lnoise(vLP.xz * 34.0) * 0.6 + lnoise(vLP.zx * 87.0) * 0.4;
+        // the inner half stays SOLID and only the outer edge scatters. At 0.30 the cut
+        // started almost at the centre, and since a disc's area is mostly its outer ring
+        // that discarded nearly the whole patch — the litter was there and invisible.
+        if (ln < smoothstep(0.34, 1.04, vR) * 0.94) discard;   // strewn needles, not a mat
+      `)
+      .replace('#include <color_fragment>', `
+        #include <color_fragment>
+        diffuseColor.rgb *= 0.82 + 0.36 * lnoise(vLP.xz * 19.0);   // needles, not mud
+      `);
+  };
+  const litter = new THREE.InstancedMesh(litterGeo, litterMat, spots.length);
+  litter.receiveShadow = true;
+  litter.name = 'needleLitter';
+
   const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, spots.length);
   // per-spot canopy SHAPE variant (loop #139). A SEPARATE rng picks the silhouette so the shared
   // r() stream — and thus every tree's POSITION, scale, lean and tone — is byte-unchanged; only
   // which of the two shapes a tree wears differs. ~55% broad fir (A), ~45% slim spruce (B).
   const vr = mulberry32(SEED ^ 0x5eed);
   const br = mulberry32(SEED ^ 0xba24);   // per-trunk bark tone (loop #141): separate rng so the shared r() (positions + canopy tones) stays byte-unchanged
-  const variant = spots.map(() => (vr() < 0.55 ? 0 : 1));
-  const nA = variant.reduce((s, v) => s + (v === 0 ? 1 : 0), 0);
-  // #6 LOD: near/far instanced PAIRS per variant, all four on the one swaying canopyMat.
-  // Each pair is allocated at full capacity; a 0.35s repartition (main.js) moves trees
-  // between them by camera distance with hysteresis. The TREES records buffer the same
-  // r()-stream data the old direct fill consumed — positions/tones byte-identical.
-  const canopiesA = new THREE.InstancedMesh(canopyGeoA, canopyMat, nA);
-  const canopiesB = new THREE.InstancedMesh(canopyGeoB, canopyMat, spots.length - nA);
-  const canopiesFarA = new THREE.InstancedMesh(canopyFarGeoA, canopyMat, nA);
-  const canopiesFarB = new THREE.InstancedMesh(canopyFarGeoB, canopyMat, spots.length - nA);
+  const cw = CANOPY.reduce((a, c) => a + c.weight, 0);
+  const variant = spots.map(() => { let u = vr() * cw; for (let i = 0; i < CANOPY.length; i++) { u -= CANOPY[i].weight; if (u < 0) return i; } return 0; });
+  const vCount = CANOPY.map((_, i) => variant.reduce((a, v) => a + (v === i ? 1 : 0), 0));
+  // #6 LOD: a near/far instanced PAIR per silhouette, all of them on the one swaying
+  // canopyMat. Each is allocated at its variant's capacity; a 0.35s repartition (main.js)
+  // moves trees between near and far by camera distance with hysteresis.
+  //
+  // ARRAYS, not four named meshes. This was canopiesA/B/FarA/FarB spelled out in four
+  // places — the constructor, the partition's ternaries, the count assignment and the
+  // name/visibility list — so adding a silhouette meant editing all four and the L4
+  // surface-strip in puzzles.js, and forgetting any one of them fails silently.
+  const nearMesh = CANOPY.map((c, i) => new THREE.InstancedMesh(c.geo, canopyMat, vCount[i]));
+  const farMesh = CANOPY.map((c, i) => new THREE.InstancedMesh(c.farGeo, canopyMat, vCount[i]));
+  // ONE group, so everything that needs "the canopies" gets them all forever: swayMats
+  // (main.js) reads the shared material off the first child, and the L4 surface-strip
+  // (puzzles.js) hides the group instead of listing meshes it will one day not know about.
+  const canopyGroup = new THREE.Group();
+  canopyGroup.name = 'canopies';
+  for (const m of nearMesh) { m.castShadow = true; canopyGroup.add(m); }
+  for (const m of farMesh) canopyGroup.add(m);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
+  const _lm = new THREE.Matrix4(), _lq = new THREE.Quaternion(), _le = new THREE.Euler();
+  const _lv = new THREE.Vector3(), _lv2 = new THREE.Vector3();
   const col = new THREE.Color(), bark = new THREE.Color();
   const TREES = [];
   for (let i = 0; i < spots.length; i++) {
@@ -3479,13 +3575,27 @@ function buildVegetation(core, r) {
     const s = 0.8 + r() * 0.8;
     e.set((r() - 0.5) * 0.12, r() * TAU, 0.1 + r() * 0.12); // lean
     q.setFromEuler(e);
-    m4.compose(new THREE.Vector3(x, y, z), q, new THREE.Vector3(s, s * (0.9 + r() * 0.4), s));
+    // the silhouette's own scale (a sapling is SMALL, a storm elder is big) and a squash
+    // across the trunk axis, both from vr() — the variant rng — so the shared r() stream
+    // that every other scatter on the island draws from is not shifted by a tree tweak
+    const vs = CANOPY[variant[i]].scale;
+    const squash = 0.86 + vr() * 0.3;
+    m4.compose(new THREE.Vector3(x, y, z), q,
+      new THREE.Vector3(s * vs * squash, s * vs * (0.9 + r() * 0.4), s * vs * (1.86 - squash)));
     trunks.setMatrixAt(i, m4);
+    // the litter lies FLAT on the ground: the trunk's lean must not tip it, so it takes
+    // only the position and a yaw of its own
+    _lq.setFromEuler(_le.set(0, vr() * TAU, 0));
+    // heightAt, NOT the spot's y. A tree spot is deliberately SUNK below the surface so
+    // the trunk's foot never floats on a slope — here that put the whole litter patch
+    // 18 cm underground, where it rendered as a thin dark line and nothing else.
+    _lm.compose(_lv.set(x, heightAt(x, z) + 0.03, z), _lq, _lv2.set(s * 1.5, 1, s * 1.5));
+    litter.setMatrixAt(i, _lm);
     // per-trunk bark tone (loop #141): warm browns, light↔dark, so the trunks aren't 131 identical
     // poles; multiplies the shared bark albedo. Uses the separate br() rng (canopy tone unchanged).
     bark.setHSL(0.055 + br() * 0.05, 0.28 + br() * 0.24, 0.40 + br() * 0.2);
     trunks.setColorAt(i, bark);
-    addCollider(x, z, 0.3 * s);   // the trunk is solid — you walked through every tree in the forest
+    addCollider(x, z, 0.3 * s * CANOPY[variant[i]].scale);   // the trunk is solid — you walked through every tree in the forest
     // per-tree foliage tone (loop #133): widen hue (warm yellow-green ↔ cool blue-green), saturation
     // AND value so the stand reads as individuals — sunlit crowns, shadowed elders — not a clone.
     const tv = r();
@@ -3498,19 +3608,19 @@ function buildVegetation(core, r) {
   }
   // the repartition: enter-near under 120m, leave over 130m (hysteresis inside the haze
   // melt, so a swap is a dozen hazed pixels). Counts shrink to the live split each call.
+  const _nearN = new Array(CANOPY.length).fill(0), _farN = new Array(CANOPY.length).fill(0);
   const treePartition = (px, pz) => {
-    let ia = 0, ib = 0, fa = 0, fb = 0;
+    _nearN.fill(0); _farN.fill(0);
     for (const t of TREES) {
       const d2 = (t.x - px) * (t.x - px) + (t.z - pz) * (t.z - pz);
       t.far = t.far ? d2 > 14400 : d2 > 16900;
-      const mesh = t.v === 0 ? (t.far ? canopiesFarA : canopiesA) : (t.far ? canopiesFarB : canopiesB);
-      const idx = t.v === 0 ? (t.far ? fa++ : ia++) : (t.far ? fb++ : ib++);
+      const mesh = t.far ? farMesh[t.v] : nearMesh[t.v];
+      const idx = t.far ? _farN[t.v]++ : _nearN[t.v]++;
       mesh.setMatrixAt(idx, t.m);
       mesh.setColorAt(idx, t.c);
     }
-    canopiesA.count = ia; canopiesFarA.count = fa;
-    canopiesB.count = ib; canopiesFarB.count = fb;
-    for (const m of [canopiesA, canopiesB, canopiesFarA, canopiesFarB]) {
+    for (let i = 0; i < CANOPY.length; i++) { nearMesh[i].count = _nearN[i]; farMesh[i].count = _farN[i]; }
+    for (const m of canopyGroup.children) {
       m.instanceMatrix.needsUpdate = true;
       if (m.instanceColor) m.instanceColor.needsUpdate = true;
       m.computeBoundingSphere();
@@ -3518,14 +3628,12 @@ function buildVegetation(core, r) {
   };
   treePartition(4, -104);   // boot split from the wake-up beach; main re-aims it at the player
   core.userData.treeLod = treePartition;
+  core.userData.canopyVariants = CANOPY.length;   // so tools/harness/trees.mjs cannot drift from the table
   trunks.castShadow = true;
-  canopiesA.castShadow = true;
-  canopiesB.castShadow = true;
-  // 'canopies' is the name swayMats (main.js) finds to drive uTime on the SHARED canopyMat → all
-  // four sway. The L4 surface-strip (_apply) hides near AND far via R.canopies*/canopiesFar*.
-  trunks.name = 'trunks'; canopiesA.name = 'canopies'; canopiesB.name = 'canopies2';
-  canopiesFarA.name = 'canopiesFar'; canopiesFarB.name = 'canopiesFar2';
-  core.add(trunks, canopiesA, canopiesB, canopiesFarA, canopiesFarB);
+  // 'canopies' is the GROUP swayMats (main.js) finds — it reads the shared material off the
+  // first child — and the one thing the L4 surface-strip (_apply) has to hide.
+  trunks.name = 'trunks';
+  core.add(trunks, canopyGroup, litter);
 
   // FOREST-FLOOR detail: fallen logs + cut stumps among the trees — the bare tree-line given a real
   // woodland floor (the world rang flat). Two InstancedMeshes (+2 draws); own rng so the world scatter
@@ -4016,7 +4124,7 @@ export const NAMES = [
   'cmTallies', 'cmFormal', 'cmPlain', 'cmUnfinished', 'cmChild',           // #50-B: the climbers' five hands down the descent
   'cgRoof', 'cgCount', 'cgLight',                                          // #50-C the congregation's carved lines (#50-A's papers register via the #69 factory)
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
-  'trunks', 'canopies', 'canopies2', 'canopiesFar', 'canopiesFar2', 'grass',   // SEA-STRATA L4 strip (loop #129); near+far LOD pairs (#6)
+  'trunks', 'canopies', 'grass',   // SEA-STRATA L4 strip (loop #129); 'canopies' is the GROUP of every LOD/silhouette (#6)
 ];
 
 export function collectRefs(root) {
