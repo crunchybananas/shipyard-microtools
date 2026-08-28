@@ -573,10 +573,93 @@ export function buildWorld() {
   }
   // tower (tapered) + gallery + lamp room + dome
   {
-    const tower = new THREE.CylinderGeometry(2.45, 4.05, 15.9, 28, 4, true);
-    stone.add(tower, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH + 7.95, LH.z), (t) =>
-      t > 0.55 && t < 0.72 ? C.copperDark.clone() : C.bone.clone().lerp(C.boneDark, 1 - t)); // painted band
+    // A DAYMARK. A lighthouse is painted so it can be IDENTIFIED by day — that is half
+    // its job, and this tower was one uniform tan cone from footing to gallery with a
+    // single dark band buried at 55-72% that nothing read at any distance. It is a
+    // District of Lights granite tower now: bare stone up to the string course, limewashed
+    // white above it, and a dark collar under the gallery. From the far meadow it finally
+    // reads as a lighthouse rather than as a chimney.
+    //
+    // 32 height segments, not 4. With five vertex rings there is nowhere to PUT a paint
+    // line — the band the old code asked for could only ever be a quarter of the tower
+    // smeared into its neighbours. +1,120 triangles on the one baked drum.
+    // OVER 1.0 ON PURPOSE. matStone carries a tan granite ALBEDO, and vertex colour
+    // multiplies it — so a white vertex colour gives tan stone, which is why the first
+    // pass painted the tower and nothing changed. Pushing the colour past 1 washes the
+    // map toward white while KEEPING its grain, which is exactly what limewash on
+    // masonry looks like: you can still see the stone through it.
+    const cPaint = new THREE.Color(0xe7e1d2).multiplyScalar(1.62);   // limewash, warm and chalky
+    const cCollar = new THREE.Color(0x39423e);         // the dark collar under the gallery
+    const tower = new THREE.CylinderGeometry(2.45, 4.05, 15.9, 28, 32, true);
+    stone.add(tower, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH + 7.95, LH.z), (t, wp) => {
+      const ang = Math.atan2(wp.z - LH.z, wp.x - LH.x);
+      const granite = C.bone.clone().lerp(C.boneDark, 1 - t);
+      // the paint line WANDERS and is worn thin — a ruler-straight edge at one height is
+      // the thing that would make this read as a decal rather than as paint on stone
+      const wob = (vnoise(ang * 2.3, 11.4) - 0.5) * 0.055;
+      const c = granite.lerp(cPaint, smoothstep(0.40 + wob, 0.46 + wob, t));
+      // salt and rainwater streak DOWN from the gallery. Vertical, per-azimuth, strongest
+      // just under the deck and fading out before the string course — the single thing
+      // that stops a painted tower reading as a plastic tube.
+      const streak = (vnoise(ang * 6.1, 3.3) - 0.42) * 1.5;
+      c.multiplyScalar(1 - Math.max(0, streak) * 0.16 * smoothstep(0.46, 0.95, t));
+      // and the collar
+      return c.lerp(cCollar, smoothstep(0.878, 0.898, t) * (1 - smoothstep(0.966, 0.982, t)));
+    });
     tower.dispose();
+    // STRING COURSE + PLINTH. A masonry tower is not a smooth taper: it has projecting
+    // courses, and they are what give a silhouette its joints. One at the paint line, one
+    // where the shaft meets the drum. Cheap rings, and they catch a hard shadow.
+    for (const [ty, over, hh, cc] of [[0.43, 0.16, 0.34, C.bone], [0.0, 0.26, 0.5, C.boneDark]]) {
+      const yy = baseH + ty * 15.9;
+      const r = 4.05 + (2.45 - 4.05) * ty;
+      const band = new THREE.CylinderGeometry(r + over * 0.8, r + over, hh, 28, 1, true);
+      stone.add(band, new THREE.Matrix4().makeTranslation(LH.x, LH.y + yy + hh / 2, LH.z), grad(cc.clone().multiplyScalar(0.82), cc));
+      band.dispose();
+    }
+    // THE STAIR LIGHTS. A lighthouse shaft is not blind — a spiral stair climbs it and
+    // every turn or so there is a small window to see the steps by. Six of them, winding
+    // round as the stair does, and they do two jobs at once: they say a person walks up
+    // there, and they give the tower a SCALE. A featureless taper could be six metres or
+    // sixty; put a human-sized opening on it and the eye knows instantly.
+    for (let i = 0; i < 6; i++) {
+      const ty = 0.085 + i * 0.148;
+      const yy = baseH + ty * 15.9;
+      const rr = 4.05 + (2.45 - 4.05) * ty;
+      const aa = deg(34) + i * 1.24;                    // each light is one turn of the stair on
+      const painted = ty > 0.44;
+      const dressing = painted ? cPaint.clone() : C.bone.clone();
+      // the opening, recessed into the shell so it reads as a hole and not a sticker
+      const op = new THREE.BoxGeometry(0.46, 0.80, 0.16);
+      stone.add(op, place(LH.x + Math.sin(aa) * (rr - 0.10), LH.y + yy, LH.z + Math.cos(aa) * (rr - 0.10), aa),
+        () => new THREE.Color(0x15171b));
+      op.dispose();
+      // sill and head, proud of the wall — dressed stone around a rubble shaft
+      for (const [dy, hh, ww, dd] of [[-0.47, 0.15, 0.74, 0.26], [0.46, 0.12, 0.64, 0.22]]) {
+        const b = new THREE.BoxGeometry(ww, hh, dd);
+        stone.add(b, place(LH.x + Math.sin(aa) * (rr + 0.02), LH.y + yy + dy, LH.z + Math.cos(aa) * (rr + 0.02), aa),
+          grad(dressing.clone().multiplyScalar(0.60), dressing.clone().multiplyScalar(0.88)));
+        b.dispose();
+      }
+    }
+    // CORBELS. The gallery deck was a brass disc floating off the stone with nothing
+    // holding it up. Every real one is carried on a ring of stone brackets, and their
+    // shadow is most of what reads as "lighthouse" in a silhouette.
+    for (let i = 0; i < 18; i++) {
+      const a = (i / 18) * TAU;
+      // TAPERED, or they read as battlements. A corbel is a bracket: it carries the deck
+      // above and dies back into the wall below, so it is wider at the top than the
+      // bottom. A four-sided cylinder is a square frustum; turn it 45 degrees so a flat
+      // face points out at the viewer rather than an edge.
+      const cb = new THREE.CylinderGeometry(0.26, 0.14, 0.58, 4);
+      cb.rotateY(Math.PI / 4);
+      const rr = 2.60;
+      // under the limewash, so they carry it too — at bare-stone tone they read as a
+      // checkerboard collar rather than as brackets
+      stone.add(cb, place(LH.x + Math.sin(a) * rr, LH.y + 20.18, LH.z + Math.cos(a) * rr, a),
+        grad(cPaint.clone().multiplyScalar(0.72), cPaint.clone().multiplyScalar(0.92)));
+      cb.dispose();
+    }
     const gallery = new THREE.CylinderGeometry(3.3, 3.3, 0.35, 24);
     brass.add(gallery, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 20.6, LH.z), grad(C.brassDark, C.brass));
     gallery.dispose();
@@ -590,21 +673,68 @@ export function buildWorld() {
     rail.rotateX(Math.PI / 2);
     brass.add(rail, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 21.8, LH.z), grad(C.brass, C.brass));
     rail.dispose();
-    // lamp room mullions
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * TAU;
-      const post = new THREE.BoxGeometry(0.12, 2.5, 0.12);
-      brass.add(post, new THREE.Matrix4().makeTranslation(LH.x + Math.sin(a) * 2.0, LH.y + 22.05, LH.z + Math.cos(a) * 2.0), grad(C.brassDark, C.brass));
+    // THE LANTERN ROOM. Six posts around a glass tube is a gazebo. A real lantern is a
+    // CAGE — a dense ring of astragals with horizontal glazing bars crossing them, sat on
+    // a solid parapet, and it is the most recognisable thing on the whole building.
+    //
+    // the murette: the low solid band the glazing stands on. Without it the glass runs
+    // straight into the deck and the room has no foot.
+    {
+      const mur = new THREE.CylinderGeometry(2.12, 2.16, 0.46, 24, 1, true);
+      stone.add(mur, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 21.05, LH.z),
+        grad(cPaint.clone().multiplyScalar(0.55), cPaint.clone().multiplyScalar(0.78)));
+      mur.dispose();
+    }
+    // astragals: 12, not 6 — at six you count them and it reads as scaffolding
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * TAU;
+      const post = new THREE.BoxGeometry(0.085, 1.95, 0.11);
+      brass.add(post, place(LH.x + Math.sin(a) * 2.06, LH.y + 22.26, LH.z + Math.cos(a) * 2.06, a), grad(C.brassDark, C.brass));
       post.dispose();
+    }
+    // and the horizontal bars that make it a cage rather than a comb
+    for (const gy of [21.55, 22.30, 23.02]) {
+      const ring = new THREE.TorusGeometry(2.06, 0.045, 6, 36);
+      ring.rotateX(Math.PI / 2);
+      brass.add(ring, new THREE.Matrix4().makeTranslation(LH.x, LH.y + gy, LH.z), grad(C.brassDark, C.brass));
+      ring.dispose();
     }
     // a true curved cupola (was a 12-gon cone that read as a paper hat): hemisphere squashed
     // to the cone's exact height/footprint, base at 23.3 → apex 25.6, eaves overhang kept
-    const dome = new THREE.SphereGeometry(2.55, 24, 12, 0, TAU, 0, Math.PI / 2);
-    stone.add(dome, place(LH.x, LH.y + 23.3, LH.z, 0, 1, 2.3 / 2.55, 1), grad(C.copperDark, C.copper));
+    // STANDING SEAMS. A copper dome is sheet metal folded into panels, and the raised
+    // seams between them run apex to eaves — it is the reason a real cupola reads as
+    // METAL rather than as a painted shell. Baked into the vertex colours off the world
+    // azimuth: no ribs to model, no draw calls, and the seams sit exactly where the
+    // panels would. 48 segments so a seam is a line and not a facet.
+    const dome = new THREE.SphereGeometry(2.55, 48, 14, 0, TAU, 0, Math.PI / 2);
+    stone.add(dome, place(LH.x, LH.y + 23.3, LH.z, 0, 1, 2.3 / 2.55, 1), (t, wp) => {
+      const ang = Math.atan2(wp.z - LH.z, wp.x - LH.x);
+      const u = ((ang / TAU) * 12 % 1 + 1) % 1;           // 12 panels
+      const seam = Math.abs(u - 0.5) * 2;                 // 1 mid-panel → 0 on the seam
+      const c = C.copperDark.clone().lerp(C.copper, t);
+      // verdigris does not weather evenly: it streaks down from the apex where the rain
+      // runs, and it sits heaviest in the folds
+      c.lerp(C.copper, (vnoise(ang * 3.1, t * 4.2) - 0.5) * 0.5 + 0.5 * (1 - t) * 0.25);
+      return c.multiplyScalar(1 - (1 - smoothstep(0, 0.16, seam)) * 0.34);
+    });
     dome.dispose();
-    const finial = new THREE.SphereGeometry(0.22, 10, 7);
-    brass.add(finial, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 25.8, LH.z), grad(C.brass, C.brass));
-    finial.dispose();
+    // THE VENTILATOR, not a doorknob. A lantern burns and has to breathe: every real one
+    // is capped by a cowl over a vent stack, with the lightning conductor above it. A
+    // plain sphere on the apex was the one part of the silhouette that said "toy".
+    {
+      const neck = new THREE.CylinderGeometry(0.17, 0.21, 0.55, 10);
+      brass.add(neck, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 25.72, LH.z), grad(C.brassDark, C.brass));
+      neck.dispose();
+      const cowl = new THREE.CylinderGeometry(0.40, 0.13, 0.34, 12);
+      brass.add(cowl, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 26.14, LH.z), grad(C.brass, C.brassDark));
+      cowl.dispose();
+      const ball = new THREE.SphereGeometry(0.13, 10, 7);
+      brass.add(ball, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 26.42, LH.z), grad(C.brass, C.brass));
+      ball.dispose();
+      const rod = new THREE.CylinderGeometry(0.025, 0.025, 0.7, 5);
+      brass.add(rod, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 26.85, LH.z), grad(C.brass, C.brass));
+      rod.dispose();
+    }
   }
   // glass for lamp room + window
   {
@@ -695,6 +825,26 @@ export function buildWorld() {
     const ped = new THREE.CylinderGeometry(0.5, 0.7, 1.1, 8);
     brass.add(ped, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 21.4, LH.z), grad(C.brassDark, C.brass));
     ped.dispose();
+    // THE CARRIAGE. The lantern held a pedestal and, once the player has found and fitted
+    // the lens, a floating gem — and between them, nothing. A lighthouse lamp is a piece
+    // of ENGINEERING: a brass carriage of rings and ribs that the optic is bolted into and
+    // that turns it. Building it (and only it — the optic itself stays exactly as it was,
+    // gated on W.lensPlaced) means the lantern reads as an apparatus with its heart
+    // missing, which is a better statement of the puzzle than an empty room was.
+    {
+      for (const [ry, rr, rt] of [[21.98, 0.86, 0.05], [22.52, 0.92, 0.045], [23.06, 0.74, 0.05]]) {
+        const ring = new THREE.TorusGeometry(rr, rt, 6, 24);
+        ring.rotateX(Math.PI / 2);
+        brass.add(ring, new THREE.Matrix4().makeTranslation(LH.x, LH.y + ry, LH.z), grad(C.brassDark, C.brass));
+        ring.dispose();
+      }
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * TAU;
+        const rib = new THREE.BoxGeometry(0.055, 1.14, 0.075);
+        brass.add(rib, place(LH.x + Math.sin(a) * 0.88, LH.y + 22.52, LH.z + Math.cos(a) * 0.88, a), grad(C.brassDark, C.brass));
+        rib.dispose();
+      }
+    }
     const lens = new THREE.Mesh(new THREE.OctahedronGeometry(0.62, 0), matLens.clone());
     lens.position.set(0, 22.5, 0);
     lens.scale.y = 1.35;
