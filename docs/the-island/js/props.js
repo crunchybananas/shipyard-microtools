@@ -3194,8 +3194,31 @@ function buildVegetation(core, r) {
                       heightAt(x, z + e) - heightAt(x, z - e)) / (2 * e);
   };
   // --- pines, wind-bent ---
-  const trunkGeo = new THREE.CylinderGeometry(0.12, 0.3, 2.6, 10);
+  // A TRUNK, not a lathe-turned pole. It was a perfect cylinder meeting the grass at a
+  // hard circular edge, which is the giveaway on every tree in the stand at once: real
+  // trunks flare into buttress roots at the base, are not round in section, and do not
+  // stand plumb. 12 radial segments (from 10) and 3 height rings give the flare something
+  // to shape; that is +28 triangles on a geometry shared by every instance.
+  const trunkGeo = new THREE.CylinderGeometry(0.12, 0.26, 2.6, 12, 3);
   trunkGeo.translate(0, 1.3, 0);
+  {
+    const tp = trunkGeo.attributes.position;
+    for (let v = 0; v < tp.count; v++) {
+      const x = tp.getX(v), y = tp.getY(v), z = tp.getZ(v);
+      const rad = Math.hypot(x, z);
+      if (rad < 1e-4) continue;                       // the cap centres
+      const ang = Math.atan2(z, x);
+      // buttress roots: the bottom 55 cm swells, and unevenly — five soft ribs, so the
+      // base spreads into the ground instead of being stamped out of it
+      const flare = 1 + Math.max(0, 1 - y / 0.55) ** 1.6 * (0.30 + 0.34 * Math.cos(ang * 5 + 1.1));
+      // out of round, and gently bowed — no two sides of a trunk are the same width
+      const wob = 1 + (vnoise(ang * 1.7, y * 0.9) - 0.5) * 0.17;
+      const bow = Math.sin(y * 0.8 + 0.6) * 0.055;
+      tp.setX(v, x * flare * wob + bow);
+      tp.setZ(v, z * flare * wob);
+    }
+    trunkGeo.computeVertexNormals();
+  }
   // A conifer, not a stack of smooth cones (loop #125): OVERLAPPING tiers whose base rims are
   // jagged + drooped, so the silhouette reads as ragged frond-skirts instead of clean geometry.
   // Factored (loop #139) so TWO silhouettes can share the builder — a broad fir and a slim spruce.
@@ -3203,39 +3226,85 @@ function buildVegetation(core, r) {
   // flat facets), SMOOTH normals, and baked per-vertex shading — dark toward the trunk, bright at
   // the frond tips — so each tier has interior depth before the foliage texture even lands.
   // (Tree POSITIONS are untouched: the scatter draws from the shared r() stream, not jr().)
+  // A WHORL, not a surface of revolution (owner: "get the trees to look a lot more
+  // natural"). The tiers were cones with a jagged base rim, which is why the read at any
+  // distance was folded paper: a cone's sides are big flat panels, and every panel on
+  // every tree caught the light as one flat value. Three things change that, all of them
+  // baked once at build time and free at runtime:
+  //
+  //   LOBES. A conifer's tier is a WHORL of branches radiating from the trunk, so its
+  //   plan is a rosette and not a circle. Modulating the radius by cos(angle * branches)
+  //   scallops each tier into distinct branch arms with real gaps between them — the
+  //   single biggest change to the silhouette, and it costs nothing but a cosine.
+  //   NOISE. Every vertex is then pushed by smooth value noise, so no tier is a clean
+  //   surface of anything and the panels stop being planar.
+  //   DROOP BY REACH. The old droop was uniform random; a real branch bends more the
+  //   further out it reaches, so it now scales with radius and the arms sag at the tips.
+  //
+  // aRim (0 at the axis → 1 at the frond tips) rides along as a custom attribute for the
+  // fragment shader — it is what lets the rim dissolve raggedly without turning the whole
+  // canopy to lace. mergeGeometries has to be told to carry it (see util.js).
   const makeCanopy = ({ n, baseR, taperK, tierH, spacing, lean, jag, droop, seedXor, seg = 16, hseg = 2 }) => {
     const jr = mulberry32(SEED ^ seedXor);
     const parts = [];
+    const lobes = 5 + Math.floor(jr() * 4);                 // branch arms per whorl
     for (let i = 0; i < n; i++) {
       const t = i / (n - 1);
       const radius = baseR * (1 - t * taperK);              // wide skirt → narrow crown
       const cone = new THREE.ConeGeometry(radius, tierH, seg, hseg, true);   // openEnded (DoubleSide mat)
       const p = cone.attributes.position;
       const shade = new Float32Array(p.count * 3);
+      const rim = new Float32Array(p.count);
+      const phase = jr() * TAU;                             // each tier's arms point elsewhere
+      // a coarser lobe count on the far LOD, or 6 radial segments cannot resolve the arms
+      // and the scallop turns into a wobble
+      const lb = seg >= 12 ? lobes : Math.min(lobes, 3);
       for (let v = 0; v < p.count; v++) {
         const y = p.getY(v);
+        const x0 = p.getX(v), z0 = p.getZ(v);
+        const ang = Math.atan2(z0, x0);
+        // the whorl: arms out, gaps between them. Full strength at the rim, fading to
+        // nothing at the crown so the tier still meets the trunk.
+        const rTier = Math.hypot(x0, z0) / Math.max(radius, 1e-3);
+        const lobe = 1 + Math.cos(ang * lb + phase) * 0.20 * rTier;
+        p.setX(v, x0 * lobe); p.setZ(v, z0 * lobe);
         if (y < -tierH / 2 + 0.02) {                        // base-rim vertices → frond tips
           const x = p.getX(v), z = p.getZ(v);
           const f = 1 + (jr() - 0.5) * jag;                 // radial jag
           p.setX(v, x * f); p.setZ(v, z * f);
-          p.setY(v, y - jr() * droop);                      // droop some fronds down
+          // a branch bends further the further it reaches — droop scaled by the arm's
+          // own length, so the long arms sag and the short ones hold
+          p.setY(v, y - jr() * droop * (0.45 + 0.85 * lobe));
         } else if (Math.abs(y) < tierH * 0.26) {            // mid ring → gentle organic bulge
           const f = 1 + (jr() - 0.5) * jag * 0.45;
           p.setX(v, p.getX(v) * f); p.setZ(v, p.getZ(v) * f);
         }
+        // and break the panels: smooth noise on the vertex itself, so no face is planar
+        const nx = p.getX(v), ny = p.getY(v), nz = p.getZ(v);
+        const d = (vnoise(nx * 1.9 + ny * 0.7, nz * 1.9 - ny * 0.5) - 0.5) * 0.22 * radius;
+        p.setX(v, nx + d); p.setZ(v, nz + d * 0.8);
+        p.setY(v, ny + (vnoise(nz * 2.3, nx * 2.3) - 0.5) * 0.10 * tierH);
+
         // baked canopy depth: luminance by distance from the axis (≈1.0 mean, so the
         // per-instance HSL tones keep their tuned brightness)
         const rr = Math.min(Math.hypot(p.getX(v), p.getZ(v)) / Math.max(radius, 1e-3), 1.15);
         const s = 0.68 + rr * 0.55;
-        shade[v * 3] = shade[v * 3 + 1] = shade[v * 3 + 2] = s;
+        // and a warm/cool split across that depth: needle tips catch the sun and read
+        // yellow-green, the shaded interior reads blue-green. Grey shading is what made
+        // the canopy one flat colour no matter how the per-tree tone was varied.
+        shade[v * 3] = s * (0.96 + rr * 0.10);
+        shade[v * 3 + 1] = s;
+        shade[v * 3 + 2] = s * (1.08 - rr * 0.14);
+        rim[v] = Math.min(rr, 1);
       }
       cone.setAttribute('color', new THREE.BufferAttribute(shade, 3));
+      cone.setAttribute('aRim', new THREE.BufferAttribute(rim, 1));
       cone.rotateY(i * 1.1);                                 // de-align facets/jags between tiers
       cone.translate(lean * i, 1.85 + i * spacing, 0);       // overlapping stack, gentle lee-lean
       cone.computeVertexNormals();
       parts.push(cone);
     }
-    const g = mergeGeometries(parts);
+    const g = mergeGeometries(parts, ['aRim']);
     for (const p of parts) p.dispose();
     return g;
   };
@@ -3280,21 +3349,85 @@ function buildVegetation(core, r) {
     sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs → object-space sample)
     sh.uniforms.uFolAmt = { value: 0.5 };
     sh.uniforms.uFolScale = { value: 1.0 };
+    sh.uniforms.uFringe = { value: 0.92 };   // how much of the frond TIPS frays away (a gradient — see the fray block)
     canopyMat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
       vLPos = position;                       // object-space coords for the foliage sample (pre-wind)
+      vRim = aRim;                            // 0 at the trunk -> 1 at the frond tips
       #ifdef USE_INSTANCING
         float windSeed = instanceMatrix[3].x * 0.13 + instanceMatrix[3].z * 0.17;
-        transformed.x += sin(uTime * 1.4 + windSeed) * 0.14 * smoothstep(1.0, 5.5, transformed.y);
+        // the TIPS move most: a branch is a cantilever, so sway scales with how far out
+        // the vertex sits as well as how high. A whole canopy sliding sideways as one
+        // rigid lump is what made the old wind read as a wobble rather than a breeze.
+        float gust = sin(uTime * 1.4 + windSeed) + 0.35 * sin(uTime * 2.7 + windSeed * 1.9);
+        transformed.x += gust * 0.11 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
+        transformed.z += sin(uTime * 1.1 + windSeed * 2.3) * 0.06 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
       #endif
-    `).replace('void main() {', 'uniform float uTime;\nvarying vec3 vLPos;\nvoid main() {');
+    `).replace('void main() {', 'uniform float uTime;\nattribute float aRim;\nvarying vec3 vLPos;\nvarying float vRim;\nvoid main() {');
     // (1) a STYLIZED foliage texture breaks the flat uniform green — sampled object-space (the
     // cones have no UVs) as a LUMINANCE multiply so each canopy keeps its hue + low-poly silhouette
     // but gains dappled value variation. (2) distant canopies melt toward the grade's haze before
     // global fog reaches them — softens the hard low-poly pop at the tree line. Fragment-only.
     sh.fragmentShader = sh.fragmentShader
-      .replace('void main() {', 'uniform vec3 uHaze;\nuniform sampler2D uFoliage;\nuniform float uFolAmt;\nuniform float uFolScale;\nvarying vec3 vLPos;\nvoid main() {')
+      .replace('void main() {', `uniform vec3 uHaze;
+        uniform sampler2D uFoliage; uniform float uFolAmt; uniform float uFolScale;
+        uniform float uFringe;
+        varying vec3 vLPos; varying float vRim;
+        float chash(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
+        float cnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);
+          float a=chash(i),b=chash(i+vec2(1,0)),c=chash(i+vec2(0,1)),d=chash(i+vec2(1,1));
+          return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
+        void main() {`)
+      // THE RAGGED EDGE, and it is the whole reason a low-poly conifer reads as folded
+      // paper. A tier's outline is a POLYGON — straight segments between vertices — and no
+      // amount of shading hides a straight edge against the sky. A real conifer's outline
+      // is needles, so it has no edge at all, it has a fringe.
+      //
+      // So the outer band of every tier DISSOLVES: high-frequency object-space noise, and
+      // fragments below the cut are discarded. Gated hard on vRim (0 at the trunk, 1 at the
+      // frond tips) so only the last quarter of each arm frays — without that gate the
+      // whole canopy turns to lace and you can see the sky through the middle of the tree.
+      // Costs one noise per canopy fragment and no geometry at all.
+      .replace('#include <clipping_planes_fragment>', `
+        #include <clipping_planes_fragment>
+        // A GRADIENT, not a band. The first version cut on a fixed threshold across the
+        // outer quarter of the arm, which speckled holes through solid foliage and read as
+        // moth-eaten rather than needled. What an edge of needles actually does is DISSOLVE:
+        // nearly solid a little way in, almost nothing at the very tip. So the cut rises
+        // steeply with vRim and the fringe fades out instead of being punched through.
+        float frayN = cnoise(vec2(vLPos.x + vLPos.y * 0.41, vLPos.z - vLPos.y * 0.33) * 64.0)
+                    * 0.55 + cnoise(vec2(vLPos.z - vLPos.y * 0.2, vLPos.x) * 148.0) * 0.45;
+        float fray = smoothstep(0.80, 1.04, vRim);
+        if (frayN < fray * fray * uFringe) discard;
+      `)
+      // AND THE PANELS THEMSELVES. Fraying fixed the outline; the interior of each tier was
+      // still a large flat facet, and a flat facet has ONE normal, so it takes one value of
+      // light across its whole area however nicely it is tinted. That is the entire reason
+      // low-poly foliage reads as folded paper.
+      //
+      // So the same needle noise that grains the albedo also perturbs the NORMAL — a
+      // tangent-free derivative bump (Mikkelsen), the same trick the terrain uses for its
+      // sand ripples. The panels stop being planar to the lighting and start catching it in
+      // clumps. Faded out with distance so the far stand cannot shimmer, and skipped on the
+      // 1:240 chart-table clone where a tree is four pixels.
+      .replace('#include <normal_fragment_begin>', `
+        #include <normal_fragment_begin>
+        // CLUMP scale, not needle scale, and gently. At 11/27 cycles with amplitude 0.55
+        // this read as dark fur — the same failure the terrain's own comment warns about
+        // ("high-freq grain in the NORMAL reads as a harsh per-pixel dapple, looks scaly").
+        // The fine grain belongs in the albedo; the bump only has to stop the panel being
+        // ONE flat value, and a branch clump is a ~30 cm thing.
+        float nH = cnoise(vec2(vLPos.x * 1.3 + vLPos.y * 0.35, vLPos.z * 1.3 - vLPos.y * 0.3) * 3.4) * 0.66
+                 + cnoise(vec2(vLPos.z - vLPos.y * 0.2, vLPos.x) * 8.5) * 0.34;
+        float nAmt = 0.16 * (1.0 - smoothstep(18.0, 70.0, length(vViewPosition)));
+        vec2 nD = vec2(dFdx(nH), dFdy(nH)) * nAmt;
+        vec3 nSx = dFdx(-vViewPosition), nSy = dFdy(-vViewPosition);
+        vec3 nR1 = cross(nSy, normal), nR2 = cross(normal, nSx);
+        float nDet = dot(nSx, nR1);
+        vec3 nGrad = sign(nDet) * (nD.x * nR1 + nD.y * nR2);
+        normal = normalize(abs(nDet) * normal - nGrad);
+      `)
       .replace('#include <color_fragment>', `
         #include <color_fragment>
         // oblique projection (#44): xz alone stretches to VERTICAL STREAKS on the cone's
@@ -3303,6 +3436,17 @@ function buildVegetation(core, r) {
         vec2 folUv = vec2(vLPos.x + vLPos.y * 0.37, vLPos.z + vLPos.y * 0.61) * uFolScale;
         float folL = dot(texture2D(uFoliage, folUv).rgb, vec3(0.299, 0.587, 0.114));
         diffuseColor.rgb *= mix(1.0, folL * 1.9, uFolAmt);
+        // NEEDLE GRAIN. The dapple above is a soft painterly wash at ~1 m; needles are a
+        // centimetre thing, and without them a flat panel is still a flat panel however
+        // nicely it is tinted. Two octaves of fine object-space noise, sheared the same way,
+        // biased so the clusters read as sprays catching light rather than dirt.
+        float ndl = cnoise(vec2(vLPos.x * 1.7 + vLPos.y, vLPos.z * 1.7 - vLPos.y) * 9.0) * 0.6
+                  + cnoise(vec2(vLPos.z - vLPos.y * 0.6, vLPos.x + vLPos.y * 0.4) * 23.0) * 0.4;
+        diffuseColor.rgb *= 0.80 + 0.42 * ndl;
+        // and the tips are NEW GROWTH: lighter, yellower, the year's candles. Real conifers
+        // are two greens — this one was one.
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.26, 1.20, 0.72),
+                               smoothstep(0.55, 1.0, vRim) * 0.5 * (0.45 + 0.55 * ndl));
       `)
       .replace('#include <fog_fragment>', `
         gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze,

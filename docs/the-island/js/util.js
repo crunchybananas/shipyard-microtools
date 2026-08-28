@@ -266,19 +266,27 @@ export class Baker {
 // color when every part carries it). The de-duplicated twin of Baker: Baker bakes
 // matrices + gradient colors for the big static world merge; this concatenates
 // already-posed parts (canopy tiers, grass blades, bird bodies) as-is.
-export function mergeGeometries(geos) {
+// `extra` carries CUSTOM attributes through the merge — anything a shader needs per
+// vertex that is not position/normal/color. Without it a merged geometry silently loses
+// them, and the shader that reads one gets zeros with no error anywhere. Every part must
+// carry every named attribute or it is dropped (a partial attribute is worse than none).
+export function mergeGeometries(geos, extra = []) {
   const flats = geos.map((g) => (g.index ? g.toNonIndexed() : g));
   let total = 0;
   for (const g of flats) total += g.attributes.position.count;
   const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3);
   const hasCol = flats.every((g) => g.attributes.color);
   const col = hasCol ? new Float32Array(total * 3) : null;
+  const ex = extra
+    .filter((n) => flats.every((g) => g.attributes[n]))
+    .map((n) => ({ n, size: flats[0].attributes[n].itemSize, arr: new Float32Array(total * flats[0].attributes[n].itemSize) }));
   let off = 0;
   for (let i = 0; i < flats.length; i++) {
     const g = flats[i];
     pos.set(g.attributes.position.array, off * 3);
     nor.set(g.attributes.normal.array, off * 3);
     if (col) col.set(g.attributes.color.array, off * 3);
+    for (const a of ex) a.arr.set(g.attributes[a.n].array, off * a.size);
     off += g.attributes.position.count;
     if (g !== geos[i]) g.dispose();   // dispose the toNonIndexed intermediates
   }
@@ -286,6 +294,7 @@ export function mergeGeometries(geos) {
   out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
   if (col) out.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  for (const a of ex) out.setAttribute(a.n, new THREE.BufferAttribute(a.arr, a.size));
   return out;
 }
 

@@ -82,6 +82,13 @@ echo "== relief =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/relief.mjs" | tee "$WORK/relief.out"
 grep -q "RELIEF 8 / 8" "$WORK/relief.out" || { echo "RELIEF FAILED"; exit 1; }
 
+echo "== the trees =="
+# The canopy's detail rides on a custom attribute and three shader-chunk replacements, and
+# both die silently — a dropped attribute reads as 0 in GLSL, a replace that matches
+# nothing is a no-op. Neither reports anything; the trees just go back to folded paper.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/trees.mjs" | tee "$WORK/trees.out"
+grep -q "TREES 7 / 7" "$WORK/trees.out" || { echo "TREES FAILED"; exit 1; }
+
 echo "== the tabletop =="
 # Everything that lies on the chart table has to lie ON it. The table came down from
 # 3.1 m to 2.5 m and six props were left out past the rim, one of which the owner found.
