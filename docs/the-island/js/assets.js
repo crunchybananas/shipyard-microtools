@@ -204,15 +204,47 @@ export function assetPath(id) {
 // Returns the Texture synchronously; the image fills in async (pass onLoad to
 // react). Safe to call from material construction: the SAME shared Texture comes
 // back every time, so the island and its 1:240 model clone share one upload.
+// Callbacks waiting on a texture that is IN THE CACHE BUT STILL DECODING. This is the
+// hole that ate the shore rocks' relief, and it is worth stating exactly:
+//
+//   getTexture used to do `if (onLoad && t.image) onLoad(t)` on a cache hit — so the
+//   FIRST caller of an asset got a real load callback, and every caller that arrived
+//   while that load was still in flight got NOTHING. Not an error, not a retry: their
+//   callback was dropped on the floor and never ran.
+//
+// applyRelief does all its work in that callback, so any material that was second to ask
+// for a heightmap silently ended up with no normalMap at all. The shore is built from
+// three stone types — granite, basalt, limestone — and all three derive their relief from
+// rock_height, so two of the three came out as flat untextured colour. The owner found it
+// by standing on the beach: "This lost texture ... it 100% used to have a texture on it
+// that looked like a rocky surface." It did. It also depended on load timing, which is
+// why it came and went.
+//
+// The file header already promised "an async load can never race a material clone"; this
+// is the other race, between two consumers of the same asset.
+const _texPending = new Map();          // id -> [onLoad] queued while the image decodes
+
 export function getTexture(id, onLoad) {
   if (_texCache.has(id)) {
     const t = _texCache.get(id);
-    if (onLoad && t.image) onLoad(t);
+    if (onLoad) {
+      if (t.image) onLoad(t);                                     // already decoded
+      else (_texPending.get(id) ?? _texPending.set(id, []).get(id)).push(onLoad);   // still in flight: WAIT
+    }
     return t;
   }
   const a = MANIFEST[id];
   if (!a || a.kind !== 'texture') throw new Error(`asset "${id}" is not a texture in the manifest`);
-  const tex = _loader.load(assetPath(id), (t) => { t.needsUpdate = true; onLoad?.(t); });
+  const drain = (t) => {
+    const q = _texPending.get(id);
+    if (!q) return;
+    _texPending.delete(id);
+    for (const cb of q) cb(t);
+  };
+  const tex = _loader.load(assetPath(id), (t) => { t.needsUpdate = true; onLoad?.(t); drain(t); },
+    undefined,
+    // a failed load must not leave everyone who asked for it waiting forever in silence
+    (e) => { console.warn(`asset "${id}" failed to load`, e && e.message); _texPending.delete(id); });
   if (a.wrap) tex.wrapS = tex.wrapT = WRAP[a.wrap] ?? THREE.RepeatWrapping;
   if (a.repeat) tex.repeat.set(a.repeat[0], a.repeat[1]);
   tex.colorSpace = COLORSPACE[a.colorSpace] ?? THREE.SRGBColorSpace;
@@ -284,7 +316,13 @@ function buildNormalFromImage(img, strength) {
 // match its repeat, and wire it. Does NOT touch flatShading — in three.js the normal map
 // perturbs the (flat or smooth) base normal via derivative TBN either way, so we keep the
 // material's crisp box edges and still get relief. opts: { normalScale, strength, roughness }.
+// Every relief asked for, and every one that actually landed. They must match: a
+// dropped callback is invisible in every other way (see _texPending). tools/harness/
+// relief.mjs reads this.
+export const RELIEF = { asked: 0, applied: 0, missing: () => RELIEF.asked - RELIEF.applied };
+
 export function applyRelief(material, id, opts = {}) {
+  RELIEF.asked++;
   const ns = opts.normalScale ?? 0.7;
   material.normalScale = new THREE.Vector2(ns, ns);
   if (opts.roughness != null) material.roughness = opts.roughness;
@@ -304,6 +342,7 @@ export function applyRelief(material, id, opts = {}) {
     if (opts.repeat) { nt = nt.clone(); nt.repeat.set(opts.repeat[0], opts.repeat[1]); nt.needsUpdate = true; }   // per-material texel override (#48)
     material.normalMap = nt;
     material.needsUpdate = true;
+    RELIEF.applied++;
   });
   const tex = getTexture(id, () => { material.needsUpdate = true; });
   // #48: `colorMap: false` = RELIEF-ONLY — the derived normal carries the surface and the

@@ -26,6 +26,12 @@ gate that has guarded every fire since the walk was born:
   walls. Casts from the eye positions bugs were REPORTED from, because an axis sweep
   cannot see a radial seam (see the file's header — I watched a sweep pass with the
   bug reinstated). 5 assertions.
+- **`relief.mjs`** — every surface that asked for relief actually got it, counted rather
+  than eyeballed. getTexture ran your callback on a cache hit ONLY if the image had
+  already decoded, so whoever asked second for an asset still in flight got nothing, in
+  silence: the shore's three stone types all derive relief from one heightmap and two came
+  out bare, and the terrain's sand ripples never switched on. Timing-dependent, so it came
+  and went. 8 assertions.
 - **`tabletop.mjs`** — everything that lies on the chart table lies ON it: inside the
   vellum, clear of the model's footprint, with a working margin between them. The table
   shrank and six props were left out past the brass rim; the owner found one of them.

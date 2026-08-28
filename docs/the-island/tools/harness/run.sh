@@ -75,6 +75,13 @@ echo "== the shell =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/shell.mjs" | tee "$WORK/shell.out"
 grep -q "SHELL 5 / 5" "$WORK/shell.out" || { echo "SHELL FAILED"; exit 1; }
 
+echo "== relief =="
+# Every surface that asked for relief has to get it. getTexture dropped the callback for
+# anyone who asked for an asset that was cached but still decoding, so the second and
+# third consumers of a heightmap ended up flat and silent — 4 of 12 when it was found.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/relief.mjs" | tee "$WORK/relief.out"
+grep -q "RELIEF 8 / 8" "$WORK/relief.out" || { echo "RELIEF FAILED"; exit 1; }
+
 echo "== the tabletop =="
 # Everything that lies on the chart table has to lie ON it. The table came down from
 # 3.1 m to 2.5 m and six props were left out past the rim, one of which the owner found.
