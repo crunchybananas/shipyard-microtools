@@ -403,6 +403,30 @@ export function buildWorld() {
   };
   const grad = (a, b) => (t) => a.clone().lerp(b, t);
 
+  // MOTTLE — granite is not one colour, and ours was.
+  //
+  // The relief map gives these stones their grain, but their ALBEDO was a single smooth
+  // top-to-bottom gradient, so a 3.4 m monolith read as a shape with a texture on it
+  // rather than as a rock. Owner: "Rocks are non-textured." They were, in the way that
+  // matters: nothing in the colour ever varied across a face.
+  //
+  // This is NOT a tiled albedo, and it must not become one — the house rule here is
+  // normal maps yes, tiled colour never, because a repeating albedo is exactly what
+  // pixelates into a visible grid at arm's length (it is why the rock relief is
+  // colorMap: false in the first place). Value noise on the WORLD position has no tile
+  // to find: two scales, broad patches at ~5 m so neighbouring stones differ from each
+  // other, and a finer grain at ~60 cm across a single face. y is folded into both, or a
+  // vertical face — which is most of a standing stone — would come out uniform.
+  //
+  // Baked into the vertex colours, so it costs one multiply at build time and nothing at
+  // all per frame: no texture, no draw call, no shader change.
+  const speck = (x, y, z) => {
+    const n = vnoise(x * 0.22 + y * 0.31, z * 0.22 - y * 0.27) - 0.5;        // broad, ~5 m
+    const f = vnoise(x * 1.6 + y * 0.9 + 13.7, z * 1.6 - y * 1.1 - 5.3) - 0.5;  // grain, ~60 cm
+    return 1 + n * 0.26 + f * 0.15;
+  };
+  const mottle = (a, b) => (t, p) => a.clone().lerp(b, t).multiplyScalar(speck(p.x, p.y, p.z));
+
   // hangDoor — hang a leaf in a doorway cut through a CURVED wall.
   //
   // A door group's origin is its hinge and the leaf extends along local +x, so the
@@ -1988,6 +2012,9 @@ export function buildWorld() {
       for (let v = 0; v < pa.count; v++) {
         const t = (pa.getY(v) / h) + 0.5;
         const cc = cBase.clone().lerp(C.bone, t * 0.4);
+        // the same mottle the baked granite gets — world position, so neighbouring
+        // stones differ from each other and not just within themselves
+        cc.multiplyScalar(speck(px + pa.getX(v), pa.getY(v), pz + pa.getZ(v)));
         cols[v * 3] = cc.r; cols[v * 3 + 1] = cc.g; cols[v * 3 + 2] = cc.b;
       }
       g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
@@ -2140,7 +2167,7 @@ export function buildWorld() {
     const oy = heightAt(ox, oz);
     // rock outcrop
     const rock = new THREE.IcosahedronGeometry(3.2, 2);
-    rockwork.add(rock, place(ox, oy + 1.2, oz, 0.7, 1.3, 0.9, 1.1), grad(C.stoneOld, C.boneDark));
+    rockwork.add(rock, place(ox, oy + 1.2, oz, 0.7, 1.3, 0.9, 1.1), mottle(C.stoneOld, C.boneDark));
     rock.dispose();
     // sliding slab door (faces the stones)
     const slab = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.2, 0.3), matMegalith);   // cut from the outcrop, facing the stones
@@ -2223,9 +2250,14 @@ export function buildWorld() {
     dp(2.7, rh, cx + hw, my, cz - 2.85, 0, Math.PI / 2);    // east wall — south of the ramp opening
     // the ramp tunnel up to the surface mouth (walkable floor lives in terrain.js)
     const rx0 = cx + hw, rx1 = 142;
+    // 4.85 tall centred at 6.32, NOT 5.4 at 6.6. These are the INSIDE of a buried ramp
+    // and they used to top out at y 9.30 while the meadow over them is dead flat at 8.80
+    // for the whole 5.8 m run — so half a metre of interior wall stood up out of the
+    // grass, and from anywhere near the standing stones it read as a long flat grey slab
+    // floating above the field. They tuck 5 cm under the surface now.
     for (const zs of [cz - 1.5, cz + 1.5]) {                // ramp side walls
-      const w = new THREE.Mesh(new THREE.PlaneGeometry(rx1 - rx0, 5.4), dMat);
-      w.rotation.y = Math.PI / 2; w.position.set((rx0 + rx1) / 2, 6.6, zs);
+      const w = new THREE.Mesh(new THREE.PlaneGeometry(rx1 - rx0, 4.85), dMat);
+      w.rotation.y = Math.PI / 2; w.position.set((rx0 + rx1) / 2, 6.32, zs);
       drain.add(w);
     }
     const rim = new THREE.TorusGeometry(1.9, 0.3, 8, 18);   // a stone lip around the surface mouth
@@ -2653,7 +2685,7 @@ export function buildWorld() {
       const a = (i / 9) * TAU + pr() * 0.35;
       const rx = PX + Math.sin(a) * 1.38, rz = PZ + Math.cos(a) * 1.38;
       const rock = new THREE.IcosahedronGeometry(0.36 + pr() * 0.2, 1);
-      rockwork.add(rock, place(rx, heightAt(rx, rz) + 0.16, rz, pr() * TAU, 1, 0.75 + pr() * 0.4, 1), grad(C.stoneOld, C.bone));
+      rockwork.add(rock, place(rx, heightAt(rx, rz) + 0.16, rz, pr() * TAU, 1, 0.75 + pr() * 0.4, 1), mottle(C.stoneOld, C.bone));
       rock.dispose();
     }
     addCollider(PX, PZ - 1.4, 0.5);           // solid enough to lean on, open on the south side
