@@ -43,9 +43,12 @@ curl -sf "http://127.0.0.1:$SERVE_PORT/the-island/" >/dev/null || { echo "server
 
 rc=0
 for s in "$@"; do
-  # accept a bare name, a harness-relative name, or any path
+  # accept a bare name, a harness-relative name, or any path — and ABSOLUTISE it.
+  # cdp.mjs import()s this path, and node's ESM loader reads a bare relative path as a
+  # PACKAGE name: "Cannot find package 'tools'" for tools/harness/foo.mjs.
   p="$s"; [ -f "$p" ] || p="$HERE/$s"
   [ -f "$p" ] || { echo "no such script: $s"; rc=1; continue; }
+  p="$(cd "$(dirname "$p")" && pwd)/$(basename "$p")"
   echo "== $(basename "$p") =="
   SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$p" || rc=1
 done

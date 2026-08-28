@@ -103,7 +103,26 @@ export default async function (h) {
     ok(`${f.name}: is still a lit room`, m.meanLuma > 55, { meanLuma: m.meanLuma });
   }
 
+  // AND YOU MAY NOT FIX IT BY DULLING ALL THE METAL. That is how I fixed it the first
+  // time — matBrass from 0.38 to 0.55 — and it worked on the pixels and flattened the
+  // gallery, the rails and the finial into painted tan across the whole game. Owner:
+  // "metal is flat, not sure what happened." The rail that causes the glare is one long
+  // flat face at one window and it has its own material now; the rest stays polished.
+  const brass = await h.evaluate(`(() => {
+    const out = {};
+    ABYME.scene.traverse((o) => {
+      let q = o, grp = null;
+      while (q) { if (q.name === 'staticBrass' || q.name === 'staticRail') { grp = q.name; break; } q = q.parent; }
+      if (!grp || !o.isMesh || !o.material || out[grp] !== undefined) return;
+      out[grp] = o.material.roughness;
+    });
+    return JSON.stringify(out);
+  })()`).then(JSON.parse);
+  ok('the tower\u2019s brass is still polished', brass.staticBrass !== undefined && brass.staticBrass <= 0.45, brass);
+  ok('the chart rail is the dulled one', brass.staticRail !== undefined && brass.staticRail >= 0.5, brass);
+
   console.log(`GLARE ${R.pass.length} / ${R.pass.length + R.fail.length}`);
+  console.log(`  brass ${brass.staticBrass} · chart rail ${brass.staticRail}`);
   for (const s of seen) console.log(`  hot ${String(s.hotPct).padStart(5)}%  clipped ${String(s.clipPct).padStart(5)}%  mean luma ${String(s.meanLuma).padStart(5)}  — ${s.name}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }

@@ -85,7 +85,7 @@ echo "== the glare =="
 # "The study props wash out under window sun" has been reported three times and nothing
 # could see it, because it is a question about pixels. This one counts them.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/glare.mjs" | tee "$WORK/glare.out"
-grep -q "GLARE 6 / 6" "$WORK/glare.out" || { echo "GLARE FAILED"; exit 1; }
+grep -q "GLARE 8 / 8" "$WORK/glare.out" || { echo "GLARE FAILED"; exit 1; }
 
 echo "== the lettered spines =="
 # The eighteen gilt volumes in the study spell the one line of canon the game says aloud

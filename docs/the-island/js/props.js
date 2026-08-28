@@ -190,23 +190,33 @@ applyRelief(matMegalith, 'rock', {
   normalScale: 0.5, strength: 1.8, colorMap: false, repeat: [0.32, 0.32], normalFrom: 'rock_height',
 });
 
-// ROUGHNESS 0.55, up from 0.38 — this is the fix for #147, the study washing out under
-// the window sun, and it is a material bug rather than a bloom one.
+// THE BAKED BRASS — the gallery ring and its posts and rails, the finial, the lamp
+// pedestal, the valve pedestal, the bell stand, the weather vane. Polished, at 0.38.
 //
-// At 0.38/0.85 the chart table's brass rim is very nearly a MIRROR, and what it mirrors
-// is a directional light of intensity 3.5. That puts a long strip of pixels along the
-// table's edge an order of magnitude above anything else in the game, and the bloom's
-// five-mip blur at radius 0.68 spreads that strip across the whole near half of the
-// table: the vellum, the logbook, the day's return and the model's sea all go white.
-// Measured from the owner's own reported frame — with bloom at strength 0 the identical
-// frame is completely clean, so it was never the props' albedo and never the threshold.
-// At 0.55 the rail keeps a warm sun-glint that reads as sunlight on brass, and every
-// paper on the table becomes legible again.
-//
-// This is the BAKED brass (the table's rim, the valve pedestal, the floor plate).
-// matBrassSolid below is a separate, smaller set (the pulley, the hook) that does not
-// present a long flat face to the window, and it is left alone deliberately.
+// I raised this to 0.55 once, to fix #147, and it worked and it was wrong. The glare is
+// real (see matBrassRail) but this material is most of the visible metal in the game, and
+// dulling all of it to cure one rail flattened the gallery, the rails and the finial into
+// painted tan. Owner: "metal is flat, not sure what happened." Measured, isolating the
+// two changes in that commit: the bloom clamp does not touch the brass at all, and the
+// roughness alone is the whole difference.
 export const matBrass = new THREE.MeshStandardMaterial({
+  vertexColors: true, flatShading: false, roughness: 0.38, metalness: 0.85, side: THREE.DoubleSide,
+});
+// ...and the ONE piece that cannot be polished: the chart table's rim.
+//
+// At 0.38/0.85 it is very nearly a mirror, it is a long flat rail, and what it mirrors is
+// a 3.5-intensity sun straight through the study window. That puts a whole STRIP of
+// pixels an order of magnitude above anything else in the game, and bloom's five-mip blur
+// at radius 0.68 spreads the strip across the near half of the table: vellum, logbook,
+// the day's return and the model's sea all go white.
+//
+// It has to be the material, and it has to be roughness. Measured on the owner's frame,
+// hot pixels at 2.86% broken and 0.24% fixed: clamping the bloom high-pass to 2.0 gets
+// 2.61% and to 1.6 gets 2.58%, and TIGHTENING the bloom radius makes it worse (3.04% at
+// 0.35, 3.09% at 0.22) because it concentrates the same energy. None of them work because
+// the problem is not one blinding pixel, it is the AREA of the strip — and roughness is
+// the only knob that shrinks it. 0.55 costs one draw call and nothing else.
+export const matBrassRail = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.55, metalness: 0.85, side: THREE.DoubleSide,
 });
 const matBrassSolid = new THREE.MeshStandardMaterial({
@@ -382,6 +392,7 @@ export function buildWorld() {
   // spine atlas; everything that asks for no cell lands on cell 0, which is black.
   const joinery = new Baker({ uv1: true, blank: spineCell(0) });
   const brass = new Baker();
+  const rail = new Baker();          // the chart table's rim alone: see matBrassRail
   const M = new THREE.Matrix4();
   const Q = new THREE.Quaternion();
   const V = new THREE.Vector3();
@@ -793,10 +804,12 @@ export function buildWorld() {
       stone.add(leg, place(LH.x + lx, LH.y + 0.45, LH.z + lz), grad(C.woodDark, C.wood));
       leg.dispose();
     }
-    // brass rim — it also hides the cut edge where the model's terrain is clipped
+    // brass rim — it also hides the cut edge where the model's terrain is clipped.
+    // Its OWN batch (matBrassRail), because it is the one piece of brass in the game that
+    // must not be polished — see the material. One extra draw call for four boxes.
     const rim = new THREE.BoxGeometry(2.7, 0.18, 0.12);
     for (const [dx, dz, ry] of [[0, 1.28, 0], [0, -1.28, 0], [1.28, 0, Math.PI / 2], [-1.28, 0, Math.PI / 2]]) {
-      brass.add(rim, place(LH.x + dx, LH.y + 0.97, LH.z + dz, ry), grad(C.brassDark, C.brass));
+      rail.add(rim, place(LH.x + dx, LH.y + 0.97, LH.z + dz, ry), grad(C.brassDark, C.brass));
     }
     rim.dispose();
   }
@@ -2956,6 +2969,7 @@ export function buildWorld() {
   mkStatic(rockwork, matMegalith, 'staticRock', true);   // the outcrop + pool rim: granite, not masonry
   mkStatic(joinery, matJoinery, 'staticJoinery', true); // the study's shelves + books: cloth and board, not wall
   mkStatic(brass, matBrass, 'staticBrass', false);
+  mkStatic(rail, matBrassRail, 'staticRail', false);   // the chart rim: the one brass that cannot be a mirror
 
   // =================== glow particles (NOT cloned into the model) ===========
   // bioluminescent pools along the drowned causeway
