@@ -3742,17 +3742,21 @@ function buildVegetation(core, r) {
   const grassMat = new THREE.MeshStandardMaterial({
     color: 0xc2a75f, flatShading: true, roughness: 0.9, side: THREE.DoubleSide,
   });
-  grassMat.onBeforeCompile = (sh) => {
+  // The meadow's shading recipe, shared: a two-axis sway weighted to the tips, and the
+  // up-normal relight. Factored out because the heath below needs exactly the same
+  // treatment for exactly the same reasons, and a second hand-copied shader patch is a
+  // second thing to forget to fix.
+  const meadowSway = (mat, amp = 1, fray = 0) => (sh) => {
     sh.uniforms.uTime = { value: 0 };
-    grassMat.userData.shader = sh;
+    mat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
       vGUp = normalMatrix * vec3(0.0, 1.0, 0.0);              // the meadow-floor normal, in view space
       #ifdef USE_INSTANCING
         float gw = instanceMatrix[3].x * 0.31 + instanceMatrix[3].z * 0.23;
         float gt = pow(max(position.y, 0.0), 1.5);            // tips drift most, roots stay put
-        transformed.x += sin(uTime * 1.5 + gw) * 0.32 * gt;   // gentle two-axis wave (not a rigid waggle)
-        transformed.z += cos(uTime * 1.2 + gw * 1.4) * 0.18 * gt;
+        transformed.x += sin(uTime * 1.5 + gw) * ${(0.32 * amp).toFixed(3)} * gt;   // gentle two-axis wave (not a rigid waggle)
+        transformed.z += cos(uTime * 1.2 + gw * 1.4) * ${(0.18 * amp).toFixed(3)} * gt;
       #endif
     `).replace('void main() {', 'uniform float uTime;\nvarying vec3 vGUp;\nvoid main() {');
     // light every blade with the ground's UP normal (the classic grass trick): a thin vertical
@@ -3762,7 +3766,29 @@ function buildVegetation(core, r) {
     sh.fragmentShader = sh.fragmentShader
       .replace('void main() {', 'varying vec3 vGUp;\nvoid main() {')
       .replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\n  normal = normalize(vGUp);');
+    // A SPRIG IS NOT A CARD. Scaled up big enough to read across the meadow, the heath's
+    // flat tapered planes showed exactly what they are — hard straight edges against the
+    // sky, the same folded-paper tell the canopy had. Fray the tips with the same
+    // dissolve, keyed on the sprig's own root→tip coordinate.
+    if (fray > 0) {
+      sh.vertexShader = sh.vertexShader
+        .replace('void main() {', 'attribute float aRim;\nvarying float vMR;\nvarying vec3 vMP;\nvoid main() {')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\n vMR = aRim; vMP = position;');
+      sh.fragmentShader = sh.fragmentShader
+        .replace('void main() {', `varying float vMR; varying vec3 vMP;
+          float mhash(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
+          float mnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);
+            float a=mhash(i),b=mhash(i+vec2(1,0)),c=mhash(i+vec2(0,1)),d=mhash(i+vec2(1,1));
+            return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
+          void main() {`)
+        .replace('#include <clipping_planes_fragment>', `
+          #include <clipping_planes_fragment>
+          float mn = mnoise(vMP.xy * 42.0) * 0.6 + mnoise(vMP.zy * 97.0) * 0.4;
+          if (mn < smoothstep(0.45, 1.05, vMR) * ${fray.toFixed(2)}) discard;
+        `);
+    }
   };
+  grassMat.onBeforeCompile = meadowSway(grassMat, 1);
 
   const G_MAIN = 3800, G_ISLET = 650;   // fewer instances — each is now a full 5-blade tuft, not one blade
   // #30: one island-spanning InstancedMesh could never frustum-cull — every view paid all
@@ -3826,6 +3852,105 @@ function buildVegetation(core, r) {
     }
   }
   core.add(grass);
+
+  // --- HEATH: low clumps across the open ground ------------------------------
+  // The meadow is the largest surface in the game and there was NOTHING on it — grass
+  // tufts and, every fifty metres, a tree. From any vantage on the island the middle of
+  // the frame was an empty field, which is the "rings flat" read more than any single
+  // material is. Heather and gorse are what actually grows on a windswept coastal heath,
+  // and a clump has something a blade does not: MASS. It holds a shadow, it breaks the
+  // ground plane, and it reads at a hundred metres where a 40 cm blade does not.
+  //
+  // Its own rng (hr), NOT the shared r(): scattering a few hundred bushes must not shift
+  // the stream that every placement after it draws from.
+  {
+    const hr = mulberry32(SEED ^ 0x4e17);
+    const heathGeo = (() => {
+      const sprigs = [];
+      const N = 14;                                   // denser: a bush, not a starburst
+      for (let i = 0; i < N; i++) {
+        const yaw = (i / N) * TAU + hr() * 0.8;
+        const lean = 0.55 + hr() * 0.5;                 // out and up: a dome, not a fan
+        const len = 0.32 + hr() * 0.30;
+        const g = new THREE.PlaneGeometry(0.085, len, 1, 2);
+        g.translate(0, len / 2, 0);
+        const pp = g.attributes.position;
+        for (let v = 0; v < pp.count; v++) {
+          const t = Math.max(0, Math.min(1, pp.getY(v) / len));
+          pp.setX(v, pp.getX(v) * (1 - t * 0.72));      // taper
+          pp.setZ(v, pp.getZ(v) + t * t * len * 0.5);   // curl outward
+        }
+        g.computeVertexNormals();
+        const rim = new Float32Array(pp.count);
+        for (let v = 0; v < pp.count; v++) rim[v] = Math.max(0, Math.min(1, pp.getY(v) / len));
+        g.setAttribute('aRim', new THREE.BufferAttribute(rim, 1));
+        const nb = g.toNonIndexed(); g.dispose();
+        nb.rotateX(lean);                                // splay away from the crown
+        nb.rotateY(yaw);
+        nb.translate(Math.cos(yaw) * 0.11, 0.03, Math.sin(yaw) * 0.11);
+        sprigs.push(nb);
+      }
+      const g = mergeGeometries(sprigs, ['aRim']);
+      for (const b of sprigs) b.dispose();
+      return g;
+    })();
+    const heathMat = new THREE.MeshStandardMaterial({
+      color: 0x8a8770, flatShading: true, roughness: 0.95, side: THREE.DoubleSide,
+    });
+    heathMat.onBeforeCompile = meadowSway(heathMat, 0.45, 0.80);   // a woody clump barely moves; its tips fray
+    const placed = [];
+    const hcol = new THREE.Color();
+    const hm = new THREE.Matrix4(), hq = new THREE.Quaternion(), he = new THREE.Euler();
+    // IN PATCHES, not scattered evenly. 520 clumps spread uniformly over a 170 m disc is
+    // one per 175 square metres — statistically present and visually invisible, which is
+    // exactly how the first attempt looked. Heath grows in stands: pick a hundred-odd
+    // centres and crowd each one, and the same budget reads as ground cover instead of
+    // as speckle.
+    const CLUSTERS = 115, PER = 16;
+    for (let c = 0; c < CLUSTERS; c++) {
+      const ca = hr() * TAU, cd = 18 + Math.sqrt(hr()) * 152;
+      const ccx = SPOTS.mainCenter.x + Math.sin(ca) * cd;
+      const ccz = SPOTS.mainCenter.y + Math.cos(ca) * cd;
+      const crad = 3.5 + hr() * 6.5;
+      for (let j = 0; j < PER * 3 && placed.length < CLUSTERS * PER; j++) {
+      const a = hr() * TAU, d = Math.sqrt(hr()) * crad;
+      const x = ccx + Math.sin(a) * d;
+      const z = ccz + Math.cos(a) * d;
+      const hh = heightAt(x, z);
+      if (hh < 2.6 || hh > 17) continue;               // off the beach, off the cliff tops
+      if (!open(x, z) || grade(x, z) > 0.85) continue;
+      const sc = 0.85 + hr() * 0.95;
+      hm.compose(new THREE.Vector3(x, hh - 0.04, z),
+        hq.setFromEuler(he.set((hr() - 0.5) * 0.16, hr() * TAU, (hr() - 0.5) * 0.16)),
+        new THREE.Vector3(sc, sc * (0.7 + hr() * 0.6), sc));
+      // heather runs from a dusty sage through olive to a dull mauve where it flowers —
+      // the mauve is what stops the clumps reading as more grass
+      const hv = hr();
+      hcol.setHSL(hv < 0.20 ? 0.90 + hr() * 0.05 : 0.17 + hr() * 0.14,
+        0.10 + hr() * 0.18, 0.26 + hr() * 0.20);   // dusty, not plummy
+      placed.push({ m: hm.clone(), c: hcol.clone(), x, z });
+      if (placed.length % PER === 0) break;            // this stand is full; move on
+      }
+    }
+    // bucketed like the grass (#30) so it frustum-culls instead of every view paying for
+    // every clump on the island
+    const heath = new THREE.Group();
+    heath.name = 'heath';
+    const buckets = new Map();
+    for (const p2 of placed) {
+      const k = Math.floor((p2.x + 225) / 150) * 8 + Math.floor((p2.z + 225) / 150);
+      if (!buckets.has(k)) buckets.set(k, []);
+      buckets.get(k).push(p2);
+    }
+    for (const list of buckets.values()) {
+      const chunk = new THREE.InstancedMesh(heathGeo, heathMat, list.length);
+      list.forEach((p2, i) => { chunk.setMatrixAt(i, p2.m); chunk.setColorAt(i, p2.c); });
+      chunk.castShadow = true;
+      chunk.computeBoundingSphere();
+      heath.add(chunk);
+    }
+    core.add(heath);
+  }
 
   // --- shore rocks: irregular weathered boulders, not regular faceted balls (loop #128) ---
   // Fidelity pass (owner: "polygons are low"): detail-2 icosahedron (320 faces, was 80) with the
