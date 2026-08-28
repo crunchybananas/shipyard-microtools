@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, smoothstep, TAU } from './util.js';
-import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider } from './terrain.js';
+import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider, LITTER } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { buildRegions } from './regions/index.js';
@@ -3625,70 +3625,6 @@ function buildVegetation(core, r) {
       `);
   };
 
-  // NEEDLE LITTER. A trunk used to meet the grass at a hard cylinder edge with meadow
-  // running right up to it, which is the one thing no forest floor does: under a conifer
-  // there is a skirt of dropped needles where nothing much grows. Without it the trees
-  // read as PLACED — models standing on a lawn — however good the trees themselves are.
-  //
-  // A jagged disc per tree, domed slightly so it sits on a gentle slope without its rim
-  // digging in, and its edge DISSOLVES with the same fray the canopy uses. That matters:
-  // an opaque disc would just trade a hard trunk edge for a hard litter edge.
-  const litterGeo = (() => {
-    const SEG = 14, g = new THREE.BufferGeometry();
-    const lr = mulberry32(SEED ^ 0x1d7a);
-    const pos = [], col = [], rim = [];
-    // MUCH lighter than the first attempt. At 0x4a3a24 the patch read as a black plank
-    // laid on the grass — a flat decal already collapses to a bar at eye height, and a
-    // near-black one reads as a hole in the world rather than as ground.
-    const c0 = new THREE.Color(0x8d7a4e), c1 = new THREE.Color(0xa2955f);   // damp core → dry edge, both close to the turf
-    const ring = [];
-    for (let i = 0; i < SEG; i++) {
-      const a = (i / SEG) * TAU;
-      const rad = 0.60 + lr() * 0.42;                      // ragged, never a circle — and tight to the trunk
-      ring.push([Math.cos(a) * rad, 0.030, Math.sin(a) * rad, rad]);   // rim clear of the turf
-    }
-    for (let i = 0; i < SEG; i++) {
-      const a = ring[i], b = ring[(i + 1) % SEG];
-      pos.push(0, 0.040, 0, a[0], a[1], a[2], b[0], b[1], b[2]);   // barely domed — enough to clear a slope, not enough to show a side
-      col.push(c0.r, c0.g, c0.b, c1.r, c1.g, c1.b, c1.r, c1.g, c1.b);
-      rim.push(0, 1, 1);
-    }
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-    g.setAttribute('aRim', new THREE.Float32BufferAttribute(rim, 1));
-    g.computeVertexNormals();
-    return g;
-  })();
-  const litterMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: false });
-  litterMat.onBeforeCompile = (sh) => {
-    litterMat.userData.shader = sh;
-    sh.vertexShader = sh.vertexShader
-      .replace('void main() {', 'attribute float aRim;\nvarying vec3 vLP;\nvarying float vR;\nvoid main() {')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\n vLP = position; vR = aRim;');
-    sh.fragmentShader = sh.fragmentShader
-      .replace('void main() {', `varying vec3 vLP; varying float vR;
-        float lhash(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
-        float lnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);
-          float a=lhash(i),b=lhash(i+vec2(1,0)),c=lhash(i+vec2(0,1)),d=lhash(i+vec2(1,1));
-          return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
-        void main() {`)
-      .replace('#include <clipping_planes_fragment>', `
-        #include <clipping_planes_fragment>
-        float ln = lnoise(vLP.xz * 34.0) * 0.6 + lnoise(vLP.zx * 87.0) * 0.4;
-        // the inner half stays SOLID and only the outer edge scatters. At 0.30 the cut
-        // started almost at the centre, and since a disc's area is mostly its outer ring
-        // that discarded nearly the whole patch — the litter was there and invisible.
-        if (ln < smoothstep(0.34, 1.04, vR) * 0.94) discard;   // strewn needles, not a mat
-      `)
-      .replace('#include <color_fragment>', `
-        #include <color_fragment>
-        diffuseColor.rgb *= 0.82 + 0.36 * lnoise(vLP.xz * 19.0);   // needles, not mud
-      `);
-  };
-  const litter = new THREE.InstancedMesh(litterGeo, litterMat, spots.length);
-  litter.receiveShadow = true;
-  litter.name = 'needleLitter';
-
   const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, spots.length);
   // per-spot canopy SHAPE variant (loop #139). A SEPARATE rng picks the silhouette so the shared
   // r() stream — and thus every tree's POSITION, scale, lean and tone — is byte-unchanged; only
@@ -3716,8 +3652,6 @@ function buildVegetation(core, r) {
   for (const m of nearMesh) { m.castShadow = true; canopyGroup.add(m); }
   for (const m of farMesh) canopyGroup.add(m);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
-  const _lm = new THREE.Matrix4(), _lq = new THREE.Quaternion(), _le = new THREE.Euler();
-  const _lv = new THREE.Vector3(), _lv2 = new THREE.Vector3();
   const col = new THREE.Color(), bark = new THREE.Color();
   const TREES = [];
   for (let i = 0; i < spots.length; i++) {
@@ -3733,14 +3667,6 @@ function buildVegetation(core, r) {
     m4.compose(new THREE.Vector3(x, y, z), q,
       new THREE.Vector3(s * vs * squash, s * vs * (0.9 + r() * 0.4), s * vs * (1.86 - squash)));
     trunks.setMatrixAt(i, m4);
-    // the litter lies FLAT on the ground: the trunk's lean must not tip it, so it takes
-    // only the position and a yaw of its own
-    _lq.setFromEuler(_le.set(0, vr() * TAU, 0));
-    // heightAt, NOT the spot's y. A tree spot is deliberately SUNK below the surface so
-    // the trunk's foot never floats on a slope — here that put the whole litter patch
-    // 18 cm underground, where it rendered as a thin dark line and nothing else.
-    _lm.compose(_lv.set(x, heightAt(x, z) + 0.03, z), _lq, _lv2.set(s * 1.5, 1, s * 1.5));
-    litter.setMatrixAt(i, _lm);
     // per-trunk bark tone (loop #141): warm browns, light↔dark, so the trunks aren't 131 identical
     // poles; multiplies the shared bark albedo. Uses the separate br() rng (canopy tone unchanged).
     bark.setHSL(0.055 + br() * 0.05, 0.28 + br() * 0.24, 0.40 + br() * 0.2);
@@ -3777,13 +3703,60 @@ function buildVegetation(core, r) {
     }
   };
   treePartition(4, -104);   // boot split from the wake-up beach; main re-aims it at the player
+  // THE LITTER MASK (terrain.js LITTER). One soft blob per tree, stamped into a texture
+  // the TERRAIN samples — so the needles follow every fold of the ground, because they
+  // ARE the ground. Owner, of the instanced discs this replaces: "the needles should be
+  // more like a texture on the ground. this is like a plane that doesn't align with the
+  // ground." A flat disc on a slope cannot align; this cannot MISalign.
+  //
+  // 1024 texels over a 430 m window is 42 cm each, which sounds coarse and is exactly
+  // right: the mask only has to say WHERE. The needle character is procedural grain in
+  // the terrain's own fragment shader, so it stays sharp at any distance while this costs
+  // one texture fetch and a third of a megabyte.
+  {
+    const SZ = 1024, WIN = 430;
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = SZ;
+    const g2 = cv.getContext('2d');
+    g2.fillStyle = '#000';
+    g2.fillRect(0, 0, SZ, SZ);
+    g2.globalCompositeOperation = 'lighter';        // stands that overlap pool, as they do
+    const cx0 = SPOTS.mainCenter.x, cz0 = SPOTS.mainCenter.y;
+    const sv = new THREE.Vector3();
+    for (const t of TREES) {
+      sv.setFromMatrixScale(t.m);
+      const px = ((t.x - cx0) / WIN + 0.5) * SZ;
+      const py = ((t.z - cz0) / WIN + 0.5) * SZ;
+      // 3.4 m, and a flat core. At 2.5 m the blob was six texels across and almost all of
+      // it was falloff tail, so the mask peaked briefly and averaged near nothing — the
+      // effect landed in exactly the right place and had no weight.
+      const rad = Math.max(5, (3.4 * sv.x / WIN) * SZ);
+      const grd = g2.createRadialGradient(px, py, 0, px, py, rad);
+      grd.addColorStop(0, 'rgba(255,255,255,1)');
+      grd.addColorStop(0.42, 'rgba(255,255,255,0.85)');
+      grd.addColorStop(0.72, 'rgba(255,255,255,0.36)');
+      grd.addColorStop(1, 'rgba(255,255,255,0)');
+      g2.fillStyle = grd;
+      g2.beginPath(); g2.arc(px, py, rad, 0, TAU); g2.fill();
+    }
+    const ltex = new THREE.CanvasTexture(cv);
+    // flipY MUST be off. A CanvasTexture flips by default, so texture v=0 is the BOTTOM
+    // of the canvas — while the blobs above are stamped with z increasing DOWN the canvas
+    // to match the shader's uv. Left flipped, the whole mask is mirrored in z: the litter
+    // lands the same distance the wrong side of the stand and there is a brown pool in
+    // empty grass and bare ground under every tree. Nothing errors; it just looks like
+    // the effect is too subtle, which is exactly how it read.
+    ltex.flipY = false;
+    ltex.wrapS = ltex.wrapT = THREE.ClampToEdgeWrapping;
+    LITTER.tex = ltex; LITTER.cx = cx0; LITTER.cz = cz0; LITTER.size = WIN;
+  }
   core.userData.treeLod = treePartition;
   core.userData.canopyVariants = CANOPY.length;   // so tools/harness/trees.mjs cannot drift from the table
   trunks.castShadow = true;
   // 'canopies' is the GROUP swayMats (main.js) finds — it reads the shared material off the
   // first child — and the one thing the L4 surface-strip (_apply) has to hide.
   trunks.name = 'trunks';
-  core.add(trunks, canopyGroup, litter);
+  core.add(trunks, canopyGroup);
 
   // FOREST-FLOOR detail: fallen logs + cut stumps among the trees — the bare tree-line given a real
   // woodland floor (the world rang flat). Two InstancedMeshes (+2 draws); own rng so the world scatter

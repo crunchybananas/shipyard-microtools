@@ -87,7 +87,7 @@ echo "== the trees =="
 # both die silently — a dropped attribute reads as 0 in GLSL, a replace that matches
 # nothing is a no-op. Neither reports anything; the trees just go back to folded paper.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/trees.mjs" | tee "$WORK/trees.out"
-grep -q "TREES 8 / 8" "$WORK/trees.out" || { echo "TREES FAILED"; exit 1; }
+grep -q "TREES 12 / 12" "$WORK/trees.out" || { echo "TREES FAILED"; exit 1; }
 
 echo "== the tabletop =="
 # Everything that lies on the chart table has to lie ON it. The table came down from

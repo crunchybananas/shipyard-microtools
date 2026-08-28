@@ -85,7 +85,59 @@ export default async function (h) {
   ok('the fringe is actually turned on', m.fringe > 0.2, { uFringe: m.fringe });
   ok('the trunk carries enough vertices for its root flare', m.trunkVerts >= 100, { trunkVerts: m.trunkVerts });
 
+  // THE NEEDLE LITTER, which the terrain draws rather than an instanced disc — owner:
+  // "the needles should be more like a texture on the ground. this is like a plane that
+  // doesn't align with the ground." A flat disc on a slope cannot align; a mask the
+  // TERRAIN samples cannot misalign.
+  //
+  // And it must be checked BOTH WAYS. CanvasTexture flips Y by default, which mirrors the
+  // whole mask in z: every blob is still perfectly formed, the average is unchanged, and
+  // the litter lands the same distance the wrong side of each stand — brown pools in
+  // empty grass and bare ground under every tree, with nothing to report it. Measuring
+  // only "is it strong under the trunks" would pass a mask that is strong SOMEWHERE.
+  const lit = await h.evaluate(`(() => {
+    let t = null;
+    ABYME.scene.traverse((o) => { if (!t && o.name === 'terrain'
+      && Math.hypot(o.matrixWorld.elements[0], o.matrixWorld.elements[1], o.matrixWorld.elements[2]) > 0.5) t = o; });
+    const sh = t && t.material.userData && t.material.userData.shader;
+    if (!sh || !sh.uniforms.uLitter) return JSON.stringify({ err: 'no litter uniform' });
+    if (sh.uniforms.uLitterOn.value < 0.5) return JSON.stringify({ err: 'litter mask is off' });
+    const tex = sh.uniforms.uLitter.value, R = sh.uniforms.uLitterRect.value;
+    const cv = document.createElement('canvas'); cv.width = tex.image.width; cv.height = tex.image.height;
+    const g = cv.getContext('2d', { willReadFrequently: true }); g.drawImage(tex.image, 0, 0);
+    const at = (x, z) => {                       // flipY is off, so v runs down the canvas
+      const px = Math.round(((x - R.x) / R.z + 0.5) * cv.width);
+      const py = Math.round(((z - R.y) / R.z + 0.5) * cv.height);
+      if (px < 0 || py < 0 || px >= cv.width || py >= cv.height) return null;
+      return g.getImageData(px, py, 1, 1).data[0] / 255;
+    };
+    const T = ABYME.THREE, m = new T.Matrix4(), v = new T.Vector3(), trees = [];
+    ABYME.scene.traverse((o) => {
+      if (!o.isInstancedMesh || o.name !== 'trunks') return;
+      if (Math.hypot(o.matrixWorld.elements[0], o.matrixWorld.elements[1], o.matrixWorld.elements[2]) < 0.5) return;
+      for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, m); v.setFromMatrixPosition(m); trees.push([v.x, v.z]); }
+    });
+    const on = trees.map(([x, z]) => at(x, z)).filter((n) => n !== null);
+    const off = trees.map(([x, z]) => at(x + 26, z + 19)).filter((n) => n !== null);
+    const mean = (a) => (a.length ? a.reduce((s, n) => s + n, 0) / a.length : 0);
+    return JSON.stringify({ trees: trees.length, res: cv.width, flipY: tex.flipY,
+      onTrunk: +mean(on).toFixed(3), away: +mean(off).toFixed(3),
+      covered: on.filter((n) => n > 0.5).length });
+  })()`).then(JSON.parse);
+  ok('the litter mask exists and is switched on', !lit.err, lit);
+  if (!lit.err) {
+    ok('every trunk stands in litter', lit.covered === lit.trees && lit.trees > 0, lit);
+    ok('open ground 30 m off is clear of it', lit.away < 0.20, lit);
+    // ...AND IT IS SAMPLED THE WAY IT WAS STAMPED. The two checks above read the CANVAS,
+    // which flipY does not touch — it changes how the GPU samples the image, not the image.
+    // So they are blind to the exact bug they were written for: I reinstated the flip and
+    // they reported 0.974 at the trunk and passed, on a world where every patch of litter
+    // is the wrong side of its tree. The flag itself is the invariant.
+    ok('the mask is sampled unflipped', lit.flipY === false, { flipY: lit.flipY });
+  }
+
   console.log(`TREES ${R.pass.length} / ${R.pass.length + R.fail.length}`);
+  console.log(`  litter mask ${lit.res || '?'}px · ${lit.onTrunk} at the trunk · ${lit.away} away`);
   console.log(`  ${m.variants} silhouettes · ${m.canopies.length} geometries · ${m.canopies.map((g) => g.verts).join('/')} verts · trunk ${m.trunkVerts} · fringe ${m.fringe}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }

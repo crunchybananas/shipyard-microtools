@@ -16,6 +16,29 @@ export function syncGates(W) {
 import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
+
+// NEEDLE LITTER, as a property of the GROUND rather than as an object lying on it.
+//
+// It was an instanced disc per tree, and the owner named the flaw exactly: "this is like
+// a plane that doesn't align with the ground". It cannot align — a flat disc on sloping
+// terrain floats on the uphill side and buries on the downhill one, and no amount of
+// tuning colour or size fixes a plane sitting on a curve.
+//
+// So the terrain draws it itself. props stamps a soft blob per tree into a mask texture
+// covering the stand, and the terrain shader samples that mask and shifts its own colour
+// — which follows every fold of the ground for free, because it IS the ground. The mask
+// is deliberately coarse (it only has to say WHERE); the needle character comes from
+// procedural grain evaluated per fragment, so the detail is sharp at any distance while
+// the data behind it is a third of a megabyte.
+//
+// props fills this in after the trees are placed, which happens at build time — before
+// the first render, and therefore before onBeforeCompile reads it.
+export const LITTER = { tex: null, cx: 0, cz: 0, size: 1 };
+let _blank = null;
+const _blankTex = () => {
+  if (!_blank) { _blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1); _blank.needsUpdate = true; }
+  return _blank;
+};
 const SEA_FLOOR = -13;
 
 // landmarks (north = +z, east = +x)
@@ -479,6 +502,11 @@ export function buildTerrain() {
     // Mikkelsen bump below. uSandOn flips 0→1 when the image decodes; until then the
     // synthetic sine ripples carry the surface (seamless fallback, no pop risk: the
     // swap is a height-source change inside the same derivative path).
+    // a 1x1 black stand-in: a sampler2D uniform bound to null is undefined behaviour, and
+    // the mask is legitimately absent on the 1:240 clone and in any build with no trees
+    sh.uniforms.uLitter = { value: LITTER.tex || _blankTex() };
+    sh.uniforms.uLitterOn = { value: LITTER.tex ? 1 : 0 };
+    sh.uniforms.uLitterRect = { value: new THREE.Vector3(LITTER.cx, LITTER.cz, LITTER.size || 1) };
     sh.uniforms.uSandOn = { value: 0 };
     sh.uniforms.uSandH = { value: getTexture('sand_height', () => { sh.uniforms.uSandOn.value = 1; }) };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
@@ -499,6 +527,7 @@ export function buildTerrain() {
         uniform float uWaterY; uniform float uTime; uniform float uSunUp;
         uniform sampler2D uCaustic;
         uniform sampler2D uSandH; uniform float uSandOn;
+        uniform sampler2D uLitter; uniform float uLitterOn; uniform vec3 uLitterRect;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
@@ -600,6 +629,22 @@ export function buildTerrain() {
         float caus = smoothstep(0.50, 0.88, min(cl1, cl2));
         float causBand = smoothstep(0.06, 0.5, wDepth) * (1.0 - smoothstep(2.6, 4.5, wDepth));
         diffuseColor.rgb *= 1.0 + caus * causBand * uSunUp * 1.1 * (1.0 - cMini);
+        // NEEDLE LITTER (see LITTER above). The mask says WHERE the conifers have dropped;
+        // the grain below is what makes it read as needles rather than as a stain, and it
+        // is evaluated per fragment so it stays sharp however coarse the mask is.
+        if (uLitterOn > 0.5) {
+          vec2 lu = (vLXZ - uLitterRect.xy) / uLitterRect.z + 0.5;
+          vec2 lc = clamp(lu, 0.0, 1.0);
+          float inside = step(0.0, lu.x) * step(lu.x, 1.0) * step(0.0, lu.y) * step(lu.y, 1.0);
+          float lm = texture2D(uLitter, lc).r * inside * cLand;
+          float lgrain = vnoise(vLXZ * 5.1) * 0.58 + vnoise(vLXZ * 14.3 + 7.0) * 0.42;
+          // toward an ACTUAL needle colour, not a multiply of the ground. Scaling a tan
+          // meadow by (0.66,0.56,0.42) shifts it barely at all — verified by painting the
+          // mask red, which showed it landing perfectly and simply not reading.
+          float lamt = smoothstep(0.02, 0.34, lm) * (0.55 + 0.45 * lgrain);
+          vec3 needles = vec3(0.215, 0.155, 0.088) * (0.72 + 0.58 * lgrain);
+          diffuseColor.rgb = mix(diffuseColor.rgb, needles, min(0.86, lamt));
+        }
       `)
       // aerial perspective (#5a): the FAR land melts toward the grade's haze before
       // global fog reaches it — depth + vastness without washing the near/mid ground
