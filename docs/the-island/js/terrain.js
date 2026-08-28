@@ -355,8 +355,16 @@ export function buildTerrain() {
   const cSandWet = new THREE.Color(0x9d8d6b);
   const cGrass = new THREE.Color(0xc2a45c);
   const cGrassOlive = new THREE.Color(0x8d8a4a);
-  const cRock = new THREE.Color(0xcfc8b8);
-  const cRockDark = new THREE.Color(0x8e887b);
+  const cRock = new THREE.Color(0xc9c1ad);
+  const cRockDark = new THREE.Color(0x7d7668);
+  // THE MEADOW WAS ONE COLOUR. cGrass and cGrassOlive are both desaturated yellows, so
+  // however they were mixed the open ground came out as a single pale field — the biggest
+  // flat surface in the game and the one with the least in it. Two more anchors: a real
+  // GREEN for the damp ground, and a heather brown for the dry exposed patches. A meadow
+  // is not one hue, it is a patchwork, and the patches are what make it read as ground
+  // rather than as a backdrop. Vertex colours, so it costs nothing at runtime.
+  const cGrassGreen = new THREE.Color(0x6d7c40);
+  const cHeather = new THREE.Color(0x9a7f57);
   const cSeabed = new THREE.Color(0x33514e);
   const cSeabedDeep = new THREE.Color(0x16313c);
   const tmp = new THREE.Color();
@@ -388,8 +396,20 @@ export function buildTerrain() {
       // still plain vertex colors: zero runtime cost).
       tSand.lerpColors(cSandWet, cSand, smoothstep(0.8, 2.0, h));
       tRock.lerpColors(cRock, cRockDark, smoothstep(0.6, 1.0, slope));
-      tRock.offsetHSL(0, 0, Math.sin(h * 1.7) * 0.03);       // limestone strata bands
+      // +/-3% lightness was invisible past a few metres, which is why the sea cliffs read
+      // as blank pale walls from across the meadow. Bands differ in WARMTH as well as
+      // value now — real bedding is different rock, not the same rock lit differently.
+      tRock.offsetHSL(Math.sin(h * 1.7 + 0.8) * 0.012, Math.sin(h * 2.3) * 0.05,
+        Math.sin(h * 1.7) * 0.075);                            // limestone strata bands
       tGrass.lerpColors(cGrass, cGrassOlive, n);
+      // two more noise fields, at scales the eye reads as different things: ~60 m for
+      // where the ground is damp enough to be properly green, ~11 m for the drier
+      // heather mottle inside it. Both continuous, so there is no tile to find — the
+      // house rule that killed the old albedo grid applies to colour as much as texture.
+      const nDamp = fbm(x * 0.017 - 61, z * 0.017 + 44, 3);
+      const nPatch = fbm(x * 0.09 + 7, z * 0.09 - 23, 2);
+      tGrass.lerp(cGrassGreen, smoothstep(0.42, 0.86, nDamp) * 0.80);
+      tGrass.lerp(cHeather, smoothstep(0.60, 0.95, nPatch) * 0.40);
       tGrass.offsetHSL(0, 0, (slope - 0.2) * -0.12);
       // grass -> rock across the old slope 0.62 cut
       tmp.lerpColors(tGrass, tRock, smoothstep(0.54, 0.70, slope));
@@ -399,7 +419,11 @@ export function buildTerrain() {
       tmp.lerp(tSand, wSand);
     }
     // global gentle noise so nothing is flat-colored
-    tmp.offsetHSL((r() - 0.5) * 0.012, (r() - 0.5) * 0.03, (n - 0.5) * 0.05);
+    // and a wider per-vertex jitter. At hue +/-0.006 and lightness +/-0.025 this was doing
+    // almost nothing; the ground needs grain at the vertex scale as well as the patch
+    // scale or the patches themselves read as flat regions. Same ONE r() draw per vertex,
+    // so the shared stream is not shifted.
+    tmp.offsetHSL((r() - 0.5) * 0.022, (r() - 0.5) * 0.07, (n - 0.5) * 0.085);
 
     colors[i * 3] = tmp.r; colors[i * 3 + 1] = tmp.g; colors[i * 3 + 2] = tmp.b;
   }

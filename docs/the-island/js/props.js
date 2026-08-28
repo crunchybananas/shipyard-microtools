@@ -3367,7 +3367,7 @@ function buildVegetation(core, r) {
     sh.uniforms.uTime = { value: 0 };
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
     sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs → object-space sample)
-    sh.uniforms.uFolAmt = { value: 0.5 };
+    sh.uniforms.uFolAmt = { value: 0.25 };   // was 0.5 — the asset is a painterly STARBURST motif and at half strength it read as fireworks up close; the procedural needle grain below carries the fine detail now
     sh.uniforms.uFolScale = { value: 1.0 };
     sh.uniforms.uFringe = { value: 0.92 };   // how much of the frond TIPS frays away (a gradient — see the fray block)
     canopyMat.userData.shader = sh;
