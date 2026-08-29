@@ -82,6 +82,13 @@ echo "== relief =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/relief.mjs" | tee "$WORK/relief.out"
 grep -q "RELIEF 8 / 8" "$WORK/relief.out" || { echo "RELIEF FAILED"; exit 1; }
 
+echo "== the gulls =="
+# At dawn one gull leaves the gyre for the gallery rail. It used to get there in a
+# straight line THROUGH the lantern and the dome, and the owner photographed it mid-flight
+# with a wing out through the copper.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/gulls.mjs" | tee "$WORK/gulls.out"
+grep -q "GULLS 1 / 1" "$WORK/gulls.out" || { echo "GULLS FAILED"; exit 1; }
+
 echo "== the trees =="
 # The canopy's detail rides on a custom attribute and three shader-chunk replacements, and
 # both die silently — a dropped attribute reads as 0 in GLSL, a replace that matches

@@ -420,26 +420,56 @@ const gulls = [];
   // paint a wing root→tip. The two wings sit at x = ∓0.7 from one centred plane, so
   // the tip is at local −x on the left and +x on the right — mirrored, which is why
   // this needs a geometry per side. Still one mesh per wing, so draws are unchanged.
+  // A GULL'S WING IS NOT A RECTANGLE, and it is not vertical. This was a flat 1.4 x 0.4
+  // plane left in the XY plane — standing on edge, facing the direction of travel — so
+  // rotating it about Z to "flap" spun it in its own plane like a propeller blade, and
+  // the whole bird read as a paper dart. Owner: "the birds need more detail."
+  //
+  // Now it lies HORIZONTAL (span across, chord fore-and-aft, so the flap rotation about
+  // Z actually raises and lowers it), and it is shaped: the chord tapers to the tip, the
+  // leading edge sweeps AFT, the wing is cambered, and the tip lifts. Those four things
+  // are the whole difference between a card and a bird at any distance.
   const mkWing = (tipAtNegX) => {
-    const g = new THREE.PlaneGeometry(1.4, 0.4, 6, 1);
+    const g = new THREE.PlaneGeometry(1.32, 0.44, 10, 2);
     const p = g.attributes.position, col = new Float32Array(p.count * 3), c = new THREE.Color();
     for (let i = 0; i < p.count; i++) {
-      // 0 at the body, 1 at the tip
-      const t = tipAtNegX ? (0.7 - p.getX(i)) / 1.4 : (p.getX(i) + 0.7) / 1.4;
-      c.copy(C_BODY).lerp(C_MANTLE, Math.min(1, t * 1.5)).lerp(C_TIP, Math.max(0, (t - 0.72) / 0.28));
+      const x = p.getX(i), y = p.getY(i);
+      const t = tipAtNegX ? (0.66 - x) / 1.32 : (x + 0.66) / 1.32;   // 0 root → 1 tip
+      const taper = 1 - t * t * 0.74;                 // narrow to a point
+      p.setY(i, y * taper - t * t * 0.30);            // taper + sweep the wing aft
+      p.setZ(i, Math.sin(t * Math.PI) * 0.05 + t * t * 0.13);   // camber, and the tip lifts
+      c.copy(C_BODY).lerp(C_MANTLE, Math.min(1, t * 1.5)).lerp(C_TIP, Math.max(0, (t - 0.70) / 0.30));
       col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
     }
     g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.computeVertexNormals();
+    g.rotateX(-Math.PI / 2);                          // lie flat: span in x, chord in z
     return g;
   };
   const wingGeoL = mkWing(true), wingGeoR = mkWing(false);
 
-  const bodyCone = new THREE.ConeGeometry(0.13, 0.6, 8);
+  const bodyCone = new THREE.ConeGeometry(0.115, 0.62, 8);
   bodyCone.rotateX(Math.PI / 2.15);                       // nose forward, tail riding up
-  const headBall = new THREE.SphereGeometry(0.09, 8, 6);
-  headBall.translate(0, 0.07, 0.33);
-  const gullBodyGeo = mergeGeometries([bodyCone, headBall]);
-  bodyCone.dispose(); headBall.dispose();
+  const headBall = new THREE.SphereGeometry(0.085, 8, 6);
+  headBall.translate(0, 0.075, 0.32);
+  // a beak, and a TAIL — a gull in the air is a cross, and without the tail the rear
+  // just stops. Both are a handful of triangles on a geometry eight birds share.
+  const beak = new THREE.ConeGeometry(0.022, 0.11, 5);
+  beak.rotateX(Math.PI / 2);
+  beak.translate(0, 0.065, 0.40);
+  const tail = new THREE.PlaneGeometry(0.30, 0.26, 2, 1);
+  {
+    const tp = tail.attributes.position;
+    for (let i = 0; i < tp.count; i++) {                  // a notched delta, not a paddle
+      const tx = tp.getX(i);
+      tp.setY(i, tp.getY(i) * (0.35 + 0.65 * Math.abs(tx) / 0.15));
+    }
+    tail.computeVertexNormals();
+    tail.rotateX(-Math.PI / 2 + 0.16);
+    tail.translate(0, 0.03, -0.36);
+  }
+  const gullBodyGeo = mergeGeometries([bodyCone, headBall, beak, tail]);
+  bodyCone.dispose(); headBall.dispose(); beak.dispose(); tail.dispose();
   {
     // the body is white underneath and grey along the back — the same read as the
     // wings, so a gull seen from below is pale and from above is a grey shape on the sea
@@ -1667,7 +1697,21 @@ function tickGulls(elapsed, dt) {
     g.rotation.y = -a + (u.speed < 0 ? Math.PI : 0); // nose along the flight tangent (flip for counter-wheelers)
     let flapAmp = 0.5;
     if (g === gulls[0] && settle > 0) {
-      g.position.lerp(GULL_PERCH, settle);
+      // SPIRAL IN — do not lerp through the building. A straight line from the gyre
+      // (radius 24, 32 m up) to the rail (radius 3.05, 21.95 m up) passes THROUGH the
+      // lantern and the dome, and at mid-settle it parks the bird inside them: the owner
+      // caught it at dawn with a wing out through the copper, "seems like a bird caught
+      // in the tower?". Interpolating in the gyre's own polar frame instead — radius,
+      // bearing and height each on their own — keeps the bird outside the tower for the
+      // whole descent by construction, because the radius only ever shrinks TOWARD the
+      // rail and the rail is outside everything. It also just looks right: a gull
+      // wheeling down onto a handrail rather than sliding down a wire.
+      const gy = LH.y + u.h + Math.sin(a * 2.3) * 2;
+      const rr = lerp(u.radius, 3.05, settle);
+      let da = -a;                                    // the perch sits at bearing 0
+      da = Math.atan2(Math.sin(da), Math.cos(da));    // take the short way round
+      const ra = a + da * settle;
+      g.position.set(LH.x + Math.cos(ra) * rr, lerp(gy, LH.y + 21.95, settle), LH.z + Math.sin(ra) * rr);
       g.position.y += Math.sin(elapsed * 2.2) * 0.02 * settle;   // breathing
       g.rotation.y = lerp(g.rotation.y, Math.PI / 2, settle);    // face the dawn (east)
       flapAmp = 0.5 * (1 - settle);                              // fold
@@ -1756,6 +1800,7 @@ player.onFootstep = (kind, pos) => {
     // 'rim' lights only the silhouette and leaves the body colour alone.
     glintStyle: (v) => (v === undefined ? interact.glintStyle : interact.setGlintStyle(v)),
     interact,   // hotspots + hover state, for tools/harness/glint.mjs
+    gulls,      // the wheeling flock, for tools/harness/gulls.mjs
     SHELF_MARKS, SHELF_TITLES, SHELF_STATS, spineAtlas,   // the lettered spines, for tools/harness/spines.mjs
     RELIEF,     // relief asked-vs-applied, for tools/harness/relief.mjs
     // THE STACK (STACK.md) — inspect what the rungs above displaced onto this one.

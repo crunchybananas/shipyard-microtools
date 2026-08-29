@@ -32,6 +32,11 @@ gate that has guarded every fire since the walk was born:
   silence: the shore's three stone types all derive relief from one heightmap and two came
   out bare, and the terrain's sand ripples never switched on. Timing-dependent, so it came
   and went. 8 assertions.
+- **`gulls.mjs`** — the dawn percher must not fly through the lighthouse. Walks the whole
+  settle ramp (the bug lives entirely in the MIDDLE — sampling the settled state scores
+  identically either way) and measures the bird's origin against the tower's real profile,
+  against the HALF-SPAN: a gull is 2.64 m across, so 0.98 m of origin clearance still
+  buries a third of a metre of wing in the copper. 1 assertion.
 - **`trees.mjs`** — the canopy's fray, needle grain, clump bump and tip-weighted sway are
   a custom vertex attribute plus three shader-chunk replacements, and both kinds fail
   SILENTLY: a dropped attribute reads as 0 in GLSL, a replace that matches nothing is a
