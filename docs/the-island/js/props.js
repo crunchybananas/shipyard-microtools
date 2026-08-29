@@ -3760,12 +3760,60 @@ function buildVegetation(core, r) {
       // effect landed in exactly the right place and had no weight.
       const rad = Math.max(5, (3.4 * sv.x / WIN) * SZ);
       const grd = g2.createRadialGradient(px, py, 0, px, py, rad);
-      grd.addColorStop(0, 'rgba(255,255,255,1)');
-      grd.addColorStop(0.42, 'rgba(255,255,255,0.85)');
-      grd.addColorStop(0.72, 'rgba(255,255,255,0.36)');
-      grd.addColorStop(1, 'rgba(255,255,255,0)');
+      // RED ONLY. The mask has three channels and was using one thing's worth of all of
+      // them; the worn paths below ride in GREEN, so both land in one texture and cost the
+      // terrain one fetch between them.
+      grd.addColorStop(0, 'rgba(255,0,0,1)');
+      grd.addColorStop(0.42, 'rgba(255,0,0,0.85)');
+      grd.addColorStop(0.72, 'rgba(255,0,0,0.36)');
+      grd.addColorStop(1, 'rgba(255,0,0,0)');
       g2.fillStyle = grd;
       g2.beginPath(); g2.arc(px, py, rad, 0, TAU); g2.fill();
+    }
+    // ---- WORN PATHS (green channel) --------------------------------------
+    // The ground remembers being walked. STACK.md §3.1: your rung inherits the ledger of
+    // the rung above and renders it as EVIDENCE — "footprints from a route you didn't
+    // walk". The barren meadow is the best canvas in the game for that and was using none
+    // of it, so the emptiness read as unfinished rather than as history.
+    //
+    // AMBIGUOUS ON PURPOSE. At level 1 this is a faint thinning of the turf that could be
+    // weather, or sheep, or nothing. It only resolves into somebody's route as you go
+    // DOWN — driven by uPathAmt in main.js off W.level — which is the same shape as the
+    // spine acrostic: present from the first minute, legible when you have earned it.
+    //
+    // Routes are the ones a keeper actually walks: the tower to the shore he washed up on,
+    // the tower to the stones, the stones to the chest. They MEANDER — a path that is a
+    // straight line between two landmarks is a survey, not a habit.
+    {
+      const wob = mulberry32(SEED ^ 0x30a7);
+      const toPx = (wx, wz) => [((wx - cx0) / WIN + 0.5) * SZ, ((wz - cz0) / WIN + 0.5) * SZ];
+      const route = (a, b, width) => {
+        const N = 26;
+        g2.strokeStyle = 'rgba(0,255,0,0.30)';
+        g2.lineWidth = width; g2.lineCap = 'round'; g2.lineJoin = 'round';
+        // three passes, each wandering slightly differently: a trodden way is a braid of
+        // near-parallel lines, not one stroke
+        for (let pass = 0; pass < 3; pass++) {
+          g2.beginPath();
+          for (let i = 0; i <= N; i++) {
+            const t = i / N;
+            // sag off the straight line, most in the middle, and jitter along the way
+            const sag = Math.sin(t * Math.PI) * (wob() - 0.5) * 26 + (wob() - 0.5) * 5;
+            const mx = a.x + (b.x - a.x) * t, mz = a.y + (b.y - a.y) * t;
+            const nx = -(b.y - a.y), nz = (b.x - a.x);
+            const nl = Math.hypot(nx, nz) || 1;
+            const [px, py] = toPx(mx + (nx / nl) * sag, mz + (nz / nl) * sag);
+            if (i === 0) g2.moveTo(px, py); else g2.lineTo(px, py);
+          }
+          g2.stroke();
+        }
+      };
+      const S = SPOTS;
+      route(S.lighthouse, S.beach, 13);        // the tower to the shore he washed up on
+      route(S.lighthouse, S.stones, 11);       // the tower to the stones
+      route(S.stones, S.chest, 8);             // and out to the chest
+      route(S.lighthouse, S.mainCenter, 9);    // across the meadow
+      g2.globalCompositeOperation = 'source-over';
     }
     const ltex = new THREE.CanvasTexture(cv);
     // flipY MUST be off. A CanvasTexture flips by default, so texture v=0 is the BOTTOM

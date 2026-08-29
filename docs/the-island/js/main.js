@@ -1666,6 +1666,11 @@ function applyAtmosphere(elapsed, dt) {
     tu.uWaterY.value = waterY();
     tu.uTime.value = elapsed;
     tu.uSunUp.value = clamp((_sunV.y + 0.02) / 0.14, 0, 1);
+    // THE MARKS SHARPEN AS YOU GO DOWN. At the surface a worn path is deniable — weather,
+    // or sheep, or nothing. Each rung inherits more of the ledger above it (STACK.md §3.1)
+    // and the ground admits more of what it is. Never fully: 0.62 at the bottom, because a
+    // path you can be certain about stops being evidence and starts being signage.
+    if (tu.uPathAmt) tu.uPathAmt.value = 0.22 + Math.min(W.level - 1, 3) * 0.19;
   }
 
 

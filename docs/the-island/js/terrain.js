@@ -506,6 +506,7 @@ export function buildTerrain() {
     // the mask is legitimately absent on the 1:240 clone and in any build with no trees
     sh.uniforms.uLitter = { value: LITTER.tex || _blankTex() };
     sh.uniforms.uLitterOn = { value: LITTER.tex ? 1 : 0 };
+    sh.uniforms.uPathAmt = { value: 0.0 };   // driven by depth in main.js — see the paths block
     sh.uniforms.uLitterRect = { value: new THREE.Vector3(LITTER.cx, LITTER.cz, LITTER.size || 1) };
     sh.uniforms.uSandOn = { value: 0 };
     sh.uniforms.uSandH = { value: getTexture('sand_height', () => { sh.uniforms.uSandOn.value = 1; }) };
@@ -528,6 +529,7 @@ export function buildTerrain() {
         uniform sampler2D uCaustic;
         uniform sampler2D uSandH; uniform float uSandOn;
         uniform sampler2D uLitter; uniform float uLitterOn; uniform vec3 uLitterRect;
+        uniform float uPathAmt;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
@@ -644,6 +646,18 @@ export function buildTerrain() {
           float lamt = smoothstep(0.02, 0.34, lm) * (0.55 + 0.45 * lgrain);
           vec3 needles = vec3(0.215, 0.155, 0.088) * (0.72 + 0.58 * lgrain);
           diffuseColor.rgb = mix(diffuseColor.rgb, needles, min(0.86, lamt));
+          // WORN PATHS ride in the mask's GREEN channel — same texture, same fetch. Turf
+          // walked thin shows the ground through it: a little lighter, a little browner,
+          // never a stripe. It takes the same grain as the litter so it breaks up like
+          // ground rather than reading as paint, and uPathAmt keeps it deniable until
+          // you have been down far enough to know what it is.
+          float pm = texture2D(uLitter, lc).g * inside * cLand;
+          // A 14% lightening was invisible at eye height, where a path is foreshortened
+          // to almost nothing — measured against uPathAmt 0 and the frames were the same
+          // picture. Worn turf goes to bare earth, so it shifts HUE as well as value.
+          float pamt = smoothstep(0.06, 0.55, pm) * uPathAmt * (0.60 + 0.40 * lgrain);
+          vec3 worn = mix(diffuseColor.rgb, vec3(0.40, 0.335, 0.225), 0.70) * (1.06 + 0.18 * lgrain);
+          diffuseColor.rgb = mix(diffuseColor.rgb, worn, pamt);
         }
       `)
       // aerial perspective (#5a): the FAR land melts toward the grade's haze before
