@@ -444,6 +444,13 @@ const gulls = [];
     g.setAttribute('color', new THREE.BufferAttribute(col, 3));
     g.computeVertexNormals();
     g.rotateX(-Math.PI / 2);                          // lie flat: span in x, chord in z
+    // ROOT AT THE ORIGIN. The wing was centred on its own middle and the mesh was then
+    // placed at x = ∓0.7, so rotating it about z pivoted it about the MIDDLE of the span:
+    // the tip went down while the root went up, straight through the body. Owner: "bird
+    // wings seem to almost flap backwards. rather than hinge at the body, they flap at
+    // the body." A wing hinges at the shoulder — put the shoulder on the axis and the
+    // rotation is a shoulder joint.
+    g.translate(tipAtNegX ? -0.66 : 0.66, 0, 0);
     return g;
   };
   const wingGeoL = mkWing(true), wingGeoR = mkWing(false);
@@ -497,9 +504,9 @@ const gulls = [];
   for (const f of FLOCK) {
     const g = new THREE.Group();
     const l = new THREE.Mesh(wingGeoL, wingMat);
-    l.position.x = -0.7;
+    l.position.x = -0.055;                            // the shoulder, at the body's edge
     const r = new THREE.Mesh(wingGeoR, wingMat);
-    r.position.x = 0.7;
+    r.position.x = 0.055;
     // a body between the wings — songbird recipe, gull proportions —
     // so the dawn percher reads as a bird up close, not two cards
     g.add(l, r, new THREE.Mesh(gullBodyGeo, wingMat));

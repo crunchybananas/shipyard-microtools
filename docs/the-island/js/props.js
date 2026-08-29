@@ -1489,6 +1489,34 @@ export function buildWorld() {
 
   // plumb mechanism over the table + brass floor plate (the dive spot)
   {
+    // A PULLEY HANGS FROM SOMETHING. This one floated under the ceiling with nothing
+    // holding it, and through the oculus from the study floor it reads as a stray gold
+    // object rather than as fitted equipment — owner, by F8: "is that item intentional?"
+    // It is: it is the plumb mechanism over the chart table. It just did not look FITTED.
+    // A ceiling plate and two straps carrying the axle is the whole difference between a
+    // machine and a prop.
+    {
+      // A BEAM, not a ceiling plate. The pulley hangs over the OCULUS — the hole the
+      // light shaft comes down — so there is no ceiling above it to bolt anything to, and
+      // a plate on its own floats exactly as badly as the pulley did. A timber spanning
+      // the opening is what a keeper would actually put there, and it gives the straps
+      // something to carry from.
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(2.92, 0.12, 0.16), matWood);
+      beam.position.set(LH.x, LH.y + baseH - 0.07, LH.z);
+      core.add(beam);
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.035, 0.22), matBrassSolid);
+      plate.position.set(LH.x, LH.y + baseH - 0.15, LH.z);
+      core.add(plate);
+      for (const sz of [-0.075, 0.075]) {              // the axle's cheeks, flanking the wheel
+        const strap = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.30, 0.035), matBrassSolid);
+        strap.position.set(LH.x, LH.y + 4.44, LH.z + sz);
+        core.add(strap);
+      }
+      const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.22, 6), matBrassSolid);
+      axle.rotation.x = Math.PI / 2;
+      axle.position.set(LH.x, LH.y + 4.4, LH.z);
+      core.add(axle);
+    }
     const pulley = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 10), matBrassSolid);
     pulley.rotation.x = Math.PI / 2;
     pulley.position.set(LH.x, LH.y + 4.4, LH.z);
