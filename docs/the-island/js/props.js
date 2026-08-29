@@ -4174,6 +4174,57 @@ function buildVegetation(core, r) {
   }
   rockMeshes.forEach((im, b) => { im.count = riCount[b]; core.add(im); });   // trim each to its filled count
 
+  // --- ERRATICS: stone INLAND, not only on the shore -------------------------
+  // Every rock on this island stood below y 4 — the shore band — so the whole meadow, the
+  // largest thing you look at, had nothing on it harder than a bush. Owner: "this seems so
+  // barren. we need more nuance and variation of the landscape, and not just the same
+  // trees and rocks stamped out."
+  //
+  // Glacial erratics are what a scoured coastal heath actually has: boulders dropped where
+  // the ice left them, in FIELDS rather than evenly, and in a range of sizes a shore scatter
+  // never shows — from a knee-high stone to something you walk around. The size range here
+  // is 0.5 to 5.2, against the shore's 0.5 to 2.7, because "stamped out" is as much about
+  // one size as about one shape.
+  //
+  // Its own rng (er), so a few hundred stones do not shift the shared stream. Three meshes
+  // (one per stone type, reusing the shore's geometry and relief materials) = +3 draws.
+  {
+    const er = mulberry32(SEED ^ 0x77b3);
+    const errMesh = rockDefs.map((d, idx) => {
+      const im = new THREE.InstancedMesh(rockVariants[idx], rockMeshes[idx].material, 90);
+      im.castShadow = true; im.receiveShadow = true; im.name = 'erratics';
+      return im;
+    });
+    const en = [0, 0, 0];
+    const em = new THREE.Matrix4(), eq = new THREE.Quaternion(), ee = new THREE.Euler();
+    // FIELDS, the same lesson the heath taught: evenly scattered stones over 150 m read as
+    // litter, a dozen boulders together read as a place the ice stopped.
+    for (let f = 0; f < 26; f++) {
+      const fa = er() * TAU, fd = 24 + Math.sqrt(er()) * 128;
+      const fx = SPOTS.mainCenter.x + Math.sin(fa) * fd;
+      const fz = SPOTS.mainCenter.y + Math.cos(fa) * fd;
+      const frad = 5 + er() * 16;
+      for (let j = 0; j < 26; j++) {
+        const a = er() * TAU, d = Math.sqrt(er()) * frad;
+        const x = fx + Math.sin(a) * d, z = fz + Math.cos(a) * d;
+        const hh = heightAt(x, z);
+        if (hh < 4.5 || hh > 19) continue;              // inland only — the shore has its own
+        if (!open(x, z) || grade(x, z) > 1.15) continue;
+        const bucket = (n) => (n < 0.46 ? 0 : n < 0.76 ? 1 : 2);
+        const b = bucket(er());
+        if (en[b] >= 90) continue;
+        // most are small, a few are landmarks — a square skew, so the big ones are rare
+        const u = er(), sc = 0.5 + u * u * u * 4.7;
+        em.compose(new THREE.Vector3(x, hh + sc * 0.16, z),
+          eq.setFromEuler(ee.set(er() * TAU, er() * TAU, er() * TAU)),
+          new THREE.Vector3(sc, sc * (0.55 + er() * 0.5), sc));
+        errMesh[b].setMatrixAt(en[b]++, em);
+        if (sc >= 1.0) { addCollider(x, z, sc * 0.78); boulders.push([x, hh, z, sc]); }
+      }
+    }
+    errMesh.forEach((im, b) => { im.count = en[b]; if (en[b]) core.add(im); });
+  }
+
   // LICHEN on the shore boulders — sage-grey and rust crusty patches weathering the bare granite (the
   // rocks rang plain grey; this gives them coastal character + a touch of colour). One InstancedMesh
   // (+1 draw); own rng so the world scatter stays byte-identical; placed on the upper boulder surfaces.
