@@ -111,6 +111,198 @@ export const SHELF_STATS = { books: 0, lettered: 0, stacks: 0 };
 // so this one number moves the LETTERING and leaves the boards, doors and jambs alone.
 export const GILT_REST = 0.45, GILT_HOVER = 0.75;
 
+// THE GENEROUS MARK — a small terrain-conforming canvas at the live shoreline.
+//
+// A flat decal on this beach repeats the needle-litter mistake: one side floats
+// and the other buries as the sand rises. This grid samples heightAt at each
+// vertex, so the writing is not a prop sitting on the shore; it follows the same
+// ground the player walks. One draw, 216 triangles, pruned from the 1:240 model.
+// The physical patch is human-scale: a long line may take a few steps, but a
+// short one should never read like monumental lettering across the beach.
+const SAND_WRITE_W = 4.2, SAND_WRITE_D = 1.25;
+const SAND_WRITE_NX = 18, SAND_WRITE_NZ = 6;
+const SAND_WRITE_X = -4;
+const SAND_WRITE_CLEARANCE = 0.92;
+
+function sandWritingGeometry() {
+  const pos = [], uv = [], idx = [];
+  for (let z = 0; z <= SAND_WRITE_NZ; z++) {
+    const v = z / SAND_WRITE_NZ;
+    for (let x = 0; x <= SAND_WRITE_NX; x++) {
+      const u = x / SAND_WRITE_NX;
+      pos.push((u - 0.5) * SAND_WRITE_W, 0, (v - 0.5) * SAND_WRITE_D);
+      // CanvasTexture flips its source for WebGL. This XZ grid is read from the
+      // landward (+z) edge, opposite PlaneGeometry's usual facing, so invert V
+      // here or every glyph is vertically upside down in the world.
+      uv.push(u, 1 - v);
+    }
+  }
+  const row = SAND_WRITE_NX + 1;
+  for (let z = 0; z < SAND_WRITE_NZ; z++) for (let x = 0; x < SAND_WRITE_NX; x++) {
+    const a = z * row + x, b = a + 1, c = a + row, d = c + 1;
+    idx.push(a, c, b, b, c, d);                  // +Y faces; material is double-sided besides
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function sandWritingAnchor(seaY) {
+  // Follow the water landward from the wake-up beach until a full hand's breadth
+  // of dry sand remains. The deeper rungs have higher shores; the writing surface
+  // moves with them instead of becoming an unreadable promise under the water.
+  // Never start inside the wet-pebble apron (-106.5..-98.5). You cannot write
+  // legibly in shingle, and its dense relief swallowed the fresh cut completely.
+  let z = -96;
+  const target = seaY + SAND_WRITE_CLEARANCE;
+  for (; z <= -58; z += 0.5) if (heightAt(SAND_WRITE_X, z) >= target) break;
+  const y = heightAt(SAND_WRITE_X, z);
+  return { x: SAND_WRITE_X, y, z };
+}
+
+function writingHash(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+function writingRand(seed) {
+  let x = seed >>> 0;
+  return () => { x += 0x6D2B79F5; let t = x; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+
+function writingFont(ctx, px) {
+  // A system hand, not the game's book face. The per-glyph drift below keeps the
+  // fallback from becoming a mechanically perfect line on platforms without it.
+  ctx.font = `400 ${px}px "Noteworthy", "Chalkboard", "Chalkboard SE", "Segoe Print", cursive`;
+}
+
+function fitWriting(ctx, text, maxWidth, maxPx) {
+  const chars = Array.from(text);
+  let px = maxPx;
+  let widths = [], total = Infinity;
+  do {
+    writingFont(ctx, px);
+    widths = chars.map((ch) => ctx.measureText(ch).width + (ch === ' ' ? px * 0.12 : px * 0.025));
+    total = widths.reduce((sum, w) => sum + w, 0);
+    if (total <= maxWidth || px <= 24) break;
+    px -= 2;
+  } while (true);
+  return { chars, widths, total, px };
+}
+
+export function updateSandWriting(mesh, marks, level, seaY) {
+  if (!mesh?.userData?.writingCanvas) return;
+  const anchor = sandWritingAnchor(seaY);
+  mesh.position.set(anchor.x, anchor.y + 0.035, anchor.z);
+  mesh.userData.anchor = anchor;
+
+  // Re-conform the grid at the new shoreline. x/z never change, so they are also
+  // the immutable local coordinates we sample from on each rung.
+  const pa = mesh.geometry.attributes.position;
+  for (let i = 0; i < pa.count; i++) {
+    pa.setY(i, heightAt(anchor.x + pa.getX(i), anchor.z + pa.getZ(i)) - anchor.y);
+  }
+  pa.needsUpdate = true;
+  mesh.geometry.computeVertexNormals();
+  mesh.geometry.computeBoundingSphere();
+
+  const stylus = mesh.userData.stylus;
+  if (stylus) {
+    const sx = anchor.x + SAND_WRITE_W * 0.44, sz = anchor.z + SAND_WRITE_D * 0.28;
+    stylus.position.set(sx, heightAt(sx, sz) + 0.08, sz);
+  }
+
+  // Nearest rung first, newest hand first; three is enough for a shore to feel
+  // inhabited without turning this quiet beat into a public message board.
+  const chosen = [...(marks || [])]
+    .sort((a, b) => (level - a.r) - (level - b.r) || (b.n || 0) - (a.n || 0) || String(a.h).localeCompare(String(b.h)))
+    .slice(0, 3);
+  const key = level + '|' + chosen.map((m) => [m.r, m.h, m.n, m.t].join(':')).join('|');
+  if (mesh.userData.writingKey === key) return;
+  mesh.userData.writingKey = key;
+
+  const cv = mesh.userData.writingCanvas, g = cv.getContext('2d');
+  g.clearRect(0, 0, cv.width, cv.height);
+  const state = [];
+  const rowH = cv.height / Math.max(1, chosen.length);
+  chosen.forEach((m, i) => {
+    const age = Math.max(0, level - m.r);
+    const weather = clamp(age * 0.34, 0, 0.82);
+    const row = document.createElement('canvas');
+    row.width = cv.width; row.height = Math.ceil(rowH);
+    const r = row.getContext('2d');
+    const layout = fitWriting(r, m.t, row.width - 150, Math.min(64, row.height * 0.56));
+    r.textAlign = 'center'; r.textBaseline = 'middle'; r.lineCap = r.lineJoin = 'round';
+    // Each glyph gets a fixed, tiny wander in baseline and angle. It is still the
+    // exact line the player entered, but it has been made by a hand moving a stick,
+    // not by a compositor setting display type.
+    const mid = row.height * 0.52;
+    const hand = writingRand(writingHash(m.h + '|' + m.r + '|' + m.t + '|hand'));
+    const fade = Math.max(0.18, 1 - weather * 1.12);
+    let penX = (row.width - layout.total) * 0.5;
+    layout.chars.forEach((ch, ci) => {
+      const advance = layout.widths[ci];
+      if (ch !== ' ') {
+        r.save();
+        r.translate(penX + advance * 0.5 + (hand() - 0.5) * 2.2,
+          mid + (hand() - 0.5) * 5.4);
+        r.rotate((hand() - 0.5) * 0.052);
+        r.scale(0.985 + hand() * 0.03, 0.975 + hand() * 0.045);
+        writingFont(r, layout.px);
+        // A narrow pale lip sits sunward of a darker cut. The offset is small
+        // enough to read as displaced grains, not a second printed copy.
+        // Light catches the lower-right wall of the cut; the upper-left wall is
+        // dark. Reversing these offsets makes the same mark look embossed.
+        r.fillStyle = `rgba(237,218,168,${0.24 * fade})`;
+        r.fillText(ch, 0.65, 0.8);
+        r.fillStyle = `rgba(43,34,24,${0.84 * fade})`;
+        r.fillText(ch, -0.55, -0.65);
+        r.restore();
+      }
+      penX += advance;
+    });
+
+    // Weather removes deterministic grains and short tide-cuts from the stroke.
+    // It never changes between reloads: instability here reads as a rendering bug,
+    // while fixed loss reads as history.
+    const rand = writingRand(writingHash(m.h + '|' + m.r + '|' + m.t));
+    r.globalCompositeOperation = 'destination-out';
+    for (let n = 0; n < Math.floor(weather * 190); n++) {
+      const x = rand() * row.width, y = mid + (rand() - 0.5) * layout.px * 1.35;
+      const w = 0.8 + rand() * (2.2 + weather * 7);
+      r.fillStyle = `rgba(0,0,0,${0.34 + rand() * 0.62})`;
+      r.fillRect(x, y, w, 0.8 + rand() * 2.2);
+    }
+    // Concentrate a second family of cuts where the letters actually are. Sparse
+    // full-canvas grains alone could miss every stroke and make age 1 look fresh.
+    // These short lateral losses read as the first wash of a tide, while the
+    // remaining groove stays legible enough to be help.
+    const textW = layout.total;
+    const textX = (row.width - textW) * 0.5;
+    const tideCuts = age > 0 ? Math.min(14, 3 + age * 3) : 0;
+    for (let n = 0; n < tideCuts; n++) {
+      const x = textX + rand() * textW;
+      const y = mid + (rand() - 0.5) * layout.px * 0.42;
+      const w = 28 + rand() * (55 + weather * 150);
+      r.fillStyle = `rgba(0,0,0,${0.84 + rand() * 0.14})`;
+      r.fillRect(x, y, w, 5 + rand() * (6 + weather * 13));
+    }
+    r.globalCompositeOperation = 'source-over';
+    g.drawImage(row, 0, i * rowH);
+    state.push({ text: m.t, rung: m.r, hand: m.h, age, weather });
+  });
+  const data = g.getImageData(0, 0, cv.width, cv.height).data;
+  let inkPixels = 0;
+  for (let i = 3; i < data.length; i += 4) if (data[i] > 12) inkPixels++;
+  mesh.userData.writingState = { level, lines: state, inkPixels };
+  mesh.material.map.needsUpdate = true;
+  mesh.visible = chosen.length > 0;
+}
+
 let _spineTex = null;
 export function spineAtlas() {
   if (_spineTex) return _spineTex;
@@ -2018,6 +2210,43 @@ export function buildWorld() {
       bottle.rotation.z = Math.PI / 2 - 0.22;                 // lying tilted, half-buried
       bottle.rotation.y = 0.6;
       core.add(bottle);
+    }
+
+    // A length of silvered driftwood beside an unbroken patch of sand: the only
+    // instrument in the game whose consequence is kind. Touching the stick opens
+    // the one-line surface; updateSandWriting conforms and fills the transparent
+    // grid once the ledger says there are words to show.
+    {
+      const cv = document.createElement('canvas');
+      cv.width = 1024; cv.height = 320;
+      const tex = new THREE.CanvasTexture(cv);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+      const mat = new THREE.MeshBasicMaterial({
+        map: tex, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+        alphaTest: 0.015, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+      });
+      const writing = new THREE.Mesh(sandWritingGeometry(), mat);
+      writing.name = 'sandWriting';
+      writing.visible = false;
+      writing.frustumCulled = false;             // the surface relocates per rung
+      writing.userData.writingCanvas = cv;
+
+      const stylus = new THREE.Group();
+      stylus.name = 'sandStylus';
+      stylus.rotation.y = -0.28;
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.045, 0.92, 7), weather);
+      shaft.rotation.z = Math.PI / 2 - 0.08;
+      stylus.add(shaft);
+      const tip = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.16, 7),
+        new THREE.MeshStandardMaterial({ color: 0x3b3025, roughness: 1 }));
+      tip.rotation.z = -Math.PI / 2;
+      tip.position.x = 0.53;
+      stylus.add(tip);
+      writing.userData.stylus = stylus;
+      core.add(writing, stylus);
+      defineProp('sandWriting', { prune: true });
+      defineProp('sandStylus', { prune: true });
     }
 
     // the dory — beached on the dry sand, bow toward the water, keeled over

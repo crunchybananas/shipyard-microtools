@@ -25,6 +25,12 @@
 
 export const LEDGER_VERSION = 1;
 
+// A shore line is intentionally small: it has to fit as one scratched thought,
+// and online it becomes permanent stranger-controlled text. Count code points,
+// not UTF-16 halves, so a non-ASCII hand is not cut in the middle of a character.
+export const MAX_WRITING_LENGTH = 48;
+export const MAX_WRITINGS_PER_RUNG = 8;
+
 // Its own storage key, deliberately NOT part of the save payload: wiping a save
 // starts your run over, but the stack you are standing in outlives you. That is
 // the thesis, and it is also why "Begin again" must not hand you a dry island.
@@ -53,7 +59,7 @@ const BOUND_Y = 120;
 //
 // A flag with no row here records NOTHING. That is the default and it is correct:
 // only the god-verbs — the acts that reach through the model and change the world
-// — cost anybody anything. Reading a letter is free.
+// — cost anybody anything. Reading a letter is free; writing is the named exception.
 export const MARK_KINDS = {
   // the four instruments on the chart table: the model reaching into the world
   valve:   { draft: 0.030, evidence: true },   // the sea moved because you asked
@@ -68,6 +74,10 @@ export const MARK_KINDS = {
   // the plate itself — the heaviest act in the game, because it is the one that
   // makes a new rung for somebody to be born on
   dive:    { draft: 0.060, evidence: true },
+  // THE EXCEPTION. Words travel down like every other mark, but displace no water
+  // and never become a generic pale scuff: the dedicated shore renderer carries
+  // them. This is the one thing a hand can leave below that is not harm.
+  writing: { draft: 0.000, evidence: false },
 };
 
 // Which progression flags ARE acts of displacement. puzzles.js `flag()` is the
@@ -153,8 +163,25 @@ export function dispose(led, { kind, rung, hand }) {
 //   k  kind (a MARK_KINDS key)   r  rung it was performed on (1..)
 //   h  hand id                   n  that hand's sequence number (ordering)
 //   at [x,y,z] or null           — where, when the kind is worth showing
-function makeMark(kind, rung, hand, seq, at) {
-  return {
+//   t  sanitized text            — writing only; absent on every costed mark
+export function sanitizeWriting(value) {
+  if (typeof value !== 'string') return '';
+  // NFKC closes visually-confusable width variants; controls and every run of
+  // whitespace collapse to one ordinary space. Rendering uses canvas (never HTML),
+  // but sanitation still belongs here because shared payloads are hostile input.
+  const clean = value.normalize('NFKC')
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ')
+    // Invisible direction controls can make a shared line appear to say
+    // something other than its stored order. Keep joiners used by emoji and
+    // scripts, but drop bidi overrides, isolates, BOM and zero-width space.
+    .replace(/[\u200b\u200e\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return Array.from(clean).slice(0, MAX_WRITING_LENGTH).join('');
+}
+
+function makeMark(kind, rung, hand, seq, at, text = '') {
+  const mark = {
     k: kind,
     r: rung | 0,
     h: String(hand || '?').slice(0, 16),
@@ -163,25 +190,28 @@ function makeMark(kind, rung, hand, seq, at) {
       ? [+at[0], +at[1], +at[2]]
       : null,
   };
+  if (kind === 'writing') mark.t = sanitizeWriting(text);
+  return mark;
 }
 
 // ---------------- recording ---------------------------------------------------
 
-// Append one act. Returns the mark, or null when the kind is not one we cost
-// (the overwhelmingly common case — most flags are free).
+// Append one mark. Returns it, or null when the kind is unknown or its payload is
+// unusable (the overwhelmingly common case at flag() sites — most flags are free).
 //
 // Idempotent per (hand, rung, kind): turning the valve forty times is one act of
 // displacement, not forty. The world already gates most of these behind a
 // one-shot flag, but the ledger must not depend on that discipline holding.
-export function record(led, { kind, rung, hand, at = null }) {
+export function record(led, { kind, rung, hand, at = null, text = '' }) {
   if (!MARK_KINDS[kind]) return null;
+  if (kind === 'writing' && !sanitizeWriting(text)) return null;
   const r = rung | 0;
   if (!(r >= 1)) return null;
   const h = String(hand || '?').slice(0, 16);
   if (led.marks.some((m) => m.h === h && m.r === r && m.k === kind)) return null;
 
   const seq = led.marks.reduce((n, m) => (m.h === h && m.n >= n ? m.n + 1 : n), 0);
-  const mark = makeMark(kind, r, h, seq, at);
+  const mark = makeMark(kind, r, h, seq, at, text);
   led.marks.push(mark);
   pruneRung(led, r);
   return mark;
@@ -192,11 +222,18 @@ export function record(led, { kind, rung, hand, at = null }) {
 // are no wall-clock timestamps in a mark, on purpose (they would be a lie across
 // machines and a fingerprint across players).
 function pruneRung(led, rung) {
-  const idx = [];
-  for (let i = 0; i < led.marks.length; i++) if (led.marks[i].r === rung) idx.push(i);
-  const excess = idx.length - MAX_MARKS_PER_RUNG;
-  if (excess <= 0) return;
-  const drop = new Set(idx.slice(0, excess));
+  const costed = [], words = [];
+  for (let i = 0; i < led.marks.length; i++) {
+    if (led.marks[i].r !== rung) continue;
+    (led.marks[i].k === 'writing' ? words : costed).push(i);
+  }
+  // Helpful text has its own small budget. It can never evict the costed history
+  // and quietly lower somebody's tide merely because a popular rung got chatty.
+  const drop = new Set([
+    ...costed.slice(0, Math.max(0, costed.length - MAX_MARKS_PER_RUNG)),
+    ...words.slice(0, Math.max(0, words.length - MAX_WRITINGS_PER_RUNG)),
+  ]);
+  if (!drop.size) return;
   led.marks = led.marks.filter((_, i) => !drop.has(i));
 }
 
@@ -232,6 +269,22 @@ function openBackflowAt(led, rung) {
 // Only the inherited marks worth SHOWING (slice 4 places these in the world).
 export function evidenceAt(led, rung) {
   return inheritedAt(led, rung).filter((m) => MARK_KINDS[m.k] && MARK_KINDS[m.k].evidence);
+}
+
+// Words visible on a rung: everything that survives the inheritance law above,
+// plus this hand's own fresh line on the rung where it was scratched. A CLOSE
+// therefore closes words too; OPEN does not pull words uphill, because a promise
+// was made to the next hand down, not to the hand above.
+export function writingsAt(led, rung, hand = null) {
+  const r = rung | 0;
+  const inherited = inheritedAt(led, r).filter((m) => m.k === 'writing');
+  const h = hand == null ? null : String(hand).slice(0, 16);
+  // Firebase uids are longer than the compact ledger hand field. Compare the
+  // canonical prefix on both sides so a freshly authenticated hand still sees
+  // its own same-rung line after a remote reconciliation.
+  const own = marksAt(led, r).filter((m) =>
+    m.k === 'writing' && (h === null || String(m.h).slice(0, 16) === h));
+  return [...inherited, ...own].sort((a, b) => a.r - b.r || a.n - b.n);
 }
 
 // THE DRAFT: the water everything above you displaces onto you. Clamped, always.
@@ -277,6 +330,11 @@ export function sanitizeLedger(raw) {
     const h = typeof m.h === 'string' && m.h ? m.h.slice(0, 16) : null;
     if (!h) continue;
 
+    // Validate writing before claiming its idempotency key. Otherwise a hostile
+    // empty line placed first could mask a later valid copy of the same mark.
+    const text = m.k === 'writing' ? sanitizeWriting(m.t) : '';
+    if (m.k === 'writing' && !text) continue;
+
     // one mark per (hand, rung, kind), same rule as record()
     const key = h + '|' + r + '|' + m.k;
     if (seen.has(key)) continue;
@@ -287,7 +345,7 @@ export function sanitizeLedger(raw) {
       const cl = (v, b) => Math.max(-b, Math.min(b, +v));
       at = [cl(m.at[0], BOUND_XZ), cl(m.at[1], BOUND_Y), cl(m.at[2], BOUND_XZ)];
     }
-    out.marks.push(makeMark(m.k, r, h, Number(m.n) | 0, at));
+    out.marks.push(makeMark(m.k, r, h, Number(m.n) | 0, at, text));
   }
 
   // cap every rung AFTER the merge, not per source

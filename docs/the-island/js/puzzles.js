@@ -3,9 +3,16 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, draft, evidence, hands, DISPOSITIONS } from './world.js';
+import {
+  W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL,
+  MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, recordWriting, writings,
+  handId, draft, evidence, hands, DISPOSITIONS,
+} from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
-import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS, matJoinery, GILT_REST, GILT_HOVER } from './props.js';
+import {
+  BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS,
+  matJoinery, GILT_REST, GILT_HOVER, updateSandWriting,
+} from './props.js';
 import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
@@ -115,6 +122,33 @@ export class Game {
   _buildHotspots(modelAnchor) {
     const I = this.interact;
     const R = this.refs;
+
+    // THE GENEROUS MARK. Every other ledger verb makes the next rung harder.
+    // This one line travels through the same append-only source at zero draft,
+    // and the shore renderer gives it back weathered below.
+    const hasOwnWriting = () => {
+      const h = String(handId()).slice(0, 16);
+      return writings(W.level).some((m) => m.r === W.level && String(m.h).slice(0, 16) === h);
+    };
+    if (R.sandStylus) I.add({
+      id: 'sandWriting', targets: [R.sandStylus], label: 'a driftwood stylus', maxDist: 5.5,
+      when: () => !W.writing && !hasOwnWriting(),
+      onClick: () => {
+        const wasLocked = this.player.locked;
+        this.player.locked = true;
+        const opened = UI.openSandWriter({
+          onCommit: (line) => {
+            const mark = recordWriting(line, this.player);
+            if (!mark) return false;
+            this._writingFor = null;                    // redraw the fresh hand next frame
+            UI.whisper('The line holds. One rung down, the tide will read it.', 4200);
+            return mark;
+          },
+          onClose: () => { this.player.locked = wasLocked; },
+        });
+        if (!opened) this.player.locked = wasLocked;
+      },
+    });
 
     // brass valve — the tide
     I.add({
@@ -1696,6 +1730,20 @@ export class Game {
     if (!isModel && R.handMarks && this._marksFor !== W.level) {
       this._marksFor = W.level;
       this._placeHandMarks(R.handMarks);
+    }
+
+    // The shore line follows the active waterline and re-renders whenever a
+    // local or shared word arrives. No per-frame canvas work: the tiny signature
+    // below is the only check performed until the rung, ledger, or waterline changes.
+    if (!isModel && R.sandWriting) {
+      const words = writings(W.level);
+      const seaY = waterY();
+      const shoreStep = Math.round(seaY * 20) / 20;
+      const key = W.level + '|' + shoreStep + '|' + words.map((m) => [m.r, m.h, m.n, m.t].join(':')).join('|');
+      if (this._writingFor !== key) {
+        this._writingFor = key;
+        updateSandWriting(R.sandWriting, words, W.level, seaY);
+      }
     }
 
     // THE SETTING: the index only exists once the question does — at the bottom,

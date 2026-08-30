@@ -23,6 +23,11 @@ The project exists and is configured. Done via CLI/API on 2026-08-18:
 | APIs | firestore, identitytoolkit, firebaserules — enabled |
 | **Rules** | **deployed and live** (ruleset `c3a7ad65…`, release `cloud.firestore`) |
 
+The working tree now extends those rules with the zero-draft `writing` mark. That
+extension is emulator-tested but **not deployed by this change**; production will
+deny shared shore lines until an explicit Firebase rules deploy. Offline/local
+inheritance remains complete in the meantime.
+
 Verified against the **live** project, not just the emulator: an unauthenticated
 read of the marks collection returns `403 PERMISSION_DENIED`, and an
 unauthenticated write of a forged mark returns `403 PERMISSION_DENIED`. The
@@ -88,11 +93,11 @@ requires billing.)
 
 **What is already bounded without it**, by the ledger's own caps:
 
-- one anonymous uid can ever write **576 documents** — 9 kinds × 64 rungs, with
+- one anonymous uid can ever write **640 documents** — 10 kinds × 64 rungs, with
   deterministic ids and `update` denied
 - however many forged marks exist, the water is clamped to `MAX_DRAFT` (0.75 tide);
   no island can be drowned past that
-- a sync reads at most 256 marks
+- a sync reads at most 288 marks
 
 So forged marks cannot break the *game*.
 
@@ -119,7 +124,7 @@ both services to `ENFORCED` via the App Check API
   deterministic document id per (hand, rung, kind), an offline mirror, a 4-second
   timeout on every call, and a pending queue that survives a failed push.
 - **`firestore.rules`** — the entire server. There is no backend code.
-- **`rules.test.mjs`** — 18 tests, all passing against the Firestore emulator. Every
+- **`rules.test.mjs`** — 24 tests, all passing against the Firestore emulator. Every
   one is an attack the trust model depends on failing.
 
 You do not need to run these — they already pass, and nothing here is needed to
@@ -145,7 +150,7 @@ load-bearing:
 
 | Attack | What stops it |
 |---|---|
-| **Drowning** a stranger's island with forged marks | `k` must be one of the nine costed kinds; `r` must be an integer 1–64; the client clamps total draft to `MAX_DRAFT` on read regardless |
+| **Drowning** a stranger's island with forged marks | `k` must be one of nine costed kinds or the zero-draft writing kind; `r` must be an integer 1–64; the client clamps total draft to `MAX_DRAFT` on read regardless |
 | **Impersonating** another player's hand | `h` must equal `request.auth.uid`, and the doc id must be `uid_rung_kind` |
 | **Injecting geometry** into the void | `at` is clamped to the island's actual extent (±400 / ±120) or must be `null` |
 | **Erasing** history — anyone's, including your own | `allow update, delete: if false`. The log is append-only for everybody, forever |
@@ -160,14 +165,16 @@ There is a test asserting exactly that.
 
 ## Cost
 
-Reads dominate: entering a rung reads at most 256 marks (`MAX_MARKS_PER_RUNG * 4`),
+Reads dominate: entering a rung reads at most 288 marks
+(`(MAX_MARKS_PER_RUNG + MAX_WRITINGS_PER_RUNG) * 4`),
 and rung 1 reads nothing at all because the surface inherits nothing. The free tier is
 50k reads/day. This is comfortably free at any scale you're likely to see, and the
 read cap means it stays bounded even if it isn't.
 
 ## Privacy
 
-A mark is: a random anonymous uid, a rung number, one of nine kind strings, and game
-coordinates. No names, no email, no IP-derived anything, no analytics. It is still
-user data leaving the machine and it is effectively permanent, which is worth one
-honest line in the UI before you ship it publicly.
+A mark is: a random anonymous uid, a rung number, one of ten kind strings, game
+coordinates, and — for a shore line only — up to 48 characters of player-authored
+text. The game asks for no name, email, IP-derived data, or analytics, but a player
+can still type identifying information. Shared text is effectively permanent, so
+both the title and the writing surface warn about that before submission.

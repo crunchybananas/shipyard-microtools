@@ -8,9 +8,10 @@ import { SAVE_KEY, SAVE_KEY_PREV, packSave, applySave } from './save-schema.js';
 import {
   FLAG_MARKS, DISPOSITIONS, localSource, loadHandId,
   record as ledgerRecord, dispose as ledgerDispose,
-  draftAt, tideFor, handsAbove, evidenceAt,
+  draftAt, tideFor, handsAbove, evidenceAt, writingsAt, sanitizeWriting,
 } from './ledger.js';
 export { DISPOSITIONS };
+export { sanitizeWriting };
 
 export const SCALE_MODEL = 1 / 240;
 
@@ -86,6 +87,7 @@ export const W = {
   onceKeys: [],          // one-time cinematics already played
   readKeys: [],          // lore fragment ids the player has READ (the unfolding story; saved)
   reading: false,        // transient: the reading surface is open (input paused while reading)
+  writing: false,        // transient: the shore-writing surface owns keyboard + movement
   dials: [0, 0, 0, 0],   // hatch glyph dials
   playerPos: null,       // saved position
   playerLook: null,      // saved facing [yaw, pitch] radians, or null (pre-v3 saves; #58)
@@ -352,8 +354,13 @@ export const HAND = loadHandId(_io);
 // it is the normal build; the dynamic import simply fails and is swallowed.
 let _source = localSource(_io);
 let _shared = false;
+// Harnesses that write must never touch the permanent shared stack. The explicit
+// query switch keeps all gameplay identical while holding the source local.
+export const LOCAL_STACK = (() => {
+  try { return new URLSearchParams(location.search).has('localstack'); } catch (_) { return false; }
+})();
 
-import('./stack-config.js')
+if (!LOCAL_STACK) import('./stack-config.js')
   .then(async (cfg) => {
     if (!cfg || !cfg.FIREBASE_CONFIG) return;
     const { firestoreSource } = await import('./ledger-firebase.js');
@@ -420,6 +427,24 @@ export const hands = (level = W.level) => handsAbove(_source.load(), level);
 
 // The inherited marks worth SHOWING, for the evidence pass (slice 4).
 export const evidence = (level = W.level) => evidenceAt(_source.load(), level);
+
+// The generous mark: one line per hand per rung, persisted in the same append-only
+// ledger but carrying zero draft. The renderer reads inherited + this hand's fresh
+// line through writings(); no call site ever reaches into the payload shape.
+export function recordWriting(text, player = null) {
+  const p = player && player.pos;
+  const mark = ledgerRecord(_source.load(), {
+    kind: 'writing',
+    rung: W.level,
+    hand: handId(),
+    at: p ? [p.x, p.y, p.z] : null,
+    text,
+  });
+  if (mark) _source.push(mark);
+  return mark;
+}
+
+export const writings = (level = W.level) => writingsAt(_source.load(), level, handId());
 
 // Forget the whole stack, in place. Deliberately NOT wired to "Begin again" — the
 // stack outliving your run is the thesis (STACK.md §3.1). This exists for the

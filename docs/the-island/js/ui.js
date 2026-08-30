@@ -1,6 +1,7 @@
 // ui.js — the few words the game ever says, and the chrome around them.
 
 import { W } from './world.js';
+import { MAX_WRITING_LENGTH } from './ledger.js';
 import A from './audio.js';
 import { SKETCHES, LORE, DEEP_FRAGMENTS } from './content.js';
 
@@ -23,6 +24,11 @@ export const UI = {
     this.readerPageno = $('reader-pageno');
     this.readerPrev = $('reader-prev');
     this.readerNext = $('reader-next');
+    this.sandWriteEl = $('sand-write-overlay');
+    this.sandWriteForm = $('sand-write-form');
+    this.sandWriteInput = $('sand-write-text');
+    this.sandWriteCount = $('sand-write-count');
+    this.sandWriteError = $('sand-write-error');
     this._reader = null;
     this._whisperTimer = null;
     this._whisperQueue = [];
@@ -36,12 +42,43 @@ export const UI = {
     this.readerPrev.addEventListener('click', () => this._readerPage(-1));
     this.readerNext.addEventListener('click', () => this._readerPage(1));
     this.readerEl.addEventListener('click', (e) => { if (e.target === this.readerEl) this.closeReader(); });
+    this.sandWriteForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const line = this.sandWriteInput.value;
+      const committed = this._sandWriter?.onCommit?.(line);
+      if (!committed) {
+        this.sandWriteError.textContent = 'Make one mark before you leave it.';
+        this.sandWriteInput.focus();
+        return;
+      }
+      this.closeSandWriter(true);
+    });
+    $('sand-write-cancel').addEventListener('click', () => this.closeSandWriter(false));
+    this.sandWriteInput.addEventListener('input', () => {
+      const left = Math.max(0, MAX_WRITING_LENGTH - Array.from(this.sandWriteInput.value).length);
+      this.sandWriteCount.textContent = left === 1 ? '1 mark remains' : `${left} marks remain`;
+      this.sandWriteError.textContent = '';
+    });
+    this.sandWriteEl.addEventListener('pointerdown', (e) => {
+      if (e.target === this.sandWriteEl) this.closeSandWriter(false);
+    });
+    // Keep typing out of every world-level key listener. Escape is the one key
+    // that belongs to the surface itself.
+    this.sandWriteEl.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') { e.preventDefault(); this.closeSandWriter(false); }
+      e.stopPropagation();
+    });
     window.addEventListener('keydown', (e) => {
       // while a fragment is open the reader owns input — pages, closes, nothing leaks to the world
       if (W.reading) {
         if (e.code === 'Escape') this.closeReader();
         else if (e.code === 'ArrowLeft') this._readerPage(-1);
         else if (e.code === 'ArrowRight' || e.code === 'Space') this._readerPage(1);
+        e.preventDefault();
+        return;
+      }
+      if (W.writing) {
+        if (e.code === 'Escape') this.closeSandWriter(false);
         e.preventDefault();
         return;
       }
@@ -76,6 +113,28 @@ export const UI = {
     W.reading = false;
     this.readerEl.classList.add('hidden');
     this._reader = null;
+  },
+
+  // ---- the shore-writing surface: one line, then the world owns it ----------
+  openSandWriter({ onCommit, onClose } = {}) {
+    if (W.reading || W.writing) return false;
+    this._sandWriter = { onCommit, onClose };
+    W.writing = true;
+    this.sandWriteInput.value = '';
+    this.sandWriteCount.textContent = `${MAX_WRITING_LENGTH} marks remain`;
+    this.sandWriteError.textContent = '';
+    this.sandWriteEl.hidden = false;
+    setTimeout(() => this.sandWriteInput.focus(), 0);
+    return true;
+  },
+  closeSandWriter(committed = false) {
+    if (!W.writing) return;
+    const session = this._sandWriter;
+    this._sandWriter = null;
+    W.writing = false;
+    this.sandWriteEl.hidden = true;
+    this.sandWriteInput.blur();
+    session?.onClose?.(committed);
   },
   _readerPage(delta) {
     const r = this._reader;

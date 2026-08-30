@@ -5,7 +5,13 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, clearStack, disposeStack, syncStack, isShared, handId } from './world.js';
+import {
+  W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight,
+  isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH,
+  LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, writings,
+  recordWriting, sanitizeWriting, clearStack, disposeStack, syncStack, isShared,
+  handId, LOCAL_STACK,
+} from './world.js';
 import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs, NAMES, SHELF_MARKS, SHELF_STATS, spineAtlas } from './props.js';
 import { RELIEF } from './assets.js';   // relief asked-vs-applied, for tools/harness/relief.mjs
@@ -1819,7 +1825,9 @@ player.onFootstep = (kind, pos) => {
     // hand = who you are to the stack; ledger() = the raw marks; draft(n) = the
     // inherited water in tide units; tideAt(n) = baseline + draft; evidence(n) =
     // the inherited marks worth rendering (slice 4).
-    hand: HAND, ledger, draft, tideAt, hands, evidence, clearStack, syncStack, isShared,
+    hand: HAND, ledger, draft, tideAt, hands, evidence, writings,
+    recordWriting: (text) => recordWriting(text, player), sanitizeWriting,
+    clearStack, syncStack, isShared, localStack: LOCAL_STACK,
     // collision oracle for tools/harness/probe.mjs — the playtest probe hunts
     // phantom walls and fall-throughs, and blaming one needs the raw rules.
     terrain: { walkableY, wallBlocked, heightAt, colliders, GATES, SPOTS },
@@ -2337,7 +2345,7 @@ renderer.setAnimationLoop((tMs) => {
   if (MODE === 'ascend' && ascent) tickAscent(dt);
   if (MODE === 'finale' && finale) tickFinale(dt);
 
-  if (!W.reading) player.update(dt);   // a fragment is open: the world holds still while you read
+  if (!W.reading && !W.writing) player.update(dt); // read/write surfaces hold the player's hand still
   game.tick(dt, elapsed);
   runDrives(W, dt, elapsed);   // #73: the self-gating per-entity drives
   tickModelGate(dt);

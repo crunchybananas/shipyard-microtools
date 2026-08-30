@@ -4,7 +4,7 @@ The scratchpad stopped being load-bearing at fire 38 (#139). This directory IS t
 gate that has guarded every fire since the walk was born:
 
 - **`run.sh`** — one command: static server + headless Chrome + saves + coverage +
-  stack + doors + bloom + shell + glint + the walk. Exit 0 = ship.
+  stack + sand writing + the visual gates + the walk. Exit 0 = ship.
   `SERVE_PORT` / `CDP_PORT` / `CHROME_BIN` env-overridable.
 - **`walk.mjs`** — the 45-assertion FULL-GAME regression: wake-up → surface chain →
   the era threshold → all three era events → the four rounds → FILE and KEEP → the
@@ -13,9 +13,14 @@ gate that has guarded every fire since the walk was born:
   undefined-visible regression guard. Real mechanics, no shortcuts the player
   couldn't take (hotspot invocation aside).
 - **`coverage.mjs`** — every journal-bound line (content corpus, T-table sites,
-  `_doRound` args, ui.js literals) must hit a SKETCHES matcher. 103/103.
+  `_doRound` args, ui.js literals) must hit a SKETCHES matcher. 106/106.
 - **`stack.mjs`** — STACK.md slices 1–2: the ledger records the god-verbs, the draft
   accumulates downward, and both survive a wiped save and a reload. 47 assertions.
+- **`writing.mjs`** — the zero-draft exception: the real shoreline input, hostile-text
+  sanitation, save-independent persistence, one-line-per-hand idempotency, downward
+  inheritance, upright glyph mapping, and terrain-conforming weathered rendering.
+  19 assertions. It forces
+  `?localstack`, so a test can never leave permanent prose in the shared world.
 - **`doors.mjs`** — where props END UP. The owner watched a door swing through the
   tower wall; the walk proved you can get THROUGH a doorway, never that the door hung
   in it is inside the building. Pure geometry. 6 assertions.
@@ -49,7 +54,7 @@ gate that has guarded every fire since the walk was born:
 - **`glare.mjs`** — nothing in the study clips to white under the window sun (#147).
   Counts pixels at near-max LUMINANCE, not neutral white: the glare is a warm reflection
   off amber brass, and a white test reported 0.00% against a frame that was a white-out.
-  6 assertions, including a floor so a frame cannot pass by being dark.
+  8 assertions, including a floor so a frame cannot pass by being dark.
 - **`spines.mjs`** — every spine in the study is lettered, and eighteen of them are
   struck with a DOUBLED gilt rule where every other volume carries one. Those eighteen,
   read top board down and left to right, spell the line of canon the game says aloud

@@ -22,7 +22,10 @@
 // slow, unreachable, unconfigured, or blocked by an extension, you get the local
 // stack and play on. The island must be complete with the wire cut.
 
-import { emptyLedger, sanitizeLedger, packLedger, LEDGER_KEY, HAND_KEY, MAX_MARKS_PER_RUNG } from './ledger.js';
+import {
+  emptyLedger, sanitizeLedger, packLedger, LEDGER_KEY, HAND_KEY,
+  MAX_MARKS_PER_RUNG, MAX_WRITINGS_PER_RUNG,
+} from './ledger.js';
 
 // The one place the shared world is named. Everybody's rung 2 is the SAME pool —
 // one ocean, which is the thesis. Bump this to fork a fresh stack (a new season,
@@ -135,11 +138,14 @@ export function firestoreSource(config, io) {
           collection(db, 'stacks', STACK_ID, 'marks'),
           where('r', '<', top),
           orderBy('r'),
-          limit(MAX_MARKS_PER_RUNG * 4),          // a hard read cap: cost is bounded per rung
+          limit((MAX_MARKS_PER_RUNG + MAX_WRITINGS_PER_RUNG) * 4), // cost + words stay bounded
         );
         const snap = await withTimeout(getDocs(q));
         const remote = [];
-        snap.forEach((d) => { const m = d.data(); remote.push({ k: m.k, r: m.r, h: m.h, n: m.n || 0, at: m.at || null }); });
+        snap.forEach((d) => {
+          const m = d.data();
+          remote.push({ k: m.k, r: m.r, h: m.h, n: m.n || 0, at: m.at || null, t: m.t || '' });
+        });
         // MERGE, never replace: your own marks are authoritative for you and may not
         // have reached the server yet. Sanitize the union — the remote half is
         // untrusted even though the rules already vetted it.
@@ -182,10 +188,12 @@ export function firestoreSource(config, io) {
           // hand can ever create (kinds × rungs) without a rate limiter.
           const id = `${uid}_${m.r | 0}_${m.k}`;
           try {
-            await withTimeout(setDoc(doc(db, 'stacks', STACK_ID, 'marks', id), {
+            const payload = {
               k: m.k, r: m.r | 0, h: uid, n: m.n | 0,
               at: Array.isArray(m.at) ? m.at.map(Number) : null,
-            }));
+            };
+            if (m.k === 'writing') payload.t = m.t;
+            await withTimeout(setDoc(doc(db, 'stacks', STACK_ID, 'marks', id), payload));
             pending.shift();                     // only drop it once it is really there
           } catch (err) {
             // A DENIAL IS PERMANENT and must not be retried forever: the rules

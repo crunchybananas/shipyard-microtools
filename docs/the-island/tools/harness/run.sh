@@ -56,6 +56,13 @@ echo "== the stack =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/stack.mjs" | tee "$WORK/stack.out"
 grep -q "STACKWALK 47 / 47" "$WORK/stack.out" || { echo "STACK FAILED"; exit 1; }
 
+echo "== the writing in the sand =="
+# The one mark that travels downhill without harm: a bounded line survives outside
+# the save, appears on the next rung, and renders increasingly weathered on dry terrain.
+# ?localstack is built into writing.mjs so a gate can never publish test prose.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/writing.mjs" | tee "$WORK/writing.out"
+grep -q "WRITING 19 / 19" "$WORK/writing.out" || { echo "WRITING FAILED"; exit 1; }
+
 echo "== the doors =="
 # The owner watched a door pass through the tower wall. Nothing in the gate looked at
 # where props END UP — the walk proves you can get THROUGH a doorway, not that the

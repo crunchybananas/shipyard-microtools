@@ -39,6 +39,12 @@ test('a signed-in hand may append its own mark', async () => {
   await assertSucceeds(setDoc(doc(db, markPath('handA', 1, 'valve')), goodMark('handA')));
 });
 
+test('a hand may leave one bounded zero-draft shore line', async () => {
+  const db = env.authenticatedContext('handA').firestore();
+  await assertSucceeds(setDoc(doc(db, markPath('handA', 1, 'writing')),
+    goodMark('handA', { k: 'writing', t: 'HOLD FAST' })));
+});
+
 test('anyone signed in may READ the shared stack', async () => {
   await env.withSecurityRulesDisabled(async (ctx) => {
     await setDoc(doc(ctx.firestore(), markPath('handA', 1, 'valve')), goodMark('handA'));
@@ -138,6 +144,21 @@ test('extra fields are refused — the document shape is closed', async () => {
   const db = env.authenticatedContext('handA').firestore();
   await assertFails(setDoc(doc(db, markPath('handA', 1, 'valve')),
     { ...goodMark('handA'), payload: 'x'.repeat(10000) }));
+});
+
+test('shore writing is required, nonempty and bounded', async () => {
+  const db = env.authenticatedContext('handA').firestore();
+  for (const t of [undefined, '', 'x'.repeat(49)]) {
+    const mark = goodMark('handA', { k: 'writing' });
+    if (t !== undefined) mark.t = t;
+    await assertFails(setDoc(doc(db, markPath('handA', 1, 'writing')), mark));
+  }
+});
+
+test('costed marks cannot carry a text payload', async () => {
+  const db = env.authenticatedContext('handA').firestore();
+  await assertFails(setDoc(doc(db, markPath('handA', 1, 'valve')),
+    goodMark('handA', { t: 'hidden payload' })));
 });
 
 test('a missing required field is refused', async () => {

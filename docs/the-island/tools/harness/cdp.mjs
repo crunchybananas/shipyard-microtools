@@ -56,6 +56,8 @@ if (cmdFile) {
     process.exitCode = 1;
   } finally {
     h.ws.close();
-    process.exit(0);
+    // Preserve failures from either the command or its assertions. Exiting 0 here
+    // made one.sh report a green run even when the script set process.exitCode.
+    process.exit(process.exitCode || 0);
   }
 }

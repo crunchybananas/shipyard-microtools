@@ -117,6 +117,19 @@ what the world permits, and what you are.
 
 The era is not a paint job. It is *what kind of place this is to be a person in.*
 
+### 3.5 THE SHORE LINE — one thing travels down without harm
+
+A hand may scratch **one bounded line per rung** into the dry shore. It enters the
+same append-only ledger and obeys the same inheritance and sealing laws as every
+other mark, but its draft is exactly zero. The current hand sees the fresh cut;
+the next rung finds the same words worn by weather. It never becomes a generic
+evidence scuff and never evicts costed history.
+
+This is not a message board. The terrain remains the interface: a driftwood stylus
+opens one line, at most three nearby inherited lines are legible, and every deeper
+rung erodes them further. On a shared stack the words are permanent anonymous
+user data, so the input surface says so before a line can be left.
+
 ---
 
 ## 4. What this re-reads (nothing shipped is wasted)
@@ -243,11 +256,12 @@ Each slice ships standalone, verifiable in isolation, offline-complete.
 | **4** | **The evidence is seen** — inherited marks render as pale worn ground (`handMarks`), one line each, skipped below the waterline. | ✅ `f23646ad` |
 | **5** | **The drift** — the dead wheel arms it; the sea rises with nobody at the wheel, once, and only when a hand really is above you. Plus **the fifth ring**: a goal one hand's work cannot reach. | ✅ `ce07fc77` |
 | **6** | **Eras as rulesets** — §3.4. The crank carries the arc: L1 **obeys** → L2 **lags** (the hour lands after you stop asking) → L3 **is audited** (the register reads the ledger at the chart table) → L4 **refuses** (only the plate is left). | ✅ |
+| **6½** | **The shore line** — one zero-draft line per hand and rung, persisted outside the save and rendered fresh here / weathered below on the real terrain. | ✅ |
 | 7 | **The endings** — the plate's four dispositions (§6). **Owner call first:** do TEND/CARRY/OPEN/CLOSE replace the shipped bell/oar terminals or sit alongside them? | next |
 | 8 | **The server** — swap the local source for HTTP. Everything above already works. | |
 
-**Slices 1–6 are shipped and gated** (30 stack assertions in `tools/harness/stack.mjs`,
-alongside the 45-assertion walk). The thesis is playable end to end offline: acts are
+**Slices 1–6 plus the shore line are shipped and gated** (47 stack assertions and
+19 writing assertions, alongside the 45-assertion walk). The thesis is playable end to end offline: acts are
 recorded, the cost runs downhill, the water rises, a stranger's work is findable, the model
 is caught being out of date, and each era is a different kind of place to hold an instrument.
 

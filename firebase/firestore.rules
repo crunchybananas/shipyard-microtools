@@ -28,10 +28,10 @@ service cloud.firestore {
     // without touching game code or migrating anything.
     match /stacks/{stack}/marks/{markId} {
 
-      // Exactly the nine costed acts in MARK_KINDS. An unknown kind has no draft
-      // and no meaning, so it must never reach a player's client at all.
+      // The nine costed acts plus one zero-draft shore line. An unknown kind has
+      // no meaning, so it must never reach a player's client at all.
       function knownKind(k) {
-        return k in ['valve', 'crank', 'ruler', 'lens', 'chest', 'hatch', 'stones', 'plumb', 'dive'];
+        return k in ['valve', 'crank', 'ruler', 'lens', 'chest', 'hatch', 'stones', 'plumb', 'dive', 'writing'];
       }
 
       // The island's playable extent (BOUND_XZ 400 / BOUND_Y 120 in ledger.js).
@@ -51,17 +51,22 @@ service cloud.firestore {
       }
 
       function validMark(d) {
-        return d.keys().hasOnly(['k', 'r', 'h', 'n', 'at'])
+        return d.keys().hasOnly(['k', 'r', 'h', 'n', 'at', 't'])
           && d.keys().hasAll(['k', 'r', 'h'])
           && d.k is string && knownKind(d.k)
           && d.r is int && d.r >= 1 && d.r <= 64
           && d.h is string && d.h == request.auth.uid          // no impersonation
           && (!('n' in d) || (d.n is int && d.n >= 0 && d.n <= 100000))
-          && (!('at' in d) || okAt(d.at));
+          && (!('at' in d) || okAt(d.at))
+          // Text exists only on the zero-draft kind, is one bounded line, and
+          // cannot be smuggled onto costed marks as an unbounded extra payload.
+          && ((d.k == 'writing' && 't' in d && d.t is string && d.t.size() >= 1 && d.t.size() <= 48)
+            || (d.k != 'writing' && !('t' in d)));
       }
 
-      // Anyone signed in (anonymously) may READ the shared stack. There is nothing
-      // private in it: a random uid, a rung, a kind, and game coordinates.
+      // Anyone signed in (anonymously) may READ the shared stack. A writing mark
+      // can contain player-authored text, so the UI warns against identifying
+      // details and every reader must continue treating the payload as hostile.
       allow read: if request.auth != null;
 
       // APPEND ONLY. One document per (hand, rung, kind) via a deterministic id,

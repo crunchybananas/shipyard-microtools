@@ -608,4 +608,129 @@ html, body {
 
 /* the import card is a touch wider: a pasted report is a wall of JSON */
 #import-card { width: min(34rem, calc(100vw - 2.5rem)); }
+
+/* ---- THE SHORE-WRITING SURFACE -------------------------------------------
+   Not another dark modal. This is the one UI beat made out of the island's own
+   material: a tide-scoured slab of sand, asymmetrical at the edge, with the input
+   sitting in the groove the player is about to cut. */
+#sand-write-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.25rem;
+  background: rgba(7, 10, 14, 0.58);
+  backdrop-filter: blur(3px) saturate(0.8);
+}
+#sand-write-overlay[hidden] { display: none; }
+#sand-write-form {
+  position: relative;
+  width: min(34rem, calc(100vw - 2.5rem));
+  padding: 2rem 2.25rem 1.65rem;
+  color: #302719;
+  background:
+    linear-gradient(145deg, rgba(238, 222, 184, 0.88), rgba(177, 151, 102, 0.84)),
+    url('assets/sand.jpg') center / 240px repeat;
+  background-blend-mode: soft-light, normal;
+  clip-path: polygon(2% 3%, 97% 0, 100% 91%, 94% 98%, 5% 100%, 0 88%);
+  box-shadow: 0 2.4rem 6rem rgba(0, 0, 0, 0.62), inset 0 0 4rem rgba(94, 70, 35, 0.18);
+  text-shadow: 0 1px rgba(255, 248, 225, 0.35);
+}
+#sand-write-form::after {
+  content: '';
+  position: absolute; inset: 0.45rem 0.7rem;
+  pointer-events: none;
+  opacity: 0.16;
+  background: repeating-linear-gradient(174deg, transparent 0 17px, rgba(69, 53, 31, 0.23) 18px, transparent 19px 31px);
+  mix-blend-mode: multiply;
+  clip-path: inherit;
+}
+#sand-write-form > * { position: relative; z-index: 1; }
+#sand-write-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #5b4930;
+}
+#sand-write-sub {
+  margin-top: 0.65rem;
+  max-width: 29rem;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  font-style: italic;
+}
+.sand-write-label {
+  display: block;
+  margin-top: 1.65rem;
+  color: #665238;
+  font-size: 0.67rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+#sand-write-text {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.15rem 0.42rem;
+  border: 0;
+  border-bottom: 2px groove rgba(76, 58, 33, 0.55);
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: #2e2417;
+  font: italic 1.18rem/1.5 Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.035em;
+  caret-color: #4a3721;
+}
+#sand-write-text::placeholder { color: rgba(73, 57, 34, 0.5); }
+#sand-write-text:focus-visible {
+  border-bottom-color: #2e2417;
+  box-shadow: 0 3px 0 -2px rgba(46, 36, 23, 0.45);
+}
+.sand-write-meta {
+  min-height: 1.2rem;
+  margin-top: 0.28rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(68, 52, 31, 0.68);
+  font-size: 0.67rem;
+  letter-spacing: 0.08em;
+}
+#sand-write-error { color: #6e3024; text-align: right; }
+#sand-write-share {
+  margin-top: 1rem;
+  padding-left: 0.8rem;
+  border-left: 1px solid rgba(73, 55, 30, 0.38);
+  color: rgba(58, 45, 28, 0.72);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+.sand-write-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.2rem;
+  margin-top: 1.35rem;
+}
+.sand-write-row button {
+  padding: 0.38rem 0.15rem;
+  border: 0;
+  border-bottom: 1px solid rgba(64, 48, 28, 0.38);
+  border-radius: 0;
+  background: transparent;
+  color: #4c3b24;
+  font: italic 0.88rem Georgia, 'Times New Roman', serif;
+  cursor: pointer;
+}
+.sand-write-row button:hover,
+.sand-write-row button:focus-visible {
+  color: #21190f;
+  border-bottom-color: #21190f;
+  outline: none;
+}
+#sand-write-send { font-style: normal; letter-spacing: 0.08em; }
+
+@media (max-width: 600px) {
+  #sand-write-form { padding: 1.65rem 1.45rem 1.35rem; }
+  #sand-write-text { font-size: 1.02rem; }
+  .sand-write-row { justify-content: space-between; }
+}
 #import-text { font-size: 0.72rem; }

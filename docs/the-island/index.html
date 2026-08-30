@@ -51,7 +51,7 @@
            stack is actually configured, so a local-only build never claims to send
            anything. Revealed on the TITLE screen rather than mid-game: the first
            costed act is a walk away, so nobody displaces anything before reading it. -->
-      <div class="title-foot" id="title-shared" hidden>the tide is shared &middot; what you do here is recorded anonymously, kept for good, and left for other players to find</div>
+      <div class="title-foot" id="title-shared" hidden>the tide is shared &middot; what you do here, including shoreline words, is recorded anonymously, kept for good, and left for other players to find</div>
     </div>
   </div>
 
@@ -98,6 +98,29 @@
         <button id="note-send" type="button">Send report</button>
       </div>
     </div>
+  </div>
+
+  <!-- THE GENEROUS MARK. The world remains the interface: a driftwood stylus on
+       the actual shore opens this one-line surface, then the words are scratched
+       back into the terrain for the next rung to inherit. -->
+  <div id="sand-write-overlay" role="dialog" aria-modal="true"
+       aria-labelledby="sand-write-title" aria-describedby="sand-write-sub sand-write-share" hidden>
+    <form id="sand-write-form">
+      <div id="sand-write-title">Write in the sand</div>
+      <div id="sand-write-sub">One line. Leave the next hand something the water does not have to pay for.</div>
+      <label class="sand-write-label" for="sand-write-text">the mark</label>
+      <input id="sand-write-text" maxlength="48" autocomplete="off" enterkeyhint="done"
+             placeholder="what should survive one tide?" aria-describedby="sand-write-count sand-write-error">
+      <div class="sand-write-meta">
+        <span id="sand-write-count">48 marks remain</span>
+        <span id="sand-write-error" aria-live="polite"></span>
+      </div>
+      <div id="sand-write-share">The next rung may inherit these words. Shared islands keep the line anonymously; leave out names and identifying details.</div>
+      <div class="sand-write-row">
+        <button id="sand-write-cancel" type="button">Leave it blank</button>
+        <button id="sand-write-send" type="submit">Scratch it</button>
+      </div>
+    </form>
   </div>
 
   <!-- sound toggle (also bound to M) -->
