@@ -366,7 +366,7 @@ export function wallBlocked(x0, z0, x1, z1) {
 // Geometry
 export function buildTerrain() {
   const N = 256; // segments
-  const geo = new THREE.PlaneGeometry(DOMAIN, DOMAIN, N, N);
+  let geo = new THREE.PlaneGeometry(DOMAIN, DOMAIN, N, N);
   geo.rotateX(-Math.PI / 2);
 
   const pos = geo.attributes.position;
@@ -478,6 +478,16 @@ export function buildTerrain() {
   geo.setAttribute('aSlope', new THREE.BufferAttribute(slopes, 1));   // fragment rock-swap key (#36)
   geo.computeVertexNormals();
 
+  // The uniform grid is intentionally affordable, but its 2.42 m cells become a
+  // staircase where a tide cuts a steep shelf. Replace only the cells that cross the
+  // complete story tide range with local analytic patches. Unlike a radial collar,
+  // this follows the real topology through the chasm, causeway and islet; unlike an
+  // overlay, it cannot z-fight or leave the coarse shelf poking through. The patch
+  // boundary is locked to the old cell edges, so it remains watertight while the
+  // visible surface cut is resolved at sub-metre scale. Permanently deep seabed pays
+  // for that finish, so the whole terrain remains one lean mesh and one draw.
+  geo = refineCoastCells(geo, N);
+
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     // flatShading OFF (loop #152): the hard low-poly facet seams read as flat plastic once the tiling
@@ -488,6 +498,13 @@ export function buildTerrain() {
     metalness: 0.0,
     side: THREE.DoubleSide, // chasm/valley walls + the underside read solid, never see-through
   });
+  // Machine-readable because a repeated height image can compile and decode perfectly
+  // while still turning the beach into visible wallpaper.
+  mat.userData.sandRelief = {
+    textureSamples: 0, worldSpan: DOMAIN, encoding: 'analytic-slope',
+    continuous: true, locallyTurning: true, repeatPeriod: 0,
+  };
+  mat.userData.coastRefinement = geo.userData.coastRefinement;
   // cut the hatch hole into the heightfield (local space, so the model
   // island inherits the same hole — recursion demands it)
   mat.onBeforeCompile = (sh) => {
@@ -498,18 +515,12 @@ export function buildTerrain() {
     sh.uniforms.uTime = { value: 0 };
     sh.uniforms.uSunUp = { value: 1 };                       // daylight gate for the caustics
     sh.uniforms.uCaustic = { value: getTexture('water_ripple') };
-    // #138 (AAA-B4): the Bender sand heightmap — organic wind-ripple relief for the
-    // Mikkelsen bump below. uSandOn flips 0→1 when the image decodes; until then the
-    // synthetic sine ripples carry the surface (seamless fallback, no pop risk: the
-    // swap is a height-source change inside the same derivative path).
     // a 1x1 black stand-in: a sampler2D uniform bound to null is undefined behaviour, and
     // the mask is legitimately absent on the 1:240 clone and in any build with no trees
     sh.uniforms.uLitter = { value: LITTER.tex || _blankTex() };
     sh.uniforms.uLitterOn = { value: LITTER.tex ? 1 : 0 };
     sh.uniforms.uPathAmt = { value: 0.0 };   // driven by depth in main.js — see the paths block
     sh.uniforms.uLitterRect = { value: new THREE.Vector3(LITTER.cx, LITTER.cz, LITTER.size || 1) };
-    sh.uniforms.uSandOn = { value: 0 };
-    sh.uniforms.uSandH = { value: getTexture('sand_height', () => { sh.uniforms.uSandOn.value = 1; }) };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
     // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. Those
     // textures are no longer sampled here and nothing else loads them, so we drop the dead getTexture
@@ -527,10 +538,10 @@ export function buildTerrain() {
         uniform vec3 uHaze; uniform float uTexAmt;
         uniform float uWaterY; uniform float uTime; uniform float uSunUp;
         uniform sampler2D uCaustic;
-        uniform sampler2D uSandH; uniform float uSandOn;
         uniform sampler2D uLitter; uniform float uLitterOn; uniform vec3 uLitterRect;
         uniform float uPathAmt;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
+        float gSandLee;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
       .replace('#include <clipping_planes_fragment>',
@@ -548,17 +559,56 @@ export function buildTerrain() {
         // RELIEF = gentle, LOW-frequency wind ripples only. High-freq grain in the NORMAL reads as a
         // harsh per-pixel dapple (looks scaly, not sandy) — fine grain stays in albedo; the bump just
         // gives the surface a soft 3-D roll so it isn't flat-lit. Amplitude kept low on purpose.
-        float rip1 = sin(dot(vLXZ, vec2(0.9, 0.42)) * 2.3 + vnoise(vLXZ * 0.22) * 6.2831);  // ~2.7m crests, meandered
-        float rip2 = sin(dot(vLXZ, vec2(-0.35, 0.94)) * 4.1 + vnoise(vLXZ * 0.38) * 6.2831); // ~1.5m cross-set, weaker
         float roll = vnoise(vLXZ * 1.1) - 0.5;               // soft ~0.9m undulation
-        float Hb   = rip1 * 0.5 + rip2 * 0.22 + roll * 0.5;
-        // #138: ORGANIC ripples (Bender heightmap, world-XZ sample — no UV, no seams)
-        // supplant the synthetic sines on the BEACH BAND only (vTerH < ~3m); higher
-        // ground keeps the old soft roll — dunes belong to the shore, not the meadow.
-        float texH = texture2D(uSandH, vWPos.xz * 0.16).r - 0.5;
         float sandW = 1.0 - smoothstep(2.2, 3.4, vTerH);
-        Hb = mix(Hb, texH * 2.0 + roll * 0.35, uSandOn * sandW);
         float bDist = 1.0 - smoothstep(45.0, 130.0, length(vViewPosition));
+        vec2 sandSlope = vec2(0.0);
+        gSandLee = 0.0;
+        // Wind relief is solved analytically in world metres rather than sampled from
+        // an image. Two incommensurate macro waves turn the primary set over tens of
+        // metres; two smaller phase waves bow each crest. Nothing tiles, and there are
+        // no texture LOD blocks to masquerade as giant stamped squares at grazing view.
+        // This coherent branch matters: most terrain pixels are meadow, cliff, the
+        // miniature, or beyond the detail fade. They should not pay for invisible sand.
+        if (sandW > 0.001 && bDist > 0.001 && mini < 0.999) {
+          float sandTurnField =
+            sin(dot(vLXZ, vec2(0.034, 0.027)) + sin(vLXZ.y * 0.021) * 1.15)
+            + sin(dot(vLXZ, vec2(-0.029, 0.041)) + 1.3) * 0.53;
+          float sandTurn = smoothstep(-0.24, 0.24, sandTurnField);
+          vec2 sandDA = normalize(vec2(0.90, 0.44));
+          vec2 sandDB = normalize(vec2(0.48, -0.88));
+          float sandBendA =
+            sin(dot(vLXZ, vec2(0.089, 0.053)) + 0.8) * 0.88
+            + sin(dot(vLXZ, vec2(-0.047, 0.073)) - 1.1) * 0.43;
+          float sandBendB =
+            sin(dot(vLXZ, vec2(-0.061, 0.081)) - 0.2) * 0.76
+            + sin(dot(vLXZ, vec2(0.077, 0.039)) + 2.0) * 0.38;
+          float sandPA = dot(vLXZ, sandDA) * 3.35 + sandBendA;
+          float sandPB = dot(vLXZ, sandDB) * 3.08 + sandBendB + 1.7;
+          float sandPatch = 0.76 + 0.24 * smoothstep(-0.72, 0.72,
+            sin(dot(vLXZ, vec2(0.051, -0.037)) - 0.6)
+            + sin(dot(vLXZ, vec2(0.023, 0.057)) + 0.9) * 0.45);
+          // Explicit slopes avoid dFdx/dFdy precision bands. Each main set has a faint
+          // second harmonic to pinch its leeward edge; exchanging dominance makes real
+          // bifurcations instead of one perfectly combed direction rotating forever.
+          vec2 sandSlopeA = sandDA
+            * (cos(sandPA) + 0.25 * cos(sandPA * 2.0 + 0.65)) * 0.138;
+          vec2 sandSlopeB = sandDB
+            * (cos(sandPB) + 0.22 * cos(sandPB * 2.0 - 0.35)) * 0.132;
+          vec2 sandCrossD = normalize(mix(vec2(-sandDA.y, sandDA.x), vec2(-sandDB.y, sandDB.x), sandTurn));
+          float sandCrossP = dot(vLXZ, sandCrossD) * 5.75
+            + sin(dot(vLXZ, vec2(0.065, -0.044)) + 0.4) * 0.42;
+          sandSlope = mix(sandSlopeA, sandSlopeB, sandTurn) * sandPatch
+            + sandCrossD * cos(sandCrossP) * 0.028;
+          // Sand is not perfectly colourless: the lee face holds slightly darker,
+          // finer grains. Carry that orientation into albedo so high noon does not
+          // erase every ripple. This reuses the slope we already paid for.
+          vec2 sandWind = normalize(mix(sandDA, sandDB, sandTurn));
+          gSandLee = clamp(dot(sandSlope, sandWind) / 0.17, -1.0, 1.0);
+        }
+        float Hb = roll * 0.42;
+        // The old authored 512² image repeated its complete shape every 6.25 m. The
+        // analytic carriers above have no common period within the 620 m island.
         // SLOPE-AWARE ROCK RELIEF (#36): above ~0.5 baked slope the bump SWAPS (never
         // stacks — same one evaluation) from wind-ripple sand to a cliff language:
         // horizontal STRATA keyed on the baked height (so the bands double as old
@@ -582,7 +632,10 @@ export function buildTerrain() {
         vec3 bR1 = cross(bSy, normal), bR2 = cross(normal, bSx);
         float bDet = dot(bSx, bR1);
         vec3 bGrad = sign(bDet) * (dHdxy.x * bR1 + dHdxy.y * bR2);
-        normal = normalize(abs(bDet) * normal - bGrad);`)
+        normal = normalize(abs(bDet) * normal - bGrad);
+        // Apply the analytic world-XZ derivative directly in view space.
+        vec3 sandDelta = mat3(viewMatrix) * vec3(-sandSlope.x, 0.0, -sandSlope.y);
+        normal = normalize(normal + sandDelta * sandW * bDist * (1.0 - mini) * (1.0 - rockW));`)
       // ground DETAIL (loop #152): the old approach TILED the uSand/uGrass texture as luminance —
       // its baked grain recurred every ~1.18m and read as a pock-mark GRID (owner-flagged); every
       // warp to hide the tile just traded the grid for a smear. Replaced with CONTINUOUS procedural
@@ -600,6 +653,9 @@ export function buildTerrain() {
         float deGrid = (0.86 + 0.26 * macro) * (0.93 + 0.14 * fine);
         float detail = mix(0.82, 1.07, cGrain) * mix(1.0, deGrid, 1.0 - cMini);
         diffuseColor.rgb *= mix(1.0, detail, uTexAmt * cLand * (1.0 - cMini * 0.85));
+        float cSandW = (1.0 - smoothstep(2.2, 3.4, vTerH))
+          * (1.0 - smoothstep(0.38, 0.52, vSlope));
+        diffuseColor.rgb *= 1.0 + gSandLee * 0.024 * cSandW * (1.0 - cMini);
         // rock strata in ALBEDO too (#36): the normal-map beds wash out in the aerial haze
         // at the 170m glyph-puzzle study range — a gentle lightness banding survives it,
         // so the east bluff finally reads as BEDDED rock from the stones, not a blank wall
@@ -675,10 +731,221 @@ export function buildTerrain() {
   return mesh;
 }
 
+function refineCoastCells(base, N) {
+  const LOW = -5.8;             // safely below the lowest authored tide (-4.2 m)
+  const SURFACE_HIGH = 1.2;     // soaked shore above the surface-era high tide (0 m)
+  const HIGH = 4.35;            // above the deepest story tide / debug maximum (+4.2 m)
+  const MIN_RISE = 1.0;         // gentle beaches do not make a visible staircase
+  const SURFACE_SUB = 4;        // 0.605 m at the owner-visible surface coastline
+  const RAISED_SUB = 3;         // 0.807 m through the foggier drowned eras
+  // Stable sea planes from the valve and the authored level rows. Steep cells are
+  // refined throughout the range; these exact stops also catch quiet, shallow banks.
+  const SURFACE_LEVELS = [-4.2, 0.0];
+  const RAISED_LEVELS = [1.47, 2.73, 3.78, 4.2];
+  const DEEP_BLOCKS = [16, 8, 4];
+  const DEEP_CEILING = -9.5;    // always >=5.3 m underwater, even at the lowest tide
+  const W = N + 1;
+  const bp = base.getAttribute('position');
+  const bn = base.getAttribute('normal');
+  const bc = base.getAttribute('color');
+  const bu = base.getAttribute('uv');
+  const bs = base.getAttribute('aSlope');
+  const refinement = new Uint8Array(N * N);
+  const deepCovered = new Uint8Array(N * N);
+  const deepOrigin = new Uint8Array(N * N);
+  let refinedCells = 0, surfaceCells = 0, raisedCells = 0, addedTriangles = 0, addedVertices = 0;
+
+  for (let j = 0; j < N; j++) {
+    for (let i = 0; i < N; i++) {
+      const a = j * W + i, b = a + 1, c = a + W, d = c + 1;
+      const y0 = bp.getY(a), y1 = bp.getY(b), y2 = bp.getY(c), y3 = bp.getY(d);
+      const lo = Math.min(y0, y1, y2, y3), hi = Math.max(y0, y1, y2, y3);
+      const rise = hi - lo;
+      const crosses = (levels) => levels.some((level) => lo <= level && hi >= level);
+      let sub = 0;
+      if (lo < SURFACE_HIGH && hi > LOW && (rise > MIN_RISE || crosses(SURFACE_LEVELS))) {
+        sub = SURFACE_SUB; surfaceCells++;
+      } else if (lo < HIGH && hi > SURFACE_HIGH && (rise > MIN_RISE || crosses(RAISED_LEVELS))) {
+        sub = RAISED_SUB; raisedCells++;
+      }
+      if (!sub) continue;
+      refinement[j * N + i] = sub;
+      refinedCells++;
+      addedTriangles += sub * sub * 2 - 2;
+      addedVertices += (sub + 1) * (sub + 1);
+    }
+  }
+
+  // Pay for the coast locally. The far offshore floor still carried two triangles
+  // per 2.42 m cell even when it is never less than 5.3 m underwater. A descending
+  // 16/8/4-cell cascade keeps every block's boundary vertices plus its original centre
+  // and fans the interior. It stays watertight and keeps the authored edge; only its
+  // gently varying, optically buried interior is simplified. Smaller fallbacks fill
+  // safe boundary pockets the 16-cell grid cannot claim, returning the coast's entire
+  // triangle cost instead of leaving a hidden power debt.
+  let deepBlocks = 0, deepCells = 0, deepFanTriangles = 0, removedDeepTriangles = 0;
+  const deepBlocksBySize = {};
+  for (const block of DEEP_BLOCKS) {
+    let count = 0;
+    for (let j = 0; j < N; j += block) {
+      for (let i = 0; i < N; i += block) {
+        let used = false;
+        for (let dz = 0; dz < block && !used; dz++) {
+          for (let dx = 0; dx < block; dx++) {
+            if (deepCovered[(j + dz) * N + i + dx]) { used = true; break; }
+          }
+        }
+        if (used) continue;
+        let hi = -Infinity;
+        for (let dz = 0; dz <= block; dz++) {
+          for (let dx = 0; dx <= block; dx++) {
+            hi = Math.max(hi, bp.getY((j + dz) * W + i + dx));
+          }
+        }
+        if (hi >= DEEP_CEILING) continue;
+        deepOrigin[j * N + i] = block;
+        deepBlocks++; count++; deepCells += block * block;
+        deepFanTriangles += block * 4;
+        removedDeepTriangles += block * block * 2 - block * 4;
+        for (let dz = 0; dz < block; dz++) {
+          for (let dx = 0; dx < block; dx++) deepCovered[(j + dz) * N + i + dx] = 1;
+        }
+      }
+    }
+    deepBlocksBySize[block] = count;
+  }
+
+  const vertexCount = bp.count + addedVertices;
+  const positions = new Float32Array(vertexCount * 3);
+  const normals = new Float32Array(vertexCount * 3);
+  const colors = new Float32Array(vertexCount * 3);
+  const uvs = new Float32Array(vertexCount * 2);
+  const slopes = new Float32Array(vertexCount);
+  positions.set(bp.array); normals.set(bn.array); colors.set(bc.array);
+  uvs.set(bu.array); slopes.set(bs.array);
+
+  const ordinaryCells = N * N - refinedCells - deepCells;
+  const triangleCount = ordinaryCells * 2 + refinedCells * 2 + addedTriangles + deepFanTriangles;
+  const indices = new Uint32Array(triangleCount * 3);
+  let q = 0, nextVertex = bp.count;
+
+  const sample = (attr, x, z, size, out, off) => {
+    const gx = clamp((x / DOMAIN + 0.5) * N, 0, N - 1e-6);
+    const gz = clamp((z / DOMAIN + 0.5) * N, 0, N - 1e-6);
+    const ix = Math.floor(gx), iz = Math.floor(gz), tx = gx - ix, tz = gz - iz;
+    const ids = [iz * W + ix, iz * W + ix + 1, (iz + 1) * W + ix, (iz + 1) * W + ix + 1];
+    for (let k = 0; k < size; k++) {
+      const a = lerp(attr.array[ids[0] * size + k], attr.array[ids[1] * size + k], tx);
+      const b = lerp(attr.array[ids[2] * size + k], attr.array[ids[3] * size + k], tx);
+      out[off + k] = lerp(a, b, tz);
+    }
+  };
+  const refinementAt = (i, j) => i >= 0 && i < N && j >= 0 && j < N ? refinement[j * N + i] : 0;
+  const edgeHeight = (i, j, sub, ix, iz, x, z) => {
+    const a = j * W + i, b = a + 1, c = a + W, d = c + 1;
+    // Only equal-resolution neighbours share analytic edge points. Every other seam
+    // stays on the old straight edge: the finer side may add collinear vertices, but
+    // it cannot open a T-junction crack against a coarse or differently refined side.
+    // Corners always retain the original grid vertex exactly.
+    if ((ix === 0 || ix === sub) && (iz === 0 || iz === sub)) {
+      return bp.getY(iz === 0 ? (ix === 0 ? a : b) : (ix === 0 ? c : d));
+    }
+    if (iz === 0 && refinementAt(i, j - 1) !== sub) return lerp(bp.getY(a), bp.getY(b), ix / sub);
+    if (iz === sub && refinementAt(i, j + 1) !== sub) return lerp(bp.getY(c), bp.getY(d), ix / sub);
+    if (ix === 0 && refinementAt(i - 1, j) !== sub) return lerp(bp.getY(a), bp.getY(c), iz / sub);
+    if (ix === sub && refinementAt(i + 1, j) !== sub) return lerp(bp.getY(b), bp.getY(d), iz / sub);
+    return heightAt(x, z);
+  };
+
+  for (let j = 0; j < N; j++) {
+    for (let i = 0; i < N; i++) {
+      const coarseA = j * W + i, coarseB = coarseA + 1;
+      const coarseC = coarseA + W, coarseD = coarseC + 1;
+      const sub = refinementAt(i, j);
+      if (deepCovered[j * N + i]) {
+        const block = deepOrigin[j * N + i];
+        if (block) {
+          const centre = (j + block / 2) * W + i + block / 2;
+          const rim = [];
+          for (let dz = 0; dz <= block; dz++) rim.push((j + dz) * W + i);
+          for (let dx = 1; dx <= block; dx++) rim.push((j + block) * W + i + dx);
+          for (let dz = block - 1; dz >= 0; dz--) rim.push((j + dz) * W + i + block);
+          for (let dx = block - 1; dx >= 1; dx--) rim.push(j * W + i + dx);
+          for (let k = 0; k < rim.length; k++) {
+            indices[q++] = centre;
+            indices[q++] = rim[k];
+            indices[q++] = rim[(k + 1) % rim.length];
+          }
+        }
+        continue;
+      }
+      if (!sub) {
+        indices[q++] = coarseA; indices[q++] = coarseC; indices[q++] = coarseB;
+        indices[q++] = coarseC; indices[q++] = coarseD; indices[q++] = coarseB;
+        continue;
+      }
+
+      const first = nextVertex;
+      const x0 = bp.getX(coarseA), x1 = bp.getX(coarseB);
+      const z0 = bp.getZ(coarseA), z1 = bp.getZ(coarseC);
+      for (let iz = 0; iz <= sub; iz++) {
+        for (let ix = 0; ix <= sub; ix++) {
+          const tx = ix / sub, tz = iz / sub;
+          const x = lerp(x0, x1, tx), z = lerp(z0, z1, tz);
+          const p = nextVertex++, p3 = p * 3;
+          positions[p3] = x;
+          positions[p3 + 1] = edgeHeight(i, j, sub, ix, iz, x, z);
+          positions[p3 + 2] = z;
+          sample(bn, x, z, 3, normals, p3);
+          const nl = Math.hypot(normals[p3], normals[p3 + 1], normals[p3 + 2]) || 1;
+          normals[p3] /= nl; normals[p3 + 1] /= nl; normals[p3 + 2] /= nl;
+          sample(bc, x, z, 3, colors, p3);
+          sample(bs, x, z, 1, slopes, p);
+          uvs[p * 2] = x / DOMAIN + 0.5;
+          uvs[p * 2 + 1] = z / DOMAIN + 0.5;
+        }
+      }
+      for (let iz = 0; iz < sub; iz++) {
+        for (let ix = 0; ix < sub; ix++) {
+          const a = first + iz * (sub + 1) + ix, b = a + 1;
+          const c = a + sub + 1, d = c + 1;
+          indices[q++] = a; indices[q++] = c; indices[q++] = b;
+          indices[q++] = c; indices[q++] = d; indices[q++] = b;
+        }
+      }
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  geo.setAttribute('aSlope', new THREE.BufferAttribute(slopes, 1));
+  geo.setIndex(new THREE.BufferAttribute(indices, 1));
+  geo.computeBoundingSphere();
+  geo.userData.coastRefinement = {
+    method: 'adaptive-cell-replacement', subdivisions: { surface: SURFACE_SUB, raised: RAISED_SUB },
+    baseCellMetres: DOMAIN / N,
+    refinedCellMetres: { surface: DOMAIN / N / SURFACE_SUB, raised: DOMAIN / N / RAISED_SUB },
+    tideBand: [LOW, HIGH], minimumRise: MIN_RISE,
+    stableTideLevels: [...SURFACE_LEVELS, ...RAISED_LEVELS],
+    refinedCells, surfaceCells, raisedCells, addedTriangles,
+    deepBlocks, deepBlockCells: DEEP_BLOCKS, deepBlocksBySize, deepCeiling: DEEP_CEILING,
+    removedDeepTriangles,
+    watertight: true, topologyPreserving: true,
+  };
+  return geo;
+}
+
 // height texture for the water shader (depth → color/foam)
 export function buildHeightTexture() {
   // half-float: linear filtering of fp16 is core WebGL2; fp32 linear is not
-  const N = 256;
+  // 512² is still only 0.5 MiB, costs the fragment shader the same single fetch,
+  // and halves the world-space step of the water's depth/foam mask. The shoreline
+  // is therefore described every 1.21 m rather than every 2.42 m without
+  // submitting a single extra terrain triangle.
+  const N = 512;
   const data = new Uint16Array(N * N);
   for (let j = 0; j < N; j++) {
     for (let i = 0; i < N; i++) {

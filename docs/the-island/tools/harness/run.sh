@@ -63,6 +63,14 @@ echo "== the writing in the sand =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/writing.mjs" | tee "$WORK/writing.out"
 grep -q "WRITING 19 / 19" "$WORK/writing.out" || { echo "WRITING FAILED"; exit 1; }
 
+echo "== the finished terrain =="
+# The beach relief must be one continuous analytic field rather than a repeated tile; the
+# visible water/foam contact must use the denser 512² depth field over a sub-metre,
+# topology-preserving coast; and high daylight must regain native MSAA instead of
+# going through the non-antialiased bloom target.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/terrain-finish.mjs" | tee "$WORK/terrain-finish.out"
+grep -q "TERRAIN-FINISH 10 / 10" "$WORK/terrain-finish.out" || { echo "TERRAIN FINISH FAILED"; exit 1; }
+
 echo "== the doors =="
 # The owner watched a door pass through the tower wall. Nothing in the gate looked at
 # where props END UP — the walk proves you can get THROUGH a doorway, not that the

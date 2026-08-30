@@ -126,6 +126,7 @@ composer.setSize(innerWidth, innerHeight);
 renderer.localClippingEnabled = true;
 composer.addPass(new RenderPass(scene, camera));
 const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 1.05); // strength, radius, threshold (only bright things bloom) — WOW pass: softer, dreamier glow on the lamp/sun-sparkle/highlights.
+bloomPass.userData = { baseStrength: 0.68 };
 // threshold runs on the LINEAR pre-tonemap buffer: at 0.85 the noon sun on pale brass
 // (the valve wheel — the hub's main interactable) blew past it and the whole prop
 // torched white. 1.05 returns sunlit brass to brass. (#54 verification catch.)
@@ -683,7 +684,8 @@ UI.init();
     UI.setReadPace(cfg.pace || 1);
     document.documentElement.style.setProperty('--text-scale', String(cfg.textScale || 1));
     document.documentElement.classList.toggle('calm-flash', !!cfg.calmFlash);
-    bloomPass.strength = cfg.calmFlash ? 0.42 : 0.68;
+    bloomPass.userData.baseStrength = cfg.calmFlash ? 0.42 : 0.68;
+    bloomPass.strength = bloomPass.userData.baseStrength;
     renderer.setPixelRatio(cfg.drift ? Math.min(BASE_DPR, 1.0) : BASE_DPR);
     composer.setPixelRatio(cfg.drift ? Math.min(BASE_DPR, 1.0) : BASE_DPR);
     composer.setSize(innerWidth, innerHeight);
@@ -1916,7 +1918,7 @@ player.onFootstep = (kind, pos) => {
       let shot = null;
       if (withShot) {
         try {
-          if (bloomPass.enabled) composer.render(); else renderer.render(scene, camera);   // no preserveDrawingBuffer: render in the same frame
+          if (bloomPass.enabled && bloomPass.strength > 0.001) composer.render(); else renderer.render(scene, camera);   // no preserveDrawingBuffer: render in the same frame
           shot = renderer.domElement.toDataURL('image/jpeg', 0.7);
         } catch (e) { shot = null; }
       }
@@ -2381,8 +2383,16 @@ renderer.setAnimationLoop((tMs) => {
     if (saveTimer > 12) { saveTimer = 0; save(player); }
   }
 
+  // The composer renders into a non-MSAA target, so running it under the high sun both
+  // washed pale sand/sky through a bloom pass with nothing useful to glow AND threw away
+  // the renderer's native antialiasing — the distant coast stair-stepped as a result.
+  // Fade bloom completely out while the sun climbs from y .38→.52, then render direct:
+  // golden hour, dawn and night keep their authored glow; clear daylight gets crisp MSAA.
+  const daylightBloom = 1 - smoothstep(0.38, 0.52, _sunV.y);
+  bloomPass.strength = (bloomPass.userData.baseStrength ?? 0.68) * daylightBloom;
+  const useBloom = bloomPass.enabled && bloomPass.strength > 0.001;
   if (gpuTimer) gpuTimer.beginFrame();
-  if (bloomPass.enabled) composer.render();   // bloomPass.enabled is the on/off lever (debug + perf fallback)
+  if (useBloom) composer.render();
   else renderer.render(scene, camera);
   if (gpuTimer) gpuTimer.endFrame();
 });

@@ -151,8 +151,10 @@ export function makeWaterMaterial(heightTex, domain) {
       ${GLSL_NOISE}
 
       void main() {
-        // vertex-registered data: remap so texel centers land on grid points
-        vec2 uv = (vLocal.xz / uDomain + 0.5) * (255.0 / 256.0) + 0.5 / 256.0;
+        // Vertex-registered 512² depth field: remap so texel centres land on the
+        // sampled world points. This mask owns the visible water/foam contact, so its
+        // 1.21 m samples smooth the distant coast without more terrain geometry.
+        vec2 uv = (vLocal.xz / uDomain + 0.5) * (511.0 / 512.0) + 0.5 / 512.0;
         float terrainH = texture2D(uHeightTex, uv).r;
         float depth = vLocal.y - terrainH;
         if (depth < 0.02) discard;

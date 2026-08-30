@@ -21,6 +21,13 @@ gate that has guarded every fire since the walk was born:
   inheritance, upright glyph mapping, and terrain-conforming weathered rendering.
   19 assertions. It forces
   `?localstack`, so a test can never leave permanent prose in the shared world.
+- **`terrain-finish.mjs`** — pins the two visual causes one frame exposed together:
+  sand relief is one continuous, locally turning analytic field (never a repeated tile
+  or texture-LOD block); every authored tide cuts a watertight, sub-metre adaptive coast
+  financed by permanently deep seabed simplification; the water/foam contact reads the
+  matching denser 512² depth field;
+  and high daylight bypasses the non-MSAA bloom target while dawn, gold and night retain
+  their glow. 10 assertions.
 - **`doors.mjs`** — where props END UP. The owner watched a door swing through the
   tower wall; the walk proved you can get THROUGH a doorway, never that the door hung
   in it is inside the building. Pure geometry. 6 assertions.

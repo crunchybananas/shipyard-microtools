@@ -11,7 +11,8 @@
 // flight got nothing at all. applyRelief does all its work in that callback, so being
 // second to ask for a heightmap meant no normalMap, silently. The shore is built from
 // three stone types that all derive relief from rock_height; two came out bare. The
-// terrain's Bender sand ripples (uSandOn) never switched on for the same reason.
+// The old terrain Bender sand map (uSandOn) could fail for the same reason. Terrain
+// relief is now continuous analytic slope, so this gate pins that independent path too.
 //
 // It was also TIMING-dependent, which is why it came and went and why no screenshot
 // comparison could pin it. So this counts instead: relief asked for vs relief applied.
@@ -51,24 +52,25 @@ export default async function (h) {
       if (!grp || !o.isMesh || !o.material || out[grp] !== undefined) return;
       out[grp] = !!o.material.normalMap;
     });
-    // the terrain's sand relief is a uniform, not a map: 0 means the Bender heightmap
-    // decoded and nobody ever told the shader about it
+    // terrain sand is intentionally independent of the asynchronous asset ledger now:
+    // it must declare and compile its continuous analytic relief contract
     let t = null;
     ABYME.scene.traverse((o) => { if (!t && o.name === 'terrain' && Math.hypot(...o.matrixWorld.elements.slice(0,3)) > 0.5) t = o; });
     const sh = t && t.material.userData && t.material.userData.shader;
-    out._sandOn = sh && sh.uniforms.uSandOn ? sh.uniforms.uSandOn.value : null;
-    out._sandDecoded = sh && sh.uniforms.uSandH && sh.uniforms.uSandH.value && sh.uniforms.uSandH.value.image
-      ? sh.uniforms.uSandH.value.image.width : null;
+    out._sandContract = t?.material?.userData?.sandRelief || null;
+    out._sandCompiled = !!(sh?.fragmentShader && /sandTurnField/.test(sh.fragmentShader)
+      && /sandSlope/.test(sh.fragmentShader) && !/uSandH|uSandSlope/.test(sh.fragmentShader));
     return JSON.stringify(out);
   })()`).then(JSON.parse);
 
   for (const g of ['rocks', 'staticStone', 'staticRock', 'staticJoinery']) {
     ok(`${g}: carries its normal map`, surf[g] === true, { [g]: surf[g] });
   }
-  ok('the terrain’s sand relief is switched on', surf._sandOn === 1,
-    { uSandOn: surf._sandOn, heightmapDecodedAt: surf._sandDecoded });
+  ok('the terrain’s continuous sand relief is compiled', surf._sandCompiled === true
+    && surf._sandContract?.encoding === 'analytic-slope' && surf._sandContract?.textureSamples === 0,
+    { compiled: surf._sandCompiled, contract: surf._sandContract });
 
   console.log(`RELIEF ${R.pass.length} / ${R.pass.length + R.fail.length}`);
-  console.log(`  ${led ? led.applied + '/' + led.asked : '?'} reliefs applied · sand ripples ${surf._sandOn === 1 ? 'on' : 'OFF'}`);
+  console.log(`  ${led ? led.applied + '/' + led.asked : '?'} reliefs applied · sand ripples ${surf._sandCompiled ? 'analytic' : 'OFF'}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }
