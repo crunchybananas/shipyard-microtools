@@ -283,6 +283,17 @@ const A = {
     car.connect(g).connect(this._out(at, this.music));
     car.start(t0); mod.start(t0);
     car.stop(t0 + decay + 0.2); mod.stop(t0 + decay + 0.2);
+    // Most callers let a pluck finish. Cinematics may compress time, so return a tiny
+    // cancellation handle that can silence even a voice whose scheduled start is still
+    // in the future. Existing fire-and-forget call sites remain unchanged.
+    return () => {
+      const t = ctx.currentTime;
+      try {
+        g.gain.cancelScheduledValues(t);
+        g.gain.setTargetAtTime(0.0001, t, 0.025);
+        car.stop(t + 0.14); mod.stop(t + 0.14);
+      } catch (_) {}
+    };
   },
 
   // a gull cries (#64) — two-syllable "kee-yaa": sawtooth through a swept bandpass,
@@ -797,7 +808,7 @@ const A = {
 
   // the dive: the whole island drops an octave and comes back
   diveSweep(durSec) {
-    if (!this.ready) return;
+    if (!this.ready) return () => {};
     const t0 = ctx.currentTime;
     this.diveFilter.frequency.setValueAtTime(19000, t0);
     this.diveFilter.frequency.exponentialRampToValueAtTime(240, t0 + durSec * 0.75);
@@ -818,14 +829,35 @@ const A = {
     wet.gain.setTargetAtTime(0.5, t0, durSec * 0.3);
     wet.gain.setTargetAtTime(0.0001, t0 + durSec * 0.85, 1.2);
     const notes = [220, 329.63, 440, 523.25, 659.25, 880];
-    notes.forEach((f, i) => this.pluck(f, i * (durSec / 8), 0.12, 2.5));
-    setTimeout(() => {
+    const voices = notes.map((f, i) => this.pluck(f, i * (durSec / 8), 0.12, 2.5)).filter(Boolean);
+    let disposed = false;
+    const dispose = () => {
+      if (disposed) return;
+      disposed = true;
+      clearTimeout(timer);
+      const t = ctx.currentTime;
+      // An accelerated crossing lands long before the original 21-second automation.
+      // Return the sea to its ordinary filter and pitch instead of letting the old dive
+      // continue invisibly underneath the next level for another quarter-minute.
       try {
-        old.disconnect(feed);
-        fb.gain.value = 0;
-        feed.disconnect(); del.disconnect(); fb.disconnect(); wet.disconnect();
+        this.diveFilter.frequency.cancelScheduledValues(t);
+        this.diveFilter.frequency.setTargetAtTime(19000, t, 0.08);
+        this.surf.src.playbackRate.cancelScheduledValues(t);
+        this.surf.src.playbackRate.setTargetAtTime(1, t, 0.08);
+        wet.gain.cancelScheduledValues(t);
+        wet.gain.setTargetAtTime(0.0001, t, 0.045);
       } catch (_) {}
-    }, (durSec + 8) * 1000);
+      voices.forEach((stop) => stop());
+      setTimeout(() => {
+        try {
+          old.disconnect(feed);
+          fb.gain.value = 0;
+          feed.disconnect(); del.disconnect(); fb.disconnect(); wet.disconnect();
+        } catch (_) {}
+      }, 500);
+    };
+    const timer = setTimeout(dispose, (durSec + 8) * 1000);
+    return dispose;
   },
 };
 

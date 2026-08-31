@@ -2536,12 +2536,23 @@ export function buildWorld() {
         geo.dispose();
       };
       const slate = new THREE.Color(0x3a4e63), breast = new THREE.Color(0xb98a58),
-        dark = new THREE.Color(0x27364a), beakC = new THREE.Color(0x3c444e);
-      part(new THREE.SphereGeometry(0.095, 10, 8), breast, 0, 0.10, 0.02, 0, 1, 0.85, 1.4);   // body, breast forward
-      part(new THREE.SphereGeometry(0.09, 10, 7), slate, 0, 0.15, -0.02, 0, 0.94, 0.55, 1.32); // mantle / folded wings
-      part(new THREE.ConeGeometry(0.05, 0.19, 6), dark, 0, 0.10, -0.2, -1.8);                  // tail, cocked up
-      part(new THREE.SphereGeometry(0.062, 10, 8), slate, 0, 0.21, 0.11);                      // head
-      part(new THREE.ConeGeometry(0.017, 0.07, 6), beakC, 0, 0.205, 0.18, Math.PI / 2);        // beak
+        dark = new THREE.Color(0x27364a), beakC = new THREE.Color(0x3c444e), legC = new THREE.Color(0x8c6040);
+      part(new THREE.SphereGeometry(0.10, 12, 9), breast, 0, 0.15, 0.02, -0.08, 1, 0.88, 1.44); // breast
+      // two folded wings instead of one cap over the whole back: the warm breast remains
+      // visible between them and the outline narrows into the tail like a real passerine.
+      part(new THREE.SphereGeometry(0.075, 10, 7), slate, -0.057, 0.18, -0.035, -0.08, 0.62, 0.38, 1.55);
+      part(new THREE.SphereGeometry(0.075, 10, 7), slate,  0.057, 0.18, -0.035, -0.08, 0.62, 0.38, 1.55);
+      part(new THREE.ConeGeometry(0.04, 0.21, 6), dark, -0.025, 0.13, -0.23, -1.8);            // split tail
+      part(new THREE.ConeGeometry(0.04, 0.21, 6), dark,  0.025, 0.13, -0.23, -1.8);
+      part(new THREE.SphereGeometry(0.065, 12, 9), slate, 0, 0.27, 0.12);                      // head
+      part(new THREE.SphereGeometry(0.009, 7, 5), dark, -0.052, 0.286, 0.163);                // eyes
+      part(new THREE.SphereGeometry(0.009, 7, 5), dark,  0.052, 0.286, 0.163);
+      part(new THREE.ConeGeometry(0.017, 0.075, 6), beakC, 0, 0.265, 0.195, Math.PI / 2);      // beak
+      part(new THREE.CylinderGeometry(0.006, 0.007, 0.11, 5), legC, -0.035, 0.055, 0.02);     // legs
+      part(new THREE.CylinderGeometry(0.006, 0.007, 0.11, 5), legC,  0.035, 0.055, 0.02);
+      const toeL = new THREE.CylinderGeometry(0.004, 0.005, 0.08, 5); toeL.rotateX(Math.PI / 2);
+      const toeR = new THREE.CylinderGeometry(0.004, 0.005, 0.08, 5); toeR.rotateX(Math.PI / 2);
+      part(toeL, legC, -0.035, 0.005, 0.055); part(toeR, legC, 0.035, 0.005, 0.055);
       bird.add(new THREE.Mesh(bb.build(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0.05 })));
     }
     const s2 = stonesGroup.getObjectByName('stone2');
@@ -3606,7 +3617,7 @@ function buildVegetation(core, r) {
   // trunks flare into buttress roots at the base, are not round in section, and do not
   // stand plumb. 12 radial segments (from 10) and 3 height rings give the flare something
   // to shape; that is +28 triangles on a geometry shared by every instance.
-  const trunkGeo = new THREE.CylinderGeometry(0.12, 0.26, 2.6, 12, 3);
+  const trunkGeo = new THREE.CylinderGeometry(0.07, 0.19, 2.6, 12, 3);
   trunkGeo.translate(0, 1.3, 0);
   {
     const tp = trunkGeo.attributes.position;
@@ -3626,98 +3637,197 @@ function buildVegetation(core, r) {
     }
     trunkGeo.computeVertexNormals();
   }
-  // A conifer, not a stack of smooth cones (loop #125): OVERLAPPING tiers whose base rims are
-  // jagged + drooped, so the silhouette reads as ragged frond-skirts instead of clean geometry.
-  // Factored (loop #139) so TWO silhouettes can share the builder — a broad fir and a slim spruce.
-  // Fidelity pass (owner: "polygons are low"): 16 radial segments + a jittered mid ring (was 9
-  // flat facets), SMOOTH normals, and baked per-vertex shading — dark toward the trunk, bright at
-  // the frond tips — so each tier has interior depth before the foliage texture even lands.
-  // (Tree POSITIONS are untouched: the scatter draws from the shared r() stream, not jr().)
-  // A WHORL, not a surface of revolution (owner: "get the trees to look a lot more
-  // natural"). The tiers were cones with a jagged base rim, which is why the read at any
-  // distance was folded paper: a cone's sides are big flat panels, and every panel on
-  // every tree caught the light as one flat value. Three things change that, all of them
-  // baked once at build time and free at runtime:
-  //
-  //   LOBES. A conifer's tier is a WHORL of branches radiating from the trunk, so its
-  //   plan is a rosette and not a circle. Modulating the radius by cos(angle * branches)
-  //   scallops each tier into distinct branch arms with real gaps between them — the
-  //   single biggest change to the silhouette, and it costs nothing but a cosine.
-  //   NOISE. Every vertex is then pushed by smooth value noise, so no tier is a clean
-  //   surface of anything and the panels stop being planar.
-  //   DROOP BY REACH. The old droop was uniform random; a real branch bends more the
-  //   further out it reaches, so it now scales with radius and the arms sag at the tips.
-  //
-  // aRim (0 at the axis → 1 at the frond tips) rides along as a custom attribute for the
-  // fragment shader — it is what lets the rim dissolve raggedly without turning the whole
-  // canopy to lace. mergeGeometries has to be told to carry it (see util.js).
-  const makeCanopy = ({ n, baseR, taperK, tierH, spacing, lean, jag, droop, seedXor, seg = 16, hseg = 2 }) => {
+  // A conifer is not a tiered surface and it is not a pinwheel of triangular cards.
+  // Build each bough from overlapping, asymmetric THREE-DIMENSIONAL needle sprays.
+  // The sprays share a bowed centreline but fork near the hand, so a nearby tree reads
+  // shoulder → bough → branchlet → fresh tip. At distance those same clumps merge
+  // into a soft, broken crown rather than a stack of stamped triangles. `aRim` records
+  // progress along the bough for edge fray, new growth and tip-weighted wind.
+  const makeCanopy = ({ n, baseY, baseR, taperK, tierH, spacing, lean, jag, droop,
+    fullness = 1, broken = 0, seedXor, seg = 16 }) => {
     const jr = mulberry32(SEED ^ seedXor);
-    const parts = [];
-    const lobes = 5 + Math.floor(jr() * 4);                 // branch arms per whorl
-    for (let i = 0; i < n; i++) {
-      const t = i / (n - 1);
-      const radius = baseR * (1 - t * taperK);              // wide skirt → narrow crown
-      const cone = new THREE.ConeGeometry(radius, tierH, seg, hseg, true);   // openEnded (DoubleSide mat)
-      const p = cone.attributes.position;
-      const shade = new Float32Array(p.count * 3);
-      const rim = new Float32Array(p.count);
-      const phase = jr() * TAU;                             // each tier's arms point elsewhere
-      // a coarser lobe count on the far LOD, or 6 radial segments cannot resolve the arms
-      // and the scallop turns into a wobble
-      const lb = seg >= 12 ? lobes : Math.min(lobes, 3);
-      for (let v = 0; v < p.count; v++) {
-        const y = p.getY(v);
-        const x0 = p.getX(v), z0 = p.getZ(v);
-        const ang = Math.atan2(z0, x0);
-        // the whorl: arms out, gaps between them. Full strength at the rim, fading to
-        // nothing at the crown so the tier still meets the trunk.
-        const rTier = Math.hypot(x0, z0) / Math.max(radius, 1e-3);
-        const lobe = 1 + Math.cos(ang * lb + phase) * 0.20 * rTier;
-        p.setX(v, x0 * lobe); p.setZ(v, z0 * lobe);
-        if (y < -tierH / 2 + 0.02) {                        // base-rim vertices → frond tips
-          const x = p.getX(v), z = p.getZ(v);
-          const f = 1 + (jr() - 0.5) * jag;                 // radial jag
-          p.setX(v, x * f); p.setZ(v, z * f);
-          // a branch bends further the further it reaches — droop scaled by the arm's
-          // own length, so the long arms sag and the short ones hold
-          p.setY(v, y - jr() * droop * (0.45 + 0.85 * lobe));
-        } else if (Math.abs(y) < tierH * 0.26) {            // mid ring → gentle organic bulge
-          const f = 1 + (jr() - 0.5) * jag * 0.45;
-          p.setX(v, p.getX(v) * f); p.setZ(v, p.getZ(v) * f);
-        }
-        // and break the panels: smooth noise on the vertex itself, so no face is planar
-        const nx = p.getX(v), ny = p.getY(v), nz = p.getZ(v);
-        const d = (vnoise(nx * 1.9 + ny * 0.7, nz * 1.9 - ny * 0.5) - 0.5) * 0.22 * radius;
-        p.setX(v, nx + d); p.setZ(v, nz + d * 0.8);
-        p.setY(v, ny + (vnoise(nz * 2.3, nx * 2.3) - 0.5) * 0.10 * tierH);
+    const pos = [], shade = [], rim = [], index = [];
+    const near = seg >= 12;
 
-        // baked canopy depth: luminance by distance from the axis (≈1.0 mean, so the
-        // per-instance HSL tones keep their tuned brightness)
-        const rr = Math.min(Math.hypot(p.getX(v), p.getZ(v)) / Math.max(radius, 1e-3), 1.15);
-        const s = 0.68 + rr * 0.55;
-        // and a warm/cool split across that depth: needle tips catch the sun and read
-        // yellow-green, the shaded interior reads blue-green. Grey shading is what made
-        // the canopy one flat colour no matter how the per-tree tone was varied.
-        shade[v * 3] = s * (0.96 + rr * 0.10);
-        shade[v * 3 + 1] = s;
-        shade[v * 3 + 2] = s * (1.08 - rr * 0.14);
-        rim[v] = Math.min(rr, 1);
+    const colour = (u, tone = 1) => {
+      // Full foliage colour lives in the geometry now. Instance colour is only a pale
+      // botanical tint, which lets woody branch vertices remain brown in this one batch.
+      const s = tone * (0.57 + u * 0.43);
+      return [s * (0.49 + u * 0.09), s * (0.77 + u * 0.08), s * (0.36 - u * 0.025)];
+    };
+    const vertex = (p0, u, tone) => {
+      const c = colour(clamp(u, 0, 1), tone);
+      pos.push(p0.x, p0.y, p0.z);
+      shade.push(c[0], c[1], c[2]);
+      rim.push(clamp(u, 0, 1));
+    };
+    const woodVertex = (p0, tone = 1, u = 0) => {
+      pos.push(p0.x, p0.y, p0.z);
+      shade.push(0.50 * tone, 0.29 * tone, 0.12 * tone);
+      // Wood sways gently with its bough, but never enters the foliage-only fray band.
+      rim.push(Math.min(0.52, u * 0.48));
+    };
+    const basis = (direction, twist = 0) => {
+      const D = direction.clone().normalize();
+      let L = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), D);
+      if (L.lengthSq() < 1e-4) L.set(Math.cos(twist), 0, Math.sin(twist));
+      else L.normalize();
+      let V = new THREE.Vector3().crossVectors(D, L).normalize();
+      if (twist && Math.abs(D.y) < 0.98) {
+        const l0 = L.clone(), v0 = V.clone(), cs = Math.cos(twist), sn = Math.sin(twist);
+        L = l0.clone().multiplyScalar(cs).add(v0.clone().multiplyScalar(sn));
+        V = v0.clone().multiplyScalar(cs).add(l0.multiplyScalar(-sn));
       }
-      cone.setAttribute('color', new THREE.BufferAttribute(shade, 3));
-      cone.setAttribute('aRim', new THREE.BufferAttribute(rim, 1));
-      cone.rotateY(i * 1.1);                                 // de-align facets/jags between tiers
-      cone.translate(lean * i, 1.85 + i * spacing, 0);       // overlapping stack, gentle lee-lean
-      cone.computeVertexNormals();
-      parts.push(cone);
+      return { D, L, V };
+    };
+    // One needle spray is two crossed, six-lobed fans. Each fan is small enough to
+    // read as a spray of needles, not a whole branch made from one triangle; crossing
+    // them gives the bough volume from every camera angle without crystal-like solids.
+    const spray = (centre, direction, length, width, height, u, twist = 0, tone = 1) => {
+      const { D, L, V } = basis(direction, twist);
+      const fan = (side, breadth, planeTone, skew, silhouette) => {
+        const outline = near && silhouette ? [
+          [-0.58, 0.00], [-0.41, 0.34], [-0.13, 0.82], [0.24, 0.57],
+          [ 0.63, 0.00], [ 0.20,-0.51], [-0.09,-0.76], [-0.40,-0.29],
+        ] : [
+          [-0.57, 0.00], [-0.08, 0.82], [0.62, 0.00], [-0.05,-0.68],
+        ];
+        const b = pos.length / 3;
+        // The far outline is a convex diamond. A centre-fan draws that same quadrilateral
+        // with four triangles; two triangles are identical on screen and half the cost.
+        if (!near) {
+          for (let k = 0; k < outline.length; k++) {
+            const [d0, w0] = outline[k];
+            const p0 = centre.clone().addScaledVector(D, d0 * length)
+              .addScaledVector(side, w0 * breadth * (1 + skew * (k % 2 ? 1 : -1)));
+            vertex(p0, u + d0 * 0.30, tone * planeTone * (1 + Math.max(0, d0) * 0.12));
+          }
+          index.push(b, b + 1, b + 2, b, b + 2, b + 3);
+          return;
+        }
+        vertex(centre.clone().addScaledVector(D, -length * 0.015), u, tone * planeTone * 0.90);
+        for (let k = 0; k < outline.length; k++) {
+          const [d0, w0] = outline[k];
+          const p0 = centre.clone().addScaledVector(D, d0 * length)
+            .addScaledVector(side, w0 * breadth * (1 + skew * (k % 2 ? 1 : -1)));
+          const endLight = 1 + Math.max(0, d0) * 0.12;
+          vertex(p0, u + d0 * 0.30, tone * planeTone * endLight);
+        }
+        for (let k = 0; k < outline.length; k++)
+          index.push(b, b + 1 + k, b + 1 + (k + 1) % outline.length);
+      };
+      // The horizontal fan owns the branch outline; the perpendicular fan only stops
+      // it going edge-on, so four points provide the same volume at half its old cost.
+      fan(L, width, 0.92, (jr() - 0.5) * 0.16, true);
+      fan(V, height, 1.05, (jr() - 0.5) * 0.14, false);
+    };
+    const stem = (a, b0, r0, r1, tone, u) => {
+      const { L, V } = basis(b0.clone().sub(a));
+      const base = pos.length / 3;
+      for (const [p0, rad] of [[a, r0], [b0, r1]]) {
+        woodVertex(p0.clone().addScaledVector(L, rad), tone, u);
+        woodVertex(p0.clone().addScaledVector(V, rad), tone, u);
+        woodVertex(p0.clone().addScaledVector(L, -rad), tone, u);
+        woodVertex(p0.clone().addScaledVector(V, -rad), tone, u);
+      }
+      for (let k = 0; k < 4; k++) {
+        const q = (k + 1) % 4;
+        index.push(base + k, base + 4 + k, base + q, base + q, base + 4 + k, base + 4 + q);
+      }
+    };
+
+    for (let i = 0; i < n; i++) {
+      const t = i / Math.max(1, n - 1);
+      // Keep enough breadth in the top third for a living crown. A purely linear taper
+      // drives the last whorl almost to zero and leaves the leader looking amputated.
+      const radius = baseR * (0.10 + 0.90 * (1 - t * taperK));
+      const tierY = baseY + i * spacing;
+      // Successive whorls turn by an irrational-looking interval; a vertical view no
+      // longer resolves into five identical spokes stacked directly above one another.
+      const phase = jr() * TAU + i * 2.37;
+      const armCount = Math.max(4,
+        (near ? Math.round(6 * fullness) : 5) - (t > 0.70 ? 1 : 0));
+      for (let j = 0; j < armCount; j++) {
+        const a0 = phase + j * TAU / armCount + (jr() - 0.5) * 0.20;
+        const armY = tierY + (jr() - 0.5) * spacing * 0.34;
+        // Only the storm elder loses whole boughs. Its gaps tell a different history;
+        // random holes in every silhouette merely make the whole forest look unfinished.
+        if (broken && jr() < broken * (0.55 + t * 0.45)) continue;
+        // The local +x side is downwind: longer, lower hands there; short, tucked
+        // boughs face the weather. Instance yaw aligns this habit across the island.
+        const windSide = 0.5 + 0.5 * Math.cos(a0);
+        const reach = radius * (0.82 + jr() * 0.22) * (0.88 + windSide * 0.18);
+        const bend = (jr() - 0.5) * (0.26 + jag * 0.12);
+        const sag = droop * (0.74 + jr() * 0.52) * (0.88 + windSide * 0.20);
+        const point = (u) => {
+          const au = a0 + bend * u * u;
+          const d = reach * (0.045 + 0.955 * u);
+          const tipLift = tierH * (0.04 + 0.05 * t) * smoothstep(0.70, 1, u);
+          return new THREE.Vector3(
+            lean * i + Math.cos(au) * d,
+            armY + tierH * 0.10 * (1 - u) - sag * Math.pow(u, 1.38) + tipLift,
+            Math.sin(au) * d,
+          );
+        };
+        if (near) {
+          // The dark structure is visible only in small gaps between sprays. Two bowed
+          // prisms are enough to make the branch anatomically legible without spending
+          // cylinders on geometry the needles mostly cover.
+          stem(point(0.035), point(0.51), 0.032 + reach * 0.013, 0.019,
+            0.82 + jr() * 0.16, 0.22);
+          stem(point(0.49), point(0.98), 0.020, 0.007,
+            0.84 + jr() * 0.16, 0.62);
+        }
+        const stops = near ? [0.16, 0.39, 0.63, 0.84] : [0.25, 0.53, 0.82];
+        for (let k = 0; k < stops.length; k++) {
+          const u = stops[k], p = point(u);
+          const p0 = point(Math.max(0, u - 0.055)), p1 = point(Math.min(1, u + 0.055));
+          const length = reach * (near ? 0.33 : 0.43) * (1 - u * 0.07) * (0.92 + jr() * 0.14);
+          const width = reach * (near ? 0.115 : 0.145) * (1 - u * 0.18) * (0.90 + jr() * 0.20);
+          const height = tierH * (near ? 0.105 - u * 0.010 : 0.14 - u * 0.016) * (0.88 + jr() * 0.20);
+          spray(p, p1.sub(p0), length, width, height, u,
+            (jr() - 0.5) * 0.50, 0.92 + jr() * 0.16);
+        }
+        const forkEvery = fullness > 1.1 ? 1 : fullness < 0.9 ? 3 : 2;
+        if (near && t < 0.92 && (i + j) % forkEvery === 0) {
+          // A side branchlet splits each bough's outline. Alternating the fork side is
+          // visible in silhouette; randomising it alone tends to leave accidental rows.
+          const u = 0.53 + (jr() - 0.5) * 0.10, p = point(u);
+          const main = point(u + 0.05).sub(point(u - 0.05)).normalize();
+          const side = new THREE.Vector3(-main.z, -0.10 - sag * 0.08, main.x)
+            .multiplyScalar(j % 2 ? -1 : 1).normalize();
+          const fork = main.multiplyScalar(0.58).add(side.multiplyScalar(0.82)).normalize();
+          p.addScaledVector(side, reach * 0.050);
+          spray(p, fork, reach * (0.25 + jr() * 0.05), reach * 0.078,
+            tierH * 0.085, Math.min(0.84, u + 0.11), (jr() - 0.5) * 0.6, 0.95);
+        }
+      }
     }
-    const g = mergeGeometries(parts, ['aRim']);
-    for (const p of parts) p.dispose();
+
+    // A chain of overlapping candle sprays forms the leader. It leans with the old
+    // growth, narrows unevenly, and ends in one fresh point instead of a geometric cap.
+    const crownY = baseY + (n - 1) * spacing;
+    const candles = near ? 7 : 5;
+    for (let k = 0; k < candles; k++) {
+      const u = k / Math.max(1, candles - 1);
+      const centre = new THREE.Vector3(
+        lean * (n - 1) + lean * 0.34 * u,
+        crownY + tierH * (0.02 + u * 0.64),
+        (jr() - 0.5) * baseR * 0.045,
+      );
+      const dir = new THREE.Vector3(lean * 0.12, 1, (jr() - 0.5) * 0.05);
+      const width = baseR * (0.18 * (1 - u) + 0.052);
+      spray(centre, dir, tierH * (0.43 - u * 0.11), width, width * 0.78,
+        0.58 + u * 0.26, k * 0.71, 0.98 + u * 0.08);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(shade, 3));
+    g.setAttribute('aRim', new THREE.Float32BufferAttribute(rim, 1));
+    g.setIndex(index); g.computeVertexNormals(); g.computeBoundingSphere();
     return g;
   };
-  // A: the broad fir (byte-identical to the loop-#125 canopy — same seed + params, so existing
-  // trees don't move). B: a slimmer, taller spruce — narrower skirt, tighter taper, one more tier.
-  // FOUR silhouettes, not two. A stand of two shapes plus a scale multiplier still reads
+  // FOUR silhouettes. A stand of two shapes plus a scale multiplier still reads
   // as a grove of clones, because the eye reads OUTLINE first and there were only two
   // outlines in the entire forest. The two new ones are not more of the same: a young
   // tree is a different PROPORTION (dense, tight tiers, no bare trunk), and an old
@@ -3727,23 +3837,20 @@ function buildVegetation(core, r) {
   // `weight` is how much of the stand wears it, and `scale` is baked into the instance
   // matrix so a sapling is genuinely a sapling and not a full-grown tree drawn small.
   const CANOPY = [
-    { name: 'broad fir',  weight: 0.30, scale: 1.00, p: { n: 5, baseR: 1.75, taperK: 0.82, tierH: 1.55, spacing: 0.86, lean: 0.26, jag: 0.50, droop: 0.40, seedXor: 0x7a3c } },
-    { name: 'slim spruce', weight: 0.28, scale: 1.00, p: { n: 6, baseR: 1.28, taperK: 0.90, tierH: 1.50, spacing: 0.96, lean: 0.16, jag: 0.42, droop: 0.34, seedXor: 0x3b71 } },
-    { name: 'sapling',    weight: 0.24, scale: 0.52, p: { n: 4, baseR: 1.05, taperK: 0.62, tierH: 1.15, spacing: 0.62, lean: 0.08, jag: 0.58, droop: 0.24, seedXor: 0x21c9 } },
-    // lean is applied PER TIER (lean * i), so it compounds: 0.62 threw this one's crown
-    // 3.1 units sideways over six tiers and it read as falling over, not wind-worked
-    { name: 'storm elder', weight: 0.18, scale: 1.14, p: { n: 6, baseR: 1.62, taperK: 0.90, tierH: 1.70, spacing: 1.16, lean: 0.30, jag: 0.64, droop: 0.56, seedXor: 0x6f04 } },
+    { name: 'broad fir',  weight: 0.30, scale: 1.00, p: { n: 8, baseY: 1.02, baseR: 1.88, taperK: 0.86, tierH: 1.18, spacing: 0.52, lean: 0.09, jag: 0.50, droop: 0.42, fullness: 1.18, seedXor: 0x7a3c } },
+    { name: 'slim spruce', weight: 0.28, scale: 1.00, p: { n: 9, baseY: 1.22, baseR: 1.38, taperK: 0.91, tierH: 1.10, spacing: 0.54, lean: 0.065, jag: 0.42, droop: 0.35, fullness: 1.00, seedXor: 0x3b71 } },
+    { name: 'sapling',    weight: 0.24, scale: 0.64, p: { n: 7, baseY: 0.54, baseR: 1.08, taperK: 0.70, tierH: 0.84, spacing: 0.36, lean: 0.04, jag: 0.58, droop: 0.24, fullness: 1.08, seedXor: 0x21c9 } },
+    // lean is applied per whorl; the elder bends coherently without looking uprooted.
+    { name: 'storm elder', weight: 0.18, scale: 1.12, p: { n: 7, baseY: 1.34, baseR: 1.84, taperK: 0.90, tierH: 1.34, spacing: 0.72, lean: 0.19, jag: 0.64, droop: 0.58, fullness: 0.82, broken: 0.18, seedXor: 0x6f04 } },
   ];
   for (const c of CANOPY) {
     c.geo = makeCanopy(c.p);
-    // #6: the FAR silhouette — same builder, same tier stack, 6 radials x 1 ring
-    c.farGeo = makeCanopy({ ...c.p, seg: 6, hseg: 1 });
+    // Same branch grammar at distance, fewer arms and no secondary branchlets.
+    c.farGeo = makeCanopy({ ...c.p, seg: 6 });
   }
-  const canopyGeoA = CANOPY[0].geo;   // kept as names for the comments below
-  const canopyGeoB = CANOPY[1].geo;
-  // the FAR pair is built from the same table above (6 radials x 1 ring, ~63% fewer
-  // canopy verts). The swap lives at 120-130m, inside the haze melt (120→300m), where a
-  // facet is a dozen hazed pixels — the silhouette carries, the cost doesn't.
+  // Fine stems, forked branchlets and eight-lobed fans matter only in the local stand.
+  // The far geometry keeps the same broken bough silhouette, so it can take over in the
+  // 65–78m middle distance before sub-pixel anatomy consumes the frame.
 
   const spots = [];
   for (let i = 0; i < 600 && spots.length < 130; i++) {
@@ -3752,6 +3859,7 @@ function buildVegetation(core, r) {
     const z = SPOTS.mainCenter.y + Math.cos(a) * d;
     const h = heightAt(x, z);
     if (h < 3.5 || h > 15) continue;
+    if (grade(x, z) > 0.52) continue;             // roots belong on ground, never a cliff face
     if (Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 16) continue;
     spots.push([x, h - 0.2, z]);
   }
@@ -3760,7 +3868,8 @@ function buildVegetation(core, r) {
     const a = r() * TAU, d = r() * 30;
     const x = SPOTS.islet.x + Math.sin(a) * d, z = SPOTS.islet.y + Math.cos(a) * d;
     const h = heightAt(x, z);
-    if (h > 2.5 && h < 8 && Math.hypot(x - SPOTS.stones.x, z - SPOTS.stones.y) > 14) spots.push([x, h - 0.2, z]);
+    if (h > 2.5 && h < 8 && grade(x, z) < 0.52
+      && Math.hypot(x - SPOTS.stones.x, z - SPOTS.stones.y) > 14) spots.push([x, h - 0.2, z]);
   }
 
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6b48, flatShading: false, roughness: 0.9 }); // base lightened so the bark albedo multiplies to bark, not mud
@@ -3768,7 +3877,9 @@ function buildVegetation(core, r) {
   // smooth-shaded + vertexColors: the baked tier shading (dark core → bright frond tips)
   // multiplies under the per-instance HSL tone and the foliage-texture dapple
   const canopyMat = new THREE.MeshStandardMaterial({ flatShading: false, roughness: 0.85, vertexColors: true, side: THREE.DoubleSide });
-  canopyMat.color = new THREE.Color(0x6d7a3e);
+  // Nearly neutral: foliage and inner-branch hues now live in vertex colour, while the
+  // instance tint supplies only the subtle warm/cool difference between individual trees.
+  canopyMat.color = new THREE.Color(0xe1e6d6);
   // wind sway via shader patch
   canopyMat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = { value: 0 };
@@ -3776,7 +3887,7 @@ function buildVegetation(core, r) {
     sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs → object-space sample)
     sh.uniforms.uFolAmt = { value: 0.25 };   // was 0.5 — the asset is a painterly STARBURST motif and at half strength it read as fireworks up close; the procedural needle grain below carries the fine detail now
     sh.uniforms.uFolScale = { value: 1.0 };
-    sh.uniforms.uFringe = { value: 0.92 };   // how much of the frond TIPS frays away (a gradient — see the fray block)
+    sh.uniforms.uFringe = { value: 0.48 };   // ragged silhouette without erasing the leader and every outer hand
     canopyMat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
@@ -3908,45 +4019,62 @@ function buildVegetation(core, r) {
   canopyGroup.name = 'canopies';
   for (const m of nearMesh) { m.castShadow = true; canopyGroup.add(m); }
   for (const m of farMesh) canopyGroup.add(m);
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
+  const m4 = new THREE.Matrix4(), tm4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
   const col = new THREE.Color(), bark = new THREE.Color();
   const TREES = [];
   for (let i = 0; i < spots.length; i++) {
     const [x, y, z] = spots[i];
     const s = 0.8 + r() * 0.8;
-    e.set((r() - 0.5) * 0.12, r() * TAU, 0.1 + r() * 0.12); // lean
+    // All crowns remember the same sea wind. A narrow yaw jitter preserves individuals,
+    // while random 360° rotation used to point every sculpted lean somewhere different.
+    e.set((r() - 0.5) * 0.10, 1.08 + (r() - 0.5) * 0.46, 0.07 + r() * 0.10);
     q.setFromEuler(e);
     // the silhouette's own scale (a sapling is SMALL, a storm elder is big) and a squash
     // across the trunk axis, both from vr() — the variant rng — so the shared r() stream
     // that every other scatter on the island draws from is not shifted by a tree tweak
     const vs = CANOPY[variant[i]].scale;
     const squash = 0.86 + vr() * 0.3;
+    const sx = s * vs * squash, sy = s * vs * (0.9 + r() * 0.4), sz = s * vs * (1.86 - squash);
     m4.compose(new THREE.Vector3(x, y, z), q,
-      new THREE.Vector3(s * vs * squash, s * vs * (0.9 + r() * 0.4), s * vs * (1.86 - squash)));
-    trunks.setMatrixAt(i, m4);
+      new THREE.Vector3(sx, sy, sz));
+    // Branch sprays deliberately leave sky between their whorls; the trunk therefore
+    // has to continue into the crown. It used to stop at 2.6 local metres because the
+    // cone stack hid the amputation. Scale the shared flared trunk to this variant's
+    // actual leader height, without changing the canopy matrix or scatter stream.
+    const cp = CANOPY[variant[i]].p;
+    // End deep inside the upper crown. Letting the trunk reach the leader made the last
+    // metre read as a sawn pole whenever fine crown fragments dissolved against the sky.
+    const crown = cp.baseY + (cp.n - 1) * cp.spacing - cp.tierH * 0.34;
+    const trunkScale = Math.pow(s * vs, 0.72);
+    tm4.compose(new THREE.Vector3(x, y, z), q, new THREE.Vector3(
+      trunkScale * (0.96 + (squash - 1) * 0.18),
+      sy * crown / 2.6,
+      trunkScale * (1.04 - (squash - 1) * 0.18),
+    ));
+    trunks.setMatrixAt(i, tm4);
     // per-trunk bark tone (loop #141): warm browns, light↔dark, so the trunks aren't 131 identical
     // poles; multiplies the shared bark albedo. Uses the separate br() rng (canopy tone unchanged).
     bark.setHSL(0.055 + br() * 0.05, 0.28 + br() * 0.24, 0.40 + br() * 0.2);
     trunks.setColorAt(i, bark);
     addCollider(x, z, 0.3 * s * CANOPY[variant[i]].scale);   // the trunk is solid — you walked through every tree in the forest
-    // per-tree foliage tone (loop #133): widen hue (warm yellow-green ↔ cool blue-green), saturation
-    // AND value so the stand reads as individuals — sunlit crowns, shadowed elders — not a clone.
+    // A pale botanical tint rather than a second full foliage colour: multiplying two
+    // saturated greens made the first volumetric-clump pass neon and turned its wood green.
     const tv = r();
     col.setHSL(
-      0.19 + r() * 0.13,                          // 68°(yellow-green) → 115°(cool green)
-      0.30 + r() * 0.26,                          // dusty → vivid
-      0.24 + tv * tv * 0.30                        // tv² skews most trees darker, a few crowns bright
+      0.18 + r() * 0.12,                          // a warm-sun ↔ cool-shade cast
+      0.08 + r() * 0.12,
+      0.64 + tv * tv * 0.15
     );
     TREES.push({ x, z, v: variant[i], m: m4.clone(), c: col.clone(), far: false });
   }
-  // the repartition: enter-near under 120m, leave over 130m (hysteresis inside the haze
-  // melt, so a swap is a dozen hazed pixels). Counts shrink to the live split each call.
+  // The repartition: enter near under 65m, leave over 78m. The two geometries keep the
+  // same outline grammar, and hysteresis prevents a branch hand flickering at the seam.
   const _nearN = new Array(CANOPY.length).fill(0), _farN = new Array(CANOPY.length).fill(0);
   const treePartition = (px, pz) => {
     _nearN.fill(0); _farN.fill(0);
     for (const t of TREES) {
       const d2 = (t.x - px) * (t.x - px) + (t.z - pz) * (t.z - pz);
-      t.far = t.far ? d2 > 14400 : d2 > 16900;
+      t.far = t.far ? d2 > 4225 : d2 > 6084;
       const mesh = t.far ? farMesh[t.v] : nearMesh[t.v];
       const idx = t.far ? _farN[t.v]++ : _nearN[t.v]++;
       mesh.setMatrixAt(idx, t.m);

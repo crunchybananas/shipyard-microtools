@@ -71,6 +71,13 @@ echo "== the finished terrain =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/terrain-finish.mjs" | tee "$WORK/terrain-finish.out"
 grep -q "TERRAIN-FINISH 10 / 10" "$WORK/terrain-finish.out" || { echo "TERRAIN FINISH FAILED"; exit 1; }
 
+echo "== the player-facing journey =="
+# The state-machine walk proves flags can be earned; this proves the player can read
+# the first-use copy, see what arrival prose names, receive story cues after closing a
+# reader, recover direction from the journal, and accelerate both long crossings cleanly.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/experience.mjs" | tee "$WORK/experience.out"
+grep -q "EXPERIENCE PASS 13 / 13" "$WORK/experience.out" || { echo "EXPERIENCE FAILED"; exit 1; }
+
 echo "== the doors =="
 # The owner watched a door pass through the tower wall. Nothing in the gate looked at
 # where props END UP — the walk proves you can get THROUGH a doorway, not that the
@@ -102,14 +109,14 @@ echo "== the gulls =="
 # straight line THROUGH the lantern and the dome, and the owner photographed it mid-flight
 # with a wing out through the copper.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/gulls.mjs" | tee "$WORK/gulls.out"
-grep -q "GULLS 1 / 1" "$WORK/gulls.out" || { echo "GULLS FAILED"; exit 1; }
+grep -q "GULLS 3 / 3" "$WORK/gulls.out" || { echo "GULLS FAILED"; exit 1; }
 
 echo "== the trees =="
 # The canopy's detail rides on a custom attribute and three shader-chunk replacements, and
 # both die silently — a dropped attribute reads as 0 in GLSL, a replace that matches
 # nothing is a no-op. Neither reports anything; the trees just go back to folded paper.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/trees.mjs" | tee "$WORK/trees.out"
-grep -q "TREES 12 / 12" "$WORK/trees.out" || { echo "TREES FAILED"; exit 1; }
+grep -q "TREES 13 / 13" "$WORK/trees.out" || { echo "TREES FAILED"; exit 1; }
 
 echo "== the tabletop =="
 # Everything that lies on the chart table has to lie ON it. The table came down from

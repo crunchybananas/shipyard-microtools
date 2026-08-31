@@ -4,7 +4,7 @@ The scratchpad stopped being load-bearing at fire 38 (#139). This directory IS t
 gate that has guarded every fire since the walk was born:
 
 - **`run.sh`** — one command: static server + headless Chrome + saves + coverage +
-  stack + sand writing + the visual gates + the walk. Exit 0 = ship.
+  stack + sand writing + player-facing experience + the visual gates + the walk. Exit 0 = ship.
   `SERVE_PORT` / `CDP_PORT` / `CHROME_BIN` env-overridable.
 - **`walk.mjs`** — the 45-assertion FULL-GAME regression: wake-up → surface chain →
   the era threshold → all three era events → the four rounds → FILE and KEEP → the
@@ -28,6 +28,11 @@ gate that has guarded every fire since the walk was born:
   matching denser 512² depth field;
   and high daylight bypasses the non-MSAA bloom target while dawn, gold and night retain
   their glow. 10 assertions.
+- **`experience.mjs`** — the player-facing journey the flag walk cannot see: readable
+  first-use copy; unobstructed L2/L3/L4 arrivals; the L3 hall actually breaching in the
+  frame named by its prose; story whispers waiting until a reader closes; a stateful,
+  diegetic journal bearing; and opt-in acceleration that lands both the descent and
+  ascent through their real state/save boundaries. 13 assertions.
 - **`doors.mjs`** — where props END UP. The owner watched a door swing through the
   tower wall; the walk proved you can get THROUGH a doorway, never that the door hung
   in it is inside the building. Pure geometry. 6 assertions.
@@ -48,13 +53,17 @@ gate that has guarded every fire since the walk was born:
   settle ramp (the bug lives entirely in the MIDDLE — sampling the settled state scores
   identically either way) and measures the bird's origin against the tower's real profile,
   against the HALF-SPAN: a gull is 2.64 m across, so 0.98 m of origin clearance still
-  buries a third of a metre of wing in the copper. 1 assertion.
+  buries a third of a metre of wing in the copper. It also inspects the one-draw grounded
+  body for eyes, beak, legs and feet, and the flush wing for an articulated swept hand
+  with dark primaries. 3 assertions.
 - **`trees.mjs`** — the canopy's fray, needle grain, clump bump and tip-weighted sway are
   a custom vertex attribute plus three shader-chunk replacements, and both kinds fail
   SILENTLY: a dropped attribute reads as 0 in GLSL, a replace that matches nothing is a
-  no-op. Checks all four canopy geometries (near + far, both silhouettes), and that the needle-litter mask the TERRAIN samples lands under the
+  no-op. Checks all eight canopy geometries (near + far across four silhouettes), proves
+  each is made of dozens of independent branch sprays rather than circumferential cone
+  tiers, and checks that the needle-litter mask the TERRAIN samples lands under the
   trunks AND nowhere else — a CanvasTexture flip mirrors it in z, which looks perfect and
-  is in the wrong place. 12 assertions.
+  is in the wrong place. 13 assertions.
 - **`tabletop.mjs`** — everything that lies on the chart table lies ON it: inside the
   vellum, clear of the model's footprint, with a working margin between them. The table
   shrank and six props were left out past the brass rim; the owner found one of them.
@@ -78,7 +87,8 @@ gate that has guarded every fire since the walk was born:
   print and exit non-zero (a bare `finally { exit(0) }` once swallowed a day's bugs).
 - **`one.sh`** — run ONE script against a fresh server + Chrome, for visual and
   exploratory passes. `SERVE_PORT=8261 CDP_PORT=9455 one.sh glint.mjs`
-- **`syntax.sh`** — parse-check the game's ES modules. **`node --check js/foo.js` does
+- **`syntax.sh`** — recursively parse-check every game ES module, including `js/regions/`.
+  **`node --check js/foo.js` does
   not work here and does not say so**: with no package.json node treats `.js` as
   CommonJS, meets `import`, and exits 0 on a broken file. syntax.sh copies to `.mjs`
   first. A whole session of "syntax ok" was worthless before this existed.

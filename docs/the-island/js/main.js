@@ -443,8 +443,12 @@ const gulls = [];
       const x = p.getX(i), y = p.getY(i);
       const t = tipAtNegX ? (0.66 - x) / 1.32 : (x + 0.66) / 1.32;   // 0 root → 1 tip
       const taper = 1 - t * t * 0.74;                 // narrow to a point
-      p.setY(i, y * taper - t * t * 0.30);            // taper + sweep the wing aft
-      p.setZ(i, Math.sin(t * Math.PI) * 0.05 + t * t * 0.13);   // camber, and the tip lifts
+      // The rear edge resolves into individual primaries instead of one ruler-straight
+      // line. At flock distance the notches are only a few pixels, but those pixels are
+      // the difference between a glider and a gull.
+      const primary = y > 0.08 && t > 0.48 ? (0.025 + 0.035 * (Math.floor(t * 10) % 2)) * t : 0;
+      p.setY(i, y * taper - t * t * 0.30 - primary);   // taper + aft sweep + feather slots
+      p.setZ(i, Math.sin(t * Math.PI) * 0.065 + t * t * 0.13);  // camber, elbow, lifted tip
       c.copy(C_BODY).lerp(C_MANTLE, Math.min(1, t * 1.5)).lerp(C_TIP, Math.max(0, (t - 0.70) / 0.30));
       col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
     }
@@ -528,19 +532,36 @@ const gulls = [];
 // pivoted wing per side: swept back along the body at rest, spread + flapping on takeoff (driven by
 // u.flush in tickPerched). Shared geometry + material across all birds — cheap, scene-only (no clone).
 const _wingGeo = (side) => {
-  const geo = new THREE.PlaneGeometry(0.52, 0.24, 1, 1);
-  geo.translate(side * 0.26, 0, 0);                                   // shoulder at x0, tip at x=side*0.52
-  const pa = geo.attributes.position;
-  for (let v = 0; v < pa.count; v++) if (side * pa.getX(v) > 0.42) pa.setY(v, pa.getY(v) * 0.28); // pointed tip
-  geo.rotateX(-Math.PI / 2);                                          // lie flat (span x, chord z)
-  geo.computeVertexNormals();
+  // Five chord stations make a shoulder, elbow and tapered hand. The old four-vertex
+  // rectangle could only ever open like a hinged card; this has a swept leading edge,
+  // a scalloped primary edge and a pointed tip, while staying one tiny shared mesh.
+  const U = [0, 0.24, 0.52, 0.78, 1];
+  const pos = [], col = [], idx = [];
+  for (let i = 0; i < U.length; i++) {
+    const u = U[i], x = side * 0.62 * u;
+    const centre = -0.025 - 0.13 * u * u;
+    const half = (0.095 + 0.07 * Math.sin(u * Math.PI)) * (1 - 0.82 * u) + 0.012;
+    const notch = i >= 2 && i % 2 ? 0.035 : 0;
+    const lift = Math.sin(u * Math.PI) * 0.025 + u * u * 0.018;
+    pos.push(x, lift, centre + half, x, lift, centre - half + notch);
+    const shade = 1 - 0.72 * Math.max(0, (u - 0.62) / 0.38);
+    col.push(shade, shade, shade, shade, shade, shade);
+    if (i < U.length - 1) {
+      const a = i * 2, b = a + 1, c = a + 2, d = a + 3;
+      idx.push(a, b, c, b, d, c);
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  geo.setIndex(idx); geo.computeVertexNormals();
   return geo;
 };
 const WING_GEO_L = _wingGeo(-1), WING_GEO_R = _wingGeo(1);
 // wing grey matched to the baked mantle so a folded wing reads as the bird's grey back,
 // not a stuck-on pale board (#46)
-const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xa9a69b, flatShading: true, roughness: 0.82, side: THREE.DoubleSide });
-const crowWingMat = new THREE.MeshStandardMaterial({ color: 0x24262b, flatShading: true, roughness: 0.7, metalness: 0.1, side: THREE.DoubleSide });
+const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xa9a69b, vertexColors: true, flatShading: false, roughness: 0.82, side: THREE.DoubleSide });
+const crowWingMat = new THREE.MeshStandardMaterial({ color: 0x34373d, vertexColors: true, flatShading: false, roughness: 0.7, metalness: 0.1, side: THREE.DoubleSide });
 // the FOLDED pose (#46): swept back AND rolled down the flank with the chord tucked
 // short, so the wing hugs the body like real folded primaries — the old pose left both
 // wings sticking out horizontally at shoulder height, the last blob-tell on the shore
@@ -559,7 +580,8 @@ const addWings = (g, mat) => {
 // One merged, vertex-coloured geometry per species (via the Baker): the resting body was five
 // meshes across three materials PER BIRD — 45 draw calls of tiny 7×6-segment spheres that read
 // visibly faceted at flush distance. Now each bird is 1 smooth body draw (+2 wings), and both
-// species share one material. Part sizes/poses match the old builders exactly.
+// species share one material. Their bodies now carry the profile-defining anatomy too:
+// split tails, eyes, legs, toes and the gull's black primaries, still in that one draw.
 const birdBodyMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0.06 });
 const bakeBirdGeo = (parts) => {
   const b = new Baker();
@@ -571,25 +593,41 @@ const bakeBirdGeo = (parts) => {
   return b.build();
 };
 const gullGeo = (() => {
-  // mantle darkened a step (#46): the old 0x95938b washed to white in warm light and the
-  // whole bird read as one pale blob — now the grey back/folded-wing mass reads at range
-  const white = new THREE.Color(0xe7e3d8), grey = new THREE.Color(0x8d8b81), beak = new THREE.Color(0xd6a233);
+  // A perched gull is read from the ground up: feet, breast, folded dark primaries,
+  // upright neck, eye, then beak. Two ellipsoids alone made a snowman. Keep every part
+  // in this one baked draw, but give the silhouette the anatomy the eye expects.
+  const white = new THREE.Color(0xeeeae0), grey = new THREE.Color(0x8e969b);
+  const black = new THREE.Color(0x24282d), ochre = new THREE.Color(0xd19a2d);
+  const toe = () => { const g = new THREE.CylinderGeometry(0.008, 0.009, 0.13, 5); g.rotateX(Math.PI / 2); return g; };
   return bakeBirdGeo([
-    [new THREE.SphereGeometry(0.16, 10, 8), white, 0, 0.17, 0, 0, 1, 0.86, 1.62],          // body
-    [new THREE.SphereGeometry(0.155, 10, 7), grey, 0, 0.25, -0.02, 0, 0.92, 0.46, 1.5],    // mantle (folded wings / back)
-    [new THREE.ConeGeometry(0.085, 0.26, 6), grey, 0, 0.18, -0.32, -1.95],                 // tail
-    [new THREE.SphereGeometry(0.097, 10, 8), white, 0, 0.36, 0.25],                        // head
-    [new THREE.ConeGeometry(0.028, 0.12, 6), beak, 0, 0.355, 0.38, Math.PI / 2],           // beak
+    [new THREE.SphereGeometry(0.17, 12, 9), white, 0, 0.25, -0.01, -0.08, 1, 0.9, 1.62],  // pear-shaped breast
+    [new THREE.SphereGeometry(0.145, 10, 8), grey, 0, 0.31, -0.09, -0.08, 0.96, 0.40, 1.62], // mantle
+    [new THREE.ConeGeometry(0.052, 0.29, 6), black, -0.055, 0.23, -0.39, -1.82],           // split black tail
+    [new THREE.ConeGeometry(0.052, 0.29, 6), black,  0.055, 0.23, -0.39, -1.82],
+    [new THREE.SphereGeometry(0.105, 12, 9), white, 0, 0.45, 0.22],                        // head above the breast
+    [new THREE.SphereGeometry(0.014, 7, 5), black, -0.087, 0.472, 0.285],                 // eyes survive profile views
+    [new THREE.SphereGeometry(0.014, 7, 5), black,  0.087, 0.472, 0.285],
+    [new THREE.ConeGeometry(0.03, 0.14, 6), ochre, 0, 0.43, 0.39, Math.PI / 2],            // beak
+    [new THREE.CylinderGeometry(0.011, 0.013, 0.17, 5), ochre, -0.06, 0.075, 0.02],       // legs
+    [new THREE.CylinderGeometry(0.011, 0.013, 0.17, 5), ochre,  0.06, 0.075, 0.02],
+    [toe(), ochre, -0.06, -0.008, 0.065], [toe(), ochre, 0.06, -0.008, 0.065],             // forward toes
   ]);
 })();
 const crowGeo = (() => {
-  const blk = new THREE.Color(0x2e3035), blkD = new THREE.Color(0x1c1e22);
+  const blk = new THREE.Color(0x30343a), blkD = new THREE.Color(0x171a1f), eye = new THREE.Color(0x8896a4);
+  const toe = () => { const g = new THREE.CylinderGeometry(0.008, 0.009, 0.15, 5); g.rotateX(Math.PI / 2); return g; };
   return bakeBirdGeo([
-    [new THREE.SphereGeometry(0.15, 10, 8), blk, 0, 0.16, 0, 0, 0.92, 0.8, 1.9],           // sleeker body
-    [new THREE.SphereGeometry(0.145, 10, 7), blkD, 0, 0.24, -0.04, 0, 0.88, 0.42, 1.6],    // mantle
-    [new THREE.ConeGeometry(0.075, 0.4, 6), blkD, 0, 0.16, -0.44, -1.72],                  // longer tail
-    [new THREE.SphereGeometry(0.092, 10, 8), blk, 0, 0.34, 0.27],                          // head
-    [new THREE.ConeGeometry(0.03, 0.17, 6), blkD, 0, 0.335, 0.44, Math.PI / 2],            // longer beak
+    [new THREE.SphereGeometry(0.16, 12, 9), blk, 0, 0.24, -0.02, -0.10, 0.94, 0.84, 1.9],
+    [new THREE.SphereGeometry(0.145, 10, 8), blkD, 0, 0.31, -0.10, -0.08, 0.90, 0.38, 1.65],
+    [new THREE.ConeGeometry(0.06, 0.43, 6), blkD, -0.045, 0.22, -0.49, -1.72],
+    [new THREE.ConeGeometry(0.06, 0.43, 6), blkD,  0.045, 0.22, -0.49, -1.72],
+    [new THREE.SphereGeometry(0.1, 12, 9), blk, 0, 0.43, 0.27],
+    [new THREE.SphereGeometry(0.012, 7, 5), eye, -0.082, 0.455, 0.335],
+    [new THREE.SphereGeometry(0.012, 7, 5), eye,  0.082, 0.455, 0.335],
+    [new THREE.ConeGeometry(0.034, 0.19, 6), blkD, 0, 0.41, 0.48, Math.PI / 2],
+    [new THREE.CylinderGeometry(0.01, 0.012, 0.18, 5), blkD, -0.055, 0.07, 0.02],
+    [new THREE.CylinderGeometry(0.01, 0.012, 0.18, 5), blkD,  0.055, 0.07, 0.02],
+    [toe(), blkD, -0.055, -0.015, 0.075], [toe(), blkD, 0.055, -0.015, 0.075],
   ]);
 })();
 
@@ -871,13 +909,46 @@ const _cinUp = new THREE.Vector3(0, 1, 0);
 const _cinV = new THREE.Vector3();
 
 // ---------------- the dive ----------------
+// The 240× crossings need weight, especially once, but the full route contains six
+// of them (147 seconds of locked input at authored speed). Keep the long cut for a
+// player who wants it and offer an explicit accelerate after the commitment click
+// is safely past. Acceleration advances the SAME curve; it never snaps or skips a
+// state transition, so the visual grammar and save boundary stay intact.
+function armTravelHurry(run, label) {
+  let armed = false;
+  let cleaned = false;
+  const hurry = (e) => {
+    if (!armed || cleaned) return;
+    if (e.type === 'keydown' && e.code !== 'Space' && e.code !== 'Enter') return;
+    if (e.type === 'keydown') e.preventDefault();
+    run.hurry = true;
+    cleanup();
+  };
+  const reveal = setTimeout(() => {
+    if (cleaned) return;
+    armed = true;
+    UI.showCinematicHint(label);
+    canvas.addEventListener('pointerdown', hurry);
+    window.addEventListener('keydown', hurry);
+  }, 1100);
+  const cleanup = () => {
+    if (cleaned) return;
+    cleaned = true;
+    clearTimeout(reveal);
+    canvas.removeEventListener('pointerdown', hurry);
+    window.removeEventListener('keydown', hurry);
+    UI.hideCinematicHint();
+  };
+  run.hurryCleanup = cleanup;
+}
+
 function startDive() {
   MODE = 'dive';
   player.locked = true;
   interact.enabled = false;
   UI.cinematic(true);
   A.duckAmbient(false); // the held breath releases — the sea swells back as you fall
-  A.diveSweep(21);
+  const stopDiveSweep = A.diveSweep(21);
   renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); // one-time drop for the 240x zoom
   farSea.visible = false;
 
@@ -889,13 +960,14 @@ function startDive() {
   dive = {
     t: 0, dur: 21, pivot,
     startQuat: camera.quaternion.clone(),
-    snapDone: false,
+    snapDone: false, hurry: false, stopDiveSweep,
   };
+  armTravelHurry(dive, 'click or press Space to let the tide hurry');
   UI.whisper(T.down_is_the_only);
 }
 
 function tickDive(dt) {
-  dive.t += dt;
+  dive.t += dt * (dive.hurry ? 4.5 : 1);
   const f = clamp(dive.t / dive.dur, 0, 1);
   if (!dive.snapDone) {
     const s = Math.exp(easeInOut(f) * Math.log(1 / SCALE_MODEL));
@@ -937,6 +1009,8 @@ function tickDive(dt) {
     player.spawn(spawnAboveWater(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2])), L.spawn.yaw, L.spawn.pitch);
   }
   if (f >= 1) {
+    dive.hurryCleanup?.();
+    dive.stopDiveSweep?.();
     dive = null;
     MODE = 'play';
     renderer.setPixelRatio(BASE_DPR);
@@ -997,7 +1071,8 @@ function startAscent(instant = false) {
   // the climb is heavier than the dive — a third longer (28s vs the dive's 21): the dive is
   // a surrender (you fall); the ascent is an EFFORT (you heave the world up by inches).
   // Panel #4 gap #3 — give the climb weight, so it isn't the dive with the sign flipped.
-  ascent = { t: 0, dur: 28, pivot, startQuat: camera.quaternion.clone(), snapDone: false, fading: false };
+  ascent = { t: 0, dur: 28, pivot, startQuat: camera.quaternion.clone(), snapDone: false, fading: false, hurry: false };
+  armTravelHurry(ascent, 'click or press Space to let the climb gather');
   UI.whisper(T.you_run_the_mechanism);
   return true;
 }
@@ -1054,7 +1129,7 @@ function landAscent() {
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
 }
 function tickAscent(dt) {
-  ascent.t += dt;
+  ascent.t += dt * (ascent.hurry ? 4.5 : 1);
   const f = clamp(ascent.t / ascent.dur, 0, 1);
   if (!ascent.snapDone) {
     // inverse of the dive: scale DOWN from 1 to SCALE_MODEL (the world becomes a model)
@@ -1078,6 +1153,7 @@ function tickAscent(dt) {
     landAscent();
   }
   if (f >= 1) {
+    ascent.hurryCleanup?.();
     ascent = null;
     MODE = 'play';
     renderer.setPixelRatio(BASE_DPR);
@@ -1814,13 +1890,20 @@ player.onFootstep = (kind, pos) => {
     bench: (t = 12) => { W.time = t; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); }, // fixed Power-Ledger pose
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
     gpuMode: () => (gpuTimer ? gpuTimer.mode : null),
-    tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch),
+    tp: (x, z, yaw = 0, pitch = 0) => {
+      player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch);
+      // A debug teleport changes the camera by hundreds of metres inside one task. Do
+      // not render even one frame with the old stand's near/far split (and do not let
+      // the power gate measure trees around the place we just left).
+      core.userData.treeLod?.(x, z);
+      treeLodTimer = 0.35;
+    },
     // the hover glint's character, switchable live so it can be judged in the frame
     // rather than in the abstract: 'wash' warms the whole prop, 'pulse' breathes,
     // 'rim' lights only the silhouette and leaves the body colour alone.
     glintStyle: (v) => (v === undefined ? interact.glintStyle : interact.setGlintStyle(v)),
     interact,   // hotspots + hover state, for tools/harness/glint.mjs
-    gulls,      // the wheeling flock, for tools/harness/gulls.mjs
+    gulls, perched, // flying + grounded birds, for motion/anatomy review gates
     SHELF_MARKS, SHELF_TITLES, SHELF_STATS, spineAtlas,   // the lettered spines, for tools/harness/spines.mjs
     RELIEF,     // relief asked-vs-applied, for tools/harness/relief.mjs
     // THE STACK (STACK.md) — inspect what the rungs above displaced onto this one.
@@ -1856,8 +1939,9 @@ player.onFootstep = (kind, pos) => {
     setMist: (m) => { mistCur = clamp(m, 0, 1); },
     getMist: () => mistCur,
     setFinaleT: (t) => { if (finale) finale.t = t; },
+    getDive: () => dive && { t: dive.t, dur: dive.dur, hurry: !!dive.hurry, snapDone: dive.snapDone },
     ascend: (instant = false) => startAscent(instant),  // #12 stage 1: the dive run backward
-    getAscent: () => ascent && { t: ascent.t, dur: ascent.dur, snapDone: ascent.snapDone },
+    getAscent: () => ascent && { t: ascent.t, dur: ascent.dur, hurry: !!ascent.hurry, snapDone: ascent.snapDone },
     armOar: () => { W.level = 1; W.flags.returned = true; },   // #22: arm the oar terminal (the climb-out)
     leave: () => startOarFinale(),                              // #22: trigger the oar terminal (the surface end)
     ring: () => startFinale(),                                  // the bell terminal (the bottom end) — regression check
@@ -2112,7 +2196,7 @@ function buildDebugPanel() {
     ] },
     { title: 'Levels & dives — SEA-STRATA', open: true, items: [
       ['L1', 'L1 surface', 'Jump to L1 (surface): LEVELS[1] spawn (4,-104), tide 1.0, regions cleared'], ['L2', 'L2 shallows', 'Jump to L2 (shallows): raised tide 1.35, region2 visible, marks l2seen'],
-      ['L3', 'L3 midwater', 'Jump to L3 (midwater): bluff spawn, raised tide 1.65, region3 visible (Watcher active)'], ['L4', 'L4 source', 'Jump to L4 (bottom): study spawn, raised tide 1.9, region4 visible (keeper twist)'],
+      ['L3', 'L3 midwater', 'Jump to L3 (midwater): drowned-hall overlook, raised tide 1.65, region3 visible (Watcher active)'], ['L4', 'L4 source', 'Jump to L4 (bottom): study spawn, raised tide 1.9, region4 visible (keeper twist)'],
       ['dive', 'dive ▼', 'Run the REAL 21s dive cinematic (+1 level). Auto-arms the plate'], ['diveI', 'dive ▼ i', 'Instant dive: +1 level with LEVELS spawn/tide/region applied, no cinematic'],
       ['asc', 'ascend ▲', 'Run the REAL 28s ascent cinematic (−1 level)'], ['ascI', 'ascend ▲ i', 'Instant ascent: −1 level, no cinematic'],
       ['bottom', 'bottom', 'Jump to the bottom (L4) leaning over the keeper figure — fires the twist proximity'],

@@ -211,7 +211,7 @@ export const LEVELS = [
   null,
   { id: 'surface',  era: { key: 'lastday',    name: 'the last day' },        region: null,       spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.0,  encounter: 'songbird' },
   { id: 'shallows', era: { key: 'arrival',    name: 'the arrival years' },   region: 'region2',  spawn: { pos: [1.5, 0, -105.5],  yaw: 2.19, pitch: 0.03 },  tide: 1.35, encounter: 'tideFigure' },   // #135: two meters seaward — the fronds frame the lighthouse instead of walling it
-  { id: 'midwater', era: { key: 'inspection', name: 'the inspection years' }, region: 'region3', spawn: { pos: [90, 0, 30],       yaw: 1.32, pitch: -0.07 }, tide: 1.65, encounter: 'watcher' },   // #135: arrive facing the flooded channel — buoy, drowned gap, the far light; the cairn is found on the turn
+  { id: 'midwater', era: { key: 'inspection', name: 'the inspection years' }, region: 'region3', spawn: { pos: [0, 0, -78],       yaw: -0.114, pitch: -0.08 }, tide: 1.65, encounter: 'watcher' }, // revisit the wake-up shore from higher ground: the drowned hall breaches directly ahead while the Watcher enters from the right
   { id: 'source',   era: { key: 'lastwinter', name: 'the last winter' },     region: 'region4',  spawn: { pos: [-82.8, 0, -41.4], yaw: 2.19, pitch: 0.02 },  tide: 1.9,  encounter: 'keeper' },
 ];
 

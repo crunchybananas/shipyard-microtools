@@ -26,6 +26,7 @@ This is the ONLY thing that creates the on-screen `#debug-panel` AND the `window
 | **W A S D** | Walk |
 | **Click** | "Touch the world" — fires the hotspot under the iris cursor (this is how nearly everything is used) |
 | **Drag a hotspot** | Two hotspots are *drag* type, not click: the **sun crank** and the **model lamp housing** (lens-aim/beam). Hold and drag those. |
+| **Click / Space** during a dive or ascent | After the prompt appears, accelerate the same crossing curve (no state is skipped). |
 | **J** | Journal (Field Notes) open/close |
 | **M** | Mute / unmute (persists) |
 | **C** | Reduced-motion comfort toggle (persists) |
@@ -129,9 +130,9 @@ You wake on the south beach (~4,−104). Walk WNW to the lighthouse study.
 
 ### D. The DESCENT — the brass PLATE (two-touch dive)
 15. **Stand on the PLATE** (~−82.8,−41.4) — you must be **within ~1.0m of its centre** or it just whispers "Stand on it." Click **`plate`** (`maxDist` 3.5) **twice**: first touch = the **brink** ("there is no climbing back"); a second deliberate touch **commits** → sets `dove`, runs the ~21s dive cinematic, and lands you on the beach **one level deeper** (`W.level` +1, max 4). Stepping >1.25m off the plate cancels the brink.
-16. **Repeat the dive** at each level. `W.level` runs 1 (surface) → 4 (`MAX_DEPTH`, the bottom). So a manual run is **3 dives down**. *Skip: `ABYME.bottom()` jumps straight to the bottom leaning over the keeper.*
+16. **Repeat the dive** at each level. `W.level` runs 1 (surface) → 4 (`MAX_DEPTH`, the bottom). So a manual run is **3 dives down**. Each 21s descent preserves its full authored pace unless you deliberately click or press Space after the acceleration prompt; that speeds up the same curve and still lands through the normal save/state boundary. *Skip: `ABYME.bottom()` jumps straight to the bottom leaning over the keeper.*
 
-What each level unlocks: **L≥1** quarters journal hotspot · **L≥2** inner door opens, coat + footprints + BELL appear, coat letter readable, tiny keeper figure on the model · **L≥3** keeper speaks on arrival, the WATCHER activates, deep re-read pages appear · **L≥4 (bottom)** the plate goes UP only (amber `plateGlow`), the TWIST arms.
+What each level unlocks: **L2** inner door opens, coat + footprints + quarters journal + BELL appear, the Tide-Figure activates, and a tiny keeper figure stands on the model · **L3** the drowned hall breaches, the keeper speaks on arrival, the WATCHER activates, and deep re-read pages appear · **L4 (bottom)** the plate goes UP only (amber `plateGlow`) and the TWIST arms.
 
 ### E. The bottom TWIST (mandatory)
 17. At the bottom, **walk up to the tiny keeper figure on the chart-table model** (within 2.4m) — **no click**. Proximity fires `keeperTwist`: the figure turns, **rises** toward you, looms larger, and speaks ("There you are. I've been coming down for you."). Sets **`keeperRose`** immediately, locks you ~6s. *Fast path: `ABYME.bottom()` spawns you right at it.*
@@ -172,7 +173,7 @@ Readable fragments (click → `UI.openReader`; first read drops a journal line):
 
 **SEA-STRATA per-level hidden readables** (each lives in its level's region, readable only there):
 - **Kelp slate** — L2, on the wade-line from the L2 spawn (~8,−101). Click **`kelpSlate`** (`when: W.level===2`). Diegetically hints the **Tide-Figure**.
-- **Bluff cairn** — L3, by the bluff spawn (~91.5,31.5), a faint cold ring on the top stone. Click **`bluffCairn`** (`when: W.level===3`). Hints the **Watcher**.
+- **Bluff cairn** — L3, across the ruler-bridge on the bluff (~91.5,31.5), a faint cold ring on the top stone. Click **`bluffCairn`** (`when: W.level===3`). Hints the **Watcher**.
 - **Source note** — L4, on the study floor by the chart table (~−83.8,−41.8). Click **`sourceNote`** (`when: W.level===4`). Frames the keeper-look twist.
 
 **The deep-read economy** (cross-level, Meow-Wolf): the 4 CANONICAL deep-capable fragments — **stone** (deepFrom 2) · **logbook** (3) · **quarters** (3) · **music** (4) — each accretes a colder *journalDeep* line the first time you reach its deep page; reading **all 4** fires the **integration** payoff (a self-hand entry + whisper, once). A **"N of 4 read from the deep"** tally rides the journal header, and a count-aware whisper marks each. Two **bonus** deep-reads (**coat**@L3, **bottle**@L2) accrete + whisper but stay OUT of the 4-tally. *Audit: `ABYME.read(id)` at the right level, page to the last page; or panel `mark lore read`.*

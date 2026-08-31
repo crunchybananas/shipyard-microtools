@@ -82,6 +82,7 @@ export default async function (h) {
     return { calls: i.calls, tris: i.triangles };
   })()`);
   ok('P1.budget(draws<340,tris<460k)', bud.calls < 340 && bud.tris < 460000);
+  console.log(`  power budget ${bud.calls} draws · ${bud.tris} triangles`);
 
   await h.evaluate(`(() => {
     const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);

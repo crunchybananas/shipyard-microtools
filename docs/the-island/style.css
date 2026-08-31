@@ -254,18 +254,39 @@ html, body {
 
 /* ---------- controls hint ---------- */
 #controls-hint {
-  position: fixed; left: 50%; bottom: 4vh; z-index: 22;
+  position: fixed; left: 50%; bottom: max(18px, 3.2vh); z-index: 22;
   transform: translateX(-50%);
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  color: var(--ink-dim);
-  text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+  width: min(760px, calc(100vw - 40px));
+  font-size: 0.84rem;
+  line-height: 1.45;
+  letter-spacing: 0.11em;
+  color: rgba(232, 224, 207, 0.9);
+  text-align: center;
+  text-shadow: 0 1px 9px rgba(0,0,0,1);
   opacity: 0;
   transition: opacity 1.2s ease;
   pointer-events: none;
 }
 #controls-hint b { color: var(--ink); font-weight: 400; }
-#controls-hint.show { opacity: 0.85; }
+#controls-hint.show { opacity: 0.92; }
+
+/* The dive and climb are deliberate, not mandatory waiting. This hint sits in
+   the lower matte and only appears once the commitment click cannot trigger it. */
+#cinematic-hint {
+  position: fixed; left: 50%; bottom: 3.5vh; z-index: 23;
+  transform: translateX(-50%) translateY(5px);
+  width: min(560px, calc(100vw - 40px));
+  color: rgba(232, 224, 207, 0.72);
+  font-size: 0.72rem;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-shadow: 0 1px 8px rgba(0,0,0,1);
+  opacity: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  pointer-events: none;
+}
+#cinematic-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ---------- journal ---------- */
 #journal-tab {
@@ -360,6 +381,26 @@ html, body {
   letter-spacing: 0.18em;
   text-transform: none;
   color: rgba(196, 180, 140, 0.5);
+}
+#journal-bearing {
+  margin: -0.35rem 0 1rem;
+  padding: 0.7rem 0.85rem 0.75rem;
+  border-top: 1px solid rgba(255, 180, 84, 0.24);
+  border-bottom: 1px solid rgba(255, 180, 84, 0.14);
+  color: rgba(232, 224, 207, 0.78);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.55;
+}
+#journal-bearing::before {
+  content: 'where the notes point';
+  display: block;
+  margin-bottom: 0.28rem;
+  color: rgba(255, 180, 84, 0.62);
+  font-size: 0.58rem;
+  font-style: normal;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 #journal-entries .entry {
   padding: 0.85rem 0;
@@ -547,9 +588,10 @@ html, body {
   #sound-tab   { top: 10px; right: 58px; }
   #motion-tab  { top: 10px; right: 104px; }
   #controls-hint {
-    font-size: 0.6rem; letter-spacing: 0.06em; line-height: 1.6;
-    max-width: 92vw; white-space: normal; text-align: center; bottom: 2vh;
+    width: calc(100vw - 28px); font-size: 0.72rem; letter-spacing: 0.045em;
+    line-height: 1.55; white-space: normal; bottom: 2vh;
   }
+  #cinematic-hint { width: calc(100vw - 28px); font-size: 0.68rem; letter-spacing: 0.08em; }
   #whisper { max-width: 90vw; font-size: 1.1rem; }
   #title-screen h1 { font-size: clamp(1.7rem, 9vw, 5rem); letter-spacing: 0.2em; margin-left: 0.2em; }
   .subtitle { letter-spacing: 0.5em; margin-left: 0.5em; }

@@ -64,8 +64,12 @@
   <!-- diegetic one-liners -->
   <div id="whisper" aria-live="polite"></div>
 
+  <!-- Long crossings keep their authored pace, but never hold a returning player
+       hostage. This appears only after the commitment click has safely passed. -->
+  <div id="cinematic-hint" aria-live="polite"></div>
+
   <!-- control hint -->
-  <div id="controls-hint">drag to look &middot; <b>W A S D</b> to walk &middot; click to touch the world &middot; <b>J</b> journal &middot; <b>M</b> sound &middot; <b>C</b> motion &middot; <b>F8</b> leave a note</div>
+  <div id="controls-hint">drag to look &middot; <b>W A S D</b> to walk &middot; click to touch &middot; <b>J</b> when lost</div>
 
   <!-- THE NOTE. F8 captures where you are and what you see; this is where you say what
        is wrong with it. It is a DOM overlay and not prompt(), deliberately: embedded
@@ -182,6 +186,7 @@
   <button id="journal-tab" title="Journal (J)">✦</button>
   <div id="journal" class="hidden">
     <h2>Field Notes</h2>
+    <div id="journal-bearing" aria-live="polite"></div>
     <div id="journal-entries"></div>
     <div class="journal-foot">J to close</div>
   </div>

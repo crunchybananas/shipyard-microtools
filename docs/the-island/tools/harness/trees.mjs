@@ -1,8 +1,8 @@
 // trees.mjs — the canopy's detail is carried by things that fail SILENTLY.
 //
-// The trees are the owner's standing example of the quality bar, and what makes them read
-// as trees rather than folded paper is not geometry any more — it is an attribute and a
-// shader patch, and both die quietly:
+// The trees are the owner's standing example of the quality bar. Their first defence is
+// now structural — dozens of disconnected branch sprays instead of cone tiers — and their
+// fine read still depends on an attribute and shader patch that can die quietly:
 //
 //   aRim (0 at the trunk → 1 at the frond tips) is a CUSTOM attribute on the canopy
 //   geometry. mergeGeometries carries position/normal/color and, until it was told
@@ -14,8 +14,8 @@
 //   shader chunks. A replace that matches nothing is a no-op with no error (the same trap
 //   the bloom clamp carries a warning for).
 //
-// So this checks the mechanism is actually present, on all four canopy geometries — near
-// and far LOD, both silhouettes — because the far pair is easy to forget.
+// So this checks the mechanism on all eight canopy geometries — near and far across four
+// silhouettes — and proves the branch-spray topology itself has not regressed to cones.
 
 export default async function (h) {
   const R = { pass: [], fail: [] };
@@ -49,7 +49,15 @@ export default async function (h) {
       geos.push({ verts: o.geometry.attributes.position.count,
                   rim: !!o.geometry.attributes.aRim,
                   rimMax: o.geometry.attributes.aRim
-                    ? Math.max(...Array.from(o.geometry.attributes.aRim.array)) : null });
+                    ? Math.max(...Array.from(o.geometry.attributes.aRim.array)) : null,
+                  components: (() => {
+                    const n=o.geometry.attributes.position.count, parent=Array.from({length:n},(_,i)=>i);
+                    const find=(x)=>{while(parent[x]!==x){parent[x]=parent[parent[x]];x=parent[x];}return x;};
+                    const join=(a,b)=>{a=find(a);b=find(b);if(a!==b)parent[b]=a;};
+                    const ix=o.geometry.index?.array;
+                    if(ix)for(let k=0;k<ix.length;k+=3){join(ix[k],ix[k+1]);join(ix[k+1],ix[k+2]);}
+                    return new Set(Array.from({length:n},(_,i)=>find(i))).size;
+                  })() });
       mats.add(o.material);
     });
     const mat = [...mats][0];
@@ -79,6 +87,10 @@ export default async function (h) {
   ok('every canopy carries aRim', m.canopies.length > 0 && m.canopies.every((g) => g.rim), m.canopies);
   // a dropped attribute reads as 0 in GLSL, so "present but all zero" is the same failure
   ok('aRim actually reaches the frond tips', m.canopies.every((g) => g.rimMax > 0.9), m.canopies.map((g) => g.rimMax));
+  // A cone stack has one connected component per tier (4–6 total), however noisy its
+  // surface is. Real branch grammar leaves dozens of independently articulated sprays.
+  ok('every canopy is built from branch sprays, not circumferential cones',
+    m.canopies.every((g) => g.components >= 35), m.canopies.map((g) => g.components));
   ok('the vertex patch landed (rim attribute + tip-weighted sway)', !!m.vert && m.vert.rimAttr && m.vert.tipSway, m.vert);
   ok('the fragment patch landed (fray, needle grain, clump bump, new growth)',
     !!m.frag && m.frag.fray && m.frag.needle && m.frag.bump && m.frag.newGrowth, m.frag);

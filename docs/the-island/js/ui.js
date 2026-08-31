@@ -18,6 +18,8 @@ export const UI = {
     this.soundTab = $('sound-tab');
     this.motionTab = $('motion-tab');
     this.hint = $('controls-hint');
+    this.cinematicHint = $('cinematic-hint');
+    this.journalBearing = $('journal-bearing');
     this.readerEl = $('reader');
     this.readerTitle = $('reader-title');
     this.readerBody = $('reader-body');
@@ -215,6 +217,16 @@ export const UI = {
     if (!this._whisperTimer) this._nextWhisper();
   },
   _nextWhisper() {
+    // A story cue spoken behind an opaque reader or journal is not a cue. Deep
+    // pages used to spend their entire acknowledgement behind the parchment, so
+    // the player who read carefully was the player guaranteed to miss it.
+    const covered = W.reading || W.writing
+      || !this.journalEl.classList.contains('hidden')
+      || !document.getElementById('settings')?.classList.contains('hidden');
+    if (covered) {
+      this._whisperTimer = setTimeout(() => this._nextWhisper(), 180);
+      return;
+    }
     const next = this._whisperQueue.shift();
     if (!next) { this._whisperTimer = null; return; }
     this.whisperEl.textContent = next.text;
@@ -237,13 +249,18 @@ export const UI = {
   },
 
   cinematic(on) { this.letterbox.classList.toggle('on', on); },
+  showCinematicHint(text) {
+    this.cinematicHint.textContent = text;
+    this.cinematicHint.classList.add('show');
+  },
+  hideCinematicHint() { this.cinematicHint.classList.remove('show'); },
 
   showHint() {
     // #60: a phone is not a keyboard — on coarse pointers the hint teaches the touch
     // grammar instead of naming keys the visitor does not have
     try {
       if (matchMedia('(pointer: coarse)').matches) {
-        this.hint.innerHTML = 'drag to look &middot; <b>hold</b> to walk &middot; tap to touch the world';
+        this.hint.innerHTML = 'drag to look &middot; <b>hold</b> to walk &middot; tap to touch &middot; open <b>✦</b> when lost';
       }
     } catch (_) {}
     this.hint.classList.add('show');
@@ -285,6 +302,7 @@ export const UI = {
         ? `Field Notes<span class="deep-tally">${bits.join(' — ')}</span>`
         : 'Field Notes';
     }
+    if (this.journalBearing) this.journalBearing.textContent = this.currentBearing();
     if (!W.journal.length) {
       this.journalEntries.innerHTML = '<div class="empty">Nothing written yet. The island will dictate.</div>';
       return;
@@ -294,6 +312,36 @@ export const UI = {
       const cls = j.hand === 'keeper' ? 'entry keeper' : 'entry';
       return `<div class="${cls}">${j.text}${sk ? `<div class="sketch">${sk}</div>` : ''}</div>`;
     }).join('');
+  },
+
+  // The journal is memory, but memory should still point somewhere. This is a
+  // state-derived bearing, not a quest HUD and not another saved entry: it names
+  // one physical relationship the player already has enough evidence to follow.
+  currentBearing() {
+    const F = W.flags;
+    if (!F.enteredStudy) return 'The lighthouse is the one landmark that answers from everywhere on the shore.';
+    if (!F.valveTurned) return 'The brass valve beside the chart table is joined to the tide outside.';
+    if (!F.rulerTaken) return W.tideTarget > 0.5
+      ? 'The chest is under high water again. The brass valve can uncover the flats.'
+      : 'The drained flats have uncovered a chest the high water kept.';
+    if (!F.rulerPlaced) return 'The ruler is bridge-work in miniature. The model carries a crack of its own.';
+    if (!F.heardBox) return 'The music box in the study is holding five notes, and one of them does not sit easily.';
+    if (!F.birdSolved) return F.heardBird
+      ? 'The dawn bird returned the box’s five notes with one correction. The standing stones will take them in that order.'
+      : 'At dawn, something living waits among the standing stones long enough to answer the box.';
+    if (!F.lensTaken) return 'The corrected stones opened the outcrop. What they uncovered is still there.';
+    if (!W.lensPlaced) return 'The lens is an eye for a lighthouse. The little lamp room on the chart-table model is missing one.';
+    if (!F.glyphsSeen) return 'At night the fitted lamp casts a beam. Its housing on the model can turn that beam toward the far cliff.';
+    if (!F.shadowRevealed) return 'The beam left four figures. Golden-hour light makes the disturbed sand on the far bluff betray itself.';
+    if (!F.hatchOpen) return 'Four buried dials wait beneath the bluff. They answer to the figures the beam wrote.';
+    if (!F.plumbTaken) return 'The opened hatch has made a way into the vault below the bluff.';
+    if (!F.plumbHung) return 'The plumb was made to hang. A bare hook waits over the chart table.';
+    if (W.level >= 4 && !F.keeperRose) return 'There is nowhere deeper. The smallest figure in the model is no longer only a marker.';
+    if (W.level >= 4 && F.keeperRose && !F.carried) return 'The bell can keep the light here. The plate can carry what was found back through the years.';
+    if (F.climbing && W.level > 1) return 'The plate remembers the way upward. Each touch carries the weight one stratum closer to air.';
+    if (F.returned) return 'The dory is still on the wake-up beach. Its oar is no longer only driftwood.';
+    if (W.level > 1) return 'The same brass plate waits in the same study. It has one direction left at this depth.';
+    return 'The plumb has found the brass plate beneath it. Stand at its centre and touch once to listen, twice to choose.';
   },
 };
 

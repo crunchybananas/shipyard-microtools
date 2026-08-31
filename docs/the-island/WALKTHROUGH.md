@@ -22,6 +22,7 @@ Everything is operated by **touching the world** (clicking the hotspot under you
 | **W A S D** | Walk |
 | **Click** | Touch / use the thing under the cursor |
 | **Drag** a hotspot | Only two: the **sun crank** and the **model's lamp housing** |
+| **Click / Space** during a crossing | After the prompt appears, let the descent or climb gather speed |
 | **J** | Journal (your field notes — read this when stuck) |
 | **M** / **C** | Mute · reduced-motion comfort |
 | **Esc** | Close reader / journal |
@@ -61,11 +62,10 @@ This chain runs in parallel with the stones and is the one that actually **opens
 ### 5. The descent
 **Stand on the brass plate** (you have to be right on its center) and touch it. The first touch is the **brink** — a warning. Touch again to **commit**, and you dive one level deeper, waking on the same beach in a dimmer copy of the island.
 
-**Repeat the dive.** There are **four levels**; from the surface, that's **three dives down** to the bottom. Each level reveals more:
-- **One down:** the shallows flood into a drowned **kelp forest**, fish-shadows drifting over it. A soft dark figure stands among the fronds — the **Tide-Figure**. Don't wade at it (it scatters like silt); **stand still and watch**, and it settles and lets go. The keeper's quarters open, and a wax slate is tangled in the kelp.
-- **Two down:** an inner door opens — a coat still warm, footprints your size, and a **bell** in the annex. A tiny keeper figure now stands on the model.
-- **Three down:** the keeper speaks when you arrive, and a **Watcher** walks the deep shore (see below).
-- **The bottom:** the plate only goes **up** now.
+**Repeat the dive.** There are **four levels total**; from the surface, that's **three dives down** to the bottom. Each arrival revisits somewhere you know and changes what it means:
+- **One down — the shallows:** the wake-up shore has become a drowned **kelp forest**, with fish-shadows drifting over it. A soft dark figure stands among the fronds — the **Tide-Figure**. Don't wade at it (it scatters like silt); **stand still and watch**, and it settles and lets go. The keeper's quarters are open now: a coat still warm, footprints your size, a journal on the cot, and a **bell** in the annex. A wax slate is tangled in the kelp.
+- **Two down — the inspection years:** you return to higher ground above that same shore and watch the **drowned hall rise through the water**. The keeper speaks when you arrive. A **Watcher** walks in from the deep shore; hold it in your gaze rather than running. The keeper's cairn waits across the ruler-bridge on the bluff.
+- **Three down — the bottom:** the study is cold and far, and a note weighted with stone lies near the table. There is nowhere deeper; the plate only goes **up** now. Approach the tiny keeper on the model to make the turn.
 
 ### 6. The bottom (the turn)
 At the bottom, **walk up to the tiny keeper figure on the chart-table model** — don't click, just approach. It turns, **rises** toward you, and speaks: *"There you are. I've been coming down for you."* That's the turn the whole descent was for. After this, you can choose your ending.
@@ -95,7 +95,7 @@ None of these gate the ending — they're the story unfolding as you explore:
 - **The deep readings** — the keeper wrote some things that only surface *the deeper you go*. Re-read the **logbook**, the **cot-journal**, the **standing stone**, and the **music-box note** from far enough down and each gives up a colder, truer page — your journal keeps a tally (*"N of 4 read from the deep"*). Read all four and they close into one understanding: you were always both the one who went down and the one who kept the light. (The unsent letter and the bottle note hide deeper pages too.)
 - **The reading glass** — on the islet. Take it, and faint **lampblack marks** you couldn't see before surface — one in the study, one high on a stone. The keeper wrote the true things small.
 - **Vistas** (just look, no click): the **drowned gallery** when the tide is out; the **inverted vault** through the cellar's east window; **the room that disagrees** at the west window — a second study whose model floods *opposite* to your tide.
-- **The Watcher** (three levels down): a figure on the deep shore that drifts toward you when you look away and freezes when you look at it. **Don't run.** Hold it in your gaze for a few seconds — *regard* it — and it lifts its head, lets go, and rises away as a small cold light. Some things down there only want to be seen.
+- **The Watcher** (two levels down): a figure on the deep shore that drifts toward you when you look away and freezes when you look at it. **Don't run.** Hold it in your gaze for a few seconds — *regard* it — and it lifts its head, lets go, and rises away as a small cold light. Some things down there only want to be seen.
 
 ---
 

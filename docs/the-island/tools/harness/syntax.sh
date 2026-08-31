@@ -21,8 +21,9 @@ ISLAND="$(cd "$HERE/../.." && pwd)"
 
 files=("$@")
 if [ ${#files[@]} -eq 0 ]; then
-  # shellcheck disable=SC2207
-  files=($(ls "$ISLAND"/js/*.js))
+  # Region modules are browser modules too. The old top-level glob left all three
+  # outside the parse gate; a broken shader template in l2_shallows.js exposed it.
+  while IFS= read -r f; do files+=("$f"); done < <(find "$ISLAND/js" -type f -name '*.js' | sort)
 fi
 
 TMP="$(mktemp -d)"
@@ -32,11 +33,14 @@ bad=0
 for f in "${files[@]}"; do
   [ -f "$f" ] || { echo "  MISSING  $f"; bad=1; continue; }
   # the extension is the whole trick: as .mjs, node parses it as a module and reports
-  cp "$f" "$TMP/$(basename "${f%.js}").mjs"
-  if out=$(node --check "$TMP/$(basename "${f%.js}").mjs" 2>&1); then
-    printf '  ok       %s\n' "$(basename "$f")"
+  rel="${f#"$ISLAND"/}"
+  target="$TMP/${rel//\//__}"
+  target="${target%.js}.mjs"
+  cp "$f" "$target"
+  if out=$(node --check "$target" 2>&1); then
+    printf '  ok       %s\n' "$rel"
   else
-    printf '  SYNTAX   %s\n' "$(basename "$f")"
+    printf '  SYNTAX   %s\n' "$rel"
     echo "$out" | sed 's/^/           /' | head -6
     bad=1
   fi

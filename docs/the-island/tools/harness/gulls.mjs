@@ -73,7 +73,24 @@ export default async function (h) {
   // what the owner photographed. The bar is the half-span, not zero.
   const HALF_SPAN = 1.32;
   ok('no part of the dawn percher enters the tower', m.worstClearance > HALF_SPAN, { ...m, HALF_SPAN });
+  const anatomy = await h.evaluate(`(() => {
+    const gull=ABYME.perched.find(b=>b.userData.species==='gull');
+    const body=gull.children.find(o=>o.isMesh), p=body.geometry.attributes.position, c=body.geometry.attributes.color;
+    let eyes=0,feet=0,beak=0;
+    for(let i=0;i<p.count;i++){
+      const r=c.getX(i),g=c.getY(i),b=c.getZ(i),y=p.getY(i),z=p.getZ(i),lum=r*.299+g*.587+b*.114;
+      if(lum<.08&&y>.42&&z>.23)eyes++;
+      const ochre=r>.3&&r>g*1.25&&b<g*.45;
+      if(ochre&&y<.16)feet++; if(ochre&&y>.34&&z>.28)beak++;
+    }
+    const wing=gull.lw.children[0].geometry, wc=wing.attributes.color;
+    return JSON.stringify({bodyVerts:p.count,eyes,feet,beak,wingVerts:wing.attributes.position.count,
+      wingColour:!!wc,tip:wc?Math.min(...Array.from(wc.array)):null,minY:body.geometry.boundingBox?.min.y??null});
+  })()`).then(JSON.parse);
+  ok('a grounded gull has eyes, beak, legs and feet in its one body draw', anatomy.eyes>0&&anatomy.feet>0&&anatomy.beak>0, anatomy);
+  ok('flush wings have an elbow, swept hand and dark primaries', anatomy.wingVerts>=10&&anatomy.wingColour&&anatomy.tip<.5, anatomy);
   console.log(`GULLS ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   console.log(`  closest approach ${m.worstClearance} m clear, at radius ${m.worstAt && m.worstAt[0]} / y ${m.worstAt && m.worstAt[1]}`);
+  console.log(`  grounded anatomy ${anatomy.bodyVerts} verts · eyes ${anatomy.eyes} · feet ${anatomy.feet} · wing ${anatomy.wingVerts} verts`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }

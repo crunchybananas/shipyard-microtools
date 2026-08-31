@@ -69,9 +69,12 @@ export function build({ region2 }) {
         #include <begin_vertex>
         #ifdef USE_INSTANCING
           float kw = instanceMatrix[3].x * 0.21 + instanceMatrix[3].z * 0.17;   // per-frond phase
-          float kh = pow(max(position.y, 0.0), 1.6);                            // tips sway most
-          transformed.x += sin(uTime * 0.7 + kw) * 0.55 * kh;                   // slow languid underwater drift
-          transformed.z += cos(uTime * 0.55 + kw * 1.3) * 0.4 * kh;
+          // position.y is metres (0..4.2), not a 0..1 bend weight. Raising it
+          // to 1.6 used to turn 55 cm of sway into FIVE metres at the tip: the
+          // shallows arrived as giant black blades crossing the whole frame.
+          float kh = pow(clamp(position.y / 4.2, 0.0, 1.0), 1.6);               // tips sway most
+          transformed.x += sin(uTime * 0.7 + kw) * 0.42 * kh;                   // slow languid underwater drift
+          transformed.z += cos(uTime * 0.55 + kw * 1.3) * 0.30 * kh;
         #endif
       `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
     };
@@ -82,11 +85,28 @@ export function build({ region2 }) {
     let ki = 0;
     const plantKelp = (x, z) => {
       const h = heightAt(x, z);
-      if (!Number.isFinite(h) || h > 1.6) return;     // only the low shore zone that the L2 tide floods
-      const s = 0.7 + kr() * 0.9;
+      const L2_WATER = 1.47;
+      if (!Number.isFinite(h)) return;
+      const room = L2_WATER - h - 0.18;
+      if (room < 0.55) return;                          // enough water for a real submerged frond
+
+      // The arrival is a composed sightline, not a roulette wheel. Keep a wading
+      // pocket around the actual rescued spawn and a narrow view corridor toward
+      // the lighthouse; fronds remain on both sides to frame it.
+      const sx = 1.9, sz = -104.1, yaw = 2.19;
+      const dx = x - sx, dz = z - sz;
+      const fx = -Math.sin(yaw), fz = -Math.cos(yaw);
+      const ahead = dx * fx + dz * fz;
+      const side = Math.abs(dx * fz - dz * fx);
+      if (Math.hypot(dx, dz) < 4.2 || (ahead > -1.5 && ahead < 27 && side < 3.2)) return;
+
+      // Kelp belongs UNDER this waterline. The old independent y-scale could
+      // make an 11 m frond in 1.5 m of water, which read as a land-sized fence.
+      const stalkH = Math.min(room, 0.8 + kr() * 1.45);
+      const s = 0.62 + kr() * 0.56;
       km.compose(new THREE.Vector3(x, h, z),
         kq.setFromEuler(ke.set((kr() - 0.5) * 0.22, kr() * TAU, (kr() - 0.5) * 0.22)),
-        new THREE.Vector3(s, s * (0.8 + kr() * 0.85), s));
+        new THREE.Vector3(s, stalkH / 4.2, s));
       kelp.setMatrixAt(ki, km);
       kc.setHSL(0.32 + kr() * 0.07, 0.32 + kr() * 0.18, 0.2 + kr() * 0.13);
       kelp.setColorAt(ki, kc); ki++;
