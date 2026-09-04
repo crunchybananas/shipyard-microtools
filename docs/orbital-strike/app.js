@@ -7,6 +7,9 @@ class OrbitalStrike {
     this.camera = null;
     this.renderer = null;
     this.player = { x: 0, y: 1.5, z: 0, health: 100, maxHealth: 100 };
+    // Reusable world-space player position; refreshed by syncPlayerPos() rather than
+    // rebuilt at each call site, so every consumer reads the same current value.
+    this.playerPos = new THREE.Vector3(this.player.x, this.player.y, this.player.z);
     this.weapons = [
       { name: 'Pulse Pistol', ammo: 50, startAmmo: 50, maxAmmo: 100, damage: 15, fireRate: 250, spread: 0, color: 0x9fffe4 },
       { name: 'Scatter Gun', ammo: 20, startAmmo: 20, maxAmmo: 40, damage: 8, fireRate: 800, pellets: 8, spread: 0.1, color: 0xffb45a }
@@ -603,8 +606,12 @@ class OrbitalStrike {
     this.updateUI();
   }
 
+  syncPlayerPos() {
+    return this.playerPos.set(this.player.x, this.player.y, this.player.z);
+  }
+
   nearestTerminal() {
-    const playerPos = new THREE.Vector3(this.player.x, this.player.y, this.player.z);
+    const playerPos = this.syncPlayerPos();
     let terminal = null;
     let distance = Infinity;
     this.terminals.forEach(candidate => {
@@ -1303,6 +1310,7 @@ class OrbitalStrike {
   update(delta) {
     if (this.gameState !== 'playing') return;
     this.clockTime += delta;
+    this.syncPlayerPos();
     this.updateStrike(delta);
     this.updateEffects(delta);
     if (this.waveTransitionPending) {
@@ -1408,7 +1416,7 @@ class OrbitalStrike {
       pickup.rotation.y += delta * 2;
       pickup.rotation.x += delta * 0.6;
       pickup.position.y = pickup.userData.baseY + Math.sin(this.clockTime * 2.4 + pickup.userData.phase) * 0.09;
-      if (pickup.position.distanceTo(playerPos) < 1.5) {
+      if (pickup.position.distanceTo(this.playerPos) < 1.5) {
         let label = '';
         if (pickup.userData.type === 'health') {
           this.player.health = Math.min(this.player.maxHealth, this.player.health + pickup.userData.value);
