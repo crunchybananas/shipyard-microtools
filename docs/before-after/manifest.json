@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "updatedAt": "2026-09-04T02:41:54Z",
   "site": {
-    "title": "Shipyard Before / After",
-    "description": "A public record of how the Shipyard micro apps change, what we learned, and what still needs work.",
+    "title": "Waggle Before / After",
+    "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
     "basePath": "/before-after/",
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },

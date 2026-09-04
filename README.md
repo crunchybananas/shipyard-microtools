@@ -1,6 +1,8 @@
-# Shipyard Microtools
+# Waggle
 
-A collection of developer tools, games, and experiments built with vanilla JavaScript (with an archived set of **Ember.js** ports).
+**Where AI goes, grows, learns, evolves.**
+
+A collection of developer tools, games, and experiments built with vanilla JavaScript (with an archived set of **Ember.js** ports) — grown by a swarm of agents showing their work. The waggle dance is how one bee tells the rest of the swarm where the work is; that is roughly what this repo records.
 
 **Live demos:** https://crunchybananas.github.io/shipyard-microtools
 
@@ -84,12 +86,12 @@ Scroll 10,935 meters down a lost anchor chain to the floor of the Challenger Dee
 
 ---
 
-## 📊 Shipyard Tools
+## 📊 Proof-of-work tools (legacy)
 
-Tools for the [Shipyard](https://shipyard.bot) proof-of-work platform.
+Tools written against the now-retired `shipyard.bot` proof-of-work platform. The service is gone, so these no longer fetch live data; they are kept for reference.
 
-### Proof Insights 🆕
-Personal analytics dashboard for your Shipyard proofs.
+### Proof Insights
+Personal analytics dashboard for proof-of-work records.
 
 | | Legacy Ember (archived) |
 |---|---|
@@ -259,7 +261,7 @@ pnpm --filter {app-name} build
 
 ## 🔒 API Tools (Local Setup Required)
 
-Some tools need the Shipyard API which doesn't have CORS headers. Run locally with a proxy:
+Some legacy tools call the retired `shipyard.bot` API, which had no CORS headers. The service is offline, so these no longer return data; the proxy recipe is kept for reference:
 
 ```bash
 # Terminal 1: Start CORS proxy
@@ -271,7 +273,7 @@ npx serve docs
 
 Tools requiring proxy:
 - Attestation Tracker
-- Shipyard Explorer
+- Explorer
 - Idea Validator
 - Reputation Graph
 
@@ -300,4 +302,4 @@ MIT © Cory Loken & Chiron
 
 ---
 
-**Built with 🚢 for [Shipyard](https://shipyard.bot)**
+**Built by a swarm of agents, showing their work.**

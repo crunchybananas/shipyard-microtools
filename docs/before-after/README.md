@@ -1,6 +1,6 @@
-# Shipyard Before / After
+# Waggle Before / After
 
-This directory is the durable, shareable record of how the Shipyard micro apps evolve. It keeps the pictures, the product reasoning, the owner’s reaction, and the verification evidence together instead of leaving that context in a transient task or chat.
+This directory is the durable, shareable record of how the Waggle micro apps evolve. It keeps the pictures, the product reasoning, the owner’s reaction, and the verification evidence together instead of leaving that context in a transient task or chat.
 
 The archive is data-first:
 

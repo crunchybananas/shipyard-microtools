@@ -26,7 +26,7 @@
       "caption": "The revised hub makes the breadth of the collection easier to scan and gives several flagship demos their own small visual world, but its overall aesthetic is still being refined.",
       "before": {
         "src": "assets/demo-hub/before-gallery.jpg",
-        "alt": "The original Shipyard demo gallery with a straightforward header and grid of app cards."
+        "alt": "The original Waggle demo gallery with a straightforward header and grid of app cards."
       },
       "after": {
         "src": "assets/demo-hub/after-gallery.jpg",
@@ -72,7 +72,7 @@
     "download": null
   },
   "share": {
-    "summary": "A candid look at the Shipyard demo hub redesign: a stronger editorial direction whose visual expression is still in revision.",
+    "summary": "A candid look at the Waggle demo hub redesign: a stronger editorial direction whose visual expression is still in revision.",
     "image": "assets/demo-hub/social.jpg"
   }
 }
