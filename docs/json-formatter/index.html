@@ -1,56 +1,51 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>JSON Formatter</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="../shared/microtools.css" />
-  </head>
-  <body data-demo="json-formatter">
-    <div class="container">
-      <header>
-        <a href="../" class="back">← All Tools</a>
-        <h1>JSON Workbench</h1>
-        <p class="subtitle">Format, inspect, and compact structured data without sending it anywhere.</p>
-      </header>
-
-      <main>
-        <div class="input-section">
-          <label for="jsonInput">Paste JSON</label>
-          <textarea id="jsonInput" rows="12" placeholder='{"name": "example", "value": 42}'></textarea>
-          
-          <div class="button-row">
-            <button id="formatBtn" class="primary-btn">✨ Format</button>
-            <button id="minifyBtn" class="secondary-btn">📦 Minify</button>
-            <button id="validateBtn" class="secondary-btn">✅ Validate</button>
-            <button id="copyBtn" class="secondary-btn">📋 Copy</button>
-          </div>
-        </div>
-
-        <div id="status" class="status hidden"></div>
-
-        <div class="output-section">
-          <div class="output-header">
-            <label>Output</label>
-            <div class="output-controls">
-              <div class="view-toggle">
-                <button id="textViewBtn" class="view-btn active">Text</button>
-                <button id="treeViewBtn" class="view-btn">Tree</button>
-              </div>
-              <span id="stats" class="stats"></span>
-            </div>
-          </div>
-          <pre id="output" class="output"></pre>
-          <div id="treeOutput" class="output tree-output hidden"></div>
-        </div>
-      </main>
-
-      <footer>
-        <p>Part of <a href="https://github.com/crunchybananas/shipyard-microtools">Microtools</a></p>
-      </footer>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="Format JSON without rounding numbers. Search keys, inspect values, and copy JSON Pointers. Everything stays in your browser." />
+  <title>JSON Workbench — Crunchy Bananas</title>
+  <link rel="stylesheet" href="../shared/workbench.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="app.js"></script>
+</head>
+<body data-demo="json-formatter">
+  <a href="#main" class="skip-link">Skip to JSON Workbench</a>
+  <header class="topbar">
+    <a href="../" class="brand suite-home">Crunchy Bananas</a>
+    <nav aria-label="App navigation"><a href="../text-diff/">Text Diff</a><a href="../before-after/json-workbench-astra/">Build story</a></nav>
+  </header>
+  <main id="main" class="workbench">
+    <div class="intro"><div><h1>JSON Workbench</h1><p class="subtitle">Find the value inside the document.</p></div><span class="privacy">Local processing · no stored drafts</span></div>
+    <div class="toolbar">
+      <button id="formatBtn" class="primary">Format</button><button id="minifyBtn">Minify</button><button id="validateBtn">Validate</button>
+      <label for="indent" class="muted">Indent</label><select id="indent"><option value="2">2 spaces</option><option value="4">4 spaces</option></select>
+      <button id="sampleBtn" class="push">Load example</button><button id="openBtn">Open JSON file</button><input id="fileInput" type="file" accept=".json,application/json,text/plain" hidden /><button id="clearBtn">Clear</button>
     </div>
-    <script src="app.js"></script>
-    <script src="../shared/microtools.js"></script>
-  </body>
+    <div class="document-grid">
+      <section class="panel source-panel" aria-labelledby="source-heading">
+        <div class="panel-head"><label id="source-heading" for="jsonInput">Source</label><span class="meta" id="sourceMeta">Up to 2 MiB</span></div>
+        <textarea id="jsonInput" spellcheck="false" aria-describedby="status" placeholder="Paste JSON here, or load the example to explore a small observatory."></textarea>
+        <div class="source-foot"><span id="stats">Numbers keep their original precision.</span></div>
+      </section>
+      <section class="panel inspect-panel" aria-labelledby="inspect-heading">
+        <div class="panel-head"><h2 id="inspect-heading">Document</h2><div class="segmented" aria-label="Document view"><button id="treeViewBtn" aria-pressed="true">Explore</button><button id="textViewBtn" aria-pressed="false">Text</button></div></div>
+        <div class="search-row"><label class="sr-only" for="search">Find a key, value, or path</label><input id="search" type="search" placeholder="Find a key, value, or /path" /><span id="searchCount" class="muted" role="status"></span></div>
+        <div id="treeOutput" tabindex="0" aria-label="JSON values"></div>
+        <pre id="output" tabindex="0" aria-label="Formatted JSON" hidden></pre>
+        <button id="moreBtn" hidden>Show more values</button>
+        <div class="inspect-foot"><button id="copyBtn" disabled>Copy document</button><button id="downloadBtn" disabled>Save JSON</button><span id="outputMeta" class="muted"></span></div>
+      </section>
+    </div>
+    <div id="status" class="status" role="status">Paste a document to begin. Formatting preserves number precision and duplicate keys.</div>
+    <button id="errorBtn" hidden>Go to error</button>
+    <section class="selection-panel" aria-labelledby="selection-heading">
+      <div><h2 id="selection-heading">Selected value</h2><code id="selectedPath">Document root</code><p id="selectedMeta" class="muted">Select a row to inspect it and copy its JSON Pointer.</p></div>
+      <pre id="selectedValue" tabindex="0" aria-label="Selected JSON value">No selection</pre>
+      <div class="selection-actions"><button id="copyPathBtn" disabled>Copy pointer</button><button id="copyValueBtn" disabled>Copy value</button></div>
+    </section>
+    <footer class="bottom-note"><p>Source stays in this tab. Clearing or closing it removes your document.</p><p class="keyboard-hint"><kbd>⌘</kbd> / <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to format</p></footer>
+  </main>
+</body>
 </html>

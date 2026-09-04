@@ -1,503 +1,174 @@
-// JSON Formatter
-// Format, validate, and minify JSON
-
-const jsonInput = document.getElementById('jsonInput');
-const output = document.getElementById('output');
-const treeOutput = document.getElementById('treeOutput');
-const status = document.getElementById('status');
-const stats = document.getElementById('stats');
-
-const formatBtn = document.getElementById('formatBtn');
-const minifyBtn = document.getElementById('minifyBtn');
-const validateBtn = document.getElementById('validateBtn');
-const copyBtn = document.getElementById('copyBtn');
-const textViewBtn = document.getElementById('textViewBtn');
-const treeViewBtn = document.getElementById('treeViewBtn');
-
-let lastParsed = null;
-let hasParsed = false;
-let currentView = 'text';
-
-function showStatus(message, type) {
-  status.textContent = message;
-  status.className = `status ${type}`;
-  setTimeout(() => {
-    status.classList.add('hidden');
-  }, 3000);
+import { parseDocument, formatDocument, searchNodes, MAX_BYTES } from './engine.mjs';
+const $ = id => document.getElementById(id);
+const source = $('jsonInput');
+const tree = $('treeOutput');
+let parsed = null;
+let selected = 0;
+let expanded = new Set([0]);
+let view = 'tree';
+let compact = false;
+let limit = 200;
+let formatted = '';
+let timer;
+let lastError;
+let generation = 0;
+const EXAMPLE = {
+  observatory: 'North Atlantic',
+  station: 'CB-07',
+  online: true,
+  coordinates: { latitude: 44.65, longitude: -63.57 },
+  instruments: [
+    { name: 'Hydrophone', depth_m: 240, recording: true },
+    { name: 'Current meter', depth_m: 80, recording: false }
+  ],
+  latest: { temperature_c: 8.4, salinity_psu: 34.7, note: null },
+  tags: ['ocean', 'night-watch']
+};
+function el(tag, className, text) {
+  const element = document.createElement(tag);
+  element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
 }
-
-function syntaxHighlight(json) {
-  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-    let cls = 'number';
-    if (/^"/.test(match)) {
-      if (/:$/.test(match)) {
-        cls = 'key';
-      } else {
-        cls = 'string';
-      }
-    } else if (/true|false/.test(match)) {
-      cls = 'boolean';
-    } else if (/null/.test(match)) {
-      cls = 'null';
-    }
-    return '<span class="' + cls + '">' + match + '</span>';
+function status(text, kind = '') { $('status').textContent = text; $('status').className = `status ${kind}`; }
+function enable(on) { for (const id of ['copyBtn', 'downloadBtn', 'copyPathBtn', 'copyValueBtn']) $(id).disabled = !on; }
+function resetOutput() {
+  parsed = null; formatted = ''; enable(false);
+  $('output').textContent = ''; $('outputMeta').textContent = ''; $('searchCount').textContent = '';
+  $('selectedPath').textContent = 'Document root'; $('selectedValue').textContent = 'No selection';
+  $('selectedMeta').textContent = 'Select a row to inspect it and copy its JSON Pointer.';
+  $('stats').textContent = 'Numbers keep their original precision.';
+  $('moreBtn').hidden = true;
+  tree.replaceChildren(el('p', 'empty', 'Your document will appear here. Explore its structure, or search for a key or value.'));
+}
+function highlight(text) {
+  // Tokenize before escaping so user strings can never introduce HTML.
+  const escape = value => value.replace(/[&<>]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[char]));
+  return text.split(/("(?:\\.|[^"\\])*"\s*:|"(?:\\.|[^"\\])*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|\btrue\b|\bfalse\b|\bnull\b)/g).map((token, i) => {
+    if (i % 2 === 0) return escape(token);
+    const type = token.startsWith('"') ? token.endsWith(':') ? 'key' : 'string' : /^-?\d/.test(token) ? 'number' : 'literal';
+    return `<span class="syntax-${type}">${escape(token)}</span>`;
+  }).join('');
+}
+function renderText() {
+  formatted = formatDocument(parsed, compact ? 0 : Number($('indent').value));
+  // Large documents retain their full output without creating thousands of spans.
+  if (formatted.length > 150000) $('output').textContent = formatted;
+  else $('output').innerHTML = highlight(formatted);
+  $('outputMeta').textContent = `${new TextEncoder().encode(formatted).length.toLocaleString()} bytes`;
+}
+function select(id) {
+  selected = id;
+  const node = parsed.nodes[id];
+  const value = formatDocument(parsed, 2, id);
+  $('selectedPath').textContent = node.path || 'Document root · pointer is an empty string';
+  const line = parsed.source.slice(0, node.start).split('\n').length;
+  $('selectedMeta').textContent = `${node.type} · source line ${line}${parsed.duplicates.length ? ' · duplicate keys make some pointers ambiguous' : ''}`;
+  $('selectedValue').textContent = value.length > 5000 ? `${value.slice(0, 5000)}\n… Preview shortened; Copy value includes it all.` : value;
+  tree.querySelectorAll('.tree-row').forEach(row => {
+    const active = Number(row.dataset.id) === selected;
+    row.classList.toggle('selected', active);
+    row.querySelector('.node-value').setAttribute('aria-pressed', String(active));
   });
 }
-
-function updateStats(json) {
-  try {
-    const parsed = JSON.parse(json);
-    const keys = JSON.stringify(parsed).match(/"[^"]+"\s*:/g) || [];
-    const chars = json.length;
-    stats.textContent = `${keys.length} keys · ${chars.toLocaleString()} chars`;
-  } catch {
-    stats.textContent = '';
-  }
-}
-
-// --- Error position navigation ---
-
-// Extract the character offset of a parse error from the engine's message.
-// Some engines report "... at position N", Firefox reports "... at line L column C",
-// and many messages (e.g. V8's "Unexpected token") carry no position at all.
-function locateParseError(message, text) {
-  // Anchor both patterns to the end of the message: V8's snippet-quoting
-  // errors ("Unexpected token 'x', \"...\" is not valid JSON") embed user
-  // content, so an unanchored match could pick up "position 5" written
-  // inside the user's own JSON. Positioned messages always END with the
-  // location, so anchoring makes false matches impossible.
-  const posMatch = message.match(/at position (\d+)(?: \(line \d+ column \d+\))?$/i);
-  if (posMatch) {
-    return Math.min(parseInt(posMatch[1], 10), Math.max(text.length - 1, 0));
-  }
-
-  const lineColMatch = message.match(/at line (\d+) column (\d+) of the JSON data$/i);
-  if (lineColMatch) {
-    const line = parseInt(lineColMatch[1], 10);
-    const col = parseInt(lineColMatch[2], 10);
-    const lines = text.split('\n');
-    let pos = 0;
-    for (let i = 0; i < line - 1 && i < lines.length; i++) {
-      pos += lines[i].length + 1;
-    }
-    pos += col - 1;
-    return Math.min(pos, Math.max(text.length - 1, 0));
-  }
-
-  return null;
-}
-
-// Minimal position-tracking JSON scanner, used when the engine's error
-// message carries no character position. Returns the offset of the first
-// invalid character, or null if the text scans clean.
-function scanJsonError(text) {
-  const n = text.length;
-  let i = 0;
-  let failed = null;
-
-  function fail(at) {
-    if (failed === null) {
-      failed = Math.min(at, Math.max(n - 1, 0));
-    }
-    return false;
-  }
-
-  function skipWs() {
-    while (i < n && (text[i] === ' ' || text[i] === '\t' || text[i] === '\n' || text[i] === '\r')) i++;
-  }
-
-  function isDigit(c) {
-    return c >= '0' && c <= '9';
-  }
-
-  function parseString() {
-    i++; // opening quote
-    while (i < n) {
-      const c = text[i];
-      if (c === '"') {
-        i++;
-        return true;
-      }
-      if (c === '\\') {
-        i++;
-        if (i >= n) return fail(n);
-        const esc = text[i];
-        if (esc === 'u') {
-          if (!/^[0-9a-fA-F]{4}$/.test(text.slice(i + 1, i + 5))) return fail(i);
-          i += 5;
-        } else if ('"\\/bfnrt'.includes(esc)) {
-          i++;
-        } else {
-          return fail(i);
-        }
-      } else if (c.charCodeAt(0) < 0x20) {
-        return fail(i);
-      } else {
-        i++;
-      }
-    }
-    return fail(n);
-  }
-
-  function parseNumber() {
-    if (text[i] === '-') i++;
-    if (text[i] === '0') {
-      i++;
-    } else if (isDigit(text[i])) {
-      while (i < n && isDigit(text[i])) i++;
-    } else {
-      return fail(i);
-    }
-    if (text[i] === '.') {
-      i++;
-      if (!isDigit(text[i])) return fail(i);
-      while (i < n && isDigit(text[i])) i++;
-    }
-    if (text[i] === 'e' || text[i] === 'E') {
-      i++;
-      if (text[i] === '+' || text[i] === '-') i++;
-      if (!isDigit(text[i])) return fail(i);
-      while (i < n && isDigit(text[i])) i++;
-    }
-    return true;
-  }
-
-  function parseObject() {
-    i++; // {
-    skipWs();
-    if (text[i] === '}') {
-      i++;
-      return true;
-    }
-    while (true) {
-      skipWs();
-      if (text[i] !== '"') return fail(i);
-      if (!parseString()) return false;
-      skipWs();
-      if (text[i] !== ':') return fail(i);
-      i++;
-      if (!parseValue()) return false;
-      skipWs();
-      if (text[i] === ',') {
-        i++;
-        continue;
-      }
-      if (text[i] === '}') {
-        i++;
-        return true;
-      }
-      return fail(i);
-    }
-  }
-
-  function parseArray() {
-    i++; // [
-    skipWs();
-    if (text[i] === ']') {
-      i++;
-      return true;
-    }
-    while (true) {
-      if (!parseValue()) return false;
-      skipWs();
-      if (text[i] === ',') {
-        i++;
-        continue;
-      }
-      if (text[i] === ']') {
-        i++;
-        return true;
-      }
-      return fail(i);
-    }
-  }
-
-  function parseValue() {
-    skipWs();
-    if (i >= n) return fail(n);
-    const c = text[i];
-    if (c === '{') return parseObject();
-    if (c === '[') return parseArray();
-    if (c === '"') return parseString();
-    if (c === '-' || isDigit(c)) return parseNumber();
-    if (text.startsWith('true', i)) {
-      i += 4;
-      return true;
-    }
-    if (text.startsWith('false', i)) {
-      i += 5;
-      return true;
-    }
-    if (text.startsWith('null', i)) {
-      i += 4;
-      return true;
-    }
-    return fail(i);
-  }
-
-  try {
-    if (!parseValue()) return failed;
-    skipWs();
-    if (i < n) return Math.min(i, n - 1);
-    return null;
-  } catch {
-    // e.g. stack overflow on pathologically deep nesting
-    return failed;
-  }
-}
-
-function showParseError(e) {
-  const full = jsonInput.value;
-  const trimmed = full.trim();
-  let relPos = locateParseError(e.message, trimmed);
-  if (relPos === null) {
-    relPos = scanJsonError(trimmed);
-  }
-
-  if (relPos === null) {
-    showStatus(`✗ Invalid JSON: ${e.message}`, 'error');
-    return;
-  }
-
-  // Parse positions are relative to the trimmed input; shift back to the
-  // textarea's coordinates so the highlight lands on the right character.
-  const lead = full.length - full.trimStart().length;
-  const pos = relPos + lead;
-  const before = full.slice(0, pos);
-  const line = before.split('\n').length;
-  const col = pos - before.lastIndexOf('\n');
-
-  showStatus(`✗ Invalid JSON at line ${line}, col ${col}: ${e.message}`, 'error');
-
-  jsonInput.focus();
-  jsonInput.setSelectionRange(pos, Math.min(pos + 1, full.length));
-
-  const lineHeight = parseFloat(getComputedStyle(jsonInput).lineHeight) || 20;
-  jsonInput.scrollTop = Math.max(0, (line - 1) * lineHeight - jsonInput.clientHeight / 2);
-
-  jsonInput.classList.add('error-flash');
-  setTimeout(() => {
-    jsonInput.classList.remove('error-flash');
-  }, 1500);
-}
-
-// --- Collapsible tree view ---
-
-const MAX_TREE_CHILDREN = 500;
-
-function createValueSpan(value) {
-  const span = document.createElement('span');
-  if (typeof value === 'string') {
-    span.className = 'string';
-  } else if (typeof value === 'number') {
-    span.className = 'number';
-  } else if (typeof value === 'boolean') {
-    span.className = 'boolean';
-  } else {
-    span.className = 'null';
-  }
-  span.textContent = JSON.stringify(value);
-  return span;
-}
-
-function createKeySpan(key, isIndex) {
-  const span = document.createElement('span');
-  span.className = isIndex ? 'tree-index' : 'key';
-  span.textContent = (isIndex ? key : JSON.stringify(key)) + ': ';
-  return span;
-}
-
-function createTreeNode(key, value, isIndex) {
-  const node = document.createElement('div');
-  node.className = 'tree-node';
-
-  const row = document.createElement('div');
-  row.className = 'tree-row';
-  node.appendChild(row);
-
-  const isComposite = value !== null && typeof value === 'object';
-  const isArray = Array.isArray(value);
-  const entries = isComposite
-    ? (isArray ? value.map((v, i) => [String(i), v]) : Object.entries(value))
-    : [];
-
-  const caret = document.createElement('span');
-  caret.className = 'tree-caret';
-  if (isComposite && entries.length > 0) {
-    caret.textContent = '▾';
-  }
-  row.appendChild(caret);
-
-  if (key !== null) {
-    row.appendChild(createKeySpan(key, isIndex));
-  }
-
-  if (!isComposite) {
-    row.appendChild(createValueSpan(value));
-    return node;
-  }
-
-  const open = document.createElement('span');
-  open.className = 'tree-bracket';
-  row.appendChild(open);
-
-  if (entries.length === 0) {
-    open.textContent = isArray ? '[]' : '{}';
-    return node;
-  }
-
-  open.textContent = isArray ? '[' : '{';
-
-  const count = entries.length;
-  const noun = isArray ? (count === 1 ? 'item' : 'items') : (count === 1 ? 'key' : 'keys');
-  const summary = document.createElement('span');
-  summary.className = 'tree-summary';
-  summary.textContent = ` … ${count} ${noun} ${isArray ? ']' : '}'}`;
-  row.appendChild(summary);
-
-  const children = document.createElement('div');
-  children.className = 'tree-children';
-  entries.slice(0, MAX_TREE_CHILDREN).forEach(([childKey, childValue]) => {
-    children.appendChild(createTreeNode(childKey, childValue, isArray));
-  });
-  if (entries.length > MAX_TREE_CHILDREN) {
-    const more = document.createElement('div');
-    more.className = 'tree-more';
-    more.textContent = `… ${entries.length - MAX_TREE_CHILDREN} more (switch to text view for full output)`;
-    children.appendChild(more);
-  }
-  node.appendChild(children);
-
-  const close = document.createElement('div');
-  close.className = 'tree-close tree-bracket';
-  close.textContent = isArray ? ']' : '}';
-  node.appendChild(close);
-
-  row.classList.add('toggleable');
-  row.addEventListener('click', () => {
-    node.classList.toggle('collapsed');
-  });
-
-  return node;
-}
-
 function renderTree() {
-  treeOutput.textContent = '';
-  if (!hasParsed) {
-    const empty = document.createElement('div');
-    empty.className = 'tree-empty';
-    empty.textContent = 'Format or minify some JSON to see the tree view.';
-    treeOutput.appendChild(empty);
-    return;
+  if (!parsed) return;
+  const query = $('search').value.trim();
+  const visible = [];
+  if (query) visible.push(...searchNodes(parsed, query));
+  else {
+    const visit = id => { const node = parsed.nodes[id]; visible.push(node); if (expanded.has(id)) node.children.forEach(visit); };
+    visit(0);
   }
-  treeOutput.appendChild(createTreeNode(null, lastParsed, false));
-}
-
-function setView(view) {
-  currentView = view;
-  textViewBtn.classList.toggle('active', view === 'text');
-  treeViewBtn.classList.toggle('active', view === 'tree');
-  output.classList.toggle('hidden', view !== 'text');
-  treeOutput.classList.toggle('hidden', view !== 'tree');
-  if (view === 'tree') {
-    renderTree();
-  }
-}
-
-textViewBtn.addEventListener('click', () => setView('text'));
-treeViewBtn.addEventListener('click', () => setView('tree'));
-
-formatBtn.addEventListener('click', () => {
-  const input = jsonInput.value.trim();
-  if (!input) {
-    showStatus('Please enter some JSON', 'error');
-    return;
-  }
-
-  try {
-    const parsed = JSON.parse(input);
-    const formatted = JSON.stringify(parsed, null, 2);
-    output.innerHTML = syntaxHighlight(formatted);
-    lastParsed = parsed;
-    hasParsed = true;
-    if (currentView === 'tree') {
-      renderTree();
+  $('searchCount').textContent = query ? `${visible.length} found` : '';
+  const fragment = document.createDocumentFragment();
+  visible.slice(0, limit).forEach(node => {
+    const row = el('div', 'tree-row');
+    row.dataset.id = node.id;
+    row.style.paddingLeft = `${query ? 8 : Math.min(node.depth, 12) * 16 + 8}px`;
+    const disclosure = el(node.children.length && !query ? 'button' : 'span', 'disclosure', node.children.length ? expanded.has(node.id) ? '▾' : '▸' : '');
+    if (disclosure.tagName === 'BUTTON') {
+      disclosure.setAttribute('aria-expanded', String(expanded.has(node.id)));
+      disclosure.setAttribute('aria-label', `${expanded.has(node.id) ? 'Collapse' : 'Expand'} ${node.path || 'document'}`);
+      disclosure.addEventListener('click', () => {
+        expanded.has(node.id) ? expanded.delete(node.id) : expanded.add(node.id);
+        renderTree();
+        tree.querySelector(`[data-id="${node.id}"] .disclosure`)?.focus();
+      });
     }
-    updateStats(formatted);
-    showStatus('✓ Formatted successfully', 'success');
-  } catch (e) {
-    output.textContent = '';
-    lastParsed = null;
-    hasParsed = false;
-    if (currentView === 'tree') {
-      renderTree();
-    }
-    showParseError(e);
-  }
-});
-
-minifyBtn.addEventListener('click', () => {
-  const input = jsonInput.value.trim();
-  if (!input) {
-    showStatus('Please enter some JSON', 'error');
-    return;
-  }
-
-  try {
-    const parsed = JSON.parse(input);
-    const minified = JSON.stringify(parsed);
-    output.innerHTML = syntaxHighlight(minified);
-    lastParsed = parsed;
-    hasParsed = true;
-    if (currentView === 'tree') {
-      renderTree();
-    }
-    updateStats(minified);
-    showStatus(`✓ Minified: ${input.length} → ${minified.length} chars`, 'success');
-  } catch (e) {
-    output.textContent = '';
-    lastParsed = null;
-    hasParsed = false;
-    if (currentView === 'tree') {
-      renderTree();
-    }
-    showParseError(e);
-  }
-});
-
-validateBtn.addEventListener('click', () => {
-  const input = jsonInput.value.trim();
-  if (!input) {
-    showStatus('Please enter some JSON', 'error');
-    return;
-  }
-
-  try {
-    JSON.parse(input);
-    showStatus('✓ Valid JSON!', 'success');
-  } catch (e) {
-    showParseError(e);
-  }
-});
-
-copyBtn.addEventListener('click', () => {
-  const text = output.textContent;
-  if (!text) {
-    showStatus('Nothing to copy', 'error');
-    return;
-  }
-
-  navigator.clipboard.writeText(text).then(() => {
-    showStatus('✓ Copied to clipboard', 'success');
-  }).catch(() => {
-    showStatus('Failed to copy', 'error');
+    const button = el('button', 'node-value');
+    const preview = node.children.length ? `${node.children.length} ${node.type === 'array' ? 'items' : 'keys'}` : parsed.source.slice(node.start, node.end);
+    button.append(el('span', 'node-key', query ? node.path || '$' : node.key), el('span', `node-preview ${node.type}`, preview.slice(0, 240)), el('span', 'node-type', node.type));
+    button.setAttribute('aria-label', `Inspect ${node.path || 'document root'}, ${node.type}`);
+    button.addEventListener('click', () => select(node.id));
+    row.append(disclosure, button); fragment.append(row);
   });
-});
-
-// Auto-format on paste
-jsonInput.addEventListener('paste', () => {
-  setTimeout(() => {
-    formatBtn.click();
-  }, 100);
-});
+  if (!visible.length) fragment.append(el('p', 'empty', 'No matching keys, values, or paths. Try a shorter search.'));
+  tree.replaceChildren(fragment);
+  $('moreBtn').hidden = visible.length <= limit || view !== 'tree';
+  $('moreBtn').textContent = `Show ${Math.min(200, visible.length - limit)} more values (${Math.min(limit, visible.length)} of ${visible.length})`;
+  select(selected);
+}
+function process(focusError = false) {
+  clearTimeout(timer); lastError = null; $('errorBtn').hidden = true;
+  $('sourceMeta').textContent = `${new TextEncoder().encode(source.value).length.toLocaleString()} bytes`;
+  if (!source.value.trim()) { resetOutput(); status('Paste a document or load the example to begin.'); return; }
+  const previousPath = parsed?.nodes[selected]?.path;
+  try {
+    parsed = parseDocument(source.value);
+    selected = Math.max(0, parsed.nodes.findIndex(node => node.path === previousPath));
+    expanded = new Set(parsed.nodes.filter(node => node.depth < 2).map(node => node.id));
+    limit = 200; enable(true); renderText(); renderTree();
+    $('stats').textContent = `${parsed.nodes.length.toLocaleString()} values · ${Math.max(...parsed.nodes.map(node => node.depth))} levels deep`;
+    status(parsed.duplicates.length ? `Valid JSON · ${parsed.duplicates.length} duplicate key(s), preserved. Some JSON Pointers are ambiguous.` : 'Valid JSON · original number precision preserved.', parsed.duplicates.length ? 'warning' : 'success');
+  } catch (error) {
+    resetOutput(); lastError = error;
+    status(`${error.line ? `Line ${error.line}, column ${error.column}: ` : ''}${error.message}`, 'error');
+    $('errorBtn').hidden = error.position === undefined;
+    if (focusError) jumpToError();
+  }
+}
+function jumpToError() {
+  if (lastError?.position === undefined) return;
+  source.focus(); source.setSelectionRange(lastError.position, Math.min(lastError.position + 1, source.value.length));
+  source.scrollTop = Math.max(0, (lastError.line - 1) * 23.4 - source.clientHeight / 2);
+}
+function setView(next) {
+  view = next; $('output').hidden = next !== 'text'; tree.hidden = next !== 'tree';
+  $('textViewBtn').setAttribute('aria-pressed', String(next === 'text')); $('treeViewBtn').setAttribute('aria-pressed', String(next === 'tree'));
+  $('search').disabled = next !== 'tree'; if (parsed) renderTree();
+}
+async function copy(value, label) {
+  try { await navigator.clipboard.writeText(value); status(`${label} copied.`, 'success'); }
+  catch { status('Clipboard access is unavailable. Use Save JSON, or select and copy the text.', 'error'); }
+}
+source.addEventListener('input', () => { generation++; resetOutput(); clearTimeout(timer); status('Reading document…'); timer = setTimeout(() => process(), 220); });
+$('formatBtn').onclick = () => { compact = false; process(true); };
+$('minifyBtn').onclick = () => { compact = true; process(true); setView('text'); };
+$('validateBtn').onclick = () => process(true);
+$('indent').onchange = () => { compact = false; if (parsed) renderText(); };
+$('sampleBtn').onclick = () => { generation++; source.value = JSON.stringify(EXAMPLE, null, 2); $('search').value = ''; compact = false; process(); setView('tree'); };
+$('clearBtn').onclick = () => { generation++; source.value = ''; $('search').value = ''; process(); source.focus(); };
+$('search').oninput = () => { limit = 200; renderTree(); };
+$('moreBtn').onclick = () => { limit += 200; renderTree(); };
+$('textViewBtn').onclick = () => setView('text'); $('treeViewBtn').onclick = () => setView('tree');
+$('errorBtn').onclick = jumpToError;
+$('copyBtn').onclick = () => copy(formatted, 'Document');
+$('copyPathBtn').onclick = () => { if (parsed) copy(parsed.nodes[selected].path, 'JSON Pointer'); };
+$('copyValueBtn').onclick = () => { if (parsed) copy(formatDocument(parsed, 2, selected), 'Value'); };
+$('downloadBtn').onclick = () => {
+  if (!parsed) return;
+  const url = URL.createObjectURL(new Blob([formatted], { type: 'application/json' }));
+  const link = el('a', ''); link.href = url; link.download = 'document.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+$('openBtn').onclick = () => $('fileInput').click();
+$('fileInput').onchange = async event => {
+  const file = event.target.files[0]; event.target.value = '';
+  if (!file) return;
+  if (file.size > MAX_BYTES) { status('Use a JSON file smaller than 2 MiB.', 'error'); return; }
+  const revision = ++generation;
+  try { const text = await file.text(); if (revision !== generation) return; source.value = text; process(); }
+  catch { status('This file could not be read. Try opening it again.', 'error'); }
+};
+document.addEventListener('keydown', event => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); compact = false; process(true); } });
+resetOutput();

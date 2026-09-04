@@ -1,58 +1,35 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Text Diff</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="../shared/microtools.css" />
-  </head>
-  <body data-demo="text-diff">
-    <div class="container">
-      <header>
-        <a href="../" class="back">← All Tools</a>
-        <h1>Text Diff</h1>
-        <p class="subtitle">Compare two drafts and isolate every meaningful change.</p>
-      </header>
-
-      <main>
-        <div class="input-row">
-          <div class="input-section">
-            <label for="textA">Original</label>
-            <textarea id="textA" rows="12" placeholder="Paste original text here..."></textarea>
-          </div>
-
-          <div class="input-section">
-            <label for="textB">Modified</label>
-            <textarea id="textB" rows="12" placeholder="Paste modified text here..."></textarea>
-          </div>
-        </div>
-
-        <div class="button-row">
-          <button id="diffBtn" class="primary-btn">🔍 Compare</button>
-          <button id="swapBtn" class="secondary-btn">⇄ Swap</button>
-          <button id="clearBtn" class="secondary-btn">Clear</button>
-        </div>
-
-        <div id="results" class="results hidden">
-          <div class="stats-bar">
-            <span id="addedCount" class="stat added">+0 added</span>
-            <span id="removedCount" class="stat removed">-0 removed</span>
-            <span id="unchangedCount" class="stat">0 unchanged</span>
-            <div class="view-toggle">
-              <button id="unifiedViewBtn" class="view-btn active">Unified</button>
-              <button id="splitViewBtn" class="view-btn">Split</button>
-            </div>
-          </div>
-          <div id="diffOutput" class="diff-output"></div>
-        </div>
-      </main>
-
-      <footer>
-        <p>Part of <a href="https://github.com/crunchybananas/shipyard-microtools">Microtools</a></p>
-      </footer>
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="Review text revisions with aligned lines, word changes, focused context, and downloadable patches. Private, local comparison." />
+  <title>Text Diff — Crunchy Bananas</title>
+  <link rel="stylesheet" href="../shared/workbench.css" /><link rel="stylesheet" href="styles.css" />
+  <script type="module" src="app.js"></script>
+</head>
+<body data-demo="text-diff">
+  <a href="#main" class="skip-link">Skip to Text Diff</a>
+  <header class="topbar"><a href="../" class="brand suite-home">Crunchy Bananas</a><nav aria-label="App navigation"><a href="../json-formatter/">JSON Workbench</a><a href="../before-after/text-diff-astra/">Build story</a></nav></header>
+  <main id="main" class="workbench">
+    <div class="intro"><div><h1>Text Diff</h1><p class="subtitle">Read what changed. Keep the context.</p></div><span class="privacy">Local processing · no stored drafts</span></div>
+    <div class="input-row">
+      <section class="panel"><div class="panel-head"><label for="textA">Original <span id="nameA" class="meta">original.txt</span></label><button id="openA">Open file</button></div><textarea id="textA" spellcheck="false" placeholder="Paste your original text…"></textarea><input id="fileA" type="file" hidden /></section>
+      <section class="panel"><div class="panel-head"><label for="textB">Modified <span id="nameB" class="meta">modified.txt</span></label><button id="openB">Open file</button></div><textarea id="textB" spellcheck="false" placeholder="Paste the revised text…"></textarea><input id="fileB" type="file" hidden /></section>
     </div>
-    <script src="app.js"></script>
-    <script src="../shared/microtools.js"></script>
-  </body>
+    <div class="toolbar compare-toolbar">
+      <button id="diffBtn" class="primary">Compare</button><button id="cancelBtn" hidden>Cancel</button><button id="swapBtn">Swap</button><button id="clearBtn">Clear</button>
+      <label class="option"><input id="ignoreWhitespace" type="checkbox" /> Ignore edge whitespace</label>
+      <button id="sampleBtn" class="push">Load example</button>
+    </div>
+    <div id="status" class="status" role="status">Paste two revisions, or load the example to see a review in action.</div>
+    <section id="results" class="panel" aria-labelledby="review-heading">
+      <div class="review-head"><h2 id="review-heading">Review</h2><div class="review-stats"><span id="addedCount" class="added">+0 added</span><span id="removedCount" class="removed">−0 removed</span><span id="unchangedCount" class="muted">0 unchanged</span></div><div class="segmented" aria-label="Comparison layout"><button id="unifiedViewBtn" aria-pressed="false">Unified</button><button id="splitViewBtn" aria-pressed="true">Split</button></div></div>
+      <div class="review-toolbar"><label class="option"><input id="contextOnly" type="checkbox" checked /> Focus on changes</label><div class="change-nav"><button id="prevBtn" aria-label="Previous change" disabled>↑</button><span id="changePosition">No changes</span><button id="nextBtn" aria-label="Next change" disabled>↓</button></div><button id="downloadBtn" disabled>Save patch</button></div>
+      <div id="diffOutput" class="diff-output" tabindex="0" aria-label="Text comparison"><div class="empty"><strong>Two versions. One clear view.</strong>Changed words stay in context, with original line numbers and a patch you can take with you.</div></div>
+      <div class="review-foot"><span id="reviewNote">Compare up to 20,000 lines per document.</span><button id="moreBtn" hidden>Show more lines</button></div>
+    </section>
+    <footer class="bottom-note"><p>Text stays in this tab. Line endings are normalized to LF.</p><p class="keyboard-hint"><kbd>⌘</kbd> / <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to compare</p></footer>
+  </main>
+</body>
 </html>
