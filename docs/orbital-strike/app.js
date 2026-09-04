@@ -57,6 +57,10 @@ class OrbitalStrike {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setClearColor(0x0a0a1a);
+    this.renderer.domElement.setAttribute('role', 'img');
+    this.renderer.domElement.setAttribute('aria-label', 'First-person view of the Theta-7 mining decks');
+    this.renderer.domElement.setAttribute('tabindex', '-1');
+    this.renderer.domElement.textContent = 'Orbital Strike game view. Use the HUD controls or keyboard to navigate.';
     document.getElementById('game-canvas').appendChild(this.renderer.domElement);
     
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -216,8 +220,10 @@ class OrbitalStrike {
       }
     });
     
-    document.addEventListener('click', () => {
+    document.addEventListener('click', e => {
+      if (e.target.closest('.touch-controls, .overlay, .terminal-overlay, .suite-home')) return;
       if (this.gameState === 'playing') {
+        if (window.matchMedia('(pointer: coarse)').matches) return;
         if (!this.mouse.locked) {
           Promise.resolve(this.renderer.domElement.requestPointerLock()).catch(() => {});
         } else {
@@ -232,6 +238,61 @@ class OrbitalStrike {
     
     document.getElementById('startBtn').onclick = () => this.startGame();
     document.getElementById('restartBtn').onclick = () => this.startGame();
+
+    document.querySelectorAll('.touch-key').forEach(button => {
+      const release = event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.keys[button.dataset.key] = false;
+        button.classList.remove('is-active');
+        button.setAttribute('aria-pressed', 'false');
+      };
+
+      button.setAttribute('aria-pressed', 'false');
+      button.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.keys[button.dataset.key] = true;
+        button.classList.add('is-active');
+        button.setAttribute('aria-pressed', 'true');
+        try { button.setPointerCapture(event.pointerId); } catch (_) { /* synthetic pointer */ }
+      });
+      button.addEventListener('pointerup', release);
+      button.addEventListener('pointercancel', release);
+      button.addEventListener('lostpointercapture', release);
+    });
+
+    document.querySelectorAll('.touch-action').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.gameState !== 'playing') return;
+        if (button.dataset.action === 'fire') this.shoot();
+        if (button.dataset.action === 'weapon') this.keys.KeyQ = true;
+        if (button.dataset.action === 'interact') this.keys.KeyE = true;
+      });
+    });
+
+    let touchLook = null;
+    this.renderer.domElement.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch' || this.gameState !== 'playing') return;
+      touchLook = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      try { this.renderer.domElement.setPointerCapture(event.pointerId); } catch (_) { /* synthetic pointer */ }
+    });
+    this.renderer.domElement.addEventListener('pointermove', event => {
+      if (!touchLook || event.pointerId !== touchLook.id) return;
+      event.preventDefault();
+      this.yaw -= (event.clientX - touchLook.x) * 0.006;
+      this.pitch -= (event.clientY - touchLook.y) * 0.006;
+      this.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.pitch));
+      touchLook.x = event.clientX;
+      touchLook.y = event.clientY;
+    });
+    const endTouchLook = event => {
+      if (touchLook && event.pointerId === touchLook.id) touchLook = null;
+    };
+    this.renderer.domElement.addEventListener('pointerup', endTouchLook);
+    this.renderer.domElement.addEventListener('pointercancel', endTouchLook);
   }
   
   startGame() {
@@ -240,6 +301,8 @@ class OrbitalStrike {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameOverScreen').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
+    this.renderer.domElement.tabIndex = 0;
+    this.renderer.domElement.focus({ preventScroll: true });
     Promise.resolve(this.renderer.domElement.requestPointerLock()).catch(() => {});
   }
 
@@ -421,11 +484,13 @@ class OrbitalStrike {
     document.getElementById('terminalText').textContent = `${lore.title}\n\n${lore.text}`;
     this.gameState = 'terminal';
     document.exitPointerLock();
+    document.getElementById('closeTerminalBtn').focus({ preventScroll: true });
   }
   
   closeTerminal() {
     document.getElementById('terminalOverlay').style.display = 'none';
     this.gameState = 'playing';
+    this.renderer.domElement.focus({ preventScroll: true });
     Promise.resolve(this.renderer.domElement.requestPointerLock()).catch(() => {});
   }
   
@@ -436,17 +501,34 @@ class OrbitalStrike {
     document.getElementById('finalScore').textContent = this.score;
     document.getElementById('finalWave').textContent = this.wave;
     document.getElementById('gameOverScreen').style.display = 'flex';
+    document.getElementById('restartBtn').focus({ preventScroll: true });
   }
   
   updateUI() {
     const weapon = this.weapons[this.currentWeapon];
     const health = Math.max(0, this.player.health);
-    document.getElementById('healthFill').style.width = `${health}%`;
-    document.getElementById('healthText').textContent = Math.round(health);
-    document.getElementById('ammoCount').textContent = `${weapon.ammo}/${weapon.maxAmmo}`;
-    document.getElementById('weaponName').textContent = weapon.name;
-    document.getElementById('waveNumber').textContent = this.wave;
-    document.getElementById('enemiesRemaining').textContent = this.enemies.length;
+    const roundedHealth = Math.round(health);
+    const setText = (id, value) => {
+      const element = document.getElementById(id);
+      const text = String(value);
+      if (element.textContent !== text) element.textContent = text;
+    };
+    const healthFill = document.getElementById('healthFill');
+    const healthWidth = `${health}%`;
+    if (healthFill.style.width !== healthWidth) healthFill.style.width = healthWidth;
+    setText('healthText', roundedHealth);
+    const healthBar = document.querySelector('.health-bar');
+    if (healthBar.getAttribute('aria-valuenow') !== String(roundedHealth)) {
+      healthBar.setAttribute('aria-valuenow', String(roundedHealth));
+    }
+    setText('ammoCount', weapon.ammo);
+    setText('maxAmmo', weapon.maxAmmo);
+    const ammoDisplay = document.querySelector('.ammo-display');
+    const ammoLabel = `${weapon.name}, ${weapon.ammo} of ${weapon.maxAmmo} rounds`;
+    if (ammoDisplay.getAttribute('aria-label') !== ammoLabel) ammoDisplay.setAttribute('aria-label', ammoLabel);
+    setText('weaponName', weapon.name);
+    setText('waveNumber', this.wave);
+    setText('enemiesRemaining', this.enemies.length);
     
     // Radar
     const ctx = this.radarCtx;

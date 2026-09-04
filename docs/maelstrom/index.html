@@ -299,8 +299,9 @@ body.zen #brand, body.zen #telemetry, body.zen #dock {
   #intro, #dock, #probe { transition: none; }
 }
 </style>
+<link rel="stylesheet" href="../shared/microtools.css" />
 </head>
-<body>
+<body data-demo="maelstrom">
 
 <canvas id="gl" aria-label="Black hole renderer. Drag to orbit, scroll to approach."></canvas>
 
@@ -1851,5 +1852,6 @@ allocTargets();
 requestAnimationFrame(loop);
 setTimeout(selfTest, 400);
 </script>
+<script src="../shared/microtools.js"></script>
 </body>
 </html>

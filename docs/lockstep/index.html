@@ -311,8 +311,9 @@
     }
     textarea:focus { outline: none; border-color: var(--accent); }
   </style>
+  <link rel="stylesheet" href="../shared/microtools.css" />
 </head>
-<body>
+<body data-demo="lockstep">
   <div class="app">
     <header>
       <div>
@@ -1333,5 +1334,6 @@
       worker.postMessage({ type: "load", rom: s, sampleRate: sr });
     }
   </script>
+<script src="../shared/microtools.js"></script>
 </body>
 </html>

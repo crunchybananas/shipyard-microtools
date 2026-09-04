@@ -241,8 +241,9 @@ footer span b { color: var(--muted); font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<link rel="stylesheet" href="../shared/microtools.css" />
 </head>
-<body>
+<body data-demo="manifest">
 
 <header>
   <h1><span class="pin">⚓</span> MANIFEST</h1>
@@ -1320,5 +1321,6 @@ $("#samples").addEventListener("click", (e) => {
 window.manifest = { loadBytes, loadFile };
 })();
 </script>
+<script src="../shared/microtools.js"></script>
 </body>
 </html>

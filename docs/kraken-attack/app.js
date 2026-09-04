@@ -558,6 +558,25 @@ window.addEventListener('keyup', e => {
   keys[e.code] = false;
 });
 
+document.querySelectorAll('.touch-controls [data-key]').forEach(button => {
+  const code = button.dataset.key;
+  const press = event => {
+    event.preventDefault();
+    keys[code] = true;
+    button.classList.add('is-pressed');
+  };
+  const release = event => {
+    event.preventDefault();
+    keys[code] = false;
+    button.classList.remove('is-pressed');
+  };
+  button.addEventListener('pointerdown', press);
+  button.addEventListener('pointerup', release);
+  button.addEventListener('pointercancel', release);
+  button.addEventListener('pointerleave', release);
+});
+window.addEventListener('blur', () => Object.keys(keys).forEach(code => { keys[code] = false; }));
+
 startBtn.addEventListener('click', startGame);
 playAgainBtn.addEventListener('click', startGame);
 restartBtn.addEventListener('click', startGame);

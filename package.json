@@ -2,6 +2,7 @@
   "name": "crunchy-bananas",
   "private": true,
   "scripts": {
+    "demos:test": "node scripts/verify-demos.mjs",
     "lint:fix": "pnpm run --filter '*' lint:fix",
     "lint": "pnpm run --filter '*' lint",
     "build": "pnpm run --filter './apps/*' build",

@@ -1,24 +1,1565 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atelier - Design Studio</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Atelier is a compact, local-first canvas for arranging type and shape compositions in the browser.">
+  <meta name="theme-color" content="#0b1730">
+  <title>Atelier — Browser Design Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230b1730'/%3E%3Cpath d='M22 72 50 20l28 52H22Z' fill='none' stroke='%23ff625e' stroke-width='9'/%3E%3Ccircle cx='50' cy='58' r='9' fill='%2328d7e5'/%3E%3C/svg%3E">
   <style>
-    body { margin: 0; background: #0a0a1a; color: #e4e4e7; font-family: Inter, system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .redirect-card { text-align: center; padding: 40px; }
-    .redirect-card h1 { font-size: 28px; margin-bottom: 8px; }
-    .redirect-card p { color: #71717a; margin-bottom: 24px; }
-    .redirect-card a { color: #818cf8; text-decoration: none; padding: 10px 24px; border: 1px solid #818cf8; border-radius: 8px; display: inline-block; }
-    .redirect-card a:hover { background: rgba(129,140,248,0.1); }
+    :root {
+      color-scheme: dark;
+      --ink: #0b1730;
+      --ink-raised: #11233b;
+      --mat: #173d50;
+      --mat-line: rgba(84, 218, 226, 0.13);
+      --mat-major: rgba(84, 218, 226, 0.24);
+      --paper: #f7f4ec;
+      --coral: #ff625e;
+      --coral-dark: #c83f43;
+      --cyan: #28d7e5;
+      --cyan-dark: #087f91;
+      --white: #fffdf8;
+      --muted: #93a5b7;
+      --line: rgba(230, 239, 246, 0.16);
+      --shadow: 0 24px 60px rgba(2, 8, 20, 0.38), 0 3px 12px rgba(2, 8, 20, 0.35);
+      --ui: "Arial Narrow", "Avenir Next Condensed", "Roboto Condensed", Arial, sans-serif;
+      --body: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--white);
+      font: 14px var(--body);
+      overflow: hidden;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { color: inherit; }
+    button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 2px;
+    }
+
+    .app-shell {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-rows: 66px minmax(0, 1fr);
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: minmax(190px, 1fr) auto minmax(390px, 1fr);
+      align-items: center;
+      gap: 22px;
+      padding: 0 18px 0 20px;
+      background: var(--ink);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      width: max-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 26px;
+      height: 26px;
+      position: relative;
+      border: 1px solid var(--cyan);
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      background: var(--coral);
+    }
+
+    .brand-mark::before {
+      width: 1px;
+      height: 34px;
+      left: 12px;
+      top: -5px;
+      rotate: 30deg;
+    }
+
+    .brand-mark::after {
+      width: 7px;
+      height: 7px;
+      left: 9px;
+      top: 9px;
+      border-radius: 50%;
+      background: var(--cyan);
+    }
+
+    .brand-word {
+      font: 800 22px var(--ui);
+      letter-spacing: 0.04em;
+    }
+
+    .brand-edition {
+      padding-left: 11px;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font: 10px/1.35 var(--mono);
+    }
+
+    .document-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .save-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(40, 215, 229, 0.1);
+    }
+
+    .document-state.saving .save-dot {
+      background: var(--coral);
+      box-shadow: 0 0 0 3px rgba(255, 98, 94, 0.12);
+    }
+
+    .document-state .divider { color: rgba(255, 255, 255, 0.24); }
+
+
+    .top-actions {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .action-group {
+      display: flex;
+      border: 1px solid var(--line);
+    }
+
+    .action-group + .action-group { margin-left: 4px; }
+
+    .top-button {
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: transparent;
+      cursor: pointer;
+      color: #c2ced9;
+      font: 700 12px var(--ui);
+    }
+
+    .top-button:last-child { border-right: 0; }
+    .top-button:hover:not(:disabled) { background: var(--ink-raised); color: var(--white); }
+    .top-button:disabled { opacity: 0.35; cursor: not-allowed; }
+    .top-button.accent { color: var(--cyan); }
+    .top-button.danger:hover { color: #ffaaa7; }
+
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 92px minmax(420px, 1fr) 302px;
+    }
+
+    .tool-rail {
+      position: relative;
+      z-index: 5;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 10px 12px;
+      background: var(--ink-raised);
+      border-right: 1px solid var(--line);
+      overflow-y: auto;
+    }
+
+    .rail-heading {
+      margin: 0 0 12px;
+      color: var(--muted);
+      text-align: center;
+      font: 700 11px var(--ui);
+    }
+
+    .tool-button {
+      min-height: 68px;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 7px;
+      padding: 8px 4px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #bdcbd7;
+      cursor: pointer;
+      font: 700 11px var(--ui);
+    }
+
+    .tool-button:hover:not(:disabled) {
+      color: var(--white);
+      border-color: rgba(40, 215, 229, 0.28);
+      background: rgba(40, 215, 229, 0.05);
+    }
+
+    .tool-button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .tool-icon {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      color: var(--cyan);
+    }
+
+    .tool-icon svg { width: 100%; height: 100%; overflow: visible; }
+    .tool-button[data-add="text"] .tool-icon { font: 24px Georgia, serif; }
+
+    .rail-rule {
+      height: 1px;
+      margin: 10px 7px;
+      background: var(--line);
+    }
+
+    .rail-help {
+      margin: auto 2px 0;
+      padding-top: 16px;
+      color: #71859a;
+      text-align: center;
+      font: 9px/1.55 var(--mono);
+    }
+
+    .stage-shell {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: 39px minmax(0, 1fr);
+      background: var(--mat);
+    }
+
+    .stage-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0 18px;
+      background: #102d40;
+      border-bottom: 1px solid rgba(40, 215, 229, 0.18);
+      color: #a9c2ce;
+      font: 10px var(--mono);
+    }
+
+    .stage-meta strong { color: var(--cyan); font-weight: 500; }
+    .selection-readout { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .mat {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 52px 64px 46px 58px;
+      overflow: auto;
+      background-color: var(--mat);
+      background-image:
+        linear-gradient(var(--mat-major) 1px, transparent 1px),
+        linear-gradient(90deg, var(--mat-major) 1px, transparent 1px),
+        linear-gradient(var(--mat-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--mat-line) 1px, transparent 1px);
+      background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+      background-position: -1px -1px;
+    }
+
+    .mat::before {
+      content: "CUTTING SURFACE / 10 MM GRID";
+      position: absolute;
+      left: 17px;
+      bottom: 17px;
+      color: rgba(194, 239, 241, 0.47);
+      font: 9px var(--mono);
+      letter-spacing: 0.03em;
+      writing-mode: vertical-rl;
+      rotate: 180deg;
+    }
+
+    .measure-x, .measure-y {
+      position: absolute;
+      pointer-events: none;
+      color: rgba(207, 243, 245, 0.58);
+      font: 9px var(--mono);
+    }
+
+    .measure-x {
+      top: 17px;
+      left: 8%;
+      right: 8%;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .measure-y {
+      top: 12%;
+      bottom: 12%;
+      left: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .artboard-wrap {
+      position: relative;
+      width: min(100%, 900px);
+      aspect-ratio: 900 / 620;
+      filter: drop-shadow(var(--shadow));
+    }
+
+    .artboard-wrap::after {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      border: 1px solid rgba(225, 249, 250, 0.22);
+      pointer-events: none;
+    }
+
+    .crop {
+      position: absolute;
+      z-index: 2;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
+    }
+
+    .crop::before, .crop::after {
+      content: "";
+      position: absolute;
+      background: rgba(227, 251, 252, 0.72);
+    }
+
+    .crop::before { width: 22px; height: 1px; }
+    .crop::after { width: 1px; height: 22px; }
+    .crop.nw { left: -23px; top: -23px; }
+    .crop.ne { right: -23px; top: -23px; transform: rotate(90deg); }
+    .crop.se { right: -23px; bottom: -23px; transform: rotate(180deg); }
+    .crop.sw { left: -23px; bottom: -23px; transform: rotate(270deg); }
+
+    #artboard {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      background: var(--paper);
+      border: 1px solid rgba(11, 23, 48, 0.3);
+      touch-action: none;
+      user-select: none;
+    }
+
+    .canvas-element { cursor: grab; }
+    .canvas-element:active { cursor: grabbing; }
+    .canvas-element .hit-zone { fill: transparent; pointer-events: all; }
+    .canvas-element .object-art { pointer-events: none; }
+
+    .selection-box {
+      fill: none;
+      stroke: var(--coral);
+      stroke-width: 2;
+      stroke-dasharray: 7 5;
+      vector-effect: non-scaling-stroke;
+      pointer-events: none;
+    }
+
+    .selection-handle {
+      fill: var(--paper);
+      stroke: var(--coral);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+      pointer-events: all;
+      cursor: nwse-resize;
+    }
+
+    .selection-handle[data-handle="ne"],
+    .selection-handle[data-handle="sw"] { cursor: nesw-resize; }
+
+    .inspector {
+      position: relative;
+      z-index: 4;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      color: var(--ink);
+      border-left: 1px solid rgba(11, 23, 48, 0.2);
+      overflow-y: auto;
+    }
+
+    .inspector-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px 20px 17px;
+      border-bottom: 1px solid #d6d0c4;
+    }
+
+    .inspector-header h2 { margin: 0; font: 800 19px/1 var(--ui); }
+
+    .inspector-header p {
+      margin: 6px 0 0;
+      color: #637083;
+      font-size: 11px;
+    }
+
+    .type-chip {
+      padding: 4px 7px;
+      border: 1px solid #b7b1a6;
+      color: #596679;
+      font: 9px var(--mono);
+      white-space: nowrap;
+    }
+
+    .empty-inspector {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      padding: 32px 25px;
+      color: #657286;
+      text-align: center;
+      line-height: 1.55;
+    }
+
+    .empty-inspector strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--ink);
+      font: 800 16px var(--ui);
+    }
+
+    .inspector-form { display: block; }
+    [hidden] { display: none !important; }
+
+    .control-section {
+      padding: 17px 20px 19px;
+      border-bottom: 1px solid #d6d0c4;
+    }
+
+    .control-section h3 {
+      margin: 0 0 12px;
+      color: #4d5c70;
+      font: 800 12px var(--ui);
+    }
+
+    .field { display: grid; gap: 6px; }
+    .field + .field { margin-top: 12px; }
+    .field > span, .field label > span { color: #596679; font-size: 11px; font-weight: 650; }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .compact-field {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      align-items: center;
+      gap: 6px;
+    }
+
+    .compact-field span { color: #758094; font: 10px var(--mono); }
+
+    .text-input, .select-input, .number-input, .hex-input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #b9b3a9;
+      border-radius: 2px;
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    .text-input, .select-input, .hex-input { padding: 9px 10px; }
+    .number-input { padding: 8px 7px; }
+    .text-input { min-height: 74px; resize: vertical; line-height: 1.4; }
+    .text-input:hover, .select-input:hover, .number-input:hover, .hex-input:hover { border-color: #7d8998; }
+
+    .fill-row {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 9px;
+    }
+
+    .color-input {
+      width: 42px;
+      height: 38px;
+      padding: 3px;
+      border: 1px solid #a9a398;
+      border-radius: 2px;
+      background: var(--white);
+      cursor: pointer;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .swatch {
+      aspect-ratio: 1;
+      border: 1px solid rgba(11, 23, 48, 0.25);
+      cursor: pointer;
+    }
+
+    .swatch[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 62px;
+      align-items: center;
+      gap: 9px;
+    }
+
+    input[type="range"] { width: 100%; accent-color: var(--coral-dark); }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .inspector-button {
+      min-height: 36px;
+      padding: 8px 9px;
+      border: 1px solid #a9a398;
+      border-radius: 2px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      font: 750 11px var(--ui);
+    }
+
+    .inspector-button:hover:not(:disabled) { border-color: var(--cyan-dark); background: #edf7f6; }
+    .inspector-button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .inspector-button.remove:hover { border-color: var(--coral-dark); background: #fff0ee; color: #9e2d33; }
+
+    .document-tools { margin-top: auto; padding: 17px 20px; }
+
+    .document-tools p {
+      margin: 10px 0 0;
+      color: #6b7788;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .shortcut-list {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 10px;
+      margin: 13px 0 0;
+      color: #6b7788;
+      font-size: 10px;
+    }
+
+    .shortcut-list dt, .shortcut-list dd { margin: 0; }
+
+    .shortcut-list kbd {
+      min-width: 31px;
+      display: inline-block;
+      padding: 2px 5px;
+      border: 1px solid #bcb6ab;
+      background: var(--white);
+      color: var(--ink);
+      font: 9px var(--mono);
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 100;
+      left: 50%;
+      bottom: 22px;
+      translate: -50% 16px;
+      max-width: min(420px, calc(100vw - 32px));
+      padding: 10px 14px;
+      border: 1px solid rgba(40, 215, 229, 0.42);
+      background: var(--ink);
+      color: var(--white);
+      box-shadow: 0 10px 30px rgba(2, 8, 20, 0.32);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease, translate 150ms ease;
+      font-size: 12px;
+    }
+
+    .toast.visible { opacity: 1; translate: -50% 0; }
+
+    @media (max-width: 1120px) {
+      .topbar { grid-template-columns: minmax(170px, 1fr) auto; }
+      .document-state { display: none; }
+      .workspace { grid-template-columns: 82px minmax(380px, 1fr) 280px; }
+      .mat { padding: 48px 42px 42px; }
+    }
+
+    @media (max-width: 860px) {
+      body { overflow: auto; }
+      .app-shell { min-height: 100dvh; grid-template-rows: auto auto; }
+      .topbar { position: sticky; top: 0; grid-template-columns: 1fr auto; min-height: 66px; }
+      .top-button { padding-inline: 9px; }
+      .workspace {
+        grid-template-columns: 76px minmax(0, 1fr);
+        grid-template-rows: minmax(530px, 72vh) auto;
+      }
+      .tool-rail { grid-row: 1; }
+      .stage-shell { grid-column: 2; grid-row: 1; }
+      .inspector { grid-column: 1 / -1; grid-row: 2; }
+      .inspector-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .control-section { border-right: 1px solid #d6d0c4; }
+      .document-tools { margin-top: 0; }
+    }
+
+    @media (max-width: 620px) {
+      .topbar { grid-template-columns: 1fr; gap: 9px; padding: 11px 12px; }
+      .brand { justify-self: center; }
+      .top-actions { justify-self: stretch; justify-content: center; flex-wrap: wrap; }
+      .workspace { display: block; }
+      .tool-rail {
+        position: sticky;
+        top: 112px;
+        z-index: 8;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 2px;
+        padding: 5px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        overflow: visible;
+      }
+      .rail-heading, .rail-rule, .rail-help { display: none; }
+      .tool-button { min-height: 55px; padding: 5px 2px; gap: 3px; font-size: 9px; }
+      .tool-icon { width: 19px; height: 19px; }
+      .stage-shell { height: min(68vh, 610px); min-height: 430px; }
+      .stage-meta { padding-inline: 10px; }
+      .stage-meta .artboard-size { display: none; }
+      .mat { padding: 42px 25px 38px; }
+      .mat::before, .measure-y { display: none; }
+      .artboard-wrap::after { inset: -6px; }
+      .crop { display: none; }
+      .inspector-form { display: block; }
+      .control-section { border-right: 0; }
+      .inspector-header, .control-section, .document-tools { padding-inline: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
-<body>
-  <div class="redirect-card">
-    <h1>Atelier</h1>
-    <p>AI-powered design studio. The full Ember experience is not deployed on this site yet &mdash; check back soon.</p>
-    <a href="../">Back to all tools</a>
+<body data-demo="atelier">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="../" aria-label="Back to all demos" title="Back to all demos">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-word">Atelier</span>
+        <span class="brand-edition">all demos<br>local studio</span>
+      </a>
+
+      <div class="document-state" id="documentState" aria-live="polite">
+        <span class="save-dot" aria-hidden="true"></span>
+        <span id="saveState">Saved locally</span>
+        <span class="divider" aria-hidden="true">/</span>
+        <span id="objectCount">0 objects</span>
+      </div>
+
+      <nav class="top-actions" aria-label="Document actions">
+        <div class="action-group">
+          <button class="top-button" id="undoButton" type="button" title="Undo (Ctrl or Command + Z)" disabled>Undo</button>
+          <button class="top-button" id="redoButton" type="button" title="Redo (Ctrl or Command + Shift + Z)" disabled>Redo</button>
+        </div>
+        <div class="action-group">
+          <button class="top-button danger" id="clearButton" type="button">Clear</button>
+        </div>
+        <div class="action-group">
+          <button class="top-button accent" id="exportJsonButton" type="button" aria-label="Export composition as JSON">Export <span class="optional-label">JSON</span></button>
+          <button class="top-button accent" id="exportSvgButton" type="button" aria-label="Export composition as SVG">Export <span class="optional-label">SVG</span></button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="workspace">
+      <aside class="tool-rail" aria-labelledby="toolHeading">
+        <h2 class="rail-heading" id="toolHeading">Add object</h2>
+        <button class="tool-button" type="button" data-add="rectangle" aria-label="Add rectangle">
+          <span class="tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span>
+          Rectangle
+        </button>
+        <button class="tool-button" type="button" data-add="circle" aria-label="Add circle">
+          <span class="tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span>
+          Circle
+        </button>
+        <button class="tool-button" type="button" data-add="text" aria-label="Add text">
+          <span class="tool-icon" aria-hidden="true">T</span>
+          Text
+        </button>
+        <div class="rail-rule" aria-hidden="true"></div>
+        <button class="tool-button selection-action" id="duplicateButton" type="button" aria-label="Duplicate selected object" disabled>
+          <span class="tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="7" y="7" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 16H3V3h13v2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></span>
+          Duplicate
+        </button>
+        <button class="tool-button selection-action" id="deleteButton" type="button" aria-label="Delete selected object" disabled>
+          <span class="tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3m2 0-1 13H8L7 7m4 4v5m3-5v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"/></svg></span>
+          Delete
+        </button>
+        <p class="rail-help">Drag to move<br>Corner to resize<br>Arrows to nudge</p>
+      </aside>
+
+      <section class="stage-shell" aria-labelledby="canvasHeading">
+        <div class="stage-meta">
+          <span id="canvasHeading"><strong>Artboard A</strong> <span class="artboard-size">/ 900 × 620 px</span></span>
+          <span class="selection-readout" id="selectionReadout">Select an object to inspect it</span>
+        </div>
+        <div class="mat">
+          <div class="measure-x" aria-hidden="true"><span>0</span><span>300</span><span>600</span><span>900</span></div>
+          <div class="measure-y" aria-hidden="true"><span>0</span><span>310</span><span>620</span></div>
+          <div class="artboard-wrap">
+            <span class="crop nw" aria-hidden="true"></span><span class="crop ne" aria-hidden="true"></span>
+            <span class="crop se" aria-hidden="true"></span><span class="crop sw" aria-hidden="true"></span>
+            <svg id="artboard" viewBox="0 0 900 620" role="application" tabindex="0" aria-label="Composition artboard. Select objects, use arrow keys to move them, or drag with a pointer.">
+              <rect width="900" height="620" fill="#f7f4ec" data-artboard-background="true"></rect>
+              <g id="elementLayer"></g>
+              <g id="selectionLayer"></g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-labelledby="inspectorTitle">
+        <header class="inspector-header">
+          <div><h2 id="inspectorTitle">Inspector</h2><p id="inspectorSubtitle">Nothing selected</p></div>
+          <span class="type-chip" id="typeChip" hidden>Object</span>
+        </header>
+        <div class="empty-inspector" id="emptyInspector">
+          <div><strong>Choose something on the paper.</strong>Move it directly, or use the controls here for exact changes.</div>
+        </div>
+
+        <form class="inspector-form" id="inspectorForm" hidden>
+          <section class="control-section">
+            <h3>Color</h3>
+            <div class="fill-row">
+              <input class="color-input" id="fillColor" type="color" value="#0b1730" aria-label="Object fill color">
+              <input class="hex-input" id="fillHex" type="text" value="#0b1730" maxlength="7" spellcheck="false" aria-label="Object fill color as hexadecimal">
+            </div>
+            <div class="swatches" aria-label="Studio color swatches">
+              <button class="swatch" type="button" data-color="#0b1730" style="background:#0b1730" aria-label="Ink navy"></button>
+              <button class="swatch" type="button" data-color="#ff625e" style="background:#ff625e" aria-label="Electric coral"></button>
+              <button class="swatch" type="button" data-color="#28d7e5" style="background:#28d7e5" aria-label="Cyan"></button>
+              <button class="swatch" type="button" data-color="#f7f4ec" style="background:#f7f4ec" aria-label="Paper white"></button>
+            </div>
+          </section>
+
+          <section class="control-section" id="textControls" hidden>
+            <h3>Type</h3>
+            <label class="field"><span>Text</span><textarea class="text-input" id="textValue" rows="3" maxlength="180"></textarea></label>
+            <div class="field-grid field">
+              <label><span>Typeface</span><select class="select-input" id="fontFamily"><option value="display">Condensed</option><option value="sans">Sans</option><option value="serif">Serif</option><option value="mono">Mono</option></select></label>
+              <label><span>Weight</span><select class="select-input" id="fontWeight"><option value="400">Regular</option><option value="600">Semibold</option><option value="800">Heavy</option></select></label>
+            </div>
+            <label class="field"><span>Size</span><span class="range-row"><input id="fontSizeRange" type="range" min="10" max="180" step="1" value="48" aria-label="Font size"><input class="number-input" id="fontSizeNumber" type="number" min="10" max="180" step="1" value="48" aria-label="Font size in pixels"></span></label>
+          </section>
+
+          <section class="control-section">
+            <h3>Position and size</h3>
+            <div class="field-grid">
+              <label class="compact-field"><span>X</span><input class="number-input bounds-input" data-prop="x" type="number" step="1" aria-label="Horizontal position"></label>
+              <label class="compact-field"><span>Y</span><input class="number-input bounds-input" data-prop="y" type="number" step="1" aria-label="Vertical position"></label>
+              <label class="compact-field"><span>W</span><input class="number-input bounds-input" data-prop="w" type="number" min="12" step="1" aria-label="Object width"></label>
+              <label class="compact-field"><span>H</span><input class="number-input bounds-input" data-prop="h" type="number" min="12" step="1" aria-label="Object height"></label>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>Arrange</h3>
+            <div class="button-row">
+              <button class="inspector-button" id="bringForwardButton" type="button">Bring forward</button>
+              <button class="inspector-button" id="sendBackwardButton" type="button">Send backward</button>
+              <button class="inspector-button" id="duplicateInspectorButton" type="button">Duplicate</button>
+              <button class="inspector-button remove" id="deleteInspectorButton" type="button">Delete</button>
+            </div>
+          </section>
+        </form>
+
+        <section class="document-tools">
+          <button class="inspector-button" id="starterButton" type="button">Restore starter composition</button>
+          <p>Your composition stays in this browser. Exports never leave the device.</p>
+          <dl class="shortcut-list">
+            <dt><kbd>↑ ↓ ← →</kbd></dt><dd>Nudge selected object</dd>
+            <dt><kbd>Shift</kbd></dt><dd>Move in 10 px steps</dd>
+            <dt><kbd>⌘ / Ctrl D</kbd></dt><dd>Duplicate selection</dd>
+            <dt><kbd>Delete</kbd></dt><dd>Remove selection</dd>
+          </dl>
+        </section>
+      </aside>
+    </main>
   </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      const STORAGE_KEY = "atelier.canvas.v2";
+      const ARTBOARD = { width: 900, height: 620 };
+      const FONT_STACKS = {
+        display: '"Arial Narrow", "Avenir Next Condensed", "Roboto Condensed", Arial, sans-serif',
+        sans: '"Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif',
+        serif: 'Georgia, "Times New Roman", serif',
+        mono: '"SFMono-Regular", Consolas, "Liberation Mono", monospace'
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const artboard = $("artboard");
+      const elementLayer = $("elementLayer");
+      const selectionLayer = $("selectionLayer");
+      const inspectorForm = $("inspectorForm");
+      const emptyInspector = $("emptyInspector");
+      const inspectorSubtitle = $("inspectorSubtitle");
+      const typeChip = $("typeChip");
+      const textControls = $("textControls");
+      const selectionReadout = $("selectionReadout");
+      const objectCount = $("objectCount");
+      const documentState = $("documentState");
+      const saveState = $("saveState");
+      const fillColor = $("fillColor");
+      const fillHex = $("fillHex");
+      const textValue = $("textValue");
+      const fontFamily = $("fontFamily");
+      const fontWeight = $("fontWeight");
+      const fontSizeRange = $("fontSizeRange");
+      const fontSizeNumber = $("fontSizeNumber");
+      const undoButton = $("undoButton");
+      const redoButton = $("redoButton");
+      const duplicateButton = $("duplicateButton");
+      const deleteButton = $("deleteButton");
+      const toast = $("toast");
+      const measureCanvas = document.createElement("canvas");
+      const measureContext = measureCanvas.getContext("2d");
+
+      let documentModel = loadDocument();
+      let selectedId = documentModel.elements.some((element) => element.id === "headline") ? "headline" : null;
+      let undoStack = [];
+      let redoStack = [];
+      let interaction = null;
+      let saveTimer = 0;
+      let toastTimer = 0;
+      let spawnOffset = 0;
+
+      documentModel.elements.forEach(normalizeElement);
+
+      function starterDocument() {
+        return {
+          version: 2,
+          elements: [
+            { id: "navy-panel", type: "rectangle", x: 64, y: 58, w: 350, h: 440, fill: "#0b1730" },
+            { id: "cyan-disc", type: "circle", x: 630, y: 64, w: 190, h: 190, fill: "#28d7e5" },
+            { id: "coral-rule", type: "rectangle", x: 398, y: 374, w: 426, h: 86, fill: "#ff625e" },
+            { id: "headline", type: "text", x: 98, y: 103, fill: "#f7f4ec", text: "MAKE\nROOM", fontSize: 83, fontFamily: "display", fontWeight: "800" },
+            { id: "inside-note", type: "text", x: 102, y: 330, fill: "#28d7e5", text: "FOR THE UNEXPECTED", fontSize: 21, fontFamily: "mono", fontWeight: "600" },
+            { id: "rule-note", type: "text", x: 432, y: 396, fill: "#0b1730", text: "CUT  /  PLACE  /  PRINT", fontSize: 24, fontFamily: "display", fontWeight: "800" },
+            { id: "folio", type: "text", x: 620, y: 523, fill: "#0b1730", text: "ATELIER — SHEET 01", fontSize: 16, fontFamily: "mono", fontWeight: "600" }
+          ]
+        };
+      }
+
+      function loadDocument() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (stored && stored.version === 2 && Array.isArray(stored.elements)) {
+            return {
+              version: 2,
+              elements: stored.elements
+                .filter((element) => element && ["rectangle", "circle", "text"].includes(element.type))
+                .slice(0, 250)
+                .map((element, index) => ({
+                  id: String(element.id || `restored-${index}`),
+                  type: element.type,
+                  x: finiteNumber(element.x, 40),
+                  y: finiteNumber(element.y, 40),
+                  w: finiteNumber(element.w, 140),
+                  h: finiteNumber(element.h, 100),
+                  fill: validHex(element.fill) ? element.fill.toLowerCase() : "#0b1730",
+                  text: String(element.text || "Text").slice(0, 180),
+                  fontSize: finiteNumber(element.fontSize, 48),
+                  fontFamily: FONT_STACKS[element.fontFamily] ? element.fontFamily : "display",
+                  fontWeight: ["400", "600", "800"].includes(String(element.fontWeight)) ? String(element.fontWeight) : "600"
+                }))
+            };
+          }
+        } catch (error) {
+          console.warn("Atelier could not restore the local composition.", error);
+        }
+        return starterDocument();
+      }
+
+      function finiteNumber(value, fallback) {
+        const number = Number(value);
+        return Number.isFinite(number) ? number : fallback;
+      }
+
+      function validHex(value) { return /^#[0-9a-f]{6}$/i.test(String(value || "")); }
+      function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+
+      function normalizeElement(element) {
+        element.x = clamp(finiteNumber(element.x, 40), 0, ARTBOARD.width - 12);
+        element.y = clamp(finiteNumber(element.y, 40), 0, ARTBOARD.height - 12);
+        element.fill = validHex(element.fill) ? element.fill.toLowerCase() : "#0b1730";
+        if (element.type === "text") {
+          element.text = String(element.text || "Text").slice(0, 180);
+          element.fontSize = clamp(finiteNumber(element.fontSize, 48), 10, 180);
+          element.fontFamily = FONT_STACKS[element.fontFamily] ? element.fontFamily : "display";
+          element.fontWeight = ["400", "600", "800"].includes(String(element.fontWeight)) ? String(element.fontWeight) : "600";
+          updateTextBounds(element);
+        } else {
+          element.w = clamp(finiteNumber(element.w, 140), 24, ARTBOARD.width);
+          element.h = clamp(finiteNumber(element.h, 100), 24, ARTBOARD.height);
+          if (element.type === "circle") {
+            const size = Math.min(element.w, element.h);
+            element.w = size;
+            element.h = size;
+          }
+        }
+        element.x = clamp(element.x, 0, ARTBOARD.width - element.w);
+        element.y = clamp(element.y, 0, ARTBOARD.height - element.h);
+      }
+
+      function textLines(element) { return String(element.text || "Text").split(/\r?\n/).slice(0, 8); }
+
+      function updateTextBounds(element) {
+        const lines = textLines(element);
+        measureContext.font = `${element.fontWeight} ${element.fontSize}px ${FONT_STACKS[element.fontFamily]}`;
+        const width = Math.max(...lines.map((line) => measureContext.measureText(line || " ").width));
+        element.w = clamp(Math.ceil(width + 6), 18, ARTBOARD.width);
+        element.h = clamp(Math.ceil(lines.length * element.fontSize * 1.08 + 5), 18, ARTBOARD.height);
+      }
+
+      function createSvg(tag, attributes = {}) {
+        const node = document.createElementNS(SVG_NS, tag);
+        Object.entries(attributes).forEach(([name, value]) => {
+          if (value !== undefined && value !== null) node.setAttribute(name, String(value));
+        });
+        return node;
+      }
+
+      function render() {
+        elementLayer.replaceChildren();
+        selectionLayer.replaceChildren();
+        documentModel.elements.forEach((element, index) => {
+          const group = createSvg("g", {
+            class: `canvas-element${element.id === selectedId ? " selected" : ""}`,
+            transform: `translate(${element.x} ${element.y})`,
+            tabindex: "0",
+            role: "button",
+            "aria-label": `${elementLabel(element, index)}. Select and drag to move.`
+          });
+          group.dataset.id = element.id;
+          group.append(createSvg("rect", { class: "hit-zone", x: 0, y: 0, width: element.w, height: element.h }));
+
+          if (element.type === "rectangle") {
+            group.append(createSvg("rect", { class: "object-art", x: 0, y: 0, width: element.w, height: element.h, fill: element.fill }));
+          } else if (element.type === "circle") {
+            group.append(createSvg("circle", { class: "object-art", cx: element.w / 2, cy: element.h / 2, r: element.w / 2, fill: element.fill }));
+          } else {
+            const textNode = createSvg("text", {
+              class: "object-art",
+              fill: element.fill,
+              "font-family": FONT_STACKS[element.fontFamily],
+              "font-size": element.fontSize,
+              "font-weight": element.fontWeight,
+              "xml:space": "preserve"
+            });
+            textLines(element).forEach((line, lineIndex) => {
+              const tspan = createSvg("tspan", {
+                x: 2,
+                y: lineIndex === 0 ? element.fontSize : undefined,
+                dy: lineIndex > 0 ? element.fontSize * 1.08 : undefined
+              });
+              tspan.textContent = line || " ";
+              textNode.append(tspan);
+            });
+            group.append(textNode);
+          }
+
+          group.addEventListener("pointerdown", beginMove);
+          group.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              selectElement(element.id, true);
+            }
+          });
+          elementLayer.append(group);
+        });
+
+        const selected = getSelected();
+        if (selected) renderSelection(selected);
+        renderInspector(selected);
+        renderDocumentState(selected);
+      }
+
+      function renderSelection(element) {
+        selectionLayer.append(createSvg("rect", { class: "selection-box", x: element.x, y: element.y, width: element.w, height: element.h }));
+        const handles = {
+          nw: [element.x, element.y],
+          ne: [element.x + element.w, element.y],
+          se: [element.x + element.w, element.y + element.h],
+          sw: [element.x, element.y + element.h]
+        };
+        Object.entries(handles).forEach(([handle, [x, y]]) => {
+          const grip = createSvg("rect", {
+            class: "selection-handle", x: x - 7, y: y - 7, width: 14, height: 14, rx: 1,
+            "aria-hidden": "true"
+          });
+          grip.dataset.handle = handle;
+          grip.addEventListener("pointerdown", beginResize);
+          selectionLayer.append(grip);
+        });
+      }
+
+      function renderInspector(selected) {
+        const hasSelection = Boolean(selected);
+        emptyInspector.hidden = hasSelection;
+        inspectorForm.hidden = !hasSelection;
+        typeChip.hidden = !hasSelection;
+        duplicateButton.disabled = !hasSelection;
+        deleteButton.disabled = !hasSelection;
+        if (!selected) {
+          inspectorSubtitle.textContent = "Nothing selected";
+          return;
+        }
+
+        const index = documentModel.elements.indexOf(selected);
+        inspectorSubtitle.textContent = elementLabel(selected, index);
+        typeChip.textContent = selected.type === "rectangle" ? "Rectangle" : capitalize(selected.type);
+        textControls.hidden = selected.type !== "text";
+        fillColor.value = selected.fill;
+        fillHex.value = selected.fill;
+        document.querySelectorAll(".swatch").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.color === selected.fill)));
+        document.querySelectorAll(".bounds-input").forEach((input) => { input.value = Math.round(selected[input.dataset.prop]); });
+
+        if (selected.type === "text") {
+          textValue.value = selected.text;
+          fontFamily.value = selected.fontFamily;
+          fontWeight.value = selected.fontWeight;
+          fontSizeRange.value = Math.round(selected.fontSize);
+          fontSizeNumber.value = Math.round(selected.fontSize);
+        }
+        $("bringForwardButton").disabled = index === documentModel.elements.length - 1;
+        $("sendBackwardButton").disabled = index === 0;
+      }
+
+      function renderDocumentState(selected) {
+        const count = documentModel.elements.length;
+        objectCount.textContent = `${count} ${count === 1 ? "object" : "objects"}`;
+        undoButton.disabled = undoStack.length === 0;
+        redoButton.disabled = redoStack.length === 0;
+        selectionReadout.textContent = selected
+          ? `${capitalize(selected.type)}  x ${Math.round(selected.x)}  y ${Math.round(selected.y)}  w ${Math.round(selected.w)}  h ${Math.round(selected.h)}`
+          : count ? "Select an object to inspect it" : "The artboard is ready for an object";
+      }
+
+      function elementLabel(element, index) {
+        const type = element.type === "rectangle" ? "Rectangle" : capitalize(element.type);
+        if (element.type === "text") {
+          const preview = element.text.replace(/\s+/g, " ").trim().slice(0, 22);
+          return `${type} ${index + 1}${preview ? `: ${preview}` : ""}`;
+        }
+        return `${type} ${index + 1}`;
+      }
+
+      function capitalize(value) { return value.charAt(0).toUpperCase() + value.slice(1); }
+      function getSelected() { return documentModel.elements.find((element) => element.id === selectedId) || null; }
+
+      function selectElement(id, focusArtboard = false) {
+        selectedId = documentModel.elements.some((element) => element.id === id) ? id : null;
+        render();
+        if (focusArtboard) artboard.focus({ preventScroll: true });
+      }
+
+      function pointFromEvent(event) {
+        const matrix = artboard.getScreenCTM();
+        if (!matrix) return { x: 0, y: 0 };
+        const point = artboard.createSVGPoint();
+        point.x = event.clientX;
+        point.y = event.clientY;
+        const transformed = point.matrixTransform(matrix.inverse());
+        return { x: transformed.x, y: transformed.y };
+      }
+
+      function beginMove(event) {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const element = documentModel.elements.find((item) => item.id === event.currentTarget.dataset.id);
+        if (!element) return;
+        selectedId = element.id;
+        checkpoint();
+        interaction = { mode: "move", pointerId: event.pointerId, start: pointFromEvent(event), original: { ...element }, moved: false };
+        artboard.setPointerCapture(event.pointerId);
+        render();
+      }
+
+      function beginResize(event) {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const element = getSelected();
+        if (!element) return;
+        checkpoint();
+        interaction = {
+          mode: "resize", handle: event.currentTarget.dataset.handle, pointerId: event.pointerId,
+          start: pointFromEvent(event), original: { ...element }, moved: false
+        };
+        artboard.setPointerCapture(event.pointerId);
+      }
+
+      artboard.addEventListener("pointermove", (event) => {
+        if (!interaction || interaction.pointerId !== event.pointerId) return;
+        const element = getSelected();
+        if (!element) return;
+        const point = pointFromEvent(event);
+        const dx = point.x - interaction.start.x;
+        const dy = point.y - interaction.start.y;
+        interaction.moved = interaction.moved || Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4;
+        if (interaction.mode === "move") {
+          element.x = clamp(interaction.original.x + dx, 0, ARTBOARD.width - element.w);
+          element.y = clamp(interaction.original.y + dy, 0, ARTBOARD.height - element.h);
+        } else {
+          resizeElement(element, interaction.handle, interaction.original, dx, dy);
+        }
+        render();
+      });
+
+      function finishInteraction(event) {
+        if (!interaction || interaction.pointerId !== event.pointerId) return;
+        if (artboard.hasPointerCapture(event.pointerId)) artboard.releasePointerCapture(event.pointerId);
+        const moved = interaction.moved;
+        const mode = interaction.mode;
+        interaction = null;
+        if (!moved) {
+          undoStack.pop();
+          render();
+          return;
+        }
+        scheduleSave();
+        announce(mode === "move" ? "Object moved" : "Object resized");
+      }
+
+      artboard.addEventListener("pointerup", finishInteraction);
+      artboard.addEventListener("pointercancel", finishInteraction);
+      artboard.addEventListener("pointerdown", (event) => {
+        if (event.target === artboard || event.target.hasAttribute("data-artboard-background")) {
+          selectedId = null;
+          render();
+        }
+      });
+
+      function resizeElement(element, handle, original, dx, dy) {
+        let left = original.x;
+        let top = original.y;
+        let right = original.x + original.w;
+        let bottom = original.y + original.h;
+        const west = handle.includes("w");
+        const north = handle.includes("n");
+        if (west) left += dx; else right += dx;
+        if (north) top += dy; else bottom += dy;
+        if (right - left < 24) { if (west) left = right - 24; else right = left + 24; }
+        if (bottom - top < 24) { if (north) top = bottom - 24; else bottom = top + 24; }
+        left = clamp(left, 0, ARTBOARD.width - 12);
+        top = clamp(top, 0, ARTBOARD.height - 12);
+        right = clamp(right, 12, ARTBOARD.width);
+        bottom = clamp(bottom, 12, ARTBOARD.height);
+        const candidateWidth = Math.max(24, right - left);
+        const candidateHeight = Math.max(24, bottom - top);
+
+        if (element.type === "text") {
+          const scale = clamp((candidateWidth / original.w + candidateHeight / original.h) / 2, 0.2, 5);
+          element.fontSize = clamp(Math.round(original.fontSize * scale), 10, 180);
+          updateTextBounds(element);
+          element.x = west ? original.x + original.w - element.w : original.x;
+          element.y = north ? original.y + original.h - element.h : original.y;
+        } else if (element.type === "circle") {
+          const size = Math.abs(dx) >= Math.abs(dy) ? candidateWidth : candidateHeight;
+          element.w = clamp(size, 24, Math.min(ARTBOARD.width, ARTBOARD.height));
+          element.h = element.w;
+          element.x = west ? original.x + original.w - element.w : original.x;
+          element.y = north ? original.y + original.h - element.h : original.y;
+        } else {
+          element.x = left;
+          element.y = top;
+          element.w = candidateWidth;
+          element.h = candidateHeight;
+        }
+        element.x = clamp(element.x, 0, ARTBOARD.width - element.w);
+        element.y = clamp(element.y, 0, ARTBOARD.height - element.h);
+      }
+
+      function makeId(prefix) {
+        return globalThis.crypto && typeof globalThis.crypto.randomUUID === "function"
+          ? `${prefix}-${globalThis.crypto.randomUUID()}`
+          : `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function addElement(type) {
+        checkpoint();
+        spawnOffset = (spawnOffset + 24) % 144;
+        const centerX = 390 + spawnOffset;
+        const centerY = 240 + spawnOffset / 2;
+        let element;
+        if (type === "rectangle") {
+          element = { id: makeId("rect"), type, x: centerX - 100, y: centerY - 65, w: 200, h: 130, fill: "#ff625e" };
+        } else if (type === "circle") {
+          element = { id: makeId("circle"), type, x: centerX - 75, y: centerY - 75, w: 150, h: 150, fill: "#28d7e5" };
+        } else {
+          element = { id: makeId("text"), type, x: centerX - 90, y: centerY - 30, fill: "#0b1730", text: "New idea", fontSize: 48, fontFamily: "display", fontWeight: "800" };
+        }
+        normalizeElement(element);
+        documentModel.elements.push(element);
+        selectedId = element.id;
+        render();
+        scheduleSave();
+        artboard.focus({ preventScroll: true });
+        announce(`${capitalize(type)} added`);
+      }
+
+      document.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => addElement(button.dataset.add)));
+
+      function deleteSelected() {
+        const index = documentModel.elements.findIndex((element) => element.id === selectedId);
+        if (index < 0) return;
+        checkpoint();
+        documentModel.elements.splice(index, 1);
+        selectedId = null;
+        render();
+        scheduleSave();
+        announce("Object deleted");
+      }
+
+      function duplicateSelected() {
+        const selected = getSelected();
+        if (!selected) return;
+        checkpoint();
+        const copy = {
+          ...selected,
+          id: makeId(selected.type),
+          x: clamp(selected.x + 24, 0, ARTBOARD.width - selected.w),
+          y: clamp(selected.y + 24, 0, ARTBOARD.height - selected.h)
+        };
+        documentModel.elements.push(copy);
+        selectedId = copy.id;
+        render();
+        scheduleSave();
+        announce("Object duplicated");
+      }
+
+      duplicateButton.addEventListener("click", duplicateSelected);
+      deleteButton.addEventListener("click", deleteSelected);
+      $("duplicateInspectorButton").addEventListener("click", duplicateSelected);
+      $("deleteInspectorButton").addEventListener("click", deleteSelected);
+
+      function moveLayer(direction) {
+        const index = documentModel.elements.findIndex((element) => element.id === selectedId);
+        const target = index + direction;
+        if (index < 0 || target < 0 || target >= documentModel.elements.length) return;
+        checkpoint();
+        [documentModel.elements[index], documentModel.elements[target]] = [documentModel.elements[target], documentModel.elements[index]];
+        render();
+        scheduleSave();
+        announce(direction > 0 ? "Object brought forward" : "Object sent backward");
+      }
+
+      $("bringForwardButton").addEventListener("click", () => moveLayer(1));
+      $("sendBackwardButton").addEventListener("click", () => moveLayer(-1));
+
+      function applyFill(value) {
+        const selected = getSelected();
+        if (!selected || !validHex(value)) return;
+        selected.fill = value.toLowerCase();
+        render();
+        scheduleSave();
+      }
+
+      fillColor.addEventListener("focus", checkpoint);
+      fillColor.addEventListener("input", () => applyFill(fillColor.value));
+      fillHex.addEventListener("focus", checkpoint);
+      fillHex.addEventListener("change", () => {
+        if (!validHex(fillHex.value)) {
+          const selected = getSelected();
+          fillHex.value = selected ? selected.fill : "#0b1730";
+          announce("Enter a six-digit hexadecimal color");
+          return;
+        }
+        applyFill(fillHex.value);
+      });
+      document.querySelectorAll(".swatch").forEach((button) => button.addEventListener("click", () => {
+        checkpoint();
+        applyFill(button.dataset.color);
+      }));
+
+      textValue.addEventListener("focus", checkpoint);
+      textValue.addEventListener("input", () => {
+        const selected = getSelected();
+        if (!selected || selected.type !== "text") return;
+        selected.text = textValue.value.slice(0, 180) || " ";
+        updateTextBounds(selected);
+        normalizeElement(selected);
+        render();
+        scheduleSave();
+      });
+
+      [fontFamily, fontWeight].forEach((input) => {
+        input.addEventListener("focus", checkpoint);
+        input.addEventListener("change", () => {
+          const selected = getSelected();
+          if (!selected || selected.type !== "text") return;
+          selected.fontFamily = FONT_STACKS[fontFamily.value] ? fontFamily.value : "display";
+          selected.fontWeight = fontWeight.value;
+          normalizeElement(selected);
+          render();
+          scheduleSave();
+        });
+      });
+
+      function applyFontSize(value) {
+        const selected = getSelected();
+        if (!selected || selected.type !== "text") return;
+        selected.fontSize = clamp(finiteNumber(value, selected.fontSize), 10, 180);
+        normalizeElement(selected);
+        render();
+        scheduleSave();
+      }
+
+      fontSizeRange.addEventListener("focus", checkpoint);
+      fontSizeRange.addEventListener("input", () => applyFontSize(fontSizeRange.value));
+      fontSizeNumber.addEventListener("focus", checkpoint);
+      fontSizeNumber.addEventListener("change", () => applyFontSize(fontSizeNumber.value));
+
+      document.querySelectorAll(".bounds-input").forEach((input) => {
+        input.addEventListener("change", () => {
+          const selected = getSelected();
+          if (!selected) return;
+          const property = input.dataset.prop;
+          const value = finiteNumber(input.value, selected[property]);
+          checkpoint();
+          if (property === "x") selected.x = clamp(value, 0, ARTBOARD.width - selected.w);
+          else if (property === "y") selected.y = clamp(value, 0, ARTBOARD.height - selected.h);
+          else if (selected.type === "text") {
+            selected.fontSize = clamp(selected.fontSize * value / selected[property], 10, 180);
+            normalizeElement(selected);
+          } else if (selected.type === "circle") {
+            const size = clamp(value, 24, Math.min(ARTBOARD.width, ARTBOARD.height));
+            selected.w = size;
+            selected.h = size;
+            normalizeElement(selected);
+          } else {
+            selected[property] = clamp(value, 24, property === "w" ? ARTBOARD.width : ARTBOARD.height);
+            normalizeElement(selected);
+          }
+          render();
+          scheduleSave();
+        });
+      });
+
+      function captureDocument() { return JSON.stringify(documentModel); }
+
+      function checkpoint() {
+        const snapshot = captureDocument();
+        if (undoStack[undoStack.length - 1] !== snapshot) undoStack.push(snapshot);
+        if (undoStack.length > 60) undoStack.shift();
+        redoStack = [];
+        renderDocumentState(getSelected());
+      }
+
+      function restoreSnapshot(snapshot) {
+        documentModel = JSON.parse(snapshot);
+        documentModel.elements.forEach(normalizeElement);
+        if (!documentModel.elements.some((element) => element.id === selectedId)) selectedId = null;
+        render();
+        scheduleSave();
+      }
+
+      function undo() {
+        if (!undoStack.length) return;
+        redoStack.push(captureDocument());
+        restoreSnapshot(undoStack.pop());
+        announce("Undid last change");
+      }
+
+      function redo() {
+        if (!redoStack.length) return;
+        undoStack.push(captureDocument());
+        restoreSnapshot(redoStack.pop());
+        announce("Redid change");
+      }
+
+      undoButton.addEventListener("click", undo);
+      redoButton.addEventListener("click", redo);
+
+      $("clearButton").addEventListener("click", () => {
+        if (!documentModel.elements.length) return announce("The artboard is already clear");
+        if (!window.confirm("Clear every object from this artboard? You can still undo this change.")) return;
+        checkpoint();
+        documentModel.elements = [];
+        selectedId = null;
+        render();
+        scheduleSave();
+        announce("Artboard cleared");
+      });
+
+      $("starterButton").addEventListener("click", () => {
+        checkpoint();
+        documentModel = starterDocument();
+        documentModel.elements.forEach(normalizeElement);
+        selectedId = "headline";
+        render();
+        scheduleSave();
+        announce("Starter composition restored");
+      });
+
+      function scheduleSave() {
+        window.clearTimeout(saveTimer);
+        documentState.classList.add("saving");
+        saveState.textContent = "Saving…";
+        saveTimer = window.setTimeout(() => {
+          try {
+            localStorage.setItem(STORAGE_KEY, captureDocument());
+            saveState.textContent = "Saved locally";
+          } catch (error) {
+            console.warn("Atelier could not save locally.", error);
+            saveState.textContent = "Local save unavailable";
+          }
+          documentState.classList.remove("saving");
+        }, 220);
+      }
+
+      function download(name, contents, type) {
+        const blob = new Blob([contents], { type });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = name;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      $("exportJsonButton").addEventListener("click", () => {
+        const payload = {
+          format: "atelier-canvas", version: 2,
+          artboard: { ...ARTBOARD, background: "#f7f4ec" },
+          elements: documentModel.elements,
+          exportedAt: new Date().toISOString()
+        };
+        download("atelier-composition.json", JSON.stringify(payload, null, 2), "application/json");
+        announce("JSON exported");
+      });
+
+      $("exportSvgButton").addEventListener("click", () => {
+        download("atelier-composition.svg", buildSvgExport(), "image/svg+xml");
+        announce("SVG exported");
+      });
+
+      function escapeXml(value) {
+        return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;");
+      }
+
+      function round(value) { return Math.round(value * 100) / 100; }
+
+      function buildSvgExport() {
+        const body = documentModel.elements.map((element) => {
+          if (element.type === "rectangle") return `  <rect x="${round(element.x)}" y="${round(element.y)}" width="${round(element.w)}" height="${round(element.h)}" fill="${element.fill}"/>`;
+          if (element.type === "circle") return `  <circle cx="${round(element.x + element.w / 2)}" cy="${round(element.y + element.h / 2)}" r="${round(element.w / 2)}" fill="${element.fill}"/>`;
+          const lines = textLines(element).map((line, index) => {
+            const y = element.y + element.fontSize + index * element.fontSize * 1.08;
+            return `    <tspan x="${round(element.x + 2)}" y="${round(y)}">${escapeXml(line || " ")}</tspan>`;
+          }).join("\n");
+          return `  <text fill="${element.fill}" font-family="${escapeXml(FONT_STACKS[element.fontFamily])}" font-size="${round(element.fontSize)}" font-weight="${element.fontWeight}" xml:space="preserve">\n${lines}\n  </text>`;
+        }).join("\n");
+        return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${ARTBOARD.width}" height="${ARTBOARD.height}" viewBox="0 0 ${ARTBOARD.width} ${ARTBOARD.height}">
+  <title>Atelier composition</title>
+  <rect width="${ARTBOARD.width}" height="${ARTBOARD.height}" fill="#f7f4ec"/>
+${body}
+</svg>`;
+      }
+
+      function announce(message) {
+        toast.textContent = message;
+        toast.classList.add("visible");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove("visible"), 1800);
+      }
+
+      document.addEventListener("keydown", (event) => {
+        const target = event.target;
+        const editing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
+        const modifier = event.metaKey || event.ctrlKey;
+        if (modifier && event.key.toLowerCase() === "z") {
+          event.preventDefault();
+          return event.shiftKey ? redo() : undo();
+        }
+        if (modifier && event.key.toLowerCase() === "d" && !editing) {
+          event.preventDefault();
+          return duplicateSelected();
+        }
+        if (editing) return;
+        if ((event.key === "Delete" || event.key === "Backspace") && getSelected()) {
+          event.preventDefault();
+          return deleteSelected();
+        }
+        if (event.key === "Escape" && getSelected()) {
+          selectedId = null;
+          return render();
+        }
+        const directions = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+        if (directions[event.key] && getSelected()) {
+          event.preventDefault();
+          const selected = getSelected();
+          const step = event.shiftKey ? 10 : 1;
+          const [xDirection, yDirection] = directions[event.key];
+          checkpoint();
+          selected.x = clamp(selected.x + xDirection * step, 0, ARTBOARD.width - selected.w);
+          selected.y = clamp(selected.y + yDirection * step, 0, ARTBOARD.height - selected.h);
+          render();
+          scheduleSave();
+        }
+      });
+
+      render();
+      scheduleSave();
+    })();
+  </script>
 </body>
 </html>

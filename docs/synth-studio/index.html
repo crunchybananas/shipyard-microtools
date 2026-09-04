@@ -3,15 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Synth Studio</title>
+  <meta name="description" content="A tactile browser synthesizer, drum machine, and sixteen-step sequencer.">
+  <meta name="theme-color" content="#3f4935">
+  <title>Synth Studio — SS-4 Sound Workshop</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="../shared/microtools.css">
 </head>
-<body>
+<body data-demo="synth-studio">
   <div class="app">
     <header class="header">
-      <h1>SYNTH STUDIO</h1>
+      <div class="brand-plate">
+        <span class="model-number">SS–4</span>
+        <div>
+          <h1>Synth Studio</h1>
+          <p>Polyphonic sound workshop</p>
+        </div>
+        <span class="power-lamp" aria-label="Instrument ready"></span>
+      </div>
       <div class="header-controls">
-        <select id="preset-select">
+        <label class="visually-hidden" for="preset-select">Preset bank</label>
+        <select id="preset-select" aria-label="Preset bank">
           <option value="">-- Presets --</option>
           <option value="bass">Bass</option>
           <option value="lead">Lead</option>
@@ -20,9 +31,9 @@
           <option value="brass">Brass</option>
           <option value="strings">Strings</option>
         </select>
-        <button id="save-btn" class="btn">Save</button>
-        <button id="reset-btn" class="btn">Reset</button>
-        <button id="export-btn" class="btn btn-primary">Export WAV</button>
+        <button type="button" id="save-btn" class="btn">Save</button>
+        <button type="button" id="reset-btn" class="btn">Reset</button>
+        <button type="button" id="export-btn" class="btn btn-primary">Export WAV</button>
       </div>
     </header>
 
@@ -30,20 +41,20 @@
       <div class="top-row">
         <!-- Oscillator Section -->
         <section class="panel oscillator-panel">
-          <h2>OSCILLATOR</h2>
+          <h2>Oscillator</h2>
           <div class="waveform-selector">
-            <button class="wave-btn active" data-wave="sine" title="Sine">∿</button>
-            <button class="wave-btn" data-wave="square" title="Square">□</button>
-            <button class="wave-btn" data-wave="sawtooth" title="Sawtooth">⊿</button>
-            <button class="wave-btn" data-wave="triangle" title="Triangle">△</button>
+            <button type="button" class="wave-btn active" data-wave="sine" title="Sine" aria-label="Sine waveform" aria-pressed="true">∿</button>
+            <button type="button" class="wave-btn" data-wave="square" title="Square" aria-label="Square waveform" aria-pressed="false">□</button>
+            <button type="button" class="wave-btn" data-wave="sawtooth" title="Sawtooth" aria-label="Sawtooth waveform" aria-pressed="false">⊿</button>
+            <button type="button" class="wave-btn" data-wave="triangle" title="Triangle" aria-label="Triangle waveform" aria-pressed="false">△</button>
           </div>
           <div class="control-group">
-            <label>Octave</label>
+            <label for="octave">Octave</label>
             <input type="range" id="octave" min="-2" max="2" value="0" step="1">
             <span class="value" id="octave-value">0</span>
           </div>
           <div class="control-group">
-            <label>Detune</label>
+            <label for="detune">Detune</label>
             <input type="range" id="detune" min="-50" max="50" value="0">
             <span class="value" id="detune-value">0</span>
           </div>
@@ -51,19 +62,19 @@
 
         <!-- Filter Section -->
         <section class="panel filter-panel">
-          <h2>FILTER</h2>
+          <h2>Filter</h2>
           <div class="control-group">
-            <label>Cutoff</label>
+            <label for="filter-cutoff">Cutoff</label>
             <input type="range" id="filter-cutoff" min="20" max="20000" value="5000" class="log-slider">
             <span class="value" id="filter-cutoff-value">5000 Hz</span>
           </div>
           <div class="control-group">
-            <label>Resonance</label>
+            <label for="filter-resonance">Resonance</label>
             <input type="range" id="filter-resonance" min="0" max="30" value="1" step="0.1">
             <span class="value" id="filter-resonance-value">1</span>
           </div>
           <div class="control-group">
-            <label>Env Amt</label>
+            <label for="filter-env-amount">Env amt</label>
             <input type="range" id="filter-env-amount" min="0" max="10000" value="0">
             <span class="value" id="filter-env-amount-value">0</span>
           </div>
@@ -71,14 +82,14 @@
 
         <!-- Visualization Section -->
         <section class="panel visualization-panel">
-          <h2>VISUALIZATION</h2>
+          <h2>Scope</h2>
           <div class="viz-container">
-            <canvas id="waveform-canvas" width="300" height="80"></canvas>
-            <canvas id="spectrum-canvas" width="300" height="80"></canvas>
+            <canvas id="waveform-canvas" width="300" height="80" role="img" aria-label="Live audio waveform">Live audio waveform</canvas>
+            <canvas id="spectrum-canvas" width="300" height="80" role="img" aria-label="Live frequency spectrum">Live frequency spectrum</canvas>
           </div>
           <div class="viz-toggle">
-            <button class="viz-btn active" data-viz="waveform">Waveform</button>
-            <button class="viz-btn" data-viz="spectrum">Spectrum</button>
+            <button type="button" class="viz-btn active" data-viz="waveform" aria-pressed="true">Waveform</button>
+            <button type="button" class="viz-btn" data-viz="spectrum" aria-pressed="false">Spectrum</button>
           </div>
         </section>
       </div>
@@ -86,29 +97,29 @@
       <div class="middle-row">
         <!-- Envelope Section -->
         <section class="panel envelope-panel">
-          <h2>ENVELOPE</h2>
+          <h2>Envelope</h2>
           <div class="adsr-visual">
-            <canvas id="adsr-canvas" width="180" height="60"></canvas>
+            <canvas id="adsr-canvas" width="180" height="60" role="img" aria-label="Attack decay sustain release envelope">Envelope curve</canvas>
           </div>
           <div class="adsr-controls">
             <div class="adsr-knob">
               <input type="range" id="attack" min="0.001" max="2" value="0.01" step="0.001" orient="vertical">
-              <label>A</label>
+              <label for="attack" title="Attack">A</label>
               <span class="value" id="attack-value">10ms</span>
             </div>
             <div class="adsr-knob">
               <input type="range" id="decay" min="0.001" max="2" value="0.1" step="0.001" orient="vertical">
-              <label>D</label>
+              <label for="decay" title="Decay">D</label>
               <span class="value" id="decay-value">100ms</span>
             </div>
             <div class="adsr-knob">
               <input type="range" id="sustain" min="0" max="1" value="0.7" step="0.01" orient="vertical">
-              <label>S</label>
+              <label for="sustain" title="Sustain">S</label>
               <span class="value" id="sustain-value">70%</span>
             </div>
             <div class="adsr-knob">
               <input type="range" id="release" min="0.001" max="3" value="0.3" step="0.001" orient="vertical">
-              <label>R</label>
+              <label for="release" title="Release">R</label>
               <span class="value" id="release-value">300ms</span>
             </div>
           </div>
@@ -116,7 +127,7 @@
 
         <!-- Effects Section -->
         <section class="panel effects-panel">
-          <h2>EFFECTS</h2>
+          <h2>Effects bus</h2>
           <div class="effect-row">
             <div class="effect-toggle">
               <input type="checkbox" id="delay-enabled">
@@ -125,15 +136,15 @@
             <div class="effect-controls">
               <div class="mini-control">
                 <input type="range" id="delay-time" min="0.05" max="1" value="0.3" step="0.01">
-                <span>Time</span>
+                <label for="delay-time">Time</label>
               </div>
               <div class="mini-control">
                 <input type="range" id="delay-feedback" min="0" max="0.9" value="0.4" step="0.01">
-                <span>Feedback</span>
+                <label for="delay-feedback">Feedback</label>
               </div>
               <div class="mini-control">
                 <input type="range" id="delay-mix" min="0" max="1" value="0.3" step="0.01">
-                <span>Mix</span>
+                <label for="delay-mix">Mix</label>
               </div>
             </div>
           </div>
@@ -145,11 +156,11 @@
             <div class="effect-controls">
               <div class="mini-control">
                 <input type="range" id="reverb-decay" min="0.1" max="5" value="2" step="0.1">
-                <span>Decay</span>
+                <label for="reverb-decay">Decay</label>
               </div>
               <div class="mini-control">
                 <input type="range" id="reverb-mix" min="0" max="1" value="0.3" step="0.01">
-                <span>Mix</span>
+                <label for="reverb-mix">Mix</label>
               </div>
             </div>
           </div>
@@ -161,7 +172,7 @@
             <div class="effect-controls">
               <div class="mini-control">
                 <input type="range" id="distortion-amount" min="0" max="100" value="20">
-                <span>Amount</span>
+                <label for="distortion-amount">Amount</label>
               </div>
             </div>
           </div>
@@ -171,31 +182,31 @@
         <section class="panel lfo-panel">
           <h2>LFO</h2>
           <div class="control-group">
-            <label>Rate</label>
+            <label for="lfo-rate">Rate</label>
             <input type="range" id="lfo-rate" min="0.1" max="20" value="5" step="0.1">
             <span class="value" id="lfo-rate-value">5 Hz</span>
           </div>
           <div class="control-group">
-            <label>Depth</label>
+            <label for="lfo-depth">Depth</label>
             <input type="range" id="lfo-depth" min="0" max="100" value="0">
             <span class="value" id="lfo-depth-value">0</span>
           </div>
           <div class="lfo-target">
-            <button class="lfo-target-btn active" data-target="none">Off</button>
-            <button class="lfo-target-btn" data-target="pitch">Pitch</button>
-            <button class="lfo-target-btn" data-target="filter">Filter</button>
+            <button type="button" class="lfo-target-btn active" data-target="none" aria-pressed="true">Off</button>
+            <button type="button" class="lfo-target-btn" data-target="pitch" aria-pressed="false">Pitch</button>
+            <button type="button" class="lfo-target-btn" data-target="filter" aria-pressed="false">Filter</button>
           </div>
         </section>
 
         <!-- Master Section -->
         <section class="panel master-panel">
-          <h2>MASTER</h2>
+          <h2>Master</h2>
           <div class="control-group">
-            <label>Volume</label>
+            <label for="master-volume">Volume</label>
             <input type="range" id="master-volume" min="0" max="1" value="0.7" step="0.01">
             <span class="value" id="master-volume-value">70%</span>
           </div>
-          <div class="level-meter">
+          <div class="level-meter" role="meter" aria-label="Output level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="meter-bar" id="meter-bar"></div>
           </div>
         </section>
@@ -203,8 +214,8 @@
 
       <!-- Keyboard Section -->
       <section class="keyboard-section">
-        <h2>KEYBOARD <span class="keyboard-hint">(Use computer keys A-L or click)</span></h2>
-        <div class="keyboard" id="keyboard">
+        <h2>Keyboard <span class="keyboard-hint">Use A–L or play the keys</span></h2>
+        <div class="keyboard" id="keyboard" aria-label="Playable synthesizer keyboard">
           <!-- Keys generated by JavaScript -->
         </div>
       </section>
@@ -212,20 +223,20 @@
       <!-- Sequencer Section -->
       <section class="sequencer-section">
         <div class="sequencer-header">
-          <h2>SEQUENCER</h2>
+          <h2>16-step sequencer</h2>
           <div class="sequencer-controls">
             <div class="bpm-control">
-              <label>BPM</label>
+              <label for="bpm">BPM</label>
               <input type="number" id="bpm" value="120" min="40" max="240">
             </div>
             <div class="swing-control">
-              <label>Swing</label>
+              <label for="swing">Swing</label>
               <input type="range" id="swing" min="0" max="0.5" value="0" step="0.01">
             </div>
             <div class="transport">
-              <button class="transport-btn" id="play-btn" title="Play">▶</button>
-              <button class="transport-btn" id="stop-btn" title="Stop">⏹</button>
-              <button class="transport-btn" id="record-btn" title="Record">⏺</button>
+              <button type="button" class="transport-btn" id="play-btn" title="Play" aria-label="Play sequence">▶</button>
+              <button type="button" class="transport-btn" id="stop-btn" title="Stop" aria-label="Stop sequence">⏹</button>
+              <button type="button" class="transport-btn" id="record-btn" title="Record" aria-label="Record performance" aria-pressed="false">⏺</button>
             </div>
           </div>
         </div>
@@ -235,7 +246,7 @@
           <div class="seq-track" data-track="synth1">
             <div class="track-label">
               <span>Synth 1</span>
-              <select class="track-note">
+              <select class="track-note" aria-label="Synth 1 note">
                 <option value="C3">C3</option>
                 <option value="D3">D3</option>
                 <option value="E3">E3</option>
@@ -251,7 +262,7 @@
           <div class="seq-track" data-track="synth2">
             <div class="track-label">
               <span>Synth 2</span>
-              <select class="track-note">
+              <select class="track-note" aria-label="Synth 2 note">
                 <option value="C3">C3</option>
                 <option value="D3">D3</option>
                 <option value="E3" selected>E3</option>
@@ -284,13 +295,13 @@
           </div>
         </div>
         
-        <div class="step-indicator" id="step-indicator"></div>
+        <div class="step-indicator" id="step-indicator" aria-hidden="true"></div>
       </section>
     </main>
 
     <footer class="footer">
-      <span>Click to start audio • Computer keyboard: A-L for notes, Z/X for octave</span>
-      <span id="recording-indicator" class="hidden">⏺ Recording...</span>
+      <span>Touch a key to wake audio · A–L play notes · Z/X shift octave</span>
+      <span id="recording-indicator" class="hidden" role="status" aria-live="polite">● Recording</span>
     </footer>
   </div>
 
@@ -300,5 +311,6 @@
   <script src="sequencer.js"></script>
   <script src="visualizer.js"></script>
   <script src="app.js"></script>
+  <script src="../shared/microtools.js"></script>
 </body>
 </html>
