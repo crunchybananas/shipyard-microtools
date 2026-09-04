@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T01:48:45Z",
+  "updatedAt": "2026-09-04T02:41:54Z",
   "site": {
     "title": "Shipyard Before / After",
     "description": "A public record of how the Shipyard micro apps change, what we learned, and what still needs work.",
@@ -21,6 +21,18 @@
       "cover": "assets/orbital-strike/social.jpg"
     },
     {
+      "slug": "demo-hub-night-harbor",
+      "title": "The demo hub comes home after dark",
+      "appSlug": null,
+      "surfaceSlug": "demo-hub",
+      "kind": "surface",
+      "status": "in-revision",
+      "publishedAt": null,
+      "data": "stories/demo-hub-night-harbor.json",
+      "href": "./demo-hub-night-harbor/",
+      "cover": "assets/demo-hub-night-harbor/social.jpg"
+    },
+    {
       "slug": "demo-hub",
       "title": "The demo hub — Useful little worlds",
       "appSlug": null,
@@ -39,7 +51,7 @@
       "title": "Demo hub",
       "category": "Collection",
       "status": "in-revision",
-      "story": "demo-hub"
+      "story": "demo-hub-night-harbor"
     }
   ],
   "apps": [

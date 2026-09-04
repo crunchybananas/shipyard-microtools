@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "demo-hub-night-harbor",
+  "title": "The demo hub comes home after dark",
+  "appSlug": null,
+  "surfaceSlug": "demo-hub",
+  "kind": "surface",
+  "status": "in-revision",
+  "publishedAt": null,
+  "thesis": "Keep the new catalog's clarity and momentum, then bring the whole surface back into the dark, workmanlike Crunchy Bananas world.",
+  "summary": "The second hub pass keeps all 32 apps, search, filters, the shared route home, and the new visual hierarchy. It replaces the bright editorial poster with a dark harbor system and swaps every illustrated preview for a real, deliberately cropped app capture.",
+  "versions": {
+    "before": {
+      "label": "Useful little worlds",
+      "commit": "7785163e"
+    },
+    "after": {
+      "label": "Dark harbor",
+      "commit": "66934769"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "gallery",
+      "title": "From bright dispatch board to night harbor",
+      "caption": "The useful information architecture remains, but the oversized poster treatment gives way to a compact working-dock shell. Authentic app captures now carry the visual energy.",
+      "before": {
+        "src": "assets/demo-hub-night-harbor/before-gallery.jpg",
+        "alt": "The bright Useful little worlds hub with an oversized headline and lime, cobalt, and coral accents."
+      },
+      "after": {
+        "src": "assets/demo-hub-night-harbor/after-gallery.jpg",
+        "alt": "The redesigned dark harbor hub with a compact headline, cyan and amber signals, and real previews from Orbital Strike and Maelstrom."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "The brand came back after dark",
+      "body": "Harbor navy, steel borders, foam text, signal cyan, and restrained worklight amber reconnect the index to the darker Crunchy Bananas visual language."
+    },
+    {
+      "title": "Real apps became the artwork",
+      "body": "Orbital Strike, Maelstrom, Fathom, Realm, Manifest, Flowforge, and Synth Studio now lead with authentic 1440 by 900 captures, each cropped to its strongest working moment."
+    },
+    {
+      "title": "The useful parts stayed put",
+      "body": "The 32-app inventory, full-card links, search, categories, live result count, responsive controls, archive entry point, and keyboard behavior all survived the visual reset."
+    },
+    {
+      "title": "Orbital Strike took the lead berth",
+      "body": "The rebuilt station interior now opens the collection, with Maelstrom beside it as a second high-impact window into the range of the suite."
+    }
+  ],
+  "builderNote": {
+    "quote": "also I dont dislike the titles with images, they would just need to be real images from the apps and cropped. showcase the best part in that area",
+    "context": "The image-led hierarchy was worth keeping. The correction was to use honest app imagery and place it inside the darker Crunchy Bananas system."
+  },
+  "proof": [
+    {
+      "label": "Inventory",
+      "value": "All 32 micro apps remain represented"
+    },
+    {
+      "label": "Authentic previews",
+      "value": "7 real app captures, each stored at 1440 by 900"
+    },
+    {
+      "label": "Responsive crawl",
+      "value": "The hub, 31 canonical demos, and 4 archive routes passed at desktop and mobile sizes"
+    },
+    {
+      "label": "Contrast",
+      "value": "Tested interface text ranges from 5.10:1 to 17.81:1"
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/blob/66934769/docs/index.html",
+    "download": null
+  },
+  "share": {
+    "summary": "The Shipyard hub keeps its smarter catalog and comes home to a dark Crunchy Bananas harbor, led by seven real app captures.",
+    "image": "assets/demo-hub-night-harbor/social.jpg"
+  }
+}
