@@ -77,6 +77,11 @@ input[type="text"] {
 
 pre {
   background: #0f172a;
+  /* This panel keeps a dark code-block background, but the shared suite stylesheet
+     sets body colour to --suite-ink, which is DARK. Without an explicit foreground
+     the decoded header/payload inherited that ink onto this background and rendered
+     at 1.17:1 — invisible. Pin a light ink so the pair is self-contained. */
+  color: #e2e8f0;
   border: 1px solid var(--border);
   padding: 12px;
   border-radius: 12px;
