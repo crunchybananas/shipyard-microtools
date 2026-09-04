@@ -7,8 +7,8 @@
       name="description"
       content="Thirty-two small browser tools, games, and experiments from Crunchy Bananas."
     />
-    <meta name="theme-color" content="#eef2e8" />
-    <title>Useful little worlds — Crunchy Bananas</title>
+    <meta name="theme-color" content="#0b1020" />
+    <title>Shipyard microtools — Crunchy Bananas</title>
     <style>
       :root {
         color-scheme: light;
@@ -1122,6 +1122,12 @@
         text-underline-offset: 0.2em;
       }
 
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem 1.35rem;
+      }
+
       noscript p {
         margin: 1rem 0;
         padding: 1rem;
@@ -1319,6 +1325,11 @@
           flex-direction: column;
           justify-content: center;
         }
+
+        .footer-links {
+          align-items: flex-start;
+          flex-direction: column;
+        }
       }
 
       @media (max-width: 25rem) {
@@ -1349,6 +1360,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="./hub.css" />
   </head>
   <body>
     <a class="skip-link" href="#catalog">Skip to the demos</a>
@@ -1359,10 +1371,10 @@
           <span class="brand-mark" aria-hidden="true">CB</span>
           <span class="brand-name">Crunchy Bananas</span>
         </a>
-        <div class="masthead-note">Browser-made / hand-finished</div>
+        <div class="masthead-note">Small apps for the browser</div>
         <div class="masthead-status">
           <span class="status-dot" aria-hidden="true"></span>
-          32 live
+          32 apps
         </div>
       </div>
     </header>
@@ -1370,34 +1382,33 @@
     <main>
       <section class="shell hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">The small software dispatch</p>
-          <h1 id="hero-title">
-            <span>Useful little</span>
-            <span class="worlds">worlds.</span>
-          </h1>
-        </div>
-        <aside class="hero-brief" aria-label="Gallery brief">
-          <p class="brief-copy">
-            Tiny, complete browser tools, games, and experiments. Pick a berth and step inside.
+          <p class="eyebrow">Shipyard microtools</p>
+          <h1 id="hero-title">Working ideas, ready to open.</h1>
+          <p class="hero-summary">
+            A collection of small browser tools, games, and experiments. Each one is complete enough to use
+            and curious enough to explore.
           </p>
-          <div class="brief-row" aria-hidden="true">
-            <div class="brief-stat"><strong>32</strong>live demos</div>
-            <div class="brief-stat"><strong>01</strong>browser tab</div>
-          </div>
-        </aside>
+        </div>
+        <a class="hero-brief" href="./before-after/" aria-label="Open the before and after archive">
+          <span class="brief-copy">
+            <strong>Before / after</strong>
+            See how these apps change as they are rebuilt.
+          </span>
+          <span class="brief-action" aria-hidden="true">View the field notes</span>
+        </a>
       </section>
 
       <section class="shell catalog" id="catalog" aria-labelledby="catalog-title">
         <div class="section-intro">
-          <h2 id="catalog-title">Today’s dispatches</h2>
+          <h2 id="catalog-title">All apps</h2>
           <p class="section-note">
-            No install queues or account gates. Each berth opens into a working, self-contained demo.
+            Search the collection or choose a category. Every app opens in your browser.
           </p>
         </div>
 
         <div class="controls">
           <div class="search-field">
-            <label class="control-label" for="demo-search">Search the dispatch board</label>
+            <label class="control-label" for="demo-search">Search apps</label>
             <div class="search-wrap">
               <span class="search-symbol" aria-hidden="true">/</span>
               <input
@@ -1405,14 +1416,14 @@
                 type="search"
                 inputmode="search"
                 autocomplete="off"
-                placeholder="Name, purpose, or material"
+                placeholder="Search by name or purpose"
               />
             </div>
           </div>
 
           <div>
             <span class="control-label" id="category-label">Filter by category</span>
-            <div class="filter-group" aria-labelledby="category-label">
+            <div class="filter-group" role="group" aria-labelledby="category-label">
               <button class="filter-button" type="button" data-category="Everything" aria-pressed="true">
                 Everything
               </button>
@@ -1433,14 +1444,14 @@
 
           <div class="result-status" role="status" aria-live="polite" aria-atomic="true">
             <strong id="result-count">32</strong>
-            <span id="result-label">demos ready</span>
+            <span id="result-label">apps shown</span>
           </div>
         </div>
 
         <div class="demo-grid" id="demo-grid"></div>
         <p class="empty-state" id="empty-state" hidden>
-          <strong>No berth found.</strong>
-          Try a broader search or choose another category.
+          <strong>No apps found.</strong>
+          Try another search or choose a different category.
         </p>
 
         <noscript>
@@ -1471,42 +1482,44 @@
 
     <footer class="footer">
       <div class="shell footer-inner">
-        <span>Small software, dispatched from the dock.</span>
-        <a href="https://github.com/crunchybananas/shipyard-microtools">Browse the shipyard source ↗</a>
+        <span>Small software, built at the dock.</span>
+        <nav class="footer-links" aria-label="Project links">
+          <a href="./before-after/">Before / after</a>
+          <a href="https://github.com/crunchybananas/shipyard-microtools">Browse the shipyard source ↗</a>
+        </nav>
       </div>
     </footer>
 
     <script>
       const DEMOS = [
         {
-          slug: "the-island",
-          title: "The Island",
+          slug: "orbital-strike",
+          title: "Orbital Strike",
           category: "Games",
-          description: "A first-person island mystery nested inside a living model of itself.",
-          tags: ["3D mystery", "Procedural", "Preserved"],
+          description: "Enter the corrupted decks of Station Theta-7 in a compact browser FPS.",
+          tags: ["3D", "First-person"],
           layout: "feature",
-          tone: "coral",
-          preserved: true,
+          tone: "blue",
+          preview: {
+            src: "./before-after/assets/orbital-strike/after-impact.jpg",
+            position: "50% 52%",
+            loading: "eager",
+            priority: "high",
+          },
         },
         {
-          slug: "realm",
-          title: "Realm",
-          category: "Games",
-          description: "Found a settlement, balance its needs, and watch a deterministic city take shape.",
-          tags: ["City builder", "Simulation"],
-          layout: "tall",
-          tone: "blue",
-          visual: "realm",
-        },
-        {
-          slug: "manifest",
-          title: "Manifest",
-          category: "Build tools",
-          description: "Inspect a file by its bytes, structure, checksum, entropy, and honest type.",
-          tags: ["File inspector", "Local"],
-          layout: "wide",
-          tone: "blue",
-          visual: "manifest",
+          slug: "maelstrom",
+          title: "Maelstrom",
+          category: "Explore",
+          description: "Orbit a spinning black hole rendered by a live general-relativity ray tracer.",
+          tags: ["Black hole", "WebGL2"],
+          layout: "prominent",
+          tone: "lime",
+          preview: {
+            src: "./assets/hub-previews/maelstrom.jpg",
+            position: "50% 46%",
+            loading: "eager",
+          },
         },
         {
           slug: "fathom",
@@ -1516,17 +1529,36 @@
           tags: ["Ocean", "Interactive"],
           layout: "standard",
           tone: "coral",
-          visual: "fathom",
+          preview: {
+            src: "./assets/hub-previews/fathom.jpg",
+            position: "61% 54%",
+          },
         },
         {
-          slug: "maelstrom",
-          title: "Maelstrom",
-          category: "Explore",
-          description: "Orbit a spinning black hole rendered by a live general-relativity ray tracer.",
-          tags: ["Black hole", "WebGL2"],
+          slug: "realm",
+          title: "Realm",
+          category: "Games",
+          description: "Found a settlement, balance its needs, and watch a deterministic city take shape.",
+          tags: ["City builder", "Simulation"],
           layout: "standard",
-          tone: "lime",
-          visual: "maelstrom",
+          tone: "blue",
+          preview: {
+            src: "./assets/hub-previews/realm.jpg",
+            position: "50% 48%",
+          },
+        },
+        {
+          slug: "manifest",
+          title: "Manifest",
+          category: "Build tools",
+          description: "Inspect a file by its bytes, structure, checksum, entropy, and honest type.",
+          tags: ["File inspector", "Local"],
+          layout: "wide",
+          tone: "blue",
+          preview: {
+            src: "./assets/hub-previews/manifest.jpg",
+            position: "50% 28%",
+          },
         },
         {
           slug: "flowforge",
@@ -1536,7 +1568,10 @@
           tags: ["Flows", "Planning"],
           layout: "wide",
           tone: "coral",
-          visual: "flowforge",
+          preview: {
+            src: "./assets/hub-previews/flowforge.jpg",
+            position: "50% 30%",
+          },
         },
         {
           slug: "synth-studio",
@@ -1546,7 +1581,20 @@
           tags: ["Audio", "Sequencer"],
           layout: "wide",
           tone: "blue",
-          visual: "synth",
+          preview: {
+            src: "./assets/hub-previews/synth-studio.jpg",
+            position: "50% 58%",
+          },
+        },
+        {
+          slug: "the-island",
+          title: "The Island",
+          category: "Games",
+          description: "A first-person island mystery nested inside a living model of itself.",
+          tags: ["3D mystery", "Procedural", "Preserved"],
+          layout: "standard",
+          tone: "coral",
+          preserved: true,
         },
         {
           slug: "cosmos",
@@ -1619,15 +1667,6 @@
           tags: ["Boss battle", "Arcade"],
           layout: "wide",
           tone: "blue",
-        },
-        {
-          slug: "orbital-strike",
-          title: "Orbital Strike",
-          category: "Games",
-          description: "Enter the corrupted decks of Station Theta-7 in a compact browser FPS.",
-          tags: ["3D", "First-person"],
-          layout: "standard",
-          tone: "lime",
         },
         {
           slug: "dev-terminal",
@@ -1804,65 +1843,24 @@
       const emptyState = document.querySelector("#empty-state");
       let activeCategory = "Everything";
 
-      const FEATURE_SCENES = {
-        realm: {
-          readout: "Settlement / year 01",
-          channel: "Population rising",
-          parts: ["road", "keep", "house house--one", "house house--two", "banner"],
-        },
-        manifest: {
-          readout: "Cargo signature",
-          channel: "Bytes verified",
-          parts: ["file", "byte byte--one", "byte byte--two", "byte byte--three", "scan"],
-        },
-        fathom: {
-          readout: "Depth / 1,840 m",
-          channel: "Signal acquired",
-          parts: ["sun", "surface", "sub", "beam", "depth"],
-        },
-        maelstrom: {
-          readout: "Lens model / live",
-          channel: "Orbit stable",
-          parts: ["orbit", "axis"],
-        },
-        flowforge: {
-          readout: "Route / passing",
-          channel: "3 nodes online",
-          parts: [
-            "node node--one",
-            "node node--two",
-            "node node--three",
-            "wire wire--one",
-            "wire wire--two",
-          ],
-        },
-        synth: {
-          readout: "SS-4 / armed",
-          channel: "Pattern 120 bpm",
-          parts: ["screen", "wave", "knob", "knob knob--two", "keys"],
-        },
-      };
+      function createPreview(preview) {
+        if (!preview) return null;
 
-      function createFeatureScene(visual) {
-        const definition = FEATURE_SCENES[visual];
-        if (!definition) return null;
+        const frame = document.createElement("div");
+        frame.className = "demo-preview";
+        frame.style.setProperty("--preview-position", preview.position || "50% 50%");
 
-        const scene = document.createElement("div");
-        scene.className = `demo-visual demo-visual--${visual}`;
-        scene.dataset.readout = definition.readout;
-        scene.dataset.channel = definition.channel;
-        scene.setAttribute("aria-hidden", "true");
+        const image = document.createElement("img");
+        image.src = preview.src;
+        image.width = 1440;
+        image.height = 900;
+        image.alt = "";
+        image.loading = preview.loading || "lazy";
+        image.decoding = "async";
+        if (preview.priority) image.fetchPriority = preview.priority;
 
-        for (const partDefinition of definition.parts) {
-          const part = document.createElement("span");
-          part.className = `scene-part ${partDefinition
-            .split(" ")
-            .map((partName) => `scene-${partName}`)
-            .join(" ")}`;
-          scene.append(part);
-        }
-
-        return scene;
+        frame.append(image);
+        return frame;
       }
 
       function createCard(demo) {
@@ -1870,7 +1868,7 @@
         article.className = "demo-card";
         article.dataset.layout = demo.layout;
         article.dataset.tone = demo.tone;
-        if (demo.visual) article.dataset.visual = demo.visual;
+        if (demo.preview) article.dataset.preview = "true";
         article.dataset.search = [demo.title, demo.category, demo.description, ...demo.tags]
           .join(" ")
           .toLocaleLowerCase();
@@ -1886,7 +1884,7 @@
 
         const state = document.createElement("span");
         state.className = "live-state";
-        state.textContent = `${demo.category} / Live`;
+        state.textContent = demo.category;
         top.append(state);
 
         if (demo.preserved) {
@@ -1918,12 +1916,12 @@
         const arrow = document.createElement("span");
         arrow.className = "open-arrow";
         arrow.setAttribute("aria-hidden", "true");
-        arrow.textContent = "↗";
+        arrow.textContent = "Open";
         footer.append(tags, arrow);
 
-        const scene = createFeatureScene(demo.visual);
+        const preview = createPreview(demo.preview);
         link.append(top);
-        if (scene) link.append(scene);
+        if (preview) link.append(preview);
         link.append(body, footer);
         article.append(link);
         return article;
@@ -1943,7 +1941,7 @@
         }
 
         resultCount.textContent = String(visibleCount);
-        resultLabel.textContent = visibleCount === 1 ? "demo ready" : "demos ready";
+        resultLabel.textContent = visibleCount === 1 ? "app shown" : "apps shown";
         emptyState.hidden = visibleCount !== 0;
       }
 

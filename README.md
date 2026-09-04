@@ -17,6 +17,16 @@ A collection of developer tools, games, and experiments built with vanilla JavaS
 | `docs/` | Plain HTML/CSS/JS | **Canonical** — actively developed, deployed to GitHub Pages |
 | `apps/` | Ember.js + Glimmer + TypeScript | Legacy/archived — frozen, kept for reference, not deployed |
 
+## Before / after archive
+
+The [Before / After archive](https://crunchybananas.github.io/shipyard-microtools/before-after/) keeps matched screenshots, commit provenance, design decisions, working notes, and share assets for substantial micro-app revisions. Its complete app inventory lives in `docs/before-after/manifest.json`; published and in-review stories live in `docs/before-after/stories/`.
+
+Validate the archive before publishing:
+
+```bash
+pnpm before-after:test
+```
+
 ### Build & Deploy
 
 The GitHub Pages site is `docs/` copied verbatim — no build step is needed for the canonical apps. CI skips the Ember build entirely unless a push actually touches `apps/` (or the pnpm workspace toolchain); when it does run, apps build to `docs/ember/{app-name}/`:

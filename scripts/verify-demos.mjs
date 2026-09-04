@@ -13,9 +13,15 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const docsRoot = resolve(repoRoot, 'docs');
 
 const EXPECTED_DEMO_COUNT = 31;
-// `the-island` is being developed independently. `ember` and `morphogen` are
-// generated/ignored build output, not canonical source demos.
-const EXCLUDED_DEMO_DIRECTORIES = new Set(['ember', 'morphogen', 'the-island']);
+// `the-island` is being developed independently. `before-after` is a support
+// page crawled separately; `ember` and `morphogen` are generated/ignored build
+// output, not canonical source demos.
+const EXCLUDED_DEMO_DIRECTORIES = new Set(['before-after', 'ember', 'morphogen', 'the-island']);
+const SUPPORT_PAGES = [
+  { name: 'before-after', path: '/before-after/index.html' },
+  { name: 'before-after-orbital-strike', path: '/before-after/orbital-strike/index.html' },
+  { name: 'before-after-demo-hub', path: '/before-after/demo-hub/index.html' },
+];
 const VIEWPORTS = [
   { name: 'desktop', width: 1365, height: 900 },
   { name: 'mobile', width: 390, height: 844 },
@@ -364,6 +370,7 @@ async function main() {
   const pages = [
     { name: 'hub', path: '/index.html' },
     ...demoNames.map(name => ({ name, path: `/${name}/index.html` })),
+    ...SUPPORT_PAGES,
   ];
   const staticServer = await ensureStaticServer();
   const crawlSummary = `${pages.length} pages at ${VIEWPORTS.length} viewports`;
@@ -387,7 +394,7 @@ async function main() {
       process.exitCode = 1;
     } else {
       console.log(
-        `\n[demos:test] PASS — hub + ${demoNames.length} tracked demos (${results.length} viewport crawls).`,
+        `\n[demos:test] PASS — hub + ${demoNames.length} tracked demos + ${SUPPORT_PAGES.length} support pages (${results.length} viewport crawls).`,
       );
     }
   } finally {

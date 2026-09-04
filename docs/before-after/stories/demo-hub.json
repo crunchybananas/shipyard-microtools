@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "demo-hub",
+  "title": "The demo hub — Useful little worlds",
+  "appSlug": null,
+  "surfaceSlug": "demo-hub",
+  "kind": "surface",
+  "status": "in-revision",
+  "publishedAt": null,
+  "thesis": "Move the index from a utility directory toward an editorial collection while leaving room to find a more ownable visual expression.",
+  "summary": "The first pass gave all 32 demos clearer hierarchy, search and category controls, richer previews, and a shared way home. The direction is useful; the look remains deliberately open for another pass.",
+  "versions": {
+    "before": {
+      "label": "Original gallery",
+      "commit": "8b0c989a"
+    },
+    "after": {
+      "label": "Useful little worlds",
+      "commit": "7785163e"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "gallery",
+      "title": "From app grid to editorial index",
+      "caption": "The revised hub makes the breadth of the collection easier to scan and gives several flagship demos their own small visual world, but its overall aesthetic is still being refined.",
+      "before": {
+        "src": "assets/demo-hub/before-gallery.jpg",
+        "alt": "The original Shipyard demo gallery with a straightforward header and grid of app cards."
+      },
+      "after": {
+        "src": "assets/demo-hub/after-gallery.jpg",
+        "alt": "The Useful little worlds gallery with an oversized editorial headline, filters, and varied demo cards."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "The collection became navigable",
+      "body": "Search, category filters, live result counts, and responsive controls turn a long index into something visitors can actively browse."
+    },
+    {
+      "title": "Flagships gained a preview",
+      "body": "Realm, Manifest, Fathom, Maelstrom, Flowforge, and Synth Studio received lightweight in-card scenes that suggest each experience before launch."
+    },
+    {
+      "title": "Every demo gained a route home",
+      "body": "One shared, keyboard-accessible navigation control now connects the standalone demos back to the collection on desktop and mobile."
+    }
+  ],
+  "builderNote": {
+    "quote": "I like the direction, but not the look.",
+    "context": "Feedback on the first gallery-wide visual pass. The structure and intent are worth keeping; the visual language is not considered finished."
+  },
+  "proof": [
+    {
+      "label": "Inventory",
+      "value": "32 live demos represented"
+    },
+    {
+      "label": "Responsive crawl",
+      "value": "The hub and 31 canonical demos passed desktop and mobile checks"
+    },
+    {
+      "label": "Current state",
+      "value": "In revision, with the visual direction explicitly open"
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/blob/7785163e/docs/index.html",
+    "download": null
+  },
+  "share": {
+    "summary": "A candid look at the Shipyard demo hub redesign: a stronger editorial direction whose visual expression is still in revision.",
+    "image": "assets/demo-hub/social.jpg"
+  }
+}

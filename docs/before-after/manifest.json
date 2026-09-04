@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-04T01:48:45Z",
+  "site": {
+    "title": "Shipyard Before / After",
+    "description": "A public record of how the Shipyard micro apps change, what we learned, and what still needs work.",
+    "basePath": "/before-after/",
+    "repository": "https://github.com/crunchybananas/shipyard-microtools"
+  },
+  "stories": [
+    {
+      "slug": "orbital-strike",
+      "title": "Orbital Strike found its fire director",
+      "appSlug": "orbital-strike",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "published",
+      "publishedAt": "2026-09-03",
+      "data": "stories/orbital-strike.json",
+      "href": "./orbital-strike/",
+      "cover": "assets/orbital-strike/social.jpg"
+    },
+    {
+      "slug": "demo-hub",
+      "title": "The demo hub — Useful little worlds",
+      "appSlug": null,
+      "surfaceSlug": "demo-hub",
+      "kind": "surface",
+      "status": "in-revision",
+      "publishedAt": null,
+      "data": "stories/demo-hub.json",
+      "href": "./demo-hub/",
+      "cover": "assets/demo-hub/social.jpg"
+    }
+  ],
+  "surfaces": [
+    {
+      "slug": "demo-hub",
+      "title": "Demo hub",
+      "category": "Collection",
+      "status": "in-revision",
+      "story": "demo-hub"
+    }
+  ],
+  "apps": [
+    {
+      "slug": "atelier",
+      "title": "Atelier",
+      "category": "Creative",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "base64-tools",
+      "title": "Base64 Tools",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "beacon",
+      "title": "Beacon",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "chronicle",
+      "title": "Chronicle",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "color-palette",
+      "title": "Color Palette",
+      "category": "Creative",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "cosmos",
+      "title": "Cosmos",
+      "category": "Explore",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "cron-parser",
+      "title": "Cron Parser",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "data-forge",
+      "title": "Data Forge",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "dev-terminal",
+      "title": "Dev Terminal",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "fathom",
+      "title": "Fathom",
+      "category": "Explore",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "flowforge",
+      "title": "Flowforge",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "gradient-generator",
+      "title": "Gradient Generator",
+      "category": "Creative",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "harbor-master",
+      "title": "Harbor Master",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "http-status",
+      "title": "HTTP Status",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "json-formatter",
+      "title": "JSON Formatter",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "kraken-attack",
+      "title": "Kraken Attack",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "lockstep",
+      "title": "Lockstep",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "maelstrom",
+      "title": "Maelstrom",
+      "category": "Explore",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "manifest",
+      "title": "Manifest",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "markdown-preview",
+      "title": "Markdown Preview",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "orbital-strike",
+      "title": "Orbital Strike",
+      "category": "Games",
+      "status": "published",
+      "story": "orbital-strike"
+    },
+    {
+      "slug": "rate-limit",
+      "title": "Rate Limit",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "realm",
+      "title": "Realm",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "regex-tester",
+      "title": "Regex Tester",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "ship-roast",
+      "title": "Ship Roast",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "ship-wreckers",
+      "title": "Ship Wreckers",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "synth-studio",
+      "title": "Synth Studio",
+      "category": "Creative",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "text-diff",
+      "title": "Text Diff",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "the-island",
+      "title": "The Island",
+      "category": "Games",
+      "status": "separate-workstream",
+      "story": null
+    },
+    {
+      "slug": "token-lens",
+      "title": "Token Lens",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "url-health",
+      "title": "URL Health",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "uuid-generator",
+      "title": "UUID Generator",
+      "category": "Build tools",
+      "status": "queued",
+      "story": null
+    }
+  ]
+}
