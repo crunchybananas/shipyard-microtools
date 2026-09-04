@@ -16,7 +16,7 @@
     },
     "after": {
       "label": "WebGL sea",
-      "commit": "PENDING"
+      "commit": "e3867f64"
     }
   },
   "comparisons": [
@@ -118,7 +118,7 @@
   ],
   "links": {
     "live": "https://crunchybananas.github.io/shipyard-microtools/beacon/",
-    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/5204a2fc/docs/beacon",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/e3867f64/docs/beacon",
     "download": "assets/beacon/montage.png"
   },
   "share": {
