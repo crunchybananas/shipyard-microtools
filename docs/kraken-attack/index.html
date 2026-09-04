@@ -5,42 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Kraken Attack</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/microtools.css" />
   </head>
-  <body>
+  <body data-demo="kraken-attack">
     <div class="container">
       <header>
         <a href="../" class="back">← All Tools</a>
-        <h1>🦑 Kraken Attack</h1>
+        <h1>Kraken Attack</h1>
         <p class="subtitle">Circle the beast. Dodge tentacles. Aim for the eyes!</p>
       </header>
 
       <main>
         <div class="game-container">
-          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          <canvas id="gameCanvas" width="600" height="500" role="img" aria-label="A naval battle arena surrounding the Kraken">Your browser needs canvas support to play Kraken Attack.</canvas>
           
           <div id="startScreen" class="overlay">
-            <h2>🦑 Kraken Attack</h2>
-            <p>The legendary Kraken rises from the depths!</p>
+            <h2>The water is moving.</h2>
+            <p>Circle the beast and fire only when its eyes open.</p>
             <div class="controls-info">
               <p><strong>← →</strong> or <strong>A D</strong> — Circle around</p>
               <p><strong>Space</strong> — Fire cannons</p>
               <p><strong>Aim for the eyes</strong> when they glow!</p>
             </div>
-            <button id="startBtn" class="play-btn">⚔️ Battle!</button>
+            <button id="startBtn" class="play-btn">Begin the battle</button>
           </div>
 
           <div id="victoryScreen" class="overlay hidden">
             <h2>🏆 Victory!</h2>
             <p>You defeated the Kraken!</p>
             <p>Final Score: <span id="victoryScore">0</span></p>
-            <button id="playAgainBtn" class="play-btn">🦑 Fight Again</button>
+            <button id="playAgainBtn" class="play-btn">Fight again</button>
           </div>
 
           <div id="gameOverScreen" class="overlay hidden">
             <h2>💀 Defeated!</h2>
             <p>The Kraken drags you to the depths...</p>
             <p>Score: <span id="finalScore">0</span></p>
-            <button id="restartBtn" class="play-btn">🔄 Try Again</button>
+            <button id="restartBtn" class="play-btn">Try again</button>
           </div>
 
           <div id="hud" class="hud hidden">
@@ -62,6 +63,13 @@
             </div>
           </div>
         </div>
+        <div class="touch-controls touch-controls--kraken" aria-label="Touch game controls">
+          <div class="touch-controls__dpad">
+            <button type="button" data-key="ArrowLeft" aria-label="Circle left">←</button>
+            <button type="button" data-key="ArrowRight" aria-label="Circle right">→</button>
+          </div>
+          <button type="button" class="touch-fire" data-key="Space" aria-label="Fire cannons">Fire</button>
+        </div>
       </main>
 
       <footer>
@@ -69,5 +77,6 @@
       </footer>
     </div>
     <script src="app.js"></script>
+    <script src="../shared/microtools.js"></script>
   </body>
 </html>

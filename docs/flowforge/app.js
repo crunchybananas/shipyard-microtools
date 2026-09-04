@@ -387,6 +387,9 @@ function renderNode(node) {
   const el = document.createElement('div');
   el.className = 'node';
   el.id = node.id;
+  el.tabIndex = 0;
+  el.setAttribute('role', 'group');
+  el.setAttribute('aria-label', `${def.title} node`);
   el.style.left = `${node.x}px`;
   el.style.top = `${node.y}px`;
   
@@ -427,6 +430,10 @@ function renderNode(node) {
         input.value = node.fields[field.name];
         if (field.placeholder) input.placeholder = field.placeholder;
       }
+
+      const fieldId = `${node.id}-field-${field.name.replace(/[^a-z0-9_-]/gi, '-')}`;
+      input.id = fieldId;
+      input.setAttribute('aria-label', `${def.title}: ${field.name}`);
       
       input.dataset.field = field.name;
       input.addEventListener('input', (e) => {
@@ -437,6 +444,7 @@ function renderNode(node) {
       if (field.name !== 'value' && field.name !== 'op') {
         const label = document.createElement('label');
         label.textContent = field.name;
+        label.htmlFor = fieldId;
         fieldEl.appendChild(label);
       }
       fieldEl.appendChild(input);
@@ -485,6 +493,12 @@ function renderNode(node) {
   // Event listeners
   header.addEventListener('mousedown', (e) => startDragNode(e, node));
   el.addEventListener('click', () => selectNode(node));
+  el.addEventListener('keydown', (e) => {
+    if (e.target === el && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      selectNode(node);
+    }
+  });
   el.addEventListener('contextmenu', (e) => showContextMenu(e, node));
   
   // Port events
@@ -812,6 +826,37 @@ document.addEventListener('mouseup', (e) => {
   }
 });
 
+let touchPan = null;
+
+canvasContainer.addEventListener('touchstart', (e) => {
+  if (e.touches.length !== 1 || (e.target !== canvasContainer && e.target !== canvas)) return;
+  const touch = e.touches[0];
+  touchPan = {
+    id: touch.identifier,
+    x: touch.clientX + canvasContainer.scrollLeft,
+    y: touch.clientY + canvasContainer.scrollTop
+  };
+  hideContextMenu();
+  selectNode(null);
+}, { passive: true });
+
+canvasContainer.addEventListener('touchmove', (e) => {
+  if (!touchPan) return;
+  const touch = [...e.touches].find(item => item.identifier === touchPan.id);
+  if (!touch) return;
+  e.preventDefault();
+  canvasContainer.scrollLeft = touchPan.x - touch.clientX;
+  canvasContainer.scrollTop = touchPan.y - touch.clientY;
+  updateMinimap();
+}, { passive: false });
+
+const endTouchPan = () => {
+  touchPan = null;
+};
+
+canvasContainer.addEventListener('touchend', endTouchPan);
+canvasContainer.addEventListener('touchcancel', endTouchPan);
+
 // ============================================
 // CANVAS ZOOM
 // ============================================
@@ -871,9 +916,26 @@ document.getElementById('context-menu').addEventListener('click', (e) => {
   hideContextMenu();
 });
 
+document.querySelectorAll('#context-menu [role="menuitem"]').forEach(item => {
+  item.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      item.click();
+    }
+  });
+});
+
 // ============================================
 // PALETTE DRAG & DROP
 // ============================================
+
+function placePaletteNode(paletteNode) {
+  const type = paletteNode.dataset.type;
+  const centerX = (canvasContainer.scrollLeft + canvasContainer.clientWidth / 2) / canvasScale;
+  const centerY = (canvasContainer.scrollTop + canvasContainer.clientHeight / 2) / canvasScale;
+  const node = createNode(type, centerX - 90, centerY - 50);
+  if (node) selectNode(node);
+}
 
 document.querySelectorAll('.palette-node').forEach(paletteNode => {
   paletteNode.addEventListener('dragstart', (e) => {
@@ -884,10 +946,22 @@ document.querySelectorAll('.palette-node').forEach(paletteNode => {
   
   // Also support click to add
   paletteNode.addEventListener('dblclick', () => {
-    const type = paletteNode.dataset.type;
-    const centerX = (canvasContainer.scrollLeft + canvasContainer.clientWidth / 2) / canvasScale;
-    const centerY = (canvasContainer.scrollTop + canvasContainer.clientHeight / 2) / canvasScale;
-    createNode(type, centerX - 90, centerY - 50);
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      placePaletteNode(paletteNode);
+    }
+  });
+
+  paletteNode.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      placePaletteNode(paletteNode);
+    }
+  });
+
+  paletteNode.addEventListener('click', () => {
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      placePaletteNode(paletteNode);
+    }
   });
 });
 
@@ -1180,11 +1254,11 @@ function updateMinimap() {
   minimapCanvas.width = 150;
   minimapCanvas.height = 100;
   
-  minimapCtx.fillStyle = '#0a0a1a';
+  minimapCtx.fillStyle = '#052b45';
   minimapCtx.fillRect(0, 0, 150, 100);
   
   // Draw nodes
-  minimapCtx.fillStyle = '#4a9eff';
+  minimapCtx.fillStyle = '#f1b84a';
   nodes.forEach(node => {
     minimapCtx.fillRect(
       node.x * scale,
@@ -1195,7 +1269,7 @@ function updateMinimap() {
   });
   
   // Draw viewport
-  minimapCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+  minimapCtx.strokeStyle = 'rgba(119, 217, 232, 0.8)';
   minimapCtx.lineWidth = 1;
   minimapCtx.strokeRect(
     canvasContainer.scrollLeft / canvasScale * scale,
@@ -1294,12 +1368,12 @@ function showLoadModal() {
     container.innerHTML = '<div class="preview-empty">No saved flows</div>';
   } else {
     container.innerHTML = saved.map((flow, i) => `
-      <div class="saved-flow-item" data-index="${i}">
+      <div class="saved-flow-item" data-index="${i}" role="button" tabindex="0" aria-label="Load ${escapeHtml(flow.name)}">
         <div>
-          <div class="saved-flow-name">${flow.name}</div>
+          <div class="saved-flow-name">${escapeHtml(flow.name)}</div>
           <div class="saved-flow-date">${new Date(flow.timestamp).toLocaleDateString()}</div>
         </div>
-        <button class="saved-flow-delete" data-index="${i}">×</button>
+        <button type="button" class="saved-flow-delete" data-index="${i}" aria-label="Delete ${escapeHtml(flow.name)}">×</button>
       </div>
     `).join('');
     
@@ -1316,6 +1390,13 @@ function showLoadModal() {
         
         const idx = parseInt(item.dataset.index);
         loadFlow(saved[idx]);
+      });
+
+      item.addEventListener('keydown', (e) => {
+        if (e.target === item && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          loadFlow(saved[parseInt(item.dataset.index)]);
+        }
       });
     });
   }
@@ -1503,6 +1584,15 @@ document.getElementById('loadBtn').addEventListener('click', showLoadModal);
 
 document.getElementById('save-confirm').addEventListener('click', saveFlow);
 
+const previewPanel = document.getElementById('preview-panel');
+const closePreviewButton = document.getElementById('closePreview');
+closePreviewButton.addEventListener('click', () => {
+  const collapsed = previewPanel.classList.toggle('collapsed');
+  closePreviewButton.setAttribute('aria-expanded', String(!collapsed));
+  closePreviewButton.setAttribute('aria-label', collapsed ? 'Expand data preview' : 'Collapse data preview');
+  closePreviewButton.textContent = collapsed ? '+' : '×';
+});
+
 // Modal close buttons
 document.querySelectorAll('.modal .close-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1540,16 +1630,16 @@ document.addEventListener('keydown', (e) => {
 // INITIALIZATION
 // ============================================
 
-// Center canvas
-canvasContainer.scrollLeft = 1500;
-canvasContainer.scrollTop = 1500;
+// Example plans are drafted from the top-left registration marks.
+canvasContainer.scrollLeft = 0;
+canvasContainer.scrollTop = 0;
 
 updateMinimap();
 
 // Show welcome example and auto-run it
 setTimeout(() => {
   EXAMPLES['json-transform']();
-  showToast('Welcome! Click ▶ Run to execute, or try the examples.');
+  showToast('Welcome! Choose Run route to execute, or try a filed plan.');
   
   // Auto-run so user sees output immediately
   setTimeout(() => executeFlow(), 150);

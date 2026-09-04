@@ -3,126 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FlowForge - Visual Node-Based Programming</title>
+  <meta name="description" content="Build, connect, and inspect data workflows on a visual routing desk.">
+  <meta name="theme-color" content="#082f49">
+  <title>FlowForge — Blueprint Routing Desk</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="../shared/microtools.css">
 </head>
-<body>
+<body data-demo="flowforge">
   <div id="app">
     <header id="header">
       <div class="header-left">
-        <h1>🔗 FLOWFORGE</h1>
+        <div class="brand-lockup">
+          <span class="brand-index" aria-hidden="true">FF/24</span>
+          <div>
+            <h1>FlowForge</h1>
+            <p>Blueprint routing desk</p>
+          </div>
+        </div>
       </div>
-      <div class="header-actions">
-        <button id="newBtn" title="New flow">New</button>
-        <button id="saveBtn" title="Save flow">Save</button>
-        <button id="loadBtn" title="Load flow">Load</button>
-        <div class="divider"></div>
-        <button id="runBtn" class="primary" title="Run flow">▶ Run</button>
-        <button id="stepBtn" title="Step through flow">⏭ Step</button>
-        <button id="clearBtn" title="Clear results">Clear</button>
-      </div>
+      <nav class="header-actions" aria-label="Flow actions">
+        <button type="button" id="newBtn" title="New flow">New</button>
+        <button type="button" id="saveBtn" title="Save flow">Save</button>
+        <button type="button" id="loadBtn" title="Load flow">Load</button>
+        <div class="divider" aria-hidden="true"></div>
+        <button type="button" id="runBtn" class="primary" title="Run flow">Run route</button>
+        <button type="button" id="stepBtn" title="Step through flow">Step</button>
+        <button type="button" id="clearBtn" title="Clear results">Clear</button>
+      </nav>
     </header>
     
-    <div id="main">
-      <aside id="palette">
+    <main id="main">
+      <aside id="palette" aria-label="Node parts shelf">
         <div class="palette-section">
-          <div class="palette-header">📥 Input</div>
+          <div class="palette-header">Input feeds</div>
           <div class="palette-nodes">
-            <div class="palette-node" data-type="json-input">JSON</div>
-            <div class="palette-node" data-type="text-input">Text</div>
-            <div class="palette-node" data-type="number-input">Number</div>
-            <div class="palette-node" data-type="http-input">HTTP</div>
+            <div class="palette-node" data-type="json-input" role="button" tabindex="0" aria-label="Add JSON input node">JSON</div>
+            <div class="palette-node" data-type="text-input" role="button" tabindex="0" aria-label="Add text input node">Text</div>
+            <div class="palette-node" data-type="number-input" role="button" tabindex="0" aria-label="Add number input node">Number</div>
+            <div class="palette-node" data-type="http-input" role="button" tabindex="0" aria-label="Add HTTP input node">HTTP</div>
           </div>
         </div>
         
         <div class="palette-section">
-          <div class="palette-header">🔄 Transform</div>
+          <div class="palette-header">Transform</div>
           <div class="palette-nodes">
-            <div class="palette-node" data-type="map">Map</div>
-            <div class="palette-node" data-type="filter">Filter</div>
-            <div class="palette-node" data-type="jsonpath">JSONPath</div>
-            <div class="palette-node" data-type="merge">Merge</div>
+            <div class="palette-node" data-type="map" role="button" tabindex="0" aria-label="Add map node">Map</div>
+            <div class="palette-node" data-type="filter" role="button" tabindex="0" aria-label="Add filter node">Filter</div>
+            <div class="palette-node" data-type="jsonpath" role="button" tabindex="0" aria-label="Add JSONPath node">JSONPath</div>
+            <div class="palette-node" data-type="merge" role="button" tabindex="0" aria-label="Add merge node">Merge</div>
           </div>
         </div>
         
         <div class="palette-section">
-          <div class="palette-header">❓ Logic</div>
+          <div class="palette-header">Logic gates</div>
           <div class="palette-nodes">
-            <div class="palette-node" data-type="if-else">If/Else</div>
-            <div class="palette-node" data-type="switch">Switch</div>
-            <div class="palette-node" data-type="math">Math</div>
-            <div class="palette-node" data-type="compare">Compare</div>
+            <div class="palette-node" data-type="if-else" role="button" tabindex="0" aria-label="Add if else node">If/Else</div>
+            <div class="palette-node" data-type="switch" role="button" tabindex="0" aria-label="Add switch node">Switch</div>
+            <div class="palette-node" data-type="math" role="button" tabindex="0" aria-label="Add math node">Math</div>
+            <div class="palette-node" data-type="compare" role="button" tabindex="0" aria-label="Add compare node">Compare</div>
           </div>
         </div>
         
         <div class="palette-section">
-          <div class="palette-header">📤 Output</div>
+          <div class="palette-header">Output taps</div>
           <div class="palette-nodes">
-            <div class="palette-node" data-type="display">Display</div>
-            <div class="palette-node" data-type="console">Console</div>
-            <div class="palette-node" data-type="download">Download</div>
+            <div class="palette-node" data-type="display" role="button" tabindex="0" aria-label="Add display output node">Display</div>
+            <div class="palette-node" data-type="console" role="button" tabindex="0" aria-label="Add console output node">Console</div>
+            <div class="palette-node" data-type="download" role="button" tabindex="0" aria-label="Add download output node">Download</div>
           </div>
         </div>
         
         <div class="palette-section">
-          <div class="palette-header">📂 Examples</div>
+          <div class="palette-header">Filed plans</div>
           <div class="palette-examples">
-            <button class="example-btn" data-example="json-transform">JSON Transform</button>
-            <button class="example-btn" data-example="math-calc">Math Calculator</button>
-            <button class="example-btn" data-example="filter-data">Filter Data</button>
-            <button class="example-btn" data-example="http-fetch">HTTP Fetch</button>
+            <button type="button" class="example-btn" data-example="json-transform">JSON transform</button>
+            <button type="button" class="example-btn" data-example="math-calc">Math calculator</button>
+            <button type="button" class="example-btn" data-example="filter-data">Filter data</button>
+            <button type="button" class="example-btn" data-example="http-fetch">HTTP fetch</button>
           </div>
           <div class="palette-help">
-            <small>💡 Drag nodes to canvas. Connect output ports (right) to input ports (left). Press ▶ Run to execute.</small>
+            <small>Drag parts onto the plan, or double-click to place. Join right-hand outputs to left-hand inputs, then run the route.</small>
           </div>
         </div>
       </aside>
       
-      <div id="canvas-container">
-        <svg id="connections"></svg>
+      <div id="canvas-container" tabindex="0" aria-label="Flow blueprint canvas. Drag to pan and use the mouse wheel to zoom.">
+        <svg id="connections" aria-hidden="true" focusable="false"></svg>
         <div id="canvas"></div>
         
-        <div id="minimap">
-          <canvas id="minimap-canvas"></canvas>
+        <div id="minimap" aria-label="Blueprint overview">
+          <canvas id="minimap-canvas" role="img" aria-label="Overview map of flow nodes">Flow node overview</canvas>
         </div>
       </div>
       
       <aside id="preview-panel">
         <div class="preview-header">
-          <span>DATA PREVIEW</span>
-          <button id="closePreview" class="icon-btn">×</button>
+          <span>Live data trace</span>
+          <button type="button" id="closePreview" class="icon-btn" aria-label="Collapse data preview" aria-expanded="true" aria-controls="preview-content">×</button>
         </div>
         <div id="preview-content">
           <div class="preview-empty">Select a node or run the flow to see data</div>
         </div>
       </aside>
+    </main>
+    
+    <div id="context-menu" class="hidden" role="menu" aria-label="Node actions">
+      <div class="context-item" data-action="delete" role="menuitem" tabindex="0">Delete node</div>
+      <div class="context-item" data-action="duplicate" role="menuitem" tabindex="0">Duplicate</div>
+      <div class="context-item" data-action="disconnect" role="menuitem" tabindex="0">Disconnect all</div>
     </div>
     
-    <div id="context-menu" class="hidden">
-      <div class="context-item" data-action="delete">Delete Node</div>
-      <div class="context-item" data-action="duplicate">Duplicate</div>
-      <div class="context-item" data-action="disconnect">Disconnect All</div>
-    </div>
-    
-    <div id="save-modal" class="modal hidden">
+    <div id="save-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="save-flow-title">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Save Flow</h2>
-          <button class="close-btn">&times;</button>
+          <h2 id="save-flow-title">File this flow</h2>
+          <button type="button" class="close-btn" aria-label="Close save dialog">&times;</button>
         </div>
         <div class="modal-body">
-          <label>Flow Name</label>
+          <label for="save-name">Flow name</label>
           <input type="text" id="save-name" placeholder="My Flow">
-          <button id="save-confirm" class="primary">Save</button>
+          <button type="button" id="save-confirm" class="primary">Save flow</button>
         </div>
       </div>
     </div>
     
-    <div id="load-modal" class="modal hidden">
+    <div id="load-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="load-flow-title">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Load Flow</h2>
-          <button class="close-btn">&times;</button>
+          <h2 id="load-flow-title">Open a filed flow</h2>
+          <button type="button" class="close-btn" aria-label="Close load dialog">&times;</button>
         </div>
         <div class="modal-body" id="saved-flows">
           <div class="preview-empty">No saved flows</div>
@@ -130,9 +139,10 @@
       </div>
     </div>
     
-    <div id="toast" class="hidden"></div>
+    <div id="toast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
   </div>
   
   <script src="app.js"></script>
+  <script src="../shared/microtools.js"></script>
 </body>
 </html>

@@ -33,8 +33,9 @@ canvas{display:block;border-radius:8px;cursor:default}
 #game-over .stat{font-size:1.2rem;color:rgba(255,255,255,0.7)}
 #game-over button{padding:0.8rem 2rem;font-size:1rem;border:2px solid rgba(255,238,187,0.6);background:transparent;color:#ffeebb;border-radius:8px;cursor:pointer}
 </style>
+<link rel="stylesheet" href="../shared/microtools.css" />
 </head>
-<body>
+<body data-demo="beacon">
 
 <div id="start-screen">
   <h1>BEACON</h1>
@@ -607,5 +608,6 @@ document.addEventListener('keydown', (e) => {
   if (!running) requestAnimationFrame(renderBg);
 })();
 </script>
+<script src="../shared/microtools.js"></script>
 </body>
 </html>

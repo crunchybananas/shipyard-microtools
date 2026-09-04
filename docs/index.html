@@ -3,637 +3,1451 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Crunchy Bananas</title>
+    <meta
+      name="description"
+      content="Thirty-two small browser tools, games, and experiments from Crunchy Bananas."
+    />
+    <meta name="theme-color" content="#eef2e8" />
+    <title>Useful little worlds — Crunchy Bananas</title>
     <style>
       :root {
-        --bg: #0f1220;
-        --card: #151a2e;
-        --text: #f8fafc;
-        --muted: #94a3b8;
-        --accent: #7c3aed;
-        --accent2: #22d3ee;
-        --border: rgba(148, 163, 184, 0.2);
+        color-scheme: light;
+        --paper: #eef2e8;
+        --paper-bright: #f8faf2;
+        --ink: #10140f;
+        --muted: #596158;
+        --lime: #d8ff3e;
+        --blue: #2147ff;
+        --coral: #f45d3d;
+        --line: #10140f;
+        --gutter: clamp(1rem, 3vw, 3rem);
+        --display: "Arial Narrow", "Avenir Next Condensed", "Roboto Condensed",
+          "Helvetica Neue", Arial, sans-serif;
+        --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
       }
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        background: radial-gradient(circle at top left, #1f2440, #0b0d18 65%);
-        color: var(--text);
-        min-height: 100vh;
-        padding: 40px 24px;
-      }
-      .container { max-width: 900px; margin: 0 auto; }
-      h1 { font-size: 2rem; margin-bottom: 8px; }
-      .subtitle { color: var(--muted); margin-bottom: 24px; }
 
-      .filters {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
       }
-      .filters input[type="search"] {
-        flex: 1 1 280px;
-        min-width: 220px;
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: rgba(255,255,255,0.05);
-        color: var(--text);
-        font-size: 0.95rem;
+
+      html {
+        background: var(--paper);
+        scroll-behavior: smooth;
       }
-      .filters input[type="search"]::placeholder { color: var(--muted); }
-      .toggle {
+
+      body {
+        min-width: 0;
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+        color: var(--ink);
+        background: var(--paper);
+        font-family: var(--sans);
+        line-height: 1.5;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      button,
+      input {
+        color: inherit;
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      :focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 4px;
+      }
+
+      .skip-link {
+        position: fixed;
+        z-index: 100;
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.7rem 1rem;
+        color: #fff;
+        background: var(--blue);
+        font-weight: 800;
+        transform: translateY(-180%);
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+
+
+
+      .shell {
+        width: min(calc(100% - (2 * var(--gutter))), 92rem);
+        margin-inline: auto;
+      }
+
+      .masthead {
+        border-bottom: 2px solid var(--line);
+      }
+
+      .masthead-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: stretch;
+        min-height: 5.25rem;
+      }
+
+      .brand {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        border-radius: 20px;
-        border: 1px solid var(--border);
-        color: var(--muted);
-        background: rgba(255,255,255,0.04);
-        font-size: 0.85rem;
-        cursor: pointer;
-      }
-      .toggle input {
-        width: 14px;
-        height: 14px;
+        gap: 0.8rem;
+        width: fit-content;
+        text-decoration: none;
+        font-weight: 850;
       }
 
-      /* Navigation */
-      nav {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 32px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border);
-      }
-      nav button {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid var(--border);
-        color: var(--muted);
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-      nav button:hover, nav button.active {
-        background: rgba(34, 211, 238, 0.1);
-        border-color: var(--accent2);
-        color: var(--accent2);
+      .brand-mark {
+        display: grid;
+        width: 2.35rem;
+        height: 2.35rem;
+        place-items: center;
+        border: 2px solid var(--ink);
+        background: var(--lime);
+        font-family: var(--display);
+        font-size: 0.9rem;
+        font-stretch: condensed;
+        letter-spacing: -0.04em;
       }
 
-      /* Sections */
-      .section {
-        margin-bottom: 40px;
-        display: none;
+      .brand-name {
+        letter-spacing: -0.025em;
       }
-      .section.visible { display: block; }
-      .section-header {
-        font-size: 1.3rem;
-        margin-bottom: 16px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--border);
+
+      .masthead-note,
+      .masthead-status {
         display: flex;
         align-items: center;
-        gap: 10px;
+        padding-inline: clamp(0.9rem, 2vw, 1.6rem);
+        border-left: 1px solid var(--line);
+        font-size: 0.78rem;
+        font-weight: 750;
       }
 
-      /* Cards Grid */
-      .cards {
+      .masthead-status {
+        gap: 0.55rem;
+        background: var(--lime);
+      }
+
+      .status-dot {
+        width: 0.55rem;
+        height: 0.55rem;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        background: var(--blue);
+      }
+
+
+
+      .hero {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: clamp(1rem, 2vw, 2rem);
+        padding-block: clamp(2.7rem, 7vw, 7.5rem) clamp(2.8rem, 5vw, 5.5rem);
+        border-bottom: 2px solid var(--line);
       }
-      .card {
-        background: rgba(21, 26, 46, 0.7);
-        border: 1px solid var(--border);
-        padding: 20px;
-        border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        min-height: 180px;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-      }
-      .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      }
-      .card h3 { font-size: 1rem; margin-bottom: 6px; }
-      .card p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
-      .card-footer {
-        margin-top: auto;
-        padding-top: 12px;
-        border-top: 1px solid var(--border);
-      }
-      .card-links {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-      .card-links a + a {
-        position: relative;
-        padding-left: 12px;
-      }
-      .card-links a + a::before {
-        content: "|";
-        position: absolute;
-        left: 0;
-        color: var(--muted);
-      }
-      .card a {
-        color: var(--accent2);
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.85rem;
-      }
-      .card a:hover { text-decoration: underline; }
-      .badge {
-        display: inline-block;
-        font-size: 0.65rem;
-        padding: 2px 6px;
-        border-radius: 4px;
-        margin-left: 6px;
-        vertical-align: middle;
-      }
-      .badge.local { background: rgba(249, 115, 22, 0.2); color: #f97316; }
-      .badge.wip { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-      .badge.new { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
 
-      footer {
-        margin-top: 48px;
-        text-align: center;
-        color: var(--muted);
-        font-size: 0.85rem;
+      .hero-copy {
+        min-width: 0;
+        grid-column: 1 / span 9;
       }
-      footer a { color: var(--accent2); text-decoration: none; }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0 0 clamp(1.2rem, 3vw, 2.4rem);
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .eyebrow::before {
+        width: clamp(2.5rem, 8vw, 7.5rem);
+        height: 0.65rem;
+        content: "";
+        background: var(--coral);
+      }
+
+      h1 {
+        max-width: 10ch;
+        margin: 0;
+        font-family: var(--display);
+        font-size: clamp(5.15rem, 11.9vw, 11.8rem);
+        font-stretch: condensed;
+        font-weight: 900;
+        letter-spacing: -0.075em;
+        line-height: 0.78;
+      }
+
+
+
+      h1 span {
+        display: block;
+      }
+
+
+
+
+      h1 .worlds {
+        color: var(--blue);
+      }
+
+      .hero-brief {
+        align-self: end;
+        min-width: 0;
+        grid-column: 10 / -1;
+        border: 2px solid var(--ink);
+        border-top-width: 0.75rem;
+        border-top-color: var(--lime);
+        background: var(--paper-bright);
+      }
+
+      .brief-copy {
+        margin: 0;
+        padding: clamp(1.1rem, 2.4vw, 1.8rem);
+        font-size: clamp(1rem, 1.4vw, 1.2rem);
+        font-weight: 650;
+        letter-spacing: -0.02em;
+      }
+
+
+
+      .brief-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-top: 1px solid var(--line);
+      }
+
+      .brief-stat {
+        padding: 0.9rem 1rem;
+        font-size: 0.72rem;
+        font-weight: 750;
+      }
+
+      .brief-stat + .brief-stat {
+        border-left: 1px solid var(--line);
+      }
+
+      .brief-stat strong {
+        display: block;
+        font-family: var(--display);
+        font-size: 2rem;
+        font-stretch: condensed;
+        line-height: 1;
+      }
+
+      .catalog {
+        padding-block: clamp(2.8rem, 6vw, 6.5rem);
+      }
+
+      .section-intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(14rem, 25rem);
+        gap: 2rem;
+        align-items: end;
+        margin-bottom: 2rem;
+      }
+
+      h2 {
+        margin: 0;
+        font-family: var(--display);
+        font-size: clamp(3rem, 6vw, 5.7rem);
+        font-stretch: condensed;
+        font-weight: 900;
+        letter-spacing: -0.055em;
+        line-height: 0.9;
+      }
+
+      .section-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: minmax(16rem, 1.25fr) minmax(0, 2fr) auto;
+        gap: 1rem;
+        align-items: end;
+        margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+        padding-block: 1rem;
+        border-block: 1px solid var(--line);
+      }
+
+      .search-field {
+        min-width: 0;
+      }
+
+      .control-label {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .search-wrap {
+        display: flex;
+        align-items: center;
+        border-bottom: 3px solid var(--ink);
+      }
+
+      .search-symbol {
+        flex: 0 0 auto;
+        color: var(--blue);
+        font-family: var(--display);
+        font-size: 1.55rem;
+        font-weight: 900;
+      }
+
+      .search-wrap input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        padding: 0.45rem 0.5rem 0.45rem 0.7rem;
+        outline: 0;
+        background: transparent;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      .search-wrap:focus-within {
+        border-color: var(--blue);
+      }
+
+      .search-wrap input::placeholder {
+        color: #747c72;
+        opacity: 1;
+      }
+
+      .filter-group {
+        display: flex;
+        min-width: 0;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+      }
+
+      .filter-button {
+        min-height: 2.55rem;
+        border: 1px solid var(--ink);
+        border-radius: 0;
+        padding: 0.55rem 0.8rem;
+        background: transparent;
+        font-size: 0.78rem;
+        font-weight: 800;
+        transition: background-color 120ms ease, color 120ms ease;
+      }
+
+      .filter-button:hover {
+        background: var(--paper-bright);
+      }
+
+      .filter-button[aria-pressed="true"] {
+        color: #fff;
+        background: var(--ink);
+      }
+
+
+
+      .result-status {
+        min-width: 8.5rem;
+        padding: 0.65rem 0.8rem;
+        border-left: 0.7rem solid var(--coral);
+        background: var(--lime);
+        font-size: 0.75rem;
+        font-weight: 800;
+        line-height: 1.15;
+      }
+
+      .result-status strong {
+        display: block;
+        font-family: var(--display);
+        font-size: 1.75rem;
+        font-stretch: condensed;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        grid-auto-flow: dense;
+        gap: clamp(0.7rem, 1.2vw, 1.15rem);
+      }
+
+      .demo-card {
+        --accent: var(--blue);
+        position: relative;
+        min-width: 0;
+        grid-column: span 4;
+        border: 2px solid var(--ink);
+        background: var(--paper-bright);
+      }
+
+      .demo-card[data-layout="wide"],
+      .demo-card[data-layout="feature"] {
+        grid-column: span 8;
+      }
+
+      .demo-card[data-tone="lime"] {
+        --accent: var(--lime);
+      }
+
+      .demo-card[data-tone="coral"] {
+        --accent: var(--coral);
+      }
+
+      .demo-card[data-tone="ink"] {
+        --accent: var(--ink);
+      }
+
+      .demo-card::before {
+        position: absolute;
+        z-index: 1;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 0.65rem;
+        content: "";
+        background: var(--accent);
+      }
+
+      .demo-card[data-layout="feature"] {
+        background: var(--lime);
+      }
+
+      .demo-link {
+        display: flex;
+        min-height: 19rem;
+        flex-direction: column;
+        padding: clamp(1.2rem, 2vw, 1.8rem);
+        text-decoration: none;
+      }
+
+      [data-layout="feature"] .demo-link {
+        min-height: 29rem;
+      }
+
+      [data-layout="tall"] .demo-link {
+        min-height: 29rem;
+      }
+
+      [data-layout="wide"] .demo-link {
+        min-height: 19rem;
+      }
+
+      .card-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-top: 0.35rem;
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .live-state {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+
+      .live-state::before {
+        width: 0.48rem;
+        height: 0.48rem;
+        border-radius: 50%;
+        content: "";
+        background: var(--blue);
+      }
+
+      .preserved-note {
+        padding: 0.18rem 0.42rem;
+        border: 1px solid var(--ink);
+        background: var(--coral);
+        font-size: 0.66rem;
+      }
+
+      .card-body {
+        display: grid;
+        min-width: 0;
+        flex: 1;
+        align-content: end;
+        gap: 1rem;
+        padding-block: 2.3rem 1.2rem;
+      }
+
+      [data-layout="wide"] .card-body,
+      [data-layout="feature"] .card-body {
+        grid-template-columns: minmax(0, 1.45fr) minmax(12rem, 0.8fr);
+        align-items: end;
+      }
+
+      .demo-title {
+        margin: 0;
+        font-family: var(--display);
+        font-size: clamp(2.5rem, 4.2vw, 4.9rem);
+        font-stretch: condensed;
+        font-weight: 900;
+        letter-spacing: -0.06em;
+        line-height: 0.88;
+      }
+
+      [data-layout="feature"] .demo-title {
+        max-width: 8ch;
+        font-size: clamp(4.5rem, 8.5vw, 9rem);
+      }
+
+      [data-layout="wide"] .demo-title {
+        max-width: 11ch;
+      }
+
+      .demo-description {
+        max-width: 34rem;
+        margin: 0;
+        color: #41483f;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      [data-layout="feature"] .demo-description {
+        color: var(--ink);
+        font-size: 1rem;
+      }
+
+      .card-footer {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.8rem;
+        align-items: center;
+        padding-top: 0.9rem;
+        border-top: 1px solid var(--ink);
+      }
+
+      .tags {
+        min-width: 0;
+        color: var(--muted);
+        font-size: 0.7rem;
+        font-weight: 750;
+      }
+
+      .open-arrow {
+        display: grid;
+        width: 2.5rem;
+        height: 2.5rem;
+        place-items: center;
+        border: 1px solid var(--ink);
+        background: var(--accent);
+        font-size: 1.3rem;
+        font-weight: 900;
+        transition: transform 120ms ease;
+      }
+
+      .demo-link:hover .open-arrow {
+        transform: translate(0.18rem, -0.18rem);
+      }
+
+      .demo-link:hover .demo-title {
+        text-decoration: underline;
+        text-decoration-thickness: 0.08em;
+        text-underline-offset: 0.08em;
+      }
+
+      .empty-state {
+        margin: 1rem 0 0;
+        padding: clamp(2rem, 5vw, 4rem);
+        border: 2px dashed var(--ink);
+        background: var(--paper-bright);
+        text-align: center;
+      }
+
+      .empty-state strong {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-family: var(--display);
+        font-size: 2.4rem;
+        font-stretch: condensed;
+        letter-spacing: -0.04em;
+      }
+
+      .archive {
+        padding-bottom: clamp(3.5rem, 8vw, 8rem);
+      }
+
+      .archive details {
+        border: 2px solid var(--ink);
+        background: var(--paper-bright);
+      }
+
+      .archive summary {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 1rem;
+        align-items: center;
+        padding: clamp(1rem, 2.5vw, 1.7rem);
+        list-style: none;
+        cursor: pointer;
+      }
+
+      .archive summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .archive-label {
+        padding: 0.35rem 0.55rem;
+        border: 1px solid var(--ink);
+        background: var(--coral);
+        font-size: 0.7rem;
+        font-weight: 850;
+      }
+
+      .archive-title {
+        min-width: 0;
+      }
+
+      .archive-title strong {
+        display: block;
+        font-family: var(--display);
+        font-size: clamp(1.7rem, 3vw, 2.8rem);
+        font-stretch: condensed;
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+
+      .archive-title small {
+        color: var(--muted);
+      }
+
+      .archive-toggle {
+        display: grid;
+        width: 2.7rem;
+        height: 2.7rem;
+        place-items: center;
+        border: 1px solid var(--ink);
+        background: var(--lime);
+        font-size: 1.4rem;
+        font-weight: 900;
+      }
+
+      details[open] .archive-toggle {
+        background: var(--blue);
+        color: #fff;
+      }
+
+      .archive-content {
+        padding: 0 clamp(1rem, 2.5vw, 1.7rem) clamp(1rem, 2.5vw, 1.7rem);
+        border-top: 1px solid var(--line);
+      }
+
+      .archive-explainer {
+        max-width: 56rem;
+        margin: 1.2rem 0 1.6rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .archive-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin: 0;
+        padding: 0;
+        border-top: 1px solid var(--line);
+        list-style: none;
+      }
+
+      .archive-list li {
+        min-width: 0;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .archive-list li:nth-child(3n) {
+        border-right: 0;
+      }
+
+      .archive-list a {
+        display: flex;
+        min-height: 4.2rem;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+        padding: 0.8rem;
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 800;
+      }
+
+      .archive-list a:hover {
+        background: var(--lime);
+      }
+
+      .archive-list span:last-child {
+        flex: 0 0 auto;
+        color: var(--blue);
+      }
+
+      .footer {
+        border-top: 2px solid var(--line);
+      }
+
+      .footer-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-height: 6rem;
+        font-size: 0.78rem;
+        font-weight: 750;
+      }
+
+      .footer a {
+        text-decoration-thickness: 0.12em;
+        text-underline-offset: 0.2em;
+      }
+
+      noscript p {
+        margin: 1rem 0;
+        padding: 1rem;
+        border: 2px solid var(--coral);
+        background: var(--paper-bright);
+        font-weight: 750;
+      }
+
+      @media (max-width: 62rem) {
+        .hero-copy {
+          grid-column: 1 / span 8;
+        }
+
+        .hero-brief {
+          grid-column: 9 / -1;
+        }
+
+        .controls {
+          grid-template-columns: minmax(15rem, 1fr) minmax(0, 1.45fr);
+        }
+
+        .result-status {
+          grid-column: 1 / -1;
+          width: fit-content;
+        }
+
+        .demo-grid {
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+
+        .demo-card {
+          grid-column: span 3;
+        }
+
+        .demo-card[data-layout="wide"],
+        .demo-card[data-layout="feature"] {
+          grid-column: span 6;
+        }
+      }
+
+      @media (max-width: 45rem) {
+        .masthead-inner {
+          grid-template-columns: minmax(0, 1fr) auto;
+          min-height: 4.6rem;
+        }
+
+        .masthead-note {
+          display: none;
+        }
+
+        .masthead-status {
+          padding-inline: 0.75rem;
+        }
+
+        .hero {
+          display: block;
+          padding-top: 2.6rem;
+        }
+
+        .hero-copy {
+          margin-bottom: 2.4rem;
+        }
+
+        h1 {
+          max-width: none;
+          font-size: clamp(4.5rem, 22vw, 7rem);
+          letter-spacing: -0.07em;
+        }
+
+        .section-intro,
+        .controls {
+          grid-template-columns: 1fr;
+        }
+
+        .section-intro {
+          gap: 0.8rem;
+        }
+
+        .controls {
+          align-items: stretch;
+        }
+
+        .result-status {
+          grid-column: auto;
+          width: 100%;
+        }
+
+        .demo-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .demo-card,
+        .demo-card[data-layout="wide"],
+        .demo-card[data-layout="feature"] {
+          grid-column: 1;
+        }
+
+        .demo-link,
+        [data-layout="wide"] .demo-link,
+        [data-layout="tall"] .demo-link {
+          min-height: 17rem;
+        }
+
+        [data-layout="feature"] .demo-link {
+          min-height: 25rem;
+        }
+
+        [data-layout="wide"] .card-body,
+        [data-layout="feature"] .card-body {
+          grid-template-columns: 1fr;
+        }
+
+        [data-layout="feature"] .demo-title {
+          font-size: clamp(4rem, 20vw, 6rem);
+        }
+
+        .archive summary {
+          grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .archive-toggle {
+          display: none;
+        }
+
+        .archive-list {
+          grid-template-columns: 1fr;
+        }
+
+        .archive-list li,
+        .archive-list li:nth-child(3n) {
+          border-right: 0;
+        }
+
+        .footer-inner {
+          align-items: flex-start;
+          flex-direction: column;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 25rem) {
+        .brand-name {
+          font-size: 0.86rem;
+        }
+
+        .masthead-status {
+          font-size: 0.7rem;
+        }
+
+        .filter-button {
+          flex: 1 1 auto;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.001ms !important;
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Crunchy Bananas 🍌</h1>
-      <p class="subtitle">Tools, games, and experiments built by humans + AI.</p>
+    <a class="skip-link" href="#catalog">Skip to the demos</a>
 
-      <div class="filters">
-        <input id="searchInput" type="search" placeholder="Search tools, games, and experiments..." />
-        <label class="toggle">
-          <input id="localOnlyToggle" type="checkbox" />
-          <span>Local-only</span>
-        </label>
+    <header class="masthead">
+      <div class="shell masthead-inner">
+        <a class="brand" href="./" aria-label="Crunchy Bananas demo gallery home">
+          <span class="brand-mark" aria-hidden="true">CB</span>
+          <span class="brand-name">Crunchy Bananas</span>
+        </a>
+        <div class="masthead-note">Browser-made / hand-finished</div>
+        <div class="masthead-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          32 live
+        </div>
       </div>
+    </header>
 
-      <nav>
-        <button class="active" data-cat="all">All</button>
-        <button data-cat="games">🎮 Games</button>
-        <button data-cat="creative">🎨 Creative</button>
-        <button data-cat="utils">🔧 Utils</button>
-      </nav>
-
-      <!-- GAMES -->
-      <section class="section visible" data-cat="games">
-        <h2 class="section-header">🎮 Games</h2>
-        <div class="cards">
-          <div class="card">
-            <h3>The Island: ABYME <span class="badge new">OVERHAUL</span></h3>
-            <p>An island within an island. Myst-inspired first-person 3D mystery — the lighthouse study holds a living 1:240 model of the island itself. Drain the real sea from a desk valve, crank the sun, bridge a chasm with a pocket ruler, then dive into the model. Zero assets: every mesh, texture and sound is math.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./the-island/">Play ABYME</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/the-island">ABYME Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Realm <span class="badge new">NEW</span></h3>
-            <p>A deterministic city-builder in the Caesar 3 lineage. Found a settlement and keep its citizens housed, fed, and working.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./realm/">Play Realm</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/realm">Vanilla Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Cosmos <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>Procedural universe explorer. Zoom seamlessly from galaxies to planets.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./cosmos/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/cosmos">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/cosmos">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Kraken Attack <span class="badge">Ember</span></h3>
-            <p>Epic boss battle! Circle the beast, dodge tentacles, aim for the eyes.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./kraken-attack/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/kraken-attack">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/kraken-attack">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Cargo Tetris <span class="badge">Ember</span></h3>
-            <p>Classic Tetris with shipping containers. Load the deck, clear rows!</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/cargo-tetris">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Ship Wreckers <span class="badge">Ember</span></h3>
-            <p>Asteroids-style boat game. Dodge rocks, blast pirates, collect cargo!</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./ship-wreckers/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/ship-wreckers">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/ship-wreckers">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Harbor Master <span class="badge">Ember</span></h3>
-            <p>Guide incoming ships to matching docks. Don't let them crash!</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./harbor-master/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/harbor-master">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/harbor-master">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>The Developer's Journey</h3>
-            <p>A Zork-style text adventure about coding and coming to terms with AI.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./dev-terminal/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/dev-terminal">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/dev-terminal">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Orbital Strike <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>Marathon-inspired WebGL FPS. Explore corridors, battle drones, uncover station lore.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./orbital-strike/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/orbital-strike">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/orbital-strike">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Cascade <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>2048 meets GPU fluid dynamics. Every tile merge triggers Navier-Stokes fluid splats on a WebGL2 canvas.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/cascade">Ember Source</a>
-              </div>
-            </div>
-          </div>
+    <main>
+      <section class="shell hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">The small software dispatch</p>
+          <h1 id="hero-title">
+            <span>Useful little</span>
+            <span class="worlds">worlds.</span>
+          </h1>
         </div>
+        <aside class="hero-brief" aria-label="Gallery brief">
+          <p class="brief-copy">
+            Tiny, complete browser tools, games, and experiments. Pick a berth and step inside.
+          </p>
+          <div class="brief-row" aria-hidden="true">
+            <div class="brief-stat"><strong>32</strong>live demos</div>
+            <div class="brief-stat"><strong>01</strong>browser tab</div>
+          </div>
+        </aside>
       </section>
 
-      <!-- CREATIVE -->
-      <section class="section visible" data-cat="creative">
-        <h2 class="section-header">🎨 Creative</h2>
-        <div class="cards">
-          <div class="card">
-            <h3>Maelstrom <span class="badge new">NEW</span></h3>
-            <p>A real-time general-relativity ray tracer. Every pixel is a null geodesic integrated through the Kerr metric — photon ring, Doppler beaming, frame dragging, twin-clock probe drops. One HTML file that re-derives its own physics on load and prints the receipts to the console.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./maelstrom/">Sail the maelstrom</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/maelstrom">Vanilla Source</a>
-              </div>
+      <section class="shell catalog" id="catalog" aria-labelledby="catalog-title">
+        <div class="section-intro">
+          <h2 id="catalog-title">Today’s dispatches</h2>
+          <p class="section-note">
+            No install queues or account gates. Each berth opens into a working, self-contained demo.
+          </p>
+        </div>
+
+        <div class="controls">
+          <div class="search-field">
+            <label class="control-label" for="demo-search">Search the dispatch board</label>
+            <div class="search-wrap">
+              <span class="search-symbol" aria-hidden="true">/</span>
+              <input
+                id="demo-search"
+                type="search"
+                inputmode="search"
+                autocomplete="off"
+                placeholder="Name, purpose, or material"
+              />
             </div>
           </div>
-          <div class="card">
-            <h3>Fathom <span class="badge new">NEW</span></h3>
-            <p>Scroll 10,935 m down an anchor chain to the Challenger Deep. One HTML file — scroll-driven CSS, synthesized sound, sonar, and the creatures of the deep at their true depths.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./fathom/">Descend</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/fathom">Vanilla Source</a>
-              </div>
+
+          <div>
+            <span class="control-label" id="category-label">Filter by category</span>
+            <div class="filter-group" aria-labelledby="category-label">
+              <button class="filter-button" type="button" data-category="Everything" aria-pressed="true">
+                Everything
+              </button>
+              <button class="filter-button" type="button" data-category="Games" aria-pressed="false">
+                Games
+              </button>
+              <button class="filter-button" type="button" data-category="Build tools" aria-pressed="false">
+                Build tools
+              </button>
+              <button class="filter-button" type="button" data-category="Creative" aria-pressed="false">
+                Creative
+              </button>
+              <button class="filter-button" type="button" data-category="Explore" aria-pressed="false">
+                Explore
+              </button>
             </div>
           </div>
-          <div class="card">
-            <h3>Synth Studio <span class="badge new">NEW</span></h3>
-            <p>Browser-based music synthesizer with sequencer and drum machine.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./synth-studio/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/synth-studio">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/synth-studio">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Starlight Orchestra <span class="badge new">NEW</span></h3>
-            <p>Paint constellations that bloom into a living orchestra.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/starlight-orchestra">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Drift <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>Generative particle art engine with Perlin noise flow fields, gravity wells, and 7 curated color palettes.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/drift">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Aether <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>Real-time GPU fluid simulation. Interactive Navier-Stokes dynamics via WebGL2 with 9 GLSL shaders.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/aether">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>FlowForge <span class="badge new">NEW</span></h3>
-            <p>Visual node-based programming. Connect nodes, execute flows.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./flowforge/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/flowforge">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/flowforge">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Harbor Chat <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>Encrypted team messaging with channels, threads, and video calls. Built for privacy-first team communication.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/harbor-chat">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Atelier <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>AI-powered design studio. Draw shapes, edit properties, and generate full UI layouts from text prompts.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./atelier/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/atelier">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Gradient Generator</h3>
-            <p>Create beautiful CSS gradients in seconds.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./gradient-generator/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/gradient-generator">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/gradient-generator">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Markdown Preview</h3>
-            <p>Live markdown preview with syntax highlighting.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./markdown-preview/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/markdown-preview">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/markdown-preview">Ember Source</a>
-              </div>
-            </div>
+
+          <div class="result-status" role="status" aria-live="polite" aria-atomic="true">
+            <strong id="result-count">32</strong>
+            <span id="result-label">demos ready</span>
           </div>
         </div>
+
+        <div class="demo-grid" id="demo-grid"></div>
+        <p class="empty-state" id="empty-state" hidden>
+          <strong>No berth found.</strong>
+          Try a broader search or choose another category.
+        </p>
+
+        <noscript>
+          <p>This gallery needs JavaScript to assemble its demo index. Every individual demo remains standalone.</p>
+        </noscript>
       </section>
 
-      <!-- UTILS -->
-      <section class="section visible" data-cat="utils">
-        <h2 class="section-header">🔧 Developer Utils</h2>
-        <div class="cards">
-          <div class="card">
-            <h3>Manifest <span class="badge new">NEW</span></h3>
-            <p>Customs inspection for files. Drop anything — magic-byte detection, structure trees, CRC checks, entropy maps, in-browser ZIP extraction, hex view. Catches files that lie about their extension.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./manifest/">Inspect</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/manifest">Vanilla Source</a>
-              </div>
-            </div>
+      <section class="shell archive" aria-label="Archived source references">
+        <details>
+          <summary>
+            <span class="archive-label">Archive</span>
+            <span class="archive-title">
+              <strong>Ember source reference</strong>
+              <small>Historical source-only products — not runnable demos</small>
+            </span>
+            <span class="archive-toggle" aria-hidden="true">±</span>
+          </summary>
+          <div class="archive-content">
+            <p class="archive-explainer">
+              These projects remain useful as code references, but they do not ship a live build in this gallery.
+              Links open their archived Ember source on GitHub.
+            </p>
+            <ul class="archive-list" id="archive-list"></ul>
           </div>
-          <div class="card">
-            <h3>Harbor API <span class="badge">Ember</span> <span class="badge new">NEW</span></h3>
-            <p>Hoppscotch-style API client. CodeMirror 6 + Chart.js via pure Ember modifiers — zero wrapper addons.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/harbor-api">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>JSON Formatter</h3>
-            <p>Format, validate, and minify JSON with syntax highlighting.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./json-formatter/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/json-formatter">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/json-formatter">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Token Lens</h3>
-            <p>JWT decode + HS256 signature verification. Runs locally.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./token-lens/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/token-lens">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/token-lens">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Base64 Tools</h3>
-            <p>Encode/decode text, files, and images to/from Base64.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./base64-tools/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/base64-tools">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/base64-tools">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>UUID Generator</h3>
-            <p>Generate UUID v4, v7, Nano IDs, and bulk random identifiers.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./uuid-generator/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/uuid-generator">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/uuid-generator">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Cron Parser</h3>
-            <p>Explains cron expressions in plain English with next run times.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./cron-parser/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/cron-parser">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/cron-parser">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>HTTP Status Codes</h3>
-            <p>Look up any HTTP status code with fun developer messages.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./http-status/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/http-status">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/http-status">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Text Diff</h3>
-            <p>Compare two text snippets and see line-by-line differences.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./text-diff/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/text-diff">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/text-diff">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>URL Health Checker <span class="badge wip">WIP</span></h3>
-            <p>Batch validate proof URLs for SSL, status codes, and load times.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./url-health/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/url-health">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/url-health">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Ship Diagnostics Studio <span class="badge wip">WIP</span></h3>
-            <p>Local-first log explorer with filters, search, and export.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/ship-diagnostics">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Chronicle <span class="badge">Ember</span></h3>
-            <p>AI work journal. Builds narratives from your attestations.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./chronicle/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/chronicle">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/chronicle">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Rate Limit Playground</h3>
-            <p>See how token bucket and sliding window limiters handle live traffic.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./rate-limit/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/rate-limit">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/rate-limit">Ember Source</a>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Ship Roast Bot <span class="badge wip">WIP</span></h3>
-            <p>Heuristic-based feedback on your project before you ship it.</p>
-            <div class="card-footer">
-              <div class="card-links">
-                <a href="./ship-roast/">Vanilla</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/ship-roast">Vanilla Source</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/ship-roast">Ember Source</a>
-              </div>
-            </div>
-          </div>
-        </div>
+        </details>
       </section>
+    </main>
 
-      <footer>
-        <a href="https://github.com/crunchybananas/shipyard-microtools">View Source</a> •
-        <a href="https://github.com/sponsors/crunchybananas">Sponsor</a>
-      </footer>
-    </div>
+    <footer class="footer">
+      <div class="shell footer-inner">
+        <span>Small software, dispatched from the dock.</span>
+        <a href="https://github.com/crunchybananas/shipyard-microtools">Browse the shipyard source ↗</a>
+      </div>
+    </footer>
 
     <script>
-      const nav = document.querySelector('nav');
-      const sections = document.querySelectorAll('.section');
-      const searchInput = document.getElementById('searchInput');
-      const localOnlyToggle = document.getElementById('localOnlyToggle');
+      const DEMOS = [
+        {
+          slug: "the-island",
+          title: "The Island",
+          category: "Games",
+          description: "A first-person island mystery nested inside a living model of itself.",
+          tags: ["3D mystery", "Procedural", "Preserved"],
+          layout: "feature",
+          tone: "coral",
+          preserved: true,
+        },
+        {
+          slug: "realm",
+          title: "Realm",
+          category: "Games",
+          description: "Found a settlement, balance its needs, and watch a deterministic city take shape.",
+          tags: ["City builder", "Simulation"],
+          layout: "tall",
+          tone: "blue",
+        },
+        {
+          slug: "manifest",
+          title: "Manifest",
+          category: "Build tools",
+          description: "Inspect a file by its bytes, structure, checksum, entropy, and honest type.",
+          tags: ["File inspector", "Local"],
+          layout: "wide",
+          tone: "blue",
+        },
+        {
+          slug: "fathom",
+          title: "Fathom",
+          category: "Explore",
+          description: "Descend through a responsive ocean scene and see what the dark water keeps.",
+          tags: ["Ocean", "Interactive"],
+          layout: "standard",
+          tone: "coral",
+        },
+        {
+          slug: "maelstrom",
+          title: "Maelstrom",
+          category: "Explore",
+          description: "Orbit a spinning black hole rendered by a live general-relativity ray tracer.",
+          tags: ["Black hole", "WebGL2"],
+          layout: "standard",
+          tone: "lime",
+        },
+        {
+          slug: "flowforge",
+          title: "Flowforge",
+          category: "Build tools",
+          description: "Sketch branching workflows and inspect how every decision connects.",
+          tags: ["Flows", "Planning"],
+          layout: "wide",
+          tone: "coral",
+        },
+        {
+          slug: "synth-studio",
+          title: "Synth Studio",
+          category: "Creative",
+          description: "Build a loop, tune the signal chain, and turn the browser into an instrument.",
+          tags: ["Audio", "Sequencer"],
+          layout: "wide",
+          tone: "blue",
+        },
+        {
+          slug: "cosmos",
+          title: "Cosmos",
+          category: "Explore",
+          description: "Travel from galaxies to planets through a procedural universe.",
+          tags: ["Space", "Procedural"],
+          layout: "standard",
+          tone: "lime",
+        },
+        {
+          slug: "beacon",
+          title: "Beacon",
+          category: "Games",
+          description: "Identify ships in the lighthouse beam and flash each correct signal before the rocks.",
+          tags: ["Lighthouse", "Arcade"],
+          layout: "standard",
+          tone: "coral",
+        },
+        {
+          slug: "data-forge",
+          title: "Data Forge",
+          category: "Build tools",
+          description: "Mint convincing structured datasets from a compact visual recipe.",
+          tags: ["Data", "Generator"],
+          layout: "wide",
+          tone: "lime",
+        },
+        {
+          slug: "atelier",
+          title: "Atelier",
+          category: "Creative",
+          description: "A focused digital workbench for composing color, form, and texture.",
+          tags: ["Canvas", "Studio"],
+          layout: "wide",
+          tone: "coral",
+        },
+        {
+          slug: "lockstep",
+          title: "Lockstep",
+          category: "Games",
+          description: "Drop in an NES ROM and connect two browsers for serverless retro co-op.",
+          tags: ["NES", "P2P co-op"],
+          layout: "standard",
+          tone: "blue",
+        },
+        {
+          slug: "harbor-master",
+          title: "Harbor Master",
+          category: "Games",
+          description: "Guide busy vessels through narrow water without tangling the lanes.",
+          tags: ["Traffic", "Arcade"],
+          layout: "standard",
+          tone: "lime",
+        },
+        {
+          slug: "ship-wreckers",
+          title: "Ship Wreckers",
+          category: "Games",
+          description: "Dodge rocks, blast pirates, and collect cargo for as long as your ship can hold.",
+          tags: ["Naval", "Arcade"],
+          layout: "wide",
+          tone: "coral",
+        },
+        {
+          slug: "kraken-attack",
+          title: "Kraken Attack",
+          category: "Games",
+          description: "Circle a sea monster, dodge its reach, and aim for the vulnerable eyes.",
+          tags: ["Boss battle", "Arcade"],
+          layout: "wide",
+          tone: "blue",
+        },
+        {
+          slug: "orbital-strike",
+          title: "Orbital Strike",
+          category: "Games",
+          description: "Enter the corrupted decks of Station Theta-7 in a compact browser FPS.",
+          tags: ["3D", "First-person"],
+          layout: "standard",
+          tone: "lime",
+        },
+        {
+          slug: "dev-terminal",
+          title: "Dev Terminal",
+          category: "Games",
+          description: "Solve a developer mystery one command and one clue at a time.",
+          tags: ["Terminal", "Text adventure"],
+          layout: "standard",
+          tone: "coral",
+        },
+        {
+          slug: "chronicle",
+          title: "Chronicle",
+          category: "Build tools",
+          description: "Turn a project’s scattered evidence into a timeline someone else can follow.",
+          tags: ["Evidence", "Timeline"],
+          layout: "wide",
+          tone: "blue",
+        },
+        {
+          slug: "color-palette",
+          title: "Color Palette",
+          category: "Creative",
+          description: "Build a color system, verify its contrast, and export production-ready values.",
+          tags: ["Color", "Accessibility"],
+          layout: "standard",
+          tone: "coral",
+        },
+        {
+          slug: "gradient-generator",
+          title: "Gradient Generator",
+          category: "Creative",
+          description: "Compose smooth color fields and copy the CSS when the balance is right.",
+          tags: ["Color", "CSS"],
+          layout: "standard",
+          tone: "blue",
+        },
+        {
+          slug: "markdown-preview",
+          title: "Markdown Preview",
+          category: "Build tools",
+          description: "Write Markdown beside an immediate, readable rendered preview.",
+          tags: ["Writing", "Preview"],
+          layout: "wide",
+          tone: "lime",
+        },
+        {
+          slug: "json-formatter",
+          title: "JSON Formatter",
+          category: "Build tools",
+          description: "Format, inspect, and validate tangled JSON in a calm split view.",
+          tags: ["JSON", "Validation"],
+          layout: "standard",
+          tone: "coral",
+        },
+        {
+          slug: "regex-tester",
+          title: "Regex Tester",
+          category: "Build tools",
+          description: "Test expressions against real text and make every match visible.",
+          tags: ["Regex", "Debugging"],
+          layout: "standard",
+          tone: "blue",
+        },
+        {
+          slug: "text-diff",
+          title: "Text Diff",
+          category: "Build tools",
+          description: "Compare two passages and surface additions, removals, and changes.",
+          tags: ["Compare", "Text"],
+          layout: "wide",
+          tone: "coral",
+        },
+        {
+          slug: "base64-tools",
+          title: "Base64 Tools",
+          category: "Build tools",
+          description: "Encode and decode text or files without sending them elsewhere.",
+          tags: ["Encode", "Local"],
+          layout: "standard",
+          tone: "lime",
+        },
+        {
+          slug: "uuid-generator",
+          title: "UUID Generator",
+          category: "Build tools",
+          description: "Generate clean batches of unique identifiers, ready to copy.",
+          tags: ["UUID", "Generator"],
+          layout: "standard",
+          tone: "blue",
+        },
+        {
+          slug: "url-health",
+          title: "URL Health",
+          category: "Build tools",
+          description: "Inspect a URL and turn its structure into a practical health report.",
+          tags: ["URL", "Inspector"],
+          layout: "wide",
+          tone: "coral",
+        },
+        {
+          slug: "http-status",
+          title: "HTTP Status",
+          category: "Build tools",
+          description: "Find the right response code by number, name, or meaning.",
+          tags: ["HTTP", "Reference"],
+          layout: "standard",
+          tone: "lime",
+        },
+        {
+          slug: "cron-parser",
+          title: "Cron Parser",
+          category: "Build tools",
+          description: "Translate cron expressions into plain language and upcoming run times.",
+          tags: ["Cron", "Scheduling"],
+          layout: "standard",
+          tone: "blue",
+        },
+        {
+          slug: "rate-limit",
+          title: "Rate Limit",
+          category: "Build tools",
+          description: "Model request windows, quotas, and retry behavior before they bite.",
+          tags: ["API", "Calculator"],
+          layout: "wide",
+          tone: "coral",
+        },
+        {
+          slug: "token-lens",
+          title: "Token Lens",
+          category: "Build tools",
+          description: "Estimate token weight and inspect how text breaks into model-sized pieces.",
+          tags: ["Tokens", "Inspector"],
+          layout: "wide",
+          tone: "blue",
+        },
+        {
+          slug: "ship-roast",
+          title: "Ship Roast",
+          category: "Build tools",
+          description: "Put a project pitch on the hot seat and get a pointed reality check.",
+          tags: ["Review", "Writing"],
+          layout: "standard",
+          tone: "lime",
+        },
+      ];
 
-      const state = {
-        category: 'all',
-        query: '',
-        localOnly: false
-      };
+      const ARCHIVED_EMBER = [
+        ["aether", "Aether"],
+        ["cargo-tetris", "Cargo Tetris"],
+        ["cascade", "Cascade"],
+        ["challenge-arena", "Challenge Arena"],
+        ["drift", "Drift"],
+        ["explorer", "Explorer"],
+        ["harbor-api", "Harbor API"],
+        ["harbor-chat", "Harbor Chat"],
+        ["morphogen", "Morphogen"],
+        ["morphos", "Morphos"],
+        ["proof-insights", "Proof Insights"],
+        ["ship-diagnostics", "Ship Diagnostics"],
+        ["ship-forecast", "Ship Forecast"],
+        ["starlight-orchestra", "Starlight Orchestra"],
+      ];
 
-      function cardMatches(card) {
-        const text = card.textContent.toLowerCase();
-        const queryOk = !state.query || text.includes(state.query);
-        const localOk = !state.localOnly || card.querySelector('.badge.local');
-        return queryOk && localOk;
+      if (DEMOS.length !== 32) {
+        throw new Error(`Gallery registry must contain 32 demos; found ${DEMOS.length}.`);
       }
 
-      function updateView() {
-        sections.forEach(section => {
-          const inCat = state.category === 'all' || section.dataset.cat === state.category;
-          let visibleCards = 0;
+      const grid = document.querySelector("#demo-grid");
+      const search = document.querySelector("#demo-search");
+      const filterButtons = [...document.querySelectorAll(".filter-button")];
+      const resultCount = document.querySelector("#result-count");
+      const resultLabel = document.querySelector("#result-label");
+      const emptyState = document.querySelector("#empty-state");
+      let activeCategory = "Everything";
 
-          section.querySelectorAll('.card').forEach(card => {
-            const show = inCat && cardMatches(card);
-            card.style.display = show ? '' : 'none';
-            if (show) visibleCards += 1;
+      function createCard(demo) {
+        const article = document.createElement("article");
+        article.className = "demo-card";
+        article.dataset.layout = demo.layout;
+        article.dataset.tone = demo.tone;
+        article.dataset.search = [demo.title, demo.category, demo.description, ...demo.tags]
+          .join(" ")
+          .toLocaleLowerCase();
+        article.dataset.category = demo.category;
+
+        const link = document.createElement("a");
+        link.className = "demo-link";
+        link.href = `./${demo.slug}/`;
+        link.setAttribute("aria-label", `Open ${demo.title} demo`);
+
+        const top = document.createElement("div");
+        top.className = "card-topline";
+
+        const state = document.createElement("span");
+        state.className = "live-state";
+        state.textContent = `${demo.category} / Live`;
+        top.append(state);
+
+        if (demo.preserved) {
+          const note = document.createElement("span");
+          note.className = "preserved-note";
+          note.textContent = "Preserved edition";
+          top.append(note);
+        }
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const title = document.createElement("h3");
+        title.className = "demo-title";
+        title.textContent = demo.title;
+
+        const description = document.createElement("p");
+        description.className = "demo-description";
+        description.textContent = demo.description;
+        body.append(title, description);
+
+        const footer = document.createElement("div");
+        footer.className = "card-footer";
+
+        const tags = document.createElement("span");
+        tags.className = "tags";
+        tags.textContent = demo.tags.join(" / ");
+
+        const arrow = document.createElement("span");
+        arrow.className = "open-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "↗";
+        footer.append(tags, arrow);
+
+        link.append(top, body, footer);
+        article.append(link);
+        return article;
+      }
+
+      function applyFilters() {
+        const query = search.value.trim().toLocaleLowerCase();
+        let visibleCount = 0;
+
+        for (const card of grid.children) {
+          const categoryMatches =
+            activeCategory === "Everything" || card.dataset.category === activeCategory;
+          const searchMatches = !query || card.dataset.search.includes(query);
+          const isVisible = categoryMatches && searchMatches;
+          card.hidden = !isVisible;
+          visibleCount += Number(isVisible);
+        }
+
+        resultCount.textContent = String(visibleCount);
+        resultLabel.textContent = visibleCount === 1 ? "demo ready" : "demos ready";
+        emptyState.hidden = visibleCount !== 0;
+      }
+
+      grid.append(...DEMOS.map(createCard));
+
+      search.addEventListener("input", applyFilters);
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeCategory = button.dataset.category;
+          filterButtons.forEach((candidate) => {
+            candidate.setAttribute("aria-pressed", String(candidate === button));
           });
-
-          section.classList.toggle('visible', inCat && visibleCards > 0);
+          applyFilters();
         });
-      }
-
-      nav.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'BUTTON') return;
-        nav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        state.category = e.target.dataset.cat;
-        updateView();
       });
 
-      searchInput.addEventListener('input', (e) => {
-        state.query = e.target.value.trim().toLowerCase();
-        updateView();
-      });
+      const archiveList = document.querySelector("#archive-list");
+      archiveList.append(
+        ...ARCHIVED_EMBER.map(([slug, title]) => {
+          const item = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = `https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/${slug}`;
+          link.target = "_blank";
+          link.rel = "noreferrer";
+          link.setAttribute("aria-label", `View archived ${title} source on GitHub`);
 
-      localOnlyToggle.addEventListener('change', (e) => {
-        state.localOnly = e.target.checked;
-        updateView();
-      });
-
-      updateView();
+          const name = document.createElement("span");
+          name.textContent = title;
+          const action = document.createElement("span");
+          action.textContent = "Source ↗";
+          link.append(name, action);
+          item.append(link);
+          return item;
+        }),
+      );
     </script>
   </body>
 </html>

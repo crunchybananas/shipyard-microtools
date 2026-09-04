@@ -3,37 +3,54 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Orbital Strike</title>
+    <meta name="description" content="Survive the corrupted decks of Station Theta-7 in a compact browser FPS." />
+    <meta name="theme-color" content="#071313" />
+    <title>Orbital Strike — Theta-7 Mission Briefing</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/microtools.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   </head>
-  <body>
+  <body data-demo="orbital-strike">
     <div class="game-wrapper">
-      <a href="../" class="back-link">← All Tools</a>
+      <a href="../" class="back back-link">← All Tools</a>
       
-      <div id="game-canvas"></div>
+      <div id="game-canvas" role="application" aria-label="Orbital Strike first-person game view"></div>
       
       <!-- Start Screen -->
-      <div id="startScreen" class="overlay">
-        <div class="game-title">ORBITAL STRIKE</div>
-        <div class="game-subtitle">STATION THETA-7</div>
-        <button class="start-button" id="startBtn">BEGIN MISSION</button>
-        <div class="controls-hint">
-          <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move<br>
-          <kbd>MOUSE</kbd> Aim &nbsp;|&nbsp; <kbd>CLICK</kbd> Shoot<br>
-          <kbd>SPACE</kbd> Jump &nbsp;|&nbsp; <kbd>Q</kbd> Switch Weapon<br>
-          <kbd>E</kbd> Interact with Terminals
+      <div id="startScreen" class="overlay" role="dialog" aria-modal="true" aria-labelledby="mission-title">
+        <div class="briefing-shell">
+          <div class="briefing-band">
+            <span>Emergency operations channel</span>
+            <span>Clearance 07</span>
+          </div>
+          <div class="mission-code" aria-hidden="true">THETA / 7–B</div>
+          <h1 class="game-title" id="mission-title">Orbital Strike</h1>
+          <p class="game-subtitle">Station Theta-7 is no longer responding to command.</p>
+          <div class="mission-objective">
+            <span>Primary order</span>
+            <strong>Enter the mining decks. Break the drone cordon. Recover the station logs.</strong>
+          </div>
+          <button type="button" class="start-button" id="startBtn">Begin mission</button>
+          <div class="controls-hint" aria-label="Keyboard and mouse controls">
+            <div><kbd>W A S D</kbd><span>Move</span></div>
+            <div><kbd>Mouse</kbd><span>Aim</span></div>
+            <div><kbd>Click</kbd><span>Fire</span></div>
+            <div><kbd>Q</kbd><span>Switch</span></div>
+            <div><kbd>E</kbd><span>Terminal</span></div>
+          </div>
         </div>
       </div>
       
       <!-- Game Over Screen -->
-      <div id="gameOverScreen" class="overlay" style="display: none;">
-        <div class="game-over-title">MISSION FAILED</div>
+      <div id="gameOverScreen" class="overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="failed-title">
+        <div class="debrief-shell">
+        <h2 class="game-over-title" id="failed-title">Mission failed</h2>
         <div class="final-score">
-          FINAL SCORE: <span id="finalScore">0</span><br>
-          WAVES SURVIVED: <span id="finalWave">0</span>
+          <span>Final score <strong id="finalScore">0</strong></span>
+          <span>Waves survived <strong id="finalWave">0</strong></span>
         </div>
-        <button class="start-button" id="restartBtn">TRY AGAIN</button>
+        <button type="button" class="start-button" id="restartBtn">Return to station</button>
+        </div>
       </div>
       
       <!-- HUD -->
@@ -47,7 +64,7 @@
         <div class="hit-marker" id="hitMarker">✕</div>
 
         <!-- Wave Info -->
-        <div class="wave-info">
+        <div class="wave-info" aria-live="polite">
           <div class="wave-number">WAVE</div>
           <div class="wave-value" id="waveNumber">1</div>
           <div class="enemies-remaining"><span id="enemiesRemaining">0</span> HOSTILES REMAINING</div>
@@ -55,14 +72,14 @@
         
         <!-- Radar -->
         <div class="radar">
-          <canvas id="radarCanvas" width="116" height="116"></canvas>
+          <canvas id="radarCanvas" width="116" height="116" role="img" aria-label="Hostile proximity radar">Hostile proximity radar</canvas>
           <div class="radar-sweep"></div>
           <div class="radar-center"></div>
         </div>
         
         <!-- Health Bar -->
-        <div class="health-bar">
-          <span class="health-icon">❤️</span>
+        <div class="health-bar" role="meter" aria-label="Suit integrity" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+          <span class="health-icon" aria-hidden="true">+</span>
           <div class="health-track">
             <div class="health-fill" id="healthFill"></div>
           </div>
@@ -70,14 +87,14 @@
         </div>
         
         <!-- Ammo Display -->
-        <div class="ammo-display">
+        <div class="ammo-display" aria-label="Weapon ammunition">
           <div class="weapon-name" id="weaponName">PULSE PISTOL</div>
           <div class="ammo-count" id="ammoCount">50</div>
           <div class="ammo-reserve">/ <span id="maxAmmo">100</span></div>
         </div>
         
         <!-- Weapon Icon -->
-        <div class="weapon-icon" id="weaponIcon">🔫</div>
+        <div class="weapon-icon" id="weaponIcon" aria-hidden="true">▰</div>
         
         <!-- Pickup Notification -->
         <div class="pickup-notification" id="pickupNotification"></div>
@@ -87,6 +104,20 @@
 
         <!-- Damage Flash -->
         <div class="damage-flash" id="damageFlash"></div>
+
+        <div class="touch-controls" aria-label="Touch controls">
+          <div class="touch-pad" aria-label="Movement controls">
+            <button type="button" class="touch-key touch-forward" data-key="KeyW" aria-label="Move forward">▲</button>
+            <button type="button" class="touch-key touch-left" data-key="KeyA" aria-label="Move left">◀</button>
+            <button type="button" class="touch-key touch-back" data-key="KeyS" aria-label="Move backward">▼</button>
+            <button type="button" class="touch-key touch-right" data-key="KeyD" aria-label="Move right">▶</button>
+          </div>
+          <div class="touch-actions">
+            <button type="button" class="touch-action" data-action="interact" aria-label="Open nearby terminal">E</button>
+            <button type="button" class="touch-action" data-action="weapon" aria-label="Switch weapon">Q</button>
+            <button type="button" class="touch-action touch-fire" data-action="fire" aria-label="Fire weapon">Fire</button>
+          </div>
+        </div>
         
         <!-- Scanlines -->
         <div class="scanlines"></div>
@@ -96,10 +127,10 @@
       </div>
       
       <!-- Terminal Overlay -->
-      <div id="terminalOverlay" class="terminal-overlay" style="display: none;">
+      <div id="terminalOverlay" class="terminal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="terminal-heading">
         <div class="terminal-header">
-          <span class="terminal-title">TERMINAL ACCESS</span>
-          <button class="terminal-close" id="closeTerminalBtn">[ESC] CLOSE</button>
+          <span class="terminal-title" id="terminal-heading">Recovered station log</span>
+          <button type="button" class="terminal-close" id="closeTerminalBtn" aria-label="Close station log">Close</button>
         </div>
         <div class="terminal-content">
           <div class="terminal-text" id="terminalText"></div>
@@ -107,5 +138,6 @@
       </div>
     </div>
     <script src="app.js"></script>
+    <script src="../shared/microtools.js"></script>
   </body>
 </html>

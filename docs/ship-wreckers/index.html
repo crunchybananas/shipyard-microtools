@@ -5,35 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ship Wreckers</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/microtools.css" />
   </head>
-  <body>
+  <body data-demo="ship-wreckers">
     <div class="container">
       <header>
         <a href="../" class="back">← All Tools</a>
-        <h1>⛵ Ship Wreckers</h1>
+        <h1>Ship Wreckers</h1>
         <p class="subtitle">Dodge rocks, blast pirates, collect cargo. How long can you survive?</p>
       </header>
 
       <main>
         <div class="game-container">
-          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          <canvas id="gameCanvas" width="600" height="500" role="img" aria-label="An open-water arcade arena with rocks, pirates, and cargo">Your browser needs canvas support to play Ship Wreckers.</canvas>
           
           <div id="startScreen" class="overlay">
-            <h2>⛵ Ship Wreckers</h2>
-            <p>Navigate the treacherous waters!</p>
+            <h2>No safe passage.</h2>
+            <p>Thread the rocks, outgun pirates, and bring the cargo home.</p>
             <div class="controls-info">
               <p><strong>WASD</strong> or <strong>Arrow Keys</strong> — Move</p>
               <p><strong>Space</strong> — Fire cannons</p>
               <p>Beware — pirate ships return fire!</p>
             </div>
-            <button id="startBtn" class="play-btn">▶ Start Game</button>
+            <button id="startBtn" class="play-btn">Leave the harbor</button>
           </div>
 
           <div id="gameOverScreen" class="overlay hidden">
             <h2>💀 Ship Wrecked!</h2>
             <p>Final Score: <span id="finalScore">0</span></p>
             <p>Cargo Collected: <span id="finalCargo">0</span></p>
-            <button id="restartBtn" class="play-btn">🔄 Play Again</button>
+            <button id="restartBtn" class="play-btn">Sail again</button>
           </div>
 
           <div id="hud" class="hud hidden">
@@ -53,6 +54,15 @@
             </div>
           </div>
         </div>
+        <div class="touch-controls" aria-label="Touch game controls">
+          <div class="touch-controls__dpad">
+            <button type="button" data-key="ArrowUp" aria-label="Sail up">↑</button>
+            <button type="button" data-key="ArrowLeft" aria-label="Sail left">←</button>
+            <button type="button" data-key="ArrowDown" aria-label="Sail down">↓</button>
+            <button type="button" data-key="ArrowRight" aria-label="Sail right">→</button>
+          </div>
+          <button type="button" class="touch-fire" data-key="Space" aria-label="Fire cannons">Fire</button>
+        </div>
       </main>
 
       <footer>
@@ -60,5 +70,6 @@
       </footer>
     </div>
     <script src="app.js"></script>
+    <script src="../shared/microtools.js"></script>
   </body>
 </html>

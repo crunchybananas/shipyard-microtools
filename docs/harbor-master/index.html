@@ -5,35 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Harbor Master</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/microtools.css" />
   </head>
-  <body>
+  <body data-demo="harbor-master">
     <div class="container">
       <header>
         <a href="../" class="back">← All Tools</a>
-        <h1>🚢 Harbor Master</h1>
+        <h1>Harbor Master</h1>
         <p class="subtitle">Draw paths to guide ships to matching docks. Don't let them collide!</p>
       </header>
 
       <main>
         <div class="game-container">
-          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          <canvas id="gameCanvas" width="600" height="500" role="img" aria-label="A busy harbor where ships are routed to matching docks">Your browser needs canvas support to play Harbor Master.</canvas>
           
           <div id="startScreen" class="overlay">
-            <h2>🚢 Harbor Master</h2>
-            <p>Guide incoming ships to their matching colored docks!</p>
+            <h2>Take the channel.</h2>
+            <p>Draw a safe course for every incoming ship.</p>
             <div class="controls-info">
               <p><strong>Drag</strong> (mouse or touch) from a ship to draw its path</p>
               <p><strong>Match colors</strong> — Red ships → Red dock</p>
               <p><strong>Avoid collisions</strong> — Game over if ships crash!</p>
             </div>
-            <button id="startBtn" class="play-btn">▶ Start Game</button>
+            <button id="startBtn" class="play-btn">Open the harbor</button>
           </div>
 
           <div id="gameOverScreen" class="overlay hidden">
             <h2>💥 Collision!</h2>
             <p>Ships Docked: <span id="finalScore">0</span></p>
             <p>High Score: <span id="highScore">0</span></p>
-            <button id="restartBtn" class="play-btn">🔄 Play Again</button>
+            <button id="restartBtn" class="play-btn">Reopen the harbor</button>
           </div>
 
           <div id="hud" class="hud hidden">
@@ -54,5 +55,6 @@
       </footer>
     </div>
     <script src="app.js"></script>
+    <script src="../shared/microtools.js"></script>
   </body>
 </html>

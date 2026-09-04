@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rate Limit Playground</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/microtools.css" />
   </head>
-  <body>
+  <body data-demo="rate-limit">
     <div class="container">
       <header>
         <a href="../" class="back">← All Tools</a>
-        <h1>⏱️ Rate Limit Playground</h1>
-        <p class="subtitle">See how token bucket and sliding window limiters handle live traffic.</p>
+        <h1>Rate Limit Lab</h1>
+        <p class="subtitle">Send live traffic through two algorithms and watch the queue breathe.</p>
       </header>
 
       <main>
@@ -113,5 +114,6 @@
       </footer>
     </div>
     <script src="app.js"></script>
+    <script src="../shared/microtools.js"></script>
   </body>
 </html>

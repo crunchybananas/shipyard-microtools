@@ -256,9 +256,17 @@ function setupKeyboard() {
   const whiteKeyWidth = 100 / notes.filter(n => n.white).length;
   
   notes.forEach((noteInfo, index) => {
-    const key = document.createElement('div');
+    const key = document.createElement('button');
+    key.type = 'button';
     key.className = noteInfo.white ? 'white-key' : 'black-key';
     key.dataset.note = noteInfo.note;
+    key.setAttribute('aria-label', `Play ${noteInfo.note} with keyboard key ${noteInfo.key}`);
+    key.setAttribute('aria-pressed', 'false');
+
+    const setKeyActive = (active) => {
+      key.classList.toggle('active', active);
+      key.setAttribute('aria-pressed', String(active));
+    };
     
     if (noteInfo.white) {
       key.innerHTML = `
@@ -278,18 +286,18 @@ function setupKeyboard() {
     key.addEventListener('mousedown', (e) => {
       e.preventDefault();
       playNote(noteInfo.note);
-      key.classList.add('active');
+      setKeyActive(true);
     });
     
     key.addEventListener('mouseup', () => {
       stopNote(noteInfo.note);
-      key.classList.remove('active');
+      setKeyActive(false);
     });
     
     key.addEventListener('mouseleave', () => {
       if (key.classList.contains('active')) {
         stopNote(noteInfo.note);
-        key.classList.remove('active');
+        setKeyActive(false);
       }
     });
     
@@ -297,12 +305,33 @@ function setupKeyboard() {
     key.addEventListener('touchstart', (e) => {
       e.preventDefault();
       playNote(noteInfo.note);
-      key.classList.add('active');
+      setKeyActive(true);
     });
     
     key.addEventListener('touchend', () => {
       stopNote(noteInfo.note);
-      key.classList.remove('active');
+      setKeyActive(false);
+    });
+
+    key.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
+        e.preventDefault();
+        playNote(noteInfo.note);
+        setKeyActive(true);
+      }
+    });
+
+    key.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        stopNote(noteInfo.note);
+        setKeyActive(false);
+      }
+    });
+
+    key.addEventListener('blur', () => {
+      stopNote(noteInfo.note);
+      setKeyActive(false);
     });
     
     keyboard.appendChild(key);
@@ -317,7 +346,7 @@ function setupKeyboardInput() {
   
   document.addEventListener('keydown', async (e) => {
     // Ignore if typing in input
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.target.matches('input, select, textarea, button')) return;
     
     const key = e.key.toLowerCase();
     
@@ -373,6 +402,7 @@ function highlightKey(note, active) {
   const key = document.querySelector(`[data-note="${note}"]`);
   if (key) {
     key.classList.toggle('active', active);
+    key.setAttribute('aria-pressed', String(active));
   }
 }
 
@@ -404,14 +434,18 @@ function setupSequencerGrid() {
     
     // Create 16 steps
     for (let i = 0; i < 16; i++) {
-      const step = document.createElement('div');
+      const step = document.createElement('button');
+      step.type = 'button';
       step.className = 'step';
       step.dataset.step = i;
+      step.setAttribute('aria-label', `${trackId} step ${i + 1}`);
+      step.setAttribute('aria-pressed', 'false');
       
       step.addEventListener('click', () => {
         if (!sequencer) return;
         const isActive = sequencer.toggleStep(trackId, i);
         step.classList.toggle('active', isActive);
+        step.setAttribute('aria-pressed', String(isActive));
         schedulePersist();
       });
       
@@ -456,6 +490,8 @@ function updateStepIndicator(step) {
   steps.forEach(s => {
     const stepIndex = parseInt(s.dataset.step);
     s.classList.toggle('current', stepIndex === step);
+    if (stepIndex === step) s.setAttribute('aria-current', 'step');
+    else s.removeAttribute('aria-current');
   });
 }
 
@@ -466,8 +502,12 @@ function setupControls() {
   // Waveform selector
   document.querySelectorAll('.wave-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.wave-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.wave-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       if (synth) synth.setParam('waveform', btn.dataset.wave);
       schedulePersist();
     });
@@ -494,8 +534,12 @@ function setupControls() {
   
   document.querySelectorAll('.lfo-target-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.lfo-target-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.lfo-target-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       if (synth) synth.setParam('lfoTarget', btn.dataset.target);
       schedulePersist();
     });
@@ -515,8 +559,12 @@ function setupControls() {
   // Visualization toggle
   document.querySelectorAll('.viz-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.viz-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       if (visualizer) visualizer.setMode(btn.dataset.viz);
     });
   });
@@ -644,6 +692,7 @@ function updateLevelMeter() {
   const level = visualizer.getPeakLevel();
   const meter = document.getElementById('meter-bar');
   meter.style.width = `${level * 100}%`;
+  meter.parentElement?.setAttribute('aria-valuenow', String(Math.round(level * 100)));
 }
 
 /**
@@ -658,10 +707,12 @@ function togglePlayback() {
     sequencer.stop();
     playBtn.classList.remove('playing');
     playBtn.textContent = '▶';
+    playBtn.setAttribute('aria-label', 'Play sequence');
   } else {
     sequencer.start();
     playBtn.classList.add('playing');
     playBtn.textContent = '⏸';
+    playBtn.setAttribute('aria-label', 'Pause sequence');
   }
 }
 
@@ -674,6 +725,7 @@ function stopPlayback() {
   sequencer.stop();
   document.getElementById('play-btn').classList.remove('playing');
   document.getElementById('play-btn').textContent = '▶';
+  document.getElementById('play-btn').setAttribute('aria-label', 'Play sequence');
   
   // Clear step highlights
   document.querySelectorAll('.step').forEach(s => s.classList.remove('current'));
@@ -693,6 +745,7 @@ async function toggleRecording() {
     // Stop recording
     mediaRecorder.stop();
     recordBtn.classList.remove('recording');
+    recordBtn.setAttribute('aria-pressed', 'false');
     indicator.classList.add('hidden');
     isRecording = false;
   } else {
@@ -725,6 +778,7 @@ async function toggleRecording() {
       
       mediaRecorder.start();
       recordBtn.classList.add('recording');
+      recordBtn.setAttribute('aria-pressed', 'true');
       indicator.classList.remove('hidden');
       isRecording = true;
       
@@ -919,7 +973,9 @@ function loadPreset(preset) {
   // Update UI
   if (preset.waveform) {
     document.querySelectorAll('.wave-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.wave === preset.waveform);
+      const active = btn.dataset.wave === preset.waveform;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', String(active));
     });
   }
   
@@ -1066,14 +1122,18 @@ function applyProjectToUI(project) {
   // Waveform buttons
   if (patch.waveform) {
     document.querySelectorAll('.wave-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.wave === patch.waveform);
+      const active = btn.dataset.wave === patch.waveform;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', String(active));
     });
   }
 
   // LFO target buttons
   if (patch.lfoTarget) {
     document.querySelectorAll('.lfo-target-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.target === patch.lfoTarget);
+      const active = btn.dataset.target === patch.lfoTarget;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', String(active));
     });
   }
 
@@ -1134,7 +1194,9 @@ function applyProjectToUI(project) {
       if (!trackEl || !Array.isArray(data.steps)) continue;
 
       trackEl.querySelectorAll('.step').forEach((stepEl, i) => {
-        stepEl.classList.toggle('active', !!data.steps[i]);
+        const active = !!data.steps[i];
+        stepEl.classList.toggle('active', active);
+        stepEl.setAttribute('aria-pressed', String(active));
       });
 
       const noteSelect = trackEl.querySelector('.track-note');
