@@ -4,6 +4,7 @@
   "scripts": {
     "before-after:test": "node scripts/verify-before-after.mjs",
     "demos:test": "node scripts/verify-demos.mjs",
+    "orbital-strike:test": "node scripts/verify-orbital-strike.mjs",
     "lint:fix": "pnpm run --filter '*' lint:fix",
     "lint": "pnpm run --filter '*' lint",
     "build": "pnpm run --filter './apps/*' build",

@@ -83,6 +83,12 @@ jobs:
       - name: Verify before/after archive
         run: node scripts/verify-before-after.mjs
 
+      # Starts the mission and drives a real rAF loop with real key events.
+      # verify-demos only ever sees the briefing screen, so a throw inside
+      # update() — where the controls live — passes that check silently.
+      - name: Verify Orbital Strike controls
+        run: node scripts/verify-orbital-strike.mjs
+
       - name: Prepare deployment
         run: |
           # Create output directory
