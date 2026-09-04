@@ -20,23 +20,41 @@
       <div id="startScreen" class="overlay" role="dialog" aria-modal="true" aria-labelledby="mission-title">
         <div class="briefing-shell">
           <div class="briefing-band">
-            <span>Emergency operations channel</span>
-            <span>Clearance 07</span>
+            <span>Orbital fire director</span>
+            <span>Secure link / clearance 07</span>
           </div>
-          <div class="mission-code" aria-hidden="true">THETA / 7–B</div>
-          <h1 class="game-title" id="mission-title">Orbital Strike</h1>
-          <p class="game-subtitle">Station Theta-7 is no longer responding to command.</p>
-          <div class="mission-objective">
-            <span>Primary order</span>
-            <strong>Enter the mining decks. Break the drone cordon. Recover the station logs.</strong>
+          <div class="briefing-orbit" aria-hidden="true">
+            <div class="orbit-track"></div>
+            <span class="orbit-node orbit-node-one"></span>
+            <span class="orbit-node orbit-node-two"></span>
+            <span class="orbit-station"><i></i><b>Theta-7</b></span>
+            <span class="orbit-callout orbit-callout-apogee">Apogee / 418 km</span>
+            <span class="orbit-callout orbit-callout-window">Burn window / 00:18</span>
+            <span class="orbit-callout orbit-callout-vector">Insertion / 214°</span>
           </div>
-          <button type="button" class="start-button" id="startBtn">Begin mission</button>
+          <div class="briefing-copy">
+            <p class="briefing-kicker">Theta-7 orbital interdiction</p>
+            <div class="mission-code" aria-hidden="true">θ–07</div>
+            <h1 class="game-title" id="mission-title">Orbital Strike</h1>
+            <p class="game-subtitle">Station Theta-7 is silent. The mining decks remain under autonomous weapons control.</p>
+            <div class="mission-objective">
+              <span>Primary order</span>
+              <strong>Enter the mining decks. Break the drone cordon. Recover the station logs.</strong>
+            </div>
+            <div class="trajectory-data" aria-label="Calculated insertion telemetry">
+              <div><span>Altitude</span><strong id="telemetryAltitude">418 km</strong></div>
+              <div><span>Relative spin</span><strong id="telemetrySpin">0.7°/s</strong></div>
+              <div><span>Deck vector</span><strong id="telemetryBearing">214°</strong></div>
+              <div><span>Burn window</span><strong id="telemetryWindow">00:18</strong></div>
+            </div>
+            <button type="button" class="start-button" id="startBtn"><span>Commit burn</span></button>
+          </div>
           <div class="controls-hint" aria-label="Keyboard and mouse controls">
             <div><kbd>W A S D</kbd><span>Move</span></div>
             <div><kbd>Mouse</kbd><span>Aim</span></div>
             <div><kbd>Click</kbd><span>Fire</span></div>
-            <div><kbd>Q</kbd><span>Switch</span></div>
-            <div><kbd>E</kbd><span>Terminal</span></div>
+            <div><span class="key-pair"><kbd>Q</kbd><kbd>R</kbd></span><span>Weapon / strike</span></div>
+            <div><span class="key-pair"><kbd>E</kbd><kbd>P</kbd></span><span>Access / pause</span></div>
           </div>
         </div>
       </div>
@@ -44,17 +62,90 @@
       <!-- Game Over Screen -->
       <div id="gameOverScreen" class="overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="failed-title">
         <div class="debrief-shell">
-        <h2 class="game-over-title" id="failed-title">Mission failed</h2>
-        <div class="final-score">
-          <span>Final score <strong id="finalScore">0</strong></span>
-          <span>Waves survived <strong id="finalWave">0</strong></span>
+          <p class="debrief-kicker">Fire-control solution lost</p>
+          <h2 class="game-over-title" id="failed-title">Mission failed</h2>
+          <div class="final-score">
+            <span>Final score <strong id="finalScore">0</strong></span>
+            <span>Waves survived <strong id="finalWave">0</strong></span>
+          </div>
+          <button type="button" class="start-button" id="restartBtn"><span>Recalculate orbit</span></button>
         </div>
-        <button type="button" class="start-button" id="restartBtn">Return to station</button>
+      </div>
+
+      <!-- Mission Complete Screen (available for app.js progression wiring) -->
+      <div id="missionCompleteScreen" class="overlay complete-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="complete-title">
+        <div class="debrief-shell complete-shell">
+          <p class="debrief-kicker">Theta-7 extraction vector acquired</p>
+          <h2 class="game-over-title" id="complete-title">Mission complete</h2>
+          <div class="final-score">
+            <span>Final score <strong id="completeScore">0</strong></span>
+            <span>Logs recovered <strong id="completeLogs">0</strong></span>
+          </div>
+          <button type="button" class="start-button" id="extractionBtn"><span>Commit extraction</span></button>
+        </div>
+      </div>
+
+      <!-- Pause Screen (available for app.js state wiring) -->
+      <div id="pauseScreen" class="overlay pause-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+        <div class="debrief-shell pause-shell">
+          <p class="debrief-kicker">Fire-control solution held</p>
+          <h2 class="game-over-title" id="pause-title">Orbit paused</h2>
+          <p class="pause-copy">Guidance is frozen at the current heading. Resume when the approach corridor is clear.</p>
+          <button type="button" class="start-button" id="resumeBtn"><span>Resume intercept</span></button>
         </div>
       </div>
       
       <!-- HUD -->
       <div id="hud" style="display: none;">
+        <div class="visor-bearing" aria-hidden="true">
+          <div class="bearing-arc bearing-arc-outer" id="bearingRing"></div>
+          <div class="bearing-arc bearing-arc-inner"></div>
+          <span class="bearing-label bearing-label-port">270</span>
+          <span class="bearing-label bearing-label-center"><b id="headingValue">214</b>° / DV</span>
+          <span class="bearing-label bearing-label-starboard">090</span>
+          <span class="visor-lock">Solution tracking</span>
+        </div>
+
+        <section class="objective-rail" aria-label="Current mission objective">
+          <span class="objective-index" aria-hidden="true">OBJ</span>
+          <div class="objective-copy">
+            <span>Active order</span>
+            <strong id="objectiveText">Breach the drone cordon</strong>
+          </div>
+          <div class="objective-logs">
+            <span>Station logs</span>
+            <strong><b id="logsRecovered">0</b> / <b id="logsRequired">3</b></strong>
+          </div>
+          <p id="missionStatus" class="mission-status" role="status">Insertion vector stable</p>
+        </section>
+
+        <div class="flight-telemetry" aria-label="Orbital telemetry">
+          <span><b>ALT</b> 418 km</span>
+          <span><b>SPIN</b> 0.7°/s</span>
+          <span><b>VECTOR</b> 214°</span>
+        </div>
+
+        <div id="waveBanner" class="wave-banner" role="status" aria-live="polite"></div>
+
+        <div class="strike-meter" id="strikeMeter" role="progressbar" aria-label="Orbital strike charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="strike-meter-label"><span>Orbital strike</span><strong id="strikeCharge">0%</strong></div>
+          <div class="strike-track" aria-hidden="true">
+            <div class="strike-fill" id="strikeFill"></div>
+            <span class="strike-notch strike-notch-one"></span>
+            <span class="strike-notch strike-notch-two"></span>
+            <span class="strike-notch strike-notch-three"></span>
+          </div>
+          <span class="strike-state">Charging</span>
+        </div>
+
+        <div id="interactionPrompt" class="interaction-prompt" aria-live="polite"></div>
+
+        <div id="strikeReticle" class="strike-reticle" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <div id="strikeFlash" class="strike-flash" aria-hidden="true"></div>
+
         <!-- Crosshair -->
         <div class="crosshair">
           <div class="crosshair-dot"></div>
@@ -115,6 +206,7 @@
           <div class="touch-actions">
             <button type="button" class="touch-action" data-action="interact" aria-label="Open nearby terminal">E</button>
             <button type="button" class="touch-action" data-action="weapon" aria-label="Switch weapon">Q</button>
+            <button type="button" class="touch-action touch-strike" data-action="strike" aria-label="Call orbital strike">Strike</button>
             <button type="button" class="touch-action touch-fire" data-action="fire" aria-label="Fire weapon">Fire</button>
           </div>
         </div>
