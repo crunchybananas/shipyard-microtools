@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T02:41:54Z",
+  "updatedAt": "2026-09-04T15:10:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,18 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "realm",
+      "title": "Realm stopped being populated by wobble toys",
+      "appSlug": "realm",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "published",
+      "publishedAt": "2026-09-04",
+      "data": "stories/realm.json",
+      "href": "./realm/",
+      "cover": "assets/realm/social.jpg"
+    },
     {
       "slug": "orbital-strike",
       "title": "Orbital Strike found its fire director",

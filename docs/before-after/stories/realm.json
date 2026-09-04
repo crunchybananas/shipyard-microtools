@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "slug": "realm",
+  "title": "Realm stopped being populated by wobble toys",
+  "appSlug": "realm",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "published",
+  "publishedAt": "2026-09-04",
+  "thesis": "A settlement builder is only as convincing as the people living in it — so the work went into the citizens, the ground they stand on, and the fact that they are now visibly doing something.",
+  "summary": "Four months ago Realm was a bright green field with rows of identical cottages and round, faceless figures wandering between them. The same scenario today has layered terrain, buildings that differ from one another, citizens with silhouettes and jobs, and a visible supply network running between them.",
+  "versions": {
+    "before": {
+      "label": "May build",
+      "commit": "fbe4c5a6"
+    },
+    "after": {
+      "label": "Current main",
+      "commit": "4c98c821"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "settlement",
+      "title": "The same island, ninety days in",
+      "caption": "Both runs are the Peaceful Valley opening, built through the same build-bar clicks and advanced to day 61. The older build reads as one repeated cottage tiled across flat green; the current one has elevation, shoreline, roads, and buildings that are individually identifiable — a windmill, a church, a market stall — so the settlement has landmarks instead of texture.",
+      "before": {
+        "src": "assets/realm/before-town.jpg",
+        "alt": "Realm in May: rows of identical brown cottages on flat bright green grass, with small round figures scattered between them."
+      },
+      "after": {
+        "src": "assets/realm/after-town.jpg",
+        "alt": "Realm today: a settlement with varied buildings including a windmill and church, on layered terrain with roads, water and rock outcrops under directional light."
+      }
+    },
+    {
+      "id": "citizens",
+      "title": "The citizens got faces, clothes and jobs",
+      "caption": "Zoomed to the same scale. The old settlers were smooth beige ovals with a bald head and no feet — closer to a wobble toy than a person, and identical whichever trade they practised. The current actors have hats, coats, tools and distinct silhouettes per role, so you can read what someone does from across the map. The coloured pips and lines are the supply web: goods actually moving between buildings.",
+      "before": {
+        "src": "assets/realm/before-actors.jpg",
+        "alt": "Close view of the old Realm settlers: featureless rounded figures with bald heads and blank faces, standing among identical cottages."
+      },
+      "after": {
+        "src": "assets/realm/after-actors.jpg",
+        "alt": "Close view of current Realm citizens: pixel-art figures with hats, coats and carried tools, connected by coloured supply-route markers between buildings."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "Actors became people rather than markers",
+      "body": "The old settler was one rounded shape recoloured per role, which made a crowd read as a texture rather than a population. Actors are now drawn from a role atlas with per-trade silhouettes, directional facing and action poses, so a farmer, a guard and a carrier are distinguishable at a glance and at a distance."
+    },
+    {
+      "title": "The ground stopped being one shade of green",
+      "body": "May's island was a flat lawn with decorative trees. The terrain now carries elevation banding, shoreline, rock, roads and seasonal colour, so buildings sit in a place instead of on a backdrop — and the eye has somewhere to travel."
+    },
+    {
+      "title": "Buildings gained identity and life stages",
+      "body": "Housing evolves hovel to manor as coverage arrives, and production buildings are visually distinct rather than palette swaps. A settlement now shows its own history: which quarter grew first, and which trades it invested in."
+    },
+    {
+      "title": "The economy became visible",
+      "body": "Goods no longer teleport into a global pool. Grain has a physical address, carriers walk it to where it is needed, and the coloured route markers in the close-up are that traffic — the simulation showing its working rather than reporting a number."
+    }
+  ],
+  "builderNote": {
+    "quote": "Realm specifically had really bad wobble like npcs, but our sprites aren't great still — we've made good progress.",
+    "context": "The owner's read on this comparison, and the reason it is published as in-progress rather than finished. The wobble-toy settlers are gone, but the actor art is still the weakest part of the frame next to the terrain and buildings, and the supply-route overlay is busier than it needs to be."
+  },
+  "proof": [
+    {
+      "label": "Captured",
+      "value": "Both sides driven through the real build bar with identical clicks, then advanced to day 61 — no hand-placed scenes."
+    },
+    {
+      "label": "Before",
+      "value": "fbe4c5a6, 9 May 2026 — 24 buildings, 99 citizens."
+    },
+    {
+      "label": "After",
+      "value": "4c98c821, 4 September 2026 — 25 buildings, day 61 of the same scenario."
+    },
+    {
+      "label": "Still open",
+      "value": "Actor art remains the weakest element; the supply-route overlay needs a density pass."
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/realm/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/4c98c821/docs/realm",
+    "download": "assets/realm/montage.png"
+  },
+  "share": {
+    "summary": "Four months ago Realm's settlers were faceless ovals on a flat green lawn. See what changed in the citizens, the ground and the economy — and what still has not.",
+    "image": "assets/realm/social.jpg"
+  }
+}

@@ -20,6 +20,7 @@ const EXCLUDED_DEMO_DIRECTORIES = new Set(['before-after', 'ember', 'morphogen',
 const SUPPORT_PAGES = [
   { name: 'before-after', path: '/before-after/index.html' },
   { name: 'before-after-orbital-strike', path: '/before-after/orbital-strike/index.html' },
+  { name: 'before-after-realm', path: '/before-after/realm/index.html' },
   { name: 'before-after-demo-hub', path: '/before-after/demo-hub/index.html' },
   { name: 'before-after-demo-hub-night-harbor', path: '/before-after/demo-hub-night-harbor/index.html' },
 ];
