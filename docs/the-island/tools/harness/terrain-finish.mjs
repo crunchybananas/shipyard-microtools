@@ -7,12 +7,12 @@ export default async function (h) {
   const ok = (name, cond, extra) => (cond ? R.pass : R.fail)
     .push(name + (cond ? '' : ' :: ' + JSON.stringify(extra)));
   const port = process.env.SERVE_PORT || 8642;
-  await h.navigate(`http://127.0.0.1:${port}/the-island/?debug&mute`);
+  await h.navigate(`http://127.0.0.1:${port}/the-island/?debug&mute&localstack`);
   for (let i = 0; i < 50; i++) {
     if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) break;
     await h.wait(.4);
   }
-  await h.evaluate(`localStorage.setItem('abyme-muted','1'); localStorage.removeItem('abyme-save-v1'); document.getElementById('btn-begin').click(); 1`);
+  await h.evaluate(`localStorage.setItem('abyme-muted','1'); localStorage.removeItem('abyme-save'); document.getElementById('btn-begin').click(); 1`);
   await h.wait(1.3); await h.evaluate(`ABYME.setIntroT(99); ABYME.W.timeDrift=0; 1`); await h.wait(3);
 
   const s = await h.evaluate(`(() => {

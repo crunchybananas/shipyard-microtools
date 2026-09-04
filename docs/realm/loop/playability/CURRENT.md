@@ -1,8 +1,10 @@
 # Current Playability And Cleanup Handoff
 
-Date updated: 2026-08-08
+Date updated: 2026-09-03
 
-Current live checkpoint: Realm `191` / simulation epoch `4`
+Promoted checkpoint: Realm `198` / save `7` / simulation epoch `10`. The reviewed
+43,200-tick golden and the complete 68-check gameplay/core/browser promotion run
+are green; `runtime-contract.json` remains the atomic version authority.
 
 Production graphics follow the atomic workflow in
 [`../graphics/PAUSE_AND_RESUME.md`](../graphics/PAUSE_AND_RESUME.md). The active
@@ -152,21 +154,56 @@ cargo crate, and custom four-direction brisk gait across all `16` rows / `128`
 frames. Innkeeper, scholar, and forager are the remaining palette-derived
 families.
 
+## Completed Living Supply Web + Thinking Warband Slice
+
+Round 008 extends the physical inventory authority through the production chain.
+Food, wheat, and flour now live in bounded building inventories. Farm workers
+carry wheat to a reachable, useful Windmill or bulk store; millers carry flour
+to a Bakery or bulk store; converters consume only their own delivered input.
+Reservations prevent two carriers from overbooking a bin, partial deliveries
+reroute their remainder, and fixed scoring weighs real route cost, local
+shortage, inbound pressure, operating crew, labor priority, and downstream food
+urgency. The selected building's Supply ledger shows local stock, capacity,
+inbound cargo, status, and waiting output on desktop and phone. Unroutable output
+stays at its producer, while an orphaned carrier may eat, sleep, and shelter with
+the physical load intact until storage returns.
+
+The same round replaces accidental raid movement with a Thinking Warband.
+`raid-planner.js` chooses an objective and route from explicit fixed-cost facts:
+travel, breach time, tower exposure, corridor pressure, and physical target
+value. `raid-intelligence.js` builds the live battlefield snapshot and durable
+intent, while combat executes only the named path and ordered breaches. Raiders
+go around healthy walls, break weak ones when that is cheaper, split equivalent
+corridors, sail from their exact offshore spawn to a locally connected coast,
+and replan when topology or an externally removed objective changes. The band
+withdraws together after one strategic sack, a fire-completed objective, or its
+shared physical-loot goal. Morale counts only actual deaths and breaks strictly
+above 60% casualties. One scout sentence makes the lead intent legible without
+exposing debug numbers.
+
+This is tactical intelligence over the current authoritative battlefield, not
+yet a fog-of-war campaign brain. The living supply web currently covers only
+food, wheat, and flour; broader goods and dedicated carts are also next work.
+See
+[`rounds/008-living-supply-web-thinking-warband.md`](rounds/008-living-supply-web-thinking-warband.md).
+
 ## Ranked Work Now
 
-1. **Deepen combat tactics and readability.** Normal First Muster balance and
-   terminal death order are proven. Add ordinary-player evidence for hard mode,
-   focus-fire, formation/stance response, and retreat clarity before broad
-   tuning. The charted edge and three weapon silhouettes now provide the visual
-   foundation for that work.
-2. **Write the campaign's second act.** The recovery doctrine closes the first
+1. **Turn tactical intent into campaign intelligence.** The bounded warband
+   planner currently sees an authoritative live battlefield. Add asymmetric
+   scout knowledge, remembered-but-aging defenses, uncertainty, rival learning,
+   and distinct doctrines across raids. Pair that with ordinary-player evidence
+   for hard mode, formation/stance response, focus-fire, siege leadership, and
+   retreat clarity rather than simply increasing hit points.
+2. **Broaden the living supply web one leg at a time.** Food, wheat, and flour
+   are physical; wood, stone, iron, planks, tools, and trade remain legacy
+   wallet flows. Introduce a real carrier/cart job, load capacity, depot policy,
+   and road-throughput feedback through one bounded chain before expanding the
+   rest. Preserve conservation, reservations, and explainable route choice.
+3. **Write the campaign's second act.** The recovery doctrine closes the first
    battle but is still one objective. Make its completion alter the next
    pressure, unlock, or rival response so Rebuild, Fortify, and Explore begin
    meaningfully different settlement stories.
-3. **Replace the remaining legacy actor families.** Innkeeper, scholar, and
-   forager still share palette-derived geometry. Continue only through complete
-   atomic A17+ families using the graphics handoff; do not resume partial-row
-   repair.
 4. **Responsive UX continuation.** Remove the invisible advisor hit target that
    can block phone title actions after the tip fades. Then restore ordinary
    keyboard focus by retiring the global Tab interception, correct the Research
@@ -192,21 +229,34 @@ families.
    stale imports/exports, unreachable UI, redundant state, and archived
    renderer assumptions. Remove one proven-dead slice at a time with tests.
 
+Graphics production remains governed by its paused atomic handoff. Gameplay,
+simulation clarity, and long-play evidence are the active priorities; do not
+restart partial sprite work from this queue.
+
 ## Existing Evidence To Reuse
 
 ```sh
+node scripts/verify-physical-grain-inventory.mjs
+node scripts/verify-logistics-broker.mjs
+node scripts/verify-production-logistics.mjs
+node scripts/verify-supply-ledger-browser.mjs
+node scripts/verify-raid-planner.mjs
+node scripts/verify-raid-route-integration.mjs
+node scripts/verify-combat-terminal-death.mjs
+node scripts/verify-first-muster-playthrough.mjs
 node scripts/verify-navigation-crowd-baseline.mjs
 node scripts/verify-phase0c-traffic-baseline.mjs
 node scripts/verify-browser-save-shell.mjs
 node scripts/verify-engine-v2-citizen-lifecycle-browser.mjs
 node scripts/runtime-revision.mjs --check
-node scripts/verify-realm.mjs
+node scripts/verify-realm.mjs --from "deterministic-core purity"
 ```
 
-The traffic fixtures remain the promotion gates for movement changes. Their
-strict modes both pass on Realm 191, while the Realm 165 measurements remain
-the last formal performance baseline. Read `../engine-v2/CURRENT.md` before
-changing ownership, save, or navigation surfaces.
+The focused gates prove the Round 008 production and raid decisions, and the
+complete promotion run covers all 68 affected gameplay, engine, save, movement,
+browser, and runtime-art checks. Realm 165 remains the last formal performance
+baseline. Read `../engine-v2/CURRENT.md` before changing ownership, save, or
+navigation surfaces.
 
 ## Definition Of Progress
 

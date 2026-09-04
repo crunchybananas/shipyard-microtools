@@ -5,14 +5,14 @@
 // temporary work cannot be mistaken for identity and drawing cannot mutate the
 // simulation graph.
 
-import { G, RESOURCE_KEYS } from './state.js?realm=197';
+import { G, RESOURCE_KEYS } from './state.js?realm=198';
 import {
   CITIZEN_ACTIVITIES,
   CITIZEN_APPEARANCE_IDS,
   getAssignmentRevision,
   validateCitizenOwnership,
-} from './citizen-ownership.js?realm=197';
-import { citizenIsIndoors } from './residences.js?realm=197';
+} from './citizen-ownership.js?realm=198';
+import { citizenIsIndoors } from './residences.js?realm=198';
 
 const CITIZEN_ACTIVITY_SET = new Set(CITIZEN_ACTIVITIES);
 const CITIZEN_APPEARANCE_ID_SET = new Set(CITIZEN_APPEARANCE_IDS);

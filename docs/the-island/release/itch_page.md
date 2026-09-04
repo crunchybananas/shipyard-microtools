@@ -24,4 +24,4 @@ further each time. It isn't deeper water. It's earlier time.
   three.js and one island. Plays in the browser, mouse or touch. ~30–90 minutes
   the first time; the deep reads take longer.
 
-*headphones recommended · a world made of code, and a voice at the bottom that isn't*
+*headphones recommended · a world made of code, and a voice rising from the bottom*

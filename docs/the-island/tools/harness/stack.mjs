@@ -5,7 +5,9 @@
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (name, cond, extra) => (cond ? R.pass : R.fail).push(name + (cond ? '' : ' :: ' + JSON.stringify(extra)));
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute';
+  // This walk records real acts. Keep every mark in the disposable local source;
+  // a regression gate must never become another hand in the permanent stack.
+  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
   const ready = async () => {
     for (let i = 0; i < 40; i++) {
@@ -18,7 +20,7 @@ export default async function (h) {
   await h.navigate(URL); await ready();
   // clean slate: no save AND no stack — this run must build the ledger from zero
   await h.evaluate(`localStorage.setItem('abyme-muted','1');
-    ['abyme-save-v1','abyme-ledger-v1','abyme-hand-v1'].forEach(k => localStorage.removeItem(k)); 1`);
+    ['abyme-save','abyme-ledger-v2','abyme-hand-v1'].forEach(k => localStorage.removeItem(k)); 1`);
   await h.navigate(URL); await ready();
   await h.evaluate(`window.__errs=[]; addEventListener('error', e => window.__errs.push(e.message));
     document.getElementById('btn-begin').click(); 1`);
@@ -74,8 +76,8 @@ export default async function (h) {
   ok('rung 2 has evidence to render', inherited.ev2 >= 5, inherited);
 
   // the ledger must OUTLIVE the save — "Begin again" wipes the run, not the stack
-  const after = await h.evaluate(`(() => { ABYME.W.level = 1; localStorage.removeItem('abyme-save-v1');
-    return { save: localStorage.getItem('abyme-save-v1'), led: JSON.parse(localStorage.getItem('abyme-ledger-v1')||'null') }; })()`);
+  const after = await h.evaluate(`(() => { ABYME.W.level = 1; localStorage.removeItem('abyme-save');
+    return { save: localStorage.getItem('abyme-save'), led: JSON.parse(localStorage.getItem('abyme-ledger-v2')||'null') }; })()`);
   ok('the stack survives a wiped save', after.save === null && after.led && after.led.marks.length >= 7, after);
 
   // and it must survive a real reload
@@ -95,7 +97,7 @@ export default async function (h) {
     ABYME.goLevel(2);
     const withDraft = W.tide;
     // …and with a clean stack the same rung sits exactly at its authored ring
-    localStorage.removeItem('abyme-ledger-v1');
+    localStorage.removeItem('abyme-ledger-v2');
     return { d: +d.toFixed(4), withDraft: +withDraft.toFixed(4), base, level: W.level };
   })()`);
   ok('arriving at rung 2 lands on baseline + draft',
@@ -173,35 +175,64 @@ export default async function (h) {
   ok('marks are pruned from the 1:240 model clone', seen.pruned === true, seen);
   ok('no mark is drawn under the waterline', seen.dry === seen.count, seen);
 
-  // --- slice 5: THE DRIFT — the dead wheel, then the sea moves anyway -----------
+  // --- slice 5: THE UPSTREAM HAND — the dead wheel, then the sea moves anyway --
+  // The dedicated upstream-hand.mjs owns the visual lifecycle. This compact stack
+  // slice keeps only the causal contract here: real inherited valve evidence arms
+  // the public state, waits before consequence, then raises the tide exactly once.
   const armed = await h.evaluate(`(() => {
     const W = ABYME.W, g = ABYME.game;
-    const hs = (id) => g.interact.hotspots.find(s => s.id === id);
-    W.onceKeys = (W.onceKeys || []).filter((k) => k !== 'drift');
-    g._driftT = null;
+    const valve = g.interact.hotspots.find(s => s.id === 'valve');
+    W.flags.upstreamHandSurged = false;
+    W.flags.upstreamHandWitnessed = false;
+    const evidence = ABYME.evidence(2).filter((m) => m.k === 'valve');
     const before = +W.tideTarget.toFixed(4);
-    hs('valve').onClick();                       // dead down here — but it arms the drift
-    const armedNow = g._driftT === 0;
-    g.tick(3.0, 1); const midway = +W.tideTarget.toFixed(4);   // still nothing at 3s
-    g.tick(1.5, 1); const after = +W.tideTarget.toFixed(4);    // …and now the sea moves
-    return { before, midway, after, armedNow, draft: +ABYME.draft().toFixed(3),
-             once: W.onceKeys.includes('drift') };
+    valve.onClick();
+    return { before, evidence, state: ABYME.upstreamHandState(), draft: +ABYME.draft().toFixed(3) };
   })()`);
-  ok('the dead wheel arms the drift when a hand is really above you', armed.armedNow, armed);
-  ok('the drift WAITS — nothing moves while you are still watching', armed.midway === armed.before, armed);
-  ok('then the sea rises with nobody at the wheel', armed.after > armed.before, armed);
-  ok('the drift fires once per game', armed.once === true, armed);
+  ok('the L2 beat is caused by inherited valve evidence',
+    armed.evidence.length > 0 && armed.draft > 0, armed);
+  ok('the dead wheel arms the public Upstream Hand state',
+    armed.state.active === true && armed.state.sourceKind === 'valve', armed);
 
-  // and it must NOT fire on a clean stack — the beat has to be true, not atmospheric
+  await h.evaluate(`(() => { for (let i=0; i<20; i++) ABYME.game.tick(0.05, i * 0.05); return 1; })()`);
+  const midway = await h.evaluate(`(() => ({
+    target: +ABYME.W.tideTarget.toFixed(4),
+    surged: ABYME.W.flags.upstreamHandSurged,
+    witnessed: ABYME.W.flags.upstreamHandWitnessed,
+  }))()`);
+  ok('the Upstream Hand WAITS — the tide is unchanged at one second',
+    midway.target === armed.before && !midway.surged && !midway.witnessed, { armed, midway });
+
+  // Production-sized steps preserve the score's phases without making software-GL
+  // wall clock part of this compact causal contract.
+  await h.evaluate(`(() => { for (let i=0; i<140; i++) ABYME.game.tick(0.05, 1 + i * 0.05); return 1; })()`);
+  const surge = await h.evaluate(`(() => ({
+    target: +ABYME.W.tideTarget.toFixed(4),
+    surged: ABYME.W.flags.upstreamHandSurged,
+    witnessed: ABYME.W.flags.upstreamHandWitnessed,
+  }))()`);
+  ok('then the sea rises exactly one hand-width, once',
+    Math.abs(surge.target - (armed.before + 0.06)) < 1e-6 && surge.surged,
+    { armed, surge });
+
+  // A clean stack has no causal valve mark, so even the same dead wheel is inert.
+  // Let the already-proven positive score finish first; otherwise its public state
+  // would still (correctly) be active while we replace the ledger underneath it.
+  await h.evaluate(`(() => { for (let i=0; i<110; i++) ABYME.game.tick(0.05, 8 + i * 0.05); return 1; })()`);
   const quiet = await h.evaluate(`(() => {
     const W = ABYME.W, g = ABYME.game;
-    ABYME.clearStack(); ABYME.goLevel(2);
-    W.onceKeys = (W.onceKeys || []).filter((k) => k !== 'drift');
-    g._driftT = null;
+    ABYME.clearStack();
+    W.flags.upstreamHandSurged = false;
+    W.flags.upstreamHandWitnessed = false;
+    ABYME.goLevel(2);
+    const before = +W.tideTarget.toFixed(4);
     g.interact.hotspots.find(s => s.id === 'valve').onClick();
-    return { armed: g._driftT !== null, draft: ABYME.draft() };
+    const state = ABYME.upstreamHandState();
+    return { active: state.active, before, after:+W.tideTarget.toFixed(4), draft:ABYME.draft(),
+             evidence:ABYME.evidence(2).filter((m) => m.k === 'valve').length };
   })()`);
-  ok('no drift when nobody is upstream of you', quiet.armed === false && quiet.draft === 0, quiet);
+  ok('no Upstream Hand when nobody turned a valve above you',
+    quiet.active === false && quiet.before === quiet.after && quiet.draft === 0 && quiet.evidence === 0, quiet);
 
   // --- THE FIFTH RING: a goal one hand's work cannot reach ---------------------
   const ring = await h.evaluate(`(() => {
@@ -298,7 +329,8 @@ export default async function (h) {
     // CLOSE seals the way down
     seed(); set('close'); W.level = 2;
     ABYME.ring();
-    out.close = { sealed: ABYME.ledger().sealed.slice(), draft3: +ABYME.draft(3).toFixed(4) };
+    out.close = { boundary: ABYME.ledger().ops.find(op => op.r === 2 && (op.k === 'open' || op.k === 'close'))?.k || null,
+                  draft3: +ABYME.draft(3).toFixed(4) };
     // and it is applied ONCE, however many times a terminal is poked
     seed(); set('carry');
     ABYME.ring(); const once1 = ABYME.ledger().marks.length;
@@ -308,7 +340,7 @@ export default async function (h) {
   })()`);
   ok('TEND changes nothing for the rung below', disp.tend.after === disp.tend.before, disp);
   ok('CARRY takes your own marks back out', disp.carry.after < disp.carry.before && disp.carry.marks === 0, disp);
-  ok('CLOSE seals the rung — nothing reaches deeper', disp.close.sealed.includes(2) && disp.close.draft3 === 0, disp);
+  ok('CLOSE seals the rung — nothing reaches deeper', disp.close.boundary === 'close' && disp.close.draft3 === 0, disp);
   ok('a disposition is performed exactly once', disp.once.once1 === disp.once.once2, disp);
 
   // the index only exists once the question does

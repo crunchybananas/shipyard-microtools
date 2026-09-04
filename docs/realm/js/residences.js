@@ -2,8 +2,8 @@
 // a citizen's existing `home` reference remains authoritative and occupancy is
 // derived from the live citizen collection.
 
-import { G, HOUSE_TIERS } from './state.js?realm=197';
-import { nearestWalkableTile } from './pathfinding.js?realm=197';
+import { G, HOUSE_TIERS } from './state.js?realm=198';
+import { nearestWalkableTile } from './pathfinding.js?realm=198';
 
 export function houseResidentCapacity(house) {
   if (!house || house.type !== 'house') return 0;

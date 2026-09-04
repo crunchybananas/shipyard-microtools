@@ -1,486 +1,502 @@
-// content.js — the island's WORDS, in one place.
+// content.js — what can be heard, read, and physically recorded on the island.
 //
-// As ABYME pivots toward "a deep story, a lot of content," narrative text moves out of
-// the engine handlers and into data here, so a line can be rewritten — or, soon, VOICED
-// — without touching puzzles.js / main.js logic. This first slice centralises the
-// KEEPER's spoken lines (exactly the material the voice routing and the "the light was
-// lit for you" twist will edit) and the journal SKETCHES. The diegetic whisper/journal
-// PAGE catalogue is the next content tick; those stay at their call sites for now where
-// they are coupled to puzzle logic.
-//
-// All metaphor, no biography — an abstract lighthouse poem (see loop/SPINE.md).
+// The prose observes; it does not solve. Written artifacts contain measurements,
+// omissions, and traces left by other hands. Interpretation belongs to the player.
 
 // ---- THE KEEPER -------------------------------------------------------------
-// The drowned voice one floor down — the only "I/you" in the game. Spare, metaphor
-// only; recognition curdling into resignation the deeper you go. These are the lines
-// the voice layer (bm_george, through the drowned bus) routes, and the ones the twist
-// re-points from below to eye-level on the final approach. The quote marks are part of
-// the line: his words are always in quotes.
+// A voice from a lower landing. It asks about consequences visible from below; it never
+// names the player, explains itself, or resolves into a secret identity.
 export const KEEPER = {
-  // when the figure looks back as you lean over the chart-table model, at depth (#14).
-  // keyed by W.level; the look fires only from L3 down (puzzles gates at W.level >= 3),
-  // and at the bottom the look[4] line opens the twist beat.
   look: {
-    3: '“Oh. Not again.”',
-    4: '“You’re faster than I was. Don’t be proud of it.”',
+    3: '“Was it dry where you stood?”',
+    4: '“Did you see what the water carried?”',
   },
-  // his answer when you first arrive at a new depth (#14). `deep` is W.level >= 4.
   arrive: {
-    shallow: '“Oh. You came down too.”',
-    deep: '“There is no bottom. I looked.”',
+    shallow: '“It rose when the wheel turned.”',
+    deep: '“I thought the water was mine.”',
   },
-  // the last, resigned line as you climb back up past him; then he falls silent (#12).
-  farewell: '“…go on up. Don’t leave the light on for me. I never could.”',
+  farewell: '“Do you know where it went?”',
 };
 
-// ---- THE LORE CORPUS (the reading surface / Meow-Wolf unfolding) -------------
-// Books, letters, charts, inscriptions the player OPENS and READS — the keeper's life
-// assembled in fragments, found in any order across the world. Each fragment: { kind, hand,
-// title, pages[], deepFrom?+deep[] (extra pages legible only at W.level>=deepFrom — the surface
-// read vs the deep read), journal? (a story-bearing line added to the journal on first read) }.
-// All metaphor: the lensmaker who keeps a light for someone out on the water, the rising sea,
-// the model built to hold one day back. Reading marks W.readKeys (the Codex + the endgame book).
+// The shelf is a routing index, never an answer key. Each stamped figure names one
+// physical instrument elsewhere on the island; the instrument's already-observed
+// construction supplies the reading. Geometry renders only `symbol` + `label` on
+// the spines. `reading` remains here as the single, testable rules authority.
+export const SIGNAL_BINDINGS = Object.freeze([
+  Object.freeze({ glyph: 0, instrument: 'sun-crank', symbol: '☉', label: 'SUN', reading: 1, readingLabel: 'one moving sun', evidenceId: 'evidence.crank' }),
+  Object.freeze({ glyph: 1, instrument: 'tide-staff', symbol: '≡', label: 'TIDE STAFF', reading: 5, readingLabel: 'five gauge rings', evidenceId: 'evidence.model-gauge' }),
+  Object.freeze({ glyph: 2, instrument: 'basin-wheel', symbol: '⊕', label: 'BASIN WHEEL', reading: 4, readingLabel: 'four wheel spokes', evidenceId: 'evidence.valve' }),
+  Object.freeze({ glyph: 3, instrument: 'music-cylinder', symbol: '♫', label: 'MUSIC TEETH', reading: 4, readingLabel: 'fourth filed tooth', evidenceId: 'evidence.music-box' }),
+  Object.freeze({ glyph: 4, instrument: 'stone-arc', symbol: '●', label: 'STONE ARC', reading: 6, readingLabel: 'six sounding stones', evidenceId: 'evidence.fallen-stone' }),
+  Object.freeze({ glyph: 5, instrument: 'lamp-eye', symbol: '◉', label: 'LAMP EYE', reading: 1, readingLabel: 'one lens eye', evidenceId: 'evidence.lens' }),
+  Object.freeze({ glyph: 6, instrument: 'survey-rule', symbol: '━', label: 'SURVEY RULE', reading: 1, readingLabel: 'one spanning rule', evidenceId: 'evidence.ruler' }),
+  Object.freeze({ glyph: 7, instrument: 'plumb-line', symbol: '◆', label: 'PLUMB LINE', reading: 1, readingLabel: 'one hanging line', evidenceId: 'evidence.plumb' }),
+]);
+
+export const SIGNAL_ROUTE = Object.freeze([1, 5, 3, 4]);
+export const SIGNAL_HATCH_CODE = Object.freeze(SIGNAL_ROUTE.map((glyph) => {
+  const binding = SIGNAL_BINDINGS.find((entry) => entry.glyph === glyph);
+  if (!binding) throw new Error(`Missing signal binding for glyph ${glyph}`);
+  return binding.reading;
+}));
+
+// ---- READABLE ARTIFACTS -----------------------------------------------------
+// Every readable has stable surface/deep notebook IDs. Pages expose traces and records;
+// they do not add an authorial interpretation to the notebook.
 export const LORE = {
   keeper_logbook: { era: 'spanning', eraDeep: 'inspection',
     kind: 'book', hand: 'keeper', title: 'The Keeper’s Logbook',
     pages: [
-      'I keep the light. That is the whole of it, set down plainly, the way you are taught to set it down. Wind from the south-west. The lamp trimmed. The glass clear. A keeper’s hand should be dull on the page. Mine wants to say more, and must not.',
-      'Ground a new lens today — the fourth this season. The last one fogged where I breathed on it too long. A lens is only patience made solid: you take a flaw, and you turn it, and turn it against the stone, until the flaw becomes a way of seeing. I keep the light so that someone out on the water can find the way back to the shore. That is the use of patience. That is the use of me.',
-      'The sea stands higher this month than last, and last than the month before. I marked the old line on the third step, and the new one has gone over it. No one else has marked it. I do not say it aloud. To say a thing is to let it be true.',
-      'I have begun to build the island again, small, upon the chart table. A foolishness. But if I can hold the whole of it in my two hands — the shore, the stones, this room with its very small lamp — then perhaps I am holding the day it was still whole. The model does not lie. It only hopes.',
-      'Smaller. The model needs a model, for the model has a sea too, and that sea is rising in it. So I built one smaller still inside it, and the smallest holds a lamp the size of a grain of light. I cannot stop. Each one is the day held a little tighter. Each one drowns a little slower.',
-      'If you are reading this, you have come a long way down to find it. Do not be proud of how fast you came; I was slow, and the slowness was the only mercy I had. Keep the light, or do not. But do not leave it burning for no one — that is the cruelty I taught myself, and I would not teach it to you.',
+      '3 April. Wind southwest. Lamp trimmed 18:40. Lens clear. Mean high water 4 cm above the printed table.',
+      '17 May. New line cut on the third stair. The old line is below water at neap tide.',
+      '2 June. Table model begun at one to two hundred and forty. Basin, channel, bridge, tower. All levels taken from the island.',
+      '19 June. A valve fitted beneath the basin. The model loses water when the bay does. Discharge not visible from the study.',
     ],
     deepFrom: 3,
     deep: [
-      '(The hand here is not steady. It may be mine. It may be yours.) There is no bottom — I have looked. Each room I make to be safe becomes the next room I am afraid in. The trick the sea teaches: you do not drown all at once. You drown a little, and call it keeping busy.',
+      'BOARD QUERY: Where is displaced water received?\n\nREPLY: [the ruled space is blank; the paper is worn through where a word was erased.]',
     ],
-    journal: 'Found the keeper’s logbook on the chart table. He ground lenses to keep a light for someone out on the water — and when the sea began to rise, he started building the island again, small, to hold one whole day back.',
-    journalDeep: 'Read again from the deep, the logbook’s last page turns colder, the hand no longer steady: there is no bottom — he has looked. Each room built to be safe becomes the next room he is afraid in. You do not drown all at once; you drown a little, and call it keeping busy.',
+    notes: { surface: 'evidence.logbook.surface', deep: 'evidence.logbook.deep' },
   },
-  // The bay itself is the readable, and it must NOT hand the puzzle over.
-  //
-  // Two drafts got this wrong in the same direction. The first transcribed the eighteen
-  // message volumes straight into the journal — correct when they were the only lettered
-  // spines in the room, and the whole puzzle printed once every spine carries a title.
-  // The second replaced that with a page saying the rule is DOUBLED on some volumes,
-  // which is the same mistake wearing a hat: owner, "the letter even gives it completely
-  // away. we don\u2019t want to hand the puzzle to the person, or not immediately."
-  //
-  // So the surface pages make you LOOK without saying what at. The last line of the last
-  // page is the whole nudge — it says something is different and refuses to say what.
-  // The method waits for the deep reading, which is gated at rung 3 and is a long way in;
-  // that is the "not immediately".
-  //
-  // Even the deep page never says the sentence. STACK.md\u2019s guardrail is that the line
-  // is said aloud once, ever. spines.mjs asserts both: no page says the line outright,
-  // and no page names a message volume.
-  lettered_shelf: { era: 'spanning', eraDeep: 'inspection',
-    kind: 'shelf', hand: 'keeper', title: 'The lettered shelf',
-    place: { prop: 'none', label: 'the lettered spines', maxDist: 3.0, glow: 'gilt' },
+  // A routing index, not a cipher: the beam selects figures; the bindings name
+  // instruments whose physical readings the player has earned elsewhere.
+  signal_shelf: { era: 'spanning',
+    kind: 'shelf', hand: 'keeper', title: 'The instrument index',
+    place: { prop: 'none', label: 'the instrument index', maxDist: 3.0, glow: 'gilt' },
     pages: [
-      'Every volume in this bay is lettered, and so is the far bay, and so is every shelf in the tower. Tide tables. Buoyage. Regulations. Psalms. Whatever a man needs to keep a light, and a few things he needed for himself.\n\nHe was not someone who left a spine blank.',
-      'The gilt is worn where he went back. BUOYAGE is rubbed almost to the board. PSALMS is not touched at all.\n\nHalf of this library is about water. None of it says so.',
-      'He had them bound the same way, by the same hand, over a great many years \u2014 and tooled the same way too, which is the sort of habit a man keeps without deciding to.\n\nAlmost the same way.',
+      'Eight narrow harbour manuals. Each spine binds one stamped figure to an instrument: sun crank, tide staff, basin wheel, music teeth, stone arc, lamp eye, survey rule, or plumb line.',
+      'The stamps match the forms cut into the cliff. No values are printed; the bindings point back into the working room and the island beyond it.',
     ],
-    deepFrom: 3,
-    deep: [
-      '(from down here the shelf stops being a shelf. Look at what is struck above each title, and count the volumes where there are two lines instead of one: eighteen, and eighteen is not a number that happens to a man\u2019s binding habits. Take those eighteen in the order a man reads his own shelf \u2014 top board down, left to right \u2014 and take only the first letter of each. He struck it in gilt at eye height and walked past it every day of his life. He knew before any of us. He shelved it.)',
-    ],
-    journal: 'His shelf is lettered end to end \u2014 not a blank spine in the tower, and half the library about water without once saying so. He had them all bound and tooled the same way, by the same hand, over a great many years. Almost the same way.',
-    journalDeep: 'Read again from further down, the shelf gives up its arrangement: eighteen volumes are tooled with two lines above the title where the rest have one, and eighteen is not a number that happens. Taken in the order a man reads his own shelf \u2014 top board down, left to right \u2014 their initials are not an accident.',
+    notes: { surface: 'artifact.signal-shelf.surface' },
   },
   coat_letter: { era: 'spanning', eraDeep: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A letter, folded small',
     pages: [
-      'I write this and I will not send it, because to send it is to admit you are far enough away to need a letter.',
-      'The light still turns. I want you to know that. Whatever you saw from the water — whatever it looked like, out there — the light still turns, and I am the one turning it, and I have not stopped, and I will not.',
-      'Come up the stairs. The kettle is on. It has been on a long time.\n\n— the one who keeps it',
+      'The east room is dry. The blue blanket is in the chest. The kettle draws from the rain tank, not the sea.',
+      'No account is required at the door. Come in wet if you must.\n\n— K.',
     ],
     deepFrom: 3,
     deep: [
-      '(folded inside the fold, in a smaller hand — the part I did not let myself write the first time) The kettle is not on for you. I have known that a while now. It is on for me — for the version of me still out on the water, who has not yet understood he is allowed to come in. I keep it warm so that when he finally rows up to the door, soaked and ashamed and years too late, there is something waiting that does not ask him where he has been.',
+      'Inside the fold: EAST ROOM — repaired latch; dry boards; spare key beneath the blue cup.',
     ],
-    journal: 'A letter in the coat pocket, never sent. The kettle has been on a long time.',
-    journalDeep: 'Read again from deeper down, the unsent letter gives up its smaller hand: the kettle was never for someone else. It is on for the part of him still out on the water — kept warm for the soaked, ashamed, years-too-late self, so that when he finally rows up to the door, something waits that does not ask where he has been.',
+    notes: { surface: 'evidence.coat-letter.surface', deep: 'evidence.coat-letter.deep' },
   },
   stone_inscription: { era: 'founding',
     kind: 'inscription', hand: 'keeper', title: 'Cut into the standing stone',
     pages: [
-      'WE WHO WENT DOWN\nLEFT THE LIGHT FOR\nWHOEVER WASHES UP\n\n— turn it, and turn it',
+      'WE WHO WENT DOWN\nLEFT THE LIGHT FOR\nWHOEVER WASHES UP',
     ],
     deepFrom: 2,
     deep: [
-      '(the tide has been over the stone, and below the old cut a fainter line is bared — the same chisel, later, set lower than any dry hand would reach)\n\nAND WHOEVER WASHES UP\nIS WHO WENT DOWN.\nTHERE WAS ONLY EVER ONE.',
+      'Below the old cut, bared by the higher tide:\n\nTHE HILL HELD.\nTHE HALL DID NOT.\nBOTH WERE OUR WORK.',
     ],
-    journal: 'Words cut into a standing stone, worn soft by the sea: “We who went down left the light for whoever washes up.”',
-    journalDeep: 'The tide has been over the standing stone, and below the worn cut a fainter line is bared — set lower than any dry hand would reach: “and whoever washes up is who went down. there was only ever one.”',
+    notes: { surface: 'evidence.standing-stone.surface', deep: 'evidence.standing-stone.deep' },
   },
-  // washed up at the wake-up beach — the FIRST fragment most players meet, an invitation.
+  // The first current measurement most players find.
   bottle_note: { era: 'lastday',
     kind: 'letter', hand: 'keeper', title: 'A note in a bottle, washed up',
     pages: [
-      'To whoever finds this — and someone always does; the sea is a poor keeper of secrets — the light you can see from here is mine.',
-      'If you are reading this on my beach, you have already come further than most turn back. Keep going, or do not. But know the light is lit, and it is lit for someone.\n\nToday I have decided that someone can be you.',
+      'The bottle was sealed at the jetty at low water. Wind southwest. If it returns to this beach, the west current has reversed.',
+      'The lamp room is unlocked. The rain tank is sound. The east room is dry.',
     ],
     deepFrom: 2,
     deep: [
-      '(the paper has a back, and the back was written on too, in a smaller hand that did not expect to be read — because by the time you turn it over, you have already gone under) You found this on the beach and thought it was meant for some stranger the light was waiting on. It was not. I wrote "someone can be you" because I could not yet write the truer thing. The someone was always you. The light was always yours. I have kept it lit on your own behalf, against the day you would come back up the beach from the wrong direction — out of the water, not down the road — and need to be told you are allowed to come in.',
+      'On the back: RETURN OBSERVED. Water 11 cm above the mark. Bottle intact.',
     ],
-    journal: 'A bottle on the beach, a note inside: the keeper says the light is lit for someone — and today he has decided that someone can be you.',
-    journalDeep: 'Turned over once you have gone under, the bottle’s note has writing on its back: “someone can be you” was the truer thing he could not yet say — the someone was always you, the light always yours, kept lit against the day you would come back up the beach out of the WATER, not down the road, and need telling that you are allowed to come in.',
+    notes: { surface: 'evidence.bottle.surface', deep: 'evidence.bottle.deep' },
   },
-  // SEA-STRATA L2: a wax slate hidden in the kelp (loop #132) — the keeper's FIRST shallow
-  // descent, and a diegetic hint for the Tide-Figure that stands in this same water. Lives in
-  // region2, so it is reachable (and readable) only at L2 — a depth-specific hidden fragment.
+  // L2: two recorded trials, enough to compare without an instruction.
   kelp_slate: { era: 'arrival',
     kind: 'inscription', hand: 'keeper', title: 'A wax slate, tangled in the kelp',
     pages: [
-      'I went down the first time only as far as the kelp — no deeper. I told myself I was checking the mooring. A keeper is allowed his small lies; they are the ballast that lets a man sink slowly enough to bear it.',
-      'There is a shape that stands in the kelp at this depth. Soft, and dark, and patient. The first dive I waded at it, certain it was the one I keep the light for — and it scattered like silt and was gone. The second dive I did not chase. I stood, and was still, and let it be what it was: which was me, waiting for me. Be still with it. It is not cruel. It is only early.',
+      'FIRST WADE. Dark form at twelve paces. Closed distance: form broke apart; water clouded with silt.',
+      'SECOND WADE. Held position. Form surfaced once. One low note crossed the bay. Duration: nine breaths.',
     ],
-    journal: 'A wax slate tangled in the L2 kelp — the keeper’s first shallow descent. A soft dark shape stands in the kelp: wade at it and it scatters like silt; be still and it resolves. “It was me, waiting for me. It is not cruel. It is only early.”',
+    notes: { surface: 'evidence.kelp-slate.surface' },
   },
-  // SEA-STRATA L3: a cairn on the bluff (loop #134), the keeper's note from deeper in the descent
-  // — the high dry vantage over the drowned hall, and a diegetic hint for the Watcher (don't run,
-  // don't look away — hold its gaze and it lets go). Lives in region3, readable only at L3.
+  // L3: a measured change in the Watcher's distance.
   bluff_cairn: { era: 'inspection',
     kind: 'inscription', hand: 'keeper', title: 'A cairn on the bluff, scratched in the top stone',
     pages: [
-      'I stacked these stones where the water has not yet reached, to mark the last dry place I know. From here you can see it: the drowned hall, the tops of the columns breaking the surface like a hand going under. I built those rooms, every one, to be safe in. I am also the sea that took them. Both. At once. That is the thing no one tells you.',
-      'There is a watcher in the deep water below. It comes toward you when you turn away, and stops when you face it. Do not run — running is only how it follows. Do not look away. Hold its gaze, and keep holding, until it lifts its head and lets you go. It was never the sea’s. It is your own attention, walked all this way down to find you. Meet it. Then climb.',
+      'Cairn rebuilt above the wet line. Drowned hall roof visible to the east.',
+      'The shore figure was twelve paces nearer after I checked the hall. No wake. No footprints. It did not advance while observed.',
     ],
-    journal: 'A cairn on the L3 bluff, the keeper’s mark scratched in the top stone: from the last dry place he watches the drowned hall break the surface — the rooms he built AND the sea that took them, both at once. A warning, too: there is a watcher in the deep water; don’t run, don’t look away. “Hold its gaze until it lets you go. It is your own attention, come to find you.”',
+    notes: { surface: 'evidence.bluff-cairn.surface' },
   },
-  // SEA-STRATA L4 'source': a note left at the bottom (loop #135), the keeper's last instruction —
-  // a diegetic frame for the chart-table look-back + carry-up (the integration). Lives in region4,
-  // readable only at L4. Completes the per-level hint set (L2 Tide-Figure, L3 Watcher, L4 keeper).
+  // L4: conservation evidence, not a final instruction.
   source_note: { era: 'lastwinter',
-    kind: 'letter', hand: 'keeper', title: 'A note left at the bottom, weighted with a stone',
+    kind: 'letter', hand: 'keeper', title: 'A transfer sheet, weighted with a stone',
     pages: [
-      'If you have come all the way down to the source, then there is only the one errand left, and I will set it down plainly so you cannot pretend you did not understand. Go to the chart table. Lean over the model — over the smallest island, the one with the grain-of-light lamp.',
-      'Someone is bent over it. Do not flinch when he lifts his head. He is not a stranger and he is not the sea; he is the one you came down here to find, which is to say he is you, at the worst hour, still keeping a light. Turn him to face you. Then carry him up. Do not leave him at the bottom — leaving him is the only way to lose, and I have lost that way before, and I would not have you learn it.',
+      'TRANSFER TEST 4. Upper basin lowered: 28 cm. Lower pool raised: 28 cm. Delay: eleven seconds.',
+      'Return test incomplete. Wheel seized after reversal. Pressure remained on both sides of the plate.',
     ],
-    journal: 'A note weighted with a stone on the cold floor of the source: the last errand. Lean over the chart-table model; the one bent over it is not a stranger, not the sea — he is you, at the worst hour, still keeping a light. Turn him to face you and carry him up. “Leaving him at the bottom is the only way to lose.”',
+    notes: { surface: 'evidence.transfer-sheet.surface' },
   },
-  // the keeper's PRIVATE bedside journal, in the quarters behind the inner door (revealed one
-  // level down). The intimate counterpart to the public logbook; its deep page turns toward the
-  // descent — he begins to suspect the one he keeps the light for went DOWN, not out to sea.
+  // The room's safety changes from barricade to chosen shelter across its two reads.
   quarters_journal: { era: 'inspection', eraDeep: 'lastwinter',
     kind: 'book', hand: 'keeper', title: 'A journal kept by the cot',
     pages: [
-      'The public log is for the inspector. This one is for me, and I keep it where no inspector goes — under the pillow, against my own ear. Here I am allowed to say it plainly: I am afraid. Not of the sea. Of being the last one awake when it comes.',
-      'I drew the island again tonight — smaller — on the wall where I can see it from the cot. My hand does this without me now. They say a man draws what he cannot say, and I have said nothing aloud in a long while, so my hand has a great deal of work.',
-      'There was someone I keep the light for. I will not set the name down — to write it is to admit how long the lamp has burned with no boat coming. But I trim it every dusk. A light kept for no one is only a fire; a light kept for someone is a promise. I choose, each dusk, to call it a promise.',
+      'Could not sleep through the west gale. Moved the chair against the inner door.',
+      'Drew the island again from memory. The channel is too narrow. The east room remains dry in every version.',
+      'Lamp trimmed at dusk. Cot lamp left burning until morning.',
     ],
     deepFrom: 3,
     deep: [
-      '(later, in a worse hand) I have begun to suspect the one I keep the light for is not out on the water, rowing up toward me. I think they are already here — that they came, and went DOWN, and that I have aimed the beam at the wrong horizon all this time. Tomorrow I will turn it to face the deep. Tomorrow I will go down and look.',
+      'Later: moved the chair away from the door. Slept with it open. Rain reached the threshold; the east boards stayed dry.',
     ],
-    journal: 'Found the keeper’s private journal by his cot — kept under the pillow, against his own ear. He is afraid of being the last one awake; he draws the island smaller each night; he trims a light at every dusk for someone he will not name.',
-    journalDeep: 'From further down, the cot-journal turns: he stopped trusting the horizon. He came to suspect the one he kept the light for went DOWN, not out to sea — and resolved to turn the lamp to face the deep, and go down after them.',
+    notes: { surface: 'evidence.quarters-journal.surface', deep: 'evidence.quarters-journal.deep' },
   },
-  // legible ONLY once you hold the keeper's reading glass — lampblack written too small for the
-  // naked eye. The found-lens reveal (puzzles.js): these marks fade in when W.flags.readGlass.
+  // Legible only through the reading glass.
   lens_mark_study: { era: 'inspection',
     kind: 'inscription', hand: 'keeper', title: 'Lampblack, too small to read by eye',
     pages: [
-      '(the glass makes it legible) I write the true things small, in lampblack, where only a patient hand with a glass will ever find them. The inspector reads the big log and goes home satisfied.',
-      'You have a glass, and a patient hand, so here is a true thing: I am not keeping the light to save a ship. There are no ships. I am keeping it so that when I finally go down to look, there will be something lit above me to climb back toward.',
+      'Through the glass: LENS ROTATION 04:10. Beam crossed the west cliff at 04:13. Four figures returned from the cut face.',
+      'Order copied in the margin as figures only. No numerals are written here.',
     ],
     deepFrom: 3,
     deep: [
-      '(smaller still, and the glass shakes as you read it — or your hand is mine) If you are reading even this, with the glass, from down here, then you already know the thing I could write only at the very bottom of the very small: there is no inspector, no ship, no other light kept by anyone else. There is only this — one hand, grinding one lens, to read one true line by which to find the way back up. You are the patient hand. You always were. Now put the glass down, and climb.',
+      'A second hand added: CLIFF DRY. HALL FLOODED. Same figures visible on both faces.',
     ],
-    journal: 'Through the keeper’s reading glass, lampblack on the chart too small for the eye: he keeps the light not for ships — there are none — but so that when he goes down, something stays lit above him to climb back toward.',
-    journalDeep: 'The smallest lampblack line, read with the glass from the deep: there is no inspector, no ship, no other light — only one hand grinding one lens to read one true line by which to climb back up. “You are the patient hand. You always were. Put the glass down, and climb.”',
+    notes: { surface: 'evidence.lens-study.surface', deep: 'evidence.lens-study.deep' },
   },
   lens_mark_stone: { era: 'inspection',
     kind: 'inscription', hand: 'keeper', title: 'Scratched into the stone, hair-fine',
     pages: [
-      '(only the glass shows it) Whoever you are, holding this glass: you are not the first to read these. You will not be the last.',
-      'We each think we are the one who went down. We are each also the light left lit. The whole trick of it is to be the one who fell AND the one who keeps the lamp — at once, without choosing. Hold both. And climb.',
+      'Through the glass: thirty-seven short strokes, grouped by five. Five longer strokes cross the groups at different angles.',
+      'The stone is polished at palm height. The polish overlaps several generations of cuts.',
     ],
     deepFrom: 3,
     deep: [
-      '(below the hair-fine line, fainter, as if added on a different night — or by the same hand much later) Count the scratches under this one, if you can hold the glass steady. Each is someone who stood here, went down, and came back up far enough to add a mark and leave the glass for the next. You think your grief is the deepest, and the first. It is neither — and that is the only comfort the stone has to give: the way down is worn smooth by everyone who climbed back. Add your mark. Leave the glass. Climb.',
+      'Below the tide line are more strokes, softened but still deliberate. One ends above the water; another continues beneath it.',
     ],
-    journal: 'Hair-fine letters on a standing stone, shown only by the glass: “We each think we are the one who went down. We are each also the light left lit. Hold both, and climb.”',
-    journalDeep: 'Below the hair-fine letters, fainter, read with the glass from the deep: count the scratches — each is someone who stood here, went down, and climbed back up far enough to add a mark and leave the glass for the next. “You think your grief is the deepest and the first. It is neither. The way down is worn smooth by everyone who climbed back. Add your mark. Leave the glass. Climb.”',
+    notes: { surface: 'evidence.lens-stone.surface', deep: 'evidence.lens-stone.deep' },
   },
-  // sealed in the high pool's phial (#49 round trip) — found glinting in the DRY pool at the
-  // surface, floated free only at the bottom (the risen sea reaches the basin at last), dried
-  // and read back at the surface study. A letter addressed to the SEA itself: the reader's
-  // arrival condition (water this high = the bottom) is baked into the fiction.
+  // A physical round trip between the dry upper pool and the fifth water ring.
   pool_phial: { era: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A note sealed in a phial, dried and unrolled',
     pages: [
-      'To the sea — because you will arrive; everything I keep comes to you in the end. I found this pool already old when I came: your work, from some year when you stood higher than anyone now believes. Then you drew back and left it to the gulls, the way you leave everything you take. I am sealing this against the day you climb back up for it.',
-      'When you stand this high again, it will mean the island is nearly done, and so am I. So here is the one thing I ask, set down while my hand is still dry: whoever fishes this out of your risen water — let them up. They will have come down a long way to be standing there. Carry them back to the surface the way you carry everything else you finally return. That is all. Keep the rest.\n\n— the keeper of the light above you',
+      'POOL TEST. Phial wedged at dry datum: +14.8 m. It can clear the lip only when the basin reaches the fifth ring.',
+      'Paper dried after recovery. Salt line inside the glass: 3 mm below the cork.',
     ],
-    journal: 'The dried note from the phial is a letter to the SEA, sealed against the day it rose high enough to take it. He asked it one thing: that whoever fishes the phial from the risen water be let back up — carried to the surface “the way you carry everything else you finally return.”',
+    notes: { surface: 'evidence.pool-phial.surface' },
   },
-  // the inspector's tide ledger (#55), wedged in the drain — the INSTITUTIONAL record of
-  // the rising sea, its official hand cracking. A written artifact, not a speaking voice
-  // (the keeper stays the game's only I/you); it countersigns his instruments from outside:
-  // the gauge's rings, the logbook's third step, the buoy's channel.
+  // The institutional measurements lag the island's instruments.
   drain_ledger: { record: true, era: 'inspection',
     kind: 'book', hand: 'inspector', title: 'A tide ledger, water-swollen',
     pages: [
-      'DISTRICT OF LIGHTS — QUARTERLY RETURN. Station: the island. Keeper: [the ink has run]. Mean high water: RISEN — see appendix. Appendix: missing. Remarks: the keeper’s figures disagree with the printed tables. The keeper’s figures are carefully made. The printed tables are reprinted each year unchanged. One of these is a record; the other is a habit.',
-      'SECOND QUARTER. Mean high water: risen again. The boat-store stair is wet at the third step at neap. I have signed the return, and I note here, unofficially, between one damp page and the next: no one reads these. I file them to a cabinet that floods. The keeper alone measures as if measuring mattered — his rings on the channel staff are the only honest instrument in this district. I have recommended him for commendation and expect nothing.',
+      'DISTRICT OF LIGHTS — QUARTERLY RETURN. Mean high water: +4 cm against table. Keeper’s staff checked against survey chain: exact.',
+      'SECOND QUARTER. Mean high water: +11 cm. Boat-store stair wet at third step during neap. Printed table unchanged.',
     ],
     deepFrom: 3,
     deep: [
-      '(the last leaf, unlined — the official hand abandoned) They will close the station before they will reprint the tables. When the water reaches the archive, the district will finally agree with the keeper — all at once, and by drowning. I have left this ledger where the tide can countersign it. What you bury, the tide still finds. What you file, it finds sooner.',
+      'FINAL RETURN. Archive floor flooded before inspection. Station figures accepted. Printed table withdrawn.',
     ],
-    journal: 'A tide ledger, water-swollen, wedged where the drain wall meets the floor — the district’s official record of the rising sea. The printed tables never changed; his figures did. “One of these is a record; the other is a habit.”',
-    journalDeep: 'The ledger’s last leaf, read from the deep, drops the official hand: they would close the station before reprinting the tables — when the water reaches the archive, the district will agree with him all at once, and by drowning. He left it where the tide could countersign it. “What you file, it finds sooner.”',
+    notes: { surface: 'evidence.drain-ledger.surface', deep: 'evidence.drain-ledger.deep' },
   },
-  // #50-A: the inspector's second fragment. The AMBIGUITY ENGINE is canon (lens_mark_study's
-  // deep page negates him), so every inspector artifact must survive two readings: a real
-  // official, or the keeper writing in an invented hand to feel witnessed.
+  // A retained recommendation whose provenance remains physically uncertain.
   commendation_copy: { record: true, era: 'inspection',
     kind: 'letter', hand: 'inspector', title: 'A carbon copy, kept',
     place: { parent: 'quarters', pos: [-0.35, 0.44, 1.05], rx: -Math.PI / 2 + 0.06, rz: 0.3, prop: 'sheet', label: 'a carbon copy, kept', maxDist: 2.6, gate: 'quarters' },
     pages: [
-      'CARBON RETAINED — RECOMMENDATION FOR COMMENDATION. To the District Board: I write concerning the keeper of the island light. His returns are exact where exactness costs sleep. His lens-work is the finest in the district, and the light has never once stood dark on his watch. I am aware the Board does not commend stations scheduled for review. I recommend him anyway. Some records exist to be filed. This one exists to be true.',
+      'CARBON RETAINED — RECOMMENDATION FOR COMMENDATION. Returns exact. Lens work within tolerance. Light outages: none. Recommendation submitted despite pending station review.',
     ],
     deepFrom: 3,
     deep: [
-      '(read again from below, the sheet gives up its trouble: the carbon is the top copy. There is no pressed original beneath it — and a carbon without an original is not a copy of anything; it is a letter never sent, in a hand very like a man praising himself in the only voice he could bear to hear it in. Or it is exactly what it claims, and the original went to a Board that never answered. The glass cannot settle it. Neither can I.)',
+      'The retained sheet is top carbon. No impression from an original page is visible beneath it. The signature line is blank.',
     ],
-    journal: 'A carbon copy kept by the cot: the inspector recommending him for commendation — “some records exist to be filed; this one exists to be true.” He kept the copy. Of course he kept the copy.',
-    journalDeep: 'Read from below, the carbon gives up its trouble: there is no pressed original — praise in a hand very like his own, a copy of nothing; or exactly what it claims, sent to a Board that never answered. The glass cannot settle which. I have stopped needing it to.',
+    notes: { surface: 'evidence.commendation.surface', deep: 'evidence.commendation.deep' },
   },
-  // #50-A: the inspector's third fragment — the end of keeping, drafted. deepFrom 4: the
-  // bottom alone can read what the notice actually is.
+  // A closure proposal without the fields that would make it an order.
   closure_notice: { record: true, era: 'lastwinter',
     kind: 'letter', hand: 'inspector', title: 'A notice of review, folded small',
     place: { pos: [-84.45, 14.475, -41.06], ry: 0.35, prop: 'fold', label: 'a paper, folded small', maxDist: 2.8 },
     pages: [
-      'NOTICE OF REVIEW — DISTRICT OF LIGHTS. The Board, having considered the returns of the island station, finds the cost of its keeping to exceed the traffic served. The light is to be extinguished and the station struck from the list, effective the turn of the quarter. The keeper will present himself at the mainland office with the log, the instruments, and the great lens.',
+      'NOTICE OF REVIEW — DISTRICT OF LIGHTS. Station cost exceeds traffic served. Proposed action: extinguish light; recover instruments and great lens; offer mainland transfer.',
     ],
     deepFrom: 4,
     deep: [
-      '(from the bottom, the notice reads otherwise. The date is blank. The quarter is never named. An order to extinguish a light that never says WHEN is not an order — it is a fear, drafted in officialese: the day the keeping ends, written down to see whether it could be survived on paper first. He did not obey it. There may have been nothing to obey. Either way the light is still lit. Go up and see.)',
+      'The effective date and authorising signature are blank. In the margin: RECEIPT NOT ACKNOWLEDGED.',
     ],
-    journal: 'Folded small under the chart table’s rim: a notice of review — the light to be extinguished, the station struck from the list, “effective the turn of the quarter.” He wedged it where he would see it every day, and did not obey it.',
-    journalDeep: 'From the bottom, the notice comes apart: the date is blank, the quarter never named. Not an order — a fear drafted in officialese, the end of keeping written down to see whether it could be survived on paper first. Either way: the light is still lit. Go up and see.',
+    notes: { surface: 'evidence.closure.surface', deep: 'evidence.closure.deep' },
   },
-  // on the MODEL's own chart table (#53) — a margin the width of a fingernail, read only by
-  // someone bent over a model with a glass: which is exactly what HE was when he wrote it.
-  // The recursion speaks to the next hand down.
+  // Measurements on the smallest visible chart-table margin.
   field_slip: { record: true, era: 'inspection',
     kind: 'letter', hand: 'inspector', title: 'A field slip, pinched under the cairn',
     place: { parent: 'bluffCairn', pos: [0.18, 0.62, 0.14], rx: -Math.PI / 2 + 0.2, rz: -0.4, prop: 'sheet', label: 'a field slip, pinched under stone', maxDist: 2.8, gate: 'l3' },
     pages: [
-      'FIELD SLIP — station: the island. Wind SW, moderate. Glass falling. Ascent to the north bluff: twenty-two minutes against the guide’s estimate of fifteen. The keeper walks it daily. Note: the cairn at the crest is not on the survey. Note: the keeper did not explain it, and I did not ask. Some structures are load-bearing without touching any wall.',
+      'FIELD SLIP — wind SW, moderate. Glass falling. North bluff ascent: 22 minutes. Cairn at crest not shown on survey.',
     ],
     deepFrom: 3,
     deep: [
-      '(pencil, on the reverse, the hand less certain of its columns) Measured this day: the tower to the inch. The stair, tread by tread. Mean high water, risen. The oil in store, sufficient. Not measured: how long a man can keep a light alone before he becomes the thing it is lit against. Distance from the light to the keeper: not recorded. No instrument on the requisition reads it.',
+      'Reverse: tower 21.4 m; stair 83 treads; mean high water +11 cm; oil 146 L. Column headed KEEPER RELIEF is blank.',
     ],
-    journal: 'An inspector’s field slip, pinched under the cairn’s top stone — the bluff climbed, the minutes counted, the cairn itself marked NOT ON THE SURVEY. He measured everything and asked nothing. On the reverse, in pencil, a second list: the things measured, and then the things not measured — and one line that ends it: no instrument on the requisition reads it.',
+    notes: { surface: 'evidence.field-slip.surface', deep: 'evidence.field-slip.deep' },
   },
   transfer_offer: { record: true, era: 'lastwinter',
     kind: 'letter', hand: 'inspector', title: 'An offer of transfer, never burnt',
     place: { parent: 'quarters', pos: [0.95, 0.02, 1.35], ry: 0.7, prop: 'fold', label: 'a letter, wedged behind the stove', maxDist: 2.6, gate: 'quarters' },
     pages: [
-      'DISTRICT OF LIGHTS — NOTICE OF VACANCY. The Board advises the keeper that the mainland station at [the name is worn away] stands vacant from the spring quarter, and that his tenure and record qualify him for transfer upon application. Housing with the post. Two assistants. The Board notes the island station’s hardship classification and is disposed to regard an application favourably.',
+      'DISTRICT OF LIGHTS — NOTICE OF VACANCY. Mainland station available from spring quarter. Housing included. Two assistants. Application invited.',
     ],
     deepFrom: 4,
     deep: [
-      '(drafted on the back, in his hand, unsent) To the Board — I am sensible of the kindness, which I did not expect from an office. I must decline. You will want a reason for the file. Write: the keeper is needed where he is. Do not write: that no one else would wind it, or trim it, or mark the line, or wait. Do not write: who would keep it. There is no room on the form for who would keep it.',
+      'Draft on reverse, unsent: TRANSFER DECLINED. Reason field first reads STATION REQUIRES KEEPER, then is struck through. No replacement reason.',
     ],
-    journal: 'An offer of transfer, wedged behind the cold stove — the mainland, housing, two assistants, a Board disposed to say yes. A way off the island, kept close enough to burn for a whole winter and never burnt. On the back, a reply drafted and never sent. It gives the office its reason and keeps the true one: there is no room on the form for who would keep it.',
+    notes: { surface: 'evidence.transfer-offer.surface', deep: 'evidence.transfer-offer.deep' },
   },
   model_margin: { era: 'lastwinter',
     kind: 'inscription', hand: 'keeper', title: 'The model’s margin, under the glass',
     pages: [
-      '(the glass, pressed close over the model’s little chart table — a margin the width of a fingernail, and on it, his smallest hand) You are bent over a model with a glass in your hand. That is what I was when I wrote this. That is what whoever reads the margin below this one will be. It does not end. I have stopped needing it to.',
-      'To the next hand down, whichever of us you are: the sea in your model is rising too. Hold the day as long as you can bear to. Then let the model hold it instead. That is all a model is for — a place to set a day down, so your two hands are free.',
+      'Under the glass: SCALE 1:240. ERROR AT WEST CHANNEL: +0.8 mm. ERROR AT UPPER POOL: -0.3 mm.',
+      'A smaller model is drawn inside the lamp room. Its basin is marked FULL; the surrounding sea is marked LOW.',
     ],
-    journal: 'On the MODEL’s chart table, under the glass: a margin the width of a fingernail, written in his smallest hand — a letter to the next hand down. “It does not end. I have stopped needing it to.”',
+    notes: { surface: 'evidence.model-margin.surface' },
   },
-  // folded into the music box on the study shelf — ties the box/bird puzzle (the fourth note he
-  // bends DOWN where the bird bends it UP) to his grief: the thing he could never do, that you do.
+  // A repair record; the bird remains an independent observation.
   music_note: { era: 'spanning', eraDeep: 'lastwinter',
     kind: 'letter', hand: 'keeper', title: 'A note folded into the music box',
     pages: [
-      'I wind it more than I should. Five notes — E, G, A, D, C — and then I wind it again. The fourth note is wrong; I have always known it is wrong; I bend it down where it ought to bend up, and I cannot make my hands do otherwise. A man plays the song he can play, not the song he means.',
-      'I wound it for someone who is not here to hear the fourth note come out wrong. If you are the one who finally hears the bird sing it right — the way I never could — then you have done the one small thing I came all this way down to do, and could not.\n\nWind it once for me. Then let it stop.',
+      'Fourth tooth catches again. Filed it. Worse.',
+      'Box sequence after filing: E · G · A · D · C. Dawn bird answers from the stone arc.',
     ],
     deepFrom: 4,
     deep: [
-      '(unfolded all the way, there is writing on the inside of the fold, pressed so faint it needs the deep dark to show)\n\nI was wrong to ask you to let it stop. Wind it once for me — yes — and then keep it. The fourth note will always bend the way your hands bend it; that is not the flaw to be ground out. That is the playing. Carry the song up wrong, and call the wrongness yours, and it is music.',
+      'Inside fold: BIRD, FOURTH NOTE HIGH. 04:52. Clear sky.',
     ],
-    journal: 'A note folded into the music box: he wound it for someone not there to hear, and could never play the fourth note right — he bends it down where the bird bends it up. “Wind it once for me. Then let it stop.”',
-    journalDeep: 'Unfolded all the way, faint on the inside of the fold, he takes the asking-back: “Wind it once — and then keep it. The fourth note bends the way your hands bend it. That is not the flaw; that is the playing. Carry the song up wrong, and call it yours, and it is music.”',
+    notes: { surface: 'evidence.music-note.surface', deep: 'evidence.music-note.deep' },
   },
 };
 
-// ---- THE CLIMBERS (#50-B: the worn way down) -----------------------------------------
-// lens_mark_stone's deep page promised them: "count the scratches under this one — each
-// is someone who stood here, went down, and came back up far enough to add a mark."
-// Five marks in five visibly different hands, one per depth along the descent's spine.
-// Written hands only; none of them knows the player — the keeper stays the only I/you.
-// ---- the keeper's shelf ------------------------------------------------------
-// THE LETTERED SPINES. The study's near bay carries eighteen gilt-lettered volumes,
-// and their initials, read the way a shelf is read — top board down, left to right —
-// spell the one line of canon the game says aloud exactly once:
-//
-//     I T H A S T O G O S O M E W H E R E
-//
-// THE KEY IS THE RULE, not the lettering. Every spine in the study carries a title (see
-// SHELF_DECOYS); these eighteen are the ones tooled with a DOUBLED rule above and below.
-//
-// STACK.md §2: "a solution is never dissolved, only displaced." The keeper knew it
-// long before the player does, and he did what a man does with a thing he knows and
-// cannot use: he shelved it. So it is not a hint dropped for the player — it is HIS,
-// filed in his own library, in his own hand, where he had to walk past it every day.
-//
-// Every title is a plausible volume in a District of Lights keeper's library, and a
-// good half of them are about moving water — ENGINES (of relief), HYDROGRAPHY,
-// OBSERVATIONS (of the sea's level), MORTAR (and the sea wall). The library of a man
-// working the same problem from every side and never once naming it.
-//
-// Short forms on purpose: a spine is ~9cm wide and ~40cm tall, which at reading
-// distance is about 80 screen pixels across. Twelve characters is the ceiling before
-// the lettering stops being legible and becomes texture.
-// THE DECOYS. Every spine in the study is lettered, in both bays — so "which books have
-// titles" is no longer the question, and the KEY moved into the tooling: a volume in the
-// message carries a DOUBLED gilt rule above the title and below it, and every other
-// volume carries a single rule. Owner: "that way all the books seem useful and the lines
-// are the key."
-//
-// Which means these have to be real. A shelf of obvious filler beside eighteen real
-// titles would give the game away by tone alone, so this is an actual keeper's library:
-// district paperwork, optics, weather, the sea, and a few volumes that are plainly his
-// rather than the Board's. Several are about water on purpose — SOUNDINGS, THE SWELL,
-// CURRENTS, SPRING TIDES — so the message's own water titles cannot be picked out by
-// theme either. The only thing that separates them is the rule.
-//
-// 45 of them, cycled through a seeded shuffle so no two neighbours repeat and the whole
-// set is used before any title comes round again. With 1 blank + 18 + 45 = 64 they fill
-// the atlas exactly (8 x 8 cells of 128 x 256 in a 1024 x 2048 canvas).
-export const SHELF_DECOYS = [
-  'LOGS 1881', 'LOGS 1882', 'LOGS 1883', 'THE COAST', 'SOUNDINGS', 'ALMANAC',
-  'SEA BIRDS', 'LICHENS', 'KNOTS', 'CHARTS I', 'CHARTS II', 'BUOYAGE',
-  'FOG SIGNALS', 'OIL & WICK', 'CLOCKWORK', 'BAROMETRY', 'THE MOON', 'STAR TABLES',
-  'LATITUDE', 'THE SWELL', 'SALVAGE', 'WRECKS', 'LIFEBOAT', 'CURRENTS',
-  'THE GARDEN', 'PSALMS', 'VERSES', 'LETTERS', 'ACCOUNTS', 'STORES',
-  'RELIEFS', 'PENSIONS', 'REGULATIONS', 'THE BOARD', 'INSPECTIONS', 'CIRCULARS',
-  'SPECTACLES', 'MIRRORS', 'PRISMS', 'PARAFFIN', 'SPRING TIDES', 'NEAP TIDES',
-  'FIRST AID', 'RATIONS', 'THE ARC LAMP',
-];
+// ---- FIELD NOTES ------------------------------------------------------------
+// Notes are evidence, never narration. They record only what the player has actually
+// touched, read, heard, or changed. Optional hints live in HINT_THREADS below.
+const dispositionCount = (world, disposition) => Object.values(world.recDisp)
+  .filter((value) => value === disposition).length;
 
-export const SHELF_TITLES = [
-  'INSTRUCTIONS',   // I
-  'TIDE TABLES',    // T
-  'HYDROGRAPHY',    // H
-  'ATTENDANCE',     // A
-  'SAILINGS',       // S
-  'TWILIGHTS',      // T
-  'ON LENSES',      // O
-  'GLASSWORK',      // G
-  'OBSERVATIONS',   // O
-  'SIGNALS',        // S
-  'OPTICS',         // O
-  'MORTAR',         // M
-  'ELEMENTS',       // E
-  'WINDS',          // W
-  'HARBOURS',       // H
-  'ENGINES',        // E
-  'ROPE WORK',      // R
-  'ESTIMATES',      // E
-];
+export const FIELD_NOTES = Object.freeze({
+  'arrival.shallows': { text: 'The shallows are higher. Kelp crosses the old footpath.', sketchId: 'upstream-hand' },
+  'arrival.inspection': { text: 'Water reaches the drowned hall roof. The study window is below the tide line.', sketchId: 'register' },
+  'arrival.source': { text: 'The fifth gauge ring is wet. The upper stone pool is full.', sketchId: 'lower-hand' },
+  'return.receiver': { text: 'The dry-room lamp is still burning. Water left above was received in the shallows.', sketchId: 'upstream-hand' },
+  'return.surface': { text: 'The original beach is smaller. The lit east room remains above water.', sketchId: 'disposition' },
+  'evidence.model-marker': { text: 'A moving point on the table model matches my position on the island.', sketchId: 'model-marker' },
+
+  'event.refuge-lit': { text: 'One dry circle of floor around the cot. Lamp oil: half a cup.', sketchId: 'disposition' },
+  'evidence.valve': { text: 'Turning the brass valve lowers the model basin and the bay together.', sketchId: 'valve' },
+  'evidence.music-box': { text: 'The music box plays E · G · A · D · C. Its fourth tooth has been filed twice.', sketchId: 'bird' },
+  'evidence.ruler': { text: 'The brass ruler spans the crack in the model. A measured bridge now spans the eastern chasm.', sketchId: 'ruler' },
+  'evidence.lens': { text: 'The small lens fits the model lighthouse. The full lighthouse lens turns with it.', sketchId: 'lens' },
+  'evidence.bird': { text: 'At dawn the bird sings five notes. Its fourth note is higher than the music box’s.', sketchId: 'bird' },
+  'evidence.beam-glyphs': { kind: 'transcription', label: 'copied from the cliff', text: 'Four figures returned in the lighthouse beam. I copied their order.', sketchId: 'beam-glyphs' },
+  'artifact.signal-shelf.surface': { kind: 'transcription', label: 'copied from the instrument index', text: 'Eight stamped figures each point to a different working instrument. The spines print names, not values.', sketchId: 'signal-bindings' },
+  'evidence.hatch-numerals': { text: 'The buried hatch has four numeral wheels and the same figure stamps as the manuals.', sketchId: 'hatch-numerals' },
+  'evidence.shadow-hatch': { text: 'At golden hour the five standing stones cast one joined shadow toward the buried hatch.', sketchId: 'hatch-numerals' },
+  'evidence.plumb': { text: 'The plumb hangs over the model beach. A brass plate lies at the corresponding point in the study floor.', sketchId: 'plumb' },
+  'evidence.tide-gauge': { text: 'The gauge has five rings. The first four cuts are weathered; the fifth is pale and sharp.', sketchId: 'upstream-hand' },
+  'evidence.dead-wheel': { text: 'Below the surface, the full-sized valve is locked. Salt prints ring its wheel; the model counterpart is free.', sketchId: 'upstream-hand' },
+  'evidence.fallen-stone': { text: 'Five stones stand in an arc. A sixth lies face down and gives only a dull knock.', sketchId: 'bird' },
+  'event.upstream-hand': { text: 'With the lower wheel still, the water rose by one hand’s width. Salt handprints remain on the wheel.', sketchId: 'upstream-hand' },
+  'evidence.register': { text: 'The register records work at this table before and after the keeper’s entries. Several hands did not sign.', sketchId: 'register' },
+  'encounter.tide-figure': { text: 'When I stopped advancing, the form held together and surfaced. It left one low note across the bay.', sketchId: 'tide-figure' },
+  'encounter.watcher': { text: 'The shore figure advanced only while unobserved. Under a held gaze it raised its head and dispersed.', sketchId: 'watcher' },
+  'encounter.lower-hand': { text: 'The lower study bears the results of changes made above: wet steps, a raised basin, and another hand’s measurements.', sketchId: 'lower-hand' },
+  'event.capitals-breach': { text: 'Three inscribed crowns rose through the water over the drowned hall.', sketchId: 'register' },
+  'event.beam-farewell': { text: 'At the source, the beam completed one submerged circuit and went dark.', sketchId: 'beam-glyphs' },
+  'evidence.room-disagreement': { text: 'The facing study’s model shows a drained bay and lit lamp not present in this room.', sketchId: 'model-marker' },
+  'evidence.bell-buoy': { text: 'The buoy still marks its old channel, now beneath the flooded bluff.', sketchId: 'upstream-hand' },
+  'evidence.crank': { text: 'The model lamp crank changes the sky’s hour. The mechanism lags at greater depth.' },
+  'evidence.model-bottle': { text: 'A sealed bottle rests on the model beach. A smaller curl of paper is visible inside.' },
+  'evidence.model-gauge': { text: 'A five-ring gauge stands beside the model sea. Its top ring is pale.' },
+  'evidence.climber-rope': { text: 'A tied climbing rope is still moving at the wade line; its lower end is submerged.' },
+  'mechanism.stone-vault': { text: 'The stone arc opened a chamber in the outcrop. A fitted lens lay inside.', sketchId: 'lens' },
+  'mechanism.lighthouse': { text: 'With the model lens seated, the full lighthouse beam follows the model housing.', sketchId: 'beam-glyphs' },
+  'mechanism.reading-glass': { text: 'The reading glass resolves lampblack marks invisible to the unaided eye.', sketchId: 'lens' },
+  'event.fifth-ring': { text: 'Water has reached the fifth gauge ring for the first recorded time.', sketchId: 'upstream-hand' },
+  'event.returned-shore': { text: 'After the ascent, the outer jetty arm, shallows bench, and skiff are underwater.' },
+  'evidence.study-model': { text: 'The study model matches the island at one to two hundred and forty, including this room.', sketchId: 'model-marker' },
+  'evidence.study-unchanged': { text: 'On return, the cup, chair, dust, and clock hand occupy their earlier positions.' },
+  'collection.climber.cmTallies': { text: 'Thirty-seven short strokes in groups of five; a palm-wide hollow beside them.' },
+  'collection.climber.cmFormal': { text: '“I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.”' },
+  'collection.climber.cmPlain': { text: '“went down for my brother. came up with the weather.”' },
+  'collection.climber.cmUnfinished': { text: '“day nine below. the lamp is” — the cut ends mid-line.' },
+  'collection.climber.cmChild': { text: '“im not lost. dont come down.”' },
+  'collection.climbers-complete': { text: 'Five distinct hands appear at five depths. None is listed in the station log.' },
+  'collection.hall.cgRoof': { text: '“WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH.” Water now stands above it.' },
+  'collection.hall.cgCount': { text: '“WE COUNTED OURSELVES EACH WINTER —” The number is effaced.' },
+  'collection.hall.cgLight': { text: '“WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT.”' },
+  'collection.hall-complete': { text: 'All three hall inscriptions use the same plural hand.' },
+  'collection.lampblack.lmValve': { text: 'TEST 6 — upper basin minus 9; lower basin plus 9.' },
+  'collection.lampblack.lmBox': { text: 'Fourth tooth filed twice. Pitch fell both times.' },
+  'collection.lampblack.lmChest': { text: 'Seal held through three spring tides.' },
+  'collection.lampblack.lmDory': { text: 'Hull sound. One oar missing before inventory.' },
+  'collection.lampblack.lmJetty': { text: 'West current reversed after 02:10.' },
+  'collection.lampblack.lmStair': { text: 'Eighty-three treads. Third wet at neap.' },
+  'collection.lampblack.lmBell': { text: 'Toll carries farther below the water line.' },
+  'collection.lampblack.lmBuoy': { text: 'Mooring datum no longer marks the channel.' },
+  'collection.lampblack.lmDrain': { text: 'Return flow delayed eleven seconds.' },
+  'collection.lampblack-complete': { text: 'Nine lampblack measurements appear on working objects across the island.' },
+  'record.filed': {
+    deriveArgs: (world) => ({ count: dispositionCount(world, 'filed') }),
+    text: ({ count }) => `${count} record${count === 1 ? ' rests' : 's rest'} in the quarters cabinet with the District returns.`,
+  },
+  'record.kept': {
+    deriveArgs: (world) => ({ count: dispositionCount(world, 'kept') }),
+    text: ({ count }) => `${count} record${count === 1 ? ' remains' : 's remain'} at the source, weighted above the wet line.`,
+  },
+  'event.round.moor': { text: 'The dory line is made fast at the jetty cleat.' },
+  'event.round.log': { text: 'The day’s return is signed with the observed water level.' },
+  'event.round.light': { text: 'The cot lamp is lit. The model lighthouse answers briefly.' },
+  'event.round.wind': { text: 'The music box is wound once. A bird remains at the sill through all five notes.' },
+  'event.rounds-complete': { text: 'Mooring, return, cot lamp, and music box have each been tended once.' },
+  'evidence.completed-song': { text: 'The standing stones accept six notes when the fallen stone carries the added low tone.', sketchId: 'bird' },
+  'evidence.disposition': { text: 'The mechanism can hold, reverse, join, or seal the transfer. Each changes both sides of the plate.', sketchId: 'disposition' },
+  'evidence.logbook.surface': { text: 'The log records rising water, a one-to-240 model, and a valve whose discharge cannot be seen from the study.', sketchId: 'valve' },
+  'evidence.logbook.deep': { text: 'The Board asked where displaced water was received. The reply was erased through the paper.', sketchId: 'register' },
+  'evidence.coat-letter.surface': { text: 'An unsent letter says the east room is dry and no account is required at its door.' },
+  'evidence.coat-letter.deep': { text: 'Inside the fold: repaired latch, dry boards, spare key beneath the blue cup.' },
+  'evidence.standing-stone.surface': { text: 'The stone reads: WE WHO WENT DOWN / LEFT THE LIGHT FOR / WHOEVER WASHES UP.' },
+  'evidence.standing-stone.deep': { text: 'A lower cut reads: THE HILL HELD. / THE HALL DID NOT. / BOTH WERE OUR WORK.' },
+  'evidence.bottle.surface': { text: 'The bottle was released at low water to test whether the west current would return it.' },
+  'evidence.bottle.deep': { text: 'The back records its return intact, with water 11 cm above the mark.' },
+  'evidence.kelp-slate.surface': { text: 'The slate records two approaches to the kelp form: pursuit scattered it; waiting preceded one low note.', sketchId: 'tide-figure' },
+  'evidence.bluff-cairn.surface': { text: 'The cairn note says the shore figure moved twelve paces while the writer looked away.', sketchId: 'watcher' },
+  'evidence.transfer-sheet.surface': { text: 'Transfer test: upper basin fell 28 cm; lower pool rose 28 cm. The attempted reversal seized.' },
+  'evidence.quarters-journal.surface': { text: 'The cot journal records a barred door, repeated island drawings, and the east room staying dry.' },
+  'evidence.quarters-journal.deep': { text: 'A later entry records the chair moved away and the door left open overnight.' },
+  'evidence.lens-study.surface': { text: 'Lampblack records four figures reflected from the west cliff after the lens rotated.', sketchId: 'beam-glyphs' },
+  'evidence.lens-study.deep': { text: 'A second hand reports the same figures on the dry cliff and flooded hall.' },
+  'evidence.lens-stone.surface': { text: 'The glass reveals grouped strokes and overlapping palm-polish on the stone.' },
+  'evidence.lens-stone.deep': { text: 'More deliberate strokes continue below the tide line.' },
+  'evidence.pool-phial.surface': { text: 'The phial clears the upper pool lip only when the basin reaches the fifth ring.' },
+  'evidence.drain-ledger.surface': { text: 'The ledger measurements rise from +4 cm to +11 cm while the printed table stays unchanged.' },
+  'evidence.drain-ledger.deep': { text: 'The final return accepts the station figures after the archive floods.' },
+  'evidence.commendation.surface': { text: 'A retained carbon lists exact returns, acceptable lens work, and no light outages.' },
+  'evidence.commendation.deep': { text: 'The top carbon has no underlying original impression and no signature.' },
+  'evidence.closure.surface': { text: 'An unsigned review proposes closing the station, recovering the lens, and offering a transfer.' },
+  'evidence.closure.deep': { text: 'The notice has no effective date. Its receipt was never acknowledged.' },
+  'evidence.field-slip.surface': { text: 'The inspector timed the bluff ascent and found a cairn absent from the survey.' },
+  'evidence.field-slip.deep': { text: 'The reverse measures tower, stair, water, and oil. KEEPER RELIEF is blank.' },
+  'evidence.transfer-offer.surface': { text: 'The mainland vacancy included housing and two assistants.' },
+  'evidence.transfer-offer.deep': { text: 'An unsent refusal has its only stated reason struck through.' },
+  'evidence.model-margin.surface': { text: 'The model margin lists scale errors and shows a smaller model with a full basin inside a low sea.' },
+  'evidence.music-note.surface': { text: 'The box plays E · G · A · D · C. A note says filing the fourth tooth made it worse.', sketchId: 'bird' },
+  'evidence.music-note.deep': { text: 'Inside the fold: BIRD, FOURTH NOTE HIGH. 04:52. Clear sky.' },
+
+  'ending.tend': { text: 'The transfer is held at its present level. The lamp continues to turn.', sketchId: 'disposition' },
+  'ending.carry': { text: ({ removed = 0 } = {}) => `The mechanism is reversed across ${removed} interventions. Water retreats below and returns above.`, sketchId: 'disposition' },
+  'ending.open': { text: 'The basins are joined. Their water levels move toward one another.', sketchId: 'disposition' },
+  'ending.close': { text: 'The plate is sealed. Pressure falls to zero on the upper side and remains below.', sketchId: 'disposition' },
+});
+
+// Hints are requested, never pushed into the evidence stream. Later steps become more
+// direct, but they still point to relationships rather than supplying an answer.
+export const HINT_THREADS = Object.freeze([
+  { id: 'surface-circuit', after: ['event.refuge-lit'], complete: { kind: 'flag', key: 'receiverReturned' }, steps: [
+    'The dry room gives the machinery something worth keeping dry.',
+    'Three table instruments reach outward: basin, sky, and broken crossing.',
+    'Light the room; lower the bay; move the hour; span the model crack. Then stand on the brass plate.',
+  ] },
+  { id: 'deep-circuit', after: ['return.receiver'], complete: { kind: 'flag', key: 'plumbHung' }, steps: [
+    'The low note returned with you. The surface still has an unfinished circuit.',
+    'Compare the music cylinder with the dawn bird, then follow what their sixth note opens.',
+    'Seat the lens, read the cliff order, find the joined shadow, open the hatch, and bring its plumb line to the study hook.',
+  ] },
+  { id: 'signal-hatch', after: ['evidence.beam-glyphs', 'artifact.signal-shelf.surface'], complete: { kind: 'flag', key: 'hatchCodeDecoded' }, steps: [
+    'The cliff supplies an order. The shelf points away from itself.',
+    'Match each projected figure to the instrument named on its spine.',
+    'Read a count from each physical instrument, then turn the wheels in the beam’s order.',
+  ] },
+  { id: 'tide-figure', after: ['evidence.kelp-slate.surface'], complete: { kind: 'flag', key: 'tideFigureSeen' }, steps: [
+    'Pursuit changes the water before it changes the figure.',
+    'Compare the slate’s first and second wades.',
+    'Approach only far enough to see it, then stop moving and wait.',
+  ] },
+  { id: 'watcher', after: ['evidence.bluff-cairn.surface'], complete: { kind: 'flag', key: 'watcherSeen' }, steps: [
+    'Its distance changes when your attention leaves it.',
+    'The cairn records movement without wake or footprints.',
+    'Face it continuously; do not trade sight for distance.',
+  ] },
+  { id: 'upstream-hand', after: ['evidence.dead-wheel'], complete: { kind: 'flag', key: 'upstreamHandWitnessed' }, steps: [
+    'The dead wheel is still connected to another level.',
+    'Compare the salt prints with the sudden rise.',
+    'Remain near the wheel long enough to witness a transfer initiated elsewhere.',
+  ] },
+  { id: 'lower-account', after: ['evidence.register'], complete: { kind: 'flag', key: 'lowerHandRegarded' }, steps: [
+    'The register counts work; the water shows its cost.',
+    'Revisit the lower study after reading the names and blanks.',
+    'Inspect the model, wet line, and waiting figure before choosing what crosses the plate.',
+  ] },
+]);
+
+// ---- THE CLIMBERS -----------------------------------------------------------
+// Five visibly different hands on the worn route. Their marks imply company without
+// declaring who anyone is or telling the player what the marks mean.
 
 export const CLIMBERS = [
-  { id: 'cmTallies',
-    whisper: 'Under the hair-fine letters, just as they said: tally strokes — dozens, in fists of five — and one place where a hand rested so many times the stone has gone smooth.',
-    journal: 'Scratched under the glass — the tallies beneath the standing stone: dozens of strokes in fists of five, and a palm-hollow worn smooth where each of them must have leaned. Not a message. Attendance.' },
-  { id: 'cmFormal',
-    whisper: 'An old formal hand, every letter ruled straight: “I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.”',
-    journal: 'Scratched under the glass — an old formal hand low on the tower wall, ruled straight as a return: “I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.” Dignity, kept to the last inch of it.' },
-  { id: 'cmPlain',
-    whisper: 'A plain hand on the stone: “went down for my brother. came up with the weather.”',
-    journal: 'Scratched under the glass — a plain hand on a stone in the kelp: “went down for my brother. came up with the weather.” It does not say whether he found him. The weather says.' },
-  { id: 'cmUnfinished',
-    whisper: 'A hurried hand, low on the cairn: “day nine below. the lamp is” — and it stops.',
-    journal: 'Scratched under the glass — low on the cairn, a hurried hand: “day nine below. the lamp is”. It stops there. Either the light went out, or it did not and there was nothing further worth carving. I have decided to believe the second.' },
-  { id: 'cmChild',
-    whisper: 'Small letters, close to the cold floor, in a hand still learning its letters: “im not lost. dont come down.”',
-    journal: 'Scratched under the glass — small letters close to the floor of the source, in a hand still learning its letters: “im not lost. dont come down.” The bravest lie on the island. Somebody’s whole descent, in six words.' },
+  { id: 'cmTallies', noteId: 'collection.climber.cmTallies',
+    whisper: 'Thirty-seven short strokes, grouped by five. The stone is smooth beside them.' },
+  { id: 'cmFormal', noteId: 'collection.climber.cmFormal',
+    whisper: 'An old formal hand, every letter ruled straight: “I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.”' },
+  { id: 'cmPlain', noteId: 'collection.climber.cmPlain',
+    whisper: 'A plain hand on the stone: “went down for my brother. came up with the weather.”' },
+  { id: 'cmUnfinished', noteId: 'collection.climber.cmUnfinished',
+    whisper: 'A hurried hand, low on the cairn: “day nine below. the lamp is” — and it stops.' },
+  { id: 'cmChild', noteId: 'collection.climber.cmChild',
+    whisper: 'Small letters, close to the cold floor, in a hand still learning its letters: “im not lost. dont come down.”' },
 ];
 export const CLIMBERS_CLOSE = {
-  whisper: 'Five hands, five descents. The way down is worn smooth — you have been reading the wear.',
-  journal: 'I have found five climbers’ hands now, one at every depth: the counter, the dignified, the brother, the day-niner, the child. None of them made it into any log. The way down is worn smooth by every hand that climbed it back — and the stone under my palm is smooth, so most of them did. I am one of the hands now.',
+  noteId: 'collection.climbers-complete',
+  whisper: 'Five distinct hands. Five different depths.',
 };
 
-// ---- THE CONGREGATION (#50-C: the WE in the stone) -----------------------------------
-// The jetty stone's founding plural ("WE WHO WENT DOWN / LEFT THE LIGHT / FOR WHOEVER
-// WASHES UP") finally accounted for: three monumental lines carved on the drowned hall,
-// readable only at L3 when the capitals break the surface — across the water, through
-// the glass. Liturgical, pre-keeper, no I and no you.
+// ---- THE HALL INSCRIPTIONS --------------------------------------------------
+// Three monumental lines share the plural hand cut into the standing stone.
 export const CONGREGATION = [
-  { id: 'cgRoof',
-    line: 'WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH',
-    journal: 'Carved on the drowned hall, read across the water: “WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH.” The water stands above the roofline now. They measured a sea that kept its word for a while.' },
-  { id: 'cgCount',
-    line: 'WE COUNTED OURSELVES EACH WINTER — …',
-    journal: 'Carved on the drowned hall, read across the water: “WE COUNTED OURSELVES EACH WINTER —” and then the number, effaced by the sea. A census kept until the counting stopped mattering, or the counters did.' },
-  { id: 'cgLight',
-    line: 'WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT',
-    journal: 'Carved on the drowned hall: “WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT.” So the light is older than its keeper. They built it climbing OUT — the lighthouse is what a congregation of the drowning made of their own ascent. He has been keeping their promise, not only his.' },
+  { id: 'cgRoof', noteId: 'collection.hall.cgRoof',
+    line: 'WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH' },
+  { id: 'cgCount', noteId: 'collection.hall.cgCount',
+    line: 'WE COUNTED OURSELVES EACH WINTER — …' },
+  { id: 'cgLight', noteId: 'collection.hall.cgLight',
+    line: 'WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT' },
 ];
 export const CONGREGATION_CLOSE = {
-  whisper: 'Three lines, one WE. The stone at the jetty finally has its congregation.',
-  journal: 'The drowned hall has given up its three carved lines, and the WE of the jetty stone has faces now — a congregation that raised roofs against the tide, counted its winters, and when the water came anyway, went up the hill and built the light. Whoever washes up is who went down. They wrote it first. Everyone since has only been keeping it lit.',
+  noteId: 'collection.hall-complete',
+  whisper: 'Three lines, all cut in the same plural hand.',
 };
 
-// ---- THE LAMPBLACK MARKS (#54: the reading-glass payoff) -----------------------------
-// The glass promised "writing everywhere" and gated exactly two planes. Now nine more
-// micro-marks hide on the working things of the keeper's life — one line each, found in
-// any order, tallied diegetically in the journal ("the third of his small true things").
-// Words live here; geometry lives in props LAMPBLACK_SITES; gates live in puzzles.
-// THE OTHER HAND (STACK.md §3.1/§5) — what you find where somebody one rung up
-// did the thing that cost you. Said once, on approach, and never again.
-//
-// The register is the whole point: nobody here is a villain. Every line is an
-// ordinary person doing ordinary, careful work — and the harm is invisible from
-// where they were standing, which is exactly the harm. So: no accusation, no
-// gloating, no lesson. Just a scuff in the ground and the fact of somebody having
-// been there before you, wanting the same things.
+// ---- HAND TRACES AND LAMPBLACK MEASUREMENTS --------------------------------
+// Physical traces establish that more than one person used the mechanisms. Lampblack
+// records the numbers the public log omits. Words live here; geometry lives in props.
 export const HAND_MARKS = {
-  valve:  'Salt dried in the shape of two hands, either side of the wheel. They drained it, and stood a while, and went in out of the wind.',
-  crank:  'The grass here is worn in a quarter-circle. Somebody stood and wound the hour back until the light was good enough to work by.',
-  ruler:  'A straight edge was laid down here and lifted again. The bridge you crossed this morning is theirs.',
-  lens:   'Glass was set from this spot. The beam you steered by last night was aimed by somebody you will never meet.',
-  chest:  'The lid was up before you got here. They took what they needed and left the rest, in case.',
-  hatch:  'Four dials, and the same four numbers. They stood here long enough to work it out, the same as you did.',
-  stones: 'Five notes were played from exactly here. The vault was already open when you arrived, and you thanked nobody.',
-  plumb:  'A weight hung and was taken down again. They wanted to know how deep it went as badly as you do.',
-  dive:   'They stood on the plate here, and went down. This is the water they left behind them.',
+  valve:  'Salt has dried in the shape of two hands on the wheel. The prints are smaller than yours.',
+  crank:  'The grass around the crank is worn through a quarter-circle. Two heel marks overlap.',
+  ruler:  'A straight edge left a clean line through the silt. Its length matches the model crack.',
+  lens:   'A circular glass mark remains in the dust. The brass beneath it is untarnished.',
+  chest:  'The lid was opened before the last tide. One object-shaped patch inside stayed dry.',
+  hatch:  'Four numeral wheels carry fresh oil. Older scratches stop at several different settings.',
+  stones: 'Five heel hollows face the arc. A sixth hollow faces the fallen stone.',
+  plumb:  'A cord mark circles the hook. The older line hangs two centimetres off centre.',
+  dive:   'Bare footprints end at the plate. A second set begins one level below.',
 };
 
 export const LAMPBLACK = [
-  { id: 'lmValve', place: 'the brass valve',                      line: 'The sea always minded the wheel. It never once minded me.' },
-  { id: 'lmBox',   place: 'the music box',                       line: 'Wound it again. The wrong note is the only part that sounds like me.' },
-  { id: 'lmChest', place: 'the half-buried chest',               line: 'A chest keeps what you can bear to close. The rest you carry.' },
-  { id: 'lmDory',  place: 'the dory’s hull',                     line: 'One oar is enough for leaving. It was never enough for following.' },
-  { id: 'lmJetty', place: 'the jetty lantern post',              line: 'Lit for whoever rows in. Lately I light it so the water has something to hold.' },
-  { id: 'lmStair', place: 'the stair to the lamp',               line: 'Ten thousand times up. The light never once came down to meet me. That is what keeping is.' },
-  { id: 'lmBell',  place: 'the small bright bell',               line: 'A bell is a wound given a use.' },
-  { id: 'lmBuoy',  place: 'the listing bell-buoy',               line: 'I moored it over the safe water. The safe water moved. It did not.' },
-  { id: 'lmDrain', place: 'the drain wall, beside the carved line', line: 'And what the tide finds, it returns. That is the mercy nobody warns you of.' },
+  { id: 'lmValve', noteId: 'collection.lampblack.lmValve', place: 'the brass valve',                        line: 'TEST 6 — upper basin minus 9; lower basin plus 9.' },
+  { id: 'lmBox',   noteId: 'collection.lampblack.lmBox', place: 'the music box',                         line: 'Fourth tooth filed twice. Pitch fell both times.' },
+  { id: 'lmChest', noteId: 'collection.lampblack.lmChest', place: 'the half-buried chest',                 line: 'Seal held through three spring tides.' },
+  { id: 'lmDory',  noteId: 'collection.lampblack.lmDory', place: 'the dory’s hull',                       line: 'Hull sound. One oar missing before inventory.' },
+  { id: 'lmJetty', noteId: 'collection.lampblack.lmJetty', place: 'the jetty lantern post',                line: 'West current reversed after 02:10.' },
+  { id: 'lmStair', noteId: 'collection.lampblack.lmStair', place: 'the stair to the lamp',                 line: 'Eighty-three treads. Third wet at neap.' },
+  { id: 'lmBell',  noteId: 'collection.lampblack.lmBell', place: 'the small bright bell',                 line: 'Toll carries farther below the water line.' },
+  { id: 'lmBuoy',  noteId: 'collection.lampblack.lmBuoy', place: 'the listing bell-buoy',                 line: 'Mooring datum no longer marks the channel.' },
+  { id: 'lmDrain', noteId: 'collection.lampblack.lmDrain', place: 'the drain wall, beside the carved line', line: 'Return flow delayed eleven seconds.' },
 ];
+export const LAMPBLACK_CLOSE = Object.freeze({
+  noteId: 'collection.lampblack-complete',
+  whisper: 'Nine lampblack measurements. Their figures agree.',
+});
 
-// The CANONICAL deep-read arc (#76: DEEP_SETS): the fragments that say MORE the deeper
-// you read them, grouped by the depth their cold page bares at. Counts are DERIVED —
-// nothing downstream may assume "four" — so a new deep fragment is one line here.
-// (Other fragments with deepFrom pages — the bottle, the coat, the lens marks — stay
-// BONUS reads outside the arc, acknowledged but untallied, as shipped.)
+// Deep-read progress is derived from this authored set. Other deep pages remain optional
+// evidence and use the same stable note contract.
 export const DEEP_SETS = {
   2: ['stone_inscription'],                                                     // the tide bares the stone
   3: ['keeper_logbook', 'quarters_journal', 'drain_ledger', 'commendation_copy', 'field_slip'], // the hands turn colder (+#55, +#50-A, +#132)
@@ -488,333 +504,134 @@ export const DEEP_SETS = {
 };
 export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 
-// ---- journal marginalia (SKETCHES) -----------------------------------------
-// A small ink sketch for each journal entry, matched by words the entry contains — so
-// every save, old or new, gets its pictures (loop #72). renderJournal() in ui.js looks
-// each entry's text up here. Moved out of ui.js so the journal's PAGES and PICTURES can
-// live together as content.
+// ---- keyed field-note sketches ----------------------------------------------
+// Notes select pictures by stable sketch ID. Copy can change without breaking art.
 const S = (body) => `<svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">${body}</svg>`;
-export const SKETCHES = [
-  // THE LETTERED SHELF (SHELF_TITLES): a board of standing spines, a few struck with
-  // their gilt band — and, for the deep reading, the same bay with the first volume of
-  // each board picked out and an arrow saying which way to read. The marginalia shows
-  // the METHOD and never the sentence, exactly as the deep page does.
-  ['lettered end to end', S('<path d="M8 33h80"/><path d="M14 33V15h6v18M22 33V11h5v22M29 33V17h7v16M38 33V12h5v21M45 33V19h6v14M53 33V13h6v20M62 33V16h5v17M69 33V10h6v23M77 33V18h6v15" opacity=".7"/><path d="M15 19h4M15 30h4M30 21h5M30 29h5M46 23h4M46 30h4M63 20h3M63 29h3M78 22h4M78 30h4" opacity=".55"/><path d="M23 15h3M23 17h3M23 27h3M23 29h3M39 16h3M39 18h3M39 27h3M39 29h3M70 14h4M70 16h4M70 27h4M70 29h4" opacity="1"/>')],
-  ['the shelf gives up its arrangement', S('<path d="M8 14h48M8 25h48M8 36h48" opacity=".6"/><path d="M18 14V8M24 14V7M30 14V9M36 14V7M42 14V8" opacity=".3"/><path d="M18 25v-6M24 25v-7M30 25v-5M36 25v-7M42 25v-6" opacity=".3"/><path d="M18 36v-6M24 36v-7M30 36v-5M36 36v-7M42 36v-6" opacity=".3"/><path d="M12 14V6M12 25v-8M12 36v-8"/><path d="M66 7v22M63 26l3 4 3-4"/><path d="M72 7h16M72 18h16M72 29h16" opacity=".3"/>')],
-  // THE FIFTH RING met (STACK.md §3.2): the graduated staff with the water finally
-  // over its top collar, and the tally of hands it took scratched beside it.
-  ['He cut the top ring', S('<path d="M48 4v32"/><path d="M41 30h14M41 24h14M41 18h14" opacity=".45"/><path d="M40 11h16" opacity=".95"/><path d="M8 14h80" opacity=".8"/><path d="M12 20h76" opacity=".4"/><path d="M16 26h68" opacity=".2"/><path d="M64 6v5M68 6v5M72 6v5M76 6v5" opacity=".55"/>')],
-  ['gave up while I was down', S('<path d="M10 18h76" opacity=".7"/><path d="M34 12c4-5 16-6 22-3" opacity=".5"/><path d="M20 24l4 4M24 24l-4 4" opacity=".6"/><path d="M46 26l4 4M50 26l-4 4" opacity=".6"/><path d="M70 23l4 4M74 23l-4 4" opacity=".6"/><path d="M14 32q8 3 16 0t16 0t16 0t16 0" opacity=".25"/>')],
-  ['no instrument on the requisition reads', S('<rect x="32" y="6" width="32" height="28" rx="1" opacity=".55"/><path d="M37 12h22M37 17h22M37 22h12" opacity=".4"/><path d="M37 28h22" opacity=".8"/><path d="M70 10l6 6M76 10l-6 6" opacity=".5"/>')],
-  ['no room on the form for who', S('<rect x="30" y="8" width="36" height="24" rx="1" opacity=".55"/><path d="M35 14h26M35 19h26" opacity=".4"/><path d="M35 25h10" opacity=".4"/><path d="M48 25q6 4 12 0" opacity=".9"/><path d="M20 14q-6 8 0 16" opacity=".3"/>')],
-  ['filed his record', S('<rect x="34" y="10" width="28" height="22" rx="1" opacity=".7"/><path d="M34 17h28" opacity=".5"/><path d="M40 14h8" opacity=".8"/><path d="M38 22h20M38 26h20" opacity=".3"/>')],
-  ['left it with him at the source', S('<path d="M30 30h36" opacity=".4"/><path d="M44 30l4-6l4 6" opacity=".8"/><circle cx="48" cy="20" r="1.6"/><path d="M24 12q24 -8 48 0" opacity=".25"/>')],
-  ['made his line fast', S('<path d="M48 12v14"/><path d="M34 18h28"/><path d="M40 22a9 5 0 1 0 16 0a9 5 0 1 0 -16 0" opacity=".6"/><path d="M42 26a7 4 0 1 0 12 0" opacity=".4"/><path d="M62 18q10 -4 18 2" opacity=".5"/>')],
-  ['signed the day’s return', S('<rect x="30" y="8" width="36" height="26" rx="1" opacity=".6"/><path d="M35 15h26M35 20h26M35 25h14" opacity=".4"/><path d="M52 27q4 -3 7 0t7 -1"/>')],
-  ['lit his small lamp', S('<path d="M42 34h12M44 34v-3h8v3" opacity=".6"/><circle cx="48" cy="24" r="6" opacity=".5"/><path d="M48 27c-2-2-2-5 0-7c2 2 2 5 0 7z"/><path d="M48 13v-3" opacity=".4"/><path d="M80 12l-3 3M79 20h-4" opacity=".35"/>')],
-  ['wound the music box', S('<rect x="30" y="22" width="22" height="11" rx="2"/><path d="M52 22l4-5" opacity=".6"/><path d="M60 14a4 4 0 1 1 4 4" opacity=".7"/><path d="M70 24q3 -6 8 -6t7 5" opacity=".5"/><circle cx="79" cy="17" r="1.5"/>')],
-  ['Four rounds, kept', S('<path d="M30 22h8M42 22h8M54 22h8M66 22h8"/><path d="M28 28q20 8 40 0" opacity=".35"/><circle cx="48" cy="14" r="3" opacity=".6"/>')],
-  ['still swinging', S('<path d="M48 6v4"/><path d="M48 10c-6 8-9 14-10 22" opacity=".4"/><path d="M48 10c6 8 9 14 10 22" opacity=".4"/><path d="M48 10c2 9 3 15 3 22"/><circle cx="51" cy="34" r="1.6"/>')],
-  ['give the capitals back', S('<path d="M10 26h76" opacity=".7"/><path d="M24 26v-6h8v6M44 26v-8h8v8M64 26v-5h8v5"/><path d="M26 20h4M46 18h4M66 21h4" opacity=".6"/><path d="M20 30q6 3 12 0t12 0t12 0t12 0" opacity=".35"/>')],
-  ['stopped performing', S('<circle cx="48" cy="22" r="14" opacity=".5"/><path d="M48 22L34 12M48 22l14-10" opacity=".8"/><path d="M48 22l10 12" opacity=".3"/><path d="M14 36h68" opacity=".4"/>')],
-  ['it drowns in order', S('<path d="M30 14c5-7 20-9 26-9s15 4 17 9"/><path d="M40 8l5-5 5 5" opacity=".7"/><path d="M10 16h76" opacity=".85"/><path d="M15 24h66" opacity=".55"/><path d="M20 32h56" opacity=".3"/>')],
-  ['living model of the island', S('<path d="M14 30h68M22 30v6M74 30v6"/><path d="M24 30c4-8 14-10 24-10s20 2 24 10" opacity=".5"/><path d="M40 20l6-7 6 7"/><path d="M30 26q6-3 12 0t12 0t12 0" opacity=".6"/>')],
-  ['A valve beside the chart table', S('<circle cx="48" cy="18" r="11"/><path d="M40 10l16 16M56 10L40 26M48 29v7"/><path d="M30 34q4-3 8 0" opacity=".5"/>')],
-  ['crank turns the orrery lamp', S('<path d="M20 30a30 30 0 0 1 56 0" opacity=".6"/><circle cx="76" cy="14" r="4"/><path d="M76 6v-3M84 14h3M82 7l2-2" opacity=".6"/><path d="M20 30l-4 4M16 34h7" />')],
-  ['music box turns five notes', S('<rect x="14" y="22" width="26" height="12" rx="2"/><path d="M40 22l4-5" opacity=".6"/><circle cx="56" cy="22" r="2"/><circle cx="64" cy="18" r="2"/><circle cx="72" cy="15" r="2"/><circle cx="80" cy="24" r="2"/><circle cx="88" cy="27" r="2"/>')],
-  ['small brass ruler from a chest', S('<path d="M20 26h24v8H20zM20 26l4-6h24l-4 6M48 20l-4 6"/><path d="M56 30h26M58 30v-3M64 30v-2M70 30v-3M76 30v-2M82 30v-3" />')],
-  ['Laid the ruler over the crack', S('<path d="M10 32l22-2M64 30l22 2"/><path d="M32 30l8 8M64 30l-8 8" opacity=".6"/><path d="M28 24h40v5H28z"/><path d="M34 24v3M42 24v2M50 24v3M58 24v2"/>')],
-  ['Set the small lens', S('<path d="M44 34V16M52 34V16M44 16h8"/><path d="M48 13l-4-5 4-5 4 5z"/><path d="M38 8l-5-3M58 8l5-3M48 1V-2" opacity=".6"/>')],
-  ['golden hour the stones’ shadows', S('<path d="M20 16v8M32 14v10M44 15v9M56 13v11M68 15v9"/><path d="M20 24L8 34M32 24L20 36M44 24l-12 12M56 24l-12 13M68 24l-12 12" opacity=".5"/><path d="M82 30l4 4M86 30l-4 4"/>')],
-  ['cellar: a brass plumb bob', S('<path d="M28 34h16M36 34V22"/><path d="M36 22l-3 6h6z"/><path d="M60 8v14l-3-4M60 22l3-4" opacity=".7"/><path d="M52 30q8 4 16 0" opacity=".5"/>')],
-  ['Hung the plumb line', S('<path d="M48 4v18"/><path d="M48 22l-3 6h6z"/><path d="M36 34q12-6 24 0" opacity=".6"/><rect x="42" y="35" width="12" height="3" opacity=".8"/>')],
-  ['stones accepted the bird', S('<path d="M24 32c-3-10 2-18 10-20l6 4-2 8c8 0 14 4 14 10" opacity=".8"/><path d="M52 18l6-4 6 4-6 4z"/><path d="M64 14l6 18" opacity=".5"/>')],
-  ['bird on the stones sang', S('<path d="M30 24v10"/><path d="M30 24c0-4 3-6 6-5l4-4 1 5c3 2 2 6-1 7" opacity=".8"/><circle cx="56" cy="20" r="1.6"/><circle cx="63" cy="16" r="1.6"/><circle cx="70" cy="13" r="1.6"/><circle cx="77" cy="9" r="1.6"/><circle cx="84" cy="22" r="1.6"/><path d="M74 6l6 0" opacity=".5"/>')],
-  ['At night the lamp burns', S('<path d="M30 36V14l4-6 4 6v22"/><path d="M34 14h0M30 20h8" opacity=".5"/><path d="M38 10l20 8M38 12l20 14" opacity=".6"/><path d="M62 22l3-4 3 4-3 4z"/><path d="M65 30v4" opacity=".5"/>')],
-  ['projects four glyphs', S('<path d="M70 4v32" opacity=".7"/><path d="M10 10l44 8M10 14l44 10" opacity=".5"/><rect x="76" y="8" width="7" height="7"/><circle cx="80" cy="22" r="3.5"/><path d="M76 30l7 0-3.5 6z"/><path d="M76 -2l7 7" opacity="0"/>')],
-  ['One level down', S('<rect x="20" y="8" width="56" height="26" rx="2" opacity=".6"/><rect x="32" y="14" width="32" height="14" rx="1.5" opacity=".8"/><rect x="42" y="18" width="12" height="6" rx="1"/><circle cx="48" cy="21" r="0.8"/>')],
-  // the emotional / recursion climaxes — once plain, now illustrated like the rest,
-  // so the journal's hand carries its most-read pages too (loop #72).
-  ['mark has appeared on the model', S('<path d="M16 27c4-9 16-12 32-12s28 3 32 12" opacity=".55"/><path d="M12 30h72" opacity=".5"/><path d="M43 19l10 9M53 19l-10 9"/><circle cx="48" cy="23" r="8" opacity=".45"/>')],
-  ['bottom of my own making', S('<rect x="12" y="5" width="72" height="31" rx="1.5" opacity=".35"/><rect x="25" y="11" width="46" height="20" rx="1.5" opacity=".55"/><rect x="37" y="17" width="22" height="11" rx="1" opacity=".85"/><circle cx="48" cy="23" r="1.7"/><path d="M43 27h10" opacity=".7"/>')],
-  ['all the way down and all the way back', S('<path d="M12 36h13v-6h13v-6h13v-6h13v-6h12" opacity=".8"/><circle cx="80" cy="9" r="5"/><path d="M80 1v-1M89 9h1M87 3l1-1M87 15l1 1" opacity=".5"/>')],
-  ['carrying what I found at the bottom', S('<path d="M16 36h11v-7h11v-7h11v-7h11v-6h11" opacity=".8"/><path d="M14 30l3-5 3 5z"/><path d="M17 25v-3" opacity=".6"/><path d="M40 16q4-2 8 0" opacity=".4"/>')],
-  ['second study faces mine', S('<rect x="9" y="13" width="30" height="18" rx="1.5"/><rect x="57" y="13" width="30" height="18" rx="1.5" opacity=".7"/><path d="M15 25q9-5 18 0" opacity=".6"/><path d="M63 27h18" opacity=".6"/><path d="M46 9v22M50 9v22" opacity=".3"/>')],
-  ['keep leaving this study', S('<path d="M22 35V17l7-4v22M22 23h7" opacity=".85"/><path d="M20 35h13"/><path d="M52 24h16v5q0 4-8 4t-8-4z"/><path d="M68 26q5 0 5 4t-5 3" opacity=".6"/>')],
-  ['which of us holds the pen', S('<path d="M30 31l23-19 6 6-23 19-9 3z" opacity=".85"/><path d="M51 12l6 6" opacity=".5"/><path d="M20 35h9" opacity=".6"/>')],
-  ['it only hopes', S('<path d="M16 26c4-8 14-11 24-11s20 3 26 11" opacity=".55"/><path d="M12 30h72"/><path d="M28 30h40" opacity=".7"/><path d="M70 13l2-4 2 4-2 3z" opacity=".6"/>')],
-  // SEA-STRATA fragments + the deep-read close (loop #142) — give the accreting journal entries
-  // from #131-140 their marginalia too, in the same low-stroke hand.
-  ['wax slate tangled', S('<path d="M30 31c-6-6-9-14-8-23" opacity=".45"/><path d="M70 32c5-7 7-15 5-24" opacity=".45"/><rect x="36" y="9" width="24" height="23" rx="2"/><path d="M41 15h14M41 20h14M41 25h9" opacity=".7"/>')],
-  ['cairn on the L3 bluff', S('<ellipse cx="48" cy="33" rx="17" ry="4.5"/><ellipse cx="46" cy="26" rx="12.5" ry="4"/><ellipse cx="49" cy="20" rx="8.5" ry="3.5"/><circle cx="48" cy="13" r="3"/><path d="M48 10v-3" opacity=".5"/>')],
-  ['weighted with a stone on the cold floor', S('<path d="M30 26l28-7 3 10-28 7z"/><path d="M58 19l-7 2 3 7" opacity=".55"/><path d="M35 24l16-4M35 28l13-3" opacity=".4"/><ellipse cx="38" cy="28" rx="4" ry="3"/><path d="M18 35h60" opacity=".35"/>')],
-  ['said more the deeper I read', S('<circle cx="48" cy="11" r="4.5"/><path d="M48 15v9"/><path d="M48 17l-9 5M48 17l9 5"/><path d="M40 23q-14 9 8 13t8-13" opacity=".6"/><path d="M12 36h72" opacity=".3"/>')],
-  // the DEEP-READ marginalia (loop #145) — the colder hand each fragment turns from below.
-  ['the logbook’s last page turns colder', S('<path d="M48 11c-7-4-15-4-22 0v20c7-4 15-4 22 0 7-4 15-4 22 0V11c-7-4-15-4-22 0z" opacity=".6"/><path d="M48 11v20" opacity=".45"/><path d="M48 30v8M44 35l4 4 4-4" opacity=".75"/>')],
-  ['the cot-journal turns', S('<path d="M40 11h16l-2 7H42z"/><path d="M44 18v5h8v-5" opacity=".7"/><path d="M48 23v3M43 26l5 9 5-9z" opacity=".6"/><path d="M30 15l9 4M66 15l-9 4" opacity=".4"/>')],
-  ['below the worn cut a fainter line is bared', S('<path d="M34 37V15c0-3 3-5 7-5h10c4 0 7 2 7 5v22z"/><path d="M40 18h16" opacity=".85"/><path d="M40 25h16" opacity=".3"/><path d="M14 37h68" opacity=".4"/>')],
-  ['inside of the fold', S('<path d="M28 30l30-8 2 8-30 8z" opacity=".7"/><path d="M58 22l-6 2 2 6" opacity=".5"/><circle cx="40" cy="31" r="2"/><circle cx="51" cy="28" r="2"/><path d="M42 31v-8M53 28v-8" opacity=".75"/>')],
-  // the two BONUS deep-read lines (loop #146) — finishing the journal marginalia.
-  ['the kettle was never for someone else', S('<path d="M32 33c-2-8-1-14 4-16h20c5 2 6 8 4 16z"/><path d="M40 17c2-4 14-4 16 0" opacity=".7"/><path d="M56 22l8-3 1 4" opacity=".6"/><path d="M44 11q2-3 0-6M52 11q2-3 0-6" opacity=".5"/><path d="M28 36h36" opacity=".4"/>')],
-  ['note has writing on its back', S('<path d="M22 23h26v12H22z"/><path d="M48 25l8 1v8l-8 1" opacity=".8"/><path d="M56 27h6v6h-6" opacity=".7"/><path d="M26 27h18M26 31h12" opacity=".45"/>')],
-  ['one hand grinding one lens', S('<circle cx="40" cy="19" r="11"/><path d="M48 27l16 13" /><path d="M35 14a8 8 0 0 1 8 1" opacity=".5"/><path d="M40 19h0" /><path d="M58 30l8 4" opacity="0"/>')],
-  ['worn smooth by everyone who climbed back', S('<path d="M30 12v16M37 12v16M44 12v16M51 12v16" /><path d="M26 26l29-18" opacity=".8"/><path d="M20 32h54" opacity=".45"/>')],
-  // STORY PASS (2026-07-27): sixteen journal entries still rendered bare — including the
-  // twist's own climaxes and both endings. The rest of the missing marginalia, same hand.
-  ['lit at both ends of the', S('<path d="M14 36h12v-7h12v-7h12v-7h12v-7h12" opacity=".75"/><path d="M20 33q-2-4 0-6q2 2 0 6z"/><path d="M72 5q-2-4 0-6q2 2 0 6z" transform="translate(0 6)"/><path d="M20 26v-2M72 12v-2" opacity=".4"/>')],
-  ['lighthouse lamp’s eye', S('<path d="M40 8l16 0 -3 24h-10z" opacity=".5"/><circle cx="48" cy="20" r="7"/><circle cx="48" cy="20" r="2.6" opacity=".8"/><path d="M35 20h-6M67 20h-6M48 7v-4" opacity=".45"/>')],
-  ['left the light on, and I have left', S('<path d="M70 30V12l4-5 4 5v18" opacity=".8"/><path d="M74 12h0M70 18h8" opacity=".45"/><path d="M14 32q8 4 16 0l-2-6h-12z"/><path d="M22 26v-8M22 18l6 3" opacity=".7"/><path d="M36 33h52" opacity=".3"/>')],
-  ['keeper’s reading glass on the islet', S('<circle cx="38" cy="18" r="9"/><path d="M45 25l14 11"/><path d="M33 16h10M33 20h7" opacity=".55"/><path d="M60 12h14M60 16h10" opacity=".25"/>')],
-  ['bell-buoy lists', S('<g transform="rotate(14 48 24)"><path d="M38 30h20l-4-8h-12z" opacity=".8"/><path d="M42 22l6-12 6 12"/><path d="M45 17h6v4h-6z" opacity=".85"/></g><path d="M14 32q10 4 20 0t20 0t20 0t14 0" opacity=".45"/>')],
-  ['toward me when I looked away', S('<path d="M64 34c0-8 3-12 6-12s6 4 6 12" opacity=".85"/><circle cx="70" cy="18" r="3.6" opacity=".85"/><circle cx="26" cy="16" r="6"/><circle cx="26" cy="16" r="2" opacity=".8"/><path d="M34 16h22" opacity=".35"/>')],
-  ['stood in the kelp and slipped off', S('<path d="M24 36c-3-8-2-18 2-26M34 36c-2-6-1-14 2-22M74 36c3-8 2-18-2-26M64 36c2-6 1-14-2-22" opacity=".5"/><path d="M44 35c0-7 2-11 5-11s5 4 5 11" opacity=".7"/><circle cx="49" cy="19" r="3.2" opacity=".6"/>')],
-  ['ground lenses to keep a light', S('<path d="M18 32V12h22v20" opacity=".7"/><path d="M18 12q11-5 22 0M22 17h14M22 21h14M22 25h9" opacity=".5"/><path d="M62 30V16l4-5 4 5v14" opacity=".8"/><path d="M66 16h0M62 21h8" opacity=".45"/>')],
-  ['A letter in the coat pocket', S('<path d="M40 6l-9 6v22h34V12l-9-6z" opacity=".6"/><path d="M40 6h16v6H40z" opacity="0"/><rect x="42" y="20" width="16" height="10" rx="1"/><path d="M42 20l8 6 8-6" opacity=".8"/>')],
-  ['worn soft by the sea', S('<path d="M40 36V14c0-4 3-7 8-7s8 3 8 7v22z"/><path d="M45 18h10M45 23h10M45 28h7" opacity=".45"/><path d="M12 36q8-4 16 0M68 36q8-4 16 0" opacity=".5"/>')],
-  ['A bottle on the beach', S('<g transform="rotate(-8 44 24)"><path d="M40 34V18q0-4 4-6v-4h4v4q4 2 4 6v16z"/><path d="M42 22h8v8h-8z" opacity=".5"/></g><path d="M14 36h68" opacity=".4"/><circle cx="76" cy="8" r="4" opacity=".5"/>')],
-  ['under the pillow', S('<path d="M16 30h56v4H16z" opacity=".7"/><path d="M20 30v-4q0-2 2-2h20q4 0 4 4v2" opacity=".85"/><rect x="52" y="22" width="14" height="8" rx="1"/><path d="M59 22v8" opacity=".5"/>')],
-  ['lampblack on the chart too small', S('<rect x="26" y="8" width="34" height="24" rx="1" opacity=".6"/><path d="M30 14h20M30 18h24M30 22h16" opacity=".2"/><circle cx="56" cy="24" r="7"/><path d="M61 29l10 8" /><path d="M52 24h8" opacity=".7"/>')],
-  ['Hair-fine letters on a standing stone', S('<path d="M38 36V13c0-4 3-6 8-6s8 2 8 6v23z"/><path d="M42 17h8M42 20h8M42 23h6" opacity=".18"/><circle cx="60" cy="24" r="6"/><path d="M64 28l9 7" opacity=".8"/>')],
-  ['bends it down where the bird bends it up', S('<rect x="12" y="24" width="20" height="10" rx="2"/><circle cx="46" cy="18" r="2"/><circle cx="54" cy="15" r="2"/><circle cx="62" cy="12" r="2"/><circle cx="70" cy="22" r="2" opacity=".55"/><path d="M70 18q3-6 0-10" opacity=".4"/><circle cx="80" cy="9" r="2"/><path d="M84 6q4-2 6 1" opacity=".5"/>')],
-  ['shut fast', S('<rect x="36" y="8" width="24" height="28" rx="1"/><path d="M40 14h16M40 22h16M40 30h16" opacity=".4"/><circle cx="55" cy="23" r="1.6"/><path d="M55 23v4" opacity=".7"/><path d="M30 36h36" opacity=".45"/>')],
-  // #49 — the three optional chains (the high pool, the beam to the deep, the sixth note).
-  ['sixth stone lies fallen', S('<path d="M20 32V16M30 32V13M40 32V15M50 32V12M60 32V14" opacity=".8"/><rect x="66" y="27" width="19" height="6" rx="2" transform="rotate(-9 75 30)"/><path d="M12 34h74" opacity=".35"/>')],
-  ['fallen stone has its note back', S('<rect x="30" y="26" width="20" height="6" rx="2" transform="rotate(-9 40 29)"/><path d="M56 24q5-5 0-11M63 27q9-8 0-19" opacity=".55"/><circle cx="72" cy="12" r="2.2"/><path d="M74 12V5l4 1" opacity=".7"/><path d="M12 35h72" opacity=".35"/>')],
-  ['played his song at the stones', S('<circle cx="18" cy="20" r="2"/><circle cx="29" cy="16" r="2"/><circle cx="40" cy="13" r="2"/><circle cx="51" cy="24" r="2"/><circle cx="62" cy="27" r="2"/><circle cx="78" cy="32" r="2.4"/><path d="M72 32h12" opacity=".5"/><path d="M18 18V8l4 1M78 30V20l4 1" opacity=".4"/>')],
-  ['dry stone pool the sea abandoned', S('<ellipse cx="48" cy="24" rx="22" ry="8"/><ellipse cx="48" cy="24" rx="15" ry="5" opacity=".5"/><path d="M44 27l3 2" opacity=".8"/><path d="M46 26l4 4M50 26l-4 4" opacity=".9"/><path d="M10 36q10-4 20 0M66 36q10-4 20 0" opacity=".3"/>')],
-  ['abandoned pool is full', S('<ellipse cx="48" cy="24" rx="22" ry="8"/><path d="M30 24q9 4 18 0t18 0" opacity=".7"/><g transform="rotate(-8 48 21)"><path d="M42 21h9M42 19v4M51 19v4" opacity=".9"/></g><path d="M8 12q10-4 20 0M68 12q10-4 20 0" opacity=".35"/>')],
-  ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
-  ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
-  ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
-  // #50 — the three new hands: the climbers (shared + close), the congregation (shared +
-  // close), and the inspector's two further fragments.
-  ['Scratched under the glass —', S('<circle cx="26" cy="17" r="8"/><path d="M32 23l10 8"/><path d="M52 12l4 10M58 12l4 10M64 12l4 10M70 12l4 10" opacity=".6"/><path d="M54 30h24" opacity=".3"/>')],
-  ['I am one of the hands now', S('<path d="M20 32c0-8 3-12 6-12s6 4 6 12M36 32c0-7 2-10 5-10s5 3 5 10M50 32c0-8 3-12 6-12s6 4 6 12M66 32c0-6 2-9 4-9s4 3 4 9" opacity=".7"/><path d="M12 34h72" opacity=".4"/><path d="M78 14q3-3 6 0" opacity=".5"/>')],
-  ['Carved on the drowned hall', S('<path d="M24 30V16M36 30V13M48 30V15M60 30V13M72 30V16" opacity=".8"/><path d="M20 15h56" opacity=".6"/><path d="M28 20h8M40 18h8M52 20h8" opacity=".3"/><path d="M10 30q10 4 20 0t20 0t20 0t14 0" opacity=".5"/>')],
-  ['They wrote it first', S('<path d="M30 34V20l6-8 6 8v14" opacity=".4"/><path d="M48 34V14l5-6 5 6v20" opacity=".85"/><path d="M53 14h0M48 22h10" opacity=".5"/><path d="M14 36h68" opacity=".35"/><path d="M68 10q4-3 8 0" opacity=".4"/>')],
-  ['A carbon copy kept by the cot', S('<rect x="30" y="10" width="30" height="22" rx="1" opacity=".85"/><rect x="35" y="14" width="30" height="22" rx="1" opacity=".35"/><path d="M35 17h18M35 22h20M35 27h14" opacity=".45"/><path d="M14 36h30" opacity=".4"/>')],
-  ['the carbon gives up its trouble', S('<rect x="34" y="12" width="30" height="22" rx="1" opacity=".85"/><path d="M39 17h18M39 22h20M39 27h14" opacity=".4"/><path d="M24 30l8-8M24 22l8 8" opacity=".6"/><circle cx="74" cy="16" r="5" opacity=".5"/><path d="M78 20l6 5" opacity=".5"/>')],
-  ['notice of review', S('<rect x="32" y="8" width="32" height="26" rx="1" opacity=".85"/><path d="M37 14h22M37 19h22M37 24h16" opacity=".45"/><path d="M37 29h9" opacity=".2"/><path d="M60 27l6 6M66 27l-6 6" opacity=".7"/>')],
-  ['survived on paper', S('<rect x="30" y="10" width="30" height="24" rx="1" opacity=".7"/><path d="M35 16h20M35 21h20" opacity=".4"/><path d="M35 27h12" opacity=".15"/><path d="M64 30V12l4-5 4 5v18" opacity=".85"/><path d="M68 12h0M64 18h8" opacity=".45"/>')],
-  // #55 — the inspector's tide ledger.
-  ['tide ledger, water-swollen', S('<path d="M28 30l24-5 2 8-24 5z" opacity=".85"/><path d="M52 25l-5 1 1.5 7" opacity=".6"/><path d="M33 29l14-3M34 33l11-2" opacity=".35"/><path d="M60 14h16M60 18h12M60 22h16" opacity=".3"/><path d="M12 36q10 4 20 0t20 0t20 0" opacity=".45"/>')],
-  ['the tide could countersign', S('<path d="M26 12h36v18H26z" opacity=".7"/><path d="M30 17h20M30 21h26" opacity=".35"/><path d="M32 26q6-4 10 0t10 0" opacity=".85"/><path d="M12 36q10 4 20 0t20 0t20 0" opacity=".5"/>')],
-  // #53 — the model's micro-finds (lean all the way in).
-  ['a letter to the next hand down', S('<rect x="26" y="10" width="44" height="22" rx="1" opacity=".6"/><rect x="36" y="15" width="24" height="12" rx="1" opacity=".8"/><rect x="42" y="18" width="12" height="6" rx="0.5"/><circle cx="76" cy="28" r="6"/><path d="M80 32l8 6" opacity=".8"/>')],
-  ['The invitation goes all the way down', S('<g transform="rotate(-8 40 24)"><path d="M36 30V18q0-3 3-4v-3h3v3q3 1 3 4v12z"/></g><g transform="rotate(-8 62 27) scale(0.55) translate(50 20)"><path d="M36 30V18q0-3 3-4v-3h3v3q3 1 3 4v12z" opacity=".7"/></g><path d="M14 34h68" opacity=".4"/><circle cx="22" cy="14" r="5" opacity=".5"/>')],
-  ['a sea the size of a dinner tray', S('<ellipse cx="48" cy="26" rx="26" ry="8" opacity=".5"/><path d="M60 26V10"/><ellipse cx="60" cy="22" rx="3" ry="1"/><ellipse cx="60" cy="18" rx="3" ry="1"/><ellipse cx="60" cy="14" rx="3" ry="1" opacity=".45"/><circle cx="30" cy="24" r="4" opacity=".6"/>')],
-  ['two figures on the model’s beach', S('<path d="M40 32c0-6 2-9 4-9s4 3 4 9" opacity=".85"/><circle cx="44" cy="19" r="2.6" opacity=".85"/><path d="M52 32c0-5 2-8 4-8s4 3 4 8" opacity=".85"/><circle cx="56" cy="21" r="2.4" opacity=".85"/><path d="M20 34h56" opacity=".4"/><path d="M14 12q6 3 12 0M70 12q6 3 12 0" opacity=".3"/>')],
-  // #124 — the plate refuses the unmeasured deep.
-  ['The plate would not take me deeper', S('<circle cx="30" cy="26" rx="0" r="11" opacity=".85"/><ellipse cx="30" cy="26" rx="11" ry="4" opacity=".5"/><path d="M52 12l8 6-6 5 9 7-5 6" opacity=".8"/><path d="M50 34h32" opacity=".4"/>')],
-  // #52 — the tide gauge landmark.
-  ['graduated staff, ringed at five heights', S('<path d="M48 5v31"/><ellipse cx="48" cy="31" rx="7" ry="2"/><ellipse cx="48" cy="25" rx="7" ry="2"/><ellipse cx="48" cy="19" rx="7" ry="2"/><ellipse cx="48" cy="13" rx="7" ry="2"/><ellipse cx="48" cy="7" rx="7" ry="2" opacity=".45"/><path d="M12 33q9-4 18 0M66 33q9-4 18 0" opacity=".5"/>')],
-  // #54 — the lampblack tally (one shared sketch for all nine finds) + the completion.
-  ['Lampblack, under the glass — on', S('<circle cx="34" cy="19" r="9"/><path d="M41 26l13 10"/><path d="M30 17h8M30 21h6" opacity=".7"/><path d="M56 14h26M56 19h20M56 24h23" opacity=".2"/>')],
-  ['the last of the lampblack', S('<circle cx="26" cy="18" r="8"/><path d="M32 24l10 9"/><path d="M48 12v6M54 12v6M60 12v6M66 12v6M72 12v6" opacity=".7"/><path d="M48 24v6M54 24v6M60 24v6M66 24v6" opacity=".7"/><path d="M14 37h68" opacity=".3"/>')],
-];
+export const SKETCHES_BY_ID = Object.freeze({
+  valve: S('<circle cx="48" cy="19" r="11"/><path d="M40 11l16 16M56 11L40 27M48 30v7"/><path d="M10 34q9-4 18 0t18 0t18 0t18 0" opacity=".35"/>'),
+  ruler: S('<path d="M10 31l23-2M63 29l23 2"/><path d="M29 22h38v6H29z"/><path d="M35 22v3M43 22v2M51 22v3M59 22v2"/>'),
+  lens: S('<circle cx="43" cy="18" r="11"/><path d="M51 26l15 12"/><path d="M28 18H8M58 18h28" opacity=".45"/>'),
+  bird: S('<path d="M22 31c0-10 5-18 14-19l7 5-3 8c8-1 15 3 16 10"/><circle cx="67" cy="18" r="2"/><circle cx="76" cy="13" r="2"/><path d="M78 13V5l5 1"/>'),
+  'beam-glyphs': S('<path d="M8 9l48 9M8 13l48 11" opacity=".5"/><path d="M66 5v30"/><rect x="73" y="5" width="7" height="7"/><circle cx="76.5" cy="20" r="3.5"/><path d="M72 31h9l-4.5 6z"/>'),
+  'signal-bindings': S('<path d="M8 34h80"/><path d="M13 34V8h8v26M25 34V11h8v23M37 34V7h8v27M49 34V10h8v24M61 34V8h8v26M73 34V12h8v22" opacity=".7"/><circle cx="17" cy="15" r="2"/><path d="M28 18h4M39 14h4M50 17h6M63 15h4M75 13v10"/>'),
+  'hatch-numerals': S('<path d="M10 32h76L77 9H19z"/><circle cx="32" cy="21" r="7"/><circle cx="64" cy="21" r="7"/><path d="M32 14v14M57 21h14" opacity=".55"/>'),
+  plumb: S('<path d="M48 3v20"/><path d="M48 23l-5 9h10z"/><ellipse cx="48" cy="35" rx="16" ry="3" opacity=".5"/>'),
+  'upstream-hand': S('<path d="M10 30q9-5 18 0t18 0t18 0t18 0"/><path d="M33 24c-3-8 0-14 4-14s5 4 4 8c2-7 8-6 7 1c4-5 8-1 5 5" opacity=".7"/>'),
+  register: S('<rect x="20" y="6" width="56" height="29" rx="1"/><path d="M48 6v29M26 13h16M54 13h16M26 20h12M54 20h16M26 27h16" opacity=".45"/><path d="M56 29h13"/>'),
+  'tide-figure': S('<path d="M15 34c-3-10-2-20 2-29M25 34c-2-8-1-16 2-24M79 34c3-10 2-20-2-29M69 34c2-8 1-16-2-24" opacity=".4"/><path d="M43 34c0-8 2-13 6-13s6 5 6 13"/><circle cx="49" cy="15" r="4"/>'),
+  watcher: S('<circle cx="24" cy="17" r="7"/><circle cx="24" cy="17" r="2"/><path d="M34 17h24" opacity=".35"/><circle cx="69" cy="14" r="4"/><path d="M63 35c0-10 2-17 6-17s6 7 6 17"/>'),
+  'lower-hand': S('<path d="M10 31q9-5 18 0t18 0t18 0t18 0" opacity=".5"/><path d="M32 25c-3-8 0-13 4-13 3 0 4 4 3 8 3-5 7-2 5 4M58 25c3-8 0-13-4-13-3 0-4 4-3 8-3-5-7-2-5 4"/>'),
+  disposition: S('<circle cx="48" cy="20" r="5"/><path d="M43 20H12M53 20h31M48 15V3M48 25v12"/><path d="M12 20l5-4M12 20l5 4M84 20l-5-4M84 20l-5 4M48 3l-4 5M48 3l4 5M48 37l-4-5M48 37l4-5"/>'),
+  'model-marker': S('<path d="M12 31c5-9 17-13 36-13s31 4 36 13" opacity=".5"/><path d="M9 34h78"/><circle cx="52" cy="22" r="4"/><path d="M52 15v-4"/>'),
+});
 
-// ---- T: every inline whisper/journal line, extracted (#75) --------------------------
-// Mechanical key extraction, exact strings preserved — the voice pipeline and any lore
-// audit can finally see ALL the island's words. Keys are first-words slugs.
+// ---- SHORT WORLD CUES --------------------------------------------------------
+// Immediate sensory feedback for active mechanics. Persistent evidence belongs in
+// FIELD_NOTES; requested guidance belongs in HINT_THREADS.
 export const T = {
   the_sea_no_longer: 'The sea no longer answers the wheel down here.',
-  // THE DISPOSITIONS (STACK.md §6) — named as you turn the index, then the codas.
-  // No option is scored and none is called right; each names its own cost plainly.
-  disp_tend: 'TEND. Hold the water here. Add nothing, undo nothing, and keep the light for whoever comes.',
-  disp_carry: 'CARRY. Go back over your own work and take it out again. They will never know it was there.',
-  disp_open: 'OPEN. Leave your ledger unlocked, and take on what rises from below. Both directions, at cost.',
-  disp_close: 'CLOSE. Seal the way down. Nothing of yours reaches them. Nothing of yours helps them either.',
-  coda_tend: 'You held the water where it was. It was not nothing. It was not enough. Both of those are true.',
-  coda_carry: 'You went back over every mark you left and took it out again — {n} of them. Somebody below you will wake on a drier shore and never know why.',
-  coda_open: 'You left it unlocked. What rises from below is yours now too. That is what it costs, and you knew.',
-  coda_close: 'You sealed it behind you. Nobody follows. Nobody is helped. The light is still lit, and it is lit for no one.',
-  // THE ERAS AS RULESETS (STACK.md §3.4) — obeys → lags → is audited → refuses.
-  the_wheel_turns_and: 'The wheel turns and the sky does not. It will go where you put it. It will go there in its own time.',
-  the_hour_will_not: 'The hour will not move for you here. Nothing will, but the plate.',
-  the_register_has_one: 'One hand in the register, counting yours. Whatever came down before you did not sign.',
-  the_register_counts_the: 'The register counts {n} hands at this table. You had assumed you were the second.',
-  // THE FIFTH RING (STACK.md §3.2) — the readout, then the payoff. The gap line is
-  // a progress meter for a goal one player cannot reach; the payoff re-reads the
-  // whole gauge: he was not predicting the sea, he was counting the people.
+  // The same instrument obeys, lags, is audited, then refuses across the descent.
+  the_wheel_turns_and: 'The wheel turns. The sky follows after a delay.',
+  the_hour_will_not: 'The wheel turns freely. The sky does not move.',
+  the_register_has_one: 'The register begins in one hand. Later entries use different pressure and slant.',
+  the_register_counts_the: 'The register counts {n} distinct hands at this table.',
+  // The fifth ring is a visible threshold, not an interpreted prophecy.
   the_top_ring_stands: 'The top ring stands {gap} m clear of the water. Fresh-cut. Nothing has ever reached it.',
   the_water_is_at: 'The water is at the fifth ring.',
-  he_cut_the_top: 'He cut the top ring before there was any water to cut it for. I thought he was guessing at the sea. He was counting how many of us there would be.',
-  // THE DRIFT (STACK.md §3.3) — arrives ~4s after the dead wheel, when you have
-  // usually turned away. It must not explain itself: the player has already been
-  // told the law once, and this is the law happening to them.
-  the_wheel_was_dead: 'The wheel was dead in your hands. The water has risen anyway — a hand’s width, all at once, with nobody at the wheel.',
+  // The lower gauge makes the upstream transfer visible.
+  it_has_to_go_somewhere: 'The lower gauge rises as the upper basin falls.',
   below_the_window_the: 'Below the window, the sea obeys.',
-  a_valve_beside_the: 'A valve beside the chart table. Turn it, and the basin drains — and so does the bay. Someone built a machine to make the sea go back, and must have turned it, and turned it. As if, on some one day, holding the water back was the only thing left worth wanting.',
   the_crank_resists_as: 'The crank resists, as if the hours themselves have taken on water.',
   the_little_lamp_drags: 'The little lamp drags the real sun with it.',
-  a_crank_turns_the: 'A crank turns the orrery lamp around the model — and the sky outside follows it. I hold the hours.',
-  the_fourth_note_does: 'The fourth note does not come. Down here the box knows which note he never could play.',
+  the_fourth_note_does: 'The fourth tooth catches. The note falls silent.',
   the_song_comes_up: 'The song comes up slow and flat, as through water.',
-  the_music_box_turns: 'The music box turns five notes: E · G · A · D · C. Someone wound it often.',
   fallen_and_long_silent: 'Fallen, and long silent. Knocking on it is like knocking on a door with no room behind it.',
-  a_sixth_stone_lies: 'A sixth stone lies fallen at the arc’s south edge, face down in the grass. The five standing hum when touched; this one only knocks, dead as driftwood. Where does a stone’s note go when it falls? Somewhere below the tide line, I think. The sea keeps what falls.',
-  the_fallen_stone_hums: 'The fallen stone hums — the very note the shape laid across the water. It came home.',
-  the_fallen_stone_has: 'The fallen stone has its note back — the one the shape in the kelp laid across the bay before it sank. Six voices now, five standing and one lying down. The five refused his song once; with a sixth to land on, maybe the wrongness finally has somewhere to go.',
+  the_fallen_stone_hums: 'The fallen stone now carries the low note heard across the kelp.',
   the_hinges_remember_how: 'The hinges remember how.',
-  a_cartographer_s_brass: 'A cartographer’s brass rule. Fifteen centimetres of certainty.',
-  took_a_small_brass: 'Took a small brass ruler from a chest the tide gave up. It wants to measure something.',
+  a_cartographer_s_brass: 'A fifteen-centimetre cartographer’s rule. Brass, straight, unmarked by salt.',
   across_the_island_something: 'Across the island, something vast settles into place.',
-  you_do_not_need: 'You do not need a ruler for a distance you already know by heart.',
-  laid_the_ruler_over: 'Laid the ruler over the crack in the model. Out east, a brass bridge now spans the chasm — etched with centimetre marks the size of doors. He measured this rift a hundred times, I think — you do not need a ruler for a distance you already know by heart. You measure it to have something to do with your hands.',
+  you_do_not_need: 'The etched marks align with the model’s survey grid.',
   far_above_glass_settles: 'Far above, glass settles into brass.',
-  set_the_small_lens: 'Set the small lens into the model’s lamp room. The real lighthouse has its eye back. Whoever kept this light must have ground and polished that glass a thousand nights, so it could see a way home for someone out on the water. It will want the dark now.',
-  on_the_model_s: 'On the model’s beach, a bottle the size of a grain of rice — corked, and holding, presumably, its own small letter. And on ITS beach, presumably, another.',
-  leaning_into_the_model: 'Leaning into the model with the glass I found the bottle on its little beach — rice-grain small, corked, a curl of paper inside. Somewhere on that beach’s own model there is another. The invitation goes all the way down.',
-  even_here_a_staff: 'Even here: a staff the height of an eyelash, five rings, the topmost pale. He measured the model’s sea too.',
-  the_model_has_its: 'The model has its own tide gauge — an eyelash of a staff off the little shore, five rings, the top one pale. He surveyed the rising of a sea the size of a dinner tray. Thoroughness, or dread. Both, I think.',
-  two_figures_stand_on: 'Two figures stand on the model’s beach now. Neither is searching. They stand the way people stand when the searching is over.',
-  there_are_two_figures: 'There are two figures on the model’s beach now, where there was one bent low — one cold light and one warm, facing each other, neither looking for anything. That is how I know which day the model is holding now. Ours.',
+  on_the_model_s: 'On the model beach, a rice-grain bottle is corked around a curl of paper.',
+  even_here_a_staff: 'A staff the height of an eyelash stands in the model sea. It has five rings; the top is pale.',
   cold_as_seawater_clear: 'Cold as seawater, clear as morning — a lamp’s eye, far too fine for a pocket.',
-  took_the_first_lens: 'Took the first lens from the stones’ vault. It is a lighthouse lamp’s eye, ground and polished thin — and back in the study, the model on the chart table stands eyeless in its little lamp room. Glass like this only ever wants to be put back.',
   the_sand_slides_from: 'The sand slides from a brass door, dialled shut.',
-  at_golden_hour_the: 'At golden hour the stones’ shadows leaned together, all pointing across the water — to a hatch buried on the bluff. Four glyph dials seal it. He must have read this same hour off these same stones, day on day; some hours you set your whole life by, and they arrive whether or not you are ready.',
-  stone_breath_long_held: 'Stone breath, long held, sighs out.',
-  heavier_than_it_looks: 'Heavier than it looks. Truer, too.',
-  in_the_cellar_a: 'In the cellar: a brass plumb bob on a pedestal, and a carving of it hanging over a little island. The chart table has a hook.',
-  it_hangs_dead_centre: 'It hangs dead-centre over the model. Over the beach where you woke.',
-  hung_the_plumb_line: 'Hung the plumb line. It hangs dead-centre over the model’s beach — over a brass plate in the floor, big enough to stand on. The weight knows the depth before it drops. Whoever hung it first already knew how far down this goes.',
-  stand_on_it: 'Stand on it.',
-  the_plate_hums_and: 'The plate hums, and holds. Below this water the island stands split in two — and the crack has never been measured. The model still waits for its ruler.',
-  the_plate_would_not: 'The plate would not take me deeper. Below the shallows the island is split by the chasm, and the drowned channel has no crossing — not until the crack in the model is measured and the brass bridge stands. He measured that rift a hundred times. Now it wants measuring once more, by me.',
-  you_are_at_the: 'You are at the surface. There is nowhere above to rise to.',
-  he_is_here_at: 'He is here, at the foot of the stairs, looking up. Stand, and rise — and take him with you. Touch again.',
-  i_turned_him_around: 'I turned him around. Whatever I came down all this way looking for, it was him — it was me — and I would not leave him at the bottom. We go up together: one lamp, lit at both ends of the staircase.',
-  the_stair_is_roped: 'The stair is roped off and dark. Light the lamp, and the way up opens.',
-  off_the_low_shore: 'Off the low shore stands a graduated staff, ringed at five heights. The lowest is the sea I woke beside; the next three I have since stood BESIDE, one dive at a time, the water meeting each ring to the inch. The fifth is new-cut and pale, set above everything — measured, and not yet met. He did not guess these heights. He surveyed them, the way you survey a grief you know is still rising.',
-  a_line_cut_low: 'A line cut low into the wet stone, in the keeper’s hand: “what you bury, the tide still finds.”',
-  not_yet_something_at: 'Not yet. Something at the chart table has lifted its head, and is looking up at you.',
-  the_oar_is_light: 'The oar is light in your hands now. The water is calm, and the light is lit behind you. Touch it again to push off — there is no rowing back.',
-  i_have_left_the: 'I have left the light on, and I have left. The boat is small and the water is calm. The island is behind me now — and getting smaller, the way a thing does when you finally stop being inside it.',
-  locked_not_from_this: 'Locked — not from this side. Whatever holds it shut is further down than the latch.',
-  a_door_off_the: 'A door off the study, shut fast. The latch turns and nothing moves — it is not held from this side. Some rooms in this house open only from further down.',
-  glass_and_brass_wedged: 'Glass and brass, wedged where the floor meets the wall — a crack the width of two fingers. Water would float it free. The sea never comes this high.',
-  high_on_the_walk: 'High on the walk to the light, a dry stone pool the sea abandoned long ago — and something bright wedged deep in its floor, past any reach of mine. Water would lift it out. But the sea never comes this high... though the further down I go, the higher the sea stands. Somewhere below, this pool is full.',
+  stone_breath_long_held: 'The brass door drops inward. Cold air lifts from a lit stair below.',
+  heavier_than_it_looks: 'The brass weight pulls the cord vertical.',
+  it_hangs_dead_centre: 'The plumb hangs over the model beach. The floor plate lies on the same vertical line.',
+  stand_on_it: 'The plate vibrates beneath the plumb line.',
+  the_stair_is_roped: 'The stair is roped off and dark. The lamp socket beside it is empty.',
+  a_line_cut_low: 'Cut low into the wet stone: “RETURN FLOW +11 SEC.”',
+  locked_not_from_this: 'The latch turns. The hinges do not move.',
+  glass_and_brass_wedged: 'Glass and brass are wedged below the dry pool lip, beyond a hand’s reach.',
   the_bottom_of_the: 'The bottom of the world, and the pool is finally full. The phial rides the risen water, and your hand closes around it.',
-  at_the_bottom_the: 'At the bottom, the abandoned pool is full — the sea I descended through stands high enough to reach it at last. The phial floated free and I have it. The note inside is sodden, swollen against the glass; it will not unroll without tearing. It needs dry air. It needs the surface. So do I.',
   a_keeper_s_reading: 'A keeper’s reading glass. Through it, the faint marks resolve — there is writing everywhere you did not see.',
-  found_the_keeper_s: 'Found the keeper’s reading glass on the islet. He wrote the true things small, in lampblack; with the glass, they surface. There is more here than the eye admits.',
-  that_is_all_of: 'That is all of them — the small true things, written where only patience would look.',
-  i_have_found_the: 'I have found the last of the lampblack — nine small true lines hidden on the working things of his life. Read together they are not a confession; they are a man keeping himself company. The big log was for the inspector; these were for whoever held the glass. That is me, now.',
+  that_is_all_of: 'Nine lampblack marks found. Their measurements agree.',
   the_stones_hum_lower: 'The stones hum lower here, as through water.',
-  e_g_a_d: 'E, G, A, D, C — and the fallen B beneath them. The song he could never finish, finished. The stones do not refuse it.',
-  i_played_his_song: 'I played his song at the stones — the box’s way, the way his hands actually played it, wrong fourth and all — and let it land on the fallen stone’s note. The arc rang all six voices together, and the island’s own music has carried the sixth ever since. The wrongness was never the flaw to be ground out. It was the playing.',
+  e_g_a_d: 'E, G, A, D, C — with the fallen stone’s lower note beneath them. All six stones sound.',
   the_stones_refuse_the: 'The stones refuse the box’s song. Something out here sings it differently.',
   the_outcrop_opens_like: 'The outcrop opens like a held breath.',
-  some_corrections_only_ever: 'Some corrections only ever arrive too late.',
-  the_stones_accepted_the: 'The stones accepted the bird’s correction. A vault in the outcrop holds a small, perfect lens. The box always bent that fourth note wrong; the bird sings it true. He must have heard it right a thousand mornings and never could make his own hands play it — some corrections only ever arrive too late.',
-  at_dawn_a_bird: 'At dawn a bird on the stones sang the box’s tune — but it bends the fourth note up: E · G · A · G · C. The bird corrects the box.',
+  some_corrections_only_ever: 'The fourth stone answers the higher pitch.',
   the_bird_sings_the: 'The bird sings the box’s song. Almost.',
   the_bay_gives_up: 'The bay gives up a road of wet stone.',
-  the_lighthouse_remembers_its: 'The lighthouse remembers its eye. Light pours down the tower’s throat onto the model — whose own small lamp is burning.',
-  at_night_the_lamp: 'At night the lamp burns. A shaft of it falls through the tower onto the model — and the model’s lighthouse glows back. Turning the model’s lamp housing turns the real beam.',
-  the_beam_writes_on: 'The beam writes on the cliff in someone’s patient hand.',
-  the_risen_capitals_catch: 'The risen capitals catch the beam — four figures hang over the drowned hall, the same four he wrote on the cliff.',
-  far_out_on_the: 'Far out on the risen water, something catches the beam and holds it. The drowned hall is reading the light.',
+  the_lighthouse_remembers_its: 'The full lighthouse lens seats. Its beam falls through the tower onto the lit model lamp.',
+  the_beam_writes_on: 'The beam returns four figures from the west cliff.',
+  the_risen_capitals_catch: 'Four figures reflect from the capitals above the drowned hall, in the same order as the cliff.',
+  far_out_on_the: 'The beam catches on the drowned hall and holds for one circuit.',
   a_chart_table_and: 'A chart table. And on it — this island. This lighthouse. This room.',
-  the_study_holds_a: 'The study holds a living model of the island, 1:240, sea and all. The window looks over the same bay the basin holds.',
   centimetre_marks_underfoot_tall: 'Centimetre marks underfoot, tall as doorways.',
-  the_dory_and_its: 'The dory, and its one unused oar. You went down and climbed back; this is the way out, when you are ready to take it.',
+  the_dory_and_its: 'The beached dory holds one unused oar. Its line remains fast to the jetty.',
   you_set_the_phial: 'You set the phial from the high pool on the chart table. In the dry air of the study, the little roll of paper loosens from the glass at last.',
-  back_at_the_surface: 'Back at the surface, I set the phial out to dry on the chart table. The note he sealed against the rising water has finally let go of the glass. It carried all the way down and all the way back up — now it can be read.',
-  the_inner_door_stands: 'The inner door stands open. A coat, still warm. Footprints — your size.',
-  one_level_down_the: 'One level down, the study is the same study. The model on its table shows a tiny figure standing on the beach. The annex holds a bell.',
-  nowhere_deeper_the_plate: 'Nowhere deeper. The plate that brought you down only ever went one way — try it again.',
-  there_is_no_further: 'There is no further down — I have stood at the bottom of my own making. The plate is the only door left, and it is under my feet. If it only goes one way, then the way on is the way back up.',
-  you_have_stood_here: 'You have stood here before. The room is exactly as you left it — too exactly.',
-  i_keep_leaving_this: 'I keep leaving this study and coming back to find it untouched: the same chair, the same cold cup, the same hour held on the glass. Either no time passes here, or I have stopped being the one who disturbs it.',
-  there_you_are_i: 'There you are. I’ve been coming down for you.',
-  another_study_west_of: 'Another study, west of this one. On its table: a sea you never drained, a lamp you never lit. Which of you is the copy?',
-  a_second_study_faces: 'A second study faces mine across the dark. Its model shows an island I never made — the bay drained, the light burning. I have trusted the model to tell the truth about the world. Here, one of them is lying.',
-  you_step_back_from: 'You step back from the edge. The sea comes back.',
-  you_step_back_he: 'You step back. He waits at the foot of the stairs, looking up.',
-  you_set_the_oar: 'You set the oar back down. The boat waits.',
+  the_inner_door_stands: 'The inner door stands open. A coat is warm. Damp footprints lead inward.',
+  you_have_stood_here: 'The chair, cup, dust, and clock hand occupy their earlier positions.',
+  another_study_west_of: 'A facing study contains a drained model basin and a lit model lamp.',
   a_bell_buoy_listing: 'A bell-buoy, listing in the drowned channel. It keeps ringing anyway.',
-  a_bell_buoy_lists: 'A bell-buoy lists out in the flooded channel between the bluff and the island, tolling to no one on the swell. It marked the safe water once. The safe water is under all of this now, and still it keeps its one job — some kept things outlive the thing they kept.',
-  you_did_not_run: 'You did not run. You looked, and kept looking, until the shape stopped being a threat and was only what it had always been — something of yours, come back to be carried up.',
-  on_the_deep_shore: 'On the deep shore a figure walked — toward me when I looked away, still when I looked at it. I did not run. I held its gaze until it lifted its head, let go, and dissolved into a small cold light that rose. Not everything down here wants to keep you. Some of it only wants to be seen.',
-  far_along_the_shore: 'Far along the shore, a small cold light stands a moment — and goes. It is not looking for you. It is only keeping you company.',
-  you_stop_wading_for: 'You stop wading for it. You only watch. It settles, surfaces — and lays a single note across the water before it sinks.',
-  a_shape_stood_in: 'A shape stood in the kelp and slipped off whenever I waded toward it. So I stopped, and stood, and only watched. It settled then, and surfaced, and laid one bell-note across the bay before the water took it. Some things will not be chased down — only witnessed. And that is enough to let them go.',
+  you_did_not_run: 'Under a held gaze, the figure raises its head and breaks into a cold light.',
+  far_along_the_shore: 'A small cold light stands on the far shore for three breaths, then goes dark.',
+  you_stop_wading_for: 'When movement stops, the form surfaces and sends one low note across the water.',
   faint_from_the_kelp: 'Faint, from the kelp: the note it laid, still crossing the water now and then.',
   click_and_the_sea: 'Click, and the sea will hurry.',
   the_tide_brought_you: 'The tide brought you back.',
-  down_is_the_only: 'Down is the only direction left.',
-  somewhere_above_a_door: 'Somewhere above, a door stands open now.',
+  down_is_the_only: 'The plate’s lower ring is lit. Its upper ring is dark.',
   there_is_no_level: 'There is no level above the surface. Not yet.',
-  you_run_the_mechanism: 'You run the mechanism backward. It fights you — the world comes up by inches.',
-  back_at_the_surface_2: 'Back at the surface — and you did not come up alone. The door, the coat, the jetty, all as you left them. You are not.',
-  i_have_been_all: 'I have been all the way down and all the way back, and I did not come up empty-handed. The hand that writes this is mine again — both of them mine. The light is lit, below and above, and nothing is left burning alone. There is the dory on the beach, and an oar I have never used. The only thing left undone is to go.',
-  back_at_the_surface_3: 'Back at the surface. The door, the coat, the jetty — all as you left them. Only you are different.',
-  i_have_been_all_2: 'I have been all the way down and all the way back. The same beach, the same light — but the hand that writes this is mine again, and I left his still burning below. I did not put it out. I did not stay. There is the dory on the beach, and an oar — the one thing here I have never used. The light is lit; the only thing left undone is to go.',
-  down_on_the_beach: 'Down on the beach, the beached dory waits — and its oar, the last thing here you have not touched.',
-  i_did_not_leave: 'I did not leave him. I turned him around at the bottom and we started up together — the lost thing I came all this way to find was the one still carrying the lamp. Two lights now, lit at both ends of the same stair, and both of them climbing.',
-  i_went_all_the: 'I went all the way down — to the smallest room, the coldest light — and found him still there, still tending it. I could not bring myself to put it out. So I have started back up the stairs, and I am carrying what I found at the bottom. The light is still burning behind me. Let it.',
-  his_voice_is_beside: 'His voice is beside you now, not below. You did not put the light out — you carried it up.',
-  below_you_the_voice: 'Below you, the voice has stopped. The light still burns — you did not put it out.',
-  the_way_out_was: 'The way out was the way in. It always was.',
+  you_run_the_mechanism: 'The mechanism reverses. The level marks pass upward one by one.',
   salt_and_lamp_oil: 'Salt and lamp oil, still.',
   far_down_a_light: 'Far down, a light is still lit.',
-  there_you_are_a: 'There you are — a speck on your own map.',
-  a_mark_has_appeared: 'A mark has appeared on the model where I stand — a little light that moves when I move. I have bent over this map for days, trusting it to show me the island truly. It was showing me ON it the whole time. You can study a place a long while before you notice you are also a figure in it.',
+  there_you_are_a: 'A lit point appears on the model shore.',
   the_ground_gives_you: 'The ground gives you back.',
   already_at_the_bottom: 'Already at the bottom.',
-  everything_down_here_is: 'Everything down here is younger than the day I left on the surface.',
-  the_water_is_higher: 'The water is higher, and yet everything under it is younger — the kelp where he first went down, a climber’s mark still sharp at its edges, his hand on the wax steadier than any page I read upstairs. I thought I was diving under the island. I am diving under the years. The island does not drown all at once; it drowns in order, and the order is his.',
+  everything_down_here_is: 'Marks below the water line have sharper edges than those above.',
   the_rope_is_still: 'The rope is still moving. Nothing down here should still be moving.',
-  a_climber_s_rope: 'A climber’s rope on the wade-line, tied off by a hand that meant to come back — and still swinging, as if that hand let go the moment I looked away. The arrival years have not finished happening. Down here, nothing has finished happening.',
   the_water_over_the: 'The water over the hall is moving. Something is coming up.',
-  i_watched_the_sea: 'I watched the sea open over the drowned hall and give the capitals back — three carved crowns breaching slow, like something surfacing for air. It is the only time I have seen the water return a thing. It was not mercy. It was the inspection years rising to be read.',
   the_light_passes_under: 'The light passes under the water — once, all the way around.',
-  at_the_bottom_of: 'At the bottom of the years the beam made one full pass beneath the sea — the whole island swept once, shore to shore, like a hand feeling along a wall in a dark room. Then it went out. Not failed — finished. The island has stopped performing for me. What is left down here is only the true things.',
-  the_line_takes_the: 'The line takes the cleat the way it always has. My hands knew the turns.',
-  i_made_his_line: 'I made his line fast at the dory — took the turns his hands took at the start of every day of the arrival years, the first act of every day he ever kept here. For a moment the mooring was not mine to tie but his, and the boat it held was every boat that ever came in. Out past the pier, someone stood in the water and watched it done, the way the waited-for watch the faithful. The rounds are still here. The island remembers being kept.',
-  one_true_line_signed: 'One true line, signed under all his true lines.',
-  i_signed_the_day: 'I signed the day’s return at the chart table — mean high water: risen — the way he signed it through all the inspection years, exact where exactness was asked of him. Something stood at the door while I wrote, the way being watched stands at a door, and was gone when I looked up from the line. The record is complete now, for whoever records are kept for.',
+  the_line_takes_the: 'The line settles into the cleat’s worn turns.',
+  one_true_line_signed: 'The observed water level is signed beneath the earlier entries.',
   the_small_flame_takes: 'The small flame takes. The dark backs off by one cot’s width.',
-  i_lit_his_small: 'I lit his small lamp by the cot — the one he lit when the great light was done for the night, the last winter’s only warmth. Across the island the model answered: its little lighthouse woke, held a while, and settled, one light remembering another. He never let both of them be dark at once. Now neither will I.',
-  wound_the_way_he: 'Wound, the way he wound it — once more than it needed.',
-  i_wound_the_music: 'I wound the music box on the last day the way he wound it on every day — once more than it needed, for someone not there to hear it. The bird came to the sill and listened all five notes out, head tilted at the fourth, and did not correct it. Some rounds are kept for no one. Those were the ones he kept most faithfully.',
-  four_rounds_kept_the: 'Four rounds, kept: the line made fast, the return signed, the small lamp lit, the box wound. A day of his, performed whole across all the years of him at once. The island did not need any of it done. I did.',
-  folded_into_my_coat: 'Folded into my coat. Paper remembers being carried.',
-  the_drawer_takes_it: 'The drawer takes it. The record is where records go.',
-  left_with_him_at: 'Left with him, at the bottom of the years.',
-  i_filed_his_record: 'I filed his record in the cabinet by the cot — returns, findings, notices, squared away and shut in the drawer where the District could always have come and found them. A life added up, for the office that asked. Both things are true at once: the record is complete, and the record is not the life.',
-  i_did_not_file: 'I did not file it. I carried it down through all the years of him and left it with him at the source, where the water keeps what matters from the office that asked. Some records exist to be filed. This one existed to be witnessed.',
-  the_jetty_s_outer: 'The jetty’s outer arm is a shadow under green glass. I walked it the morning I came. The water holds it now.',
+  wound_the_way_he: 'The spring takes one full turn. The cylinder begins to move.',
+  folded_into_my_coat: 'The folded record fits inside the coat lining.',
+  the_drawer_takes_it: 'The record rests beside the District returns.',
+  left_with_him_at: 'Weighted on the source slab, above the wet line.',
+  the_jetty_s_outer: 'The jetty’s outer arm is a shadow under green water.',
   the_bench_faces_the: 'The bench faces the sea from inside it now. The seat goes awash with every third wave. The water holds it now.',
   the_skiff_is_off: 'The skiff is off its blocks and rides at the old anchor, half a gunwale under. The water holds it now.',
-  three_things_the_island: 'Three things the island gave up while I was down in the years: the jetty’s furthest arm, the bench at the shallows, the skiff off its blocks. The chart in the study will say the shore moved. What moved is everything the shore was for. And I understand the tide gauge’s fifth ring now — the fresh-cut one, above all the others. It was never a measurement. It was a forecast.',
   field_report_taken_copied: 'Note sent — position, view, state and a screenshot went with it.',
 };
 
-// ---- the finale codas (#134, AAA-A6): the ending re-reads THIS player's walk ------
-// Pure assembly — no imports, node-testable. state = { rounds: 0..4, filed, kept,
-// lossesNamed: 0..3 }. Returns short lines for the finale card; empty array if the
-// walk left nothing behind (the codas degrade to silence, never to filler).
-export function finaleCoda(kind, s) {
+// ---- finale observations ----------------------------------------------------
+// Four physical dispositions, four visible results. The coda reports state without
+// scoring it. Unknown retired ending kinds deliberately produce no copy.
+export function finaleCoda(kind, s = {}) {
   const lines = [];
-  if (s.rounds > 0) {
-    lines.push(s.rounds === 4
-      ? (kind === 'oar' ? 'his rounds went with me, kept whole' : 'his rounds are the shape of my day now')
-      : `${['one', 'two', 'three'][s.rounds - 1]} of his rounds, kept`);
+  if (kind === 'tend') lines.push('water held at the marked line', 'lamp circuit continuing');
+  if (kind === 'carry') {
+    const removed = Math.max(0, Number(s.removed ?? 0) || 0);
+    lines.push(`${removed} intervention${removed === 1 ? '' : 's'} reversed`, 'water retreating below and returning above');
   }
-  if (s.filed + s.kept > 0) {
-    const parts = [];
-    if (s.filed) parts.push(`${s.filed} filed for the office`);
-    if (s.kept) parts.push(`${s.kept} left with him`);
-    lines.push('the record — ' + parts.join(', '));
-  }
-  if (kind === 'oar') {
-    lines.push(s.lossesNamed === 3
-      ? 'the oar passes over the arm, the bench, the skiff — named, and held'
-      : 'the oar passes over what the water holds now');
-  } else {
-    lines.push('the shore in the model is smaller than the chart — what it was for is here with me');
-  }
+  if (kind === 'open') lines.push('upper and lower basins joined', 'both gauges moving toward one level');
+  if (kind === 'close') lines.push('plate sealed', 'upper pressure zero; lower pressure holding');
+  if (!lines.length) return [];
+  if (s.rounds > 0) lines.push(`${s.rounds} maintenance round${s.rounds === 1 ? '' : 's'} completed`);
+  if (s.filed > 0) lines.push(`${s.filed} record${s.filed === 1 ? '' : 's'} filed in the quarters cabinet`);
+  if (s.kept > 0) lines.push(`${s.kept} record${s.kept === 1 ? '' : 's'} weighted at the source`);
   return lines;
 }

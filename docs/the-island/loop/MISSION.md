@@ -96,7 +96,7 @@ forks are the live tensions at the foot of SPINE.md.)
      attentive players. NEVER break or gate the existing main chain.
    - **Close-look jank** — the "grass poking through a table" class: things
      that betray the illusion within 2 metres. Hunt them with screenshots.
-   - **Graphics wow** — sky, water, light, weather, post. The five master
+   - **Graphics wow** — sky, water, light, weather, post. The four master
      grades in `world.js` are the only palettes; extend, don't fork. Pure
      quality-bar ticks obey "The Graphics Quality Bar & Power Ledger" (below)
      and are RATE-LIMITED: at most 1 in every 3 build iterations, never two in
@@ -104,10 +104,11 @@ forks are the live tensions at the foot of SPINE.md.)
      leads — a graphics tick can still be REJECTED by a persona panel as avoidance.
    - **Audio / music** — everything synthesized in `audio.js`; the 5-note
      leitmotif (E G A D C) is the seed of all melody.
-   - **Performance / code health** — budget: **locked 60fps; draws < 360
-     (interior/overview), < 260 (open beach); tris < 800k** (`?debug` shows all
-     three). (The old "<200 draws" was fictional — the real island runs ~307–340;
-     measure at the `?debug` bench pose, never guess.)
+   - **Performance / code health** — budget: **locked 60fps; at the canonical
+     upstream-hand pose, peak draws < 525 and tris < 1,000,000; the feature adds
+     at most 16 draws and 20,000 tris; point lights stay <= 9 and do not increase.**
+     `tools/harness/upstream-hand.mjs` is the executable gate; `?debug` supplies
+     GPU timing for investigation, not a second competing budget.
    - **UX / onboarding / accessibility** — never adding HUD chrome.
 3. **Build it.**
 4. **Verify it** (see protocol below).
@@ -134,9 +135,11 @@ forks are the live tensions at the foot of SPINE.md.)
   Anything state-driven must be applied to BOTH instances (`puzzles.js
   _apply`) or shared by material. Never let them disagree.
 - The game must remain completable end-to-end after every iteration:
-  valve → chest/ruler → bridge → birdsong → lens → shadows → beam glyphs →
-  dials → plumb → dive → bell. If you touch terrain, puzzles, props, or
-  player movement, re-verify the affected links of that chain.
+  valve → chest/ruler → bridge → birdsong → lens → beam figures + signal
+  instrument index → physical readings → hatch dials → plumb → shallows transfer + Tide-Figure → register
+  + Watcher → Lower Hand + disposition → ascent → returned plate. If you touch
+  terrain, puzzles, props, or player movement, re-verify the affected links of that
+  chain.
 - **No debug-only payoffs (Panel #2, 2026-06-19).** A tick whose effect is only
   reachable by forcing state through `?debug` — e.g. behavior gated on
   `W.level > 2`, a flag a player can't yet set — is NOT shippable as a "story"
@@ -145,8 +148,10 @@ forks are the live tensions at the foot of SPINE.md.)
   shipped a five-level decay no player could reach (the dive only ever set
   `W.level = 2`). If you can't make the effect reachable this tick, it is
   **VISUAL DEBT**, logged as such — not a shipped feature, and not "verified."
-- Saves must survive: new persistent state goes through `world.js`
-  `save()/load()` with a backward-compatible default.
+- Saves are a current-development contract, not an archive: new persistent state
+  goes through `save-schema.js` and `world.js` `save()/load()`. Change the one
+  canonical schema when the game changes; do not add migrations, backup keys, or
+  compatibility branches for old development saves.
 
 ## Known traps (learned the hard way)
 
@@ -239,7 +244,8 @@ refresh, planar/SSR water reflection (a 2nd scene render + breaks the shared-wat
 ## Verification protocol (non-negotiable)
 
 - Serve with the existing launch config (`preview_start` name `abyme`, port
-  8741) and load `/?debug` for the time scrubber, teleports, and fps/draws.
+  8741) and load `/?debug&localstack` for the state-changing time scrubber and
+  teleports. `/?debug` alone enables GPU timing without mutation controls.
 - Every visual change gets **screenshots at the times of day it affects**
   (the grades differ wildly: dawn 7h, noon 12h, golden 17.7h, night 23h)
   and at close range if it's within player reach.
@@ -249,8 +255,9 @@ refresh, planar/SSR water reflection (a 2nd scene render + breaks the shared-wat
 - Puzzle-affecting changes: drive the real input pipeline at least once
   (dispatch pointermove → next eval → pointerdown/up) or walk the debug
   buttons through the affected steps.
-- Check the `?debug` readout after: 60fps locked, draws within the reconciled
-  budget (< 360 interior/overview, < 260 beach), tris < 800k, no console errors.
+- Check the `?debug` readout after for locked 60fps, GPU timing, and console
+  errors; run `tools/harness/upstream-hand.mjs` for the enforced render-budget
+  thresholds above.
 
 ## Ship protocol
 

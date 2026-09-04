@@ -2,7 +2,7 @@
 // Shared game state — imported by all modules
 // ════════════════════════════════════════════════════════════
 
-import { createCompanySupplyState } from './company-supply.js?realm=197';
+import { createCompanySupplyState } from './company-supply.js?realm=198';
 
 export const TILE = { WATER:0, SAND:1, GRASS:2, FOREST:3, STONE:4, IRON:5, MOUNTAIN:6 };
 export const TW = 64, TH = 32;
@@ -37,7 +37,7 @@ export const TILE_COLORS = {
 
 export const BUILDINGS = {
   house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:4, foodStore:8, desc:'Shelters settlers, holds 8 pantry food, and pays taxes. Evolves Hovel → Manor with well, market, church, and tavern coverage.' },
-  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:1,wheat:3}, workers:1, desc:'Harvests one direct ration plus bulk wheat for milling into much more bread',
+  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:1,wheat:3}, workers:1, desc:'Harvests one direct ration and sacks of wheat that workers must carry into the milling network',
     upgrades: [
       { cost:{wood:15,stone:8},          prodMult:1.5, name:'Level 2' },
       { cost:{wood:25,stone:20,iron:5},  prodMult:2.0, name:'Level 3' },
@@ -72,12 +72,12 @@ export const BUILDINGS = {
   tradingpost:{ name:'Trading Post',icon:'⛵', cost:{wood:20,stone:15}, workers:1, on:[1], desc:'Sends caravans for gold (build on sand)' },
   castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50,planks:20}, defense:50, happiness:20, pop:10, desc:'The realm\'s mightiest defense — and the Wonder\'s foundation stone' },
   wonder:    { name:'Hall of Ages', icon:'🕍', cost:{stone:50,planks:20,gold:40}, workers:4, happiness:10, radius:8, maxCount:1, desc:'The Wonder. Raise all three stages to win the age' },
-  granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
-  storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, foodStore:40, desc:'Receives delivered goods and holds up to 40 food' },
+  granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'A physical reserve for food, wheat, and flour; halves winter food loss' },
+  storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, foodStore:40, desc:'A flexible physical depot for delivered food, wheat, and flour' },
   church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15,planks:8}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
   school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
-  windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, convert:{from:'wheat',to:'flour',amount:4}, desc:'Mills wheat into flour for the bakery' },
-  bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, convert:{from:'flour',to:'food',amount:3,yield:2}, happiness:5, desc:'Bakes flour into bread — two food per flour. Small happiness boost.' },
+  windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, convert:{from:'wheat',to:'flour',amount:4}, desc:'Mills only wheat delivered to its own input bin, then sends flour onward' },
+  bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, convert:{from:'flour',to:'food',amount:3,yield:2}, happiness:5, desc:'Bakes only locally delivered flour into bread — two food per flour' },
   chickencoop: { name:'Chicken Coop', icon:'🐔', cost:{wood:15}, prod:{food:1}, workers:1, desc:'Small chicken coop producing eggs and meat' },
   cowpen:    { name:'Cow Pen',     icon:'🐄', cost:{wood:25,stone:5}, prod:{food:2}, workers:1, desc:'Pastures cattle for milk and meat' },
   fisherman: { name:"Fisherman's Hut", icon:'🐟', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },

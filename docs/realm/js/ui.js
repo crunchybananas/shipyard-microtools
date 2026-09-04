@@ -2,45 +2,47 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=197';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=197';
-import { getWonderReport } from './wonder.js?realm=197';
-import { panCameraTo } from './render.js?realm=197';
-import { dispatch } from './commands.js?realm=197';
-import { missions } from './missions.js?realm=197';
-import { getActiveScenario } from './scenarios.js?realm=197';
-import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=197';
-import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=197';
-import { saveGame, loadGame } from './save.js?realm=197';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=197';
-import { notify } from './notifications.js?realm=197';
-import { TRADE_PARTNERS } from './trade.js?realm=197';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=198';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=198';
+import { getWonderReport } from './wonder.js?realm=198';
+import { panCameraTo } from './render.js?realm=198';
+import { dispatch } from './commands.js?realm=198';
+import { missions } from './missions.js?realm=198';
+import { getActiveScenario } from './scenarios.js?realm=198';
+import { FIRST_MUSTER_CHAPTER_ID, getFirstMusterReport } from './first-muster.js?realm=198';
+import { getPostRaidRecoveryReport } from './post-raid-recovery.js?realm=198';
+import { saveGame, loadGame } from './save.js?realm=198';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=198';
+import { notify } from './notifications.js?realm=198';
+import { TRADE_PARTNERS } from './trade.js?realm=198';
 import {
   citizenStaffingCapacity,
   onCitizenTransition,
   staffingCount,
-} from './citizen-ownership.js?realm=197';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=197';
-import { residentsForHouse } from './residences.js?realm=197';
+} from './citizen-ownership.js?realm=198';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=198';
+import { residentsForHouse } from './residences.js?realm=198';
 import {
   activeStaffingCount,
   buildingOperationLabel,
   effectiveActiveStaffingCount,
   isBuildingOperational,
   militaryCrewForBuilding,
-} from './building-operation.js?realm=197';
+} from './building-operation.js?realm=198';
 import {
+  PHYSICAL_RESOURCE_KEYS,
   authoredBuildingCount,
   foodCapacity,
   foodStores,
   isFoodStore,
   storedFood,
-} from './building-inventory.js?realm=197';
-import { recruitmentStatus } from './military.js?realm=197';
-import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=197';
-import { buildingUseReport } from './building-use.js?realm=197';
-import { armyOrderMeta, companyObjective, liveGuardBuilding } from './army-orders.js?realm=197';
-import { companySupplyReport } from './company-supply.js?realm=197';
+} from './building-inventory.js?realm=198';
+import { resourceFlowReport } from './logistics.js?realm=198';
+import { recruitmentStatus } from './military.js?realm=198';
+import { WORKFORCE_PRIORITIES, workforcePolicySnapshot } from './workforce-policy.js?realm=198';
+import { buildingUseReport } from './building-use.js?realm=198';
+import { armyOrderMeta, companyObjective, liveGuardBuilding } from './army-orders.js?realm=198';
+import { companySupplyReport } from './company-supply.js?realm=198';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -73,6 +75,72 @@ function workforcePolicyControls(building) {
     ? ` · ${snapshot.crownWorkers} Crown order${snapshot.crownWorkers === 1 ? '' : 's'} protected`
     : '';
   return `<div class="workforce-policy"><div class="workforce-policy-head"><span class="ip-label">Labor priority</span><span class="workforce-policy-current workforce-${snapshot.priority}">${meta.icon} ${meta.label}</span></div><div class="workforce-priority-grid">${buttons}</div><div class="ip-hint workforce-policy-detail">${escapeHtml(meta.detail)}${crewNote}</div></div>`;
+}
+
+const SUPPLY_LEDGER_TYPES = new Set(['windmill', 'bakery', 'granary', 'storehouse']);
+const PHYSICAL_RESOURCE_SET = new Set(PHYSICAL_RESOURCE_KEYS);
+
+function supplyLedger(building) {
+  if (!SUPPLY_LEDGER_TYPES.has(building?.type)) return '';
+  const report = resourceFlowReport(building, G);
+  const def = BUILDINGS[building.type] || {};
+  const input = PHYSICAL_RESOURCE_SET.has(def.convert?.from) ? def.convert.from : null;
+  const supported = PHYSICAL_RESOURCE_KEYS.filter(key => report.resources[key].capacity > 0);
+  if (supported.length === 0) return '';
+
+  const rows = supported.map(key => {
+    const flow = report.resources[key];
+    const storedPct = Math.min(100, Math.round(flow.stored / flow.capacity * 100));
+    const inboundPct = Math.min(100 - storedPct, Math.round(flow.inbound / flow.capacity * 100));
+    const role = key === input ? 'input' : key === 'food' ? 'rations' : 'reserve';
+    const inbound = flow.inbound > 0
+      ? `<span class="supply-inbound-count">+${flow.inbound} en route</span>`
+      : '';
+    return `
+      <div class="supply-flow-row">
+        <div class="supply-flow-label"><span>${resourceEmoji(key)}</span><span>${escapeHtml(key)}</span><small>${role}</small></div>
+        <div class="supply-flow-meter" role="meter" aria-label="${escapeHtml(key)} stored" aria-valuemin="0" aria-valuemax="${flow.capacity}" aria-valuenow="${flow.stored}">
+          <span class="supply-flow-stored" style="width:${storedPct}%"></span>
+          <span class="supply-flow-inbound" style="left:${storedPct}%;width:${inboundPct}%"></span>
+        </div>
+        <div class="supply-flow-value">${flow.stored}/${flow.capacity}${inbound}</div>
+      </div>`;
+  }).join('');
+
+  const inputFlow = input ? report.resources[input] : null;
+  let state = 'Accepting deliveries';
+  let detail = 'Workers choose reachable stores and reserve space before setting out.';
+  if (inputFlow) {
+    if (report.status !== 'operational') {
+      state = buildingOperationLabel(building);
+      detail = inputFlow.inbound > 0
+        ? `${inputFlow.inbound} ${input} still inbound; production waits for an active crew.`
+        : `Delivered ${input} stays here until the building is staffed and working.`;
+    } else if (inputFlow.stored > 0) {
+      state = `Ready to use ${input}`;
+      detail = `${inputFlow.stored} ${input} on site${inputFlow.inbound > 0 ? `, with ${inputFlow.inbound} more reserved on the road` : ''}.`;
+    } else if (inputFlow.inbound > 0) {
+      state = `${inputFlow.inbound} ${input} inbound`;
+      detail = 'A carrier has claimed this input space and is taking a real route here.';
+    } else {
+      state = `Waiting for ${input}`;
+      detail = `No carrier currently has a reachable delivery reservation for this ${building.type}.`;
+    }
+  }
+
+  const outputKey = def.convert?.to;
+  const outputWaiting = outputKey ? Math.floor(building.produced?.[outputKey] || 0) : 0;
+  const output = outputWaiting > 0
+    ? `<div class="supply-ledger-output"><span>Output waiting</span><strong>${resourceEmoji(outputKey)} ${outputWaiting}</strong></div>`
+    : '';
+
+  const ledgerTitle = building.founderStockpile === true ? 'Founder Stockpile' : 'Supply ledger';
+  return `<section class="supply-ledger" aria-label="Physical supply ledger">
+    <div class="supply-ledger-head"><span>${ledgerTitle}</span><strong>${escapeHtml(state)}</strong></div>
+    <div class="supply-ledger-thread">${rows}</div>
+    ${output}
+    <p>${escapeHtml(detail)}</p>
+  </section>`;
 }
 
 const BUILDING_ATLAS_TYPES = [
@@ -1010,12 +1078,13 @@ export function showInfoPanel(b) {
     <div class="ip-row ip-use-row"><span class="ip-label">People</span><span class="ip-val">${escapeHtml(use.people)}</span></div>
     <div class="ip-row ip-use-row"><span class="ip-label">Activity</span><span class="ip-val">${escapeHtml(use.activity)}</span></div>
     <div class="ip-row ip-use-row"><span class="ip-label">Realm effect</span><span class="ip-val">${escapeHtml(use.strategic)}</span></div>`;
-  if (isFoodStore(b)) {
+  if (isFoodStore(b) && !SUPPLY_LEDGER_TYPES.has(b.type)) {
     const stockLabel = b.founderStockpile === true
       ? 'Founder Stockpile'
       : b.type === 'house' ? 'Pantry' : 'Food store';
     html += `<div class="ip-row"><span class="ip-label">${stockLabel}</span><span class="ip-val">🍎 ${storedFood(b)}/${foodCapacity(b)}</span></div>`;
   }
+  html += supplyLedger(b);
   // Lore tooltip (flavor text)
   const LORE = {
     house: '"Four walls and a fire make a world of difference to the weary traveler."',
@@ -1126,7 +1195,7 @@ export function showInfoPanel(b) {
   }
 
   // Production chain status (converters: windmill, bakery, sawmill, blacksmith)
-  if (def.convert) {
+  if (def.convert && !PHYSICAL_RESOURCE_SET.has(def.convert.from)) {
     const from = def.convert.from, to = def.convert.to;
     const inStock = Math.floor(G.resources[from] || 0);
     const outStock = Math.floor(G.resources[to] || 0);
@@ -1262,7 +1331,8 @@ export function showInfoPanel(b) {
   const missions = document.getElementById('missions');
   if (missions) {
     const mRect = missions.getBoundingClientRect();
-    panel.style.top = (mRect.bottom + 8) + 'px';
+    panel.style.removeProperty('top');
+    panel.style.setProperty('--info-panel-top', `${mRect.bottom + 8}px`);
   }
 
   panel.style.display = 'block';

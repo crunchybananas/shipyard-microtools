@@ -1,54 +1,98 @@
 # THE ISLAND — ABYME
 
-*An island within an island.* A Myst-inspired first-person mystery in real-time 3D,
-built from pure web tech. One dependency (three.js, from a CDN), **zero assets** —
-every mesh, texture, and sound is synthesized in code.
+*An island within an island.* ABYME is a first-person mystery about changing a
+miniature world, descending into the consequences, and returning to decide what
+should cross between levels.
 
-**Play it:** open `index.html` over any static server. Headphones recommended.
+It is a static Three.js application with no build step. Geometry, materials,
+weather, water, animation, and audio are synthesized at runtime.
 
-## The conceit
+## Run it
 
-You wash up on a lonely lighthouse island. In the lighthouse study stands a chart
-table holding a perfect 1:240 living model of the island you're standing on — same
-sea, same lighthouse, same study. The model and the world render from one shared
-`WorldState`, so they can never disagree:
+Serve this directory over HTTP; `file://` cannot load the ES modules.
 
-- Turn the **brass valve** by the model's basin → the real ocean drains, exposing a
-  causeway. Watch it happen through the study window.
-- Crank the **orrery lamp** around the model → the actual sun wheels across the sky.
-  Cross the horizon and you might catch the green flash.
-- Lay a pocket **ruler** across a crack in the model → a 36-metre brass ruler now
-  bridges the real chasm, centimetre etchings tall as doorways.
-- Set the small **lens** in the model's lamp room → the real lighthouse burns at
-  night, and its beam writes glyphs on a cliff.
+```sh
+python3 -m http.server 8000
+```
 
-The finale inverts the trick: the world swells 240× around you, and you land on the
-same beach, one level down.
+Then open `http://localhost:8000/`. Headphones are recommended. Add `?debug` for
+GPU timing. State-changing developer tools are built only on the isolated
+`?debug&localstack` route; there, backtick shows or hides the panel.
 
-## Puzzle chain (spoilers)
+## The game
 
-tide valve → causeway chest (ruler) → bridge the chasm → music box vs. the dawn
-bird's corrected melody on the standing stones (lens) → golden-hour stone shadows
-reveal the buried hatch → night beam projects the 4-glyph dial code → cellar plumb
-bob → hang it over the model's beach → stand on the brass plate → **dive** → ring
-the bell in the now-open annex.
+The lighthouse study contains a live 1:240 model of the island. Both scales render
+from the same `WorldState`, so a small physical act has one full-sized consequence:
+
+- the brass valve lowers the model basin and the real bay;
+- the sun crank moves the model lamp and the sky;
+- the ruler laid across a model crack becomes the eastern bridge;
+- the lens fitted to the model lighthouse lights the real tower;
+- the aimed beam writes an ordered signal on the cliff;
+- the plumb hung over the model wakes the brass crossing plate.
+
+The hatch is a circuit through the island. The beam supplies four figures in order.
+Eight signal-manual spines bind those figures to working instruments, never to
+numbers. The player must carry the route back through physical observations—rings,
+an eye, a filed tooth, sounding stones—then set four decimal dials at the hatch.
+
+The plate descends through four strata of the same island. Every threshold has an
+authored evidence gate:
+
+1. **Surface:** complete the model circuit, decode and open the hatch, hang the
+   plumb.
+2. **Shallows:** witness the dead valve transfer water from above and hold still
+   with the Tide-Figure.
+3. **Inspection:** let the study register finish its count and hold the Watcher in
+   view.
+4. **Source:** regard the Lower Hand without approaching it as a prize, then set
+   one of four physical dispositions.
+
+The climb returns through the same plate. Back at the surface, a final two-touch
+commit applies the selected disposition: **tend**, **carry**, **open**, or
+**close**. They are operations on the persistent stack, not morality labels. The
+bell and oar remain usable world instruments; neither is an ending switch.
+
+## Field Notes
+
+`J` opens a diegetic field notebook. Gameplay records stable evidence IDs and the
+UI resolves their current wording, so changing prose does not corrupt progression
+or saves. Notes only contain things the player has actually observed.
+
+Help is deliberately separate. **Trace a lead** advances one eligible hint thread
+only when the player asks. Requested help never becomes evidence and never unlocks
+a gate.
+
+## Persistence
+
+The current run lives at `abyme-save`, payload version `1`. The loader accepts only
+that version and its declared fields, sanitizing current values at the boundary;
+there are no migration or backup branches in gameplay code.
+
+The L2 transfer persists consequence and observation separately:
+`upstreamHandSurged` owns the permanent water rise at the instant it happens, while
+`upstreamHandWitnessed` is earned only when the later reveal is actually seen.
+Interrupted scores can therefore resume without duplicating water or inventing evidence.
+
+The stack ledger is separate from the run save. Restarting a run clears the run,
+not the history of acts already displaced onto deeper strata. Ledger epoch `2`
+stores marks plus durable disposition operations locally. The incomplete mark-only
+Firebase transport is deliberately not activated; shared play waits for the same
+complete mark, tombstone, outbox, and rules contract.
 
 ## Architecture
 
-Static ES modules, no build step. `js/`:
-
-| file | role |
+| Module | Authority |
 |---|---|
-| `world.js` | the single authoritative WorldState + sun path + 5 master color grades + save/load |
-| `terrain.js` | one analytic height function feeds geometry, collision, water depth, foam |
-| `props.js` | every structure baked from primitives into few merged draw calls; the model clone |
-| `shaders.js` | hand-written GLSL: ocean (object-space waves → free 1:240 miniature sea), sky (sun/moon/stars/milky way/green flash), beams, glow points |
-| `puzzles.js` | the puzzle state machine; applies WorldState to BOTH island instances per frame |
-| `player.js` / `interact.js` | drag-look walking, iris cursor, glint hovers, drag hotspots |
-| `audio.js` | all synthesized: swell-locked surf, wind by altitude, FM music box, bird, stone drones, progressive score stems, the dive sweep |
-| `main.js` | boot, grades→lights, intro dolly, the dive, the finale |
+| `js/world.js` | live world state, strata, sky, tide, stack boundary, save I/O |
+| `js/save-schema.js` | clean save-epoch schema and normalization |
+| `js/ledger.js` | pure append-only stack, inheritance, sanitation, dispositions |
+| `js/progression.js` | pure challenge graph, gate requirements, plate decisions |
+| `js/notebook.js` | stable earned evidence and explicitly requested hint tiers |
+| `js/content.js` | field-note copy, hint threads, readable artifacts, sketches |
+| `js/props.js` | structures, glyph/instrument/dial atlases, model clone |
+| `js/puzzles.js` | physical interactions and state-to-scene application |
+| `js/main.js` | boot, crossings, return, ending commit, debug and field reports |
 
-Append `?debug` to the URL for a time scrubber, teleports, and puzzle shortcuts.
-
-The previous 2D SVG version of The Island lives in git history (`app.js`,
-`styles.css` before this rewrite).
+Developer routes and exact debug calls live in [PLAYTHROUGH.md](PLAYTHROUGH.md).
+The spoiler-light player route lives in [WALKTHROUGH.md](WALKTHROUGH.md).

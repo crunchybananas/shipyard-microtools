@@ -13,7 +13,7 @@
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
-  const PAGE = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const PAGE = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
   const ready = async () => {
     for (let i = 0; i < 40; i++) {
       if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) return;
@@ -22,7 +22,7 @@ export default async function (h) {
     throw new Error('app never booted');
   };
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`localStorage.removeItem('abyme-save-v1'); localStorage.setItem('abyme-muted','1'); 1`);
+  await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
   await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(2.5);
@@ -89,8 +89,70 @@ export default async function (h) {
   })()`).then(JSON.parse);
   ok('a grounded gull has eyes, beak, legs and feet in its one body draw', anatomy.eyes>0&&anatomy.feet>0&&anatomy.beak>0, anatomy);
   ok('flush wings have an elbow, swept hand and dark primaries', anatomy.wingVerts>=10&&anatomy.wingColour&&anatomy.tip<.5, anatomy);
+
+  // Two field reports named what a still screenshot cannot: the grounded birds
+  // hovered/wobbled, then vanished less than a second into takeoff. First hold every
+  // shore gull far from the player and measure the actual sole + root for three seconds.
+  const idle = await h.evaluate(`(() => new Promise((res) => {
+    ABYME.W.time=7.5; ABYME.W.sunFrozen=true; ABYME.tp(-82.8,-41.4,0,0);
+    const birds=ABYME.perched.filter((b)=>b.userData.species==='gull');
+    const base=birds.map((b)=>{ const u=b.userData; u.flush=0; u.cool=0;
+      b.position.set(u.px,u.py,u.pz); b.rotation.set(0,u.yaw,0);
+      const body=b.children.find((o)=>o.isMesh); body.geometry.computeBoundingBox();
+      return {x:u.px,y:u.py,z:u.pz,yaw:u.yaw,minY:body.geometry.boundingBox.min.y,ground:u.groundY}; });
+    let frames=0,soleError=0,rootDrift=0,yawDrift=0,wingMin=Infinity,wingMax=-Infinity;
+    const step=()=>{
+      birds.forEach((b,i)=>{ const q=base[i];
+        soleError=Math.max(soleError,Math.abs(b.position.y+q.minY-q.ground));
+        rootDrift=Math.max(rootDrift,Math.hypot(b.position.x-q.x,b.position.y-q.y,b.position.z-q.z));
+        const dy=Math.atan2(Math.sin(b.rotation.y-q.yaw),Math.cos(b.rotation.y-q.yaw));
+        yawDrift=Math.max(yawDrift,Math.abs(dy));
+      });
+      if(birds[0]?.lw){ wingMin=Math.min(wingMin,birds[0].lw.rotation.z); wingMax=Math.max(wingMax,birds[0].lw.rotation.z); }
+      if(++frames>=180) return res(JSON.stringify({frames,soleError,rootDrift,yawDrift,wingRange:wingMax-wingMin}));
+      requestAnimationFrame(step);
+    }; requestAnimationFrame(step);
+  }))()`).then(JSON.parse);
+  ok('idle gull soles meet the terrain', idle.soleError<=0.002, idle);
+  ok('grounded gull roots and feet do not hover or swivel',
+    idle.rootDrift<=0.001&&idle.yawDrift<=0.001, idle);
+  // Three seconds can catch less than the full 0.9-rad/s cycle; 0.01 still proves
+  // deliberate wing life without encouraging a visible whole-body substitute.
+  ok('a grounded gull still breathes through its folded wings', idle.wingRange>=0.01, idle);
+
+  // Trigger one actual proximity flush and watch until it leaves the draw list. The
+  // departure must remain continuous and visible long enough to reach far-water scale.
+  const flight = await h.evaluate(`(() => new Promise((res) => {
+    const bird=ABYME.perched.find((b)=>b.userData.species==='gull'),u=bird.userData;
+    u.flush=0; u.cool=0; bird.position.set(u.px,u.py,u.pz); bird.rotation.set(0,u.yaw,0); bird.visible=true;
+    ABYME.tp(u.px+2,u.pz,0,0);
+    let startedAt=null,lastFlush=0,lastPos=[u.px,u.py,u.pz],maxSpeed=0,finite=true,frames=0;
+    const checks=[1.2,3.2,5.2].map((at)=>({at,visible:null}));
+    const step=(now)=>{
+      if(startedAt===null&&u.flush>0){ startedAt=now; lastFlush=u.flush; lastPos=[bird.position.x,bird.position.y,bird.position.z]; }
+      if(startedAt!==null){
+        const t=(now-startedAt)/1000;
+        for(const c of checks) if(c.visible===null&&t>=c.at)c.visible=bird.visible;
+        const vals=[bird.position.x,bird.position.y,bird.position.z];
+        finite=finite&&vals.every(Number.isFinite);
+        const simDt=u.flush-lastFlush;
+        if(simDt>1e-6) maxSpeed=Math.max(maxSpeed,Math.hypot(vals[0]-lastPos[0],vals[1]-lastPos[1],vals[2]-lastPos[2])/simDt);
+        lastFlush=u.flush; lastPos=vals;
+        if(!bird.visible) return res(JSON.stringify({firstHidden:t,displacement:Math.hypot(vals[0]-u.px,vals[2]-u.pz),
+          rise:vals[1]-u.py,checks,maxSpeed,finite,frames}));
+        if(t>9) return res(JSON.stringify({firstHidden:null,displacement:0,rise:0,checks,maxSpeed,finite,frames,timeout:true}));
+      }
+      frames++; requestAnimationFrame(step);
+    }; requestAnimationFrame(step);
+  }))()`).then(JSON.parse);
+  ok('takeoff earns its disappearance with a continuous far-water exit',
+    flight.firstHidden>=6.15&&flight.displacement>=78&&flight.rise>=24
+      &&flight.checks.every((c)=>c.visible===true)&&flight.maxSpeed<=35&&flight.finite,
+    flight);
   console.log(`GULLS ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   console.log(`  closest approach ${m.worstClearance} m clear, at radius ${m.worstAt && m.worstAt[0]} / y ${m.worstAt && m.worstAt[1]}`);
   console.log(`  grounded anatomy ${anatomy.bodyVerts} verts · eyes ${anatomy.eyes} · feet ${anatomy.feet} · wing ${anatomy.wingVerts} verts`);
+  console.log(`  sole error ${idle.soleError.toFixed(4)} m · root drift ${idle.rootDrift.toFixed(4)} m · wing breath ${idle.wingRange.toFixed(3)} rad`);
+  console.log(`  exit ${flight.firstHidden?.toFixed(2)} s · ${flight.displacement?.toFixed(1)} m out · ${flight.rise?.toFixed(1)} m up · max ${flight.maxSpeed?.toFixed(1)} m/s`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }

@@ -1,129 +1,174 @@
-# ABYME — Session Handoff · 2026-07-27/28
+# ABYME — Engineering Handoff
 
-The Island (ABYME) lives at `docs/the-island/` in `crunchybananas/shipyard-microtools`
-(submodule of `crunchybananas/dockhand`). `docs/` is the deployed GitHub Pages site, so
-**everything on submodule `main` is live**. Both repos' `main` branches carry everything
-described below.
+This file is the shortest current contract for contributors. Narrative intent lives
+in [SPINE.md](SPINE.md), stack semantics in [STACK.md](STACK.md), and the exact test
+route in [../PLAYTHROUGH.md](../PLAYTHROUGH.md).
 
----
+## Product sentence
 
-## What shipped this session
+A player alters a live model of a lighthouse island, descends through the costs those
+acts send downward, regards another hand living with the result, then climbs back to
+choose what relation should remain between levels.
 
-**Audit batch (7 commits):**
-- **#47/#38 waterline pass** — terrain knows the tide (`uWaterY`, object-space): wet-sand
-  swash band, submerged warm-light falloff, min-of-two seabed caustics; water got a
-  scalloped foam collar + dual-scroll surface caustic. Rides every SEA-STRATA level; the
-  1:240 model clone inherits its own tide line.
-- **#37 farSea shader** — the glitter road reaches the horizon; the 280–438 m double-draw
-  band is gone (world sea circled at r = 310, ring inner 310). Shares the near water's
-  uniform objects, so `applyAtmosphere` drives both for free.
-- **#45 pier** — silvered driftwood, four lengthwise deck boards with gaps, per-piece
-  timber tone, baked tide-stain rings on the piles.
-- **#46 gulls** — folded wings hug the flanks (FOLD constants shared by `addWings` and
-  `tickPerched`); crows inherit.
-- **#51 depth responses** — music box waterlogged + **the fourth note never comes at L4**
-  (tied to the stones-vault lore), crank drags at depth, stones hum damped; persisted
-  once-whispers. Crank ratio verified exactly 0.5 at L3.
-- **#52 progress** — the L3 **bell-buoy** in the flooded chasm channel: untended
-  distance-faded toll (~13 s swell clock, `puzzles._tickBuoy`) + proximity journal beat.
+## Non-negotiable contracts
 
-**Loop fires 1–5:**
-1. **#36 rock relief** — cliffs swap wind-ripples for bedding + wall-plane fracture above
-   ~0.5 slope; ±9 % albedo strata survive the haze at the 170 m glyph-study range.
-2. **#43 study contact AO** — Baker callbacks now get the world vertex; a tessellated ring
-   walk-surface bakes pools under every furniture footprint (0.200 vs 0.302 lum at legs).
-3. **Story pass** — twist locks verified in code (two-touch embrace, body-before-line,
-   carried/farewell exclusive); 16 unillustrated journal entries (both climaxes, both
-   endings) got sketches. Coverage is enforced-complete (see "Rules of the house").
-4. **Gameplay pass** — fixed the **post-return lockout**: annex wall / inner door / coat
-   letter / cot journal / keeper lamp all honour `W.flags.returned` now.
-5. **Generative era music** — the Bender mp3 beds are REPLACED by a ~7-node synth graph
-   (drone + fifth through a breathing lowpass, sea-breath pad, sparse leitmotif fragments
-   per era root E/G/A/D/C). Depth darkens cutoff 950→220 Hz, widens detune, thins the
-   melody; **the fourth note plays flat below the surface and never comes at the source**.
-   `musicTo(level)` retargets the one graph — the transition is the crossfade.
+### One state, two scales
 
-**Owner-reported fixes (tonight):**
-- **Lighthouse door** — was a 1.9×3.4 m unframed slab in a wall-wide breach; now a
-  battened keeper's leaf with frame + brass pull in a ~1.1×2.55 m doorway (stone infills +
-  transom, taper-matched so no seam slits). Collision follows the visuals (`LH_GAPS`).
-- **Study window** — was a 2.6 m flat sheet chording a curved 30° opening; now a framed
-  four-pane sash in a ~13° opening (chord deviation < 4 cm). The model reads through the
-  glass from outside.
-- **The annex ("chamber next to the tower")** — it is DESIGNED to open one level down,
-  but gave no feedback. Clicking the shut inner door now answers: *"Locked — not from
-  this side. Whatever holds it shut is further down than the latch."* + a once-only
-  journal line. Opens at L2+, stays open after the return.
+The island and its 1:240 model render from the same `W`. A model action and its
+full-sized consequence may animate at different scales, but they do not maintain
+parallel truth.
 
-## Issues closed this session
-#36 #37 #38 #43 #45 #46 #47 #51 #66 (all with verification comments) · #52 progressed.
+### Earned evidence
 
----
+Gameplay records stable Field Note IDs through `Notebook`. The UI resolves copy and
+sketches from `content.js`.
 
-## Awaiting the owner
+- Never save rendered prose.
+- Never infer progression from displayed text.
+- Never write an observation the player has not made.
+- Never mix requested guidance into the evidence list.
+- **Trace a lead** advances a supported hint thread only on explicit input.
 
-1. **LISTEN to the generative music.** Verified structurally (era retargeting, the flat/
-   missing fourth, stop/restart), not subjectively. Tuning is one table in `js/audio.js`
-   (`_ERAS`: root / cutoff / melody gaps / breath period / volume per level). The old
-   mp3s are still in `assets/music/` unreferenced if you want to A/B.
-2. **Walk the new door/window/annex** in real play — headless shots look right; feel is
-   yours to judge. Same for the L3 bell-buoy toll volume (`_tickBuoy`, vol curve).
-3. **The generative beds replaced #66's complaint** — if you'd rather have Bender stems
-   *fixed* instead (longer chains, better prompts), that's a fresh Bender run via Peel;
-   the engine can layer under or instead of them.
+### Physical signal deduction
 
-## Open backlog (by cluster)
-- **Story/puzzle:** #49 optional depth-keyed puzzle chains (the big one), #50 non-keeper
-  voices, #53 model micro-finds, #54 reading-glass payoff (8–12 lampblack marks), #55
-  drainMark lore, #52 remainder (L3/L4 micro-puzzle, region4 landmark), #75 content
-  migration, #76 per-depth codex.
-- **Graphics:** #44 micro-pass (glass fresnel, canopy dapple, beam-mist, green-flash,
-  songbird), #48 close-range rock relief + seaweed props.
-- **Audio:** #63 spatialize one-shots, #64 audible day/night cycle (natural companion to
-  the new music engine).
-- **Perf:** #27 #28 #30 #31 #32 #34 (light gating, shadow freeze, grass chunking, water
-  fbm bake, bloom probe, regional Bakers).
-- **UX:** #57 hotspot labels, #59 settings tab, #60 touch input, #61 intro-skip
-  advertisement.
-- **Architecture:** #69–#73, #77 (fragment factory, prop registry, region modules,
-  encounter engine, update scheduler, terrain purify).
+The hatch relationship is fixed:
 
-## Running + verifying (the 5-minute version)
-- Serve `docs/` statically **with no-store headers** and an **absolute docroot** (a bare
-  `python3 -m http.server` will bite you twice: Chrome's heuristic cache serves stale
-  modules, and a relative docroot can resolve against the wrong checkout).
-- `?debug` → `window.ABYME` (`tp`, `goLevel`, `bench(t)`, `state()`, panel chips). Reach
-  play: click Begin (+ confirm), then `ABYME.setIntroT(99)`.
-- **Frozen-tab rules** (headless/background): game logic and eased params stop — drive
-  `game._apply(refs,false,0)` and uniforms manually; the canvas has no
-  `preserveDrawingBuffer`, so call `ABYME.composer.render()` in the SAME eval before a
-  screenshot; wait ~1.6 s after `tp` for the camera to catch up, and re-shoot if stale.
-- `tp` near water/obstacles can tide-rescue you to the beach ("The tide brought you
-  back") — always read back `player.pos`. The `bridge` chip drops to the chasm floor on
-  fresh saves (no ruler bridge yet) — that black screen is a dark crack, not a crash.
-- The audio singleton: `(await import('/the-island/js/audio.js')).default`.
-- Full detail: `PLAYTHROUGH.md` (tester toolkit), `WALKTHROUGH.md` (player path).
+```text
+beam figures in order
+        ↓
+eight figure–instrument bindings
+        ↓
+physical readings already earned in play
+        ↓
+four decimal hatch wheels
+```
 
-## Rules of the house (do not break)
-- **Canon:** grief → INTEGRATION (`loop/SPINE.md`); the embrace is a PLAYER ACTION;
-  all-metaphor, never biography. The twist beats are wired in `puzzles.js` (keeperTwist /
-  embrace / carried-vs-farewell) — treat as load-bearing.
-- **Tech:** three.js only (no new JS deps); power-safe (60 fps cap, adaptive DPR — every
-  graphics change holds or cuts load); **never add a point light** (9 = the fragility
-  ceiling; a 10th black-screens weaker GPUs — light with emissives).
-- **The clone:** everything in `core` clones to the 1:240 chart-table model. Never
-  `THREE.Points` in `core`; new named props go in `NAMES` (props.js); region content is
-  auto-pruned with its region group. Shared materials must damp scale-dependent effects
-  via the `mini`/`cMini` derivative trick.
-- **Journal coverage:** every `addJournal`/`journal:`/`journalDeep:` string must match a
-  `SKETCHES` entry (content.js). Check:
-  `node` one-liner in LOG habit — currently 50/50.
-- **Push protocol:** submodule `HEAD:main` first, then the parent gitlink (separate
-  commands, worktree root). The Realm project pushes to the same repo — expect fetch +
-  rebase.
+The beam does not provide values. The shelf does not provide selection, order, or
+numbers. The revealed hatch wheels always turn; only the exact physical reading opens
+them. Do not add a fallback answer, emphasized spine subset, exact-code note, hidden
+sentence, or bypass flag.
 
-## Suggested next moves
-1. Owner listens to the music; tune `_ERAS` together.
-2. #49 (optional puzzle chains) — the biggest remaining gameplay depth win.
-3. #64 audible day/night, now trivial on the music engine's scheduler.
-4. #54 reading-glass payoff — highest story-per-effort of the open lore items.
+### Declarative crossings
+
+`progression.js` is the authority for challenge nodes, gate requirements, dial
+behavior, Lower Hand regard, and plate decisions. `puzzles.js` enacts those
+instructions; it does not invent a second route.
+
+Current gates:
+
+- L1 → L2: complete surface circuit, solve the signal through its instrument
+  route, open the hatch, and hang the plumb.
+- L2 → L3: witnessed Upstream Hand plus regarded Tide-Figure.
+- L3 → L4: settled register plus regarded Watcher.
+- L4 → ascent: regarded Lower Hand plus chosen disposition.
+- returned L1 → ending: two-touch plate commit.
+
+Every crossing uses the same arm/commit grammar and disarms when the player steps off.
+
+### Lower Hand
+
+The bottom encounter is gaze, proximity, and stillness held together. Proximity alone
+is not completion. The figure remains another hand; it is neither collected nor
+collapsed into the player. Completing regard reveals the physical four-position
+index.
+
+### One ending threshold
+
+The bottom index selects `tend | carry | open | close`. The selected operation is
+committed only by the returned surface plate after the full ascent. Every choice gets
+the same final visual dignity and a truthful physical coda. The bell and oar are
+nonterminal world instruments.
+
+### Clean run persistence
+
+The run key is `abyme-save`, with payload version `1`. The loader accepts only the
+current version and declared fields, sanitizing current values at the boundary.
+Change the version when the shape changes; do not add aliases, backup slots, or
+recovery branches to gameplay.
+
+The stack ledger is intentionally separate and outlives Begin again.
+
+## Authority map
+
+| Concern | Owner |
+|---|---|
+| World state, levels, time, tide, stack boundary | `js/world.js` |
+| Current run schema | `js/save-schema.js` |
+| Pure stack operations and sanitation | `js/ledger.js` |
+| Challenge graph and pure gate decisions | `js/progression.js` |
+| Stable evidence and hint requests | `js/notebook.js` |
+| Prose, readable surfaces, sketches, hint threads | `js/content.js` |
+| Physical signal, instrument, and dial assets | `js/props.js` |
+| Hotspots and world application | `js/puzzles.js` |
+| Crossings, finale, reports, debug tools | `js/main.js` |
+| Notebook presentation and readers | `js/ui.js`, `style.css` |
+
+Put new truth in one owner and test that owner. Avoid mirrored constant tables in
+docs, UI, and harnesses; import runtime exports where exact values matter.
+
+## Content standard
+
+Every line should do at least one of these:
+
+- record a measurement;
+- expose a material consequence;
+- preserve an omission the player can interpret;
+- distinguish one hand, era, or level from another.
+
+No text should explain the whole metaphysics, name a correct moral answer, or turn a
+physical puzzle into instructions. Readable surfaces may deepen on later strata, but
+reaching a page is what earns its evidence.
+
+## Visual standard
+
+The room and notebook use material hierarchy rather than generic interface chrome:
+sea-black, field paper, oxidized metal, and warm lamp brass. Progression objects need
+clean silhouettes, visible cause-and-effect, and usable focus states. Respect reduced
+motion without deleting state transitions or evidence.
+
+The four final choices share the same island, time, camera importance, and light.
+Difference belongs in world state and coda, not reward spectacle.
+
+## Required verification
+
+Run pure contracts first:
+
+```sh
+node --test test/*.test.mjs
+node tools/harness/saves.spec.mjs
+```
+
+Then run the browser gate:
+
+```sh
+bash tools/harness/run.sh
+```
+
+A release candidate also needs one visible end-to-end pass on
+`?debug&localstack`:
+
+1. reveal the dials and verify they always turn but only the physical answer opens;
+2. complete every plate gate through real interactions;
+3. prove proximity alone cannot resolve the Lower Hand;
+4. climb all the way back;
+5. prove bell and oar do not enter terminal mode;
+6. commit each disposition fixture and confirm idempotent reload;
+7. open Field Notes before and after **Trace a lead** and compare entry count;
+8. inspect the study, shelf, hatch, lower figure, and finale at the shipped viewport;
+9. check console errors and the performance readout.
+
+## Reproducible feedback
+
+Use `F8` or **⚑ field report** for visual or interaction defects. A report captures
+pose, facing, mode, run state, performance, and screenshot. Settled play can reopen
+exactly with `?report=last`; unstable scenes are observation-only and reopen their
+captured thumbnail plus the reason replay was withheld. Import either report kind on
+another origin. Fix the reported state, then return to the complete route; a local
+visual correction is not done if it breaks the challenge graph.
+
+## Future-change rule
+
+Nothing is protected merely because it shipped. The authorities above are protected
+because they keep change coherent. Remove obsolete data and old paths when a design
+changes; do not leave compatibility names, dormant terminals, or prose-based adapters
+behind.

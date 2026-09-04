@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, setSeed } from '../js/state.js?realm=197';
-import { generateWorld } from '../js/world.js?realm=197';
+import { G, setSeed } from '../js/state.js?realm=198';
+import { generateWorld } from '../js/world.js?realm=198';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
 import {
   FIRST_MUSTER_STATE_PATH,
   FIRST_MUSTER_STEPS,
   getFirstMusterReport,
   updateFirstMusterChapter,
-} from '../js/first-muster.js?realm=197';
-import { checkScenarioComplete, getActiveScenario } from '../js/scenarios.js?realm=197';
-import { on, off } from '../js/bus.js?realm=197';
+} from '../js/first-muster.js?realm=198';
+import { checkScenarioComplete, getActiveScenario } from '../js/scenarios.js?realm=198';
+import { on, off } from '../js/bus.js?realm=198';
 
 function finishedBuilding(type, x) {
   return {

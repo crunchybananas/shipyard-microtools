@@ -55,7 +55,7 @@ const POSES = [
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
   await h.navigate(URL);
   for (let i = 0; i < 40; i++) {

@@ -3,8 +3,9 @@
 //
 // This is a SOURCE, the same shape as localSource() in ledger.js, and that is the
 // whole design: every consumer above it — the draft, the evidence, the eras, the
-// dispositions — already reads through that interface, so nothing else in the game
-// changes when strangers arrive.
+// dispositions — reads through that interface. This transport currently exposes
+// mark sharing only; world.js refuses to activate it until disposition operations
+// have an explicitly authorized remote collection and durable outbox too.
 //
 // THERE IS NO NETCODE HERE ON PURPOSE. Nobody is ever in your world at the same
 // time as you; clients never reconcile. A mark is a fact that already happened, so
@@ -17,20 +18,25 @@
 // IN as well, because a rule can be updated and a cached client cannot: both ends
 // distrust the wire.
 //
-// OFFLINE IS NOT A FALLBACK, IT IS THE FLOOR. Every read is wrapped so the game
-// NEVER blocks on the network and never gets worse without it: if Firebase is
-// slow, unreachable, unconfigured, or blocked by an extension, you get the local
-// stack and play on. The island must be complete with the wire cut.
+// OFFLINE IS NOT A FALLBACK, IT IS THE FLOOR. Every read is wrapped and the island
+// remains complete with the wire cut. This module is currently transport groundwork,
+// not an activatable shared mode; see SUPPORTS_SHARED_DISPOSITIONS below.
 
 import {
-  emptyLedger, sanitizeLedger, packLedger, LEDGER_KEY, HAND_KEY,
+  emptyLedger, applyLedger, sanitizeLedger, packLedger, mergeLedgers,
+  LEDGER_KEY, HAND_KEY, DISPOSITIONS,
   MAX_MARKS_PER_RUNG, MAX_WRITINGS_PER_RUNG,
 } from './ledger.js';
 
 // The one place the shared world is named. Everybody's rung 2 is the SAME pool —
 // one ocean, which is the thesis. Bump this to fork a fresh stack (a new season,
 // a playtest cohort) without touching a line of game code.
-export const STACK_ID = 'v1';
+export const STACK_ID = 'v2';
+
+// The current transport can publish marks only. World activation checks this
+// capability and remains on the complete local source until authenticated,
+// append-only disposition operations are explicitly authorized and supported.
+export const SUPPORTS_SHARED_DISPOSITIONS = false;
 
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2';
 const FETCH_TIMEOUT_MS = 4000;
@@ -64,10 +70,9 @@ async function connect(config) {
 // firestoreSource(config, io) — a drop-in for localSource(io).
 //
 // `io` is the same storage shim, used for the OFFLINE MIRROR: every remote read is
-// cached locally so a second launch without a network still shows the stack you
-// last saw, and every local write is kept so nothing you did is lost to a failed
-// push. The mirror is what makes the online build degrade to exactly the offline
-// build instead of to an empty island.
+// cached locally so a second launch without a network still shows the stack last
+// seen. Pending delivery is session-bound in this mark-only transport; the lack of
+// a durable mark+operation outbox is another reason activation stays disabled.
 export function firestoreSource(config, io) {
   let led = null;
   let conn = null;
@@ -78,7 +83,7 @@ export function firestoreSource(config, io) {
   const readMirror = () => {
     let raw = null;
     try { raw = JSON.parse(io.get(LEDGER_KEY) || 'null'); } catch (_) { raw = null; }
-    return sanitizeLedger(raw);
+    return applyLedger(raw);
   };
   const writeMirror = () => {
     try { io.set(LEDGER_KEY, JSON.stringify(packLedger(led || emptyLedger()))); } catch (_) { /* private mode */ }
@@ -103,18 +108,26 @@ export function firestoreSource(config, io) {
   // Caught by playing the deployed build, not by any assertion.
   ensure().then(() => reconcileHand()).catch(() => { /* offline: the local id stands */ });
 
-  // Any mark already recorded under the offline id belongs to this uid — it was the
-  // same person, the same session, seconds ago. Rewrite them once the uid lands.
+  // Any local fact already recorded under the offline id belongs to this uid. The
+  // canonical ledger identity is ALWAYS the 16-character prefix; only the wire
+  // payload carries Firebase's full uid for security-rule ownership.
   function reconcileHand() {
     if (!conn || !led) return;
     const local = io.get(HAND_KEY);
-    if (!local || local === conn.uid) return;
+    const remote = String(conn.uid || '').slice(0, 16);
+    if (!local || !remote || local === remote) return;
     let changed = 0;
-    for (const m of led.marks) if (m.h === local) { m.h = conn.uid; changed++; }
-    if (changed) writeMirror();
+    for (const m of led.marks) if (m.h === local) { m.h = remote; changed++; }
+    for (const op of led.ops) if (op.h === local) { op.h = remote; changed++; }
+    for (const mark of pending) if (mark.h === local) mark.h = remote;
+    if (changed) {
+      led = sanitizeLedger(led);
+      writeMirror();
+    }
   }
 
   return {
+    capabilities: Object.freeze({ sharedMarks: true, sharedDispositions: false }),
     // The hand id, once we have one. Null only in the moments before auth resolves
     // (or forever, offline), and world.js falls back to the local id there.
     uid: () => (conn ? conn.uid : null),
@@ -149,13 +162,7 @@ export function firestoreSource(config, io) {
         // MERGE, never replace: your own marks are authoritative for you and may not
         // have reached the server yet. Sanitize the union — the remote half is
         // untrusted even though the rules already vetted it.
-        const local = (led || readMirror()).marks;
-        const merged = sanitizeLedger({
-          marks: [...local, ...remote],
-          sealed: (led || {}).sealed || [],
-          open: (led || {}).open || [],
-        });
-        led = merged;
+        led = mergeLedgers(led || readMirror(), { marks: remote, ops: [] });
         writeMirror();
       } catch (_) {
         // offline, unconfigured, blocked, or slow — the island does not care
@@ -167,11 +174,18 @@ export function firestoreSource(config, io) {
     // Record locally FIRST (so the game is never waiting on a socket to feel the
     // consequence of an act), then push. A failed push is queued and retried on the
     // next successful call rather than lost.
-    push(mark) {
+    pushMark(mark) {
       if (!mark) return;
       writeMirror();
       pending.push(mark);
       this.flush();
+    },
+
+    // Disposition operations have their own source channel. The local mirror is
+    // authoritative offline and persists the CARRY tombstone immediately.
+    pushDisposition(operation) {
+      if (!operation || !DISPOSITIONS.includes(operation.k)) return;
+      writeMirror();
     },
 
     async flush() {
@@ -182,11 +196,11 @@ export function firestoreSource(config, io) {
         const { doc, setDoc } = store;
         while (pending.length) {
           const m = pending[0];
-          // DETERMINISTIC id, and the rules require exactly this shape. It is what
-          // makes "turning the valve forty times is one displacement" true on the
-          // SERVER as well as in the client, and it caps how many documents any one
-          // hand can ever create (kinds × rungs) without a rate limiter.
-          const id = `${uid}_${m.r | 0}_${m.k}`;
+          // The clock keeps retries idempotent while allowing a genuinely new act
+          // after CARRY. The materialized ledger still admits only one active
+          // (hand, rung, kind); an older immutable document is retired by the
+          // disposition tombstone rather than overwritten.
+          const id = `${uid}_${m.r | 0}_${m.n | 0}_${m.k}`;
           try {
             const payload = {
               k: m.k, r: m.r | 0, h: uid, n: m.n | 0,

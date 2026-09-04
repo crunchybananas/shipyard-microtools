@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getDayPeriod, TILE } from './state.js?realm=197';
-import { isWalkable } from './pathfinding.js?realm=197';
-import { getCitizenSpeedMult } from './events.js?realm=197';
-import { revealAround } from './world.js?realm=197';
-import { visualJitter } from './fx.js?realm=197';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getDayPeriod, TILE } from './state.js?realm=198';
+import { isWalkable } from './pathfinding.js?realm=198';
+import { getCitizenSpeedMult } from './events.js?realm=198';
+import { revealAround } from './world.js?realm=198';
+import { visualJitter } from './fx.js?realm=198';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -14,21 +14,24 @@ import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   staffingCount,
-} from './citizen-ownership.js?realm=197';
+} from './citizen-ownership.js?realm=198';
 import {
   citizenAtResidencePortal,
   citizenHasValidResidence,
   citizenIsIndoors,
   residencePortalForCitizen,
   residentsForHouse,
-} from './residences.js?realm=197';
-import { isBuildingOperational } from './building-operation.js?realm=197';
+} from './residences.js?realm=198';
+import { isBuildingOperational } from './building-operation.js?realm=198';
 import {
-  canDepositFood,
+  PHYSICAL_RESOURCE_KEYS,
+  canDepositResource,
   depositFood,
+  depositResource,
   findReachableFoodStore,
   withdrawFood,
-} from './building-inventory.js?realm=197';
+} from './building-inventory.js?realm=198';
+import { planResourceDelivery } from './logistics.js?realm=198';
 import {
   AUTO_REVIEW_INTERVAL_TICKS,
   buildingAcceptsAutomaticWorkers,
@@ -37,12 +40,12 @@ import {
   reviewAutomaticAssignment,
   scoreCitizenJob,
   workforceFoodDaysLeft,
-} from './workforce-policy.js?realm=197';
+} from './workforce-policy.js?realm=198';
 import {
   assignedCitizenBuilding as assignedBuilding,
   citizenStableHash as citizenHash,
   setCitizenActivity as setActivity,
-} from './citizen-activity.js?realm=197';
+} from './citizen-activity.js?realm=198';
 import {
   advanceCitizenPathRequest,
   blacklistCitizenTarget as blacklistTarget,
@@ -53,7 +56,7 @@ import {
   pruneCitizenNoGo as pruneExpiredNoGo,
   remainingCitizenRouteIsWalkable as remainingCitizenRouteWalkable,
   replanCitizenToRequestedTarget as replanToRequestedTarget,
-} from './citizen-navigation.js?realm=197';
+} from './citizen-navigation.js?realm=198';
 import {
   applyCitizenSeparation,
   canCitizenStep as canStepCitizen,
@@ -65,13 +68,13 @@ import {
   finishCitizenTrafficProgress,
   noteCitizenTrafficWait,
   resolveCitizenStep,
-} from './citizen-traffic.js?realm=197';
+} from './citizen-traffic.js?realm=198';
 import {
   citizenIdleLoiterTarget as idleLoiterTarget,
   citizenWorkTargetForBuilding as workTargetForBuilding,
   pathCitizenToWork as pathToWork,
   startCitizenWorking as startWorking,
-} from './citizen-work.js?realm=197';
+} from './citizen-work.js?realm=198';
 import {
   CITIZEN_NIGHT_EXEMPT_ACTIVITIES as NIGHT_EXEMPT,
   beginCitizenOpenRaidFlight as beginOpenRaidFlight,
@@ -80,7 +83,7 @@ import {
   leaveCitizenRaidShelter as leaveRaidShelter,
   seekCitizenRaidShelter as seekRaidShelter,
   sendCitizenHome as goHome,
-} from './citizen-shelter.js?realm=197';
+} from './citizen-shelter.js?realm=198';
 import {
   CITIZEN_MEAL_INTERRUPTIBLE_ACTIVITIES as MEAL_INTERRUPTIBLE_ACTIVITIES,
   beginCitizenFoodRoute as beginFoodRoute,
@@ -88,7 +91,7 @@ import {
   citizenFoodTargetStillValid as foodTargetStillValid,
   reachableCitizenFoodRoute as reachableFoodRoute,
   resumeCitizenAfterMeal as resumeAfterMeal,
-} from './citizen-food.js?realm=197';
+} from './citizen-food.js?realm=198';
 import {
   CITIZEN_MEAL_HUNGER_THRESHOLD,
   drainCitizenHeartbeatNeeds,
@@ -97,19 +100,22 @@ import {
   restoreCitizenSleepRest,
   satisfyCitizenLeisureNeed,
   settleCitizenWakeRest,
-} from './citizen-needs.js?realm=197';
+} from './citizen-needs.js?realm=198';
 
-// Chain targets win only within reach: a windmill across the island must
-// not beat the granary next door (AI-audit deferred fix). The carrier
-// takes the chain target when it is close (<=18 Manhattan tiles — dist2
-// above is Manhattan, not squared), or when it is no worse than twice as
-// far as the best generic store.
-function preferChainTarget(c, primary, fallback) {
-  if (!primary) return fallback;
-  if (!fallback) return primary;
-  const dp = dist2(c.x, c.y, primary.x, primary.y);
-  if (dp <= 18) return primary;
-  return dp <= dist2(c.x, c.y, fallback.x, fallback.y) * 2 ? primary : fallback;
+const PHYSICAL_RESOURCE_SET = new Set(PHYSICAL_RESOURCE_KEYS);
+const BROKERED_CHAIN_RESOURCES = new Set(['wheat', 'flour']);
+
+// Gold keeps its established distance-bounded Market preference. Grain no
+// longer uses this Manhattan heuristic; wheat/flour are ranked by real routes
+// and production utility in the logistics broker below.
+function preferGoldMarket(c, market, fallback) {
+  if (!market) return fallback;
+  if (!fallback) return market;
+  const marketDistance = dist2(c.x, c.y, market.x, market.y);
+  if (marketDistance <= 18) return market;
+  return marketDistance <= dist2(c.x, c.y, fallback.x, fallback.y) * 2
+    ? market
+    : fallback;
 }
 
 function buildingsByType(c, types) {
@@ -131,37 +137,83 @@ function buildingsByType(c, types) {
 // Islands and newly placed buildings can make the visually closest store
 // unreachable; trying the next real building prevents an endless repath loop.
 function deliveryTargets(c, resKey) {
-  let primaryType = null;
-  let storageTypes;
-  if (resKey === 'wheat') { primaryType = 'windmill'; storageTypes = ['granary', 'storehouse', 'house']; }
-  else if (resKey === 'flour') { primaryType = 'bakery'; storageTypes = ['granary', 'storehouse', 'house']; }
-  else if (resKey === 'gold') { primaryType = 'market'; storageTypes = ['storehouse', 'house']; }
-  else storageTypes = ['storehouse', 'granary', 'house'];
+  if (resKey !== 'gold') return buildingsByType(c, ['storehouse', 'granary', 'house']);
+  const markets = buildingsByType(c, ['market']);
+  const storage = buildingsByType(c, ['storehouse', 'house']);
+  const preferred = preferGoldMarket(c, markets[0], storage[0]);
+  return preferred === markets[0]
+    ? [...markets, ...storage]
+    : [...storage, ...markets];
+}
 
-  const storage = buildingsByType(c, storageTypes);
-  if (!primaryType) return storage;
-  const primary = buildingsByType(c, [primaryType]);
-  const preferred = preferChainTarget(c, primary[0], storage[0]);
-  // Keep the intended production chain when it is sensible, but make all
-  // nearby stores viable fallbacks before asking a worker to cross the island.
-  return preferred === primary[0]
-    ? [...primary, ...storage]
-    : [...storage, ...primary];
+function showDeliveryStorageNeed(c, text = 'Need storage') {
+  const now = G.gameTick || 0;
+  if (!c._needsDeliveryNoticeAt || now - c._needsDeliveryNoticeAt > 180) {
+    c._needsDeliveryNoticeAt = now;
+    G.particles.push({
+      tx: c.x, ty: c.y, offsetY: -28,
+      text,
+      alpha: 1.25, vy: -0.12, decay: 0.018, type: 'speech',
+    });
+  }
 }
 
 function requestDeliveryStorage(c) {
   setActivity(c, 'needs_delivery', { timer: 90 + rngInt(0, 60) });
   clearPath(c);
   c._deliveryTarget = null;
-  const now = G.gameTick || 0;
-  if (!c._needsDeliveryNoticeAt || now - c._needsDeliveryNoticeAt > 180) {
-    c._needsDeliveryNoticeAt = now;
-    G.particles.push({
-      tx: c.x, ty: c.y, offsetY: -28,
-      text: 'Need storage',
-      alpha: 1.25, vy: -0.12, decay: 0.018, type: 'speech',
-    });
-  }
+  showDeliveryStorageNeed(c);
+}
+
+function assignedOutputSource(c, resource = c.carrying) {
+  const building = assignedBuilding(c);
+  if (!building || !G.buildings.includes(building) || building.buildProgress < 1) return null;
+  const definition = BUILDINGS[building.type];
+  const producesResource = Object.hasOwn(definition?.prod || {}, resource)
+    || definition?.convert?.to === resource;
+  return producesResource ? building : null;
+}
+
+// A route can disappear after pickup when a depot fills or is destroyed.
+// Return that still-physical load to its producer's visible output buffer so
+// a carrier is never condemned to skip food, shelter, and sleep forever.
+function stageCarriedOutputAtSource(c) {
+  const source = assignedOutputSource(c);
+  if (!source || dist2(c.x, c.y, source.x, source.y) > 2.6) return false;
+  const resource = c.carrying;
+  const amount = c.carryAmount;
+  source.produced ||= {};
+  source.produced[resource] = (source.produced[resource] || 0) + amount;
+  c.carrying = null;
+  c.carryAmount = 0;
+  c._deliveryTarget = null;
+  c.workTarget = workTargetForBuilding(c, source);
+  clearPath(c);
+  setActivity(c, 'working', {
+    reason: 'cargo-needs-storage',
+    timer: 60 + rngInt(0, 30),
+  });
+  showDeliveryStorageNeed(c, 'Output waiting');
+  return true;
+}
+
+function returnCarriedOutputToSource(c) {
+  const source = assignedOutputSource(c);
+  if (!source) return false;
+  if (stageCarriedOutputAtSource(c)) return true;
+  const target = workTargetForBuilding(c, source);
+  c.workTarget = target;
+  if (!pathTo(c, target.x, target.y, { exact: true })) return false;
+  c.activityTimer = 0;
+  showDeliveryStorageNeed(c, 'Returning output');
+  return true;
+}
+
+function citizenHasBlockedCargo(c) {
+  return !!(c.carrying && c.carryAmount > 0)
+    && c.activity.kind === 'needs_delivery'
+    && !c._deliveryTarget
+    && !assignedOutputSource(c);
 }
 
 function releaseJob(c, { unreachable = false } = {}) {
@@ -293,6 +345,35 @@ function routeDelivery(c, resKey) {
     blacklistTarget(c, dropoff.x, dropoff.y);
     return routeDelivery(c, resKey);
   }
+  if (BROKERED_CHAIN_RESOURCES.has(resKey)) {
+    // A failed adoption blacklists one authoritative building per pass. The
+    // hard cap prevents a malformed path callback or changing world from
+    // turning a delivery heartbeat into unbounded recursion.
+    const maxAttempts = Math.max(1, G.buildings.length);
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const plan = planResourceDelivery(c, resKey, {
+        isBlacklisted: building => isBlacklisted(c, building.x, building.y),
+      });
+      if (!plan) break;
+      const dropoff = plan.building;
+      if (
+        !G.buildings.includes(dropoff)
+        || !canDepositResource(dropoff, resKey, 1, G)
+      ) {
+        blacklistTarget(c, dropoff.x, dropoff.y);
+        continue;
+      }
+      if (pathTo(c, plan.goal.x, plan.goal.y, { exact: true })) {
+        // The route request owns body movement; the delivery intent becomes a
+        // reservation only after that request has actually been accepted.
+        c._deliveryTarget = dropoff;
+        return true;
+      }
+      blacklistTarget(c, dropoff.x, dropoff.y);
+    }
+    c._deliveryTarget = null;
+    return false;
+  }
   for (const dropoff of deliveryTargets(c, resKey)) {
     if (isBlacklisted(c, dropoff.x, dropoff.y)) continue;
     if (pathTo(c, dropoff.x, dropoff.y)) {
@@ -308,9 +389,9 @@ function routeDelivery(c, resKey) {
 }
 
 function deliveryTargetStillValid(c) {
-  return !!c._deliveryTarget
-    && G.buildings.includes(c._deliveryTarget)
-    && (c.carrying !== 'food' || canDepositFood(c._deliveryTarget, 1));
+  if (!c._deliveryTarget || !G.buildings.includes(c._deliveryTarget)) return false;
+  if (!PHYSICAL_RESOURCE_SET.has(c.carrying)) return true;
+  return canDepositResource(c._deliveryTarget, c.carrying, 1, G);
 }
 
 function evacuateBlockedCitizen(c) {
@@ -404,12 +485,13 @@ export function updateCitizens() {
     // on a short cadence — the brain no longer waits for the body to stop.
     if ((G.gameTick + (c._hb ?? (c._hb = citizenHash(c) % 12))) % 12 === 0) {
       if (raidActive && seekRaidShelter(c)) continue;
-      // Hunger interrupts only safe exterior work. Cargo, sleep, and danger
-      // keep priority; Crown and AI assignments remain owned while the body
-      // walks to a physical pantry.
+      // Hunger interrupts safe exterior work and a physically blocked carrier.
+      // A carrier with a live route still finishes it first; one with nowhere
+      // to put the load may eat without deleting or remotely crediting cargo.
+      const blockedCargo = citizenHasBlockedCargo(c);
       if (
         c.hunger > CITIZEN_MEAL_HUNGER_THRESHOLD
-        && !(c.carrying && c.carryAmount > 0)
+        && (!(c.carrying && c.carryAmount > 0) || blockedCargo)
         && MEAL_INTERRUPTIBLE_ACTIVITIES.has(c.activity.kind)
       ) {
         beginFoodRoute(c);
@@ -429,7 +511,7 @@ export function updateCitizens() {
       // Flee flag clears once the danger passes (it used to stick forever
       // — set in combat.js, never reset). While fleeing, citizens sprint.
       if (c._fleeing && !threatened) c._fleeing = false;
-      if (period === 'night' && !NIGHT_EXEMPT.has(c.activity.kind) && !threatened && !(c.carrying && c.carryAmount > 0)) {
+      if (period === 'night' && !NIGHT_EXEMPT.has(c.activity.kind) && !threatened) {
         goHome(c);
       } else if (c.activity.kind === 'sleep' && (period !== 'night' || threatened)) {
         // Dawn: wake with a stagger so the morning rush reads as a town
@@ -884,29 +966,36 @@ function runStateMachine(c) {
       if (workplace) {
         const def = BUILDINGS[workplace.type] || {};
         if ((def.prod || def.convert) && workplace.produced) {
-          // Pick up one resource kind per trip. Mixed-output workplaces keep
-          // every other positive batch buffered so carrying food cannot erase
-          // the same Farm's wheat harvest.
-          const [resKey, amount] = Object.entries(workplace.produced)
-            .find(([, value]) => Number.isFinite(value) && value > 0) || [];
-          if (resKey) {
+          // Reserve a real route before lifting an output batch. A saturated
+          // grain network therefore leaves wheat visibly buffered at the Farm
+          // instead of trapping its worker in an immortal carrying loop. Try
+          // every positive output so blocked wheat cannot head-of-line block
+          // a routable ration from the same harvest.
+          const outputs = Object.entries(workplace.produced)
+            .filter(([, value]) => Number.isFinite(value) && value > 0);
+          for (const [resKey, amount] of outputs) {
             c.carrying = resKey;
             c.carryAmount = amount;
-            delete workplace.produced[resKey];
-            if (!Object.values(workplace.produced).some(value => Number.isFinite(value) && value > 0)) {
-              workplace.produced = null;
-            }
-            setActivity(c, 'walk_to_deliver', { reason: 'cargo-ready' });
             // User-reported: citizens were walking to map midpoint (MAP_W/2, MAP_H/2)
             // because "town center" was an imaginary coordinate, not a building.
             // Pick a real drop-off: resource-specific storage if present
             // (granary/storehouse for food and goods, market for gold), then
             // nearest house only as a last inhabited fallback.
             if (!routeDelivery(c, resKey)) {
-              requestDeliveryStorage(c);
+              c.carrying = null;
+              c.carryAmount = 0;
+              c._deliveryTarget = null;
+              clearPath(c);
+              continue;
             }
+            delete workplace.produced[resKey];
+            if (!Object.values(workplace.produced).some(value => Number.isFinite(value) && value > 0)) {
+              workplace.produced = null;
+            }
+            setActivity(c, 'walk_to_deliver', { reason: 'cargo-ready' });
             return;
           }
+          if (outputs.length > 0) showDeliveryStorageNeed(c, 'Output waiting');
         }
       }
       // No completed output yet. Stay at the existing workstation instead
@@ -918,6 +1007,11 @@ function runStateMachine(c) {
     case 'needs_delivery': {
       if (c.carrying && c.carryAmount > 0 && routeDelivery(c, c.carrying)) {
         setActivity(c, 'walk_to_deliver');
+        break;
+      }
+      if (c.carrying && c.carryAmount > 0 && returnCarriedOutputToSource(c)) break;
+      if (c.carrying && c.carryAmount > 0 && PHYSICAL_RESOURCE_SET.has(c.carrying)) {
+        requestDeliveryStorage(c);
         break;
       }
       const target = idleLoiterTarget(c);
@@ -934,6 +1028,7 @@ function runStateMachine(c) {
         break;
       }
       if (!deliveryTargetStillValid(c)) {
+        if (PHYSICAL_RESOURCE_SET.has(c.carrying)) c._deliveryTarget = null;
         setActivity(c, 'needs_delivery');
         clearPath(c);
         break;
@@ -967,12 +1062,14 @@ function runStateMachine(c) {
       if (c.carrying && c.carryAmount > 0) {
         const resource = c.carrying;
         const requested = c.carryAmount;
-        const foodDeposit = resource === 'food'
+        const physicalDeposit = resource === 'food'
           ? depositFood(c._deliveryTarget, requested)
-          : null;
-        const credited = foodDeposit ? foodDeposit.accepted : requested;
-        const remainder = foodDeposit ? foodDeposit.remainder : 0;
-        if (!foodDeposit) {
+          : PHYSICAL_RESOURCE_SET.has(resource)
+            ? depositResource(c._deliveryTarget, resource, requested, G)
+            : null;
+        const credited = physicalDeposit ? physicalDeposit.accepted : requested;
+        const remainder = physicalDeposit ? physicalDeposit.remainder : 0;
+        if (!physicalDeposit) {
           G.resources[resource] = (G.resources[resource] || 0) + credited;
         }
         G.totalResourcesGathered = (G.totalResourcesGathered || 0) + credited;
@@ -1037,12 +1134,6 @@ function runStateMachine(c) {
       break;
 
     case 'walk_to_eat': {
-      if (c.carrying && c.carryAmount > 0) {
-        c._foodTarget = null;
-        setActivity(c, 'needs_delivery', { reason: 'cargo-ready' });
-        clearPath(c);
-        break;
-      }
       if (!foodTargetStillValid(c)) {
         c._foodTarget = null;
         beginFoodRoute(c, 'food-source-empty');
@@ -1073,11 +1164,7 @@ function runStateMachine(c) {
     }
 
     case 'waiting_for_food':
-      if (c.carrying && c.carryAmount > 0) {
-        c._foodTarget = null;
-        setActivity(c, 'needs_delivery', { reason: 'cargo-ready' });
-        clearPath(c);
-      } else if (c.hunger <= CITIZEN_MEAL_HUNGER_THRESHOLD) {
+      if (c.hunger <= CITIZEN_MEAL_HUNGER_THRESHOLD) {
         resumeAfterMeal(c);
       } else {
         beginFoodRoute(c);

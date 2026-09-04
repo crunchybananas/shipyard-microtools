@@ -1,110 +1,83 @@
-# ABYME — asset style guide & ledger
+# ABYME — asset contract
 
-ABYME pivoted from "everything is math" to a rich, asset-driven world (the tag
-`abyme-pure-math-v1` marks the old era). Generated assets — textures, voice, music,
-meshes — are now first-class. This file is the **one place** that governs how they are
-made, so a year of batches still share one look, stay power-safe, and stay honest about
-their provenance. Every asset is declared in `js/assets.js` `MANIFEST` and loaded through
-it (never hand-loaded inline).
+This file describes the assets that the current game actually ships. Historical
+experiments are not a compatibility surface: when an asset or loader stops serving
+the game, remove the manifest row, code path, and file together.
 
-> **Hard rules that never bend:** (1) **No biography, ever** — ABYME is an abstract
-> lighthouse poem; a generation prompt must contain no real event, person, place, or
-> company. (2) **Power holds or cuts** — every visual asset ships with a Power Ledger
-> (below). (3) **three.js only** — assets are welcome, JS libraries are not.
+## Current architecture
 
----
+- `js/assets.js` owns the 12 generated textures sampled by Three.js/WebGL. Every
+  `MANIFEST` row has a live runtime consumer and records its path, byte size,
+  license, source, prompt, and sampler settings. JavaScript loads those textures
+  through the module rather than by URL.
+- Two UI textures are intentionally CSS-native. CSS is their loader, so putting
+  dormant duplicate rows in the JavaScript manifest would not make ownership more
+  honest. These are the complete exceptions:
 
-## The look (so a batch reads as ONE place)
+  | File | Live consumer | Bytes | Embedded provenance |
+  |---|---|---:|---|
+  | `sand.jpg` | `style.css` shore-writing surface | 58,051 | MFLUX 0.18.0, FLUX.1-schnell, seed 0; prompt: “seamless tileable fine beach sand, gentle wind ripples, pale warm cream grains, a few tiny shell flecks and pebbles, soft daylight, top-down orthographic, no seams, tileable seamless texture” |
+  | `note_paper.jpg` | `style.css` reading surface | 38,257 | MFLUX 0.18.0, FLUX.1-schnell, seed 0; prompt: “seamless tileable aged ruled ledger paper, faint water stains and foxing, soft daylight, top-down, low saturation, tileable seamless texture” |
 
-ABYME is a Myst-lineage island under a cinematic ACES grade that shifts by time of day and,
-on the dive, **curdles through five color-psychology eras**. The world's color comes from
-that grade — so **assets are achromatic / low-chroma wherever possible** and let the grade do
-the coloring. An asset that bakes in its own strong hue will fight the eras and read wrong at
-depth.
+  Both files are 512×512 JPEGs whose embedded metadata identifies MFLUX as the
+  creator and the content as AI-generated. No JavaScript loader shim is warranted.
+- `js/audio.js` synthesizes the entire score and sound world with Web Audio. Its
+  persistent generative bed, puzzle instruments, environmental voices, and the
+  keeper's nonverbal drowned timbre use no downloaded music or speech files.
+  Language remains visible text.
+- `js/world.js` owns exactly four playable strata: the last day, the arrival years,
+  the inspection years, and the last winter. Visual grading and the procedural
+  arrangement in `js/audio.js` follow those same four states.
 
-**The five era anchors** (from `world.js` `ERA_CASTS` / master grades — the mood an asset is
-seen under, not a color to paint in):
+## Visual language
 
-| Level | Era | Cast |
-|------:|-----|------|
-| L1 (surface) | saturated golden / warm daylight | the clean `noon`/`golden` grade |
-| L2 | sodium streetlight green-yellow (false comfort) | `0x8aa830` |
-| L3 | sickly jaundice / fluorescent gold | `0xc29a1c` |
-| L4 | cold isolation blue | `0x2f6cc8` |
-| L5+ | dead violet — the keeper's near-dark floor | `0x573a72` |
+ABYME is a hand-built, weathered island under a time-of-day and era grade. Generated
+textures should be matte, low-chroma, and free of baked directional lighting so the
+same material remains believable in every stratum and in the 1:240 table model.
 
-Material vocabulary already in code (match it; `props.js` top): bone `0xcfc8b8`, aged copper
-`0x4e9e88` (the painted lighthouse band — a deliberate fixed hue), brass `0xb08d4f`, wood
-`0x6b4a2f`, old stone `0x9b9484`, ink `0x20242c`, cloth `0x355560`. Flat-shaded, weathered,
-hand-built — never glossy or photoreal.
+Use the material vocabulary already established in `js/props.js`; do not add a
+strong baked hue to compensate for lighting. Texture frequency matters more than
+micro-detail because every surface also appears at model scale.
 
-### Prompt preamble (prepend to every texture/image prompt)
+A useful generation baseline is:
 
-> *seamless tileable PBR albedo, hand-built weathered surface, matte, soft overcast daylight,
-> low saturation near-neutral, gentle grain, no text no logo no watermark, orthographic
-> top-down, painterly-realistic —*
+> seamless tileable material texture, hand-built weathered surface, matte,
+> low saturation, soft diffuse light, no text, logo, or watermark, orthographic
 
-…then the specific surface (e.g. *"aged vellum chart paper, faint fold creases"*). **Frequency
-matters more than detail**: scale the grain so the 1:240 model clone reads as chalk, not noise
-mush. Albedo first; normal/roughness maps are a *separate* gated tick only if the budget holds.
+Then name the physical material and its useful structure. Height sources must be
+actual grayscale height information; `applyRelief` derives and caches their normal
+maps at runtime.
 
-### Voice (Kokoro) & music
+## Size and power contract
 
-- **Keeper voice:** timbre **bm_george** (owner-chosen). Always routed through the existing
-  "drowned bus" (`audio.js` — lowpass ~1500 Hz + ~0.19 s feedback delay) so real speech still
-  sounds *overheard through a floor of water*, never a clean TTS narrator. Lines are spare,
-  curious→pleading→resigned; never address the player as an audience.
-- **Music:** five short loopable ambient stems, one per era, **all seeded from the E-G-A-D-C
-  leitmotif** (`props.js` `BOX_MELODY`) so they are family, not strangers. Keep the **surface
-  (L1) stem warm** — the cozy-that-wounds tone means the bite is reserved for depth.
+- Shipped textures are 512×512 or smaller and below 256 KB compressed. Keep that
+  ceiling unless a measured visual need justifies changing the contract.
+- Reuse cached textures and materials. A texture should add no geometry or draw call;
+  account for shader fetches, upload memory, and model-scale readability.
+- The current automated rendered-event gate is `tools/harness/upstream-hand.mjs`:
+  peak work must stay below 525 calls and 1,000,000 triangles, and the event may add
+  at most 16 calls and 20,000 triangles over its measured baseline. Point lights may
+  not exceed nine or increase over that baseline. These are the enforced limits;
+  the debug panel's color is only a live diagnostic.
+- For any visual change, record fixed-pose before/after draws, triangles, and GPU
+  frame time at noon and night. A visual gain must hold or reduce the measured load,
+  or update an executable gate in the same change.
 
----
+## Acceptance
 
-## Power & memory budget (per asset class)
+Before adding or replacing a texture:
 
-Ceilings (bench pose, noon **and** night): **draws < 360**, **tris < 800k**, **60 fps**, adaptive DPR.
+1. For a WebGL texture, add or update its single `MANIFEST` row with truthful
+   provenance and byte count. For a CSS-native UI texture, add the direct CSS
+   reference and update the exception inventory above instead.
+2. Verify every manifest row has a live JavaScript consumer, every CSS exception has
+   a live stylesheet consumer, and every file under `assets/` belongs to one of those
+   two sets. Remove superseded candidates; possible future reuse is not a runtime use.
+3. Inspect it in the full-size world and the table model across all four strata.
+4. Run `bash tools/harness/syntax.sh` and the relevant visual gate; for a broad
+   rendering change, run `bash tools/harness/run.sh`.
+5. Record the power comparison. Do not ship an unmeasured visual exception.
 
-| Class | Cost it adds | Budget / rule |
-|-------|--------------|---------------|
-| texture | GPU fragment fetches + VRAM; **no** geometry/draws | ≤ 512² albedo, **≤ 256 KB** compressed; reuse one material across props; verify the model clone reads clean |
-| mesh | draws + tris | must fit the draw/tri ceiling; pay back any new draw the same tick (gate a dormant light, merge a mesh) |
-| voice | heap (decoded buffer) | mono ~24 kHz, short; lazy-fetch on first depth; free when far |
-| music | heap (decoded buffer) | short loop; **decode lazily by level** (current + adjacent only) |
-
-> **Memory, not GPU, is the real ceiling for voice+music.** The Power Ledger needs a
-> resident-buffer column and a lazy/free policy, not just draws/tris/ms.
-
-**Debt:** `driftwood.png` is **1.05 MB** — oversized for a tileable texture. Re-export ≤ 256 KB
-in the next texture batch (the budget above is the target, not the current state).
-
----
-
-## Per-asset acceptance test (before it ships)
-
-1. **Provenance** — a `MANIFEST` row with `license`, `source`, and an abstract `prompt` (no biography).
-2. **The look** — reads as the same place as its neighbours; achromatic enough that the five grades still color it; the **1:240 model clone** reads clean (chalk, not noise).
-3. **Power Ledger** — draws/tris/GPU-ms at the bench pose, **noon and night**, net hold-or-cut. Audio: resident-buffer count under the lazy policy.
-4. **In-register** — voice "still feels overheard, not addressed"; music keeps the surface warm; a texture doesn't fight the era casts.
-5. **Honesty** — if it changes the truth of the title-screen claim, update `index.html` (the "…made of math" line) in the same tick.
-
----
-
-## Generating on Bender (the pipeline)
-
-Assets are generated on the big node ("Bender") via Peel: `asset_texture_generate`
-(FLUX.1-schnell), `asset_voice_generate` (Kokoro-82M), `asset_music_generate`,
-`asset_mesh_generate`. Outputs land in `~/.peel/assets/`; copy the chosen file into
-`docs/the-island/assets/` and add its `MANIFEST` row. **Voice/music come back as WAV** —
-transcode to a compact mono mp3 before shipping (`ffmpeg -i in.wav -ac 1 -ar 24000 -b:a 64k
-out.mp3` — ~6× smaller, and mp3 is WKWebView-safe for `decodeAudioData`, unlike Opus). The
-keeper's 6 lines shipped this way at ~148 KB total (`assets/voice/`).
-
-> **Dispatch note:** `asset_voice_generate` / `asset_texture_generate` default to the LOCAL
-> backend, which lacks the ML venvs and fails instantly. Pass **`node: "tree"`** to route the
-> job to Bender (the heavy node) — that is what actually generates.
-
-> **First troubleshooting line:** if jobs fail around ~40 s with *"Identity not verified,"*
-> **restart Peel ON Bender** (not the local Mac) — it's a peer-trust handshake, not a prompt error.
-
-**Sequence rule:** lock the look (this file) *before* asset volume, so early assets in a batch
-don't get redone. Generate a small coordinated batch sharing the preamble; accept per the test above.
+Most WebGL texture work came from the Bender asset pipeline; the two CSS-native
+textures preserve their embedded local MFLUX provenance above. Copy only accepted,
+live output into `assets/`; the runtime repository is not a candidate archive.

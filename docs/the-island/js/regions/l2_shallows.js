@@ -9,6 +9,19 @@ import { heightAt } from '../terrain.js';
 import { defineProp } from '../props.js';
 
 export function build({ region2 }) {
+  // THE UPSTREAM HAND — the rig is intentionally empty here.  The model-side half
+  // cannot be built until instantiateModel() exists, so UpstreamHand populates this
+  // L2-only world root after collectRefs().  Giving it a registered place in the
+  // region keeps the spectacle under core -> diveGroup (correct during dives), and
+  // region2's existing model-prune keeps it from recursively cloning itself.
+  {
+    const upstreamHand = new THREE.Group();
+    upstreamHand.name = 'upstreamHand';
+    upstreamHand.visible = false;
+    defineProp('upstreamHand');
+    region2.add(upstreamHand);
+  }
+
   // ERA EVENT L2 (#130, AAA-A2): a climber's rope on the wade-line, tied off by a hand
   // that meant to come back — and STILL SWINGING when you arrive. Motion where nothing
   // should move: the arrival years have not finished happening. The swing decays over

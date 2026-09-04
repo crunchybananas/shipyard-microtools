@@ -8,7 +8,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { ensureServer } from './_serve.mjs';
-import runtimeContract from '../runtime-contract.json?realm=197' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=198' with { type: 'json' };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -41,8 +41,8 @@ try {
   });
 
   const setup = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const economy = await import('./js/economy.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const g = window.G;
     g.speed = 0;
     g.debug.disableEvents = true;
@@ -100,9 +100,9 @@ try {
 
   const baseline = await page.evaluate(async ({ revision, ticks }) => {
     const [presentation, ownership, sim] = await Promise.all([
-      import('./js/citizen-presentation.js?realm=197'),
-      import('./js/citizen-ownership.js?realm=197'),
-      import('./js/sim.js?realm=197'),
+      import('./js/citizen-presentation.js?realm=198'),
+      import('./js/citizen-ownership.js?realm=198'),
+      import('./js/sim.js?realm=198'),
     ]);
     const g = window.G;
     // The current engine lets requestAnimationFrame drain presentation

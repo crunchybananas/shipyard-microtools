@@ -5,6 +5,11 @@
   --ink-dim: #b9ae94;
   --amber: #ffb454;
   --night: #070a12;
+  --field-paper: #cfc4a5;
+  --field-paper-deep: #b7aa88;
+  --field-ink: #20251f;
+  --field-rule: #687d74;
+  --verdigris: #75a89c;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,6 +30,11 @@ html, body {
 }
 
 .hidden { display: none !important; }
+
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
 
 /* ---------- post: vignette + grain (free post-processing) ---------- */
 #vignette {
@@ -354,92 +364,291 @@ html, body {
 #motion-tab.reduced .slash { opacity: 1; }
 
 #journal {
-  position: fixed; top: 50%; left: 50%; z-index: 26;
-  transform: translate(-50%, -50%);
-  width: min(480px, 88vw);
-  max-height: 76vh;
-  overflow-y: auto;
-  padding: 2.2rem 2.4rem;
-  background: linear-gradient(165deg, #181a17 0%, #11130f 100%);
-  border: 1px solid rgba(196, 180, 140, 0.3);
-  border-radius: 3px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+  position: fixed; top: 50%; left: 50%; z-index: 46;
+  transform: translate(-50%, -50%) rotate(-0.35deg);
+  width: min(1040px, 94vw);
+  height: min(760px, 86vh);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  color: var(--field-ink);
+  background:
+    linear-gradient(90deg, transparent 0 49.25%, rgba(36, 43, 37, .25) 49.72%, rgba(255,255,255,.2) 50.12%, transparent 50.55%),
+    repeating-linear-gradient(0deg, rgba(58, 80, 72, 0.075) 0 1px, transparent 1px 25px),
+    linear-gradient(101deg, var(--field-paper) 0 49.8%, var(--field-paper-deep) 50.2% 100%);
+  border: 1px solid rgba(19, 25, 21, 0.75);
+  border-left: 9px solid #30342b;
+  border-radius: 1px 5px 4px 1px;
+  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.78), inset 0 0 70px rgba(86, 67, 39, 0.13);
+  animation: field-open 180ms cubic-bezier(.2,.75,.25,1) both;
+}
+@keyframes field-open {
+  from { opacity: 0; transform: translate(-48%, -49%) rotate(0.8deg) scale(.965); }
+}
+#journal::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 19%, rgba(255,255,255,.16), transparent 23%),
+    linear-gradient(176deg, transparent 0 73%, rgba(38, 91, 90, .1) 73.3%, transparent 75%);
+  mix-blend-mode: multiply;
+}
+.journal-head {
+  grid-column: 1; grid-row: 1;
+  padding: 1.25rem 1.8rem .55rem;
+}
+.journal-overline {
+  display: block;
+  margin-bottom: .25rem;
+  color: rgba(38, 55, 47, .58);
+  font: 600 .6rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .17em;
 }
 #journal h2 {
   font-weight: 400;
-  font-size: 1.1rem;
-  letter-spacing: 0.32em;
-  color: var(--amber);
-  margin-bottom: 1.4rem;
-  text-transform: uppercase;
+  font-size: clamp(1.45rem, 2.2vw, 2.05rem);
+  letter-spacing: -0.025em;
+  color: #26372f;
 }
-/* the deep-read tally — a quiet sub-line under the header (loop #137) */
-#journal h2 .deep-tally {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  text-transform: none;
-  color: rgba(196, 180, 140, 0.5);
+#journal-folios {
+  grid-column: 1; grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 0 1.8rem;
+  border-block: 1px solid rgba(49, 78, 67, .28);
 }
-#journal-bearing {
-  margin: -0.35rem 0 1rem;
-  padding: 0.7rem 0.85rem 0.75rem;
-  border-top: 1px solid rgba(255, 180, 84, 0.24);
-  border-bottom: 1px solid rgba(255, 180, 84, 0.14);
-  color: rgba(232, 224, 207, 0.78);
-  font-size: 0.82rem;
+#journal-folios button {
+  position: relative;
+  min-width: 0;
+  padding: .56rem .32rem .5rem;
+  border: 0;
+  border-right: 1px solid rgba(49, 78, 67, .16);
+  background: transparent;
+  color: rgba(38, 55, 47, .56);
+  font: 600 clamp(.48rem, .76vw, .64rem)/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .055em;
+  cursor: pointer;
+}
+#journal-folios button:last-child { border-right: 0; }
+#journal-folios button:hover { color: #6f432c; background: rgba(125, 82, 44, .055); }
+#journal-folios button.active {
+  color: #26372f;
+  box-shadow: inset 0 -2px #8b5938;
+}
+#journal-folios button.has-marks::before {
+  content: '';
+  position: absolute; top: .3rem; right: .3rem;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(70, 100, 87, .68);
+}
+#journal-folios button.current-gate::after {
+  content: '';
+  position: absolute; left: 50%; bottom: -.24rem;
+  width: .42rem; height: .42rem;
+  background: var(--field-paper);
+  border: solid rgba(49, 78, 67, .38); border-width: 0 1px 1px 0;
+  transform: translateX(-50%) rotate(45deg);
+}
+#journal-leaf {
+  grid-column: 1; grid-row: 3;
+  min-height: 0;
+  display: flex; flex-direction: column;
+  padding: 1.05rem 1.8rem .8rem;
+}
+#journal-leaf h3, #journal-facing h3 {
+  color: #273a31;
+  font-weight: 400;
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  letter-spacing: .025em;
+}
+#journal-leaf-deck {
+  margin-top: .25rem;
+  color: rgba(38, 55, 47, .63);
+  font-size: .76rem;
   font-style: italic;
-  line-height: 1.55;
+  line-height: 1.4;
 }
-#journal-bearing::before {
-  content: 'where the notes point';
+#journal-entries {
+  min-height: 0;
+  margin-top: .55rem;
+  overflow-y: auto;
+  padding: .15rem .7rem 1rem .1rem;
+  scrollbar-color: rgba(54, 72, 63, .38) transparent;
+}
+#journal-entries .field-mark {
+  position: relative;
+  margin: .18rem 0 .68rem;
+  padding: .62rem .72rem .68rem 1rem;
+  border: 1px solid rgba(52, 78, 67, .15);
+  border-left: 2px solid rgba(52, 78, 67, .32);
+  background: rgba(244, 238, 216, .2);
+  box-shadow: 0 2px 4px rgba(47, 40, 26, .06);
+  font-size: .91rem;
+  line-height: 1.5;
+  color: var(--field-ink);
+}
+#journal-entries .field-mark:nth-child(3n + 2) { transform: rotate(.18deg); }
+#journal-entries .field-mark:nth-child(3n) { transform: rotate(-.14deg); }
+#journal-entries .field-mark::before {
+  content: '';
+  position: absolute; left: .38rem; top: .98rem;
+  width: 6px; height: 6px;
+  border: 1px solid rgba(41, 67, 57, .65);
+  border-radius: 50%;
+}
+#journal-entries .field-mark.rubbing::before { border-radius: 0; transform: rotate(45deg); }
+#journal-entries .field-mark.joining::before { background: rgba(164, 91, 45, .72); border-color: transparent; }
+#journal-entries .mark-label {
   display: block;
-  margin-bottom: 0.28rem;
-  color: rgba(255, 180, 84, 0.62);
-  font-size: 0.58rem;
-  font-style: normal;
-  letter-spacing: 0.18em;
+  margin-bottom: .2rem;
+  font: 600 .59rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .12em;
   text-transform: uppercase;
+  color: rgba(40, 62, 52, .68);
 }
-#journal-entries .entry {
-  padding: 0.85rem 0;
-  border-bottom: 1px solid rgba(196, 180, 140, 0.14);
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: var(--ink);
+#journal-entries .mark-copy { margin: 0; }
+#journal-entries .field-mark .sketch {
+  margin-top: .45rem;
+  color: #896b37;
+  opacity: .72;
 }
-#journal-entries .entry .sketch {
-  margin-top: 0.5rem;
-  font-size: 1.25rem;
-  letter-spacing: 0.5em;
-  color: var(--amber);
-  opacity: 0.9;
-}
-#journal-entries .entry .sketch svg {
+#journal-entries .field-mark .sketch svg {
   display: block;
-  height: 46px;
-  stroke: #9adfca;
-  opacity: 0.7;
+  width: min(148px, 44%); height: auto;
+  stroke: #476b60;
 }
-/* the keeper's hand — at depth the journal fills with words you never wrote (#21);
-   a colder ink, a different slant, a marginal rule: another hand bleeding into yours */
-#journal-entries .entry.keeper {
-  color: #9adfca;
+.glyph-rubbing {
+  display: grid;
+  grid-template-columns: repeat(4, 2.4rem);
+  gap: .42rem;
+  margin-top: .65rem;
+  width: max-content;
+  max-width: 100%;
+}
+.glyph-mark {
+  display: grid; place-items: center;
+  aspect-ratio: 1;
+  border-bottom: 1px solid rgba(54, 84, 72, .28);
+}
+.glyph-mark svg {
+  width: 2rem; height: 2rem;
+  fill: none;
+  stroke: #3f6559;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.glyph-mark svg .fill { fill: #3f6559; stroke: none; }
+#journal-entries .empty {
+  padding: 1.6rem .2rem;
   font-style: italic;
-  padding-left: 0.95rem;
-  border-left: 2px solid rgba(154, 223, 202, 0.38);
-  transform: rotate(-0.45deg);
-  opacity: 0.9;
+  color: rgba(32, 37, 31, .58);
 }
-#journal-entries .entry.keeper .sketch svg { stroke: #9adfca; }
-#journal-entries .empty { font-style: italic; color: var(--ink-dim); }
+#journal-facing {
+  grid-column: 2; grid-row: 1 / 4;
+  min-height: 0;
+  padding: 1.45rem 2rem 1.2rem 2.25rem;
+  display: flex; flex-direction: column;
+  color: #223b36;
+}
+#journal-facing h3 { max-width: 18rem; }
+#journal-causal {
+  list-style: none;
+  margin: 1.1rem 0 1rem .25rem;
+  padding: 0;
+  overflow-y: auto;
+}
+#journal-causal li {
+  position: relative;
+  min-height: 2.05rem;
+  padding: .22rem .25rem .65rem 1.65rem;
+  color: rgba(31, 55, 48, .62);
+  font: italic .82rem/1.35 Georgia, 'Times New Roman', serif;
+}
+#journal-causal li::before {
+  content: '';
+  position: absolute; left: .2rem; top: .18rem;
+  width: .66rem; height: .66rem;
+  border: 1px solid rgba(51, 80, 68, .58);
+  border-radius: 50%;
+}
+#journal-causal li:not(:last-child)::after {
+  content: '';
+  position: absolute; left: .53rem; top: .92rem; bottom: -.08rem;
+  border-left: 1px solid rgba(51, 80, 68, .32);
+  transform: rotate(-2deg);
+}
+#journal-causal li.complete { color: #29483e; }
+#journal-causal li.complete::before {
+  background: #557d6e;
+  box-shadow: inset 0 0 0 2px var(--field-paper-deep);
+}
+#journal-causal li.open::before { border-style: dashed; }
+#journal-lead {
+  margin-top: auto;
+  padding-top: .95rem;
+  border-top: 1px solid rgba(49, 78, 67, .26);
+}
+#journal-hint {
+  background: transparent;
+  color: #284b43;
+  border: 0;
+  border-bottom: 1px solid rgba(40, 75, 67, .62);
+  padding: .25rem 0 .2rem;
+  font: italic 1rem/1.3 Georgia, 'Times New Roman', serif;
+  cursor: pointer;
+}
+#journal-hint:hover { color: #7b482c; border-color: #7b482c; }
+#journal-hint:disabled {
+  cursor: default;
+  color: rgba(40, 75, 67, .4);
+  border-color: rgba(40, 75, 67, .22);
+}
+#journal-hint-text {
+  min-height: 4.6rem;
+  margin-top: .75rem;
+  max-width: 21rem;
+  font-size: .84rem;
+  line-height: 1.52;
+  font-style: italic;
+  color: rgba(30, 54, 48, .82);
+}
+#journal-hint-text.empty { opacity: .58; }
 .journal-foot {
-  margin-top: 1.3rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
-  color: var(--ink-dim);
-  text-align: center;
+  grid-column: 1 / -1;
+  grid-row: 4;
+  padding: .55rem 1rem .65rem;
+  border-top: 1px solid rgba(49, 78, 67, .22);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: rgba(32, 37, 31, .58);
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  #journal {
+    width: 92vw; height: 84vh;
+    display: block;
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+    background:
+      repeating-linear-gradient(0deg, rgba(58, 80, 72, .075) 0 1px, transparent 1px 25px),
+      linear-gradient(158deg, var(--field-paper), var(--field-paper-deep));
+  }
+  .journal-head { padding: 1rem 1.2rem .5rem; }
+  #journal-folios { margin: 0 1.2rem; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  #journal-leaf { min-height: 18rem; padding: .95rem 1.2rem .7rem; }
+  #journal-entries { overflow: visible; }
+  #journal-facing { min-height: 19rem; padding: 1.1rem 1.25rem 1.35rem; border-top: 1px solid rgba(49, 78, 67, .3); }
+  #journal-causal { overflow: visible; }
+  #journal-hint-text { min-height: 0; }
+  .journal-foot { position: sticky; bottom: 0; background: rgba(190, 179, 147, .92); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #journal { animation: none; }
 }
 
 /* ---- the reading surface: a vellum page you open and read (the lore corpus) ---- */
@@ -485,43 +694,101 @@ html, body {
 @media (max-width: 600px) { .reader-page { padding: 2rem 1.5rem 1.2rem; } .reader-body { font-size: 1rem; } }
 
 /* ---------- finale ---------- */
+/* The world is the ending. Remove every instrument and cursor before the first
+   frame rather than letting high-z utility controls float over the last image. */
+body.finale-active #iris,
+body.finale-active #hotlabel,
+body.finale-active #whisper,
+body.finale-active #cinematic-hint,
+body.finale-active #controls-hint,
+body.finale-active #settings-tab,
+body.finale-active #sound-tab,
+body.finale-active #motion-tab,
+body.finale-active #journal-tab,
+body.finale-active #settings,
+body.finale-active #journal,
+body.finale-active #reader,
+body.finale-active #import-overlay,
+body.finale-active #note-overlay,
+body.finale-active #sand-write-overlay,
+body.finale-active #debug-panel {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 #finale {
   position: fixed; inset: 0; z-index: 45;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 clamp(1.4rem, 7vw, 7rem) calc(11vh + clamp(1.5rem, 4vh, 3.8rem));
+  background: linear-gradient(180deg,
+    transparent 0%, transparent 40%, rgba(4, 7, 10, 0.34) 60%, rgba(4, 7, 10, 0.95) 100%);
   opacity: 0;
-  transition: opacity 3s ease;
+  transition: opacity 0.9s ease;
 }
 #finale.show { opacity: 1; }
-.finale-inner { text-align: center; }
-.fin-line1, .fin-line2 {
+.finale-inner {
+  width: min(42rem, 88vw);
+  text-align: left;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.98);
+}
+.fin-line1 {
   font-style: italic;
-  letter-spacing: 0.22em;
-  color: var(--ink-dim);
-  font-size: 1rem;
+  letter-spacing: 0.055em;
+  color: #fff7e8;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  line-height: 1.4;
+}
+.fin-line2 {
+  color: #ead7b5;
+  font-size: clamp(0.82rem, 1.5vw, 1rem);
+  font-style: italic;
+  letter-spacing: 0.075em;
 }
 /* #134: the read-back coda — this player's walk, surfacing late and quiet */
 .fin-coda {
-  margin-top: 1.3rem;
+  margin-top: 1rem;
   font-style: italic;
-  letter-spacing: 0.12em;
-  color: var(--ink-dim);
-  font-size: 0.82rem;
-  line-height: 1.9;
+  letter-spacing: 0.035em;
+  color: #f0e4ce;
+  font-size: clamp(0.78rem, 1.25vw, 0.9rem);
+  line-height: 1.65;
   opacity: 0;
-  transition: opacity 2.4s ease;
+  transition: opacity 1.6s ease;
 }
-.fin-coda.show { opacity: 0.85; }
+.fin-coda.show { opacity: 0.92; }
 #finale h1 {
-  margin: 1.6rem 0;
+  margin: 0.45rem 0 0.55rem;
   font-weight: 400;
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
-  letter-spacing: 0.5em;
-  margin-left: 0.5em;
-  color: var(--ink);
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  letter-spacing: 0.24em;
+  color: #fffaf0;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 1);
 }
-#finale .title-btn { margin-top: 3rem; opacity: 0; transition: opacity 1.5s ease 4s; }
+#finale .title-btn {
+  margin-top: 1.4rem;
+  opacity: 0;
+  color: #fff7e8;
+  border-color: rgba(255, 247, 232, 0.68);
+  background: rgba(5, 8, 11, 0.35);
+  transition: opacity 1.2s ease 2.8s, border-color .25s ease, background .25s ease;
+}
 #finale.show .title-btn { opacity: 1; }
+
+body.finale-reduced-motion #finale,
+body.finale-reduced-motion .fin-coda,
+body.finale-reduced-motion #finale .title-btn {
+  transition-duration: 0.01ms;
+  transition-delay: 0s;
+}
+
+@media (max-width: 600px) {
+  #finale {
+    padding: 0 1.25rem calc(11vh + 1.25rem);
+  }
+  .finale-inner { width: 100%; }
+}
 
 /* ---------- failure ---------- */
 #webgl-fail {
@@ -606,7 +873,7 @@ html, body {
 /* #143 accessibility: letter size scales the read surfaces (whisper, reader, journal) */
 #whisper { font-size: calc(1.25rem * var(--text-scale, 1)); }
 .reader-body { font-size: calc(1.02rem * var(--text-scale, 1)); }
-#journal-entries .entry { font-size: calc(0.95rem * var(--text-scale, 1)); }
+#journal-entries .field-mark { font-size: calc(0.91rem * var(--text-scale, 1)); }
 /* calm the flashes: the white curtain never snaps, even on its fast path */
 .calm-flash #curtain, .calm-flash #curtain.fast { transition-duration: 1.4s; }
 
@@ -650,6 +917,14 @@ html, body {
 
 /* the import card is a touch wider: a pasted report is a wall of JSON */
 #import-card { width: min(34rem, calc(100vw - 2.5rem)); }
+.report-observation { margin: 0 0 0.8rem; }
+.report-observation img {
+  display: block; width: 100%; max-height: 42vh; object-fit: contain;
+  background: #0e1012; border: 1px solid #3a4046; border-radius: 4px;
+}
+.report-observation figcaption {
+  margin-top: 0.3rem; color: #7f878e; font: 0.7rem/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
 
 /* ---- THE SHORE-WRITING SURFACE -------------------------------------------
    Not another dark modal. This is the one UI beat made out of the island's own

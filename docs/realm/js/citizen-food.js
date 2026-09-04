@@ -5,19 +5,19 @@
 // visible walk/wait/resume activities; consumption itself stays with the
 // state machine so it happens only at physical arrival.
 
-import { G } from './state.js?realm=197';
-import { findPath, isWalkable } from './pathfinding.js?realm=197';
+import { G } from './state.js?realm=198';
+import { findPath, isWalkable } from './pathfinding.js?realm=198';
 import {
   findReachableFoodStore,
   isFoodStore,
   storedFood,
-} from './building-inventory.js?realm=197';
-import { citizenHasValidResidence } from './residences.js?realm=197';
+} from './building-inventory.js?realm=198';
+import { citizenHasValidResidence } from './residences.js?realm=198';
 import {
   assignedCitizenBuilding,
   citizenStableHash,
   setCitizenActivity,
-} from './citizen-activity.js?realm=197';
+} from './citizen-activity.js?realm=198';
 import {
   blacklistCitizenTarget,
   citizenManhattanDistance,
@@ -25,11 +25,11 @@ import {
   citizenTargetIsBlacklisted,
   clearCitizenPath,
   pathCitizenTo,
-} from './citizen-navigation.js?realm=197';
-import { pathCitizenToWork } from './citizen-work.js?realm=197';
+} from './citizen-navigation.js?realm=198';
+import { pathCitizenToWork } from './citizen-work.js?realm=198';
 
 export const CITIZEN_MEAL_INTERRUPTIBLE_ACTIVITIES = new Set([
-  'idle', 'find_job', 'walk_to_work', 'working', 'leisure',
+  'idle', 'find_job', 'walk_to_work', 'working', 'leisure', 'needs_delivery',
 ]);
 
 const FOOD_RETRY_BASE_TICKS = 72;
@@ -126,7 +126,6 @@ function waitForFood(citizen, reason = 'food-shortage') {
 }
 
 export function beginCitizenFoodRoute(citizen, shortageReason = 'food-shortage') {
-  if (citizen.carrying && citizen.carryAmount > 0) return false;
   const routes = new Map();
   const store = findReachableFoodStore(citizen, {
     mode: 'withdraw',
@@ -158,6 +157,10 @@ export function beginCitizenFoodRoute(citizen, shortageReason = 'food-shortage')
 export function resumeCitizenAfterMeal(citizen) {
   citizen._foodTarget = null;
   clearCitizenPath(citizen);
+  if (citizen.carrying && citizen.carryAmount > 0) {
+    setCitizenActivity(citizen, 'needs_delivery', { reason: 'cargo-ready' });
+    return;
+  }
   const workplace = assignedCitizenBuilding(citizen);
   if (workplace && G.buildings.includes(workplace)) {
     setCitizenActivity(citizen, 'walk_to_work', { reason: 'route-to-work' });

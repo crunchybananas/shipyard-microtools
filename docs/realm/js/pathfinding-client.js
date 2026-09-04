@@ -9,7 +9,7 @@ import {
   promotePathfindingWorkerAuthority,
   resetPathfindingService,
   useSynchronousPathfindingService,
-} from './pathfinding-service.js?realm=197';
+} from './pathfinding-service.js?realm=198';
 
 let worker = null;
 
@@ -17,7 +17,7 @@ export function startPathfindingWorkerClient() {
   if (worker) return true;
   if (typeof Worker !== 'function') return false;
   try {
-    worker = new Worker(new URL('./pathfinding-worker.js?realm=197', import.meta.url), { type: 'module', name: 'realm-pathfinding' });
+    worker = new Worker(new URL('./pathfinding-worker.js?realm=198', import.meta.url), { type: 'module', name: 'realm-pathfinding' });
   } catch (error) {
     // Some private/restricted browser sessions expose Worker but reject its
     // construction. Routing remains correct on the deterministic synchronous

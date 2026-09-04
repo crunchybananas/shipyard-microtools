@@ -5,7 +5,7 @@
 // Automatic policy may move only AI-managed workers; a player-command assignment
 // is a Crown order and is never reconsidered here.
 
-import { G, BUILDINGS, getDifficulty } from './state.js?realm=197';
+import { G, BUILDINGS, getDifficulty } from './state.js?realm=198';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -16,8 +16,8 @@ import {
   transitionCitizenActivity,
   vocationForBuilding,
   workersForBuilding,
-} from './citizen-ownership.js?realm=197';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=197';
+} from './citizen-ownership.js?realm=198';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=198';
 
 export const WORKFORCE_PRIORITIES = Object.freeze(['high', 'normal', 'low', 'off']);
 export const AUTO_REASSIGN_THRESHOLD = 12;
@@ -158,9 +158,10 @@ export function workforceFoodDaysLeft() {
   if (foodDaysTick !== G.gameTick) {
     foodDaysTick = G.gameTick;
     const daily = Math.max(1, Math.ceil(G.population * getDifficulty().foodMult));
-    const stock = (G.resources.food || 0)
-      + (G.resources.wheat || 0)
-      + (G.resources.flour || 0);
+    // Wheat and flour are work-in-progress, not meals. Counting them here
+    // made the job market stand down food workers while a stalled mill or
+    // bakery left the settlement with nothing citizens could actually eat.
+    const stock = G.resources.food || 0;
     foodDaysValue = stock / daily;
   }
   return foodDaysValue;

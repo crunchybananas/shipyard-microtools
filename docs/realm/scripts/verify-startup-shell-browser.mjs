@@ -6,7 +6,7 @@ import { chromium } from '@playwright/test';
 import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 197, 'Update this gate together with current browser module URLs');
+assert.equal(contract.moduleRevision, 198, 'Update this gate together with current browser module URLs');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });

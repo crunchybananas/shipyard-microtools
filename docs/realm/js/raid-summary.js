@@ -3,8 +3,8 @@
 // and changed the chronicle. The core owns the counters; the bus-backed log
 // functions keep presentation in the shell.
 
-import { G } from './state.js?realm=197';
-import { announce, chronicle } from './log.js?realm=197';
+import { G } from './state.js?realm=198';
+import { announce, chronicle } from './log.js?realm=198';
 
 const RAID_PROSE = Object.freeze({
   razed: Object.freeze([
@@ -32,10 +32,10 @@ const RAID_PROSE = Object.freeze({
     (day, kills) => `Raid on day ${day}: ${kills} foes ran into the realm's sword and stayed. We took no losses.`,
   ]),
   bloodless: Object.freeze([
-    day => `Raid on day ${day}: the raiders withdrew before either side struck a blow.`,
-    day => `Raid on day ${day}: the raiders thought better of it and slipped back into the trees.`,
-    day => `Raid on day ${day}: a raid that found nothing. The watch held its breath all night.`,
-    day => `Raid on day ${day}: the raiders came and the raiders went. Not a blade was drawn.`,
+    day => `Raid on day ${day} ended without a battlefield death. At dawn, the realm counted what remained.`,
+    day => `Raid on day ${day}: the warband departed and no grave marked the encounter, though the ledger remembered it.`,
+    day => `Raid on day ${day}: the watch saw them come and go; the stores and walls held the only accounting.`,
+    day => `Raid on day ${day}: no blade found flesh. The settlement measured the outcome in timber and grain.`,
   ]),
 });
 

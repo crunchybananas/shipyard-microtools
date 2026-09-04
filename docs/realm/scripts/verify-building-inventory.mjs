@@ -3,26 +3,29 @@
 import assert from 'node:assert/strict';
 import {
   G, BUILDINGS, MAP_W, MAP_H, createResourceStock, setSeed,
-} from '../js/state.js?realm=197';
-import { generateWorld } from '../js/world.js?realm=197';
+} from '../js/state.js?realm=198';
+import { generateWorld } from '../js/world.js?realm=198';
 import {
   depositFood,
+  depositResource,
   establishFounderStockpile,
   findReachableFoodStore,
   foodCapacity,
   foodConservationReport,
   foodSpace,
   storedFood,
+  storedResource,
+  resourceConservationReport,
   withdrawFood,
   withdrawFoodFromStores,
-} from '../js/building-inventory.js?realm=197';
-import { getFirstMusterReport } from '../js/first-muster.js?realm=197';
-import { plunderBuildingFood, updateEnemies } from '../js/combat.js?realm=197';
-import { removeBuilding } from '../js/building-lifecycle.js?realm=197';
-import { serializeGame, prepareSave, commitGameLoad } from '../js/save-state.js?realm=197';
-import { executeTrade } from '../js/trade.js?realm=197';
-import { startResearch } from '../js/tech.js?realm=197';
-import { decodeGraphState, encodeGraphState, makeEnvelope } from '../js/save-schema.js?realm=197';
+} from '../js/building-inventory.js?realm=198';
+import { getFirstMusterReport } from '../js/first-muster.js?realm=198';
+import { plunderBuildingFood, plunderBuildingSupplies, updateEnemies } from '../js/combat.js?realm=198';
+import { removeBuilding } from '../js/building-lifecycle.js?realm=198';
+import { serializeGame, prepareSave, commitGameLoad } from '../js/save-state.js?realm=198';
+import { executeTrade } from '../js/trade.js?realm=198';
+import { startResearch } from '../js/tech.js?realm=198';
+import { decodeGraphState, encodeGraphState, makeEnvelope } from '../js/save-schema.js?realm=198';
 
 function completeBuilding(type, x, y, extras = {}) {
   return {
@@ -242,6 +245,39 @@ assert.deepEqual(JSON.parse(firstFounder), {
   assert.equal(G.notificationLog.filter(entry => entry.text.includes('could not all be stored')).length, 1);
   updateEnemies();
   assert.equal(G.notificationLog.filter(entry => entry.text.includes('could not all be stored')).length, 1);
+}
+
+// Valuable production-chain stock is real raid loot too. Sack order is
+// deterministic, the bag conserves every physical mirror, and killing the
+// carrier returns each good only to compatible storage.
+{
+  resetCombatRealm();
+  const attacked = putLiveBuilding(completeBuilding('storehouse', 40, 40));
+  depositResource(attacked, 'food', 1);
+  depositResource(attacked, 'flour', 2);
+  depositResource(attacked, 'wheat', 3);
+  const enemy = { x: 40, y: 40, hp: 1, plundered: 0 };
+  assert.equal(plunderBuildingSupplies(enemy, attacked, 4), 4);
+  assert.deepEqual(enemy.loot, { food: 1, flour: 2, wheat: 1 });
+  assert.equal(storedResource(attacked, 'food'), 0);
+  assert.equal(storedResource(attacked, 'flour'), 0);
+  assert.equal(storedResource(attacked, 'wheat'), 2);
+  assert.deepEqual(G._raidStolen, { food: 1, flour: 2, wheat: 1 });
+  enemy.hp = 0;
+  G.enemies.push(enemy);
+  updateEnemies();
+  assert.deepEqual(
+    {
+      food: storedResource(attacked, 'food'),
+      flour: storedResource(attacked, 'flour'),
+      wheat: storedResource(attacked, 'wheat'),
+    },
+    { food: 1, flour: 2, wheat: 3 },
+  );
+  assert.equal(G._raidStolen, null);
+  for (const resource of ['food', 'wheat', 'flour']) {
+    assert.equal(resourceConservationReport(resource, G).conserved, true);
+  }
 }
 
 // Manual demolition relocates what fits and debits discarded overflow. A free

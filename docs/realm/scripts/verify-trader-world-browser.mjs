@@ -41,9 +41,9 @@ try {
   await page.waitForTimeout(1600);
 
   const observed = await page.evaluate(async () => {
-    const ownership = await import('./js/citizen-ownership.js?realm=197');
-    const renderCache = await import('./js/citizen-render-cache.js?realm=197');
-    const render = await import('./js/render.js?realm=197');
+    const ownership = await import('./js/citizen-ownership.js?realm=198');
+    const renderCache = await import('./js/citizen-render-cache.js?realm=198');
+    const render = await import('./js/render.js?realm=198');
     const game = window.G;
     const citizen = game.citizens[0];
     const centerX = 32;

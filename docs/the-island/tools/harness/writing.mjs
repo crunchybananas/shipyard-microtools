@@ -19,7 +19,7 @@ export default async function (h) {
 
   await h.navigate(URL); await ready();
   await h.evaluate(`localStorage.setItem('abyme-muted','1');
-    ['abyme-save-v1','abyme-ledger-v1','abyme-hand-v1'].forEach(k => localStorage.removeItem(k)); 1`);
+    ['abyme-save','abyme-ledger-v2','abyme-hand-v1'].forEach(k => localStorage.removeItem(k)); 1`);
   await h.navigate(URL); await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
   await h.wait(1.2);
@@ -70,7 +70,7 @@ export default async function (h) {
       const mark = ABYME.ledger().marks.find(m => m.k === 'writing');
       return { hidden: document.getElementById('sand-write-overlay').hidden,
         writing: ABYME.W.writing, locked: ABYME.player.locked, mark,
-        draft2: ABYME.draft(2), stored: localStorage.getItem('abyme-ledger-v1') };
+        draft2: ABYME.draft(2), stored: localStorage.getItem('abyme-ledger-v2') };
     })()`);
     ok('committing returns control to the island', committed.hidden && !committed.writing && !committed.locked, committed);
     ok('the ledger stores one normalized line, not raw input', committed.mark?.t === 'Hold fast' && committed.mark.r === 1, committed.mark);
@@ -90,7 +90,7 @@ export default async function (h) {
 
     // The ledger outlives the save. Remove only the save, reload, and the shore must
     // still remember; localstack keeps this test forever away from production.
-    await h.evaluate(`localStorage.removeItem('abyme-save-v1'); 1`);
+    await h.evaluate(`localStorage.removeItem('abyme-save'); 1`);
     await h.navigate(URL); await ready();
     const reloaded = await h.evaluate(`(() => {
       document.getElementById('btn-begin').click();

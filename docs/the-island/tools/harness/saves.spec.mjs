@@ -1,88 +1,98 @@
-// saves.spec.mjs (#140, AAA-C2) — the save schema's contract, testable in bare node
-// because save-schema.js is deliberately dependency-free. Covers: every migration
-// step, a REAL captured full-progress v3 fixture, forward/unknown fields, corrupt
-// payloads, and the pack→apply round trip. world.js's storage boundary (the corrupt
-// stash, the fresh-start path) is exercised browser-side by walk.mjs's restore
-// branch + verify140 — this spec owns the pure layer.
-import { readFileSync } from 'node:fs';
-import { migrateSave, applySave, packSave, SAVE_VERSION, SAVE_FIELDS } from '../../js/save-schema.js';
+// saves.spec.mjs — the one current save contract.
+import { applySave, packSave, SAVE_VERSION, SAVE_KEY, SAVE_FLAG_DEFAULTS, SAVE_FIELDS } from '../../js/save-schema.js';
 
-const FIX = new URL('./fixtures/', import.meta.url).pathname;
 let pass = 0;
 const fails = [];
 const ok = (name, cond) => (cond ? pass++ : fails.push(name));
-
-// a minimal W with the schema-relevant default shapes (the contract surface —
-// apply() merges flags/recDisp INTO these, everything else lands whole)
 const freshW = () => ({
   time: 7.4, tide: 1, tideTarget: 1, lensPlaced: false, beamAngle: 2.2,
-  flags: { introDone: false, chestOpen: false, rulerTaken: false, carried: false },
-  stems: 0, inventory: [], recDisp: {}, journal: [], onceKeys: [], readKeys: [],
+  disposition: 'tend',
+  flags: {
+    introDone: false, dove: false, returned: false, hatchCodeDecoded: false, hatchOpen: false,
+    upstreamHandSurged: false, upstreamHandWitnessed: false, registerRead: false, lowerHandRegarded: false,
+    dispositionChosen: false, endingCommitted: false,
+  },
+  stems: 0, inventory: [], recDisp: {},
+  notebook: { entries: [], hintLevels: {} }, onceKeys: [],
   dials: [0, 0, 0, 0], playerPos: null, playerLook: null, level: 1,
-  regions: { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] },
+  regions: { l2seen: false, l3seen: false, l4seen: false },
 });
 
-// ---- migration steps -----------------------------------------------------------
-// v1: no version int, ruler taken but chestOpen never persisted → inferred true
-const v1 = { flags: { rulerTaken: true }, level: 2, stems: 2 };
-const m1 = migrateSave(JSON.parse(JSON.stringify(v1)));
-ok('v1→ chestOpen inferred', m1.flags.chestOpen === true);
-ok('v1→ data carried', m1.level === 2 && m1.stems === 2);
+ok('current contract is payload v2', SAVE_VERSION === 2);
+ok('there is one canonical storage key', SAVE_KEY === 'abyme-save');
+ok('unversioned data rejected', applySave(freshW(), { flags: {} }) === false);
+ok('wrong payload version rejected', applySave(freshW(), { v: 3, journal: [] }) === false);
+ok('previous development payload rejected', applySave(freshW(), { v: 1, flags: {} }) === false);
 
-// a v1 save WITHOUT the ruler must not gain the chest
-ok('v1 no-ruler untouched', migrateSave({ flags: {} }).flags.chestOpen === undefined);
+const original = freshW();
+original.time = 17.6;
+original.tideTarget = 1.65;
+original.lensPlaced = true;
+original.disposition = 'open';
+original.flags.hatchCodeDecoded = true;
+original.flags.hatchOpen = true;
+original.flags.upstreamHandSurged = true;
+original.flags.upstreamHandWitnessed = true;
+original.flags.registerRead = true;
+original.flags.lowerHandRegarded = true;
+original.flags.dispositionChosen = true;
+original.notebook.entries = [
+  { id: 'evidence.beam-glyphs', args: { glyphs: [1, 5, 3, 4] } },
+  { id: 'artifact.signal-shelf.surface' },
+];
+original.notebook.hintLevels = { 'signal-hatch': 2 };
+original.dials = [5, 1, 4, 6];
+original.level = 4;
+original.regions = { l2seen: true, l3seen: true, l4seen: true };
 
-// v2: full flags always written; contiguous chain to current
-const v2 = { v: 2, flags: { rulerTaken: true, chestOpen: false }, level: 3 };
-ok('v2 flags respected (no re-inference)', migrateSave(v2).flags.chestOpen === false);
+const packed = JSON.parse(JSON.stringify(packSave(original, {
+  pos: { x: 1, y: 2, z: 3 }, yaw: 0.5, pitch: -0.1,
+})));
+ok('pack stamps the current contract', packed.v === 2);
+ok('payload contains every declared field', Object.keys(packed).filter((k) => k !== 'v')
+  .every((key) => SAVE_FIELDS.some((field) => field.key === key)));
+ok('payload contains exactly the current flag shape',
+  JSON.stringify(Object.keys(packed.flags)) === JSON.stringify(Object.keys(SAVE_FLAG_DEFAULTS)));
+ok('payload omits rendered journal prose', !('journal' in packed));
+ok('payload omits lore read keys', !('readKeys' in packed));
+ok('regions omit fragment bookkeeping', !('fragmentsFound' in packed.regions));
 
-// ---- the real thing: a captured full-progress v3 payload ------------------------
-const full = JSON.parse(readFileSync(FIX + 'v3-full.json', 'utf8'));
-ok('fixture is current version', full.v === SAVE_VERSION);
-{
-  const W = freshW();
-  applySave(W, JSON.parse(JSON.stringify(full)));
-  ok('full: deep progress lands', W.level >= 1 && W.flags.returned === true);
-  // the canonical fixture is the walk's end-state: the P9 bell branch restores the
-  // pre-Wind snapshot, so three rounds are true and Wind is legitimately absent
-  ok('full: rounds persisted', W.flags.roundMoor === true && W.flags.roundLight === true);
-  ok('full: record dispositions persisted', W.recDisp.commendation_copy === 'filed' && W.recDisp.closure_notice === 'kept');
-  ok('full: journal survives', Array.isArray(W.journal) && W.journal.length > 20);
-  ok('full: once-keys survive', W.onceKeys.includes('eraThreshold'));
-}
+const restored = freshW();
+ok('current payload applies', applySave(restored, packed) === true);
+ok('notebook ids and args survive', JSON.stringify(restored.notebook.entries) === JSON.stringify(original.notebook.entries));
+ok('requested hint tier survives', restored.notebook.hintLevels['signal-hatch'] === 2);
+ok('one solved hatch state survives', restored.flags.hatchCodeDecoded && restored.flags.hatchOpen
+  && JSON.stringify(restored.dials) === '[5,1,4,6]');
+ok('new progression flags survive', restored.flags.upstreamHandSurged
+  && restored.flags.lowerHandRegarded && restored.flags.dispositionChosen);
+ok('disposition survives', restored.disposition === 'open');
+ok('position and view survive', JSON.stringify(restored.playerPos) === '[1,2,3]' && JSON.stringify(restored.playerLook) === '[0.5,-0.1]');
 
-// ---- forward-compat + partials --------------------------------------------------
-{
-  const W = freshW();
-  applySave(W, { v: SAVE_VERSION, futureField: { anything: true }, flags: { introDone: true } });
-  ok('unknown future field ignored', !('futureField' in W));
-  ok('partial payload: defaults hold', W.level === 1 && W.stems === 0 && W.flags.carried === false);
-  ok('partial payload: given fields land', W.flags.introDone === true);
-}
+const malformed = freshW();
+applySave(malformed, {
+  v: 2,
+  flags: { introDone: true, valveTurned: 'yes', retiredFlag: true },
+  inventory: ['lens', 'lens', 'retired-item', 'phial'],
+  recDisp: { field_slip: 'kept', closure_notice: 'burned', retired_record: 'carried' },
+  notebook: { entries: [{ id: 'evidence.valve' }, { id: 'evidence.valve' }, null] },
+  dials: [3, 99, -1, 5],
+});
+ok('duplicate note ids normalize', JSON.stringify(malformed.notebook.entries) === '[{"id":"evidence.valve"}]');
+ok('bad numerals normalize independently', JSON.stringify(malformed.dials) === '[3,0,0,5]');
+ok('flags accept only current boolean fields', malformed.flags.introDone === true
+  && malformed.flags.valveTurned === false && !('retiredFlag' in malformed.flags));
+ok('inventory accepts only current unique ids', JSON.stringify(malformed.inventory) === '["lens","phial"]');
+ok('record dispositions accept only current ids and states',
+  JSON.stringify(malformed.recDisp) === '{"field_slip":"kept"}');
 
-// ---- corrupt payloads must not throw and must leave defaults --------------------
-for (const [name, junk] of [['null', null], ['number', 17], ['string', 'junk'], ['array', [1, 2]], ['empty', {}]]) {
-  const W = freshW();
-  let threw = false;
-  try { applySave(W, junk); } catch (_) { threw = true; }
-  ok(`corrupt ${name}: no throw + defaults`, !threw && W.level === 1 && W.flags.introDone === false);
-}
-
-// ---- round trip -----------------------------------------------------------------
-{
-  const W = freshW();
-  applySave(W, JSON.parse(JSON.stringify(full)));
-  const packed = packSave(W, { pos: { x: 1, y: 2, z: 3 }, yaw: 0.5, pitch: -0.1 });
-  const W2 = freshW();
-  applySave(W2, JSON.parse(JSON.stringify(packed)));
-  ok('round trip: version stamped', packed.v === SAVE_VERSION);
-  ok('round trip: flags stable', JSON.stringify(W2.flags) === JSON.stringify(W.flags));
-  ok('round trip: recDisp stable', JSON.stringify(W2.recDisp) === JSON.stringify(W.recDisp));
-  ok('round trip: journal length stable', W2.journal.length === W.journal.length);
-}
-
-ok('field table covers the fixture', Object.keys(full).filter((k) => k !== 'v')
-  .every((k) => SAVE_FIELDS.some((f) => f.key === k)));
+const polluted = freshW();
+polluted.flags.retiredFlag = true;
+polluted.inventory = ['plumb', 'retired-item', 'plumb'];
+polluted.recDisp = { transfer_offer: 'filed', mystery: 'carried' };
+const cleaned = packSave(polluted);
+ok('packing strips state outside the current contract', !('retiredFlag' in cleaned.flags)
+  && JSON.stringify(cleaned.inventory) === '["plumb"]'
+  && JSON.stringify(cleaned.recDisp) === '{"transfer_offer":"filed"}');
 
 console.log(`SAVES ${pass} / ${pass + fails.length}`);
 if (fails.length) { console.log('FAILURES:', JSON.stringify(fails)); process.exit(1); }

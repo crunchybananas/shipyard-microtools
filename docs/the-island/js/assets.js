@@ -1,8 +1,8 @@
-// assets.js — the single front door for every generated ASSET file (textures,
-// voice, music, meshes). One MANIFEST is the one place that knows each asset's
-// file, byte size, LICENSE and provenance (which model + prompt made it); one
-// loader applies the right settings and CACHES, so nothing loads twice and an
-// async load can never race a material clone (the iter-82 bug).
+// assets.js — the single front door for every generated WebGL texture. MANIFEST
+// records each Three.js texture's file, byte size, license and provenance; one
+// loader applies sampler settings and caches uploads, so nothing loads twice and
+// an async load can never race a material clone. CSS-native UI textures are the
+// intentional exception and are inventoried in ASSETS.md.
 //
 // Why this exists: ABYME pivoted from "everything is math" to a rich, asset-driven
 // world (the tag abyme-pure-math-v1 marks the old era). As asset volume grows we
@@ -14,8 +14,8 @@ import * as THREE from 'three';
 
 const BASE = 'assets/';
 
-// Every shippable asset is declared here ONCE.
-//   kind:    'texture' | 'voice' | 'music' | 'mesh'
+// Every shippable WebGL texture is declared here ONCE.
+//   kind:    'texture'
 //   license + source + prompt: the provenance ledger (drives the asset-honesty
 //            line and any future credits; `prompt` is the abstract, no-biography
 //            generation prompt — see ASSETS.md).
@@ -24,20 +24,14 @@ export const MANIFEST = {
   // #138 (AAA-B4): TRUE relief heightmaps — grayscale height, not albedo. The Sobel
   // in buildNormalFromImage reads luminance, so feeding it real height yields real
   // geometric normals (ripples/strata/furrows) instead of color-edge guesses.
-  sand_height: {
-    kind: 'texture', file: 'sand_height.png', bytes: 224256,
-    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell (asset.texture.generate, seed 21)',
-    prompt: 'macro photograph of wind-rippled beach sand from directly above, parallel ripples, overcast diffuse light',
-    wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
-  },
   rock_height: {
-    kind: 'texture', file: 'rock_height.png', bytes: 212992,
+    kind: 'texture', file: 'rock_height.png', bytes: 213084,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell (asset.texture.generate, seed 11)',
     prompt: 'seamless tileable grayscale height map of weathered layered rock, strata bedding, cracks',
     wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
   },
   bark_height: {
-    kind: 'texture', file: 'bark_height.png', bytes: 197632,
+    kind: 'texture', file: 'bark_height.png', bytes: 198290,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell (asset.texture.generate, seed 5)',
     prompt: 'seamless tileable grayscale height map of pine bark, deep vertical furrows, ridged plates',
     wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
@@ -88,22 +82,6 @@ export const MANIFEST = {
     prompt: 'seamless tileable aged conifer bark, deep vertical grooves, weathered grey-brown, top-down',
     wrap: 'repeat', repeat: [1, 3], colorSpace: 'srgb', anisotropy: 4,
   },
-  // the beach SAND + dune GRASS. NOTE (loop #152): the terrain USED to sample these object-space as a
-  // luminance multiply, but their ~1.18m tile read as a pock-mark GRID (owner-flagged); #152 replaced
-  // that with continuous PROCEDURAL grain + a wind-ripple normal bump, so the terrain no longer loads
-  // either texture. Kept in the manifest for provenance / possible reuse (currently unreferenced).
-  sand: {
-    kind: 'texture', file: 'sand.jpg', bytes: 58051,
-    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
-    prompt: 'seamless tileable fine beach sand, gentle wind ripples, pale warm grains, tiny shell flecks, top-down',
-    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
-  },
-  dunegrass: {
-    kind: 'texture', file: 'dunegrass.jpg', bytes: 103707,
-    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
-    prompt: 'seamless tileable dry coastal dune grass and pale scrub over sandy soil, top-down',
-    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
-  },
   // the shoreline FOAM lace — sampled in the water shader's foam band for animated structure
   // (shaders.js makeWaterMaterial; gated by the clone `mini`).
   foam: {
@@ -133,28 +111,6 @@ export const MANIFEST = {
     prompt: 'seamless tileable calm sea water surface, gentle wavelets and soft caustic dapple, top-down',
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
   },
-  // the shore boulders — NATURAL cracked granite (no masonry seams, unlike the lighthouse 'stone'),
-  // on the rocks InstancedMesh via applyRelief (albedo + derived normal so the cracks catch light).
-  rock: {
-    kind: 'texture', file: 'rock.jpg', bytes: 149380,
-    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
-    prompt: 'seamless tileable natural weathered granite boulder, cracked rough stone, lichen flecks, no block seams, top-down',
-    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
-  },
-  // two more boulder stones so the shore rocks aren't all one granite (the rocks split into 3
-  // InstancedMeshes by a positional hash in props.js — granite + basalt + limestone).
-  basalt: {
-    kind: 'texture', file: 'rock_basalt.jpg', bytes: 120063,
-    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
-    prompt: 'seamless tileable dark basalt boulder, angular fractured volcanic stone, charcoal grey, sparse lichen, no seams, top-down',
-    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
-  },
-  limestone: {
-    kind: 'texture', file: 'rock_limestone.jpg', bytes: 124050,
-    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
-    prompt: 'seamless tileable pale weathered limestone boulder, soft rounded eroded stone, cream-grey, moss patches, no seams, top-down',
-    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
-  },
   // the tree-top canopy — a STYLIZED painterly foliage, sampled object-space in the canopy shader
   // (no UVs) as a subtle luminance multiply to break the flat uniform green. Kept low-detail.
   foliage: {
@@ -163,32 +119,10 @@ export const MANIFEST = {
     prompt: 'seamless tileable stylized painterly pine canopy foliage, soft dabbed needle clusters, gentle value variation, low detail',
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
   },
-
-  // the keeper's voice — bm_george (Kokoro-82M), generated on Bender, transcoded to
-  // mono 24 kHz mp3, played through the drowned bus (audio.js say()). `prompt` is the
-  // spoken line (provenance). Lazy-loaded by id when the keeper first speaks at depth.
-  keeper_arrive_shallow: { kind: 'voice', file: 'voice/keeper_arrive_shallow.mp3', bytes: 20205, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: 'Oh. You came down too.' },
-  keeper_arrive_deep:    { kind: 'voice', file: 'voice/keeper_arrive_deep.mp3',    bytes: 22125, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: 'There is no bottom. I looked.' },
-  keeper_look_3:         { kind: 'voice', file: 'voice/keeper_look_3.mp3',         bytes: 15981, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: 'Oh. Not again.' },
-  keeper_look_4:         { kind: 'voice', file: 'voice/keeper_look_4.mp3',         bytes: 28269, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "You're faster than I was. Don't be proud of it." },
-  keeper_farewell:       { kind: 'voice', file: 'voice/keeper_farewell.mp3',       bytes: 32685, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "Go on up. Don't leave the light on for me. I never could." },
-  keeper_there_you_are:  { kind: 'voice', file: 'voice/keeper_there_you_are.mp3',  bytes: 26733, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "There you are. I've been coming down for you." },
-
-  // the era music — five looping DARK ambient stems, one per descent level (the color-psychology
-  // arc made HEARD, now lower + heavier per owner note: "much longer + darker tone"). Each is an
-  // EVOLVING ~20s bed: two distinct ACE-Step clips A→B crossfaded (the model caps a single gen at
-  // 12s, so we stitch for length + variation), motif E-G-A-D-C. Crossfaded by W.level in audio.js,
-  // decoded lazily (current + adjacent) via keepOnlyAudio. mono 32kHz mp3.
-  music_l1: { kind: 'music', file: 'music/music_l1.mp3', bytes: 240669, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'slow dark ambient, low cello + sub-bass, distant piano motif & foghorn, melancholy dusk — the surface (L1)' },
-  music_l2: { kind: 'music', file: 'music/music_l2.mp3', bytes: 240669, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'uneasy detuned dark ambient, bent low strings, sodium-lamp false warmth turning cold (L2)' },
-  music_l3: { kind: 'music', file: 'music/music_l3.mp3', bytes: 240669, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'submerged queasy dark ambient, muffled groaning hull + whale-low brass, airless (L3)' },
-  music_l4: { kind: 'music', file: 'music/music_l4.mp3', bytes: 240669, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'cold lonely abyssal ambient, vast sub-bass drone + rare sonar ping, isolation (L4)' },
-  music_l5: { kind: 'music', file: 'music/music_l5.mp3', bytes: 240669, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'desolate near-silent ambient, one low note in immense quiet, the bottom of grief (L5)' },
 };
 
 const _texCache = new Map();   // id -> THREE.Texture (shared)
 const _normCache = new Map();  // id -> THREE.DataTexture (a normal map DERIVED from the albedo, shared)
-const _bufCache = new Map();   // id -> Promise<AudioBuffer>
 const _loader = new THREE.TextureLoader();
 
 const COLORSPACE = { srgb: THREE.SRGBColorSpace, linear: THREE.LinearSRGBColorSpace };
@@ -327,8 +261,9 @@ export function applyRelief(material, id, opts = {}) {
   material.normalScale = new THREE.Vector2(ns, ns);
   if (opts.roughness != null) material.roughness = opts.roughness;
   // #138: when a TRUE heightmap asset exists, derive the normal from IT instead of
-  // the albedo's color-luminance (opts.normalFrom = the height asset id). The albedo
-  // (if any) still comes from `id`; only the relief source changes.
+  // the albedo's color-luminance (opts.normalFrom = the height asset id). For a
+  // relief-only material, `id` itself is the relief source and no unused albedo is
+  // fetched merely to satisfy this helper's signature.
   const nid = opts.normalFrom || id;
   getTexture(nid, (t) => {
     if (!t.image) return;
@@ -344,11 +279,12 @@ export function applyRelief(material, id, opts = {}) {
     material.needsUpdate = true;
     RELIEF.applied++;
   });
-  const tex = getTexture(id, () => { material.needsUpdate = true; });
   // #48: `colorMap: false` = RELIEF-ONLY — the derived normal carries the surface and the
   // base colour stays flat (the house position: normal maps yes, tiled colour never — a
   // tiled albedo is what pixelates at arm's length and reads as cracked mud).
-  if (opts.colorMap !== false) material.map = tex;
+  if (opts.colorMap !== false) {
+    material.map = getTexture(id, () => { material.needsUpdate = true; });
+  }
   material.needsUpdate = true;
   return material;
 }
@@ -362,32 +298,4 @@ export function getDerivedNormal(id, strength, cb) {
     if (!nt) { nt = buildNormalFromImage(t.image, strength); _normCache.set(id, nt); }
     cb(nt);
   });
-}
-
-// Decode an audio asset (voice/music) to an AudioBuffer via the given AudioContext.
-// Cached by id — the PROMISE is cached, so concurrent callers share one fetch+decode.
-// audio.js uses this for the keeper's voice and the era music stems (lazy by level).
-export function loadAudioBuffer(id, ctx) {
-  if (_bufCache.has(id)) return _bufCache.get(id);
-  const a = MANIFEST[id];
-  if (!a || (a.kind !== 'voice' && a.kind !== 'music')) throw new Error(`asset "${id}" is not audio in the manifest`);
-  const p = fetch(assetPath(id))
-    .then((r) => { if (!r.ok) throw new Error(`asset "${id}" → HTTP ${r.status}`); return r.arrayBuffer(); })
-    .then((buf) => ctx.decodeAudioData(buf));
-  _bufCache.set(id, p);
-  return p;
-}
-
-// Evict a decoded audio buffer from the cache so its PCM can be GC'd once no BufferSource
-// references it. Voice is one-shot + depth-gated, so audio.js drops each clip when it finishes
-// playing (a rare replay just re-fetches + re-decodes — cheap). The Promise-dedupe cache itself
-// stays — it is the iter-82 race fix; we only make entries evictable, never remove the cache.
-export function evictAudio(id) { _bufCache.delete(id); }
-
-// Keep ONLY the given audio ids cached, evicting the rest — for the era music stems' bounded
-// working set (current level + adjacent), called at the W.level transitions. Born bounded so the
-// 5 long music loops never all sit decoded at once.
-export function keepOnlyAudio(ids) {
-  const keep = ids instanceof Set ? ids : new Set(ids);
-  for (const id of _bufCache.keys()) if (!keep.has(id)) _bufCache.delete(id);
 }

@@ -26,7 +26,7 @@ const CORE = new Set([
   'trade.js', 'wonder.js', 'scenarios.js', 'missions.js', 'sim.js',
   'commands.js', 'bus.js', 'log.js', 'fx.js', 'avatar.js', 'military.js',
   'story.js', 'raid-summary.js', 'first-muster.js', 'post-raid-recovery.js',
-  'raid-targeting.js',
+  'raid-targeting.js', 'raid-planner.js', 'raid-intelligence.js', 'logistics.js',
   'building-lifecycle.js', 'building-operation.js', 'citizen-ownership.js',
   'building-inventory.js', 'building-use.js', 'army-orders.js', 'residences.js',
   'workforce-policy.js', 'death-markers.js', 'company-supply.js',

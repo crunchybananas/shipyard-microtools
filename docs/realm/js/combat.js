@@ -2,34 +2,69 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=197';
-import { depositFoodAcrossStores, withdrawFood } from './building-inventory.js?realm=197';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng } from './state.js?realm=198';
+import {
+  PHYSICAL_RESOURCE_KEYS,
+  depositResourceAcrossStores,
+  withdrawFood,
+  withdrawResource,
+} from './building-inventory.js?realm=198';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
 // Wells still auto-douse (economy.updateFires), so placement matters.
 const RAID_FLAMMABLE = new Set(['house', 'tavern', 'bakery', 'lumber', 'windmill', 'farm', 'granary', 'storehouse']);
 
-// A raider sacks only the physical food inside the structure being struck.
-// Empty walls no longer conjure abstract gold/wood from the realm wallet, and
-// plunder progress advances only for goods that actually enter the loot bag.
-export function plunderBuildingFood(e, building, requested = 2) {
+const RAID_SUPPLY_PLUNDER_ORDER = Object.freeze(['food', 'flour', 'wheat']);
+
+function assertPlunderRequest(e, requested) {
   if (!e || !Number.isSafeInteger(requested) || requested < 0) {
     throw new TypeError('Raider plunder requires an enemy and a non-negative safe integer amount.');
   }
-  const result = withdrawFood(building, requested, G);
-  const stole = result.taken;
+}
+
+function recordPlunder(e, resource, stole) {
   if (stole > 0) {
     e.plundered = (e.plundered || 0) + stole;
     e.loot = e.loot || {};
-    e.loot.food = (e.loot.food || 0) + stole;
+    e.loot[resource] = (e.loot[resource] || 0) + stole;
     G._raidStolen = G._raidStolen || {};
-    G._raidStolen.food = (G._raidStolen.food || 0) + stole;
+    G._raidStolen[resource] = (G._raidStolen[resource] || 0) + stole;
   }
+}
+
+function showPlunderCue(e, stole) {
   if (stole > 0 && visualJitter(e.x, e.y, 301) < 0.35) {
     G.particles.push({ tx: e.x, ty: e.y, offsetY: -18, text: '💰', alpha: 1.1, vy: -0.14, decay: 0.02, type: 'text' });
   }
+}
+
+// Compatibility entrypoint for food-specific sinks and focused tests.
+export function plunderBuildingFood(e, building, requested = 2) {
+  assertPlunderRequest(e, requested);
+  const stole = withdrawFood(building, requested, G).taken;
+  recordPlunder(e, 'food', stole);
+  showPlunderCue(e, stole);
   return stole;
+}
+
+// A raid hit sacks only goods physically present in the struck structure.
+// Finished rations go first, then flour and wheat. Empty walls and workshops
+// can never conjure loot from the realm-wide compatibility mirrors.
+export function plunderBuildingSupplies(e, building, requested = 2) {
+  assertPlunderRequest(e, requested);
+  let remainder = requested;
+  let total = 0;
+  for (const resource of RAID_SUPPLY_PLUNDER_ORDER) {
+    if (remainder <= 0) break;
+    const stole = withdrawResource(building, resource, remainder, G).taken;
+    if (stole <= 0) continue;
+    recordPlunder(e, resource, stole);
+    total += stole;
+    remainder -= stole;
+  }
+  showPlunderCue(e, total);
+  return total;
 }
 function maybeIgnite(b, notifyFn) {
   if (b.onFire || !RAID_FLAMMABLE.has(b.type)) return;
@@ -65,13 +100,24 @@ function closeRaidStolenLedger(outcome) {
 function clearRaidApproachWhenEmpty() {
   if (G.enemies.length === 0) G._raidSide = null;
 }
-import { stepEntityToward } from './pathfinding.js?realm=197';
-import { spawnClashFX, visualJitter } from './fx.js?realm=197';
-import { raidTargetForIndex } from './raid-targeting.js?realm=197';
+import { stepEntityToward } from './pathfinding.js?realm=198';
+import { spawnClashFX, visualJitter } from './fx.js?realm=198';
+import { raidTargetForIndex } from './raid-targeting.js?realm=198';
+import {
+  RAID_BREACH_DAMAGE_PER_TICK,
+  clearRaidRoute,
+  raidIntentBreach,
+  raidIntentTarget,
+  raidRouteNeedsReplan,
+  replanRaidRoute,
+  routeRaidBandToNearestEdge,
+  routeRaiderToNearestEdge,
+} from './raid-intelligence.js?realm=198';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
+const PHYSICAL_RESOURCE_KEY_SET = new Set(PHYSICAL_RESOURCE_KEYS);
 
 function assignedRaidTarget(enemy) {
   const x = Math.round(enemy.tx), y = Math.round(enemy.ty);
@@ -96,20 +142,176 @@ function ensureRaidTarget(enemy) {
   enemy.ty = target.y;
   return target;
 }
-import { sfx as playSound } from './log.js?realm=197';
-import { removeBuilding } from './building-lifecycle.js?realm=197';
-import { announce as notify } from './log.js?realm=197';
-import { chronicle } from './log.js?realm=197';
-import { recordDeathMarker } from './death-markers.js?realm=197';
+import { sfx as playSound } from './log.js?realm=198';
+import { removeBuilding } from './building-lifecycle.js?realm=198';
+import { announce as notify } from './log.js?realm=198';
+import { chronicle } from './log.js?realm=198';
+import { recordDeathMarker } from './death-markers.js?realm=198';
 import {
   removeCitizenFromWorld,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=197';
+} from './citizen-ownership.js?realm=198';
 import {
   citizenHasValidResidence,
   citizenIsIndoors,
-} from './residences.js?realm=197';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=197';
+} from './residences.js?realm=198';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=198';
+
+function plannedRaidCellOpen(x, y) {
+  if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) return false;
+  const terrain = G.map?.[y]?.[x];
+  if (terrain === TILE.WATER || terrain === TILE.MOUNTAIN || terrain === undefined) return false;
+  const building = G.buildingGrid?.[y]?.[x];
+  return !building || building.type === 'road';
+}
+
+function strikeRaidBlocker(enemy, building, jitterChannel) {
+  building.hp -= RAID_BREACH_DAMAGE_PER_TICK;
+  maybeIgnite(building, notify);
+  if (G.gameTick % 40 === 0) {
+    plunderBuildingSupplies(enemy, building, 2);
+    if (raidBandHasItsLoot()) withdrawRaidBand('loot');
+  }
+  if (G.gameTick % 30 === 0) {
+    G.particles.push({
+      tx: building.x,
+      ty: building.y,
+      offsetY: -6,
+      text: null,
+      alpha: 0.9,
+      vx: (visualJitter(building.x, building.y, jitterChannel) - 0.5) * 0.3,
+      vy: -0.18,
+      decay: 0.06,
+      type: 'spark',
+      size: 1.2,
+      color: '#b9b9b9',
+    });
+  }
+  if (building.hp <= 0) removeBuilding(building, { cause: 'raid' });
+}
+
+function raidBandLootTotal() {
+  return Object.values(G._raidStolen || {}).reduce((sum, amount) => (
+    sum + (Number.isFinite(amount) && amount > 0 ? amount : 0)
+  ), 0);
+}
+
+function raidBandHasItsLoot() {
+  const goals = G.enemies
+    .filter(enemy => !enemy.retreating && Number.isFinite(enemy.plunderGoal) && enemy.plunderGoal > 0)
+    .map(enemy => enemy.plunderGoal);
+  return goals.length > 0 && raidBandLootTotal() >= Math.min(...goals);
+}
+
+function withdrawRaidBand(reason) {
+  const withdrew = routeRaidBandToNearestEdge(G);
+  if (withdrew === 0) return false;
+  G._raidSpawnCount = 0;
+  const message = reason === 'morale'
+    ? 'The raiders break and flee!'
+    : reason === 'loot'
+      ? 'The warband fills its carts and withdraws!'
+      : reason === 'blocked'
+        ? 'The warband finds no viable assault and withdraws.'
+        : 'The warband completes its objective and withdraws!';
+  notify(message, reason === 'morale' || reason === 'blocked' ? 'success' : 'event');
+  return true;
+}
+
+function refreshPlannedRaidTarget(enemy) {
+  if (!Array.isArray(enemy.raidPath) || !enemy.raidIntent) return null;
+  if (raidRouteNeedsReplan(enemy, G)) {
+    const plan = replanRaidRoute(enemy, G);
+    if (!plan) {
+      withdrawRaidBand('blocked');
+      return null;
+    }
+  }
+  return raidIntentTarget(enemy, G);
+}
+
+function advancePlannedRaidRoute(enemy, target, speed) {
+  const path = enemy.raidPath;
+  if (!Array.isArray(path) || path.length === 0 || !Number.isSafeInteger(enemy.raidPathIdx)) {
+    enemy.raidPlanEpoch = -1;
+    return 'invalid';
+  }
+  while (enemy.raidPathIdx < path.length) {
+    const point = path[enemy.raidPathIdx];
+    if (!point || !Number.isSafeInteger(point.x) || !Number.isSafeInteger(point.y)) {
+      enemy.raidPlanEpoch = -1;
+      return 'invalid';
+    }
+    if (Math.hypot(point.x - enemy.x, point.y - enemy.y) > 0.2) break;
+    enemy.x = point.x;
+    enemy.y = point.y;
+    enemy.raidPathIdx++;
+  }
+  if (enemy.raidPathIdx >= path.length) {
+    if (Math.hypot(target.x - enemy.x, target.y - enemy.y) <= 1.6) return 'arrived';
+    enemy.raidPlanEpoch = -1;
+    return 'invalid';
+  }
+
+  const waypoint = path[enemy.raidPathIdx];
+  const blocker = G.buildingGrid?.[waypoint.y]?.[waypoint.x] || null;
+  if (blocker && blocker.type !== 'road' && blocker.hp > 0) {
+    const plannedBreach = raidIntentBreach(enemy, G, waypoint.x, waypoint.y);
+    if (plannedBreach !== blocker) {
+      // Topology changed without a matching epoch, or the route surface was
+      // corrupted. Never opportunistically hit an unplanned structure.
+      enemy.raidPlanEpoch = -1;
+      return 'invalid';
+    }
+    const tileX = Math.round(enemy.x);
+    const tileY = Math.round(enemy.y);
+    if (Math.max(Math.abs(waypoint.x - tileX), Math.abs(waypoint.y - tileY)) <= 1) {
+      strikeRaidBlocker(enemy, blocker, 302);
+      return 'breaching';
+    }
+  }
+
+  const currentX = Math.round(enemy.x);
+  const currentY = Math.round(enemy.y);
+  const currentTerrain = G.map?.[currentY]?.[currentX];
+  const waypointTerrain = G.map?.[waypoint.y]?.[waypoint.x];
+  const approachingLandfall = currentTerrain === TILE.WATER || waypointTerrain === TILE.WATER;
+  const approachCellOpen = (x, y) => {
+    const terrain = G.map?.[y]?.[x];
+    if (terrain === TILE.WATER) return !G.buildingGrid?.[y]?.[x];
+    return plannedRaidCellOpen(x, y);
+  };
+  const moved = stepEntityToward(
+    enemy,
+    waypoint.x,
+    waypoint.y,
+    speed,
+    approachingLandfall ? approachCellOpen : plannedRaidCellOpen,
+  );
+  if (!moved) {
+    enemy.raidPlanEpoch = -1;
+    return 'invalid';
+  }
+  return 'moving';
+}
+
+function attackRaidTarget(enemy, target) {
+  enemy.attackTimer = (enemy.attackTimer || 0) - 1;
+  if (enemy.attackTimer > 0) return false;
+  enemy.attackTimer = 55;
+  target.hp -= enemy.damage || 7;
+  maybeIgnite(target, notify);
+  plunderBuildingSupplies(enemy, target, 2);
+  if (target.hp <= 0) {
+    removeBuilding(target, { cause: 'raid' });
+    // One strategic sack satisfies the whole band's bounded ambition. Named
+    // route breaches remain non-terminal in strikeRaidBlocker().
+    withdrawRaidBand('objective');
+  } else if (raidBandHasItsLoot()) {
+    withdrawRaidBand('loot');
+  }
+  return true;
+}
 
 function detachProjectileTargets(enemy) {
   let snapshot = null;
@@ -132,15 +334,15 @@ function resolveEnemyDeathAt(index) {
   if (G.namedCharacters?.rival) {
     G.resources.gold += 5;
   }
-  // Slain raiders recover only as much food as still fits in a live store.
-  // Overflow remains lost; it never reappears in the compatibility wallet.
+  // Slain raiders recover physical supplies only into compatible live stores.
+  // Overflow remains lost; it never reappears in a compatibility mirror.
   if (e.loot) {
     let dropped = 0;
     for (const [k, v] of Object.entries(e.loot)) {
-      const recovered = k === 'food'
-        ? depositFoodAcrossStores(v, { origin: e, state: G }).accepted
+      const recovered = PHYSICAL_RESOURCE_KEY_SET.has(k)
+        ? depositResourceAcrossStores(k, v, { origin: e, state: G }).accepted
         : v;
-      if (k !== 'food') G.resources[k] = (G.resources[k] || 0) + recovered;
+      if (!PHYSICAL_RESOURCE_KEY_SET.has(k)) G.resources[k] = (G.resources[k] || 0) + recovered;
       if (G._raidStolen?.[k]) G._raidStolen[k] = Math.max(0, G._raidStolen[k] - recovered);
       dropped += recovered;
     }
@@ -171,28 +373,23 @@ export function updateEnemies() {
   // raider can neither take a turn nor remain in the fighting count.
   for (let i = G.enemies.length - 1; i >= 0; i--) resolveEnemyDeathAt(i);
 
-  // Morale break: when a raid has lost more than 60% of its fighters, the
-  // survivors break and flee — raids resolve with drama instead of a grind.
+  // Morale counts actual deaths, never comrades already withdrawing with
+  // loot. Exactly 60% holds; only losses beyond that line break survivors.
   if (G._raidSpawnCount && G.gameTick % 60 === 0) {
-    const fighting = G.enemies.filter(e => !e.retreating).length;
-    if (fighting > 0 && fighting <= Math.ceil(G._raidSpawnCount * 0.4)) {
-      for (const e of G.enemies) {
-        if (e.retreating) continue;
-        e.retreating = true;
-        const dxEdge = Math.min(e.x, MAP_W - 1 - e.x) <= Math.min(e.y, MAP_H - 1 - e.y);
-        e.tx = dxEdge ? (e.x < MAP_W / 2 ? 0 : MAP_W - 1) : e.x;
-        e.ty = dxEdge ? e.y : (e.y < MAP_H / 2 ? 0 : MAP_H - 1);
-      }
-      G._raidSpawnCount = 0;
-      notify('The raiders break and flee!', 'success');
-    }
-    if (fighting === 0) G._raidSpawnCount = 0;
+    const killsStart = G.storyState?.raid?.killsStart;
+    const casualties = Number.isSafeInteger(killsStart)
+      ? Math.max(0, (G.stats?.enemiesKilled || 0) - killsStart)
+      : 0;
+    if (casualties * 5 > G._raidSpawnCount * 3) withdrawRaidBand('morale');
+    if (G.enemies.length === 0) G._raidSpawnCount = 0;
   }
   for (let i = G.enemies.length - 1; i >= 0; i--) {
     const e = G.enemies[i];
+    if (e.retreating && (e.raidPath || e.raidIntent)) clearRaidRoute(e);
     // Raiders fight back: engage the nearest soldier in reach instead of
     // walking through the battle line. Never overwrites e.tx/ty — the raid
     // target survives the skirmish.
+    let plannedTarget = null;
     if (!e.retreating) {
       if (e.engaged && (e.engaged.hp <= 0 || !G.soldiers.includes(e.engaged) ||
           Math.hypot(e.engaged.x - e.x, e.engaged.y - e.y) > MILCFG.disengage)) {
@@ -217,121 +414,75 @@ export function updateEnemies() {
         }
         continue; // locked in melee — no movement this tick
       }
-      // Preserve the assigned building through combat. A destroyed target is
-      // replaced deterministically before the next movement step; tx/ty are
-      // already part of the strict enemy save surface, so no new field is
-      // required.
-      ensureRaidTarget(e);
-    }
-    // Check if there's a wall in path — enemies must go around walls
-    const nx = Math.round(e.x), ny = Math.round(e.y);
-    const wall = G.buildingGrid[ny]?.[nx];
-    if (wall && wall.type === 'wall' && wall.hp > 0) {
-      // Attack wall instead of passing through
-      wall.hp -= 0.35;
-      maybeIgnite(wall, notify);
-      if (G.gameTick % 40 === 0) plunderBuildingFood(e, wall, 2);
-      if (G.gameTick % 30 === 0) {
-        G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (visualJitter(wall.x, wall.y, 302)-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
-      }
-      if (wall.hp <= 0) {
-        removeBuilding(wall, { cause: 'raid' });
-      }
-      continue; // don't move this tick
+      plannedTarget = refreshPlannedRaidTarget(e);
+      // Legacy/save fallback: enemies without the new bounded route surface
+      // retain the established static target and local movement contract.
+      if (!plannedTarget) ensureRaidTarget(e);
     }
 
-    // Move toward target — collision-checked; raiders batter what blocks them
-    const dx = e.tx - e.x, dy = e.ty - e.y;
-    const d = Math.sqrt(dx*dx + dy*dy);
-    if (d > 0.3) {
-      // Retreating raiders leave the map unobstructed (edge tiles can be
-      // water); advancing raiders respect footprints and siege blockers.
-      const raiderOpen = e.retreating
-        ? () => true
-        : (x, y) => { const bb = G.buildingGrid[y]?.[x]; return !bb || bb.type === 'road'; };
-      // Forced march far from town, combat pace once close; looted
-      // raiders sprint for the edge. Kills the 30-45s dead air between
-      // the horn and the fight without changing the battle itself.
-      const distC = Math.abs(e.x - MAP_W / 2) + Math.abs(e.y - MAP_H / 2);
-      const marchSpd = e.retreating ? 0.045 : (distC > 22 ? 0.05 : 0.02);
-      if (e.retreating && (e.plundered || 0) > 0 && G.gameTick % 90 === 0) {
-        G.particles.push({ tx: e.x, ty: e.y, offsetY: -16, text: '💰', alpha: 1.0, vy: -0.1, decay: 0.02, type: 'text' });
-      }
-      const moved = stepEntityToward(e, e.tx, e.ty, marchSpd, raiderOpen);
-      if (!moved && !e.retreating) {
-        // Blocked by a building — attack it (walls and everything else),
-        // so sieges resolve instead of raiders milling at the perimeter.
-        const bx = Math.round(e.x) + Math.sign(Math.round(e.tx) - Math.round(e.x));
-        const by = Math.round(e.y) + Math.sign(Math.round(e.ty) - Math.round(e.y));
-        const blocker = G.buildingGrid[by]?.[bx] || G.buildingGrid[Math.round(e.y)]?.[bx] || G.buildingGrid[by]?.[Math.round(e.x)];
-        if (blocker && blocker.hp > 0) {
-          blocker.hp -= 0.35;
-          maybeIgnite(blocker, notify);
-          if (G.gameTick % 40 === 0) plunderBuildingFood(e, blocker, 2);
-          if (G.gameTick % 30 === 0) {
-            G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (visualJitter(blocker.x, blocker.y, 303)-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
-          }
-          if (blocker.hp <= 0) removeBuilding(blocker, { cause: 'raid' });
-        } else {
-          // Boxed in with nothing to hit — take a deterministic one-tile
-          // sidestep while preserving tx/ty as the strategic target.
-          const side = ((G.gameTick + Math.max(0, G.enemies.indexOf(e))) & 1) ? 1 : -1;
-          stepEntityToward(e, e.x + side * 2, e.y, marchSpd, raiderOpen);
-        }
-      }
-    } else if (e.retreating) {
-      // Reached the retreat edge — gone, with whatever they carried.
-      detachProjectileTargets(e);
-      G.enemies.splice(i, 1);
-      clearRaidApproachWhenEmpty();
-      closeRaidStolenLedger('escape');
-      continue;
+    // Forced march far from town, combat pace once close; looted raiders
+    // retain their established retreat speed and unobstructed edge exit.
+    const distC = Math.abs(e.x - MAP_W / 2) + Math.abs(e.y - MAP_H / 2);
+    const marchSpd = e.retreating ? 0.045 : (distC > 22 ? 0.05 : 0.02);
+
+    if (!e.retreating && plannedTarget && Array.isArray(e.raidPath)) {
+      const routeAction = advancePlannedRaidRoute(e, plannedTarget, marchSpd);
+      if (routeAction === 'breaching') continue;
+      if (routeAction === 'arrived' && !attackRaidTarget(e, plannedTarget)) continue;
+      if (e.retreating) continue;
+      // `moving` and a one-tick invalidation both fall through to nearby
+      // citizen pressure. An invalid route replans exactly once next tick.
     } else {
-      // Arrived at the assigned building — attack it, then deterministically
-      // retarget if it was destroyed. Roads are never selected; walls are
-      // selected only when no other structure remains.
-      const targetBuilding = ensureRaidTarget(e);
-      const target = targetBuilding ? { b: targetBuilding } : null;
-      if (target) {
-        e.attackTimer = (e.attackTimer || 0) - 1;
-        if (e.attackTimer > 0) continue;
-        e.attackTimer = 55;
-        const dmg = e.damage || 7;
-        target.b.hp -= dmg;
-        maybeIgnite(target.b, notify);
-        plunderBuildingFood(e, target.b, 2);
-        if (target.b.hp <= 0) {
-          removeBuilding(target.b, { cause: 'raid' });
+      // Legacy movement remains the safe fallback for old saves and for the
+      // rare explicit snapshot that yields no route.
+      const nx = Math.round(e.x), ny = Math.round(e.y);
+      const wall = G.buildingGrid[ny]?.[nx];
+      if (wall && wall.type === 'wall' && wall.hp > 0) {
+        strikeRaidBlocker(e, wall, 302);
+        continue;
+      }
+
+      const dx = e.tx - e.x, dy = e.ty - e.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d > 0.3) {
+        const raiderOpen = e.retreating
+          ? () => true
+          : (x, y) => {
+              const terrain = G.map?.[y]?.[x];
+              if (terrain === TILE.WATER) return !G.buildingGrid?.[y]?.[x];
+              return plannedRaidCellOpen(x, y);
+            };
+        if (e.retreating && (e.plundered || 0) > 0 && G.gameTick % 90 === 0) {
+          G.particles.push({ tx: e.x, ty: e.y, offsetY: -16, text: '💰', alpha: 1.0, vy: -0.1, decay: 0.02, type: 'text' });
         }
-        if ((e.plundered || 0) >= (e.plunderGoal || 35)) {
-          e.retreating = true;
-          const distX = Math.min(e.x, MAP_W - 1 - e.x);
-          const distY = Math.min(e.y, MAP_H - 1 - e.y);
-          if (distX < distY) {
-            e.tx = e.x < MAP_W / 2 ? 0 : MAP_W - 1;
-            e.ty = e.y;
+        const moved = stepEntityToward(e, e.tx, e.ty, marchSpd, raiderOpen);
+        if (!moved && !e.retreating) {
+          const bx = Math.round(e.x) + Math.sign(Math.round(e.tx) - Math.round(e.x));
+          const by = Math.round(e.y) + Math.sign(Math.round(e.ty) - Math.round(e.y));
+          const blocker = G.buildingGrid[by]?.[bx] || G.buildingGrid[Math.round(e.y)]?.[bx] || G.buildingGrid[by]?.[Math.round(e.x)];
+          if (blocker && blocker.hp > 0) {
+            strikeRaidBlocker(e, blocker, 303);
           } else {
-            e.tx = e.x;
-            e.ty = e.y < MAP_H / 2 ? 0 : MAP_H - 1;
+            const side = ((G.gameTick + Math.max(0, G.enemies.indexOf(e))) & 1) ? 1 : -1;
+            stepEntityToward(e, e.x + side * 2, e.y, marchSpd, raiderOpen);
           }
         }
+      } else if (e.retreating) {
+        // Reached the retreat edge — gone, with whatever they carried.
+        detachProjectileTargets(e);
+        G.enemies.splice(i, 1);
+        clearRaidApproachWhenEmpty();
+        closeRaidStolenLedger('escape');
+        continue;
       } else {
-        // No buildings left to attack — retreat toward the nearest map edge
-        // and despawn on arrival. Without this, raids that wipe the settlement
-        // leave every surviving enemy spinning on the town-center tile forever;
-        // later raid days pile more enemies on top (observed in deep-play:
-        // 108-159 raiders stacked on tile (40,40) by Year 3 after pop hit 0,
-        // HUD skull counter climbing unbounded while the map sat frozen).
-        e.retreating = true;
-        // Pick whichever axis (x or y) is closer to its nearer edge
-        const distX = Math.min(e.x, MAP_W - 1 - e.x);
-        const distY = Math.min(e.y, MAP_H - 1 - e.y);
-        if (distX < distY) {
-          e.tx = e.x < MAP_W / 2 ? 0 : MAP_W - 1;
-          e.ty = e.y;
+        const targetBuilding = ensureRaidTarget(e);
+        if (targetBuilding) {
+          if (!attackRaidTarget(e, targetBuilding)) continue;
+          if (e.retreating) continue;
         } else {
-          e.tx = e.x;
-          e.ty = e.y < MAP_H / 2 ? 0 : MAP_H - 1;
+          // No buildings left to attack — retain the established nearest-edge
+          // retreat instead of leaving a permanent stack at town center.
+          routeRaiderToNearestEdge(e);
         }
       }
     }
@@ -356,8 +507,12 @@ export function updateEnemies() {
       }
       if (!c._fleeing || G.gameTick % 20 === 0) {
         c._fleeing = true;
-        const deliveryObligation = !!(c.carrying && c.carryAmount > 0)
-          || ['needs_delivery', 'walk_to_deliver', 'deliver'].includes(c.activity.kind);
+        const blockedCargo = c.activity.kind === 'needs_delivery'
+          && !c._deliveryTarget && !G.buildings.includes(c.assignment?.building);
+        const deliveryObligation = !blockedCargo && (
+          !!(c.carrying && c.carryAmount > 0)
+          || ['needs_delivery', 'walk_to_deliver', 'deliver'].includes(c.activity.kind)
+        );
         if (deliveryObligation || c.activity.kind === 'seek_shelter') {
           // Cargo routes and an established own-home shelter route survive a
           // hit. The panic sprint flag makes both obligations urgent without
@@ -389,7 +544,7 @@ export function updateEnemies() {
   for (let i = G.citizens.length - 1; i >= 0; i--) {
     const c = G.citizens[i];
     if (c.hp === undefined || c.hp > 0) continue;
-    if (c.carrying && c.carrying !== 'food' && c.carryAmount > 0) {
+    if (c.carrying && !PHYSICAL_RESOURCE_KEY_SET.has(c.carrying) && c.carryAmount > 0) {
       G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
     }
     removeCitizenFromWorld(c);

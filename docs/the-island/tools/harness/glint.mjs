@@ -26,7 +26,7 @@ const PROBES = ['musicBox', 'valveWheel', 'logbook', 'lore_closure_notice'];
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
   const SHOT_DIR = process.env.SHOT_DIR || '';
 
   const ready = async () => {
@@ -37,7 +37,7 @@ export default async function (h) {
     throw new Error('app never booted');
   };
   await h.navigate(URL); await ready();
-  await h.evaluate(`localStorage.setItem('abyme-muted','1'); localStorage.removeItem('abyme-save-v1'); 1`);
+  await h.evaluate(`localStorage.setItem('abyme-muted','1'); localStorage.removeItem('abyme-save'); 1`);
   await h.navigate(URL); await ready();
   // three reports a failed shader through console.error, and a rim patch that does not
   // compile would otherwise show up only as a prop that quietly stops being drawn

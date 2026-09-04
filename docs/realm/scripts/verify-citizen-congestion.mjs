@@ -13,15 +13,15 @@ import {
   TILE,
   createResourceStock,
   setSeed,
-} from '../js/state.js?realm=197';
-import { makeCitizen } from '../js/world.js?realm=197';
-import { makeAvatar } from '../js/avatar.js?realm=197';
+} from '../js/state.js?realm=198';
+import { makeCitizen } from '../js/world.js?realm=198';
+import { makeAvatar } from '../js/avatar.js?realm=198';
 import {
   findPath,
-} from '../js/pathfinding.js?realm=197';
-import { resetPathfindingService } from '../js/pathfinding-service.js?realm=197';
-import { updateCitizens } from '../js/citizens.js?realm=197';
-import { pathCitizenTo } from '../js/citizen-navigation.js?realm=197';
+} from '../js/pathfinding.js?realm=198';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=198';
+import { updateCitizens } from '../js/citizens.js?realm=198';
+import { pathCitizenTo } from '../js/citizen-navigation.js?realm=198';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -29,13 +29,13 @@ import {
   commandAssignCitizen,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=197';
-import { storedFood } from '../js/building-inventory.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
+import { storedFood } from '../js/building-inventory.js?realm=198';
 import {
   commitGameLoad,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=197';
+} from '../js/save-state.js?realm=198';
 
 const MAX_TICKS = 1200;
 const MAX_ACTIVE_STALL = 90;
@@ -106,7 +106,7 @@ function resetWorld(seed = 190191) {
   G.researchedTechs = new Set(['agriculture', 'forestry']);
   G.avatar = makeAvatar(40, 40);
   G.notificationLog = [];
-  G.storyFlags = { physicalFoodInventory: true };
+  G.storyFlags = { physicalFoodInventory: true, physicalSupplyWeb: true };
   G.storyState = { lastProverbSeason: null, raid: null };
   G.namedCharacters = {};
   G.totalResourcesGathered = 0;

@@ -6,16 +6,19 @@
 // statistics, and feedback; structural teardown is deliberately identical.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=197';
-import { nearestWalkableTile } from './pathfinding.js?realm=197';
-import { announce, chronicle, sfx } from './log.js?realm=197';
+import { G, BUILDINGS, HOUSE_TIERS } from './state.js?realm=198';
+import { nearestWalkableTile } from './pathfinding.js?realm=198';
+import { announce, chronicle, sfx } from './log.js?realm=198';
 import {
   releaseAssignmentsForBuilding,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=197';
-import { discardBuildingFood, relocateBuildingFood } from './building-inventory.js?realm=197';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=197';
-import { clearGuardOrderForBuilding } from './army-orders.js?realm=197';
+} from './citizen-ownership.js?realm=198';
+import {
+  discardBuildingResources,
+  relocateBuildingResources,
+} from './building-inventory.js?realm=198';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=198';
+import { clearGuardOrderForBuilding } from './army-orders.js?realm=198';
 
 const REMOVAL_CAUSES = new Set(['manual', 'fire', 'raid', 'undo']);
 const ASSIGNMENT_BOUND_ACTIVITIES = new Set(['idle', 'find_job', 'walk_to_work', 'working']);
@@ -182,11 +185,12 @@ export function removeBuilding(building, { cause, undoEntry = null } = {}) {
   const capacity = commissioned ? buildingCapacity(building) : 0;
   const defense = commissioned ? (BUILDINGS[building.type].defense || 0) : 0;
 
-  // A deliberate demolition tries to carry stock into another completed
-  // pantry first. Fire, raids, undo, and any overflow destroy it. Both paths
-  // debit the compatibility wallet exactly once before this store stops live.
-  if (cause === 'manual') relocateBuildingFood(building, G);
-  discardBuildingFood(building, G);
+  // A deliberate demolition tries to carry every physical stock into another
+  // compatible completed store first. Fire, raids, undo, and any overflow
+  // destroy it. Both paths debit each compatibility mirror exactly once
+  // before this store stops live.
+  if (cause === 'manual') relocateBuildingResources(building, G);
+  discardBuildingResources(building, G);
 
   clearBuildingReferences(building);
   G.buildings.splice(index, 1);

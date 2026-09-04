@@ -5,16 +5,16 @@
 // no simulation data and returns a frozen, reference-free snapshot for UI and
 // verification consumers.
 
-import { G, BUILDINGS } from './state.js?realm=197';
+import { G, BUILDINGS } from './state.js?realm=198';
 import {
   activeStaffingCount,
   effectiveActiveStaffingCount,
   isBuildingComplete,
   militaryCrewForBuilding,
-} from './building-operation.js?realm=197';
-import { workersForBuilding } from './citizen-ownership.js?realm=197';
-import { residentsForHouse } from './residences.js?realm=197';
-import { foodCapacity, isFoodStore, storedFood } from './building-inventory.js?realm=197';
+} from './building-operation.js?realm=198';
+import { workersForBuilding } from './citizen-ownership.js?realm=198';
+import { residentsForHouse } from './residences.js?realm=198';
+import { foodCapacity, isFoodStore, storedFood } from './building-inventory.js?realm=198';
 
 const STRATEGIC_ROLE = Object.freeze({
   house: 'Adds four beds, a private eight-ration pantry, nightly sleep, raid shelter, and taxable household growth.',

@@ -6,15 +6,25 @@
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, smoothstep, TAU } from './util.js';
-import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider, LITTER } from './terrain.js';
+import {
+  heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider, LITTER,
+  GALLERY_RADIUS, GALLERY_RAIL_RADIUS, VAULT_OUTCROP,
+} from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { buildRegions } from './regions/index.js';
 import { applyRelief, getTexture } from './assets.js';
-import { LORE, SHELF_TITLES, SHELF_DECOYS } from './content.js';
+import { LORE, SIGNAL_BINDINGS, SIGNAL_ROUTE, SIGNAL_HATCH_CODE } from './content.js';
 
 export const GLYPHS = 8;
-export const GLYPH_CODE = [3, 7, 1, 5];
+export const NUMERALS = 10;
+export { SIGNAL_BINDINGS };
+export const BEAM_GLYPHS = SIGNAL_ROUTE;
+export const HATCH_CODE = SIGNAL_HATCH_CODE;
+// Runtime evidence for the physical index: one binding per volume, in glyph
+// order. The harness reads this instead of reconstructing placement from camera
+// coordinates, so moving the shelf cannot silently scramble its grammar.
+export const SHELF_BINDING_MARKS = [];
 export const STONE_NOTES = [261.63, 293.66, 329.63, 392.0, 440.0, 493.88]; // C4 D4 E4 G4 A4 — and B4, the fallen sixth (#49; never in BOX/BIRD)
 export const BOX_MELODY = [2, 3, 4, 1, 0];   // stone indices: E G A D C
 export const BIRD_MELODY = [2, 3, 4, 3, 0];  // E G A G C — the bird corrects one note
@@ -55,61 +65,6 @@ export const matJoinery = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.94, metalness: 0.0,
 });
 applyRelief(matJoinery, 'cloth', { normalScale: 0.35, strength: 1.2, colorMap: false, repeat: [1.6, 1.6] });
-
-
-// THE SPINE ATLAS — every piece of lettering in the keeper's library, on one canvas.
-//
-// It rides on matJoinery as an EMISSIVE map, which solves three problems at once and is
-// worth spelling out because none of them is obvious:
-//
-//   Why emissive and not a colour map. A colour map MULTIPLIES, and gilt has to be
-//   brighter than the cloth under it — you cannot multiply a dark blue buckram up to
-//   gold. Emissive ADDS, over whatever vertex colour the book already has, so one atlas
-//   letters a plum spine and a near-black one identically. It is also how gilt actually
-//   behaves: it is the thing in a dark room that catches the lamp.
-//   Why channel 1. Baker's uvs are box-projected in WORLD METRES so the cloth relief
-//   holds one scale across the whole bake — right for a tiling normal map, useless for
-//   an atlas cell. uv1 carries the cells; uv keeps the projection. Nothing moves.
-//   Why no new batch. The shelves, the books, the door boards and the jambs all share
-//   matJoinery. Everything that asks for no cell lands on cell 0, which is black, which
-//   adds nothing — so the whole batch can carry the map for the cost of the map.
-//
-// 128x256 cells: a spine is ~9cm wide and ~40cm tall, about 80 screen pixels across at
-// reading distance, so 128 texels across it is already generous and 256 along it is the
-// honest limit of what a title can be. The lettering is CONDENSED to fit, which is what
-// a real binder does with a long title on a narrow spine.
-const SPINE_COLS = 8, SPINE_ROWS = 8, SPINE_CW = 128, SPINE_CH = 256, SPINE_PAD = 3;
-const SPINE_AW = SPINE_COLS * SPINE_CW, SPINE_AH = SPINE_ROWS * SPINE_CH;
-// cell 0 is BLANK and is the Baker's default. Its uv is the cell's inset rect and the
-// pieces that use it sample its centre — a uv of exactly (0,0) sits on the atlas edge,
-// where mipmapping bleeds in from whatever is beside it.
-export const spineCell = (i) => {
-  const col = i % SPINE_COLS, row = Math.floor(i / SPINE_COLS);
-  return [
-    (col * SPINE_CW + SPINE_PAD) / SPINE_AW,
-    1 - ((row + 1) * SPINE_CH - SPINE_PAD) / SPINE_AH,
-    ((col + 1) * SPINE_CW - SPINE_PAD) / SPINE_AW,
-    1 - (row * SPINE_CH + SPINE_PAD) / SPINE_AH,
-  ];
-};
-export const SPINE_TITLE0 = 1;                                // cells 1..18: the message
-export const SPINE_DECOY0 = 1 + SHELF_TITLES.length;          // cells 19..63: everything else
-// 1 blank + 18 + 45 = 64, which is the 8x8 grid exactly
-
-// WHERE EACH LETTERED VOLUME ACTUALLY LANDED. The acrostic is the one thing on this
-// shelf that no other check can see: the geometry is fine, the texture is fine, the
-// draw call is fine, and the message is scrambled. One line in the placement loop is
-// enough to do it — I shipped it bottom-up and mirrored on the first pass. So the
-// build records its own reading order and tools/harness/spines.mjs spells it back.
-export const SHELF_MARKS = [];
-// how many volumes were built and how many got a title. Every standing volume is meant
-// to be lettered now — the key is the doubled rule, and a shelf with blank spines on it
-// hands the puzzle away by making the lettered ones the answer.
-export const SHELF_STATS = { books: 0, lettered: 0, stacks: 0 };
-// what the gilt sits at normally, and what hovering the shelf lifts it to. Every gilt
-// letter in the study is the only thing on matJoinery reading a non-blank atlas cell,
-// so this one number moves the LETTERING and leaves the boards, doors and jambs alone.
-export const GILT_REST = 0.45, GILT_HOVER = 0.75;
 
 // THE GENEROUS MARK — a small terrain-conforming canvas at the live shoreline.
 //
@@ -303,72 +258,6 @@ export function updateSandWriting(mesh, marks, level, seaY) {
   mesh.visible = chosen.length > 0;
 }
 
-let _spineTex = null;
-export function spineAtlas() {
-  if (_spineTex) return _spineTex;
-  const cv = document.createElement('canvas');
-  cv.width = SPINE_AW; cv.height = SPINE_AH;
-  const g = cv.getContext('2d');
-  g.fillStyle = '#000'; g.fillRect(0, 0, SPINE_AW, SPINE_AH);   // cell 0, and every unused cell
-  const at = (i) => [(i % SPINE_COLS) * SPINE_CW, Math.floor(i / SPINE_COLS) * SPINE_CH];
-
-  // THE TOOLING IS THE PUZZLE. A volume in the message is struck with a DOUBLED rule —
-  // two lines above the title and two below — and every other volume on every shelf in
-  // the tower carries a single rule above and below. Nothing else distinguishes them:
-  // same binder's hand, same boards, same gilt, same kind of title.
-  //
-  // The inset still varies a little per volume, because a shelf where every rule starts
-  // at the same millimetre reads as printed rather than tooled. What must NOT vary is
-  // the count, so that is the one thing here that is not jittered.
-  const tooling = (x, y, style, keyed) => {
-    const inset = Math.round(SPINE_CW * (0.16 + 0.04 * (style % 3)));
-    g.fillStyle = '#fff';
-    const rule = (f, th) => g.fillRect(x + inset, y + Math.round(SPINE_CH * f), SPINE_CW - inset * 2, th);
-    if (keyed) { rule(0.118, 3); rule(0.148, 2); rule(0.840, 2); rule(0.870, 3); }
-    else       { rule(0.133, 3); /*             */ rule(0.855, 3); }
-  };
-  // the label reads BOTTOM TO TOP, which is the British convention and the one a
-  // District of Lights binder would have used
-  const label = (x, y, title) => {
-    g.save();
-    g.translate(x + SPINE_CW / 2, y + SPINE_CH / 2);
-    g.rotate(-Math.PI / 2);
-    const px = Math.round(SPINE_CW * 0.42);
-    g.font = `600 ${px}px Georgia, 'Times New Roman', serif`;
-    if ('letterSpacing' in g) g.letterSpacing = `${Math.round(px * 0.09)}px`;
-    const avail = SPINE_CH * 0.60;
-    const w = g.measureText(title).width;
-    if (w > avail) g.scale(avail / w, 1);
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = '#fff';
-    g.fillText(title, 0, 0);
-    g.restore();
-  };
-
-  // gilt WEARS. A shelf where all eighteen titles are struck at identical brightness
-  // reads as printed, not stamped; a few rubbed-back ones are what makes the rest look
-  // like metal. Deterministic per cell so the shelf is the same shelf every session.
-  SHELF_TITLES.forEach((t, n) => {
-    const [x, y] = at(SPINE_TITLE0 + n);
-    g.globalAlpha = 0.68 + 0.32 * (((n * 37) % 11) / 10);
-    tooling(x, y, n, true); label(x, y, t);
-    g.globalAlpha = 1;
-  });
-  SHELF_DECOYS.forEach((t, n) => {
-    const [x, y] = at(SPINE_DECOY0 + n);
-    g.globalAlpha = 0.68 + 0.32 * (((n * 23) % 11) / 10);
-    tooling(x, y, n, false); label(x, y, t);
-    g.globalAlpha = 1;
-  });
-
-  const tex = new THREE.CanvasTexture(cv);
-  tex.channel = 1;                       // read uv1, not the world-projected uv
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
-  _spineTex = tex;
-  return tex;
-}
-
 export const matMegalith = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.96, metalness: 0.0, side: THREE.DoubleSide,
 });
@@ -378,8 +267,8 @@ export const matMegalith = new THREE.MeshStandardMaterial({
 // hard between the warm sun and the cool sky, one stone of five came out sandstone-tan
 // while its siblings went charcoal — from the same quarry, in the same light. Relief
 // should describe the surface, not repaint it.
-applyRelief(matMegalith, 'rock', {
-  normalScale: 0.5, strength: 1.8, colorMap: false, repeat: [0.32, 0.32], normalFrom: 'rock_height',
+applyRelief(matMegalith, 'rock_height', {
+  normalScale: 0.5, strength: 1.8, colorMap: false, repeat: [0.32, 0.32],
 });
 
 // THE BAKED BRASS — the gallery ring and its posts and rails, the finial, the lamp
@@ -497,6 +386,81 @@ export function glyphSprite(atlas, index, color, size = 1) {
   return m;
 }
 
+// Each signal spine names an instrument rather than printing its reading. The
+// symbol makes the binding legible at a glance; the compact label disambiguates it
+// at reading distance. Values live only on the physical instruments themselves.
+export function makeInstrumentAtlas(bindings = SIGNAL_BINDINGS) {
+  const cell = 256;
+  const cv = document.createElement('canvas');
+  cv.width = cell * bindings.length; cv.height = cell;
+  const g = cv.getContext('2d');
+  g.clearRect(0, 0, cv.width, cv.height);
+  g.fillStyle = '#fff';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  for (let i = 0; i < bindings.length; i++) {
+    const binding = bindings[i];
+    const x = cell * (i + 0.5);
+    g.font = `500 ${Math.round(cell * 0.40)}px "Avenir Next", sans-serif`;
+    g.fillText(binding.symbol, x, cell * 0.36, cell * 0.72);
+    g.fillRect(x - cell * 0.30, cell * 0.64, cell * 0.60, cell * 0.018);
+    g.font = `700 ${Math.round(cell * 0.105)}px "Avenir Next Condensed", "Arial Narrow", sans-serif`;
+    g.fillText(binding.label, x, cell * 0.80, cell * 0.86);
+  }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+export function instrumentSprite(atlas, index, color, size = 1) {
+  const tex = atlas.clone();
+  tex.needsUpdate = true;
+  tex.repeat.set(1 / SIGNAL_BINDINGS.length, 1);
+  tex.offset.set(index / SIGNAL_BINDINGS.length, 0);
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex, transparent: true, color, depthWrite: false,
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+  return new THREE.Mesh(new THREE.PlaneGeometry(size, size), mat);
+}
+
+// Numerals are their own instrument alphabet, not extra cells smuggled into the
+// glyph sheet. This keeps the logic honest: the beam can only project figures;
+// the shelf is the physical thing that translates those figures into numbers.
+export function makeNumeralAtlas() {
+  const cell = 128;
+  const cv = document.createElement('canvas');
+  cv.width = cell * NUMERALS; cv.height = cell;
+  const g = cv.getContext('2d');
+  g.clearRect(0, 0, cv.width, cv.height);
+  g.fillStyle = '#fff';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.font = `700 ${Math.round(cell * 0.70)}px "Avenir Next Condensed", "Arial Narrow", sans-serif`;
+  for (let i = 0; i < NUMERALS; i++) {
+    // A stamped baseline gives 6/9 and 1/7 a reliable orientation when the dial
+    // is caught at a grazing angle, without turning the face into interface chrome.
+    const x = cell * (i + 0.5);
+    g.fillText(String(i), x, cell * 0.48);
+    g.fillRect(x - cell * 0.23, cell * 0.82, cell * 0.46, cell * 0.035);
+  }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+export function numeralSprite(atlas, index, color, size = 1) {
+  const tex = atlas.clone();
+  tex.needsUpdate = true;
+  tex.repeat.set(1 / NUMERALS, 1);
+  tex.offset.set(index / NUMERALS, 0);
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex, transparent: true, color, depthWrite: false,
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+  return new THREE.Mesh(new THREE.PlaneGeometry(size, size), mat);
+}
+
 // a soft round glow, code-generated once and shared — for billboarded halos
 // (additive). A Sprite, never a Points: instantiateModel strips Points from core.
 let _glowTex = null;
@@ -545,6 +509,8 @@ export function buildWorld() {
   core.name = 'islandCore';
 
   const atlas = makeGlyphAtlas();
+  const instrumentAtlas = makeInstrumentAtlas();
+  const numeralAtlas = makeNumeralAtlas();
 
   // ---------- terrain + water ----------
   const terrain = buildTerrain();
@@ -580,9 +546,10 @@ export function buildWorld() {
   // coursed-block relief — so a boulder beside the standing stones wore mortar lines.
   // Its own batch costs one draw group and lets it be granite.
   const rockwork = new Baker();
-  // shelves + books: wood and cloth, not masonry (see matJoinery). uv1 carries the
-  // spine atlas; everything that asks for no cell lands on cell 0, which is black.
-  const joinery = new Baker({ uv1: true, blank: spineCell(0) });
+  // shelves + ordinary books: wood and cloth, not masonry (see matJoinery). The
+  // eight signal-index volumes remain individual meshes because their paired marks are
+  // physical, readable faces rather than a library-wide title texture.
+  const joinery = new Baker();
   const brass = new Baker();
   const rail = new Baker();          // the chart table's rim alone: see matBrassRail
   const M = new THREE.Matrix4();
@@ -852,16 +819,19 @@ export function buildWorld() {
         grad(cPaint.clone().multiplyScalar(0.72), cPaint.clone().multiplyScalar(0.92)));
       cb.dispose();
     }
-    const gallery = new THREE.CylinderGeometry(3.3, 3.3, 0.35, 24);
+    // The dawn gull is 2.64 m across. The old 3.1 m rail left only 0.98 m
+    // outside the lantern cage, so its wing envelope entered the copper even at
+    // rest. Widen deck and rail together: the perch stays physically supported.
+    const gallery = new THREE.CylinderGeometry(GALLERY_RADIUS, GALLERY_RADIUS, 0.35, 24);
     brass.add(gallery, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 20.6, LH.z), grad(C.brassDark, C.brass));
     gallery.dispose();
     for (let i = 0; i < 10; i++) {
       const a = (i / 10) * TAU;
       const post = new THREE.CylinderGeometry(0.05, 0.05, 1.0, 5);
-      brass.add(post, new THREE.Matrix4().makeTranslation(LH.x + Math.sin(a) * 3.1, LH.y + 21.3, LH.z + Math.cos(a) * 3.1), grad(C.brassDark, C.brass));
+      brass.add(post, new THREE.Matrix4().makeTranslation(LH.x + Math.sin(a) * GALLERY_RAIL_RADIUS, LH.y + 21.3, LH.z + Math.cos(a) * GALLERY_RAIL_RADIUS), grad(C.brassDark, C.brass));
       post.dispose();
     }
-    const rail = new THREE.TorusGeometry(3.1, 0.05, 8, 48);
+    const rail = new THREE.TorusGeometry(GALLERY_RAIL_RADIUS, 0.05, 8, 48);
     rail.rotateX(Math.PI / 2);
     brass.add(rail, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 21.8, LH.z), grad(C.brass, C.brass));
     rail.dispose();
@@ -1346,27 +1316,31 @@ export function buildWorld() {
   modelAnchor.position.set(LH.x, LH.y + 1.01, LH.z);
   core.add(modelAnchor);
 
-  // the cartographer annotated their own model: small burnished marks on
-  // the table margin by each station — a tide glyph by the valve, a sun
-  // glyph by the crank, the plumb diagram facing the model's beach (the
-  // same hand as the cellar carve), and a tiny paired maker's mark tucked
-  // in the south-east corner. No words anywhere; the same hand, everywhere.
+  // Three instrument plates are rebated into the table margin: tide at the
+  // valve, sun at the crank, plumb at the line. The dark brass beds make each
+  // mark part of its mechanism and keep the chart itself quiet.
   {
-    const mark = (gi, x, z, s, rz, op) => {
-      const g = glyphSprite(atlas, gi, 0xc08a3e, s);
+    const plateMat = new THREE.MeshStandardMaterial({
+      color: 0x6d542d, metalness: 0.82, roughness: 0.58,
+    });
+    const mark = (gi, x, z, rz) => {
+      const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.018, 16), plateMat);
+      plate.position.set(x, LH.y + 0.956, z);
+      plate.rotation.y = rz;
+      plate.name = `apparatusPlate${gi}`;
+      plate.userData.glyph = gi;
+      core.add(plate);
+      const g = glyphSprite(atlas, gi, 0xe2bd72, 0.145);
       g.rotation.x = -Math.PI / 2;
       g.rotation.z = rz;
-      g.position.set(x, LH.y + 0.956, z);
-      g.material.opacity = op;
+      g.position.set(x, LH.y + 0.968, z);
+      g.material.opacity = 0.62;
+      g.name = `apparatusMark${gi}`;
       core.add(g);
     };
-    // the margin band is only 25 cm wide (model water sheet edge 1.29 to
-    // rim inner face 1.54) — marks must fit inside it or duck under the sheet
-    mark(2, LH.x + 1.405, LH.z + 1.02, 0.2, 0.4, 0.65);   // tide, by the valve
-    mark(7, LH.x - 1.405, LH.z - 1.02, 0.2, -1.1, 0.65);  // sun, by the crank
-    mark(4, LH.x - 0.02, LH.z - 1.405, 0.2, 0.05, 0.7);   // plumb, facing the model's beach
-    mark(1, LH.x + 1.33, LH.z - 1.38, 0.17, 0.3, 0.55);   // the maker's pair
-    mark(0, LH.x + 1.46, LH.z - 1.35, 0.13, -0.2, 0.55);
+    mark(2, LH.x + 1.04, LH.z + 0.70, 0.4);   // tide, by the valve
+    mark(0, LH.x - 1.04, LH.z - 0.88, -1.1);  // sun, by the crank
+    mark(7, LH.x - 0.02, LH.z - 1.04, 0.05);  // plumb, facing the model's beach
   }
 
   // the count of descents, raw-scratched into the clear east margin — one stroke
@@ -1417,38 +1391,46 @@ export function buildWorld() {
     core.add(wheel);
   }
 
-  // orrery: brass arm + sun-lamp orbiting the model (drives/displays the sky)
+  // Orrery: a compact brass arm and sun-lamp orbiting the model. The carriage
+  // stays over the model basin, preserving the room's sightlines as it rises.
   {
+    const mount = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.105, 0.17, 10), matBrassSolid);
+    mount.position.set(LH.x, LH.y + 1.035, LH.z);
+    core.add(mount);
     const orrery = new THREE.Group();
-    orrery.position.set(LH.x, LH.y + 1.02, LH.z);
+    orrery.position.set(LH.x, LH.y + 1.12, LH.z);
     orrery.name = 'orreryPivot';
     const tilt = new THREE.Group();
     tilt.name = 'orreryTilt';
-    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.045, 1.75, 6), matBrassSolid);
+    const orreryMetal = matBrassSolid.clone();
+    orreryMetal.color.setHex(0x856536);
+    orreryMetal.roughness = 0.56;
+    const armLength = 0.82;
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.028, armLength, 8), orreryMetal);
     arm.rotation.z = Math.PI / 2;
-    arm.position.x = 0.875;
+    arm.position.x = armLength / 2;
     tilt.add(arm);
-    const lampBall = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), matLamp);
-    lampBall.position.x = 1.75;
+    const lampBall = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), matLamp);
+    lampBall.position.x = armLength;
     lampBall.name = 'orreryLamp';
     tilt.add(lampBall);
     orrery.add(tilt);
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 0.16, 8), matBrassSolid);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.105, 0.13, 10), orreryMetal);
     orrery.add(hub);
     core.add(orrery);
 
     // crank handle on the table edge — the player's grip on the sun
     const crank = new THREE.Group();
-    crank.position.set(LH.x - 1.7, LH.y + 0.95, LH.z - 1.1);
+    crank.position.set(LH.x - 1.10, LH.y + 0.99, LH.z - 0.55);
     crank.name = 'crankHandle';
-    const crankAxle = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 6), matBrassSolid);
+    const crankAxle = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.2, 8), matBrassSolid);
     crankAxle.rotation.z = Math.PI / 2;
     crank.add(crankAxle);
-    const crankArm = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.3, 0.06), matBrassSolid);
-    crankArm.position.set(0.18, 0.12, 0);
+    const crankArm = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.19, 0.045), matBrassSolid);
+    crankArm.position.set(0.12, 0.075, 0);
     crank.add(crankArm);
-    const crankKnob = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), matWood);
-    crankKnob.position.set(0.18, 0.28, 0);
+    const crankKnob = new THREE.Mesh(new THREE.SphereGeometry(0.052, 8, 6), matWood);
+    crankKnob.position.set(0.12, 0.185, 0);
     crank.add(crankKnob);
     core.add(crank);
   }
@@ -1527,156 +1509,121 @@ export function buildWorld() {
     core.add(note);
   }
 
-  // bookshelves (baked)
+  // The study's signal shelf routes figures back into the room and landscape.
+  // Eight index volumes bind the complete figure alphabet to physical instruments;
+  // none prints a value. The beam supplies the order and remembered observation
+  // supplies each instrument's reading.
   {
-    const PER_SHELF = SHELF_TITLES.length / 3;   // 18 volumes over the message bay's three boards
-    let titled = 0;
-    SHELF_MARKS.length = 0;
-    SHELF_STATS.books = SHELF_STATS.lettered = SHELF_STATS.stacks = 0;
-    // EVERY standing volume gets a title, in both bays — the key is the doubled rule, not
-    // the lettering. Walk a seeded shuffle of the decoy library cyclically so no two
-    // neighbours carry the same title and the whole library is used before any volume
-    // comes round again; with ~75 standing books and 45 titles a few repeat, which is
-    // what a shelf holding two copies of the tide tables actually looks like.
-    const deck = SHELF_DECOYS.map((_, i) => i);
-    for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
-    let deckN = 0;
+    const SPINES = [0x263b43, 0x355560, 0x3e665f, 0x5c3935, 0x6c5939, 0x343641, 0x59445e];
+    SHELF_BINDING_MARKS.length = 0;
+
+    // Both bays share one timber footprint. The near bay is measured and sparse;
+    // the far bay carries the irregular working library, so the room still feels lived in.
     for (let s = 0; s < 2; s++) {
       const a0 = deg(285 + s * 38);
-      const lettered = s === 0;                  // the near bay carries the message
+      const tx = Math.cos(a0), tz = -Math.sin(a0);
+      const nx = Math.sin(a0), nz = Math.cos(a0);
+      const at = (bx, by, depth) => [
+        LH.x + nx * (4.4 + depth) + tx * bx, by, LH.z + nz * (4.4 + depth) + tz * bx,
+      ];
       for (let sh = 0; sh < 3; sh++) {
         const shelf = new THREE.BoxGeometry(2.0, 0.07, 0.45);
-        joinery.add(shelf, place(LH.x + Math.sin(a0) * 4.4, LH.y + 0.6 + sh * 0.62, LH.z + Math.cos(a0) * 4.4, a0), grad(C.woodDark, C.wood));
+        joinery.add(shelf, place(LH.x + nx * 4.4, LH.y + 0.6 + sh * 0.62, LH.z + nz * 4.4, a0), grad(C.woodDark, C.wood));
         shelf.dispose();
-        // THE SHELVES. Every book used to be an upright box of identical depth drawn
-        // from ONE of two colours, so a whole wall of them read as a single teal slab —
-        // the "basic geometry" tell. A real shelf is legible from across a room because
-        // of what is IRREGULAR about it: bindings from different decades, volumes shoved
-        // back or left proud, a gap where something was taken out, the neighbours leaning
-        // into it, and a few laid flat because they were too tall to stand. All of that
-        // is per-book arithmetic on geometry that was already here — same one baked
-        // batch, same draw call, no new material.
-        const SPINES = [
-          0x355560,   // the old cloth blue that used to be half the wall
-          0x3e7a6a,   // faded green board
-          0x6e3630,   // oxblood
-          0x7d6740,   // tan calf
-          0x2f3a44,   // near-black buckram
-          0x8a7250,   // vellum, sun-bleached
-          0x4a3a52,   // dull plum
-        ];
-        const shelfY = LH.y + 0.64 + sh * 0.62;
-        // unit vectors along the shelf (tangent) and into the wall (radial)
-        const tx = Math.cos(a0), tz = -Math.sin(a0);
-        const nx = Math.sin(a0), nz = Math.cos(a0);
-        const at = (bx, by, depth) => [
-          LH.x + nx * (4.4 + depth) + tx * bx, by, LH.z + nz * (4.4 + depth) + tz * bx,
-        ];
 
-        // PLAN THE SHELF BEFORE PLACING IT. The eighteen doubled-rule volumes have to
-        // land in acrostic order, evenly spread so the message is not bunched at one end
-        // — and you cannot choose positions in a list you are still generating. So the
-        // first pass decides what stands where and the second pass builds it. Both bays
-        // are fully lettered; bay 0 is the one the message runs across, and bay 1 is
-        // where things got shoved, which is why the flat stacks live there.
-        const plan = [];
-        let bx = -0.85;
-        while (bx < 0.85) {
-          // a gap: something was borrowed and never came back
-          if (r() < 0.07) { bx += 0.03 + r() * 0.05; continue; }
-
-          // a flat stack, for the volumes too tall to stand up in a keeper's shelf
-          if (r() < (lettered ? 0.03 : 0.12) && bx < 0.6) {
-            const sw = 0.20 + r() * 0.12;
-            const n = 2 + Math.floor(r() * 2);
-            const lay = [];
-            for (let k = 0; k < n; k++) {
-              lay.push({ th: 0.035 + r() * 0.03, d: 0.26 + r() * 0.05,
-                c: vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.18, 0.14),
-                jx: (r() - 0.5) * 0.02, jz: (r() - 0.5) * 0.04, ja: (r() - 0.5) * 0.09 });
-            }
-            plan.push({ k: 'stack', bx, sw, lay });
-            bx += sw + 0.02;
-            continue;
-          }
-
-          const bw = 0.055 + r() * 0.10, bh = 0.28 + r() * 0.24;
-          // a lean, tipped into the gap its neighbour left. Rotating about the box's
-          // centre lifts the low corner off the shelf, so drop it back by the sagitta.
-          const lean = r() < 0.13 ? (r() - 0.5) * 0.5 : 0;
-          plan.push({ k: 'book', bx, bw, bh, lean, d: 0.24 + r() * 0.09,
-            depth: -0.03 + r() * 0.07,                 // shoved back, or left proud
-            c: vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.05, 0.20, 0.16),
-            cell: SPINE_DECOY0 + deck[deckN++ % deck.length] });
-          bx += bw * Math.cos(lean) + 0.012;
-        }
-
-        if (lettered) {
-          // READ IT THE WAY A SHELF IS READ: top board down, left to right. Neither axis
-          // runs that way on its own. `sh` counts UPWARD from the floor, and bx runs along
-          // the tangent (cos a0, -sin a0), which from inside the room looking at the wall
-          // runs right to left on screen. Placed naively the message came out bottom-up
-          // and mirrored — every letter present, in an order nobody would ever try.
-          const stand = plan.map((b, i) => (b.k === 'book' ? i : -1)).filter((i) => i >= 0);
-          const want = Math.min(PER_SHELF, stand.length);
-          const base = (2 - sh) * PER_SHELF;                    // top board carries the first six
-          for (let k = 0; k < want; k++) {
-            const slot = stand[Math.round((k * (stand.length - 1)) / (want - 1 || 1))];
-            const n = base + (want - 1 - k);
-            plan[slot].cell = SPINE_TITLE0 + n;
-            SHELF_MARKS.push({ n, shelf: sh, bx: plan[slot].bx });
-            titled++;
-          }
-        }
-
-        for (const b of plan) {
-          if (b.k === 'book') { SHELF_STATS.books++; if (b.cell) SHELF_STATS.lettered++; }
-          else SHELF_STATS.stacks++;
-          if (b.k === 'stack') {
-            let sy = shelfY;
-            for (const l of b.lay) {
-              const lay = new THREE.BoxGeometry(b.sw, l.th, l.d);
-              // each one shoved a little out of true with the one under it
-              joinery.add(lay, place(...at(b.bx + b.sw / 2 + l.jx, sy + l.th / 2, -0.02 + l.jz), a0 + l.ja), () => l.c);
-              lay.dispose();
-              sy += l.th;
-            }
-            continue;
-          }
-          const book = new THREE.BoxGeometry(b.bw, b.bh, b.d);
-          const drop = b.lean ? (b.bh / 2) * (1 - Math.cos(b.lean)) + (b.bw / 2) * Math.abs(Math.sin(b.lean)) : 0;
-          // the SPINE is the -z face: `place` turns local +z onto the outward radial, and
-          // the shelf stands against the wall, so -z is the face looking into the room.
-          const rect = b.cell ? spineCell(b.cell) : null;
-          joinery.add(book, place(...at(b.bx + b.bw / 2, shelfY + b.bh / 2 - drop, b.depth),
-            a0, 1, 1, 1, 0, b.lean), () => b.c, rect && ((_nx, _ny, nz) => (nz < -0.5 ? rect : null)));
+        if (s === 0 || sh === 0) continue;
+        // Ordinary reference books in the far bay: irregular enough to read as a
+        // working library, deliberately unmarked so they cannot impersonate the key.
+        let bx = -0.86;
+        while (bx < 0.82) {
+          if (r() < 0.10) { bx += 0.05 + r() * 0.05; continue; }
+          const bw = 0.07 + r() * 0.085;
+          const bh = 0.29 + r() * 0.19;
+          const d = 0.25 + r() * 0.07;
+          const lean = r() < 0.16 ? (r() - 0.5) * 0.34 : 0;
+          const depth = -0.025 + r() * 0.055;
+          const drop = lean ? (bh / 2) * (1 - Math.cos(lean)) + (bw / 2) * Math.abs(Math.sin(lean)) : 0;
+          const book = new THREE.BoxGeometry(bw, bh, d);
+          const col = vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.04, 0.16, 0.13);
+          joinery.add(book, place(...at(bx + bw / 2, LH.y + 0.64 + sh * 0.62 + bh / 2 - drop, depth),
+            a0, 1, 1, 1, 0, lean), () => col);
           book.dispose();
+          bx += bw * Math.cos(lean) + 0.014;
         }
       }
     }
-    // A READER FOR THE BAY. The proxy is built HERE rather than by the fragment factory
-    // because its placement is derived from the same LH and a0 the boards are, and a
-    // hand-copied position in content.js would drift the first time a shelf moves.
-    // content.js still owns everything a writer owns — the label, the reach, the pages.
-    {
-      const a0 = deg(285);
-      const rr = 4.15;                                    // just in front of the spines
-      const box = new THREE.Mesh(new THREE.BoxGeometry(1.95, 1.95, 0.34),
-        new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
-      box.position.set(LH.x + Math.sin(a0) * rr, LH.y + 1.5, LH.z + Math.cos(a0) * rr);
-      box.rotation.y = a0;
-      box.name = 'lore_lettered_shelf';
-      defineProp('lore_lettered_shelf');
-      core.add(box);
-    }
 
-    // the lettering itself, and the gilt it is struck in
-    const atlas = spineAtlas();
-    matJoinery.emissiveMap = atlas;
-    matJoinery.emissive = new THREE.Color(0xd8b26a);
-    matJoinery.emissiveIntensity = GILT_REST;
-    matJoinery.needsUpdate = true;
-    if (titled !== SHELF_TITLES.length) console.warn('shelf: only', titled, 'of', SHELF_TITLES.length, 'titles placed');
+    // Two rows of four index volumes. The grouping sits in the shelf's local frame,
+    // so every glyph and instrument mark stays bolted to its spine if the bay moves.
+    const a0 = deg(285);
+    const signalShelf = new THREE.Group();
+    signalShelf.name = 'signalShelf';
+    // These marks must be hand-readable in the real study, but at 1:240 every
+    // glyph is microscopic and nonfunctional. Do not pay eight multi-piece book
+    // draw calls again inside the table model.
+    defineProp('signalShelf', { prune: true });
+    signalShelf.position.set(LH.x + Math.sin(a0) * 4.4, LH.y, LH.z + Math.cos(a0) * 4.4);
+    signalShelf.rotation.y = a0;
+    const bookW = 0.32, bookH = 0.49, bookD = 0.29;
+    for (let glyph = 0; glyph < GLYPHS; glyph++) {
+      const signal = SIGNAL_BINDINGS.find((entry) => entry.glyph === glyph);
+      if (!signal) throw new Error(`Missing signal binding for glyph ${glyph}`);
+      const row = Math.floor(glyph / 4);
+      const col = glyph % 4;
+      const shelf = 2 - row;
+      // +local X is visually left when standing inside this curved room.
+      const localX = 0.60 - col * 0.40;
+      const volume = new THREE.Group();
+      volume.name = `signalVolume${glyph}`;
+      volume.position.set(localX, 0.64 + shelf * 0.62 + bookH / 2, -0.015 + (glyph % 2) * 0.008);
+      volume.userData.glyph = glyph;
+      volume.userData.instrument = signal.instrument;
+      volume.userData.label = signal.label;
+      const binding = matJoinery.clone();
+      binding.vertexColors = false;
+      binding.color.setHex(SPINES[glyph % SPINES.length]);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(bookW, bookH, bookD), binding);
+      volume.add(body);
+
+      // A continuous brass frame makes the two marks one binding, not two
+      // unrelated decals. Thin transverse rules separate figure from instrument.
+      for (const y of [-bookH * 0.39, 0, bookH * 0.39]) {
+        const rule = new THREE.Mesh(new THREE.BoxGeometry(bookW * 0.74, 0.012, 0.012), matBrassSolid);
+        rule.position.set(0, y, -bookD / 2 - 0.007);
+        volume.add(rule);
+      }
+      for (const x of [-bookW * 0.39, bookW * 0.39]) {
+        const rule = new THREE.Mesh(new THREE.BoxGeometry(0.012, bookH * 0.84, 0.012), matBrassSolid);
+        rule.position.set(x, 0, -bookD / 2 - 0.007);
+        volume.add(rule);
+      }
+      const figure = glyphSprite(atlas, glyph, 0xe6c279, 0.145);
+      figure.rotation.y = Math.PI;
+      figure.position.set(0, bookH * 0.205, -bookD / 2 - 0.014);
+      figure.name = `signalGlyph${glyph}`;
+      volume.add(figure);
+      const instrument = instrumentSprite(instrumentAtlas, glyph, 0xf0d59a, 0.17);
+      instrument.rotation.y = Math.PI;
+      instrument.position.set(0, -bookH * 0.205, -bookD / 2 - 0.014);
+      instrument.name = `signalInstrument${glyph}`;
+      volume.add(instrument);
+      signalShelf.add(volume);
+      SHELF_BINDING_MARKS.push(Object.freeze({
+        glyph, instrument: signal.instrument, label: signal.label, row, col, shelf, localX,
+      }));
+    }
+    core.add(signalShelf);
+
+    // A single reader spans exactly the index volumes. Content owns the label and
+    // observations; geometry owns the name and placement.
+    const rr = 4.15;
+    const box = new THREE.Mesh(new THREE.BoxGeometry(1.92, 1.30, 0.34),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+    box.position.set(LH.x + Math.sin(a0) * rr, LH.y + 1.86, LH.z + Math.cos(a0) * rr);
+    box.rotation.y = a0;
+    box.name = 'lore_signal_shelf';
+    defineProp('lore_signal_shelf', { prune: true });
+    core.add(box);
   }
 
   // plumb mechanism over the table + brass floor plate (the dive spot)
@@ -2580,31 +2527,97 @@ export function buildWorld() {
 
   // =================== VAULT OF THE LENS (in the stones pad) ================
   {
-    const SC = SPOTS.stones;
-    const ox = SC.x - 11, oz = SC.y - 4;
+    const V = VAULT_OUTCROP;
+    const ox = V.x, oz = V.z;
     const oy = heightAt(ox, oz);
+    const tx = -V.faceZ, tz = V.faceX;
+    const face = (out = 0, side = 0) => ({
+      x: ox + V.faceX * (V.faceRadius + out) + tx * side,
+      z: oz + V.faceZ * (V.faceRadius + out) + tz * side,
+    });
     // rock outcrop
-    const rock = new THREE.IcosahedronGeometry(3.2, 2);
-    rockwork.add(rock, place(ox, oy + 1.2, oz, 0.7, 1.3, 0.9, 1.1), mottle(C.stoneOld, C.boneDark));
+    const rock = new THREE.IcosahedronGeometry(V.radius, 2);
+    rockwork.add(rock, place(ox, oy + 1.2, oz, V.rotation, V.scaleX, V.scaleY, V.scaleZ), mottle(C.stoneOld, C.boneDark));
     rock.dispose();
-    // sliding slab door (faces the stones)
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.2, 0.3), matMegalith);   // cut from the outcrop, facing the stones
+
+    // A true exterior reliquary: a dark backing and a shallow carved frame sit on
+    // the rock face, aimed at the standing stones. The former coordinates buried
+    // all three pieces a metre inside the icosahedron, so opening the slab revealed
+    // nothing but more opaque rock.
+    const arch = (halfW, bottom, shoulder) => {
+      const sh = new THREE.Shape();
+      sh.moveTo(-halfW, bottom);
+      sh.lineTo(halfW, bottom);
+      sh.lineTo(halfW, shoulder);
+      sh.absarc(0, shoulder, halfW, 0, Math.PI, false);
+      sh.closePath();
+      return sh;
+    };
+    const backPos = face(0.035);
+    const nicheBack = new THREE.Mesh(
+      new THREE.ShapeGeometry(arch(0.68, -0.98, 0.24), 16),
+      new THREE.MeshStandardMaterial({
+        color: 0x172528, emissive: 0x071113, emissiveIntensity: 0.35,
+        roughness: 1, metalness: 0, side: THREE.DoubleSide,
+      }));
+    nicheBack.position.set(backPos.x, oy + 1.12, backPos.z);
+    nicheBack.rotation.y = V.doorYaw;
+    nicheBack.name = 'vaultNicheBack';
+    core.add(nicheBack);
+
+    const frameShape = arch(0.91, -1.10, 0.25);
+    frameShape.holes.push(arch(0.70, -0.99, 0.24));
+    const frameGeo = new THREE.ExtrudeGeometry(frameShape, {
+      depth: 0.14, steps: 1, curveSegments: 16,
+      bevelEnabled: true, bevelSegments: 1, bevelSize: 0.035, bevelThickness: 0.025,
+    });
+    frameGeo.translate(0, 0, -0.07);
+    const framePos = face(0.09);
+    stone.add(frameGeo, place(framePos.x, oy + 1.12, framePos.z, V.doorYaw), mottle(C.boneDark, C.stoneOld));
+    frameGeo.dispose();
+    const sill = new THREE.BoxGeometry(1.74, 0.16, 0.32);
+    const sillPos = face(0.10);
+    stone.add(sill, place(sillPos.x, oy + 0.10, sillPos.z, V.doorYaw), grad(C.stoneOld, C.bone));
+    sill.dispose();
+
+    // sliding slab door (faces the stones, just proud of the carved frame)
+    const doorShape = arch(0.72, -1.03, 0.25);
+    const doorGeo = new THREE.ExtrudeGeometry(doorShape, {
+      depth: 0.24, steps: 1, curveSegments: 16,
+      bevelEnabled: true, bevelSegments: 1, bevelSize: 0.025, bevelThickness: 0.025,
+    });
+    doorGeo.translate(0, 0, -0.12);
+    const slab = new THREE.Mesh(doorGeo, matMegalith);   // cut from the outcrop, facing the stones
     const scols = new Float32Array(slab.geometry.attributes.position.count * 3);
     for (let v = 0; v < scols.length / 3; v++) { scols[v * 3] = C.boneDark.r; scols[v * 3 + 1] = C.boneDark.g; scols[v * 3 + 2] = C.boneDark.b; }
     slab.geometry.setAttribute('color', new THREE.BufferAttribute(scols, 3));
-    slab.position.set(ox + 2.6, oy + 1.0, oz + 0.4);
-    slab.rotation.y = deg(105);
+    const doorPos = face(0.17);
+    slab.position.set(doorPos.x, oy + 1.12, doorPos.z);
+    slab.rotation.y = V.doorYaw;
     slab.name = 'vaultDoor';
+    const seal = new THREE.Mesh(
+      new THREE.RingGeometry(0.19, 0.235, 28, 1, 0.25, Math.PI * 1.75),
+      new THREE.MeshStandardMaterial({ color: 0x343834, roughness: 0.95, metalness: 0 }));
+    seal.position.set(0, 0.13, 0.15);
+    slab.add(seal);
     core.add(slab);
     // niche + pedestal + the lens
     const ped = new THREE.CylinderGeometry(0.18, 0.26, 0.9, 8);
-    stone.add(ped, place(ox + 2.0, oy + 0.45, oz + 0.2), grad(C.stoneOld, C.bone));
+    const relicPos = face(0.075);
+    stone.add(ped, place(relicPos.x, oy + 0.45, relicPos.z), grad(C.stoneOld, C.bone));
     ped.dispose();
     const lensItem = new THREE.Mesh(new THREE.OctahedronGeometry(0.22, 0), matLens.clone());
     lensItem.scale.y = 1.3;
-    lensItem.position.set(ox + 2.0, oy + 1.1, oz + 0.2);
+    lensItem.position.set(relicPos.x, oy + 1.1, relicPos.z);
     lensItem.name = 'lensItem';
     lensItem.visible = false; // revealed behind the slab; toggled visible when door opens
+    const lensHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: radialGlowTex(), color: 0x71ffe0, transparent: true, opacity: 0.34,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    }));
+    lensHalo.scale.setScalar(0.95);
+    lensHalo.position.z = 0.02;
+    lensItem.add(lensHalo);
     core.add(lensItem);
   }
 
@@ -2745,7 +2758,8 @@ export function buildWorld() {
   let vaultDrips = null;
   {
     const hx = SPOTS.hatch.x, hz = SPOTS.hatch.y, hy = 23.5;
-    // stone ring + brass lid + four glyph dials
+    // Stone ring + brass lid + four decimal dials. The beam supplies an order;
+    // the shelf routes its figures to instruments whose construction gives readings.
     const ring = new THREE.TorusGeometry(1.5, 0.22, 8, 20);
     ring.rotateX(Math.PI / 2);
     stone.add(ring, new THREE.Matrix4().makeTranslation(hx, hy + 0.1, hz), grad(C.stoneOld, C.boneDark));
@@ -2760,14 +2774,13 @@ export function buildWorld() {
       const dial = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.18, 10), matBrassSolid.clone());
       dial.position.set(hx + Math.sin(a) * 1.95, hy + 0.16, hz + Math.cos(a) * 1.95);
       dial.name = `dial${i}`;
-      dial.userData.glyphIndex = 0;
+      dial.userData.numeralIndex = 0;
       core.add(dial);
-      // glyph shown on top of the dial
-      const gl = glyphSprite(atlas, 0, 0xffd9a0, 0.42);
-      gl.rotation.x = -Math.PI / 2;
-      gl.position.y = 0.1;
-      gl.name = `dialGlyph${i}`;
-      dial.add(gl);
+      const number = numeralSprite(numeralAtlas, 0, 0xffd9a0, 0.42);
+      number.rotation.x = -Math.PI / 2;
+      number.position.y = 0.1;
+      number.name = `dialNumber${i}`;
+      dial.add(number);
     }
 
     // sunshadow shimmer marker (revealed at golden hour)
@@ -2970,7 +2983,7 @@ export function buildWorld() {
       rc.far = 50;
       const hit = rc.intersectObject(terrain, false)[0];
       const xFace = hit ? hit.point.x : 60;
-      const gl = glyphSprite(atlas, GLYPH_CODE[i], 0xffe2a8, 3.4);
+      const gl = glyphSprite(atlas, BEAM_GLYPHS[i], 0xffe2a8, 3.4);
       gl.position.set(xFace - 1.4, baseY, z);
       gl.rotation.y = -Math.PI / 2; // facing west, toward the lighthouse
       gp.add(gl);
@@ -2992,7 +3005,7 @@ export function buildWorld() {
     hp.visible = false;
     const XS = [-2, 2, 6, 10];                 // spread ACROSS the hall's width — the ridge reads
     for (let i = 0; i < 4; i++) {              // them as a row; collinear-with-the-aisle they stack
-      const gl = glyphSprite(atlas, GLYPH_CODE[i], 0xffe2a8, 3.6);
+      const gl = glyphSprite(atlas, BEAM_GLYPHS[i], 0xffe2a8, 3.6);
       gl.position.set(XS[i], 4.9, -111);       // above the risen lintel line, mid-hall
       hp.add(gl);                               // default plane faces +z — toward the north ridge
     }
@@ -3002,18 +3015,17 @@ export function buildWorld() {
   // =================== VEGETATION ===========================================
   buildVegetation(core, r);
 
-  // =================== TINY FIGURE (the keeper, on the model) ===============
-  // The second person — the keeper one level down, standing on the model's
-  // beach. The group sits AT the figure's feet so it can turn and tip in place
-  // when it "looks back" (#14); children are local offsets. Exaggerated ~3x so
-  // it reads as a luminous speck at 1:240.
+  // =================== LOWER HAND (on the model) ============================
+  // A figure one stratum down, standing on the model's beach. The group sits at
+  // its feet so the body can turn in place when the player holds it in regard.
+  // Exaggerated about 3x so the gesture reads at 1:240 without assigning identity.
   {
     const fig = new THREE.Group();
     fig.name = 'tinyFigure';
     fig.visible = false;
     const fy = heightAt(SPOTS.beach.x, SPOTS.beach.y);
     fig.position.set(SPOTS.beach.x, fy, SPOTS.beach.y);
-    fig.userData.baseY = fy;   // the twist's rise (puzzles _apply) lifts from here
+    fig.userData.baseY = fy;
     const fb = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 3.4, 6),
       new THREE.MeshStandardMaterial({ color: 0x355560, emissive: 0x58f2c2, emissiveIntensity: 1.8, flatShading: true }));
     fb.position.y = 1.7;
@@ -3022,32 +3034,12 @@ export function buildWorld() {
       new THREE.MeshStandardMaterial({ color: 0xd9c9a8, emissive: 0xffe2a8, emissiveIntensity: 1.0, flatShading: true }));
     fh.position.y = 3.9;
     fig.add(fh);
-    // a small brow gives the figure a FRONT (+z) so it visibly turns to face you
+    // A small brow gives the figure a front (+z) so the turn is legible.
     const brow = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.26, 0.34),
       new THREE.MeshStandardMaterial({ color: 0x1a2730, emissive: 0x0a1a24, emissiveIntensity: 0.5, flatShading: true }));
     brow.position.set(0, 3.98, 0.5);
     fig.add(brow);
     core.add(fig);
-
-    // THE SECOND FIGURE (#53): after the embrace, the model's beach holds TWO — the
-    // keeper's cyan speck and a warm amber one beside it, standing together, neither
-    // searching. Visible only on the model, only once W.flags.carried (puzzles _apply).
-    // Warm where he is cold: your lamp, next to his.
-    const comp = new THREE.Group();
-    comp.name = 'tinyCompanion';
-    comp.visible = false;
-    const cy2 = heightAt(SPOTS.beach.x + 1.4, SPOTS.beach.y + 1.1);
-    comp.position.set(SPOTS.beach.x + 1.4, cy2, SPOTS.beach.y + 1.1);
-    const cb = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.8, 3.0, 6),
-      new THREE.MeshStandardMaterial({ color: 0x5c4a30, emissive: 0xffb454, emissiveIntensity: 1.5, flatShading: true }));
-    cb.position.y = 1.5;
-    comp.add(cb);
-    const ch = new THREE.Mesh(new THREE.SphereGeometry(0.5, 6, 5),
-      new THREE.MeshStandardMaterial({ color: 0xd9c9a8, emissive: 0xffe2a8, emissiveIntensity: 1.0, flatShading: true }));
-    ch.position.y = 3.5;
-    comp.add(ch);
-    comp.rotation.y = Math.atan2(fig.position.x - comp.position.x, fig.position.z - comp.position.z);   // facing him
-    core.add(comp);
   }
 
   // =================== THE WATCHER (grief given form) =======================
@@ -3568,7 +3560,7 @@ export function buildWorld() {
     for (const [id, lore] of Object.entries(LORE)) {
       const pl = lore.place;
       if (!pl) continue;
-      // prop 'none': the object is built where its geometry is derived (the lettered
+      // prop 'none': the object is built where its geometry is derived (the signal
       // shelf's proxy comes off the same LH and a0 as the boards). The entry still gets
       // its reader hotspot from puzzles' half of the factory.
       if (pl.prop === 'none') continue;
@@ -4094,19 +4086,32 @@ function buildVegetation(core, r) {
   // more like a texture on the ground. this is like a plane that doesn't align with the
   // ground." A flat disc on a slope cannot align; this cannot MISalign.
   //
-  // 1024 texels over a 430 m window is 42 cm each, which sounds coarse and is exactly
-  // right: the mask only has to say WHERE. The needle character is procedural grain in
-  // the terrain's own fragment shader, so it stays sharp at any distance while this costs
-  // one texture fetch and a third of a megabyte.
+  // At 1024 texels the current stand resolves to roughly 40 cm per texel, which sounds
+  // coarse and is exactly right: the mask only has to say WHERE. Its world rectangle is
+  // derived from the things stamped into it. A fixed window once left the southernmost
+  // islet trunk (and the end of the stones-to-chest path) just outside the texture.
+  // Future scatter or route changes now expand and recenter the mask as one contract.
   {
-    const SZ = 1024, WIN = 430;
+    const SZ = 1024;
+    // Routes wander as much as 15.5 m off their endpoint envelope; tree litter reaches
+    // about 7 m from the largest crown. Eighteen metres therefore contains both effects
+    // without teaching terrain.js anything about vegetation or route construction.
+    const MASK_PAD = 18;
+    const anchors = TREES.map(({ x, z }) => [x, z]);
+    for (const p of [SPOTS.lighthouse, SPOTS.beach, SPOTS.stones, SPOTS.chest, SPOTS.mainCenter])
+      anchors.push([p.x, p.y]);
+    const minX = Math.min(...anchors.map(([x]) => x));
+    const maxX = Math.max(...anchors.map(([x]) => x));
+    const minZ = Math.min(...anchors.map(([, z]) => z));
+    const maxZ = Math.max(...anchors.map(([, z]) => z));
+    const cx0 = (minX + maxX) * 0.5, cz0 = (minZ + maxZ) * 0.5;
+    const WIN = Math.ceil(Math.max(maxX - minX, maxZ - minZ) + MASK_PAD * 2);
     const cv = document.createElement('canvas');
     cv.width = cv.height = SZ;
     const g2 = cv.getContext('2d');
     g2.fillStyle = '#000';
     g2.fillRect(0, 0, SZ, SZ);
     g2.globalCompositeOperation = 'lighter';        // stands that overlap pool, as they do
-    const cx0 = SPOTS.mainCenter.x, cz0 = SPOTS.mainCenter.y;
     const sv = new THREE.Vector3();
     for (const t of TREES) {
       sv.setFromMatrixScale(t.m);
@@ -4135,8 +4140,8 @@ function buildVegetation(core, r) {
     //
     // AMBIGUOUS ON PURPOSE. At level 1 this is a faint thinning of the turf that could be
     // weather, or sheep, or nothing. It only resolves into somebody's route as you go
-    // DOWN — driven by uPathAmt in main.js off W.level — which is the same shape as the
-    // spine acrostic: present from the first minute, legible when you have earned it.
+    // DOWN — driven by uPathAmt in main.js off W.level: present from the first minute,
+    // legible only after the landscape has supplied enough comparison.
     //
     // Routes are the ones a keeper actually walks: the tower to the shore he washed up on,
     // the tower to the stones, the stones to the chest. They MEANDER — a path that is a
@@ -4533,13 +4538,13 @@ function buildVegetation(core, r) {
     return g;
   };
   const rockVariants = [makeRock(SEED ^ 0x2b91), makeRock(SEED ^ 0x5d17), makeRock(SEED ^ 0x8c3f)];
-  // three stone types so the shore isn't 70 copies of one granite — split into 3 InstancedMeshes
-  // (granite / basalt / limestone), each its own albedo + derived relief. The per-instance random
-  // rotation already hides UV-orientation repeat, so distinct albedos read as natural variety (+2 draws).
+  // Three stone types keep the shore from becoming 70 copies of one granite. Their
+  // distinct geology lives in base colour and displaced geometry; one shared strata
+  // heightmap supplies subtle relief without fetching three albedos that are never shown.
   const rockDefs = [
-    { id: 'rock', color: 0xa89e8c },       // weathered granite — quieter, carried by the relief now
-    { id: 'basalt', color: 0x8a8f98 },     // dark volcanic
-    { id: 'limestone', color: 0xc7bda6 },  // pale eroded
+    { color: 0xa89e8c },       // weathered granite
+    { color: 0x8a8f98 },       // dark volcanic
+    { color: 0xc7bda6 },       // pale eroded
   ];
   const rockMeshes = rockDefs.map((d, idx) => {
     const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: false, roughness: 0.95 });
@@ -4548,7 +4553,7 @@ function buildVegetation(core, r) {
     // catching light; the colour is a quiet flat base; texels enlarged (repeat 0.6) so
     // features read as geology up close, not texture grid. (The Bender house rule made
     // material: normal maps yes, tiled colour never.)
-    applyRelief(mat, d.id, { normalScale: 0.8, strength: 2.6, colorMap: false, repeat: [0.6, 0.6], normalFrom: 'rock_height' });   // #138: strata bedding relief (Bender heightmap; 0.8 keeps it geology, not zebra, at grazing light)
+    applyRelief(mat, 'rock_height', { normalScale: 0.8, strength: 2.6, colorMap: false, repeat: [0.6, 0.6] });   // #138: strata bedding relief (Bender heightmap; 0.8 keeps it geology, not zebra, at grazing light)
     const im = new THREE.InstancedMesh(rockVariants[idx], mat, 70);
     im.castShadow = true; im.name = 'rocks';
     return im;
@@ -4823,9 +4828,8 @@ export function instantiateModel(core, modelAnchor) {
   return modelRoot;
 }
 
-// #70: the registration seam — new state-driven props register here (name + whether the
-// 1:240 clone prunes them) instead of hand-editing two lists; the legacy NAMES entries
-// below keep working unchanged. main.js asserts every name resolves at boot.
+// Dynamic state-driven props register through this seam. Built-in refs remain in
+// NAMES below; main.js asserts the combined registry resolves at boot.
 export function defineProp(name, { prune = false } = {}) {
   if (!NAMES.includes(name)) NAMES.push(name);
   if (prune) MODEL_PRUNE.add(name);
@@ -4843,7 +4847,7 @@ export const NAMES = [
   'readGlass', 'lensMarkStudy', 'lensMarkStone', 'watcher', 'musicNote',
   'stairFoot', 'galleryHatch', 'stairRope',   // hub Phase B: the climb foot, descend point, and the lamp-lit gate
   'drainFlood', 'drainMark',                   // hub Phase C: the first tunnel's flood plane + carved line
-  'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
+  'dial0', 'dial1', 'dial2', 'dial3', 'dialNumber0', 'dialNumber1', 'dialNumber2', 'dialNumber3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
@@ -4851,7 +4855,6 @@ export const NAMES = [
   'poolWater', 'poolPhial', 'poolGlint', 'phialDesk', 'hallGlyphs',       // #49: the high-pool round trip + the beam turned to the deep
   'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain',   // #54: the lampblack micro-marks
   'tideGauge', 'gaugeTop',                                                 // #52: the tide gauge — the descent's waterlines made monumental
-  'tinyCompanion',                                                         // #53: the second figure on the model's beach, once carried
   'drainLedger',                                                           // #55: the inspector's tide ledger, wedged in the drain
   'cmTallies', 'cmFormal', 'cmPlain', 'cmUnfinished', 'cmChild',           // #50-B: the climbers' five hands down the descent
   'cgRoof', 'cgCount', 'cgLight',                                          // #50-C the congregation's carved lines (#50-A's papers register via the #69 factory)

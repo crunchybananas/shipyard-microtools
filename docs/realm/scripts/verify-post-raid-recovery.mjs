@@ -1,34 +1,34 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, setSeed } from '../js/state.js?realm=197';
-import { generateWorld } from '../js/world.js?realm=197';
-import { dispatch } from '../js/commands.js?realm=197';
+import { G, setSeed } from '../js/state.js?realm=198';
+import { generateWorld } from '../js/world.js?realm=198';
+import { dispatch } from '../js/commands.js?realm=198';
 import {
   FIRST_MUSTER_STEPS,
   updateFirstMusterChapter,
-} from '../js/first-muster.js?realm=197';
-import { checkRaids } from '../js/economy.js?realm=197';
+} from '../js/first-muster.js?realm=198';
+import { checkRaids } from '../js/economy.js?realm=198';
 import {
   commitGameLoad,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=197';
+} from '../js/save-state.js?realm=198';
 import {
   getPostRaidRecoveryReport,
   getPostRaidRecoverySnapshot,
   updatePostRaidRecovery,
-} from '../js/post-raid-recovery.js?realm=197';
-import { checkScenarioComplete, getActiveScenario } from '../js/scenarios.js?realm=197';
+} from '../js/post-raid-recovery.js?realm=198';
+import { checkScenarioComplete, getActiveScenario } from '../js/scenarios.js?realm=198';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
-} from '../js/citizen-ownership.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
 import {
   assignCitizenResidence,
   residencePortalForCitizen,
-} from '../js/residences.js?realm=197';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=197';
+} from '../js/residences.js?realm=198';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=198';
 
 function reset(seed = 18950) {
   setSeed(seed);

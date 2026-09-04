@@ -21,7 +21,7 @@
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
   for (let i = 0; i < 3; i++) {
     await h.navigate(URL);

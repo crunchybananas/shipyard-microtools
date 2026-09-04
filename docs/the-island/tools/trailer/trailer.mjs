@@ -23,7 +23,7 @@ export default async function (h) {
   };
   await h.navigate('http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute');
   await ready();
-  await h.evaluate(`localStorage.removeItem('abyme-save-v1'); 1`);
+  await h.evaluate(`localStorage.removeItem('abyme-save'); 1`);
   await h.navigate('http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute');
   await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
@@ -99,7 +99,7 @@ export default async function (h) {
     console.log(`shot ${name}: ${n} frames`);
   }
   // the title card IS the game's title screen, buttons hidden
-  await h.evaluate(`localStorage.removeItem('abyme-save-v1'); 1`);
+  await h.evaluate(`localStorage.removeItem('abyme-save'); 1`);
   await h.navigate('http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/');
   await ready();
   await h.evaluate(`(() => {

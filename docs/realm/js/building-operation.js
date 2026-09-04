@@ -2,8 +2,8 @@
 // ordinary benefit. Construction sites are never operational; staffed
 // buildings also require at least their catalogued workforce.
 
-import { G, BUILDINGS } from './state.js?realm=197';
-import { staffingCount, workersForBuilding } from './citizen-ownership.js?realm=197';
+import { G, BUILDINGS } from './state.js?realm=198';
+import { staffingCount, workersForBuilding } from './citizen-ownership.js?realm=198';
 
 const MILITARY_BUILDINGS = new Set(['barracks', 'archery']);
 

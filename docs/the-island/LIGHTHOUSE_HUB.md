@@ -1,164 +1,140 @@
-# THE LIGHTHOUSE AS A PROGRESSION HUB — design (APPROVED, building)
+# Lighthouse Hub — Current Design Contract
 
-> Status: **APPROVED — building.** Owner reviewed + answered the six questions (2026-06-25) and said
-> "start building". **Phase A (bones) SHIPPED. Phase B (the climb) — first slice SHIPPED:** the
-> walkable lamp-room gallery + the vista + the next-tide FORESHADOW, reached by a committed climb
-> gated on `lampLit`; an enclosed spiral stair winds the tower (shows in the chart-table model).
-> **B2 (later):** a flythrough up the stair so the climb is *seen* (the stair is currently enclosed).
-> **Phase C (the tunnels) — first slice SHIPPED:** owner chose a fresh entrance (the sealed cellar
-> can't sprout tunnels). A collapsed **drain** on the standing-stones pad drops to a small buried
-> chamber that **floods with depth** (dry at the surface, drowned at the bottom — the real flood-per-
-> depth mechanic, decision #4) with one carved line of lore. This proves the Phase C pattern
-> (entrance + buried chamber + collision + flood + lore). **C-next:** grow the warren (more chambers,
-> the cross-level descents that connect the strata, the cellar joining in). Decisions in §7.
-> Canon guardrails: zero-dep three.js · ALL-METAPHOR · grief → INTEGRATION · power-safe 60fps ·
-> the 1:240 chart-table model mirrors the island (recursion) · never literal.
->
-> **OWNER DECISIONS (binding):** (1) tunnels = **large network**; (2) top vista = **foreshadow** (glimpse
-> the next level's waterline); (3) cross-level = **YES, tunnels connect between sea-strata levels** (this is
-> what justifies the large network); (4) flood-per-depth = **YES**; (5) lore = **one line each**; (6) start
-> with **Phase A bones**. Build order: A bones ✅ → B climb + foreshadow vista → C large cross-level flooded
-> network → D wiring.
+The lighthouse is the game's instrument panel, evidence room, and return point. It
+must feel like a worked place in the world, never a menu wrapped in architecture.
 
----
+## Spatial reading
 
-## 1. The core idea (why this is *right*, not just bigger)
+A player entering the study should understand the room in this order:
 
-ABYME already runs on two axes: you go **down** (the dive / SEA-STRATA — descend into deeper, dimmer
-copies of the island) and you go **up** (the climb-out ending — `W.flags.returned`). Right now the
-lighthouse is mostly a *fixture* you operate from the study; the descent happens through a plate in the
-floor and the ascent is an ending.
+1. **Window and basin:** the valve can be operated while its full-sized tide result
+   remains visible outside.
+2. **Chart table:** the 1:240 island is the center of the room. The crack, lighthouse
+   lens seat, moving player marker, and plumb alignment all belong to this object.
+3. **Time instrument:** the crank has a clear silhouette and a view toward the sky.
+4. **Signal shelf:** eight manuals are close enough to compare as one index, but
+   separated from the beam's cliff so the deduction requires memory or Field Notes.
+5. **Floor plate:** the threshold is physically under the model beach. It stays
+   visually secondary until the plumb completes the circuit.
+6. **Tower stair:** lighting the lamp opens the climb to the gallery and its exterior
+   confirmation.
+7. **Quarters and records:** these deepen the place without competing with the
+   surface circuit.
 
-The hub idea makes the lighthouse **hold both axes in one structure** — and that's the whole game's
-metaphor made architectural:
+The room may be dense with lived detail, but progression props need clean sightlines
+and independent interaction volumes. No floating arrows or HUD objectives should be
+needed to distinguish them.
 
-- **The top — the watch.** You climb to tend the light. The part of grief that keeps a vigil, keeps
-  something lit, keeps perspective.
-- **The middle — the working room.** The study: where you look at your situation from outside (the
-  model), and keep doing the daily work.
-- **The depths — the buried.** Tunnels under the foundation: the unspoken, the things you don't go into
-  until you're ready.
+## The model circuit
 
-> **The lighthouse is the architecture of a grieving mind.** It opens up as you do the work — locked
-> parts become walkable. **That progressive opening *is* integration, made spatial.** You don't conquer
-> the lighthouse; you become able to move through all of yourself.
+Every required surface interaction has a local action and a distant confirmation.
 
----
+| Study action | Full-sized consequence | Earned evidence |
+|---|---|---|
+| Turn valve | Bay drains or fills | Basin and bay move together |
+| Drag sun crank | Sky changes hour | Model lamp moves with the sun |
+| Lay ruler over model crack | Eastern bridge rises | Scale turns measurement into passage |
+| Fit lens to model lighthouse | Tower lamp can burn at night | Two lighthouse lenses answer together |
+| Drag model lamp housing | Beam crosses the cliff | Four projected figures gain an order |
+| Read signal shelf | Eight figure–instrument bindings become available | The route points back into the room and island |
+| Hang plumb above model | Floor plate wakes | Model beach and crossing plate align |
 
-## 2. Current state (what we build on)
+These are physical facts, not arbitrary inventory locks. If an action cannot be
+understood by looking at both scales, improve the staging before adding explanatory
+copy.
 
-- **Tower** (~26 m, tapered) with a gallery + lamp room + dome at the top (the lamp lens ≈ y36). Today
-  it's only seen from outside / operated via the model — **not climbable.**
-- **Base drum = the study** (~5.2 m radius): chart table + 1:240 model, valve, sun-crank, music box,
-  the brass descent plate. The control room.
-- **Annex** (keeper's room, props.js:777): small, attached at the drum edge — currently **overlaps the
-  drum wall (z-fights)** and has no real walkable connection (owner-flagged). Opens one dive-level down.
-- **Cellar** (props.js:1448, group `cellar`): already a real underground space — the vault vista, the
-  "room that disagrees" (`disagreeSea`/`disagreeLamp`), the light shaft, motes. **This is the seed of
-  the tunnel network — we grow it, we don't start from scratch.**
-- **Progression flags** (`W.flags`): `lampLit`, `hatchOpen`, `carried`, `returned`, `bellRung` — the
-  unlock signals we gate hub spaces on.
-- **Window** — just fixed (glazed, reads as a window).
+## Signal shelf
 
----
+The shelf is an index, not a solution.
 
-## 3. The four spaces
+- It contains exactly eight manuals.
+- Every spine carries one recurring figure and one named instrument.
+- The complete figure–instrument routing is visible at once; no value is printed.
+- No volume is emphasized as one of the four needed.
+- The manuals never encode an extra sentence, ordering trick, or fallback answer.
+- The beam supplies selection and order; the shelf supplies destinations; the
+  instruments supply physical readings.
+- The buried hatch uses four decimal numeral rings, visually distinct from the beam
+  figure atlas.
 
-### A · Ground floor — *the working room* (fix + open)
-**What:** the study, made into a clean, properly walkable ground floor; the annex fixed and connected.
-**Fix the bones:** nudge the annex out so its wall no longer overlaps the drum (kill the z-fight), cut a
-real doorway in the drum at the annex angle, and widen the passage so you can actually walk in. The annex
-stays the keeper's room (the life left mid-sentence), now reachable.
-**Metaphor:** the present-tense room — the daily work continues while you grieve.
-**Gate:** open from the start (annex still reveals its contents one level down, as today).
+The notebook may preserve the beam order and the shelf bindings. It must never write
+the exact four-wheel answer or make the physical instruments optional.
 
-### B · The climb — *the watch* (new)
-**What:** an internal spiral stair winding up the tower from the ground floor to a **walkable lamp room +
-gallery (outdoor balcony)** at the top, with a **vista** over the whole island and the sea.
-**The vista is the payoff:** from the top you see the island whole — the stones, the causeway, the
-drowned shapes — and the sea-strata reading of the tide. Orientation and awe; the model made real at
-1:1. (Option: the top is where you glimpse the *next* level's waterline — a quiet foreshadow.)
-**Metaphor:** going up to tend the light = the vigil, hope kept lit, the long view that grief eventually
-allows.
-**Gate:** the stair is dark/roped until **`lampLit`** — you earn the climb by lighting the lamp. (Lighting
-the lamp is already a mid-game beat.)
+## Field Notes in the hub
 
-### C · The tunnels — *the buried* (grow the cellar)
-**What:** extend `cellar` into a small **network** beneath the foundation — the keeper's workings, old
-drains, buried rooms — revealed a piece at a time. Each tunnel carries one thing: a fragment/lore beat
-(the keeper's buried writing), a small mechanic, or a connection (e.g., a tunnel that surfaces at the
-stones).
-**Scale (proposed):** **3–4 short tunnels**, not a maze — legible, each a single idea. Lean geometry
-(instanced supports, BackSide shells like the existing vault) so it stays in budget.
-**Metaphor:** the foundations the light stands on — the parts of grief you go into only when ready. The
-descent work, literalized under the structure that holds the watch.
-**Gate:** staged — tunnel 1 with the cellar/plumb beat (`hatchOpen`); deeper ones after a dive / near the
-turn; the deepest only after the keeper (`carried`).
+The hub is where observations are compared, so `J` should feel like opening a field
+instrument at the table.
 
-### D · Hub wiring — *integration* (progressive opening)
-**What:** make the lighthouse the **return point** that visibly opens each pass: study → annex → climb
-(`lampLit`) → tunnels (staged) → fully open after the turn/return (`carried`/`returned`). Coming back and
-finding more of it walkable is the felt reward.
-**Metaphor:** the parts becoming connected = integration. The final state (everything open, top and
-tunnels both reachable) is the structure whole.
+- Entries are earned and keyed by stable IDs.
+- Copy is observational; it does not issue objectives.
+- Discovery order is preserved.
+- A page reached later is separate evidence from the artifact's first page.
+- **Trace a lead** is explicit, optional, and visually separate from the evidence
+  spread.
+- Hint tiers may point to a relationship but cannot write evidence or satisfy a
+  challenge gate.
 
----
+When the tab pulses, it means a new observation was earned. It does not mean a new
+task was assigned.
 
-## 4. Progression map (gate → space)
+## Plate behavior
 
-| Beat / flag | Unlocks |
+The plate is the sole threshold across all strata. It uses one consistent grammar:
+
+1. stand on its center;
+2. first touch arms the available crossing;
+3. second touch commits;
+4. stepping away disarms it.
+
+On the surface, it remains cold until the full model circuit is complete. On lower
+strata, it reports the local missing evidence through its material response and a
+brief line. At the source it points upward. After the full climb, it commits the
+bottom disposition at the returned surface.
+
+The bell and oar can answer touch with sound or movement, but never compete with the
+plate as terminal authority.
+
+## The hub across strata
+
+The study is repeated, not reset. Each return changes what the same architecture
+means.
+
+| Stratum | Hub function |
 |---|---|
-| start | study ground floor (walkable, annex fixed) |
-| one dive down | annex contents (existing) |
-| `lampLit` | the stair + walkable top + vista |
-| `hatchOpen` | tunnel 1 (cellar/plumb, existing) |
-| after a dive / mid-descent | tunnel 2 (a buried fragment) |
-| `carried` (the turn) | the deepest tunnel |
-| `returned` | the lighthouse fully open — the integrated structure |
+| Surface | Learn agency through the live model and complete the circuit |
+| Shallows | Discover that an act above still arrives below through the dead valve |
+| Inspection | Let the register count the hands and costs that the surface concealed |
+| Source | Read the wet consequences, regard the Lower Hand, set a disposition |
+| Returned surface | See what endured, then commit the chosen relation at the plate |
 
----
+The Lower Hand remains visually and narratively separate. The scene asks for regard,
+not collection, substitution, or a reveal that collapses two figures into one.
 
-## 5. Technical constraints (the honest ones)
+## Return composition
 
-- **The 1:240 model clone mirrors the island (recursion).** Every lighthouse change reflects in the
-  chart-table model. The clone prunes some named groups (`MODEL_PRUNE`) and chokes on `Points` — interior
-  stair/tunnel detail should be `Mesh`/`InstancedMesh` and likely pruned from the tiny clone (too small to
-  read). Need to verify the climb/tunnels don't break `core.clone(true)`.
-- **Power budget:** more geometry (stair steps, top room, tunnels). Hold <360 draws / <800k tris /
-  <16.6 ms. Levers: instance the stair steps; gate tunnel-section visibility on player proximity (don't
-  render the whole network at once); reuse the BackSide-shell trick the vault already uses.
-- **Collision:** `player.interior()` exists; interior walkability already works for the study. The stair
-  needs walkable step collision (ramp approximation likely simpler than true steps) and the tunnels need
-  wall collision — confirm how the study interior currently constrains the player.
-- **SEA-STRATA per level:** the lighthouse exists in every region copy. Decide whether the hub changes per
-  depth — e.g., **tunnels flood as the tide rises deeper** (a strong, free metaphor: the buried parts go
-  underwater the deeper you are), the top vista dims/changes per era grade.
-- **Intro fly-over:** the opening camera path must not clip the new stair/top geometry.
+All four dispositions share one visual standard: the same island, rotating lamp,
+golden hour, and long shadow. The game does not rank the selections through spectacle.
 
----
+Only the physical result and coda change:
 
-## 6. Phasing & rough scope
+- **tend:** hold the transfer at its present level;
+- **carry:** reverse this hand's interventions;
+- **open:** join upper and lower flow;
+- **close:** seal the crossing.
 
-- **Phase A — Bones** (~1–2 sessions): annex overlap fix + doorway + walkable ground floor. *Also clears
-  the glitch the owner flagged.*
-- **Phase B — The climb** (~2–3 sessions): stair + walkable top + vista + `lampLit` gate + model-clone safety.
-- **Phase C — The tunnels** (~3–4 sessions): 3–4 tunnels, staged unlocks, fragments, flood-per-level.
-- **Phase D — Wiring** (~1–2 sessions): progression gating, return-point polish, full-open integration state.
+The final image should make the lighthouse readable as a maintained system inside an
+imperfect world, not as a trophy or a punishment screen.
 
-Each phase ships standalone and is verifiable in isolation.
+## Implementation boundaries
 
----
+- `world.js` owns live state and stack integration.
+- `progression.js` owns challenge requirements and plate decisions.
+- `notebook.js` owns earned evidence and requested hint tiers.
+- `content.js` owns words and sketches, never gate truth.
+- `props.js` owns the glyph, instrument, and dial atlases plus shelf/hatch forms.
+- `puzzles.js` owns hub interactions.
+- `main.js` owns crossings and the single ending commit.
 
-## 7. Questions — ANSWERED (owner, 2026-06-25)
-
-1. **Tunnel scale:** → **LARGE NETWORK.** Go bigger than 3–4 — a non-linear warren, a real explorable depth.
-2. **The top vista:** → **FORESHADOW (mechanical).** The top glimpses the *next level's waterline* — a quiet
-   reveal of where the descent goes, on top of the contemplative whole-island view.
-3. **Cross-level:** → **YES — tunnels connect *between* sea-strata levels.** This is the keystone: the
-   cross-level links are what make the large network cohere (a warren that descends through the strata, not
-   isolated per-level basements). The dive/flood and the tunnels become one continuous descent.
-4. **Flood-per-depth:** → **YES.** Tunnels flood as you go deeper — the buried parts go underwater the
-   deeper you carry the grief.
-5. **New writing:** → **one line each.** Atmospheric, not a reading chore.
-6. **Start phase:** → **Phase A bones first.** ✅ BUILT + SHIPPED (annex z-fight fix + real walkable doorway
-   throat + drum doorway; clears the owner-flagged "can't go in, too tight, glitches into the main part").
+Do not reintroduce special-case progress checks in UI copy, obsolete save-field
+aliases, or alternate terminals. A changed contract belongs in these authorities and
+their tests.

@@ -6,7 +6,7 @@ import { chromium } from '@playwright/test';
 import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
-assert.equal(contract.moduleRevision, 197, 'Update food-route browser imports with the runtime revision');
+assert.equal(contract.moduleRevision, 198, 'Update food-route browser imports with the runtime revision');
 
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -35,12 +35,12 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const result = await page.evaluate(async () => {
-    const economy = await import('./js/economy.js?realm=197');
-    const inventory = await import('./js/building-inventory.js?realm=197');
-    const ownership = await import('./js/citizen-ownership.js?realm=197');
-    const render = await import('./js/render.js?realm=197');
-    const state = await import('./js/state.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const economy = await import('./js/economy.js?realm=198');
+    const inventory = await import('./js/building-inventory.js?realm=198');
+    const ownership = await import('./js/citizen-ownership.js?realm=198');
+    const render = await import('./js/render.js?realm=198');
+    const state = await import('./js/state.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const g = window.G;
 
     const requireCondition = (condition, message) => {
@@ -167,6 +167,18 @@ try {
     const farm = completeBuilding('farm', worker, [founderStore]);
     const islandStore = completeBuilding('storehouse', worker, [founderStore, farm]);
 
+    // Building completion can satisfy a tick-60 mission reward. Settle that
+    // deterministic authority before taking the one-meal inventory baseline;
+    // otherwise browser startup timing can place the reward inside the route
+    // window and make an exact withdrawal assertion flaky.
+    g.debug.step(60 - (g.gameTick % 60));
+    for (const store of inventory.foodStores(g, { withFood: true })) {
+      if (store === founderStore) continue;
+      const moved = inventory.withdrawFood(store, inventory.storedFood(store), g).taken;
+      const deposited = inventory.depositFood(founderStore, moved, g);
+      requireCondition(deposited.remainder === 0, 'Founder Storehouse could not absorb settled fixture rewards');
+    }
+
     ui.updateUI();
     g.selectedCitizenId = null;
     g.selectedBuilding = founderStore;
@@ -179,7 +191,11 @@ try {
     requireCondition(foodHudTitle.includes('physically stored'), `Food HUD hid physical storage: ${foodHudTitle}`);
     requireCondition(foodHudTitle.includes('Citizens walk there to eat'), `Food HUD hid the citizen route: ${foodHudTitle}`);
 
-    ownership.claimCitizenAssignment(worker, farm, { reason: 'player-command' });
+    ownership.releaseCitizenAssignment(worker, 'player-command');
+    requireCondition(
+      ownership.claimCitizenAssignment(worker, farm, { reason: 'player-command' }),
+      'Crown worker could not claim the Farm after fixture settlement',
+    );
     ownership.transitionCitizenActivity(worker, 'working', 'arrived-at-work');
     setPosition(worker, farm.x + 1, farm.y);
     worker.speed = 0.38;
@@ -204,8 +220,14 @@ try {
     const approachTicks = stepUntil('Crown worker reaching Storehouse meal', () => worker.activity.kind === 'eating');
     requireCondition(approachTicks > 0, 'Crown worker ate without a visible route');
     requireCondition(worker._foodTarget === founderStore, 'Meal completed at a different Storehouse');
-    requireCondition(g.resources.food === foodBeforeRoute - 1, 'Arrival did not withdraw exactly one mirrored food');
-    requireCondition(inventory.storedFood(founderStore) === storeBeforeRoute - 1, 'Arrival did not withdraw exactly one physical food');
+    requireCondition(
+      g.resources.food === foodBeforeRoute - 1,
+      `Arrival mirrored food mismatch: expected ${foodBeforeRoute - 1}, found ${g.resources.food}`,
+    );
+    requireCondition(
+      inventory.storedFood(founderStore) === storeBeforeRoute - 1,
+      `Arrival physical food mismatch: expected ${storeBeforeRoute - 1}, found ${inventory.storedFood(founderStore)}`,
+    );
     requireCondition(worker.hunger === 20, 'Arrival meal did not satisfy hunger');
     requireCondition((g._dailyFoodConsumed || 0) === consumedBefore + 1, 'Meal did not update truthful daily consumption');
     requireCondition(worker.assignment === crownAssignment, 'Eating erased the Crown assignment');

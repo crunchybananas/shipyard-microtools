@@ -25,7 +25,7 @@ const DOORS = [
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (name, cond, extra) => (cond ? R.pass : R.fail).push(name + (cond ? '' : ' :: ' + JSON.stringify(extra)));
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
   const ready = async () => {
     for (let i = 0; i < 40; i++) {

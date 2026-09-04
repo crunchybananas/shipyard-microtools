@@ -1,14 +1,14 @@
 // Post-raid recovery doctrine — a deterministic, reward-free player choice
 // that turns the First Muster victory into one concrete follow-up action.
 
-import { G, BUILDINGS, MAP_H, MAP_W } from './state.js?realm=197';
-import { isBuildingComplete, isBuildingOperational } from './building-operation.js?realm=197';
-import { isFirstMusterComplete } from './first-muster.js?realm=197';
+import { G, BUILDINGS, MAP_H, MAP_W } from './state.js?realm=198';
+import { isBuildingComplete, isBuildingOperational } from './building-operation.js?realm=198';
+import { isFirstMusterComplete } from './first-muster.js?realm=198';
 import {
   citizenAtResidencePortal,
   citizenHasValidResidence,
   residentsForHouse,
-} from './residences.js?realm=197';
+} from './residences.js?realm=198';
 
 export const POST_RAID_RECOVERY_ID = 'post_raid_recovery';
 export const POST_RAID_DOCTRINE_PATH = 'storyFlags.postRaidDoctrine';

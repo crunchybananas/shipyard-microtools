@@ -4,8 +4,8 @@
 // player gives them intent rather than steering individual units.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_H, MAP_W, rngRange } from './state.js?realm=197';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=197';
+import { G, MAP_H, MAP_W, rngRange } from './state.js?realm=198';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=198';
 
 export const ARMY_ORDERS = Object.freeze(['defend', 'rally', 'patrol', 'guard', 'explore']);
 
@@ -79,7 +79,7 @@ function formationOffset(soldier, members) {
   return { x: -ring, y: -along };
 }
 
-function objectiveDestination(objective, soldier, members, state) {
+function objectiveDestination(objective, soldier, members, _state) {
   const offset = formationOffset(soldier, members);
   const requestedX = objective.x + offset.x;
   const requestedY = objective.y + offset.y;

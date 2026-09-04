@@ -46,7 +46,7 @@ different birds; they must never see different granaries.
 
 | Tier | Modules |
 |---|---|
-| CORE | state, world, pathfinding-kernel, pathfinding-service, pathfinding, ground-traffic, citizens, citizen-activity, citizen-needs, citizen-work, citizen-food, citizen-shelter, citizen-navigation, citizen-traffic, citizen-route-state, soldiers, combat, military, walkers, economy, building-inventory, events, tech, trade, wonder, scenarios, first-muster, post-raid-recovery, missions, story, raid-summary, sim, commands, bus, log, fx, avatar, building-lifecycle, building-operation, workforce-policy, citizen-ownership, residences, death-markers |
+| CORE | state, world, pathfinding-kernel, pathfinding-service, pathfinding, ground-traffic, citizens, citizen-activity, citizen-needs, citizen-work, citizen-food, citizen-shelter, citizen-navigation, citizen-traffic, citizen-route-state, soldiers, combat, military, walkers, economy, building-inventory, logistics, events, tech, trade, wonder, scenarios, first-muster, post-raid-recovery, missions, story, raid-summary, raid-planner, raid-intelligence, sim, commands, bus, log, fx, avatar, building-lifecycle, building-operation, workforce-policy, citizen-ownership, residences, death-markers |
 | SHELL | main (loop/init), pathfinding-client, pathfinding-worker, render, minimap, postfx, ui, input, audio, notifications (DOM half), story-ui (chronicle DOM + optional wall-clock preview), achievements, advisor, save (localStorage wrapper), save-state/save-schema (pure boundary), citizen-inspector, citizen-presentation, citizen-render-cache, presentation-cues, enhancements, particles (update), animals, sprite-lab, sprite-muster, sprite-source-contract, actor-registration, enemy-sprite-contract, atlas-loader |
 
 ## Core contract rules
@@ -103,6 +103,48 @@ different birds; they must never see different granaries.
   timing or computed results. Local collision avoidance and right-of-way remain
   deterministic main-thread traffic decisions; global A* does not model moving
   citizens as hard obstacles.
+- `logistics.js` is the deterministic production-delivery broker. For physical
+  wheat and flour it ranks only live, capacity-bearing destinations with a real
+  route, then weighs converter role, free space, inbound reservations,
+  operational staffing, workforce priority, and downstream food urgency. It
+  returns immutable diagnostics; `citizens.js` owns bounded route adoption,
+  partial deposit, and remainder rerouting. Food eating retains its separate
+  occupancy-aware route contract.
+- Physical supply currently means `food`, `wheat`, and `flour`. Windmills and
+  Bakeries consume their own delivered input; Granaries and Storehouses are
+  fallback grain stores; Houses never receive wheat or flour. Other resources
+  still use their legacy wallet/delivery paths until a later physical-goods and
+  cart slice changes them deliberately. Unroutable output stays in the producer
+  buffer. A carrier orphaned from both source and destination keeps the load but
+  may still eat, sleep, and shelter, then resumes the obligation when storage
+  becomes reachable.
+
+## Raid intent and siege routing
+
+- `raid-planner.js` is a dependency-free fixed-cost planner. An explicit belief
+  snapshot is its complete authority; it chooses an objective, engagement cell,
+  path, and ordered breaches by minimizing
+  `travel + breach + exposure + congestion - value`. Stable string/node ties,
+  fixed integer costs, an `80x80` search bound, immutable rationales, and a
+  compact decision fingerprint keep the result replayable and debuggable.
+- `raid-intelligence.js` is the Realm adapter. It projects authoritative terrain,
+  road travel, live completed structures and hit points, tower exposure,
+  building-local physical loot, and prior route assignments into planner input.
+  It persists a bounded save-shaped intent on each active raider and produces
+  the player-facing scout sentence. An offshore spawn uses bounded water-only
+  BFS to the nearest connected viable landfall before the ground assault begins;
+  every stored route step is adjacent and combat never opens a permissive tunnel
+  through mountain or building cells. The live adapter currently sees the
+  current battlefield; campaign fog of war, stale knowledge, deception, and
+  learned doctrine are future belief-layer work, not shipped behavior.
+- `combat.js` executes the named route and may attack only a matching ordered
+  breach or the chosen objective. Obstacle-epoch changes and external target
+  loss replan deterministically; sequential assignment pressure can split
+  equivalent corridors. One strategic sack, a fire-completed objective, or the
+  shared physical-loot goal withdraws the whole band. Planned breaches do not
+  satisfy the mission. Morale uses actual raid deaths, holds at exactly 60%, and
+  breaks strictly beyond it; successful withdrawal is never a casualty. This is
+  tactical route coordination, not yet formation or full campaign command AI.
 
 ## Commands (the only mutation surface)
 
@@ -147,13 +189,17 @@ the core neither knows nor cares.
 
 ## Save format
 
-- Realm is in development and uses one strict Engine v2 save epoch. The current
-  contract is module revision `197`, schema `realm.engine-v2`, key
-  `realm-engine-v2-save`, save version `6`, simulation version `8`, and core
-  order
-  `sha256:14621d8fcd8b94594989a9bc8b98e0e67c7f654687e80cdab8cafd940c19c014`.
-  These values come only from `runtime-contract.json`; the order identifier is
-  the content address of the executable order.
+- Realm is in development and uses one strict Engine v2 save epoch. Round 008 is
+  promoted atomically at module revision `198`, schema `realm.engine-v2`, key
+  `realm-engine-v2-save`, save version `7`, and simulation version `10`. These
+  values are not permission for mixed-version loads. The authoritative live
+  values and core order identifier come only from `runtime-contract.json`; the
+  order identifier is the content address of the executable order.
+- Save `7` is the clean cut for authoritative food/wheat/flour inventories, the
+  required `physicalSupplyWeb` marker, physical-cargo delivery references, and
+  bounded raid path/intent/breach state. Simulation `10` identifies the new
+  delivery, local conversion, and warband decision behavior for golden-master
+  review.
 - Superseded save keys and shapes are outside the runtime contract. There is no
   migration, fallback, backup, compatibility classifier, or preservation
   guarantee for development-era data. Source control is the rollback mechanism.
@@ -192,7 +238,9 @@ the core neither knows nor cares.
 - **Schedule:** citizens read the day clock (`getDayPeriod()`): sleep at home at
   night (rest restores), work by day, leisure at dusk. Production *pulses* are
   unchanged (no economy rebalance); what changes is where bodies are and hauling
-  rhythm (goods bank directly overnight, hauling resumes at dawn).
+  rhythm. Food, wheat, and flour remain in building inventory, output buffers,
+  or carried cargo until a valid transfer, while legacy nonphysical goods retain
+  their existing banking behavior.
 - **Needs:** `needs{rest,joy,faith}` + existing hunger. Walker visits now actually
   satisfy resident needs (walkers stop being cosmetic); dusk leisure visits pull
   services. Per-citizen mood contributes a bounded ±15 to realm happiness on top of
@@ -254,6 +302,15 @@ defects. RFC 0002's sprite work remains governed separately by its native-scale
 acceptance and source-contract evidence. See `loop/engine-v2/CURRENT.md` and
 `loop/engine-v2/ROADMAP.md` for current status.
 
+Realm 198 promotes the Round 008 Living Supply Web + Thinking Warband slice. It
+adds deterministic reserved production routes, local grain conversion, truthful
+supply ledgers, embodied orphan-cargo recovery, coast-aware raid landfalls,
+explicit raid intent, deliberate breach execution, shared band ambition, honest
+casualty morale, and topology/target replanning. The new module graph, strict save
+shape, reviewed simulation-10 golden, and complete 68-check affected release run
+are green together; broader physical goods/carts and deeper partial-information
+campaign intelligence remain later phases.
+
 ## Verification for every engine-touching loop iteration
 
 ```
@@ -264,6 +321,12 @@ node docs/realm/scripts/verify-engine-v2-save.mjs  # strict clean-epoch schema/l
 node docs/realm/scripts/verify-save-continuity.mjs # fresh-process continuation
 node docs/realm/scripts/verify-building-lifecycle.mjs
 node docs/realm/scripts/verify-building-use.mjs
+node docs/realm/scripts/verify-physical-grain-inventory.mjs
+node docs/realm/scripts/verify-logistics-broker.mjs
+node docs/realm/scripts/verify-production-logistics.mjs
+node docs/realm/scripts/verify-supply-ledger-browser.mjs
+node docs/realm/scripts/verify-raid-planner.mjs
+node docs/realm/scripts/verify-raid-route-integration.mjs
 node docs/realm/scripts/verify-army-orders.mjs
 node docs/realm/scripts/verify-a17-innkeeper-actions.mjs
 node docs/realm/scripts/verify-a18-scholar-actions.mjs

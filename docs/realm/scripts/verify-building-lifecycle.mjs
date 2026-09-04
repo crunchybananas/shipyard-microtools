@@ -1,28 +1,28 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, BUILDINGS, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=197';
-import { generateWorld } from '../js/world.js?realm=197';
-import { placeBuilding, updateFires } from '../js/economy.js?realm=197';
-import { buildingCapacity } from '../js/building-lifecycle.js?realm=197';
-import { dispatch } from '../js/commands.js?realm=197';
-import { updateEnemies } from '../js/combat.js?realm=197';
-import { initChronicle } from '../js/log.js?realm=197';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=197';
+import { G, BUILDINGS, MAP_H, MAP_W, createResourceStock, setSeed } from '../js/state.js?realm=198';
+import { generateWorld } from '../js/world.js?realm=198';
+import { placeBuilding, updateFires } from '../js/economy.js?realm=198';
+import { buildingCapacity } from '../js/building-lifecycle.js?realm=198';
+import { dispatch } from '../js/commands.js?realm=198';
+import { updateEnemies } from '../js/combat.js?realm=198';
+import { initChronicle } from '../js/log.js?realm=198';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=198';
 import {
   claimCitizenAssignment,
   onCitizenTransition,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=197';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=198';
 
 setSeed(424242);
 generateWorld();
 initChronicle();
 G.resources = createResourceStock({
   wood: 10000, stone: 10000, food: 120, gold: 10000,
-  iron: 10000, wheat: 10000, flour: 10000, planks: 10000, tools: 10000,
+  iron: 10000, wheat: 0, flour: 0, planks: 10000, tools: 10000,
 });
 establishFounderStockpile();
 G._undoStack = [];
@@ -255,7 +255,11 @@ function assertDetached(building, label) {
 
 // Undo integration: full refund plus story/capacity/defense rollback.
 {
-  G.storyFlags = { beforePlacement: true, physicalFoodInventory: true };
+  G.storyFlags = {
+    beforePlacement: true,
+    physicalFoodInventory: true,
+    physicalSupplyWeb: true,
+  };
   G.chronicle = [{ day: G.day, season: G.season, tick: G.gameTick, text: 'before', tag: 'misc' }];
   const resourcesBefore = structuredClone(G.resources);
   const maxPopBefore = G.maxPop;
@@ -268,7 +272,11 @@ function assertDetached(building, label) {
   assert.deepEqual(G.resources, resourcesBefore, 'undo: full resource refund');
   assert.equal(G.maxPop, maxPopBefore, 'undo: castle capacity');
   assert.equal(G.defense, defenseBefore, 'undo: castle defense');
-  assert.deepEqual(G.storyFlags, { beforePlacement: true, physicalFoodInventory: true }, 'undo: story flags');
+  assert.deepEqual(G.storyFlags, {
+    beforePlacement: true,
+    physicalFoodInventory: true,
+    physicalSupplyWeb: true,
+  }, 'undo: story flags');
   assert.equal(G.chronicle.length, 1, 'undo: chronicle rollback');
   assertDetached(building, 'undo');
 }

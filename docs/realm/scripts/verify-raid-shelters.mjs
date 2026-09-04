@@ -3,27 +3,27 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=197';
-import { makeCitizen } from '../js/world.js?realm=197';
-import { makeAvatar } from '../js/avatar.js?realm=197';
-import { updateCitizens } from '../js/citizens.js?realm=197';
-import { updateEnemies } from '../js/combat.js?realm=197';
+} from '../js/state.js?realm=198';
+import { makeCitizen } from '../js/world.js?realm=198';
+import { makeAvatar } from '../js/avatar.js?realm=198';
+import { updateCitizens } from '../js/citizens.js?realm=198';
+import { updateEnemies } from '../js/combat.js?realm=198';
 import {
   claimCitizenAssignment,
   onCitizenTransition,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
 import {
   citizenAtResidencePortal,
   citizenHasValidResidence,
   citizenIsIndoors,
   houseResidentCapacity,
   residencePortalForCitizen,
-} from '../js/residences.js?realm=197';
-import { prepareSave, serializeGame } from '../js/save-state.js?realm=197';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=197';
-import { resetPathfindingService } from '../js/pathfinding-service.js?realm=197';
+} from '../js/residences.js?realm=198';
+import { prepareSave, serializeGame } from '../js/save-state.js?realm=198';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=198';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=198';
 
 function resetCore(seed = 91_801) {
   resetPathfindingService();
@@ -263,4 +263,31 @@ stepCitizensUntil(() => carrier.activity.kind === 'sheltered');
 assert.equal(G.resources.wood, woodBefore + 3, 'post-delivery shelter route credited cargo twice');
 assert.equal(citizenIsIndoors(carrier), true);
 
-console.log('[raid-shelters] PASS — realm-wide own-home alarm, pre-arrival vulnerability, portal/capacity gates, indoor immunity, sleeper continuity, unreachable flight, cargo handoff, and normal all-clear exit');
+// A carrier whose producer and destination are both gone has no live delivery
+// obligation to finish before taking cover. The payload remains embodied while
+// its owner shelters and returns to the delivery state after the all-clear.
+resetCore(91_805);
+const orphanHome = addBuilding('house', 20, 20);
+const orphanCarrier = addCitizen('Orphaned Sheltering Carrier', 25, 20);
+orphanCarrier.home = orphanHome;
+orphanCarrier.carrying = 'wheat';
+orphanCarrier.carryAmount = 2;
+orphanCarrier._deliveryTarget = null;
+orphanCarrier.assignment = null;
+transitionCitizenActivity(orphanCarrier, 'needs_delivery', 'cargo-ready');
+G.enemies = [raider(55, 55)];
+updateCitizens();
+assert.equal(orphanCarrier.activity.kind, 'seek_shelter', 'targetless physical cargo suppressed the raid alarm');
+stepCitizensUntil(() => orphanCarrier.activity.kind === 'sheltered');
+assert.equal(citizenIsIndoors(orphanCarrier), true);
+assert.equal(orphanCarrier.carrying, 'wheat', 'sheltering deleted orphaned cargo');
+assert.equal(orphanCarrier.carryAmount, 2);
+G.enemies = [];
+G.gameTick++;
+updateCitizens();
+assert.equal(orphanCarrier.activity.kind, 'find_job');
+stepCitizensUntil(() => orphanCarrier.activity.kind === 'needs_delivery');
+assert.equal(orphanCarrier.carrying, 'wheat', 'all-clear recovery deleted orphaned cargo');
+assert.equal(orphanCarrier.carryAmount, 2);
+
+console.log('[raid-shelters] PASS — realm-wide own-home alarm, pre-arrival vulnerability, portal/capacity gates, indoor immunity, sleeper continuity, unreachable flight, active-cargo handoff, orphan-cargo cover, and normal all-clear exit');

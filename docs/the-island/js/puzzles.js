@@ -6,22 +6,33 @@ import * as THREE from 'three';
 import {
   W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL,
   MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, recordWriting, writings,
-  handId, draft, evidence, hands, DISPOSITIONS,
+  handId, draft, evidence, upstreamEvents, hands, MAX_TIDE, effectiveTideAt,
 } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import {
-  BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS,
-  matJoinery, GILT_REST, GILT_HOVER, updateSandWriting,
+  BIRD_MELODY, BOX_MELODY, STONE_NOTES, HATCH_CODE, BEAM_GLYPHS,
+  updateSandWriting,
 } from './props.js';
 import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
 import { clamp, lerp, lerpAngle, TAU } from './util.js';
+import { UpstreamHand } from './upstream-hand.js';
+import {
+  NOTE_IDS, PROGRESSION, advanceDecimalDial, advanceLowerHandRegard, canAttemptStoneSong,
+  canOpenChest, canRevealShimmer, hatchCodeMatches, nextPlateAction,
+} from './progression.js';
+import {
+  LAMPBLACK, LAMPBLACK_CLOSE, HAND_MARKS, CLIMBERS, CLIMBERS_CLOSE,
+  CONGREGATION, CONGREGATION_CLOSE, LORE, T,
+} from './content.js';
+import { resetPuzzleRuntimeState } from './puzzle-runtime.js';
+import { nextRefugeAction } from './refuge.js';
+import { DISPOSITION_IDS, dispositionOperation, nextDisposition } from './dispositions.js';
 
 // #132: the inspector's record — every LORE entry flagged record:true participates
 // in the FILE-or-KEEP economy (read → take → cabinet or source).
 const REC_IDS = Object.keys(LORE).filter((id) => LORE[id].record);
-import { KEEPER, LAMPBLACK, HAND_MARKS, CLIMBERS, CLIMBERS_CLOSE, CONGREGATION, CONGREGATION_CLOSE, LORE, T } from './content.js';
 
 // The tide gauge's top ring — cut by the keeper above every waterline the descent
 // has, "measured, not yet met". Under THE STACK it is the one mark in the world that
@@ -29,7 +40,6 @@ import { KEEPER, LAMPBLACK, HAND_MARKS, CLIMBERS, CLIMBERS_CLOSE, CONGREGATION, 
 // props.js (the gauge's `top.position.y`); keep them together if either moves.
 const GAUGE_FIFTH_Y = 4.83;
 
-const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
 const CLIFF = new THREE.Vector3(57.5, 14, 50);
 const CLIFF_AZ = Math.atan2(CLIFF.x - LH.x, CLIFF.z - LH.z);
@@ -42,42 +52,98 @@ const KEEPER_SONG = [...BOX_MELODY, 5];
 // #49: the high pool's basin floor (matches props) — the water shows above it only at L4
 const POOL = { x: -75.5, z: -77.0, floor: 3.42 };
 const _kv = new THREE.Vector3();
-const _ov = new THREE.Vector3();   // scratch for the oar's world position (nested in the dory group)
-
-// the keeper's words (KEEPER.look) live in content.js now, alongside his arrival and
-// farewell lines — one place for the voice layer and the twist to re-point (#14).
 
 export class Game {
-  constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onAscend, onFinale, onLeave, onClimb }) {
+  constructor({ refs, modelRefs, modelRoot, modelAnchor, interact, player, notebook, onDive, onAscend, onEnding, onClimb }) {
+    if (!notebook || typeof notebook.record !== 'function' || typeof notebook.has !== 'function') {
+      throw new TypeError('Game requires a Notebook instance');
+    }
+    for (const [name, callback] of Object.entries({ onDive, onAscend, onEnding, onClimb })) {
+      if (typeof callback !== 'function') throw new TypeError(`Game requires an ${name} callback`);
+    }
     this.refs = refs;
     this.modelRefs = modelRefs;
     this.player = player;
     this.interact = interact;
+    this.notebook = notebook;
+    this.progression = PROGRESSION;
     this.onDive = onDive;
     this.onAscend = onAscend;
-    this.onFinale = onFinale;
-    this.onLeave = onLeave;     // the climb-out terminal: row off the wake-up beach (#22, The Oar)
+    this.onEnding = onEnding;
     this.onClimb = onClimb;     // hub Phase B: ascend/descend the lamp-room stair (up = true/false)
 
-    W.dials = W.dials || [0, 0, 0, 0];
+    // The chart-table half has to be built after instantiateModel(), while its
+    // architectural half already has an L2-only root in regions/l2_shallows.js.
+    // One owner drives both so the 1:240 break can never desynchronise.
+    this.upstreamHand = refs.upstreamHand && modelRoot ? new UpstreamHand({
+      worldRoot: refs.upstreamHand,
+      modelRoot,
+      modelWheel: modelRefs.valveWheel,
+      waterY,
+      reducedMotion: () => W.reduceMotion,
+    }) : null;
 
-    // eased animation values
-    this.anim = {
-      chest: 0, vault: 0, hatch: 0, boxLid: 0, innerDoor: 0,
-      beamI: 0, shaft: 0, valveSpin: 0, stoneGlow: [0, 0, 0, 0, 0, 0],
-      shimmer: 0,
-    };
-    this.stoneSeq = [];
-    this.songSeq = [];   // #49: rolling window for the keeper's song (E G A D C + the fallen B)
-    this.birdTimer = 8; // sing soon after dawn arrives
-    this.boxPlaying = false;
-    this._keeperLook = 0;        // eased 0..1: the figure turning to face you
-    this._keeperLookTarget = 0;
-    this._keeperRise = 0;        // eased 0..1: the twist — the figure rising to meet your eye
-    this._embraceBrink = false;  // the embrace's OWN two-touch (never shares the plate's _brink)
-    this._leftStudy = false;     // armed once you wander off, for the return beat
+    W.dials = Array.isArray(W.dials) && W.dials.length === HATCH_CODE.length
+      ? W.dials.map((n) => ((Math.trunc(Number(n)) || 0) % 10 + 10) % 10)
+      : HATCH_CODE.map(() => 0);
+
+    this._runtimeTimers = new Set();
+    this._mlOwnMat = false;
+    this._encounterStarts = new Map(Game.ENCOUNTERS.flatMap((spec) => {
+      const fig = refs[spec.ref];
+      if (!fig) return [];
+      return [[spec.ref, {
+        position: fig.position.clone(), quaternion: fig.quaternion.clone(),
+        scale: fig.scale.clone(), visible: fig.visible,
+        opacities: (fig.userData.mats || []).map((material) => material.opacity),
+      }]];
+    }));
+    this.resetRuntime();
 
     this._buildHotspots(modelAnchor);
+  }
+
+  _scheduleRuntime(callback, delayMs) {
+    const timer = setTimeout(() => {
+      this._runtimeTimers.delete(timer);
+      callback();
+    }, delayMs);
+    this._runtimeTimers.add(timer);
+    return timer;
+  }
+
+  // The one lifecycle boundary for state that is intentionally absent from saves.
+  // A run reset must be able to happen halfway through any note pattern, encounter,
+  // delayed era beat, or borrowed tableau without letting the old run speak again.
+  resetRuntime() {
+    for (const timer of this._runtimeTimers) clearTimeout(timer);
+    this._runtimeTimers.clear();
+
+    this._upstreamAudioStop?.();
+    this._upstreamAudioStop = null;
+    this.upstreamHand?.cancel();
+    A.valveRush(false);
+    A.duckAmbient(false);
+    A.duckAmbient(false, 'upstreamHand');
+
+    for (const [ref, start] of this._encounterStarts) {
+      const fig = this.refs[ref];
+      if (!fig) continue;
+      fig.position.copy(start.position);
+      fig.quaternion.copy(start.quaternion);
+      fig.scale.copy(start.scale);
+      fig.visible = start.visible;
+      (fig.userData.mats || []).forEach((material, i) => {
+        if (start.opacities[i] !== undefined) material.opacity = start.opacities[i];
+      });
+    }
+
+    const lanternGlass = this.refs.cotLantern?.getObjectByName('cotLanternGlass');
+    if (lanternGlass?.material) lanternGlass.material.emissiveIntensity = 0;
+    if (this.modelRefs?.lampLens?.material) this.modelRefs.lampLens.material.emissiveIntensity = 0.25;
+    if (this.refs.handMarks) this.refs.handMarks.count = 0;
+
+    resetPuzzleRuntimeState(this);
   }
 
   flag(name, value = true) {
@@ -103,18 +169,52 @@ export class Game {
     fn();
   }
 
+  _recordEvidence(id, args) {
+    return this.notebook.record(id, args);
+  }
+
+  _plateBlocked(action) {
+    A.deny();
+    const missing = new Set(action.missing || []);
+    if (action.gate === 'surfaceFirst') {
+      UI.whisper(missing.has('refugeLit')
+        ? 'The plate is cold. The open east room has a lamp and dry floor.'
+        : 'The plate answers three unfinished lines: basin, sky, and crossing.');
+    } else if (action.gate === 'surfaceDeep') {
+      UI.whisper(missing.has('plumbHung')
+        ? 'The first crossing is still in the brass. A deeper line has not reached the hook.'
+        : 'The plate has no complete line through the lighthouse yet.');
+    } else if (action.gate === 'level2') {
+      UI.whisper(missing.has('upstreamHandWitnessed')
+        ? 'The plate answers the water, but the dead valve has not yet shown what moves it.'
+        : 'The plate answers, then stills. Something in the kelp remains unwitnessed.');
+    } else if (action.gate === 'level3') {
+      UI.whisper(missing.has('registerRead')
+        ? 'The plate waits on the study register. Its measure has not settled.'
+        : 'The plate catches a cold reflection from the shore. It will not deepen yet.');
+    } else if (action.gate === 'level4') {
+      UI.whisper(missing.has('lowerHandRegarded')
+        ? 'The plate is warm, but the small figure below has not held your regard.'
+        : 'The brass index has not been set.');
+    } else if (action.gate === 'refuge-return') {
+      UI.whisper('The plate is still. The small lamp in the east room is burning.');
+    } else {
+      UI.whisper('The plate has no crossing to offer.');
+    }
+  }
+
   // #131: perform one of HIS ROUNDS — flag it, keep it, stage its tableau (tick owns
   // the timers). kind ∈ Moor|Log|Light|Wind; the Wind round rides the music box.
-  _doRound(kind, whisper, journal) {
+  _doRound(kind, whisper) {
     if (W.flags['round' + kind]) return;
     W.flags['round' + kind] = true;
     UI.whisper(whisper);
-    UI.addJournal(journal, '', 'self');
+    this._recordEvidence(`event.round.${kind.toLowerCase()}`);
     A.themeRound(kind);                        // #137: the round's instrument states the theme
     this['_tab' + kind] = 0;                   // arm the tableau clock
     save(this.player);
     if (W.flags.roundMoor && W.flags.roundLog && W.flags.roundLight && W.flags.roundWind) {
-      this.once('roundsAll', () => UI.addJournal(T.four_rounds_kept_the, '', 'self'));
+      this.once('roundsAll', () => this._recordEvidence('event.rounds-complete'));
     }
   }
 
@@ -157,13 +257,11 @@ export class Game {
         // SEA-STRATA: below the surface the tide is the descent's, not yours — the wheel goes dead.
         if (W.level > 1) {
           UI.whisper(T.the_sea_no_longer);
-          // THE DRIFT (STACK.md §3.3). The dead wheel was a flat refusal; under the
-          // stack it is the reveal. This water is not yours to move because it is not
-          // YOUR water — it is what the rungs above displaced onto you. So arm the
-          // proof: in a few seconds the sea moves anyway, with nobody at the wheel,
-          // because somebody upstream just turned theirs. Only ever when a hand really
-          // IS above you (draft > 0) — the beat has to be true, not atmospheric.
-          if (draft() > 0.03 && !W.onceKeys?.includes('drift') && this._driftT == null) this._driftT = 0;
+          this._recordEvidence('evidence.dead-wheel');
+          // THE UPSTREAM HAND. At the first drowned level an inherited valve mark
+          // crosses the model's 1:240 boundary. Exact provenance matters: an
+          // unrelated pile of costly marks must never make this wheel answer.
+          if (W.level === 2) this._armUpstreamHand();
           return;
         }
         W.tideTarget = W.tideTarget > 0.5 ? 0 : 1;
@@ -171,7 +269,7 @@ export class Game {
           A.leitStrum();   // the first turn earns a stem — the island's own figure answers (#65)
           A.addStem(1); W.stems = Math.max(W.stems, 1);
           UI.whisper(T.below_the_window_the);
-          UI.addJournal(T.a_valve_beside_the);
+          this._recordEvidence('evidence.valve');
         } else {
           A.chime();       // later toggles keep the plain chime
         }
@@ -215,7 +313,7 @@ export class Game {
         if (W.level > 1) this.once('crankDeep', () => UI.whisper(T.the_crank_resists_as));
         if (this.flag('crankUsed')) {
           UI.whisper(T.the_little_lamp_drags);
-          UI.addJournal(T.a_crank_turns_the);
+          this._recordEvidence('evidence.crank');
         }
       },
     });
@@ -233,21 +331,21 @@ export class Game {
         const det = depth ? 0.945 - 0.015 * depth : 1;     // sinks further flat per level
         const gap = 620 + depth * 130;                     // the mechanism drags
         BOX_MELODY.forEach((stoneIdx, n) => {
-          setTimeout(() => {
+          this._scheduleRuntime(() => {
             const missing = W.level >= 4 && n === 3;
             if (!missing) A.pluck(STONE_NOTES[stoneIdx] * 2 * det, 0, depth ? 0.3 : 0.4, depth ? 2.1 : 1.4);
             else this.once('boxMissingNote', () => UI.whisper(T.the_fourth_note_does));
-            if (n === BOX_MELODY.length - 1) setTimeout(() => { this.boxPlaying = false; }, 900 + depth * 250);
+            if (n === BOX_MELODY.length - 1) this._scheduleRuntime(() => { this.boxPlaying = false; }, 900 + depth * 250);
           }, n * gap);
         });
         if (depth) this.once('boxDeep', () => UI.whisper(T.the_song_comes_up));
         if (this.flag('heardBox')) {
-          UI.addJournal(T.the_music_box_turns);
+          this._recordEvidence('evidence.music-box');
         }
         // #131 the WIND round rides the box: at the surface, once the strata are years,
         // winding it IS one of his rounds — once more than needed, for no one there
         if (W.level === 1 && W.onceKeys?.includes('eraThreshold') && !W.flags.roundWind) {
-          this._doRound('Wind', T.wound_the_way_he, T.i_wound_the_music);
+          this._doRound('Wind', T.wound_the_way_he);
         }
       },
     });
@@ -272,13 +370,13 @@ export class Game {
           A.stoneDead();
           this.once('fallenStone', () => {
             UI.whisper(T.fallen_and_long_silent);
-            UI.addJournal(T.a_sixth_stone_lies);
+            this._recordEvidence('evidence.fallen-stone');
           });
           return;
         }
         this.once('fallenStoneWakes', () => {
           UI.whisper(T.the_fallen_stone_hums);
-          UI.addJournal(T.the_fallen_stone_has, '', 'self');
+          this._recordEvidence('evidence.fallen-stone', { awake: true });
         });
         this._touchStone(5);
       },
@@ -289,6 +387,13 @@ export class Game {
       id: 'chest', targets: [R.chestLid.parent], label: 'a half-buried chest',
       when: () => !W.flags.rulerTaken,
       onClick: () => {
+        if (!canOpenChest(W)) {
+          A.deny();
+          UI.whisper(W.flags.valveTurned
+            ? 'Water still presses the lid into the sand.'
+            : 'The tide has packed the chest shut. Its lid will not lift under water.');
+          return;
+        }
         if (!W.flags.chestOpen) {
           this.flag('chestOpen'); A.chime();
           UI.whisper(T.the_hinges_remember_how);
@@ -297,7 +402,6 @@ export class Game {
           W.inventory.push('ruler');
           A.chime();
           UI.whisper(T.a_cartographer_s_brass);
-          UI.addJournal(T.took_a_small_brass);
           save(this.player);
         }
       },
@@ -322,12 +426,11 @@ export class Game {
         A.addStem(2); W.stems = Math.max(W.stems, 2);
         A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
         UI.cinematic(true);
-        setTimeout(() => UI.cinematic(false), 5200);
+        this._scheduleRuntime(() => UI.cinematic(false), 5200);
         UI.whisper(T.across_the_island_something);
-        // promote the grief-rhyme out of the optional journal into the in-the-moment whisper
-        // layer (Panel #4 act-two gap): the measuring as a thing to do with grieving hands
+        // Keep the visible survey-grid confirmation at the action site.
         UI.whisper(T.you_do_not_need);
-        UI.addJournal(T.laid_the_ruler_over);
+        this._recordEvidence('evidence.ruler');
         save(this.player);
       },
     });
@@ -345,7 +448,7 @@ export class Game {
         W.inventory = W.inventory.filter((s) => s !== 'lens');
         A.chime();
         UI.whisper(T.far_above_glass_settles);
-        UI.addJournal(T.set_the_small_lens);
+        this._recordEvidence('evidence.lens');
         save(this.player);
       },
     });
@@ -359,9 +462,8 @@ export class Game {
       },
     });
 
-    // ---- the model's micro-finds (#53): the game's signature object finally holds its
-    // own secrets. Lean ALL the way in — three need the reading glass (at 1:240 nothing
-    // reads without it); the fourth appears only once you have carried him up.
+    // ---- the model's micro-finds: the signature object holds details that only the
+    // reading glass resolves at 1:240.
     const marginProxy = proxy(LH.x - 1.4, LH.y + 1.2, LH.z, 2.2);
     I.add({
       id: 'modelMargin', targets: [marginProxy], label: 'the model’s chart margin', maxDist: 2.6, noGlint: true,
@@ -375,7 +477,7 @@ export class Game {
       onClick: () => {
         A.pluck(1567.98, 0, 0.1, 1.4);
         UI.whisper(T.on_the_model_s);
-        this.once('modelBottle', () => UI.addJournal(T.leaning_into_the_model, '', 'self'));
+        this.once('modelBottle', () => this._recordEvidence('evidence.model-bottle'));
       },
     });
     const mGaugeProxy = proxy(-64, 2.5, -93, 2.2);
@@ -385,20 +487,9 @@ export class Game {
       onClick: () => {
         A.crankTick();
         UI.whisper(T.even_here_a_staff);
-        this.once('modelGauge', () => UI.addJournal(T.the_model_has_its, '', 'self'));
+        this.once('modelGauge', () => this._recordEvidence('evidence.model-gauge'));
       },
     });
-    const mPairProxy = proxy(SPOTS.beach.x + 0.7, 1.8, SPOTS.beach.y + 0.5, 2.4);
-    I.add({
-      id: 'modelPair', targets: [mPairProxy], label: 'two small figures', maxDist: 2.8, noGlint: true,
-      when: () => W.flags.carried,
-      onClick: () => {
-        A.chime();
-        UI.whisper(T.two_figures_stand_on);
-        this.once('modelPair', () => UI.addJournal(T.there_are_two_figures, '', 'self'));
-      },
-    });
-
     // vault lens item
     I.add({
       id: 'lensItem', targets: [R.lensItem], label: 'the first lens',
@@ -408,8 +499,6 @@ export class Game {
         W.inventory.push('lens');
         A.chime();
         UI.whisper(T.cold_as_seawater_clear);
-        // forward thread: the stones puzzle dead-ended here for testers — say where the glass wants to go.
-        UI.addJournal(T.took_the_first_lens);
         save(this.player);
       },
     });
@@ -417,24 +506,31 @@ export class Game {
     // hatch shimmer + dials
     I.add({
       id: 'shimmer', targets: [R.hatchShimmer], label: 'troubled sand', maxDist: 6, noGlint: true,
-      when: () => isGolden() && !W.flags.shadowRevealed,
+      when: () => canRevealShimmer(W, isGolden()) && !W.flags.shadowRevealed,
       onClick: () => {
         this.flag('shadowRevealed');
         A.chime();
         UI.whisper(T.the_sand_slides_from);
-        UI.addJournal(T.at_golden_hour_the);
+        this._recordEvidence('evidence.shadow-hatch');
         save(this.player);
       },
     });
     for (let i = 0; i < 4; i++) {
       I.add({
-        id: `dial${i}`, targets: [R[`dial${i}`]], label: 'a glyph dial', maxDist: 4,
+        id: `dial${i}`, targets: [R[`dial${i}`]], label: 'a numbered dial', maxDist: 4,
         when: () => W.flags.shadowRevealed && !W.flags.hatchOpen,
         onClick: () => {
-          W.dials[i] = (W.dials[i] + 1) % GLYPHS;
+          this._recordEvidence('evidence.hatch-numerals');
+          W.dials[i] = advanceDecimalDial(W.dials[i]);
           A.crankTick();
-          if (W.dials.every((d, n) => d === GLYPH_CODE[n])) {
-            this.flag('hatchOpen');
+          if (hatchCodeMatches(W.dials, HATCH_CODE)) {
+            // One solved mechanical state, committed in one save. There is no
+            // inferred-code waypoint and no frame where "decoded" is true while
+            // the hatch remains closed.
+            W.flags.hatchCodeDecoded = true;
+            W.flags.hatchOpen = true;
+            const act = actForFlag('hatchOpen');
+            if (act) recordAct(act, this.player);
             A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
             A.addStem(4); W.stems = Math.max(W.stems, 4);
             UI.whisper(T.stone_breath_long_held);
@@ -447,13 +543,12 @@ export class Game {
     // plumb bob in the cellar
     I.add({
       id: 'plumb', targets: [R.plumbBob], label: 'a plumb bob',
-      when: () => !W.flags.plumbTaken,
+      when: () => W.flags.hatchOpen && !W.flags.plumbTaken,
       onClick: () => {
         this.flag('plumbTaken');
         W.inventory.push('plumb');
         A.chime();
         UI.whisper(T.heavier_than_it_looks);
-        UI.addJournal(T.in_the_cellar_a);
         save(this.player);
       },
     });
@@ -470,84 +565,51 @@ export class Game {
         W.inventory = W.inventory.filter((s) => s !== 'plumb');
         A.chime();
         UI.whisper(T.it_hangs_dead_centre);
-        UI.addJournal(T.hung_the_plumb_line);
+        this._recordEvidence('evidence.plumb');
         save(this.player);
       },
     });
 
-    // the brass floor plate — THE DIVE, and then THE CLIMB. A committed crossing,
-    // not a slide: the first touch brings you to the brink (the world goes quiet,
-    // the cost is named); a second, deliberate touch commits. Step off and it lets
-    // go. You descend, one level deeper each time, until the bottom — and there the
-    // plate's only direction left is UP. Once you turn back you cannot dive again
-    // (W.flags.climbing, one-way) until you reach the surface: the only way out is
-    // down first, then up — the integration arc made mechanical (#12 stage 2).
+    // The plate is the crossing threshold in every stratum. It is live before the
+    // plumb reaches it: the first, short line goes only to the receiver in L2; the
+    // plumb later extends that same mechanism into the deeper stack.
     I.add({
       id: 'plate', targets: [R.deskPlate], label: 'the brass plate', maxDist: 3.5,
-      when: () => W.flags.plumbHung,
+      when: () => true,
       onClick: () => {
         const d = Math.hypot(this.player.pos.x - R.deskPlate.position.x, this.player.pos.z - R.deskPlate.position.z);
         if (d > 1.0) { UI.whisper(T.stand_on_it); return; }
-        // direction: descend while there's deeper to go and you haven't turned back;
-        // otherwise (at the bottom, or already climbing) the plate is the way up
-        const goingUp = W.flags.climbing || W.level >= MAX_DEPTH;
-        if (!goingUp) {
-          // ---- DESCEND ----
-          // #124: the L3 arrival lands on the bluff, and the flooded channel's only
-          // crossing is the ruler bridge — a diver who never measured the crack would
-          // strand there. The plate itself refuses, in the keeper's terms: the ruler
-          // IS the route east (terrain.js has said so all along).
-          if (W.level === 2 && !W.flags.rulerPlaced) {
-            UI.whisper(T.the_plate_hums_and);
-            this.once('diveNeedsRuler', () => UI.addJournal(T.the_plate_would_not));
-            return;
-          }
-          if (!this._brink) {
-            this._brink = true;
-            A.duckAmbient(true);
-            UI.whisper(W.flags.dove
-              ? 'The way back closes behind the light. Touch the plate again to go under.'
-              : 'The journal will not follow you down. Touch the plate again to descend — there is no climbing back.');
-            return;
-          }
+        const action = nextPlateAction({
+          world: W, notebook: this.notebook, maxDepth: MAX_DEPTH, armed: !!this._brink,
+        });
+        if (action.kind === 'blocked') {
           this._brink = false;
-          this.flag('dove');
-          this.onDive();
+          A.duckAmbient(false);
+          this._plateBlocked(action);
           return;
         }
-        // ---- ASCEND (the bottom turns you back, or you are already climbing) ----
-        if (W.level <= 1) { UI.whisper(T.you_are_at_the); return; }
-        // THE EMBRACE (item 4): once the keeper has RISEN to meet you (keeperRose, at the bottom,
-        // not yet climbing), this committed plate-touch IS the integration — you turn him around
-        // and rise CARRYING him. The active verb is yours: the rising is your CHOICE, the only
-        // thing that separates integration from being rescued. It gets its OWN two-touch brink so a
-        // stale plate-brink can never collapse it into one tap, and the embrace line always shows.
-        if (W.flags.keeperRose && !W.flags.climbing) {
-          if (!this._embraceBrink) {
-            this._embraceBrink = true;
-            A.duckAmbient(true);
-            UI.whisper(T.he_is_here_at);
-            return;
-          }
-          this._embraceBrink = false;
-          this.flag('carried');   // the twist: you did not leave him at the bottom
-          UI.addJournal(T.i_turned_him_around, '', 'self');
-          this.flag('climbing');
-          if (this.onAscend) this.onAscend();
-          return;
-        }
-        // ---- the plain climb (no keeper risen, or already climbing through the levels) ----
-        if (!this._brink) {
+        if (action.kind.startsWith('arm-')) {
           this._brink = true;
           A.duckAmbient(true);
-          UI.whisper(W.flags.climbing
-            ? 'Touch the plate again to rise another level. What lies below will not let you down again.'
-            : 'There is nowhere further down. Touch the plate again to begin the long climb up — and carry what you found here.');
+          UI.whisper(action.kind === 'arm-descent'
+            ? (action.route === 'surfaceFirst'
+              ? 'The brass reaches one level down. Touch it again to cross.'
+              : 'The plumb line draws the room deeper. Touch it again to cross.')
+            : action.kind === 'arm-ascent'
+              ? (action.route === 'receiver-return'
+                ? 'The brass pulls toward the lit room above. Touch it again to return.'
+                : 'The brass draws the room upward. Touch it again to cross.')
+              : 'The brass holds.');
           return;
         }
         this._brink = false;
-        this.flag('climbing');   // one-way: from here the plate only rises, until the surface
-        if (this.onAscend) this.onAscend();
+        A.duckAmbient(false);
+        if (action.kind === 'descend') {
+          this.onDive();
+        } else if (action.kind === 'ascend') {
+          this.flag('climbing');
+          this.onAscend();
+        }
       },
     });
 
@@ -556,7 +618,7 @@ export class Game {
     I.add({
       id: 'climbStair', targets: [R.stairFoot], label: 'the stair to the lamp', maxDist: 2.8,
       when: () => W.lampLit && !W.atTop,
-      onClick: () => { if (this.onClimb) this.onClimb(true); },
+      onClick: () => this.onClimb(true),
     });
     // the rope across the foot, before the lamp is lit — names what lighting it opens
     I.add({
@@ -568,28 +630,39 @@ export class Game {
     I.add({
       id: 'galleryHatch', targets: [R.galleryHatch], label: 'the way down', maxDist: 3.0,
       when: () => W.atTop,
-      onClick: () => { if (this.onClimb) this.onClimb(false); },
+      onClick: () => this.onClimb(false),
     });
 
-    // THE SETTING (STACK.md §6) — the four-position brass index beside the plate.
-    // Only at the bottom, and only after the twist: until you have met the thing at
-    // the end of the descent, the question "what do you owe the one below you" has
-    // not been asked yet. Each touch turns it one position and names that position's
-    // cost. Nothing is committed here — the plate performs it when you take an end.
+    // Four factual operations, available only after the lower figure has been
+    // regarded. The dial carries its own legend; this interaction replaces stale
+    // queued feedback so the sentence can never disagree with the pointer.
     if (R.dispDial) I.add({
-      id: 'dispSet', targets: [R.dispDial], label: 'a brass index, four positions', maxDist: 2.6,
-      when: () => W.level >= MAX_DEPTH && W.flags.keeperRose,
+      id: 'dispSet', targets: [R.dispDial],
+      label: () => {
+        const operation = dispositionOperation(W.disposition);
+        return W.flags.dispositionChosen
+          ? `${operation.verb.toLowerCase()} — ${operation.operation}`
+          : 'a brass index, four engraved operations';
+      },
+      maxDist: 2.6,
+      when: () => W.level >= MAX_DEPTH && W.flags.lowerHandRegarded,
       onClick: () => {
-        const i = DISPOSITIONS.indexOf(W.disposition || 'tend');
-        W.disposition = DISPOSITIONS[(i + 1) % DISPOSITIONS.length];
+        if (!W.flags.dispositionChosen) {
+          W.disposition = 'tend';
+          this.flag('dispositionChosen');
+          this._recordEvidence('evidence.disposition');
+        } else {
+          W.disposition = nextDisposition(W.disposition).id;
+        }
         A.crankTick();
-        UI.whisper(T['disp_' + W.disposition]);
+        const operation = dispositionOperation(W.disposition);
+        UI.whisperNow(`${operation.verb}: ${operation.operation}.`);
         save(this.player);
       },
     });
 
     // #52 — the tide gauge: a look-read landmark. Clicking names the CURRENT ring;
-    // the first read journals the whole instrument (he surveyed these heights).
+    // the first read records the instrument.
     if (R.tideGauge) I.add({
       id: 'tideGauge', targets: [R.tideGauge, R.gaugeTop].filter(Boolean), label: 'a graduated staff', maxDist: 36,
       onClick: () => {
@@ -620,7 +693,7 @@ export class Game {
         // can be kept, and so the player can watch their own displacement close it.
         const gap = GAUGE_FIFTH_Y - waterY();
         if (gap > 0.02) UI.whisper(T.the_top_ring_stands.replace('{gap}', gap.toFixed(2)));
-        this.once('tideGauge', () => UI.addJournal(T.off_the_low_shore, '', 'self'));
+        this.once('tideGauge', () => this._recordEvidence('evidence.tide-gauge', { level: W.level }));
       },
     });
 
@@ -635,11 +708,11 @@ export class Game {
     // drainFlood rises past its shelf — filed to a cabinet that floods).
     if (R.drainLedger) I.add({
       id: 'drainLedger', targets: [R.drainLedger],
-      label: () => (W.readKeys.includes('drain_ledger') ? 'a water-swollen ledger — take it' : 'a water-swollen ledger'),
+      label: () => (this.notebook?.hasReadLore('drain_ledger') ? 'a water-swollen ledger — take it' : 'a water-swollen ledger'),
       maxDist: 2.6,
       when: () => !W.recDisp.drain_ledger,       // #132: a record — gone once carried
       onClick: () => {
-        if (W.readKeys.includes('drain_ledger')) {
+        if (this.notebook?.hasReadLore('drain_ledger')) {
           W.recDisp.drain_ledger = 'carried';
           UI.whisper(T.folded_into_my_coat);
           save(this.player);
@@ -647,56 +720,34 @@ export class Game {
       },
     });
 
-    // the bell — the END at the bottom (descent / accept the loop). Struck below, it
-    // withholds; struck at the surface it keeps the golden parade. The OTHER terminal
-    // is the oar, at the top (below).
+    // The bell remains an instrument, not a hidden ending button. It can be sounded
+    // at depth without stealing the player's unfinished descent or disposition.
     I.add({
       id: 'bell', targets: [R.bell], label: 'a small bright bell', maxDist: 2.2,
       when: () => W.level >= 2,
       onClick: () => {
-        // session-local guard: a reload during the finale must allow re-ringing
-        if (this._bellBusy) return;
-        // the bottom is the keeper's: you may not toll the deep bell until you have met him
-        // rising (the twist is the MANDATORY bottom beat, never skippable — SPINE lock). Nudge
-        // toward the chart table; once he has risen, ringing here is a real choice (you stay below).
-        if (W.level >= MAX_DEPTH && !W.flags.keeperRose) {
-          UI.whisper(T.not_yet_something_at);
-          return;
-        }
-        this._bellBusy = true;
-        this.flag('bellRung');
-        this.onFinale();
+        A.chime();
+        UI.whisper(W.level >= MAX_DEPTH
+          ? 'One clear note crosses the bottom water and returns unchanged.'
+          : 'The bell answers once. Nothing opens.');
       },
     });
 
-    // the oar — the END at the top (#22, owner fork: choice + The Oar). The beached
-    // dory has been a standing promise since loop #39; it arms ONLY once you have gone
-    // all the way down and climbed all the way back out (W.flags.returned at the
-    // surface). The bell is a thing you STRIKE at the bottom (you must stay below to
-    // keep it lit — the loop accepted); the oar is a thing you ROW at the top (the
-    // light kept AND left — you leave, changed). A committed crossing, like the plate:
-    // one touch to weigh it, a second to push off. There is no rowing back.
+    // The oar is part of the changed surface, not another terminal. The dry-room lamp
+    // is the sole, visible place where a disposition becomes an ending.
     I.add({
       id: 'oar', targets: [R.doryOar, R.doryHull], label: 'the oar', maxDist: 3.2,
       when: () => W.level <= 1 && W.flags.returned,
       onClick: () => {
-        if (this._oarBusy) return;               // session guard: the leave is underway
-        if (!this._oarBrink) {
-          this._oarBrink = true;
-          UI.whisper(T.the_oar_is_light);
-          return;
-        }
-        this._oarBrink = false;
-        this._oarBusy = true;
-        UI.addJournal(T.i_have_left_the, '', 'self');
-        if (this.onLeave) this.onLeave();
+        A.crankTick();
+        UI.whisper('The oar lifts freely. The dory remains beached above the new tideline.');
       },
     });
 
     // ---- the reading surface: fragments of the keeper's life, found in any order ----
     // Books, letters, inscriptions you OPEN and READ; the story assembles non-linearly as you
-    // explore (Meow-Wolf). Each opens UI.openReader(loreId), which marks W.readKeys + drops a
-    // journal line on first read. The logbook says MORE the deeper you've gone (LORE.deepFrom).
+    // explore. UI records the artifact's stable surface/deep note IDs only as the
+    // player reaches those pages.
     if (R.logbook) I.add({
       id: 'logbook', targets: [R.logbook], label: 'the keeper’s logbook', maxDist: 2.8,
       onClick: () => UI.openReader('keeper_logbook'),
@@ -731,30 +782,61 @@ export class Game {
       when: () => W.level === 2,
       onClick: () => this.once('climberRope', () => {
         UI.whisper(T.the_rope_is_still);
-        UI.addJournal(T.a_climber_s_rope, '', 'self');
+        this._recordEvidence('evidence.climber-rope');
       }),
     });
 
     // #131 HIS ROUNDS (AAA-A3): the keeper's day, findable and performable — one act
     // per era, unlocked once the strata are understood as years (the era threshold).
-    // Each performance sets its flag, keeps a journal line, and arms a short NON-VERBAL
+    // Each performance sets its flag, records the act, and arms a short NON-VERBAL
     // tableau in tick (figures act, never speak). Completing all four is read back by
     // the endings (A6).
     const roundsOn = () => W.onceKeys?.includes('eraThreshold');
     if (R.mooringCleat) I.add({
       id: 'roundMoor', targets: [R.mooringCleat], label: 'his line, made fast — take the turns', maxDist: 3.2,
       when: () => roundsOn() && W.level === 2 && !W.flags.roundMoor,
-      onClick: () => this._doRound('Moor', T.the_line_takes_the, T.i_made_his_line),
+      onClick: () => this._doRound('Moor', T.the_line_takes_the),
     });
     if (R.returnSheet) I.add({
       id: 'roundLog', targets: [R.returnSheet], label: 'the day’s return, unsigned', maxDist: 2.6,
       when: () => roundsOn() && W.level === 3 && !W.flags.roundLog,
-      onClick: () => this._doRound('Log', T.one_true_line_signed, T.i_signed_the_day),
+      onClick: () => this._doRound('Log', T.one_true_line_signed),
     });
     if (R.cotLantern) I.add({
-      id: 'roundLight', targets: [R.cotLantern], label: 'his small lamp, cold', maxDist: 2.6,
-      when: () => roundsOn() && W.level === 4 && !W.flags.roundLight,
-      onClick: () => this._doRound('Light', T.the_small_flame_takes, T.i_lit_his_small),
+      id: 'refugeLamp', targets: [R.cotLantern],
+      label: () => {
+        if (!W.flags.refugeLit) return 'a small lamp — light it';
+        if (W.flags.returned && !W.flags.endingCommitted) {
+          const operation = dispositionOperation(W.disposition);
+          return `the refuge lamp — ${operation.verb.toLowerCase()}`;
+        }
+        return 'the small lamp, burning';
+      },
+      maxDist: 2.6,
+      when: () => W.level <= 1,
+      onClick: () => {
+        const action = nextRefugeAction({ world: W, armed: !!this._refugeBrink });
+        if (action.kind === 'light-refuge') {
+          this.flag('refugeLit');
+          W.flags.roundLight = true;
+          this._recordEvidence('event.refuge-lit');
+          A.chime();
+          UI.whisper('A dry circle of floor appears around the cot.');
+          save(this.player);
+        } else if (action.kind === 'arm-ending') {
+          this._refugeBrink = true;
+          const operation = dispositionOperation(W.disposition);
+          A.duckAmbient(true);
+          UI.whisperNow(`${operation.verb}: ${operation.operation}. Touch the lamp again to commit.`);
+        } else if (action.kind === 'commit-ending') {
+          this._refugeBrink = false;
+          A.duckAmbient(false);
+          this.onEnding(W.disposition || 'tend');
+        } else if (action.kind === 'keep-light') {
+          A.crankTick();
+          UI.whisper('The wick holds. The boards inside the threshold are dry.');
+        }
+      },
     });
     if (R.bluffCairn) I.add({
       id: 'bluffCairn', targets: [R.bluffCairn], label: 'a cairn, a mark scratched in the stone', maxDist: 3.2,
@@ -766,23 +848,9 @@ export class Game {
       when: () => W.level === 4,               // exists only at the L4 source (region4)
       onClick: () => UI.openReader('source_note'),
     });
-    // the annex door, LOCKED at the surface pre-descent (owner: "the chamber next to the
-    // tower doesn't let me walk in" — it is designed to open one level down, but a shut
-    // door with no answer reads as a bug). Clicking the closed leaf now says so, in the
-    // keeper's terms; the door opens at L2+ and stays open once returned (gameplay pass).
-    if (R.innerDoor) I.add({
-      id: 'innerDoorLocked', targets: [R.innerDoor], label: 'a shut door', maxDist: 3.0,
-      when: () => W.level < 2 && !W.flags.returned,
-      onClick: () => {
-        UI.whisper(T.locked_not_from_this);
-        this.once('annexLocked', () => UI.addJournal(T.a_door_off_the));
-      },
-    });
     if (R.quartersJournal) I.add({
       id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
-      // the quarters open one level down (the old `>= 1` gate was a no-op that let the
-      // journal be clicked through the sealed doorway at L1); readable again post-return
-      when: () => W.level >= 2 || W.flags.returned,
+      when: () => true,
       onClick: () => UI.openReader('quarters_journal'),
     });
 
@@ -791,10 +859,7 @@ export class Game {
     if (R.poolGlint) I.add({
       id: 'poolGlint', targets: [R.poolGlint], label: 'something bright, wedged deep', maxDist: 3.4,
       when: () => W.level < MAX_DEPTH && !W.flags.phialTaken,
-      onClick: () => {
-        UI.whisper(T.glass_and_brass_wedged);
-        this.once('poolGlint', () => UI.addJournal(T.high_on_the_walk, '', 'self'));
-      },
+      onClick: () => UI.whisper(T.glass_and_brass_wedged),
     });
     // the phial afloat at L4 — the raised sea lifts it within reach
     if (R.poolPhial) I.add({
@@ -805,7 +870,6 @@ export class Game {
         if (!W.inventory.includes('phial')) W.inventory.push('phial');
         A.chime();
         UI.whisper(T.the_bottom_of_the);
-        UI.addJournal(T.at_the_bottom_the, '', 'self');
         save(this.player);
       },
     });
@@ -833,14 +897,13 @@ export class Game {
         onClick: () => {
           A.pluck(1174.7, 0, 0.12, 1.2);
           UI.whisper(c.whisper);
-          const key = 'cm_' + c.id;
-          if (W.readKeys.includes(key)) return;
-          W.readKeys.push(key);
-          UI.addJournal(c.journal, '', 'self');
-          if (CLIMBERS.every((x) => W.readKeys.includes('cm_' + x.id))) {
+          const key = c.noteId;
+          if (this.notebook?.has(key)) return;
+          this._recordEvidence(key);
+          if (CLIMBERS.every((x) => this.notebook?.has(x.noteId))) {
             this.once('climbersAll', () => {
               UI.whisper(CLIMBERS_CLOSE.whisper);
-              UI.addJournal(CLIMBERS_CLOSE.journal, '', 'self');
+              this._recordEvidence(CLIMBERS_CLOSE.noteId);
             });
           }
           save(this.player);
@@ -857,14 +920,13 @@ export class Game {
         onClick: () => {
           A.pluck(659.26, 0, 0.14, 2.2);
           UI.whisper(`Through the glass, the carved line resolves: “${c.line}”`);
-          const key = 'cg_' + c.id;
-          if (W.readKeys.includes(key)) return;
-          W.readKeys.push(key);
-          UI.addJournal(c.journal, '', 'self');
-          if (CONGREGATION.every((x) => W.readKeys.includes('cg_' + x.id))) {
+          const key = c.noteId;
+          if (this.notebook?.has(key)) return;
+          this._recordEvidence(key);
+          if (CONGREGATION.every((x) => this.notebook?.has(x.noteId))) {
             this.once('congregationAll', () => {
               UI.whisper(CONGREGATION_CLOSE.whisper);
-              UI.addJournal(CONGREGATION_CLOSE.journal, '', 'self');
+              this._recordEvidence(CONGREGATION_CLOSE.noteId);
             });
           }
           save(this.player);
@@ -873,7 +935,7 @@ export class Game {
     }
     // #69: FACTORY fragments — every LORE entry carrying `place` gets its reader
     // hotspot here automatically; a new readable is a content.js entry, nothing else.
-    const LORE_GATES = { quarters: () => W.level >= 2 || W.flags.returned, l3: () => W.level === 3 };
+    const LORE_GATES = { quarters: () => true, l3: () => W.level === 3 };
     for (const [id, lore] of Object.entries(LORE)) {
       const pl = lore.place;
       if (!pl || !R['lore_' + id]) continue;
@@ -882,19 +944,12 @@ export class Game {
         id: 'lore_' + id, targets: [R['lore_' + id]],
         // #132: a record artifact grows a second phase — read it, then TAKE it
         label: lore.record
-          ? () => (W.readKeys.includes(id) ? (pl.label || lore.title) + ' — take it' : pl.label || lore.title)
+          ? () => (this.notebook?.hasReadLore(id) ? (pl.label || lore.title) + ' — take it' : pl.label || lore.title)
           : pl.label || lore.title,
         maxDist: pl.maxDist ?? 2.8,
-        // glow 'gilt': there is no mesh to light — the books are baked into a batch they
-        // share with the boards and the doors — but every gilt letter in the study is the
-        // only thing on that batch reading a non-blank atlas cell, so lifting one emissive
-        // lifts the LETTERING alone. Arrives eased from interact's glint ramp.
-        onGlint: pl.glow === 'gilt'
-          ? (v) => { matJoinery.emissiveIntensity = GILT_REST + (GILT_HOVER - GILT_REST) * v; }
-          : undefined,
         when: () => (!gate || gate()) && !W.recDisp[id],
         onClick: () => {
-          if (lore.record && W.readKeys.includes(id)) {
+          if (lore.record && this.notebook?.hasReadLore(id)) {
             W.recDisp[id] = 'carried';
             UI.whisper(T.folded_into_my_coat);
             save(this.player);
@@ -911,9 +966,10 @@ export class Game {
       id: 'recordCabinet', targets: [R.recordCabinet], label: 'the records cabinet — file what I carry', maxDist: 2.8,
       when: () => (W.level >= 2 || W.flags.returned) && recCarried().length > 0,
       onClick: () => {
-        for (const rid of recCarried()) W.recDisp[rid] = 'filed';
+        const records = recCarried();
+        for (const rid of records) W.recDisp[rid] = 'filed';
         UI.whisper(T.the_drawer_takes_it);
-        this.once('firstFile', () => UI.addJournal(T.i_filed_his_record, '', 'self'));
+        this._recordEvidence('record.filed');
         save(this.player);
       },
     });
@@ -921,9 +977,10 @@ export class Game {
       id: 'sourceRest', targets: [R.sourceRest], label: 'the slab by his note — leave what I carry', maxDist: 2.8,
       when: () => W.level === 4 && recCarried().length > 0,
       onClick: () => {
-        for (const rid of recCarried()) W.recDisp[rid] = 'kept';
+        const records = recCarried();
+        for (const rid of records) W.recDisp[rid] = 'kept';
         UI.whisper(T.left_with_him_at);
-        this.once('firstKeep', () => UI.addJournal(T.i_did_not_file, '', 'self'));
+        this._recordEvidence('record.kept');
         save(this.player);
       },
     });
@@ -936,7 +993,7 @@ export class Game {
         this.flag('readGlass');
         if (!W.inventory.includes('readglass')) W.inventory.push('readglass');
         UI.whisper(T.a_keeper_s_reading);
-        UI.addJournal(T.found_the_keeper_s, '', 'self');
+        this._recordEvidence('mechanism.reading-glass');
       },
     });
     if (R.lensMarkStudy) I.add({
@@ -949,7 +1006,7 @@ export class Game {
       when: () => W.flags.readGlass,
       onClick: () => UI.openReader('lens_mark_stone'),
     });
-    // #54 — the lampblack micro-marks: nine one-line finds tallied in the journal.
+    // #54 — the lampblack micro-marks: nine one-line finds tallied in field notes.
     // Re-clickable (the line always whispers again); only the FIRST read tallies.
     // Level-keyed gates: the bell needs the annex open, the buoy exists only at L3
     // (region3) and is read across the water — the glass is a glass, after all.
@@ -957,7 +1014,6 @@ export class Game {
       lmBell: { when: () => W.level >= 2 || W.flags.returned },
       lmBuoy: { when: () => W.level === 3, maxDist: 30 },
     };
-    const LM_ORD = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth'];
     for (const m of LAMPBLACK) {
       if (!R[m.id]) continue;
       const gate = LM_GATES[m.id] || {};
@@ -967,15 +1023,14 @@ export class Game {
         onClick: () => {
           A.pluck(1244.5, 0, 0.13, 1.2); A.pluck(1661.2, 0.06, 0.07, 1.5);   // a soft ink-resolve
           UI.whisper(`In lampblack, small: “${m.line}”`);
-          const key = 'lm_' + m.id;
-          if (W.readKeys.includes(key)) return;
-          W.readKeys.push(key);
-          const n = W.readKeys.filter((k) => k.startsWith('lm_')).length;
-          UI.addJournal(`Lampblack, under the glass — on ${m.place}, the ${LM_ORD[n - 1]} of his small true things: “${m.line}”`, '', 'self');
+          const key = m.noteId;
+          if (this.notebook?.has(key)) return;
+          this._recordEvidence(key);
+          const n = LAMPBLACK.filter((item) => this.notebook?.has(item.noteId)).length;
           if (n === LAMPBLACK.length) {
             this.once('lampblackAll', () => {
               UI.whisper(T.that_is_all_of);
-              UI.addJournal(T.i_have_found_the, '', 'self');
+              this._recordEvidence(LAMPBLACK_CLOSE.noteId);
             });
           }
           save(this.player);
@@ -1006,12 +1061,22 @@ export class Game {
           this.songSeq = [];
           this.flag('keeperSong');
           A.addStem(6); W.stems = Math.max(W.stems, 6);
-          setTimeout(() => { A.leitStrum(); A.pluck(493.88, 0.5, 0.22, 4.5); }, 800);
+          this._scheduleRuntime(() => { A.leitStrum(); A.pluck(493.88, 0.5, 0.22, 4.5); }, 800);
           UI.whisper(T.e_g_a_d);
-          UI.addJournal(T.i_played_his_song, '', 'self');
+          this._recordEvidence('evidence.completed-song');
           save(this.player);
         }
       }
+      return;
+    }
+    if (!canAttemptStoneSong(W)) {
+      this.stoneSeq = [];
+      A.deny();
+      this.once('stonesNeedBothSongs', () => UI.whisper(
+        W.flags.heardBox || W.flags.heardBird
+          ? 'The stones answer as separate notes. One of the island’s two songs is still missing.'
+          : 'The stones answer as separate notes. There is no sequence to test yet.',
+      ));
       return;
     }
     if (i === 5) return;   // the fallen stone is no part of the bird's five-note lesson
@@ -1022,7 +1087,7 @@ export class Game {
       // wrong — was it the music box's version they tried?
       const boxPrefix = BOX_MELODY.slice(0, n).join(',') === this.stoneSeq.join(',');
       this.stoneSeq = [];
-      setTimeout(() => {
+      this._scheduleRuntime(() => {
         A.deny();
         if (boxPrefix && W.flags.heardBox) UI.whisper(T.the_stones_refuse_the);
       }, 700);
@@ -1030,12 +1095,11 @@ export class Game {
       this.stoneSeq = [];
       this.flag('birdSolved');
       A.addStem(3); W.stems = Math.max(W.stems, 3);
-      setTimeout(() => A.leitStrum(), 800);   // stem-earning solve: the leitmotif, not the chime (#65)
+      this._scheduleRuntime(() => A.leitStrum(), 800);   // stem-earning solve: the leitmotif, not the chime (#65)
       UI.whisper(T.the_outcrop_opens_like);
-      // promote the grief-rhyme out of the optional journal into the in-the-moment whisper
-      // layer (Panel #4 act-two gap): the correction that came a lifetime too late
+      // Confirm the physical correction at the stones themselves.
       UI.whisper(T.some_corrections_only_ever);
-      UI.addJournal(T.the_stones_accepted_the);
+      this._recordEvidence('mechanism.stone-vault');
       save(this.player);
     }
   }
@@ -1045,13 +1109,13 @@ export class Game {
     const d = this.player.pos.distanceTo(stonesPos);
     if (d > 38) return;
     BIRD_MELODY.forEach((stoneIdx, n) => {
-      setTimeout(() => {
+      this._scheduleRuntime(() => {
         A.chirp(STONE_NOTES[stoneIdx], 0, 0.35, { x: stonesPos.x, z: stonesPos.z, ref: 24 });   // #63: from the arc
         this.anim.stoneGlow[stoneIdx] = Math.max(this.anim.stoneGlow[stoneIdx], 0.5);
       }, n * 650);
     });
     if (d < 30 && this.flag('heardBird')) {
-      UI.addJournal(T.at_dawn_a_bird);
+      this._recordEvidence('evidence.bird');
       UI.whisper(T.the_bird_sings_the);
     }
   }
@@ -1062,7 +1126,7 @@ export class Game {
     const F = W.flags;
 
     this._tickHandMarks(dt);   // the other hand's scuffs speak when you stand in them
-    this._tickDrift(dt);       // …and the sea moves once with nobody at the wheel
+    this._tickUpstreamHandLifecycle(); // …and the sea moves once with nobody at the wheel
     this._tickFifthRing();     // the ring he cut for a level that did not exist yet
     this._tickEraLag(dt);      // L2: the hour you asked for, arriving late
     this._tickRegister(dt);    // L3: the era that measures, measuring the hands
@@ -1074,7 +1138,7 @@ export class Game {
       this._eraLineT = (this._eraLineT || 0) + dt;
       if (this._eraLineT > 8) this.once('eraThreshold', () => {
         UI.whisper(T.everything_down_here_is);
-        UI.addJournal(T.the_water_is_higher, '', 'self');
+        this._recordEvidence('arrival.shallows');
       });
     }
 
@@ -1083,15 +1147,17 @@ export class Game {
     // fires when the player has actually DISPLACED something — the sentence has to
     // land on water they put there, or it is just a slogan. Whisper only, never
     // repeated, never explained. Everything after this is shown.
-    if (W.level >= 2 && draft() > 0.03 && W.onceKeys?.includes('eraThreshold')) {
+    // L2 earns this line from the Upstream Hand's physical reveal. L3 remains the
+    // fallback for a player who never touches the dead wheel on the way down.
+    if (W.level >= 3 && draft() >= 0.03 - 1e-6 && W.onceKeys?.includes('eraThreshold')) {
       this._lawT = (this._lawT || 0) + dt;
-      if (this._lawT > 6) this.once('theLaw', () => UI.whisper('The water here stands higher than the ring he cut for it. It did not come from nowhere. It has to go somewhere.'));
+      if (this._lawT > 6) this.once('theLaw', () => UI.whisper(T.it_has_to_go_somewhere));
     }
 
     // #130 era event L3: the CAPITALS BREACH — the only time the sea gives something
     // back. On first arrival the drowned hall's crowns push up through the waterline
     // over ~9s (gallery y animated in _apply while _breachT runs); water rushes, then
-    // the journal keeps it.
+    // the field notes keep the measurement.
     if (W.level === 3 && this._breachT == null && !W.onceKeys?.includes('capitalsBreached')) {
       this.once('capitalsBreach', () => { UI.whisper(T.the_water_over_the); A.valveRush(true); });
       this._breachT = 0;
@@ -1102,7 +1168,7 @@ export class Game {
         this._breachT += dt;
         if (this._breachT > 2.6) A.valveRush(false);
         if (this._breachT > 9) {
-          this.once('capitalsBreached', () => UI.addJournal(T.i_watched_the_sea, '', 'self'));
+          this.once('capitalsBreached', () => this._recordEvidence('event.capitals-breach'));
           this._breachT = null;
         }
       }
@@ -1125,14 +1191,14 @@ export class Game {
         W.beamAngle = this._farewellA0;
         W.flags.beamFarewell = true;                     // douses the lamp below (derived off this)
         A.pluck(82.4, 0, 0.4, 6);                        // low E — the theme's root, last thing heard
-        this.once('beamFarewell2', () => UI.addJournal(T.at_the_bottom_of, '', 'self'));
+        this.once('beamFarewell2', () => this._recordEvidence('event.beam-farewell'));
         this._farewellT = null;
         save(this.player);
       }
     }
 
     // #133: the walk home names what the water holds now — one whisper per drowned
-    // piece as you pass it, and the journal keeps the sum once all three are seen.
+    // piece as you pass it, and one field note keeps the sum once all three are seen.
     if (W.flags.returned) {
       const P = this.player.pos;
       const near = (x, z, r) => Math.hypot(P.x - x, P.z - z) < r;
@@ -1140,7 +1206,7 @@ export class Game {
       if (near(24, -103.4, 12)) this.once('loss_bench', () => UI.whisper(T.the_bench_faces_the));
       if (near(-45, -112, 13)) this.once('loss_skiff', () => UI.whisper(T.the_skiff_is_off));
       if (['loss_arm', 'loss_bench', 'loss_skiff'].every((k) => W.onceKeys?.includes(k))) {
-        this.once('lossAll', () => UI.addJournal(T.three_things_the_island, '', 'self'));
+        this.once('lossAll', () => this._recordEvidence('event.returned-shore'));
       }
     }
 
@@ -1187,9 +1253,13 @@ export class Game {
     }
 
     // tide easing + valve sound
+    // Shared draft can legitimately take the deep strata past the debug slider's
+    // 2.0. Ease over the full authored+ledger range and close the final fraction
+    // exactly; clamping at 2 left late multiplayer arrivals rushing forever.
+    W.tideTarget = clamp(Number.isFinite(W.tideTarget) ? W.tideTarget : 1, 0, MAX_TIDE);
     const dTide = W.tideTarget - W.tide;
     if (Math.abs(dTide) > 0.0004) {
-      W.tide = clamp(W.tide + Math.sign(dTide) * dt / 13, 0, 2); // [0,2]: tide>1 RAISES the sea for SEA-STRATA depths
+      W.tide = clamp(W.tide + clamp(dTide, -dt / 13, dt / 13), 0, MAX_TIDE);
       an.valveSpin += dt * 4 * Math.sign(dTide);
       A.valveRush(true);
       if (!this._causewayNoted && W.tide < 0.25) {
@@ -1206,20 +1276,21 @@ export class Game {
     ease('vault', F.birdSolved ? 1 : 0, 0.9);
     ease('hatch', F.hatchOpen ? 1 : 0, 1.2);
     ease('boxLid', this.boxPlaying ? 1 : 0, 3);
-    ease('innerDoor', (W.level >= 2 || W.flags.returned) ? 1 : 0, 1.0);   // stays open once returned
+    ease('innerDoor', 1, 1.0);   // the refuge is offered before the machinery asks anything
 
     // lamp + beam
     // #130: after the beam's farewell pass the light stays out for the rest of the
     // stratum — the island has stopped performing. The exception lives HERE, in the
     // derivation, so nothing can fight it; climbing out of L4 restores the derivation.
-    W.lampLit = W.lensPlaced && isNight() && !(W.flags.beamFarewell && W.level === 4);
+    W.lampLit = W.lensPlaced && (isNight() || W._finaleLamp === true)
+      && !(W.flags.beamFarewell && W.level === 4);
     if (W.lampLit && !this._lampLitOnce) {
       this._lampLitOnce = true;
       this.once('lamplit', () => {
         UI.cinematic(true);
-        setTimeout(() => UI.cinematic(false), 5000);
+        this._scheduleRuntime(() => UI.cinematic(false), 5000);
         UI.whisper(T.the_lighthouse_remembers_its);
-        UI.addJournal(T.at_night_the_lamp);
+        this._recordEvidence('mechanism.lighthouse');
       });
     }
     ease('beamI', W.lampLit ? 1 : 0, 1.5);
@@ -1229,7 +1300,7 @@ export class Game {
     if (this.refs.stairRope) this.refs.stairRope.visible = !W.lampLit;
 
     // golden-hour shimmer on the buried hatch
-    const shimmerOn = isGolden() && !F.shadowRevealed;
+    const shimmerOn = canRevealShimmer(W, isGolden()) && !F.shadowRevealed;
     ease('shimmer', shimmerOn ? 0.5 + 0.3 * Math.sin(elapsed * 2.5) : 0, 3);
 
     // stones glow decay (six now — the fallen stone glows like its standing kin, #49)
@@ -1251,11 +1322,10 @@ export class Game {
       const d = this.player.pos.distanceTo(CLIFF);
       if (d < 70) {
         this.flag('glyphsSeen');
+        this._recordEvidence(NOTE_IDS.beamGlyphs, { glyphs: [...BEAM_GLYPHS] });
         A.addStem(5); W.stems = Math.max(W.stems, 5);
         A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
         UI.whisper(T.the_beam_writes_on);
-        UI.addJournal(`The lighthouse beam, aimed at the cliff, projects four glyphs:`,
-          GLYPH_CODE.map((g) => GLYPH_CHARS[g]).join('  '));
       }
     }
 
@@ -1271,7 +1341,7 @@ export class Game {
         this.flag('beamDeepSeen');
         A.chime();
         UI.whisper(T.the_risen_capitals_catch);
-        UI.addJournal(`He wrote that he would turn the light to face the deep — and he did. With the sea risen to the hall’s shoulders, the beam finds the drowned colonnade and writes on it: the same four figures as the cliff — ${GLYPH_CODE.map((g) => GLYPH_CHARS[g]).join('  ')}. One message, sent up the island and down it, to whoever would read it from either side of the water. The bluff’s brass dials answer to these figures; now the deep has said so itself.`, '', 'self');
+        this._recordEvidence(NOTE_IDS.beamGlyphs, { glyphs: [...BEAM_GLYPHS] });
       } else {
         // aimed true from the chart table but not yet walked to — name what the beam found
         this.once('beamDeepAim', () => UI.whisper(T.far_out_on_the));
@@ -1284,17 +1354,15 @@ export class Game {
       this.flag('enteredStudy');
       this.once('study', () => {
         UI.whisper(T.a_chart_table_and);
-        UI.addJournal(T.the_study_holds_a);
+        this._recordEvidence('evidence.study-model');
       });
     }
     if (F.rulerPlaced && !this._walkedBridge && Math.abs(p.z - SPOTS.chasmBridgeZ) < 3 && p.x > 30 && p.x < 63) {
       this._walkedBridge = true;
       this.once('bridge', () => UI.whisper(T.centimetre_marks_underfoot_tall));
     }
-    // the oar terminal (#22) is undiscoverable on text alone — so when a player who has come
-    // all the way back (returned, at the surface) wanders near the dory, name the way out
-    // unmissably, the moment they are AT it. Session-local (no save flag); the hover-glint
-    // then confirms the oar is live.
+    // Returning changes the tideline around the dory. Name the physical difference
+    // once; the oar remains an ordinary instrument rather than an ending switch.
     if (W.flags.returned && W.level <= 1 && !this._sawOarNudge && Math.hypot(p.x - (-26), p.z - (-102)) < 9) {
       this._sawOarNudge = true;
       UI.whisper(T.the_dory_and_its);
@@ -1306,24 +1374,20 @@ export class Game {
         this.flag('phialDried');
         W.inventory = W.inventory.filter((s) => s !== 'phial');
         UI.whisper(T.you_set_the_phial);
-        UI.addJournal(T.back_at_the_surface, '', 'self');
       });
     }
     if (W.level >= 2 && !this._level2Study && Math.hypot(p.x - LH.x, p.z - LH.z) < 4.8) {
       this._level2Study = true;
       this.once('level2study', () => {
         UI.whisper(T.the_inner_door_stands);
-        UI.addJournal(T.one_level_down_the);
+        this._recordEvidence('arrival.shallows');
       });
     }
-    // discoverability of the climb (Panel #4 #1): at the bottom, in the study (near both
-    // the plate AND the bell), make sure the player learns the plate turns back — the one
-    // true payoff must not be missable behind a guess. Fork-NEUTRAL: it names the EXISTENCE
-    // of the way up, never a choice; the bell finale is untouched. Fires once.
+    // The bottom changes the plate itself; this is an observation of the engraved
+    // object, not a narrator telling the player which ending to choose.
     if (W.level >= MAX_DEPTH && !W.flags.climbing && Math.hypot(p.x - LH.x, p.z - LH.z) < 4.8) {
       this.once('climbHint', () => {
-        UI.whisper(T.nowhere_deeper_the_plate);
-        UI.addJournal(T.there_is_no_further, '', 'self');
+        UI.whisper('The plate’s engraved arrows point upward here. The brass index beside it has four stops.');
       });
     }
     // the house remembers (#7thGuest "remembers the player across visits"): wander
@@ -1336,57 +1400,37 @@ export class Game {
       if (dStudy < 4.6 && this._leftStudy) {
         this.once('studyReturns', () => {
           UI.whisper(T.you_have_stood_here);
-          UI.addJournal(T.i_keep_leaving_this, '', W.level >= 2 ? 'keeper' : 'self');
+          this._recordEvidence('evidence.study-unchanged');
         });
       }
     }
-    // the keeper looks back (#14): lean over the chart-table model at depth and
-    // the figure on it turns, tips its head up to your giant eye, and speaks —
-    // the world hushing for a breath. Once per level; the figure's turn is eased
-    // toward the player in _apply while you stay near.
+    // The lower hand is not the player and never becomes a companion. At the source
+    // it can only be regarded: close, directly looked at, and held in stillness for
+    // 2.6 seconds. The body turns first; no identity line supplies an interpretation.
     if (W.level >= 3 && this.modelRefs.tinyFigure) {
       this.modelRefs.tinyFigure.getWorldPosition(_kv);
-      const near = this.player.pos.distanceTo(_kv) < 2.4;
-      this._keeperLookTarget = near ? 1 : 0;
-      if (near && W.level >= MAX_DEPTH) {
-        // THE TWIST (item 4) — at the bottom, the figure does not just look back: it TURNS and
-        // walks UP to you. You were never the searcher; you are the one it has been descending
-        // toward. BODY BEFORE LINE: the weary recognition, then it RISES (W.flags.keeperRose +
-        // the pitch inverts), then — at eye-level, the water thinned — the line CONFIRMS it.
-        this.once('keeperTwist', () => {
-          // persist the revelation IMMEDIATELY (atomic with the once-key) so a mid-beat reload can
-          // never strand you in a twist-less bottom; this also arms the embrace AND the visual rise.
-          this.flag('keeperRose');
-          // hold the player (like the dive/ascent) so the rise and the eye-level line always land
-          // with the figure in view — never blasted into an empty room behind your back.
-          this.player.locked = true;
-          A.duckAmbient(true);
-          A.keeperRise();                                     // the pitch inverts to RISE as he climbs
-          A.say('keeper_look_4', 'resigned');                 // costly love: he is spent ("faster than I was")
-          UI.whisper(KEEPER.look[4]);
-          setTimeout(() => {                                   // body before line: after he has risen
-            A.say('keeper_there_you_are', 'resigned', true);  // eye-level: clear, close, no longer below
-            UI.whisper(T.there_you_are_i);
-          }, 3800);
-          setTimeout(() => { this.player.locked = false; A.duckAmbient(false); }, 6000);   // release the held breath
-        });
-      } else if (near) {
-        this.once('keeperLook' + W.level, () => {
-          A.duckAmbient(true);
-          A.say(W.level === 3 ? 'keeper_look_3' : 'keeper_look_4', W.level >= 4 ? 'resigned' : 'pleading');
-          UI.whisper(KEEPER.look[Math.min(W.level, 4)] || KEEPER.look[4]);
-          setTimeout(() => A.duckAmbient(false), 2700);
-        });
-      }
+      const dx = _kv.x - p.x, dz = _kv.z - p.z;
+      const dist = Math.hypot(dx, dz) || 1e-6;
+      const fx = -Math.sin(this.player.yaw), fz = -Math.cos(this.player.yaw);
+      const dot = (fx * dx + fz * dz) / dist;
+      const prev = this._lowerPrev;
+      const speed = prev && dt > 0 ? Math.hypot(p.x - prev.x, p.z - prev.z) / dt : Infinity;
+      this._lowerPrev = { x: p.x, z: p.z };
+      const regard = advanceLowerHandRegard(this._lowerRegard || 0, {
+        dt,
+        distance: W.level >= MAX_DEPTH ? dist : Infinity,
+        lookDot: dot,
+        speed,
+      });
+      this._lowerLookTarget = dist < 2.4 && dot > 0.5 ? 1 : 0;
+      this._lowerRegard = regard.seconds;
+      if (regard.complete) this.resolveLowerHand();
     } else {
-      this._keeperLookTarget = 0;
+      this._lowerLookTarget = 0;
+      this._lowerRegard = 0;
+      this._lowerPrev = null;
     }
-    this._keeperLook = lerp(this._keeperLook, this._keeperLookTarget, 1 - Math.exp(-4 * dt));
-    // the rise eases in only at the bottom, after the revelation, while the choice is still open:
-    // it relaxes as you climb away, once you have CARRIED him out (don't silently re-raise the mute
-    // figure on a re-descent), or the moment you ring the bell instead (you turned away from him).
-    const risen = W.flags.keeperRose && W.level >= MAX_DEPTH && !W.flags.carried && !W.flags.bellRung;
-    this._keeperRise = lerp(this._keeperRise, risen ? 1 : 0, 1 - Math.exp(-1.6 * dt));
+    this._lowerLook = lerp(this._lowerLook, this._lowerLookTarget, 1 - Math.exp(-4 * dt));
 
     // The Room That Disagrees (#18): in the cellar, drawn to the west window, the
     // player sees a model that contradicts the world — name the unease, once
@@ -1395,7 +1439,7 @@ export class Game {
       this._roomDisagrees = true;
       this.once('roomDisagrees', () => {
         UI.whisper(T.another_study_west_of);
-        UI.addJournal(T.a_second_study_faces);
+        this._recordEvidence('evidence.room-disagreement');
       });
     }
 
@@ -1405,27 +1449,16 @@ export class Game {
       if (!plate || Math.hypot(p.x - plate.position.x, p.z - plate.position.z) > 1.25) {
         this._brink = false;
         A.duckAmbient(false);
-        UI.whisper(T.you_step_back_from);
+        UI.whisper('The plate’s vibration settles.');
       }
     }
-    // the EMBRACE's brink lets go the same way — step off the plate and the offer waits, so the
-    // turn-and-rise is always a fresh, deliberate two-touch (never a stale single tap)
-    if (this._embraceBrink) {
-      const plate = this.refs.deskPlate;
-      if (!plate || Math.hypot(p.x - plate.position.x, p.z - plate.position.z) > 1.25) {
-        this._embraceBrink = false;
+    if (this._refugeBrink) {
+      const lamp = this.refs.cotLantern;
+      lamp?.getWorldPosition(_kv);
+      if (!lamp || !W.flags.returned || Math.hypot(p.x - _kv.x, p.z - _kv.z) > 3.0) {
+        this._refugeBrink = false;
         A.duckAmbient(false);
-        UI.whisper(T.you_step_back_he);
-      }
-    }
-    // the OAR's brink lets go the same way — walk away from the dory and it resets, so leaving
-    // is always a deliberate two-touch and never fires on a single touch with a stale brink
-    // (the oar sits in the dory group, so use its WORLD position, not its local .position)
-    if (this._oarBrink) {
-      const oar = this.refs.doryOar;
-      if (!oar || (oar.getWorldPosition(_ov), Math.hypot(p.x - _ov.x, p.z - _ov.z) > 3.6)) {
-        this._oarBrink = false;
-        UI.whisper(T.you_set_the_oar);
+        UI.whisper('The lamp settles back to one steady flame.');
       }
     }
 
@@ -1435,11 +1468,16 @@ export class Game {
     // apply to both islands
     this._apply(this.refs, false, elapsed);
     this._apply(this.modelRefs, true, elapsed);
+
+    // Last in the frame on purpose: _apply writes the shared valve animation to
+    // both islands; the Upstream Hand then overrides ONLY the miniature wheel for
+    // the few seconds in which the model acts before the world does.
+    this.upstreamHand?.tick(dt);
   }
 
   // SEA-STRATA L3 bell-buoy (#52): the drowned channel's marker still keeps its watch.
   // An untended toll on an uneven swell clock — damped-long like everything down here,
-  // fading with distance but never quite gone (L3's sound-led nav cue) — and a journal
+  // fading with distance but never quite gone (L3's sound-led nav cue) — and a field-note
   // beat the first time you come near it (the ramp descent passes ~15m away).
   _tickBuoy(dt) {
     if (!this.refs.bellBuoy || W.level !== 3) return;
@@ -1455,7 +1493,7 @@ export class Game {
     if (Math.hypot(this.player.pos.x - 52, this.player.pos.z - 12) < 26) {
       this.once('bellBuoySeen', () => {
         UI.whisper(T.a_bell_buoy_listing);
-        UI.addJournal(T.a_bell_buoy_lists, '', 'self');
+        this._recordEvidence('evidence.bell-buoy');
       });
     }
   }
@@ -1477,9 +1515,9 @@ export class Game {
         w.position.y += dt * 0.5;
         return w.scale.x < 0.05;
       },
-      onResolve() {
+      onResolve(game) {
         UI.whisper(T.you_did_not_run);
-        UI.addJournal(T.on_the_deep_shore, '', 'self');
+        game._recordEvidence('encounter.watcher');
       },
       // the echo: a far cold pinprick that stands a moment at the shore and goes —
       // never approaching, never twice in a row. What was seen stays seen.
@@ -1510,7 +1548,7 @@ export class Game {
         A.pluck(493.88, 0, 0.42, 3.6, { x: f.position.x, z: f.position.z, ref: 30 });
         A.pluck(987.77, 0.07, 0.16, 4.6, { x: f.position.x, z: f.position.z, ref: 30 });
         UI.whisper(T.you_stop_wading_for);
-        UI.addJournal(T.a_shape_stood_in, '', 'self');
+        game._recordEvidence('encounter.tide-figure');
       },
       // the echo: the laid note still crosses the water sometimes, faint, from the kelp
       echo(game) {
@@ -1587,9 +1625,47 @@ export class Game {
     }
   }
 
-  // the player is poised on the plate, one touch from a committed descent —
-  // the main loop pauses autosave here (the journal won't follow you down)
-  atBrink() { return !!this._brink; }
+  // A second touch can commit either a crossing or the chosen ending. Keep both
+  // transitions outside autosave so Continue never lands in a half-confirmed state.
+  atBrink() { return !!(this._brink || this._refugeBrink); }
+
+  resolveLowerHand() {
+    if (!this.flag('lowerHandRegarded')) return false;
+    this._recordEvidence(NOTE_IDS.lowerHand);
+    A.chime();
+    UI.whisper('The small figure turns and holds one hand against the model’s flooded shore.');
+    return true;
+  }
+
+  resolveEncounter(id) {
+    const spec = Game.ENCOUNTERS.find((entry) => entry.id === id);
+    const fig = spec && this.refs[spec.ref];
+    if (!spec || !fig || !this.flag(spec.flag)) return false;
+    spec.onResolve(this, fig);
+    return true;
+  }
+
+  upstreamState() {
+    return this.upstreamHand?.inspect() || {
+      phase: 'idle', active: false, sourceHand: null, sourceKind: null,
+      modelPulse: 0, wallScale: 0, worldRadius: 0, surged: false,
+      reducedMotion: !!W.reduceMotion,
+    };
+  }
+
+  // Crossing and terminal owners need one synchronous lifecycle boundary. Resolve
+  // preserves the displaced tide, while a terminal may withhold the event's line so
+  // it cannot speak across the ending that superseded it.
+  resolveUpstreamHand({ reveal = true } = {}) {
+    this.upstreamHand?.resolve({ reveal });
+  }
+
+  // A shared ledger pull may finish after the arrival frame. Force the two
+  // ledger-backed renderers to rebuild without touching any gameplay state.
+  refreshStack() {
+    this._marksFor = null;
+    this._writingFor = null;
+  }
 
   // ---------------------------------------------------- state → scene graph
   // Lay the inherited marks into the world. Each becomes a worn patch of ground at
@@ -1639,19 +1715,24 @@ export class Game {
     this._pendHour = 0;
     this._pendHold = 0;
     A.crankTick();
-    if (this.flag('crankUsed')) UI.addJournal(T.a_crank_turns_the);
+    if (this.flag('crankUsed')) this._recordEvidence('evidence.crank');
   }
 
   // L3 (the inspection years): your ledger is READ. The era whose authority measures
   // instead of protects finally measures the thing that matters — how many hands have
   // been through here. Spoken once, at the chart table, where the counting is done.
   _tickRegister(dt) {
-    if (W.level !== 3 || W.onceKeys?.includes('register')) return;
+    if (W.level !== 3 || W.flags.registerRead) return;
     const p = this.player.pos;
-    if (Math.hypot(p.x - (-86.4), p.z - (-39.3)) > 3.2) return;
+    if (Math.hypot(p.x - (-86.4), p.z - (-39.3)) > 3.2) {
+      this._regT = 0;
+      return;
+    }
     this._regT = (this._regT || 0) + dt;
     if (this._regT < 1.6) return;
     const n = hands();
+    this.flag('registerRead');
+    this._recordEvidence(NOTE_IDS.register, { hands: n });
     this.once('register', () => {
       UI.whisper(n <= 1 ? T.the_register_has_one : T.the_register_counts_the.replace('{n}', String(n)));
     });
@@ -1665,32 +1746,52 @@ export class Game {
     this.once('fifthRing', () => {
       A.valveRush(true);
       UI.whisper(T.the_water_is_at);
-      UI.addJournal(T.he_cut_the_top, '', 'keeper');
+      this._recordEvidence('event.fifth-ring');
     });
   }
 
-  // THE DRIFT (STACK.md §3.3) — the one time the model is caught being out of date.
-  //
-  // The whole game teaches one law: the chart-table model tells the truth about the
-  // world. The drift is that law failing, and failing for a REASON — you turned a
-  // wheel that did nothing, and then the sea moved on its own, because the hand one
-  // rung up was turning theirs. The model was never lying; it was behind.
-  //
-  // Deliberately a delay and not a cutscene: the player has usually walked away and
-  // is looking at something else when the water shifts, which is the whole point —
-  // the cost arrives late and somewhere you are not watching. Fires once per game.
-  _tickDrift(dt) {
-    if (this._driftT == null) return;
-    this._driftT += dt;
-    if (this._driftT < 4.2) return;                 // long enough to have turned away
-    this._driftT = null;
-    this.once('drift', () => {
-      // a surge from above: a hand's width of water, arriving unasked. It eases in
-      // over the tide's normal ~13s, so it reads as the sea deciding, not as a jump.
-      W.tideTarget = Math.min(W.tideTarget + 0.06, 2);
-      A.valveRush(true);
-      UI.whisper(T.the_wheel_was_dead);
+  // THE UPSTREAM HAND (STACK.md §3.3) — choose an actual inherited valve mark.
+  // A stranger wins when the shared stack has one; your own surface act is the
+  // complete offline reading.
+  _armUpstreamHand() {
+    if (!this.upstreamHand || this.upstreamHand.active) return false;
+    if (W.flags.upstreamHandWitnessed) return false;
+    const mine = String(handId()).slice(0, 16);
+    const valves = upstreamEvents(2, 'valve');
+    const mark = valves.find((m) => String(m.h).slice(0, 16) !== mine) || valves[0];
+    if (!mark) return false;
+
+    return this.upstreamHand.begin(mark, {
+      onModel: () => {
+        A.duckAmbient(true, 'upstreamHand');
+        this._upstreamAudioStop = A.upstreamHand({ x: -82.7, z: -38.9, ref: 8 });
+      },
+      onSurge: () => {
+        // Commit the physical consequence at the instant it happens. Observation is
+        // a later fact: a reload between surge and reveal may stage the evidence again,
+        // but the persisted rise remains idempotent and can never be applied twice.
+        W.flags.upstreamHandSurged = true;
+        if (W.level === 2) W.tideTarget = Math.max(W.tideTarget, effectiveTideAt(2));
+        save(this.player);
+      },
+      onReveal: () => {
+        this.flag('upstreamHandWitnessed');
+        this._recordEvidence(NOTE_IDS.upstreamHand);
+        this.once('theLaw', () => UI.whisper(T.it_has_to_go_somewhere, 5200));
+      },
+      onComplete: () => {
+        this._upstreamAudioStop?.();
+        this._upstreamAudioStop = null;
+        A.duckAmbient(false, 'upstreamHand');
+      },
     });
+  }
+
+  // Lifecycle guard only. The authored animation itself is owned by
+  // UpstreamHand.tick() after both island instances apply their state.
+  _tickUpstreamHandLifecycle() {
+    if (!this.upstreamHand?.active) return;
+    if (W.level !== 2) this.resolveUpstreamHand();
   }
 
   // Say what happened here, once, when the player is close enough to be standing
@@ -1724,9 +1825,8 @@ export class Game {
     // W.level every frame (not imperatively at dive time) so a reload restores the right
     // register. Guarded — the regions are pruned from the clone, so this no-ops on isModel.
     // THE OTHER HAND'S MARKS (STACK.md §3.1): lay out the scuffs this rung inherited.
-    // Rebuilt only when the rung changes — the ledger is append-only and cannot grow
-    // beneath you, so there is nothing to do per frame. Island instance only (the
-    // clone prunes handMarks).
+    // Rebuilt on rung change, plus once when a late shared sync calls refreshStack().
+    // Island instance only (the clone prunes handMarks).
     if (!isModel && R.handMarks && this._marksFor !== W.level) {
       this._marksFor = W.level;
       this._placeHandMarks(R.handMarks);
@@ -1746,13 +1846,12 @@ export class Game {
       }
     }
 
-    // THE SETTING: the index only exists once the question does — at the bottom,
-    // after the twist. Its pointer reads the selection so the choice is visible in
-    // the world and not only in a whisper you may have missed.
+    // The setting becomes visible only after the lower-hand encounter. Its pointer
+    // keeps the chosen disposition readable in the world.
     if (R.dispDial) {
-      R.dispDial.visible = W.level >= MAX_DEPTH && !!W.flags.keeperRose;
+      R.dispDial.visible = W.level >= MAX_DEPTH && !!W.flags.lowerHandRegarded;
       if (R.dispPointer) {
-        const di = Math.max(0, DISPOSITIONS.indexOf(W.disposition || 'tend'));
+        const di = Math.max(0, DISPOSITION_IDS.indexOf(W.disposition || 'tend'));
         R.dispPointer.parent.rotation.y = di * Math.PI / 2;
       }
     }
@@ -1837,9 +1936,9 @@ export class Game {
 
     for (let i = 0; i < 4; i++) {
       const d = R[`dial${i}`];
-      if (d) d.rotation.y = (W.dials?.[i] ?? 0) / GLYPHS * TAU;
-      const g = R[`dialGlyph${i}`];
-      if (g && !isModel) g.material.map.offset.x = (W.dials?.[i] ?? 0) / GLYPHS;
+      if (d) d.rotation.y = (W.dials?.[i] ?? 0) / 10 * TAU;
+      const n = R[`dialNumber${i}`];
+      if (n && !isModel && n.material?.map) n.material.map.offset.x = (W.dials?.[i] ?? 0) / 10;
     }
 
     for (let i = 0; i < 6; i++) {
@@ -1895,7 +1994,7 @@ export class Game {
     // #131: once lit, his small lamp STAYS lit (the tableau owns it while its clock runs)
     if (R.cotLantern && this._tabLight == null) {
       const lg = R.cotLantern.getObjectByName('cotLanternGlass');
-      if (lg) lg.material.emissiveIntensity = W.flags.roundLight ? 1.05 : 0;
+      if (lg) lg.material.emissiveIntensity = W.flags.refugeLit ? 1.05 : 0;
     }
     // #133 THE SHRINKING SHORE: three pieces in pre-loss or drowned pose, keyed to the
     // descent's milestones (dove → the arm, L3 → the bench, L4 → the skiff). Hard-set
@@ -1954,32 +2053,24 @@ export class Game {
     if (R.bell) R.bell.rotation.z = Math.sin(elapsed * 0.9) * 0.022 * Math.min(Math.max(0, W.level - 1), 4);
     if (R.tinyFigure) {
       const fig = R.tinyFigure;
-      // #53: once CARRIED, the pair stands on the model's beach at every depth — the
-      // keeper no longer vanishes at the surface; the reunion is what the model holds now
-      // STRICT boolean (fire 35 bugfix): `(false || undefined) && x` leaks undefined,
-      // and three.js only culls on visible === false — the island-scale figure stood
-      // glowing on the wake-up beach for every fresh save since #53. Never again.
-      fig.visible = !!((W.level >= 2 || F.carried) && isModel);
+      // A distinct lower hand appears only in the recursively scaled model and only
+      // below the surface. It turns under regard but never rises, merges, or gains a
+      // companion: the encounter leaves its interpretation with the player.
+      fig.visible = !!(W.level >= 2 && isModel);
       if (fig.visible) {
-        const look = this._keeperLook;
-        const rise = this._keeperRise;   // the twist: it climbs up to meet your eye at the bottom
-        // turn to face the player and tip the brow up toward the giant eye
+        const look = this._lowerLook;
         fig.getWorldPosition(_kv);
         const wantYaw = Math.atan2(this.player.pos.x - _kv.x, this.player.pos.z - _kv.z);
-        fig.rotation.y = lerpAngle(fig.rotation.y, wantYaw, Math.max(look, rise));
-        fig.rotation.x = -0.6 * look - 0.5 * rise;                              // brow fully up as it rises
-        fig.position.y = (fig.userData.baseY ?? fig.position.y) + rise * 1.8;   // lifts toward you
-        fig.scale.setScalar(1 + rise * 1.6);                                    // and looms larger, coming up
-        // breathing — a notice-flare as it looks back, then a steady glow as it rises to you
+        fig.rotation.y = lerpAngle(fig.rotation.y, wantYaw, look);
+        fig.rotation.x = -0.6 * look;
+        fig.position.y = fig.userData.baseY ?? fig.position.y;
+        fig.scale.setScalar(1);
         const body = fig.children[0];
-        if (body?.material) body.material.emissiveIntensity = 1.8 * (1 + 0.12 * Math.sin(elapsed * 1.5)) + 1.7 * look + 1.4 * rise;
+        if (body?.material) body.material.emissiveIntensity = 1.8 * (1 + 0.12 * Math.sin(elapsed * 1.5)) + 1.7 * look;
         const head = fig.children[1];
-        if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look + 1.6 * rise;
+        if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look;
       }
     }
-
-    // #53: the second figure — warm beside his cold — exists only once carried
-    if (R.tinyCompanion) R.tinyCompanion.visible = !!(isModel && F.carried);   // same undefined-leak: the companion showed on the model PRE-carry (twist spoiler)
 
     // The Room That Disagrees (#18 live ghostState): the model on its table always
     // shows the OPPOSITE of the world — its sea floods as you drain the real one,

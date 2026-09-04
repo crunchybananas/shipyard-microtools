@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=197';
-import { dispatch } from '../js/commands.js?realm=197';
+import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=198';
+import { dispatch } from '../js/commands.js?realm=198';
 import {
   armyMayEngage,
   armyOrderAnchor,
@@ -11,9 +11,9 @@ import {
   liveGuardBuilding,
   resetCompanyCommandRuntime,
   updateCompanyMovement,
-} from '../js/army-orders.js?realm=197';
-import { updateSoldiers } from '../js/soldiers.js?realm=197';
-import { removeBuilding } from '../js/building-lifecycle.js?realm=197';
+} from '../js/army-orders.js?realm=198';
+import { updateSoldiers } from '../js/soldiers.js?realm=198';
+import { removeBuilding } from '../js/building-lifecycle.js?realm=198';
 
 function building(type, x, y, buildProgress = 1) {
   const value = {
@@ -49,7 +49,7 @@ Object.assign(G, {
   resources: { wood: 0, stone: 0, food: 0, gold: 0, iron: 0, wheat: 0, flour: 0, planks: 0, tools: 0 },
   maxPop: 0, defense: 0,
   stats: { buildingsLost: 0 },
-  storyFlags: { physicalFoodInventory: true }, chronicle: [],
+  storyFlags: { physicalFoodInventory: true, physicalSupplyWeb: true }, chronicle: [],
   selectedBuilding: null, _refreshPanelFor: null, _undoStack: [],
 });
 

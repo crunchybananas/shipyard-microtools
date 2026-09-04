@@ -12,6 +12,92 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 44 — 2026-09-03 — live field reports: birds touch earth; the lens vault becomes real
+
+**Shipped:** Three reports arrived through the game's own F8 field recorder while the
+localhost build was being played. Grounded gulls now derive their root height from the
+actual mesh sole and keep that root and yaw fixed; life stays in a minute folded-wing
+breath instead of whole-body hover or foot wobble. A flushed gull now commits to a
+continuous 6.3-second, 82-metre seaward departure before it leaves the draw list—no
+more vanishing in the first beat of takeoff.
+
+The walk-through “vault” at `(124,-150)` was two bugs pretending to be one: its
+icosahedron had no collision, and its slab, pedestal and lens were buried inside the
+opaque rock. The outcrop is now one shared render/physics contract: a rotated elliptical
+boulder with a body-width collision margin, plus an arch-cut exterior reliquary aimed at
+the standing stones. The carved slab, shadowed backing and luminous lens all live on the
+surface. Solving the bird lowers the slab but never makes the rock intangible; this is a
+shallow reveal, not a room. Per the owner, there is no old-save escape branch or other
+development compatibility cruft—the future invariant is simply that no legal step ends
+inside the stone.
+
+**Evidence:** the new gate was watched RED against the former collision (`0/72`
+approaches blocked), then green **8/8**: **72/72** radial approaches sealed before and
+after the solution, the exact reported coordinate solid, the real `Player._step`
+refused, the arch/slab/lens outside the rock surface, and the real lens hotspot reachable
+from legal ground at **1.78 m**. Before/after 2560×1600 player-view frames verify the
+sealed arch and open reliquary. Gulls **7/7**: sole error **0.0000 m**, grounded root
+drift **0.0000 m**, folded-wing breath **0.018 rad**, departure **6.33 s / 82.0 m /
+26.0 m rise**, max **28.9 m/s**. Recursive module syntax green. Full release gate green:
+saves **23/23**, coverage **106/106**, stack **47/47**, Upstream Hand **32/32**,
+writing **19/19**, terrain **10/10**, experience **13/13**, doors **6/6**, bloom
+**3/3**, shell **5/5**, relief **8/8**, gulls **7/7**, vault **8/8**, trees **13/13**,
+tabletop **15/15**, glare **8/8**, spines **21/21**, glint **25/25**, full walk
+**45/45**. Surface budget remains **196 draws / 444,437 triangles**.
+
+**Debt:** none. The full gate also shed one duplicate assertion that sampled the
+Upstream Hand exactly on its 8.55-second spoken-line boundary; the fresh early-terminal
+case remains the deterministic proof that interrupted scenes suppress unreached copy.
+
+**Next tick suggestion:** continue the live field-report loop from this build. The next
+high-leverage pass is the islet's approach composition—make the new reliquary and the
+standing-stone music read as one destination from the causeway, not two adjacent props.
+
+---
+
+## loop-fire 43 — 2026-09-03 — story / worldbuilding: THE UPSTREAM HAND
+
+**Shipped:** the dead brass valve on L2 now answers an actual inherited `valve`
+mark with a twelve-second, object-led break in scale. The chart-table wheel reenacts
+the upstream pull; pressure rings cross the model; one luminous causal filament
+escapes the miniature mechanism; its exact wheel geometry opens across the curved
+study wall; then a full-bay crest carries the cost into the world. The tide keeps
+exactly `+0.06`, once, and the line lands: “It has to go somewhere.” A stranger's
+mark is preferred on the shared stack; the player's own surface mark completes the
+same thought offline. No inherited valve means no invented ghost.
+
+The spectacle never takes movement or interaction away. Reduced-motion holds the
+model, filament, wall, and bay as spatial tableaux. Late and out-of-order shared
+pulls reconcile the rung the player actually occupies; Continue rescues a newly
+flooded arrival; real crossings and both endings resolve every transient before
+their own sound/copy/scale work begins. The Hand owns its ambient hush independently
+from the plate, and its eight-second WebAudio voice now has a real cancellation
+handle. The widened dawn-gull gallery was finished as one render/floor/collision
+contract too: 1.43 m wing clearance and a genuinely walkable outer overlook.
+
+**Evidence:** dedicated browser gate **32/32** with a live (device-muted) WebAudio
+graph: real L1/L2 DOM valve clicks, remote and own-hand sources, delayed phases,
+exact one-shot rise, no-evidence negative, reload, max-draft water above the old
+2.0 ceiling, late + out-of-order ledger merges, reduced motion, plate overlap,
+real ascent, bell terminal, cancellation, cleanup, and zero browser errors. Full
+release gate green: saves **23/23**, coverage **106/106**, stack **47/47**, writing
+**19/19**, terrain **10/10**, experience **13/13**, doors **6/6**, bloom **3/3**,
+shell **5/5**, relief **8/8**, gulls **3/3**, trees **13/13**, tabletop **15/15**,
+glare **8/8**, spines **21/21**, glint **25/25**, full walk **45/45**. L2 peak:
+402→415 draws, 863,216→864,844 triangles (**+13 / +1,628**), point lights 9→9;
+all transient draws return to zero after cleanup.
+
+**Debt:** the L2 world was already above the surface walk's old 460k-triangle pose;
+this feature pins its honest incremental cost and a 900k deep ceiling instead of
+hiding that inherited baseline. Older unrelated ambient-hush callers still share
+the compatibility owner; the Hand itself is isolated from them.
+
+**Next tick suggestion:** let the permanent hand-width rise alter one authored
+shoreline object on revisit—a grounded boat, salt line, or newly reached inscription—
+so the bay-scale event leaves a close, touchable scar as well as a systemic waterline.
+
+---
+
 ## loop-fire 42 — 2026-08-07 — #141: the door, prepared — EPIC AAA-C lands on its owner gates
 
 **Shipped:** release/ — everything the world-facing steps need, each gate one

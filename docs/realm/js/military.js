@@ -1,19 +1,19 @@
 // Player-authored military recruitment. Barracks and ranges provide a
 // training place; they never mint troops or spend resources on their own.
 
-import { G } from './state.js?realm=197';
-import { emit } from './bus.js?realm=197';
+import { G } from './state.js?realm=198';
+import { emit } from './bus.js?realm=198';
 import {
   activeStaffingCount,
   effectiveActiveStaffingCount,
   militaryCrewForBuilding,
   isBuildingComplete,
   isBuildingOperational,
-} from './building-operation.js?realm=197';
-import { removeCitizenFromWorld } from './citizen-ownership.js?realm=197';
-import { nearestWalkableTile } from './pathfinding.js?realm=197';
-import { withdrawFoodFromStores } from './building-inventory.js?realm=197';
-import { isFoodWorkplace } from './workforce-policy.js?realm=197';
+} from './building-operation.js?realm=198';
+import { removeCitizenFromWorld } from './citizen-ownership.js?realm=198';
+import { nearestWalkableTile } from './pathfinding.js?realm=198';
+import { withdrawFoodFromStores } from './building-inventory.js?realm=198';
+import { isFoodWorkplace } from './workforce-policy.js?realm=198';
 
 export const RECRUITMENT = Object.freeze({
   barracks: Object.freeze({

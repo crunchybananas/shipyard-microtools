@@ -1,5 +1,5 @@
-# The Island's release gate in CI (#139, AAA-C1): the 45-assertion full-game walk
-# + journal↔sketch coverage + the power budget, on every push touching the island.
+# The Island's complete release gate: state contracts, the 63-assertion causal
+# walk, rendered regressions, and the executable Upstream Hand power budget.
 name: island-walk
 on:
   push:

@@ -2,27 +2,41 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=197';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=197';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=197';
-import { revealAround, makeCitizen } from './world.js?realm=197';
-import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=197';
-import { spawnDust, visualJitter } from './fx.js?realm=197';
-import { emit } from './bus.js?realm=197';
-import { isBuildingUnlocked } from './tech.js?realm=197';
-import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=197';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=198';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=198';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=198';
+import { revealAround, makeCitizen } from './world.js?realm=198';
+import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=198';
+import { spawnDust, visualJitter } from './fx.js?realm=198';
+import { emit } from './bus.js?realm=198';
+import { isBuildingUnlocked } from './tech.js?realm=198';
+import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=198';
 import {
   citizenConstructionRequiresStaff,
   releaseCitizenAssignment,
   removeCitizenFromWorld,
   transitionCitizenActivity,
   workersForBuilding,
-} from './citizen-ownership.js?realm=197';
-import { activeStaffingCount, isBuildingOperational } from './building-operation.js?realm=197';
-import { updateRecruitment } from './military.js?realm=197';
-import { isFirstMusterRaidReady } from './first-muster.js?realm=197';
-import { clearCitizenRouteState } from './citizen-route-state.js?realm=197';
-import { raidTargetForIndex } from './raid-targeting.js?realm=197';
+} from './citizen-ownership.js?realm=198';
+import { activeStaffingCount, isBuildingOperational } from './building-operation.js?realm=198';
+import { updateRecruitment } from './military.js?realm=198';
+import { isFirstMusterRaidReady } from './first-muster.js?realm=198';
+import { clearCitizenRouteState } from './citizen-route-state.js?realm=198';
+import { raidTargetForIndex } from './raid-targeting.js?realm=198';
+import {
+  assignRaidRoute,
+  raidIntentReportLine,
+  raidIntentTarget,
+  raidStructureId,
+  routeRaidBandToNearestEdge,
+} from './raid-intelligence.js?realm=198';
+import {
+  PHYSICAL_RESOURCE_KEYS,
+  storedResource,
+  withdrawResource,
+} from './building-inventory.js?realm=198';
+
+const PHYSICAL_RESOURCE_KEY_SET = new Set(PHYSICAL_RESOURCE_KEYS);
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -288,15 +302,27 @@ export function updateProduction() {
         adjustedProd[k] = Math.round(v * mult);
       }
       // Production-chain converters (windmill, bakery): draw the input good
-      // from the realm stores and emit the output. A converter with no input
-      // this cycle produces nothing — build the upstream chain.
+      // from their own delivered input bin and emit the output. Legacy
+      // non-physical chains (wood → planks, iron → tools) still draw from the
+      // realm wallet; grain has to make the actual trip through town.
       if (def.convert) {
         // Guilds (Era III tech): chartered converters draw half again more input.
         const guildMult = G.researchedTechs.has('guilds') ? 1.5 : 1;
         const room = def.convert.cap ? Math.max(0, def.convert.cap - Math.floor(G.resources[def.convert.to] || 0)) : Infinity;
-        const take = Math.min(Math.round(def.convert.amount * guildMult), Math.floor(G.resources[def.convert.from] || 0), room);
+        const physicalInput = PHYSICAL_RESOURCE_KEY_SET.has(def.convert.from);
+        const availableInput = physicalInput
+          ? storedResource(b, def.convert.from)
+          : Math.floor(G.resources[def.convert.from] || 0);
+        const take = Math.min(Math.round(def.convert.amount * guildMult), availableInput, room);
         if (take > 0) {
-          G.resources[def.convert.from] -= take;
+          if (physicalInput) {
+            const consumed = withdrawResource(b, def.convert.from, take, G);
+            if (consumed.taken !== take) {
+              throw new Error(`Converter ${b.type} could not consume its reserved ${def.convert.from} input.`);
+            }
+          } else {
+            G.resources[def.convert.from] -= take;
+          }
           adjustedProd[def.convert.to] = (adjustedProd[def.convert.to] || 0) + take * (def.convert.yield || 1);
         }
       }
@@ -467,9 +493,10 @@ export function updateProduction() {
         const sorted = [...G.citizens].sort((a, b) => b.hunger - a.hunger);
         const c = sorted[0];
         if (c.hunger >= 90) {
-          // Food in a dead carrier's hands was never part of the wallet.
-          // Other legacy resources retain their existing recovery semantics.
-          if (c.carrying && c.carrying !== 'food' && c.carryAmount > 0) {
+          // Physical goods in a dead carrier's hands were never part of the
+          // stored-resource mirrors. Legacy abstract resources retain their
+          // existing recovery semantics; dropped food/grain is lost.
+          if (c.carrying && !PHYSICAL_RESOURCE_KEY_SET.has(c.carrying) && c.carryAmount > 0) {
             G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
           }
           removeCitizenFromWorld(c);
@@ -612,11 +639,18 @@ export function checkRaids() {
       }
       report.push(hint);
     }
-    // Loop 083: {chronicle:false} on the per-raid report toasts
-    // (spawn + intercept + no-defenders hint). See 082 HIGH.
-    for (const line of report) notify(line, 'danger', { chronicle: false });
-
     G._raidSpawnCount = raiders; // morale-break baseline (combat.js)
+    G._raidStolen = null;
+    // Establish the casualty baseline before soldiers or towers can act on
+    // the spawn tick. Morale therefore measures deaths, not how many raiders
+    // have already completed the band's mission and begun withdrawing.
+    if (G.storyState && G.stats) {
+      G.storyState.raid = {
+        day: G.day,
+        killsStart: G.stats.enemiesKilled || 0,
+        deathsStart: G.stats.citizensDied || 0,
+      };
+    }
     // Spawn enemy raiders that visibly approach the settlement
     let primaryTarget = null;
     for (let i = 0; i < raiders; i++) {
@@ -629,19 +663,37 @@ export function checkRaids() {
       else if (side === 2) { ex = along; ey = MAP_H - 1; }
       else { ex = 0; ey = along; }
       const target = raidTargetForIndex(i, G, bandSide, MAP_W, MAP_H);
-      primaryTarget ||= target;
-      G.enemies.push({
+      const enemy = {
         x: ex, y: ey, tx: target?.x ?? MAP_W / 2, ty: target?.y ?? MAP_H / 2,
-        hp: isFirstRaid ? 24 : 30,
-        maxHp: isFirstRaid ? 24 : 30,
+        hp: isFirstRaid ? 18 : 30,
+        maxHp: isFirstRaid ? 18 : 30,
         damage: isFirstRaid ? 5 : 7,
         plunderGoal: isFirstRaid ? 20 : (hasDefense ? 42 : 30),
         type: 'raider',
         state: 'approach',
         // Sprite-only variation is derived without advancing gameplay RNG.
         variant: Math.floor(visualJitter(ex, ey, 1300 + i) * 3),
+      };
+      const plan = assignRaidRoute(enemy, {
+        state: G,
+        side: bandSide,
+        raidIndex: i,
+        firstRaid: isFirstRaid,
+        attackerCount: raiders,
+        // First Muster keeps its established objective contract. Later bands
+        // weigh every ranked structure, physical stores, routes, and defenses.
+        forcedTarget: isFirstRaid ? target : null,
       });
+      G.enemies.push(enemy);
+      primaryTarget ||= plan ? raidIntentTarget(enemy, G) : target;
+      if (i === 0 && plan) report.push(raidIntentReportLine(enemy));
     }
+
+    // Loop 083: {chronicle:false} on the per-raid report toasts
+    // (spawn + intercept + no-defenders hint). See 082 HIGH. The lead raider's
+    // single intent sentence makes the route/value tradeoff legible without
+    // repeating it for every member of the warband.
+    for (const line of report) notify(line, 'danger', { chronicle: false });
 
     // Attacked-area preview: shell pans to the primary strategic target and
     // names it so the player can answer with walls, towers, or Company Advance.
@@ -871,7 +923,14 @@ export function updateFires() {
     }
     // Destroy building if HP reaches 0
     if (b.hp <= 0) {
+      const completedRaidObjective = G.enemies.some(enemy => (
+        !enemy.retreating && enemy.raidIntent?.objectiveId === raidStructureId(b)
+      ));
       removeBuilding(b, { cause: 'fire' });
+      if (completedRaidObjective && routeRaidBandToNearestEdge(G) > 0) {
+        G._raidSpawnCount = 0;
+        notify('The warband completes its objective and withdraws!', 'event');
+      }
     }
   }
 }
@@ -895,7 +954,9 @@ export function getHouseTierReport(b) {
       if (!ok) out.pass = false;
     }
     if (reqs.food) {
-      const ok = (G.resources.food + (G.resources.wheat || 0) + (G.resources.flour || 0)) > 0;
+      // Only a finished ration satisfies a household. Raw grain elsewhere in
+      // the supply chain cannot evolve a hungry home.
+      const ok = (G.resources.food || 0) > 0;
       out.checks.push({ label: 'Food in store', ok });
       if (!ok) out.pass = false;
     }

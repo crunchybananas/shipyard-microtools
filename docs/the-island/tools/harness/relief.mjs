@@ -20,7 +20,7 @@
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
-  const PAGE = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const PAGE = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
   const ready = async () => {
     for (let i = 0; i < 40; i++) {
@@ -30,7 +30,7 @@ export default async function (h) {
     throw new Error('app never booted');
   };
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`localStorage.removeItem('abyme-save-v1'); localStorage.setItem('abyme-muted','1'); 1`);
+  await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
   await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(4);   // decodes + Sobel passes finish

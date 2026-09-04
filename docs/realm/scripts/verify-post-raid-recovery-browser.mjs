@@ -19,10 +19,10 @@ try {
   await page.locator('#title-screen .title-btn.primary').click();
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=197');
-    const firstMuster = await import('./js/first-muster.js?realm=197');
-    const residences = await import('./js/residences.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const state = await import('./js/state.js?realm=198');
+    const firstMuster = await import('./js/first-muster.js?realm=198');
+    const residences = await import('./js/residences.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     window.setSpeed(0);
     window.G.gameTick = 240;
     window.G.enemies = [];
@@ -69,9 +69,9 @@ try {
   assert.equal(await page.evaluate(() => window.G.selectedBuild), 'wall', 'Fortify action did not enter Wall placement');
 
   const aftermath = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=197');
-    const recovery = await import('./js/post-raid-recovery.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const state = await import('./js/state.js?realm=198');
+    const recovery = await import('./js/post-raid-recovery.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const x = state.MAP_W - 6, y = 40;
     window.G.map[y][x] = state.TILE.GRASS;
     window.G.fog[y][x] = true;
@@ -111,10 +111,10 @@ try {
     'household CTA did not open the resident House',
   );
   const householdComplete = await page.evaluate(async () => {
-    const ownership = await import('./js/citizen-ownership.js?realm=197');
-    const recovery = await import('./js/post-raid-recovery.js?realm=197');
-    const residences = await import('./js/residences.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const ownership = await import('./js/citizen-ownership.js?realm=198');
+    const recovery = await import('./js/post-raid-recovery.js?realm=198');
+    const residences = await import('./js/residences.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const resident = window.G.citizens.find(citizen => citizen.actorId === window.__recoveryHouse.actorId);
     const portal = residences.residencePortalForCitizen(resident);
     window.G.gameTick++;
@@ -144,10 +144,10 @@ try {
   await mobile.locator('#title-screen .title-btn.primary').click();
   await mobile.waitForFunction(() => !document.body.classList.contains('title-active'));
   const foodTargets = await mobile.evaluate(async () => {
-    const state = await import('./js/state.js?realm=197');
-    const firstMuster = await import('./js/first-muster.js?realm=197');
-    const ownership = await import('./js/citizen-ownership.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const state = await import('./js/state.js?realm=198');
+    const firstMuster = await import('./js/first-muster.js?realm=198');
+    const ownership = await import('./js/citizen-ownership.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const g = window.G;
     window.setSpeed(0);
     g.gameTick = 240;

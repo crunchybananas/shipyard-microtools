@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# assemble.sh (#142) — frames → the 90s draft master. Straight cuts + 0.5s fades,
-# the title card last, scored quietly with an era stem if one exists on disk.
+# assemble.sh (#142) — frames → the 90s draft master. Straight cuts, then the
+# title card. Frame capture does not record the live procedural Web Audio score,
+# so this renderer deliberately emits a silent review master.
 set -eu
 HERE="$(cd "$(dirname "$0")" && pwd)"
 FR="$HERE/frames"
@@ -28,14 +29,5 @@ fi
 printf "file '%s'\n" "${CLIPS[@]}" > "$OUT/list.txt"
 ffmpeg -y -loglevel error -f concat -safe 0 -i "$OUT/list.txt" -c copy "$OUT/silent.mp4"
 
-# score: quietest available era stem under the whole cut, faded out at the end
-STEM="$(ls "$HERE/../../assets/music/"*.mp3 2>/dev/null | head -1 || true)"
-if [ -n "$STEM" ]; then
-  DUR="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUT/silent.mp4")"
-  ffmpeg -y -loglevel error -i "$OUT/silent.mp4" -stream_loop -1 -i "$STEM" \
-    -filter_complex "[1:a]volume=0.35,afade=t=out:st=$(echo "$DUR - 3" | bc):d=3[a]" \
-    -map 0:v -map "[a]" -t "$DUR" -c:v copy -c:a aac -b:a 160k "$OUT/master.mp4"
-else
-  cp "$OUT/silent.mp4" "$OUT/master.mp4"
-fi
+cp "$OUT/silent.mp4" "$OUT/master.mp4"
 echo "master: $OUT/master.mp4"

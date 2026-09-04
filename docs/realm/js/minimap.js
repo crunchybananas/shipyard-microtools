@@ -2,8 +2,8 @@
 // Minimap — renderer-independent map overview
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=197';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=197';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=198';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=198';
 
 let minimapC = null;
 let minimapCtx = null;

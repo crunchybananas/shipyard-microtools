@@ -3,19 +3,30 @@
 The scratchpad stopped being load-bearing at fire 38 (#139). This directory IS the
 gate that has guarded every fire since the walk was born:
 
-- **`run.sh`** — one command: static server + headless Chrome + saves + coverage +
-  stack + sand writing + player-facing experience + the visual gates + the walk. Exit 0 = ship.
+- **`run.sh`** — one command: static server + headless Chrome + save and notebook
+  contracts + runtime reset + Upstream Hand + sand writing + player-facing experience
+  + the visual gates + the full walk. Exit 0 = ship.
   `SERVE_PORT` / `CDP_PORT` / `CHROME_BIN` env-overridable.
-- **`walk.mjs`** — the 45-assertion FULL-GAME regression: wake-up → surface chain →
-  the era threshold → all three era events → the four rounds → FILE and KEEP → the
-  drowned shore → both endings with their read-back codas → the restored-save branch —
-  plus the power budget (draws < 340, tris < 460k per composer frame) and the
-  undefined-visible regression guard. Real mechanics, no shortcuts the player
-  couldn't take (hotspot invocation aside).
-- **`coverage.mjs`** — every journal-bound line (content corpus, T-table sites,
-  `_doRound` args, ui.js literals) must hit a SKETCHES matcher. 106/106.
-- **`stack.mjs`** — STACK.md slices 1–2: the ledger records the god-verbs, the draft
-  accumulates downward, and both survive a wiped save and a reload. 47 assertions.
+- **`walk.mjs`** — the 64-assertion future-facing route: physical evidence →
+  instrument-routed signal → every gated descent → held-regard encounters → atomic
+  ascent saves → returned-surface commitment for all four dispositions. It uses
+  shipped hotspots and asserts zero window errors. Power is not asserted here.
+- **`coverage.mjs`** — 21 static assertions keep every stable Field Notes id,
+  sketch, lore layer, hint thread, and progression reference reachable while making
+  retired journal, save-migration, identity-ending, and instrument-ending paths fail.
+- **`runtime-reset.mjs`** — six assertions prove Begin, soft reset, and report replay
+  cancel cinematics, score nodes, puzzle timers, queued copy, and delayed old-run work.
+- **`stack.mjs`** — a focused ledger walk retained for direct stack development; it
+  is not invoked by the current release gate.
+- **`upstream-hand.mjs`** — a real L1 valve input under one local identity becomes
+  another identity's inherited L2 cause: model, wall and bay channels stage in order;
+  the exact `+0.06` surge commits once; controls stay live; transients clean up; save,
+  late-merge, revisit, max-draft, reduced-motion, replay, clean-ledger and same-hand
+  fallback, out-of-order shared pulls, overlapping audio ownership, crossing and terminal cleanup,
+  and deep-Continue arrival paths all hold. Its executable power assertion requires
+  peak work below 525 calls and 1,000,000 triangles, no more than +16 calls / +20,000
+  triangles over baseline, and no point-light increase above nine. 32 assertions. It forces
+  `?localstack`, so the two test identities can never reach the permanent ledger.
 - **`writing.mjs`** — the zero-draft exception: the real shoreline input, hostile-text
   sanitation, save-independent persistence, one-line-per-hand idempotency, downward
   inheritance, upright glyph mapping, and terrain-conforming weathered rendering.
@@ -32,7 +43,7 @@ gate that has guarded every fire since the walk was born:
   first-use copy; unobstructed L2/L3/L4 arrivals; the L3 hall actually breaching in the
   frame named by its prose; story whispers waiting until a reader closes; a stateful,
   diegetic journal bearing; and opt-in acceleration that lands both the descent and
-  ascent through their real state/save boundaries. 13 assertions.
+  ascent through their real state/save boundaries. 18 assertions.
 - **`doors.mjs`** — where props END UP. The owner watched a door swing through the
   tower wall; the walk proved you can get THROUGH a doorway, never that the door hung
   in it is inside the building. Pure geometry. 6 assertions.
@@ -54,8 +65,13 @@ gate that has guarded every fire since the walk was born:
   identically either way) and measures the bird's origin against the tower's real profile,
   against the HALF-SPAN: a gull is 2.64 m across, so 0.98 m of origin clearance still
   buries a third of a metre of wing in the copper. It also inspects the one-draw grounded
-  body for eyes, beak, legs and feet, and the flush wing for an articulated swept hand
-  with dark primaries. 3 assertions.
+  body for eyes, beak, legs and feet, pins every idle sole/root to terrain while the
+  folded wings breathe, and follows a proximity takeoff until its continuous six-second
+  curve has carried the bird beyond visible shore scale. 7 assertions.
+- **`vault-outcrop.mjs`** — the lens vault is a sealed boulder with a shallow reveal
+  niche, not an enterable room. Sweeps the real rotated collision footprint before and
+  after the bird solution, pins the exact reported penetration point, and proves the
+  carved arch, slab and lens all live on a reachable exterior face. 8 assertions.
 - **`trees.mjs`** — the canopy's fray, needle grain, clump bump and tip-weighted sway are
   a custom vertex attribute plus three shader-chunk replacements, and both kinds fail
   SILENTLY: a dropped attribute reads as 0 in GLSL, a replace that matches nothing is a
@@ -71,14 +87,10 @@ gate that has guarded every fire since the walk was born:
   Counts pixels at near-max LUMINANCE, not neutral white: the glare is a warm reflection
   off amber brass, and a white test reported 0.00% against a frame that was a white-out.
   8 assertions, including a floor so a frame cannot pass by being dark.
-- **`spines.mjs`** — every spine in the study is lettered, and eighteen of them are
-  struck with a DOUBLED gilt rule where every other volume carries one. Those eighteen,
-  read top board down and left to right, spell the line of canon the game says aloud
-  once. Gates all three layers: the message reads (it shipped bottom-up and mirrored the
-  first time), the KEY holds (counted off the atlas pixels — two rules on the message,
-  one on everything else, and no blank spines to give the set away), and the reader does
-  not hand it over (the surface pages may make you look, never explain; the method waits
-  for the deep reading at rung 3). 21 assertions.
+- **`spines.mjs`** — the study's eight signal manuals each bind one beam glyph to
+  one named physical instrument. The checks prove the three atlases and physical
+  shelf form a complete route; the beam supplies order, instruments supply readings,
+  and no spine contains a value, four-place answer, or hidden acrostic.
 - **`glint.mjs`** — the hover highlight marks a prop, it does not replace it: it ramps
   rather than steps, it cannot manufacture a light source, and it restores even from a
   re-hover that lands mid-fade. 25 assertions. `SHOT_DIR=` also photographs each style
@@ -112,9 +124,6 @@ gate that has guarded every fire since the walk was born:
   a step, and its first "it restores" check compared the material against the very
   baseline the bug corrupts. Assert on something the bug CANNOT produce.
 
-CI: `.github/workflows/island-walk.yml` runs this on every push touching
-`docs/the-island/**`. **CI is the logic gate**: on the runner's software GL,
-20-second real-time cinematics cannot hit wall-clock, so CI requires the 33 pumped
-assertions green AND the failure list to equal exactly the whitelisted realtime
-set (any other failure is red). The full 45/45 — cinematics, endings, both
-terminals in real time — is the LOCAL pre-push bar.
+CI: `.github/workflows/island-walk.yml` runs the same `run.sh` gate on every push or
+pull request touching `docs/the-island/**`, then uploads current golden images for
+human inspection. Local and CI runs use the same assertion counts and failure rules.

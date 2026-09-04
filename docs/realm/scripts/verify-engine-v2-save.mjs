@@ -1,37 +1,41 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, getSeed, setSeed } from '../js/state.js?realm=197';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=197';
-import { coreTick } from '../js/sim.js?realm=197';
-import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=197';
-import { missions } from '../js/missions.js?realm=197';
-import { initChronicle } from '../js/log.js?realm=197';
+import { G, getSeed, setSeed } from '../js/state.js?realm=198';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=198';
+import { coreTick } from '../js/sim.js?realm=198';
+import { removeBuilding, undoLastBuildingPlacement } from '../js/building-lifecycle.js?realm=198';
+import { missions } from '../js/missions.js?realm=198';
+import { initChronicle } from '../js/log.js?realm=198';
 import {
   commitGameLoad,
   commitGameLoadForTest,
   prepareSave,
   serializeGame,
-} from '../js/save-state.js?realm=197';
-import { hasSave, loadGame, saveGame } from '../js/save.js?realm=197';
-import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=197';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=197';
+} from '../js/save-state.js?realm=198';
+import { hasSave, loadGame, saveGame } from '../js/save.js?realm=198';
+import { decodeGraphState, encodeGraphState, SAVE_KEY, validateSave } from '../js/save-schema.js?realm=198';
+import {
+  depositResource,
+  establishFounderStockpile,
+  storedResource,
+} from '../js/building-inventory.js?realm=198';
 import {
   claimCitizenAssignment,
   renameCitizen,
   transitionCitizenActivity,
   workersForBuilding,
-} from '../js/citizen-ownership.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
 import {
   citizenRenderCacheSize,
   citizenRenderRecord,
   resetCitizenRenderCache,
-} from '../js/citizen-render-cache.js?realm=197';
+} from '../js/citizen-render-cache.js?realm=198';
 import {
   getCitizenTransitionLedger,
   initCitizenInspector,
   resetCitizenTransitionLedger,
-} from '../js/citizen-inspector.js?realm=197';
+} from '../js/citizen-inspector.js?realm=198';
 
 function clone(value) {
   return structuredClone(value);
@@ -80,6 +84,12 @@ function deleteObjectValue(envelope, objectReference, key) {
   const before = node.entries.length;
   node.entries = node.entries.filter(([name]) => name !== key);
   assert.equal(node.entries.length, before - 1, `missing encoded field ${key}`);
+}
+
+function appendObjectReference(envelope, entries) {
+  const id = envelope.state.nodes.length;
+  envelope.state.nodes.push({ kind: 'object', entries });
+  return { $: 'ref', id };
 }
 
 function injectDetachedProjectileTarget(envelope) {
@@ -148,7 +158,9 @@ G.buildingGrid[building.y][building.x] = building;
 G.armyGuardPoint = { x: building.x, y: building.y };
 G.armyStance = 'guard';
 G.armyObjective = { x: 42, y: 42, mode: 'attack-move' };
-establishFounderStockpile();
+const founderStockpile = establishFounderStockpile();
+assert.equal(depositResource(founderStockpile, 'wheat', 7).accepted, 7);
+assert.equal(depositResource(founderStockpile, 'flour', 5).accepted, 5);
 assert.equal(claimCitizenAssignment(citizen, building, { reason: 'job-market' }), true);
 assert.deepEqual(workersForBuilding(building), [citizen]);
 assert.equal(Object.hasOwn(building, 'workers'), false);
@@ -159,7 +171,16 @@ citizen.path = sharedPath;
 citizen.pathIdx = 1;
 G.avatar.path = sharedPath;
 G.avatar.pathIdx = 1;
-G._undoStack = [{ b: building, flagsSnapshot: { physicalFoodInventory: true }, chronicleLen: 0 }];
+citizen.carrying = 'wheat';
+citizen.carryAmount = 2;
+citizen._deliveryTarget = founderStockpile;
+transitionCitizenActivity(citizen, 'walk_to_deliver', 'route-to-delivery');
+citizen.activityTimer = 7;
+G._undoStack = [{
+  b: building,
+  flagsSnapshot: { physicalFoodInventory: true, physicalSupplyWeb: true },
+  chronicleLen: 0,
+}];
 missions[0].done = true;
 missions[0]._celebratedTick = 42;
 
@@ -170,6 +191,32 @@ const detachedImpact = { x: 44, y: 40, hp: 0 };
 G.projectiles.push({
   x: 42, y: 40, tx: 44, ty: 40,
   target: detachedImpact, damage: 8, life: 20, type: 'arrow',
+});
+
+// A live raid plan is authoritative simulation state, not a presentation
+// cache. Keep a positive graph-shaped route in the golden save so every
+// current-epoch round trip exercises the bounded path, ordered breaches, and
+// explainable intent surface.
+G.enemies.push({
+  x: 35, y: 39, tx: building.x, ty: building.y,
+  hp: 30, maxHp: 30, damage: 7, plunderGoal: 30,
+  type: 'raider', state: 'approach', variant: 0,
+  raidPath: [
+    { x: 35, y: 39 }, { x: 36, y: 39 },
+    { x: 37, y: 39 }, { x: 38, y: 39 },
+  ],
+  raidPathIdx: 1,
+  raidPlanEpoch: G.obstacleEpoch,
+  raidBreaches: [],
+  raidIntent: {
+    side: 3, raidIndex: 0, firstRaid: 0, attackerCount: 1,
+    objectiveId: `farm@${building.x},${building.y}`,
+    targetType: 'farm', targetX: building.x, targetY: building.y,
+    routeMode: 'open', breachId: '', breachType: '', breachX: -1, breachY: -1,
+    defensePresent: 0, pressurePresent: 0,
+    travelCost: 3000, breachCost: 0, exposureCost: 0, congestionCost: 0,
+    value: 120000, totalCost: -117000,
+  },
 });
 
 const golden = serializeGame({ savedAt: 123456 });
@@ -203,10 +250,10 @@ for (const [key, encoded] of nodeFor(golden, gameRef).entries) {
 assert.equal(rootWrongKindRejections, 75, 'authoritative root validator coverage changed without updating the gate');
 
 const fixtures = [];
-function fixture(name, mutate) {
+function fixture(name, mutate, expectedPath = null) {
   const value = clone(golden);
   mutate(value);
-  fixtures.push([name, value]);
+  fixtures.push([name, value, expectedPath]);
 }
 
 fixture('wrong schema', value => { value.schema = 'realm.not-engine-v2'; });
@@ -228,6 +275,51 @@ fixture('missing formerly lazy root field', value => {
   const node = nodeFor(value, value.state.roots.game);
   node.entries = node.entries.filter(([key]) => key !== '_moodDelta');
 });
+fixture('missing physical supply web epoch flag', value => {
+  const storyFlags = nestedObjectReference(value, value.state.roots.game, 'storyFlags');
+  deleteObjectValue(value, storyFlags, 'physicalSupplyWeb');
+}, '$.state.game.storyFlags.physicalSupplyWeb');
+fixture('grain inventory on incompatible building type', value => {
+  const farm = collectionItem(value, 'buildings', 0);
+  injectObjectValue(value, farm, 'inventory', appendObjectReference(value, [['wheat', 0]]));
+}, '$.state.game.buildings[0].inventory.wheat');
+fixture('grain inventory exceeds building capacity', value => {
+  const founder = collectionItem(value, 'buildings', 1);
+  const inventory = nestedObjectReference(value, founder, 'inventory');
+  replaceObjectValue(value, inventory, 'wheat', 41);
+}, '$.state.game.buildings[1].inventory.wheat');
+fixture('grain mirror disagrees with physical inventory', value => {
+  const resources = nestedObjectReference(value, value.state.roots.game, 'resources');
+  replaceObjectValue(value, resources, 'wheat', 8);
+}, '$.state.game.resources.wheat');
+fixture('physical cargo targets incompatible building', value => {
+  const carrier = collectionItem(value, 'citizens', 0);
+  replaceObjectValue(value, carrier, '_deliveryTarget', clone(collectionItem(value, 'buildings', 0)));
+}, '$.state.game.citizens[0]._deliveryTarget');
+fixture('partial planned raid route surface', value => {
+  deleteObjectValue(value, collectionItem(value, 'enemies'), 'raidPlanEpoch');
+}, '$.state.game.enemies[0]');
+fixture('raid route index outside waypoint bounds', value => {
+  replaceObjectValue(value, collectionItem(value, 'enemies'), 'raidPathIdx', 999);
+}, '$.state.game.enemies[0].raidPathIdx');
+fixture('raid route contains a non-adjacent jump', value => {
+  const enemy = collectionItem(value, 'enemies');
+  const path = nodeFor(value, objectValue(value, enemy, 'raidPath'));
+  replaceObjectValue(value, path.items[2], 'x', 70);
+}, '$.state.game.enemies[0].raidPath[2]');
+fixture('raid intent smuggles an unknown heuristic', value => {
+  const intent = nestedObjectReference(value, collectionItem(value, 'enemies'), 'raidIntent');
+  injectObjectValue(value, intent, 'secretKnowledge', 1);
+}, '$.state.game.enemies[0].raidIntent.secretKnowledge');
+fixture('raid objective identity disagrees with coordinates', value => {
+  const intent = nestedObjectReference(value, collectionItem(value, 'enemies'), 'raidIntent');
+  replaceObjectValue(value, intent, 'objectiveId', 'farm@1,1');
+}, '$.state.game.enemies[0].raidIntent.objectiveId');
+fixture('open raid route retains a breach', value => {
+  const enemy = collectionItem(value, 'enemies');
+  const breaches = nodeFor(value, objectValue(value, enemy, 'raidBreaches'));
+  breaches.items.push(appendObjectReference(value, [['id', 'wall@36,39'], ['x', 36], ['y', 39]]));
+}, '$.state.game.enemies[0].raidIntent');
 fixture('unknown citizen field', value => {
   injectObjectValue(value, collectionItem(value, 'citizens'), 'arbitraryBrain', true);
 });
@@ -410,12 +502,13 @@ fixture('building-grid reference mismatch', value => {
   const citizensNode = nodeFor(value, objectValue(value, value.state.roots.game, 'citizens'));
   rowNode.items[building.x] = clone(citizensNode.items[0]);
 });
-fixtures.push(['malformed JSON', '{"schema":']);
+fixtures.push(['malformed JSON', '{"schema":', null]);
 
-for (const [name, raw] of fixtures) {
+for (const [name, raw, expectedPath] of fixtures) {
   const before = liveSentinel();
   const result = prepareSave(raw);
   assert.equal(result.ok, false, `${name}: invalid fixture was accepted`);
+  if (expectedPath) assert.equal(result.error.path, expectedPath, `${name}: wrong rejection path`);
   assertUnchanged(before, name);
 }
 
@@ -535,9 +628,23 @@ assert.equal(G.citizens[0].assignment.building, G.buildings[0]);
 assert.deepEqual(workersForBuilding(G.buildings[0]), [G.citizens[0]]);
 assert.deepEqual(G.citizens[0].path.goal, { x: 41, y: 40 });
 assert.equal(G.avatar.path, G.citizens[0].path, 'avatar/citizen path alias was not preserved');
+assert.equal(G.enemies[0].raidIntent.objectiveId, `farm@${building.x},${building.y}`);
+assert.deepEqual(G.enemies[0].raidBreaches, []);
+assert.deepEqual(G.enemies[0].raidPath.slice(G.enemies[0].raidPathIdx), [
+  { x: 36, y: 39 }, { x: 37, y: 39 }, { x: 38, y: 39 },
+]);
 assert.equal(G._undoStack[0].b, G.buildings[0], 'undo building alias was not preserved');
 assert.deepEqual(G.projectiles[0].target, detachedImpact, 'detached projectile impact snapshot was not committed exactly');
 assert.notEqual(G.projectiles[0].target, detachedImpact, 'prepared projectile snapshot retained a live object reference');
+const loadedFounderStockpile = G.buildings.find(candidate => candidate.founderStockpile === true);
+assert.ok(loadedFounderStockpile, 'physical supply store was not restored');
+assert.equal(storedResource(loadedFounderStockpile, 'wheat'), 7);
+assert.equal(storedResource(loadedFounderStockpile, 'flour'), 5);
+assert.equal(G.resources.wheat, 7);
+assert.equal(G.resources.flour, 5);
+assert.equal(G.citizens[0].carrying, 'wheat');
+assert.equal(G.citizens[0].carryAmount, 2);
+assert.equal(G.citizens[0]._deliveryTarget, loadedFounderStockpile, 'mid-delivery physical target alias was not preserved');
 assert.equal(commitGameLoad(prepared.value).ok, false, 'prepared tokens must be single-use');
 
 // Building destruction owns the complete actor/reference lifecycle. A save
@@ -574,14 +681,22 @@ G.selectedBuilding = removedBuilding;
 G._refreshPanelFor = removedBuilding;
 G._patrolPosts = [removedBuilding];
 G._patrolPostsBuildingCount = G.buildings.length;
-G.storyFlags = { marker: 'after-builds', physicalFoodInventory: true };
+G.storyFlags = { marker: 'after-builds', physicalFoodInventory: true, physicalSupplyWeb: true };
 G.chronicle = [
   { day: G.day, season: G.season, tick: G.gameTick, text: 'before retained', tag: 'misc' },
   { day: G.day, season: G.season, tick: G.gameTick, text: 'after retained', tag: 'misc' },
 ];
 G._undoStack = [
-  { b: retainedBuilding, flagsSnapshot: { marker: 'before-retained', physicalFoodInventory: true }, chronicleLen: 1 },
-  { b: removedBuilding, flagsSnapshot: { marker: 'before-removed', physicalFoodInventory: true }, chronicleLen: 2 },
+  {
+    b: retainedBuilding,
+    flagsSnapshot: { marker: 'before-retained', physicalFoodInventory: true, physicalSupplyWeb: true },
+    chronicleLen: 1,
+  },
+  {
+    b: removedBuilding,
+    flagsSnapshot: { marker: 'before-removed', physicalFoodInventory: true, physicalSupplyWeb: true },
+    chronicleLen: 2,
+  },
 ];
 removeBuilding(removedBuilding, { cause: 'manual' });
 assert.equal(G.buildings.includes(removedBuilding), false);
@@ -608,7 +723,9 @@ assert.equal(G._undoStack.length, 1);
 assert.equal(G._undoStack[0].b, retainedBuilding, 'destruction should remove only its own stale undo entry');
 assert.equal(undoLastBuildingPlacement(), true, 'UNDO after demolition should reach the newest still-live build');
 assert.equal(G.buildings.includes(retainedBuilding), false);
-assert.deepEqual(G.storyFlags, { marker: 'before-retained', physicalFoodInventory: true });
+assert.deepEqual(G.storyFlags, {
+  marker: 'before-retained', physicalFoodInventory: true, physicalSupplyWeb: true,
+});
 assert.equal(G.chronicle.length, 1);
 const immediatePostDemolition = serializeGame();
 assert.equal(prepareSave(immediatePostDemolition).ok, true, 'immediate post-demolition save must be valid');
@@ -766,6 +883,12 @@ assert.deepEqual(
   }
   G.citizens.forEach((candidate, index) => {
     renameCitizen(candidate, `Veto Citizen ${index}`, 'player-rename');
+    // This fixture measures grave retention, not cargo recovery. Clear the
+    // earlier mid-delivery probe so killing its carrier cannot manufacture a
+    // physical-resource wallet entry without a destination store mutation.
+    candidate.carrying = null;
+    candidate.carryAmount = 0;
+    candidate._deliveryTarget = null;
     candidate.hp = 0;
   });
   G.population = 41;

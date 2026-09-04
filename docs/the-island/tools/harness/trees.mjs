@@ -20,7 +20,7 @@
 export default async function (h) {
   const R = { pass: [], fail: [] };
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
-  const PAGE = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?mute';
+  const PAGE = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
   const ready = async () => {
     for (let i = 0; i < 40; i++) {
@@ -30,7 +30,7 @@ export default async function (h) {
     throw new Error('app never booted');
   };
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`localStorage.removeItem('abyme-save-v1'); localStorage.setItem('abyme-muted','1'); 1`);
+  await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
   await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(3);
@@ -129,12 +129,15 @@ export default async function (h) {
       if (Math.hypot(o.matrixWorld.elements[0], o.matrixWorld.elements[1], o.matrixWorld.elements[2]) < 0.5) return;
       for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, m); v.setFromMatrixPosition(m); trees.push([v.x, v.z]); }
     });
-    const on = trees.map(([x, z]) => at(x, z)).filter((n) => n !== null);
+    const samples = trees.map(([x, z], i) => ({ i, x, z, value: at(x, z) }));
+    const on = samples.map(({ value }) => value).filter((n) => n !== null);
     const off = trees.map(([x, z]) => at(x + 26, z + 19)).filter((n) => n !== null);
     const mean = (a) => (a.length ? a.reduce((s, n) => s + n, 0) / a.length : 0);
     return JSON.stringify({ trees: trees.length, res: cv.width, flipY: tex.flipY,
       onTrunk: +mean(on).toFixed(3), away: +mean(off).toFixed(3),
-      covered: on.filter((n) => n > 0.5).length });
+      covered: on.filter((n) => n > 0.5).length,
+      uncovered: samples.filter(({ value }) => value === null || value <= 0.5)
+        .map(({ i, x, z, value }) => ({ i, x: +x.toFixed(3), z: +z.toFixed(3), value })) });
   })()`).then(JSON.parse);
   ok('the litter mask exists and is switched on', !lit.err, lit);
   if (!lit.err) {

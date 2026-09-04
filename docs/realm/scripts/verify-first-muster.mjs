@@ -1,27 +1,27 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, createResourceStock, setSeed } from '../js/state.js?realm=197';
-import { generateWorld, makeCitizen } from '../js/world.js?realm=197';
-import { dispatch } from '../js/commands.js?realm=197';
-import { trySpawnSettlers } from '../js/economy.js?realm=197';
+import { G, createResourceStock, setSeed } from '../js/state.js?realm=198';
+import { generateWorld, makeCitizen } from '../js/world.js?realm=198';
+import { dispatch } from '../js/commands.js?realm=198';
+import { trySpawnSettlers } from '../js/economy.js?realm=198';
 import {
   claimCitizenAssignment,
   releaseCitizenAssignment,
   resetCitizenOwnershipRuntime,
   staffingCount,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
 import {
   recruitmentCandidatePreview,
   recruitmentForBuilding,
   recruitmentStatus,
   updateRecruitment,
-} from '../js/military.js?realm=197';
-import { residentsForHouse } from '../js/residences.js?realm=197';
-import { commitGameLoad, prepareSave, serializeGame } from '../js/save-state.js?realm=197';
-import { establishFounderStockpile } from '../js/building-inventory.js?realm=197';
-import { effectiveActiveStaffingCount, isBuildingOperational } from '../js/building-operation.js?realm=197';
+} from '../js/military.js?realm=198';
+import { residentsForHouse } from '../js/residences.js?realm=198';
+import { commitGameLoad, prepareSave, serializeGame } from '../js/save-state.js?realm=198';
+import { establishFounderStockpile } from '../js/building-inventory.js?realm=198';
+import { effectiveActiveStaffingCount, isBuildingOperational } from '../js/building-operation.js?realm=198';
 
 function finishedBuilding(type, x, y = 40) {
   const building = {
@@ -95,6 +95,7 @@ founder.home = house;
 resident.home = house;
 G.storyFlags = {
   physicalFoodInventory: true,
+  physicalSupplyWeb: true,
   founders_named: true,
   founder1: founder.identity.name,
   founder2: 'Protected Founder Two',

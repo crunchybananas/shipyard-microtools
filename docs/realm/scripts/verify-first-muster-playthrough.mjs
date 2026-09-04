@@ -31,13 +31,13 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const report = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=197');
-    const economy = await import('./js/economy.js?realm=197');
-    const firstMuster = await import('./js/first-muster.js?realm=197');
-    const military = await import('./js/military.js?realm=197');
-    const recovery = await import('./js/post-raid-recovery.js?realm=197');
-    const scenarios = await import('./js/scenarios.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const state = await import('./js/state.js?realm=198');
+    const economy = await import('./js/economy.js?realm=198');
+    const firstMuster = await import('./js/first-muster.js?realm=198');
+    const military = await import('./js/military.js?realm=198');
+    const recovery = await import('./js/post-raid-recovery.js?realm=198');
+    const scenarios = await import('./js/scenarios.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const g = window.G;
     g.debug.disableEvents = true;
     const requireCondition = (condition, message) => {
@@ -65,10 +65,41 @@ try {
       throw new Error(`${label} did not settle within ${limit} core ticks: ${JSON.stringify({
         tick: g.gameTick,
         day: g.day,
+        dayPhase: g.dayPhase,
         population: g.population,
         soldiers: g.soldiers.length,
         enemies: g.enemies.length,
         chapter: firstMuster.getFirstMusterReport(g).primary?.id || 'complete',
+        recovery: (() => {
+          const current = recovery.getPostRaidRecoveryReport(g);
+          return {
+            selected: current.selected,
+            complete: current.complete,
+            doctrine: current.doctrine,
+            stabilization: current.stabilization,
+            primary: current.primary,
+          };
+        })(),
+        construction: g.buildings
+          .filter(building => building.buildProgress < 1)
+          .map(building => ({
+            type: building.type,
+            x: building.x,
+            y: building.y,
+            progress: building.buildProgress,
+            total: building.buildTotal,
+          })),
+        citizens: g.citizens.map(citizen => ({
+          actorId: citizen.actorId,
+          activity: citizen.activity,
+          assignment: citizen.assignment?.building?.type || null,
+          carrying: citizen.carrying,
+          carryAmount: citizen.carryAmount,
+          hunger: citizen.hunger,
+          home: citizen.home ? { x: citizen.home.x, y: citizen.home.y } : null,
+          x: citizen.x,
+          y: citizen.y,
+        })),
       })}`);
     };
     const dispatch = command => {

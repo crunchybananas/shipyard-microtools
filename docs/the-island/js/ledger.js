@@ -16,14 +16,14 @@
 // same reason save-schema.js is: node imports it directly and the whole contract
 // is exercised headlessly. world.js owns the storage I/O at its boundary.
 //
-// SANITATION IS NOT OPTIONAL. Slice 8 swaps the local source for an HTTP one and
-// these marks start arriving from strangers. Every inbound payload therefore goes
+// SANITATION IS NOT OPTIONAL. A shared source makes these marks arrive from
+// strangers. Every inbound payload therefore goes
 // through sanitizeLedger() before it can touch WorldState: unknown kinds dropped,
 // positions clamped to the island's bounds, per-rung counts capped, total draft
 // clamped. A hostile ledger must not be able to drown a player or inject geometry.
 // The call sites must never sanitize; this module must never trust.
 
-export const LEDGER_VERSION = 1;
+export const LEDGER_VERSION = 2;
 
 // A shore line is intentionally small: it has to fit as one scratched thought,
 // and online it becomes permanent stranger-controlled text. Count code points,
@@ -34,7 +34,7 @@ export const MAX_WRITINGS_PER_RUNG = 8;
 // Its own storage key, deliberately NOT part of the save payload: wiping a save
 // starts your run over, but the stack you are standing in outlives you. That is
 // the thesis, and it is also why "Begin again" must not hand you a dry island.
-export const LEDGER_KEY = 'abyme-ledger-v1';
+export const LEDGER_KEY = 'abyme-ledger-v2';
 
 // Who you are to the stack. Kept apart from the ledger AND from the save: a new
 // run is a new run, but it is the same hand — so your rung-1 work still reads as
@@ -81,14 +81,13 @@ export const MARK_KINDS = {
 };
 
 // Which progression flags ARE acts of displacement. puzzles.js `flag()` is the
-// single choke point every flag passes through, so the whole recording surface is
-// this table — a flag absent from it costs nobody anything, which is the default
-// and the correct one. (`lens` has no flag: the placement sets the top-level
-// W.lensPlaced, so that one site records directly.)
+// single choke point every one-shot flag passes through, so this table is the
+// one-shot recording surface. Repeated physical acts (`lens` placement and one
+// `dive` per rung) record directly at their action sites.
 //
 // Note the choices: taking the ruler is free, LAYING it is the act — the bridge is
 // what the rung below inherits. Opening the chest costs a little because the lid
-// stays open forever. Diving costs the most, because it makes the rung.
+// stays open forever.
 export const FLAG_MARKS = {
   valveTurned: 'valve',
   crankUsed:   'crank',
@@ -97,7 +96,6 @@ export const FLAG_MARKS = {
   hatchOpen:   'hatch',
   birdSolved:  'stones',
   plumbHung:   'plumb',
-  dove:        'dive',
 };
 
 // Per-rung retention. Online, a popular rung accumulates marks without bound;
@@ -110,6 +108,15 @@ export const MAX_MARKS_PER_RUNG = 64;
 // hands worked it. Without this cap an old enough rung is unplayable — the island
 // is simply underwater — and a hostile ledger could put it there on purpose.
 export const MAX_DRAFT = 0.75;
+
+// Dispositions are immutable operations. The sanitized ledger reduces them to a
+// compact CRDT-like state: one durable CARRY tombstone per hand, one winning
+// OPEN/CLOSE register per rung, and a bounded set of inert TEND acknowledgements.
+// The high cap covers every active hand that could survive the mark retention
+// budget while still placing a hard ceiling on hostile local/network payloads.
+export const MAX_DISPOSITION_OPS = (MAX_MARKS_PER_RUNG + MAX_WRITINGS_PER_RUNG) * 64 + 128;
+const MAX_TEND_OPS = 64;
+const MAX_CLOCK = 0x7ffffffe;
 
 // ---------------- construction ------------------------------------------------
 
@@ -132,7 +139,7 @@ export const MAX_DRAFT = 0.75;
 export const DISPOSITIONS = ['tend', 'carry', 'open', 'close'];
 
 export function emptyLedger() {
-  return { v: LEDGER_VERSION, marks: [], sealed: [], open: [] };
+  return { v: LEDGER_VERSION, marks: [], ops: [] };
 }
 
 // Perform a disposition on behalf of `hand`, standing on `rung`. Pure: it mutates
@@ -140,28 +147,32 @@ export function emptyLedger() {
 // (the coda says how many marks you took back, and it has to be the real number).
 export function dispose(led, { kind, rung, hand }) {
   if (!DISPOSITIONS.includes(kind)) return null;
-  const r = rung | 0, h = String(hand || '?').slice(0, 16);
-  led.sealed = led.sealed || [];
-  led.open = led.open || [];
-  if (kind === 'carry') {
-    const before = led.marks.length;
-    led.marks = led.marks.filter((m) => m.h !== h);
-    return { kind, removed: before - led.marks.length };
-  }
-  if (kind === 'close') {
-    if (!led.sealed.includes(r)) led.sealed.push(r);
-    return { kind, sealedAt: r };
-  }
-  if (kind === 'open') {
-    if (!led.open.includes(r)) led.open.push(r);
-    return { kind, openAt: r };
-  }
-  return { kind };                                  // tend: the world is left as it is
+  const r = Number(rung);
+  const h = sanitizeHand(hand);
+  if (!Number.isInteger(r) || r < 1 || r > 64 || !h) return null;
+
+  const n = nextClock(led);
+  if (n === null) return null;
+  const operation = { k: kind, r, h, n };
+  const before = led.marks.length;
+  const normalized = sanitizeLedger({
+    marks: led.marks,
+    ops: [...(Array.isArray(led.ops) ? led.ops : []), operation],
+  });
+  led.v = LEDGER_VERSION;
+  led.marks = normalized.marks;
+  led.ops = normalized.ops;
+
+  const result = { kind, operation };
+  if (kind === 'carry') result.removed = before - led.marks.length;
+  if (kind === 'close') result.sealedAt = r;
+  if (kind === 'open') result.openAt = r;
+  return result;
 }
 
 // A mark is stored short because it is eventually a network payload:
 //   k  kind (a MARK_KINDS key)   r  rung it was performed on (1..)
-//   h  hand id                   n  that hand's sequence number (ordering)
+//   h  hand id                   n  logical operation clock (ordering)
 //   at [x,y,z] or null           — where, when the kind is worth showing
 //   t  sanitized text            — writing only; absent on every costed mark
 export function sanitizeWriting(value) {
@@ -178,6 +189,41 @@ export function sanitizeWriting(value) {
     .replace(/\s+/g, ' ')
     .trim();
   return Array.from(clean).slice(0, MAX_WRITING_LENGTH).join('');
+}
+
+function sanitizeHand(value) {
+  if (typeof value !== 'string') return '';
+  const hand = value.slice(0, 16);
+  return /^[A-Za-z0-9_-]{1,16}$/.test(hand) ? hand : '';
+}
+
+function sanitizeClock(value) {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 0 && n <= MAX_CLOCK ? n : null;
+}
+
+// Lamport clock for operations and marks made against the ledger currently in
+// hand. A later action observed in this replica always supersedes an earlier one;
+// concurrent replicas resolve equal clocks deterministically in compareOps().
+function nextClock(led) {
+  let latest = -1;
+  for (const item of [...(led?.marks || []), ...(led?.ops || [])]) {
+    const n = sanitizeClock(item?.n);
+    if (n !== null && n > latest) latest = n;
+  }
+  return latest < MAX_CLOCK ? latest + 1 : null;
+}
+
+const OP_ORDER = { tend: 0, open: 1, close: 2, carry: 3 };
+function compareOps(a, b) {
+  if (a.n !== b.n) return a.n - b.n;
+  if (a.h !== b.h) return a.h < b.h ? -1 : 1;
+  if (a.r !== b.r) return a.r - b.r;
+  return OP_ORDER[a.k] - OP_ORDER[b.k];
+}
+
+function newer(a, b) {
+  return !a || compareOps(a, b) < 0 ? b : a;
 }
 
 function makeMark(kind, rung, hand, seq, at, text = '') {
@@ -205,12 +251,14 @@ function makeMark(kind, rung, hand, seq, at, text = '') {
 export function record(led, { kind, rung, hand, at = null, text = '' }) {
   if (!MARK_KINDS[kind]) return null;
   if (kind === 'writing' && !sanitizeWriting(text)) return null;
-  const r = rung | 0;
-  if (!(r >= 1)) return null;
-  const h = String(hand || '?').slice(0, 16);
+  const r = Number(rung);
+  if (!Number.isInteger(r) || r < 1 || r > 64) return null;
+  const h = sanitizeHand(hand);
+  if (!h) return null;
   if (led.marks.some((m) => m.h === h && m.r === r && m.k === kind)) return null;
 
-  const seq = led.marks.reduce((n, m) => (m.h === h && m.n >= n ? m.n + 1 : n), 0);
+  const seq = nextClock(led);
+  if (seq === null) return null;
   const mark = makeMark(kind, r, h, seq, at, text);
   led.marks.push(mark);
   pruneRung(led, r);
@@ -252,9 +300,18 @@ export function inheritedAt(led, rung) {
   // A CLOSE seals a rung: nothing from at-or-above it reaches anyone deeper. Take
   // the DEEPEST seal above you — a later hand's seal supersedes an earlier one's,
   // because the water has to get past the lowest closed door first.
-  const seals = (led.sealed || []).filter((s) => s < r);
+  const seals = (led.ops || []).filter((op) => op.k === 'close' && op.r < r).map((op) => op.r);
   const floor = seals.length ? Math.max(...seals) : 0;
   return led.marks.filter((m) => m.r < r && m.r > floor).sort((a, b) => a.r - b.r || a.n - b.n);
+}
+
+// The active bidirectional-flow state at one rung. OPEN and CLOSE share a single
+// last-writer register, so the ledger can never claim both at once.
+export function boundaryAt(led, rung) {
+  const r = rung | 0;
+  const op = (led.ops || []).find((candidate) =>
+    candidate.r === r && (candidate.k === 'open' || candidate.k === 'close'));
+  return op ? op.k : null;
 }
 
 // An OPEN rung also takes on what is BELOW it — the one disposition where cost runs
@@ -262,8 +319,20 @@ export function inheritedAt(led, rung) {
 // rung that was opened, so opening does not leak the whole stack onto everybody.
 function openBackflowAt(led, rung) {
   const r = rung | 0;
-  if (!(led.open || []).includes(r)) return [];
+  if (boundaryAt(led, r) !== 'open') return [];
   return led.marks.filter((m) => m.r > r);
+}
+
+// A sealed flow boundary must not make a future run impossible. The hand event is
+// an observation of what happened immediately above, not inherited material or
+// water, so it deliberately reads across OPEN/CLOSE while still respecting CARRY
+// tombstones (carried marks have already been removed from led.marks).
+export function upstreamEventsAt(led, rung, kind) {
+  const r = rung | 0;
+  if (r <= 1 || !MARK_KINDS[kind]) return [];
+  return led.marks
+    .filter((m) => m.r === r - 1 && m.k === kind)
+    .sort((a, b) => b.n - a.n || (a.h < b.h ? -1 : a.h > b.h ? 1 : 0));
 }
 
 // Only the inherited marks worth SHOWING (slice 4 places these in the world).
@@ -288,8 +357,8 @@ export function writingsAt(led, rung, hand = null) {
 }
 
 // THE DRAFT: the water everything above you displaces onto you. Clamped, always.
-// Rung 1 inherits nothing and is therefore always the dry island — the surface is
-// the one place in the stack where nobody is upstream of you.
+// Rung 1 inherits nothing: nobody is upstream of the surface. OPEN is the named
+// exception, carrying half the lower basin's cost back uphill.
 export function draftAt(led, rung) {
   let d = 0;
   for (const m of inheritedAt(led, rung)) d += (MARK_KINDS[m.k] || { draft: 0 }).draft;
@@ -319,82 +388,125 @@ export function handsAbove(led, rung) {
 // ledger, because an island with no history is playable and a crash is not.
 export function sanitizeLedger(raw) {
   const out = emptyLedger();
-  if (!raw || typeof raw !== 'object' || !Array.isArray(raw.marks)) return out;
+  if (!raw || typeof raw !== 'object') return out;
 
-  const seen = new Set();
-  for (const m of raw.marks) {
+  // Reduce disposition operations before marks. CARRY is a high-water tombstone:
+  // every mark by that hand at or below its clock stays retired even if an older
+  // remote copy arrives in a later merge. OPEN/CLOSE is one LWW register per rung.
+  const carries = new Map();
+  const boundaries = new Map();
+  const tends = new Map();
+  for (const candidate of Array.isArray(raw.ops) ? raw.ops : []) {
+    if (!candidate || typeof candidate !== 'object' || !DISPOSITIONS.includes(candidate.k)) continue;
+    const r = Number(candidate.r);
+    const h = sanitizeHand(candidate.h);
+    const n = sanitizeClock(candidate.n);
+    if (!Number.isInteger(r) || r < 1 || r > 64 || !h || n === null) continue;
+    const op = { k: candidate.k, r, h, n };
+    if (op.k === 'carry') carries.set(h, newer(carries.get(h), op));
+    else if (op.k === 'open' || op.k === 'close') boundaries.set(r, newer(boundaries.get(r), op));
+    else tends.set(h + '|' + r, newer(tends.get(h + '|' + r), op));
+  }
+
+  const boundaryOps = [...boundaries.values()].sort(compareOps);
+  const carryBudget = Math.max(0, MAX_DISPOSITION_OPS - boundaryOps.length - MAX_TEND_OPS);
+  const carryOps = [...carries.values()].sort(compareOps).slice(-carryBudget);
+  const structural = [...boundaryOps, ...carryOps];
+  const roomForTends = Math.max(0, Math.min(MAX_TEND_OPS, MAX_DISPOSITION_OPS - structural.length));
+  const inert = [...tends.values()].sort(compareOps).slice(-roomForTends);
+  out.ops = [...structural, ...inert].sort(compareOps);
+
+  const activeCarry = new Map(out.ops.filter((op) => op.k === 'carry').map((op) => [op.h, op]));
+  const byIdentity = new Map();
+  for (const m of Array.isArray(raw.marks) ? raw.marks : []) {
     if (!m || typeof m !== 'object') continue;
     if (!MARK_KINDS[m.k]) continue;                       // unknown/renamed kind
-    const r = Number(m.r) | 0;
-    if (!(r >= 1 && r <= 64)) continue;                   // absurd rung
-    const h = typeof m.h === 'string' && m.h ? m.h.slice(0, 16) : null;
+    const r = Number(m.r);
+    if (!Number.isInteger(r) || r < 1 || r > 64) continue;
+    const h = sanitizeHand(m.h);
     if (!h) continue;
+    const n = sanitizeClock(m.n);
+    if (n === null) continue;
 
     // Validate writing before claiming its idempotency key. Otherwise a hostile
     // empty line placed first could mask a later valid copy of the same mark.
     const text = m.k === 'writing' ? sanitizeWriting(m.t) : '';
     if (m.k === 'writing' && !text) continue;
 
-    // one mark per (hand, rung, kind), same rule as record()
+    // One ACTIVE mark per (hand, rung, kind), same rule as record(). A mark made
+    // after CARRY has a newer clock and becomes a legitimate new act; stale copies
+    // at or below the tombstone can never resurrect.
     const key = h + '|' + r + '|' + m.k;
-    if (seen.has(key)) continue;
-    seen.add(key);
 
     let at = null;
     if (Array.isArray(m.at) && m.at.length === 3 && m.at.every((v) => Number.isFinite(+v))) {
       const cl = (v, b) => Math.max(-b, Math.min(b, +v));
       at = [cl(m.at[0], BOUND_XZ), cl(m.at[1], BOUND_Y), cl(m.at[2], BOUND_XZ)];
     }
-    out.marks.push(makeMark(m.k, r, h, Number(m.n) | 0, at, text));
+    const mark = makeMark(m.k, r, h, n, at, text);
+    const carried = activeCarry.get(h);
+    if (carried && mark.n <= carried.n) continue;
+
+    const prior = byIdentity.get(key);
+    if (!prior || prior.n < mark.n || (prior.n === mark.n && markFingerprint(prior) < markFingerprint(mark))) {
+      byIdentity.set(key, mark);
+    }
   }
+  out.marks = [...byIdentity.values()].sort((a, b) =>
+    a.r - b.r || a.n - b.n || (a.h < b.h ? -1 : a.h > b.h ? 1 : a.k.localeCompare(b.k)));
 
   // cap every rung AFTER the merge, not per source
   for (const rung of new Set(out.marks.map((m) => m.r))) pruneRung(out, rung);
-
-  // The disposition sets are as hostile a surface as the marks: a forged `sealed`
-  // could cut a player off from the whole stack, and a forged `open` could pile
-  // every rung's water onto them. Same treatment — known range, deduped, capped.
-  const rungList = (raw2) => {
-    if (!Array.isArray(raw2)) return [];
-    const seen2 = new Set();
-    for (const v of raw2) {
-      const n = Number(v) | 0;
-      if (n >= 1 && n <= 64) seen2.add(n);
-    }
-    return [...seen2].slice(0, 64);
-  };
-  out.sealed = rungList(raw.sealed);
-  out.open = rungList(raw.open);
   return out;
+}
+
+function markFingerprint(mark) {
+  return JSON.stringify([mark.t || '', mark.at || null]);
 }
 
 // ---------------- payload -----------------------------------------------------
 
 export function packLedger(led) {
-  return { v: LEDGER_VERSION, marks: led.marks, sealed: led.sealed || [], open: led.open || [] };
+  const clean = sanitizeLedger(led);
+  return { v: LEDGER_VERSION, marks: clean.marks, ops: clean.ops };
 }
 
-// Migrations get the save-schema treatment when there is a v2. Until then the
-// version int exists so that day is additive rather than a wipe.
+// The game is in development: there is one current ledger contract and no legacy
+// adapter. Bumping the version starts a fresh stack namespace deliberately.
 export function applyLedger(raw) {
-  return sanitizeLedger(raw);
+  return raw && raw.v === LEDGER_VERSION ? sanitizeLedger(raw) : emptyLedger();
+}
+
+// State-based merge used by both local tests and the shared source. Sanitation is
+// the reducer: operation order and duplicate delivery cannot change the outcome.
+export function mergeLedgers(...ledgers) {
+  return sanitizeLedger({
+    marks: ledgers.flatMap((led) => Array.isArray(led?.marks) ? led.marks : []),
+    ops: ledgers.flatMap((led) => Array.isArray(led?.ops) ? led.ops : []),
+  });
 }
 
 // ---------------- the source interface ----------------------------------------
 //
 // A SOURCE is where marks come from. The local one is your own history: the acts
 // you performed on rung 1 are what rung 2 inherits, so the whole thesis is
-// playable single-player with no server and no stranger. Slice 8 adds an HTTP
-// source that fetches other hands' marks for a rung; NOTHING else changes,
+// playable single-player with no server and no stranger. A complete shared source
+// can fetch other hands' marks for a rung; NOTHING else changes,
 // because every consumer reads through this interface.
 //
-//   load()            → a sanitized ledger (sync for local, a promise for HTTP)
-//   push(mark)        → record it wherever this source keeps things
+//   load()                    → the sanitized materialized ledger
+//   pushMark(mark)            → persist one mark fact
+//   pushDisposition(operation)→ persist one disposition operation/tombstone
 //
 // `io` is the storage shim world.js passes in ({ get, set }) so this module stays
 // free of localStorage and remains node-testable.
 export function localSource(io) {
   let led = null;
+  const persist = () => {
+    try { io.set(LEDGER_KEY, JSON.stringify(packLedger(led || emptyLedger()))); } catch (_) {
+      /* private mode: the stack forgets, the island still works */
+    }
+  };
   return {
     load() {
       if (led) return led;
@@ -403,11 +515,13 @@ export function localSource(io) {
       led = applyLedger(raw);
       return led;
     },
-    push(mark) {
+    pushMark(mark) {
       if (!mark) return;
-      try { io.set(LEDGER_KEY, JSON.stringify(packLedger(led || emptyLedger()))); } catch (_) {
-        /* private mode: the stack forgets, the island still works */
-      }
+      persist();
+    },
+    pushDisposition(operation) {
+      if (!operation || !DISPOSITIONS.includes(operation.k)) return;
+      persist();
     },
     // Forget the stack in place — storage AND the in-memory cache. Without the
     // second half, clearing the key looks like it worked and the old draft keeps

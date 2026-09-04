@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run.sh — the release gate, end to end: static server + headless Chrome + the
-# 45-assertion full-game walk + the journal↔sketch coverage check. Exit 0 = ship.
+# 64-assertion full-game walk + the field-note contract. Exit 0 = ship.
 #
 #   SERVE_PORT (default 8642)   CDP_PORT (default 9223)   CHROME_BIN (autodetect)
 #
@@ -48,13 +48,22 @@ curl -sf "http://127.0.0.1:$SERVE_PORT/the-island/" > /dev/null || { echo "serve
 echo "== saves schema =="
 node "$HERE/saves.spec.mjs" || exit 1
 echo "== coverage =="
-node "$HERE/coverage.mjs" || exit 1
-echo "== the stack =="
-# STACK.md slices 1-2: the ledger records the god-verbs, the draft accumulates
-# downward, and both survive a wiped save and a reload. Pure logic + storage — no
-# cinematics — so this is a hard gate on CI too.
-SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/stack.mjs" | tee "$WORK/stack.out"
-grep -q "STACKWALK 47 / 47" "$WORK/stack.out" || { echo "STACK FAILED"; exit 1; }
+node "$HERE/coverage.mjs" | tee "$WORK/coverage.out"
+grep -q "COVERAGE PASS 21 / 21" "$WORK/coverage.out" || { echo "COVERAGE FAILED"; exit 1; }
+
+echo "== runtime reset ownership =="
+# Begin, debug reset, delayed puzzle work, intro copy, and score nodes share one
+# cancellable boundary. A fresh run must never hear or see the run it replaced.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/runtime-reset.mjs" | tee "$WORK/runtime-reset.out"
+grep -q "RUNTIME-RESET PASS 6 / 6" "$WORK/runtime-reset.out" || { echo "RUNTIME RESET FAILED"; exit 1; }
+
+echo "== the upstream hand =="
+# The L2 valve's delayed answer is causal, physical, and one-shot: make one real
+# upstream valve mark under a separate local identity, stage the whole event, and
+# prove its +0.06 surge, cleanup, save/reload behavior, and render budget.  The
+# script always uses ?localstack, so neither identity can publish a test mark.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/upstream-hand.mjs" | tee "$WORK/upstream-hand.out"
+grep -q "UPSTREAM-HAND 32 / 32" "$WORK/upstream-hand.out" || { echo "UPSTREAM HAND FAILED"; exit 1; }
 
 echo "== the writing in the sand =="
 # The one mark that travels downhill without harm: a bounded line survives outside
@@ -72,11 +81,11 @@ SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/terrai
 grep -q "TERRAIN-FINISH 10 / 10" "$WORK/terrain-finish.out" || { echo "TERRAIN FINISH FAILED"; exit 1; }
 
 echo "== the player-facing journey =="
-# The state-machine walk proves flags can be earned; this proves the player can read
-# the first-use copy, see what arrival prose names, receive story cues after closing a
-# reader, recover direction from the journal, and accelerate both long crossings cleanly.
+# The ChallengeGraph walk proves flags can be earned; this proves the notebook contains
+# only observed evidence, renders its physical spread at both breakpoints, waits until a
+# reader closes to speak, and reveals help only when Trace a lead is explicitly pressed.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/experience.mjs" | tee "$WORK/experience.out"
-grep -q "EXPERIENCE PASS 13 / 13" "$WORK/experience.out" || { echo "EXPERIENCE FAILED"; exit 1; }
+grep -q "EXPERIENCE PASS 22 / 22" "$WORK/experience.out" || { echo "EXPERIENCE FAILED"; exit 1; }
 
 echo "== the doors =="
 # The owner watched a door pass through the tower wall. Nothing in the gate looked at
@@ -109,7 +118,13 @@ echo "== the gulls =="
 # straight line THROUGH the lantern and the dome, and the owner photographed it mid-flight
 # with a wing out through the copper.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/gulls.mjs" | tee "$WORK/gulls.out"
-grep -q "GULLS 3 / 3" "$WORK/gulls.out" || { echo "GULLS FAILED"; exit 1; }
+grep -q "GULLS 7 / 7" "$WORK/gulls.out" || { echo "GULLS FAILED"; exit 1; }
+
+echo "== the lens-vault outcrop =="
+# The slab reveals a shallow niche, not a room. The irregular boulder must stay
+# solid before and after the bird puzzle, while the lens stays reachable outside it.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/vault-outcrop.mjs" | tee "$WORK/vault-outcrop.out"
+grep -q "VAULT-OUTCROP 8 / 8" "$WORK/vault-outcrop.out" || { echo "VAULT OUTCROP FAILED"; exit 1; }
 
 echo "== the trees =="
 # The canopy's detail rides on a custom attribute and three shader-chunk replacements, and
@@ -130,11 +145,11 @@ echo "== the glare =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/glare.mjs" | tee "$WORK/glare.out"
 grep -q "GLARE 8 / 8" "$WORK/glare.out" || { echo "GLARE FAILED"; exit 1; }
 
-echo "== the lettered spines =="
-# The eighteen gilt volumes in the study spell the one line of canon the game says aloud
-# once. Nothing else in the gate can see the MESSAGE — the geometry is fine either way.
+echo "== the signal index =="
+# Eight manuals route the beam's figures to named physical instruments. The index must
+# stay complete without printing values, becoming a sentence, or selecting the order.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/spines.mjs" | tee "$WORK/spines.out"
-grep -q "SPINES 21 / 21" "$WORK/spines.out" || { echo "SPINES FAILED"; exit 1; }
+grep -q "SPINES 20 / 20" "$WORK/spines.out" || { echo "SPINES FAILED"; exit 1; }
 
 echo "== the hover glint =="
 # The highlight must mark a prop, not replace it. The full-body wash it used to be
@@ -144,30 +159,9 @@ SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/glint.
 grep -q "GLINT 25 / 25" "$WORK/glint.out" || { echo "GLINT FAILED"; exit 1; }
 
 echo "== the walk =="
-# CI runs on software GL where 20s real-time cinematics cannot hit wall-clock, so
-# CI is the LOGIC GATE: the 33 pumped assertions must pass AND the failure list
-# must equal EXACTLY the known realtime set below — any other failure is red.
-# The full 45/45 (cinematics included) is the local pre-push bar.
-REALTIME_SET='P2.realDive→L2|P2.vista(#135 held+released)|P3.kelpSlate|P5.keeperTwist(realProximity)|P6.embrace+realAscent→L3|P7.returned|P7.phialDried+read|P7.roundWind+all(#131)|P7.shoreNamed(#133)|P8.oarFinale|P8.oarCoda(#134)|P9.bellFinale'
-walk_ok() {
-  if [ "${CI:-}" = "true" ]; then
-    grep -q "WALK PASS 45 / 45" "$WORK/walk.out" && return 0
-    grep -q "WALK PASS 33 / 45" "$WORK/walk.out" || return 1
-    fails=$(grep "FAILURES:" "$WORK/walk.out" | sed 's/FAILURES: //')
-    node -e "
-      const fails = JSON.parse(process.argv[1]);
-      const allowed = new Set(process.argv[2].split('|'));
-      process.exit(fails.every((f) => allowed.has(f)) ? 0 : 1);
-    " "$fails" "$REALTIME_SET"
-  else
-    grep -q "WALK PASS 45 / 45" "$WORK/walk.out"
-  fi
-}
-walk_once() { SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/walk.mjs" | tee "$WORK/walk.out"; walk_ok; }
-# one retry: cold-profile shader hitches can eat a timing margin on the first pass;
-# a real regression fails both runs (the retry is flake armor, not forgiveness)
-if ! walk_once; then
-  echo "== first pass failed — one retry =="
-  walk_once || { echo "WALK FAILED (twice)"; exit 1; }
-fi
-[ "${CI:-}" = "true" ] && echo "gate green (CI logic subset; realtime cinematics are the local bar)" || echo "gate green"
+# Every puzzle action goes through its shipped hotspot. Crossing travel uses the public
+# instant transition so local and software-GL runs enforce the same 64 assertions: the
+# instrument-routed decoder, every depth gate, held regard, return, and all dispositions.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/walk.mjs" | tee "$WORK/walk.out"
+grep -q "WALK PASS 64 / 64" "$WORK/walk.out" || { echo "WALK FAILED"; exit 1; }
+echo "gate green"

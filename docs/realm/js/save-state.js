@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=197';
-import { missions } from './missions.js?realm=197';
+} from './state.js?realm=198';
+import { missions } from './missions.js?realm=198';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=197';
+} from './save-schema.js?realm=198';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,11 +22,15 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=197';
-import { houseResidentCapacity } from './residences.js?realm=197';
-import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=197';
-import { foodCapacity } from './building-inventory.js?realm=197';
-import { makePathfindingRequest } from './pathfinding-service.js?realm=197';
+} from './citizen-ownership.js?realm=198';
+import { houseResidentCapacity } from './residences.js?realm=198';
+import { WORKFORCE_PRIORITIES } from './workforce-policy.js?realm=198';
+import {
+  PHYSICAL_RESOURCE_KEYS,
+  foodCapacity,
+  resourceCapacity,
+} from './building-inventory.js?realm=198';
+import { makePathfindingRequest } from './pathfinding-service.js?realm=198';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization
@@ -80,7 +84,7 @@ const CHRONICLE_TAGS = new Set([
 ]);
 const NAMED_CHARACTER_ROLES = new Set(['mayor', 'bard', 'rival', 'smith', 'merchant', 'teacher']);
 const DEATH_CAUSES = new Set(['battle', 'plague', 'raid']);
-const PLUNDER_RESOURCE_KEYS = new Set(['gold', 'food', 'wood']);
+const PLUNDER_RESOURCE_KEYS = new Set(['gold', 'food', 'wheat', 'flour', 'wood']);
 const CITIZEN_STATES = new Set(CITIZEN_ACTIVITIES);
 const CITIZEN_APPEARANCE_ID_SET = new Set(CITIZEN_APPEARANCE_IDS);
 const CITIZEN_PROFESSION_SET = new Set(CITIZEN_PROFESSIONS);
@@ -177,7 +181,19 @@ const REQUIRED_BUILDING_KEYS = new Set([
 const AVATAR_KEYS = new Set(['x', 'y', 'tx', 'ty', 'vx', 'vy', 'path', 'pathIdx', 'speed', 'name', 'state', 'scoutedTiles', 'scoutingFinds', 'faceX', 'faceZ', '_movedAt', '_px', '_py', '_laneX', '_laneY', '_dirKey', '_dirPend', '_dirPendMs', '_actorAnimationKey', '_actorAnimationStartedAt']);
 const REQUIRED_AVATAR_KEYS = new Set(['x', 'y', 'tx', 'ty', 'vx', 'vy', 'path', 'pathIdx', 'speed', 'name', 'state', 'scoutedTiles', 'scoutingFinds', 'faceX', 'faceZ']);
 const SOLDIER_KEYS = new Set(['x', 'y', 'tx', 'ty', 'homeBuilding', 'garrison', 'name', 'type', 'hp', 'maxHp', 'state', 'stateTimer', '_postIdx', 'attackTimer', '_px', '_py', '_pdx', '_pdy', '_mvx', '_mvy', '_movedAt', '_actorAnimationKey', '_actorAnimationStartedAt']);
-const ENEMY_KEYS = new Set(['x', 'y', 'tx', 'ty', 'hp', 'maxHp', 'damage', 'plunderGoal', 'type', 'state', 'variant', 'attackCue', 'attackTimer', 'engaged', 'loot', 'plundered', 'retreating', '_px', '_py']);
+const RAID_INTENT_KEYS = new Set([
+  'side', 'raidIndex', 'firstRaid', 'attackerCount',
+  'objectiveId', 'targetType', 'targetX', 'targetY',
+  'routeMode', 'breachId', 'breachType', 'breachX', 'breachY',
+  'defensePresent', 'pressurePresent',
+  'travelCost', 'breachCost', 'exposureCost', 'congestionCost', 'value', 'totalCost',
+]);
+const ENEMY_KEYS = new Set([
+  'x', 'y', 'tx', 'ty', 'hp', 'maxHp', 'damage', 'plunderGoal',
+  'type', 'state', 'variant', 'attackCue', 'attackTimer', 'engaged',
+  'loot', 'plundered', 'retreating', 'raidPath', 'raidPathIdx',
+  'raidPlanEpoch', 'raidIntent', 'raidBreaches', '_px', '_py',
+]);
 const PROJECTILE_KEYS = new Set(['x', 'y', 'tx', 'ty', 'target', 'damage', 'life', 'type']);
 const WALKER_KEYS = new Set(['x', 'y', 'tx', 'ty', 'home', 'color', 'emoji', 'life', 'visitedHouses', 'hauler', 'src', 'leg', '_px', '_py', '_actorAnimationKey', '_actorAnimationStartedAt']);
 const CARAVAN_KEYS = new Set(['x', 'y', 'tx', 'ty', 'homeX', 'homeY', 'phase', 'gold', 'building', 'speed', '_px', '_py']);
@@ -290,6 +306,31 @@ function validateDenseArray(value, path, maxLength = Infinity, allowedNamedKeys 
   for (const key of Object.keys(value)) {
     if (!/^(0|[1-9]\d*)$/.test(key) && !allowedNamedKeys.has(key)) {
       return failure('unknown-field', `${path}.${key}`, `Unknown named array field ${key}.`);
+    }
+  }
+  return { ok: true };
+}
+
+function validateRaidWaypointPath(value, path) {
+  const array = validateDenseArray(value, path, MAP_W * MAP_H);
+  if (!array.ok) return array;
+  if (value.length === 0) return failure('invalid-path', path, 'A planned raid route must contain at least one waypoint.');
+  for (let i = 0; i < value.length; i++) {
+    const pointPath = `${path}[${i}]`;
+    const point = value[i];
+    const surface = validateObjectSurface(point, new Set(['x', 'y']), new Set(['x', 'y']), pointPath);
+    if (!surface.ok) return surface;
+    if (
+      !Number.isSafeInteger(point.x) || point.x < 0 || point.x >= MAP_W
+      || !Number.isSafeInteger(point.y) || point.y < 0 || point.y >= MAP_H
+    ) return failure('out-of-range', pointPath, 'Raid waypoints must be integer map positions.');
+    if (i > 0) {
+      const previous = value[i - 1];
+      const dx = Math.abs(point.x - previous.x);
+      const dy = Math.abs(point.y - previous.y);
+      if (Math.max(dx, dy) !== 1) {
+        return failure('invalid-path', pointPath, 'Consecutive raid waypoints must be adjacent map cells.');
+      }
     }
   }
   return { ok: true };
@@ -494,6 +535,10 @@ const ENEMY_FIELD_VALIDATORS = new Map([
   ['variant', fieldRule(value => Number.isSafeInteger(value) && value >= 0 && value <= 2, 'Enemy variant must be 0, 1, or 2.', 'out-of-range')],
   ['attackTimer', finiteRule], ['engaged', nullableReferenceRule], ['loot', ordinaryObjectRule],
   ['plundered', nonNegativeFiniteRule], ['retreating', booleanRule],
+  ['raidPath', validateRaidWaypointPath], ['raidPathIdx', nonNegativeIntegerRule],
+  ['raidPlanEpoch', fieldRule(value => Number.isSafeInteger(value) && value >= -1, 'Raid plan epoch must be an integer of at least -1.', 'out-of-range')],
+  ['raidIntent', ordinaryObjectRule],
+  ['raidBreaches', denseArrayRule],
 ]);
 
 const PROJECTILE_FIELD_VALIDATORS = new Map([
@@ -542,6 +587,104 @@ function validatePlunderRecord(value, path) {
   if (!surface.ok) return surface;
   for (const [key, amount] of Object.entries(value)) {
     if (!Number.isSafeInteger(amount) || amount < 0) return failure('out-of-range', `${path}.${key}`, 'Plunder amounts must be non-negative safe integers.');
+  }
+  return { ok: true };
+}
+
+function validateRaidIntent(value, path, enemy) {
+  const surface = validateObjectSurface(value, RAID_INTENT_KEYS, RAID_INTENT_KEYS, path);
+  if (!surface.ok) return surface;
+  if (!Number.isSafeInteger(value.side) || value.side < 0 || value.side > 3) {
+    return failure('out-of-range', `${path}.side`, 'Raid approach side must be 0 through 3.');
+  }
+  for (const key of ['raidIndex', 'travelCost', 'breachCost', 'exposureCost', 'congestionCost', 'value']) {
+    if (!Number.isSafeInteger(value[key]) || value[key] < 0) {
+      return failure('out-of-range', `${path}.${key}`, 'Raid intent costs and indices must be non-negative safe integers.');
+    }
+  }
+  if (!Number.isSafeInteger(value.attackerCount) || value.attackerCount < 1) {
+    return failure('out-of-range', `${path}.attackerCount`, 'Raid attacker count must be positive.');
+  }
+  for (const key of ['firstRaid', 'defensePresent', 'pressurePresent']) {
+    if (value[key] !== 0 && value[key] !== 1) {
+      return failure('out-of-range', `${path}.${key}`, `${key} must be 0 or 1.`);
+    }
+  }
+  if (!Number.isSafeInteger(value.totalCost)) {
+    return failure('wrong-type', `${path}.totalCost`, 'Raid total cost must be a safe integer.');
+  }
+  if (!BUILDINGS[value.targetType] || value.targetType === 'road') {
+    return failure('invalid-enum', `${path}.targetType`, 'Raid intent must name an attackable building type.');
+  }
+  for (const key of ['targetX', 'targetY']) {
+    const limit = key === 'targetX' ? MAP_W : MAP_H;
+    if (!Number.isSafeInteger(value[key]) || value[key] < 0 || value[key] >= limit) {
+      return failure('out-of-range', `${path}.${key}`, 'Raid target coordinates must be integer map positions.');
+    }
+  }
+  const expectedObjectiveId = `${value.targetType}@${value.targetX},${value.targetY}`;
+  if (value.objectiveId !== expectedObjectiveId) {
+    return failure('inconsistent-state', `${path}.objectiveId`, 'Raid objective identity must match its type and coordinates.');
+  }
+  if (enemy.tx !== value.targetX || enemy.ty !== value.targetY) {
+    return failure('inconsistent-state', path, 'Raid target coordinates must match the enemy movement target.');
+  }
+  if (value.routeMode === 'open') {
+    if (
+      value.breachId !== '' || value.breachType !== ''
+      || value.breachX !== -1 || value.breachY !== -1
+      || value.breachCost !== 0 || enemy.raidBreaches.length !== 0
+    ) {
+      return failure('inconsistent-state', path, 'An open raid route cannot retain breach state.');
+    }
+  } else if (value.routeMode === 'breach') {
+    if (!BUILDINGS[value.breachType] || value.breachType === 'road') {
+      return failure('invalid-enum', `${path}.breachType`, 'Raid breach intent must name a destructible building type.');
+    }
+    if (
+      !Number.isSafeInteger(value.breachX) || value.breachX < 0 || value.breachX >= MAP_W
+      || !Number.isSafeInteger(value.breachY) || value.breachY < 0 || value.breachY >= MAP_H
+    ) return failure('out-of-range', path, 'Raid breach coordinates must be integer map positions.');
+    if (value.breachId !== `${value.breachType}@${value.breachX},${value.breachY}` || value.breachCost <= 0) {
+      return failure('inconsistent-state', path, 'Raid breach identity and cost must match a deliberate breach.');
+    }
+    const firstBreach = enemy.raidBreaches[0];
+    if (!firstBreach || firstBreach.id !== value.breachId || firstBreach.x !== value.breachX || firstBreach.y !== value.breachY) {
+      return failure('inconsistent-state', path, 'Raid intent must describe the first ordered breach.');
+    }
+  } else {
+    return failure('invalid-enum', `${path}.routeMode`, 'Unknown raid route mode.');
+  }
+
+  if (enemy.raidBreaches.length > enemy.raidPath.length) {
+    return failure('out-of-range', `${path}.raidBreaches`, 'Raid breaches cannot outnumber route waypoints.');
+  }
+  const seenBreaches = new Set();
+  let pathCursor = 0;
+  for (let i = 0; i < enemy.raidBreaches.length; i++) {
+    const breachPath = `${path}.raidBreaches[${i}]`;
+    const breach = enemy.raidBreaches[i];
+    const breachSurface = validateObjectSurface(breach, new Set(['id', 'x', 'y']), new Set(['id', 'x', 'y']), breachPath);
+    if (!breachSurface.ok) return breachSurface;
+    if (
+      !Number.isSafeInteger(breach.x) || breach.x < 0 || breach.x >= MAP_W
+      || !Number.isSafeInteger(breach.y) || breach.y < 0 || breach.y >= MAP_H
+    ) return failure('out-of-range', breachPath, 'Raid breach coordinates must be integer map positions.');
+    const breachType = typeof breach.id === 'string' ? breach.id.split('@')[0] : '';
+    if (!BUILDINGS[breachType] || breachType === 'road' || breach.id !== `${breachType}@${breach.x},${breach.y}`) {
+      return failure('inconsistent-state', `${breachPath}.id`, 'Raid breach identity must match a destructible type and its coordinates.');
+    }
+    if (seenBreaches.has(breach.id)) {
+      return failure('duplicate-reference', breachPath, 'A raid route cannot list the same breach twice.');
+    }
+    seenBreaches.add(breach.id);
+    const routeIndex = enemy.raidPath.findIndex((point, index) => (
+      index >= pathCursor && point.x === breach.x && point.y === breach.y
+    ));
+    if (routeIndex < 0) {
+      return failure('inconsistent-state', breachPath, 'Ordered raid breaches must occur on the planned path.');
+    }
+    pathCursor = routeIndex + 1;
   }
   return { ok: true };
 }
@@ -980,15 +1123,21 @@ function validateBuildingNestedState(building, path) {
   }
   if (building.inventory !== undefined) {
     const inventoryPath = `${path}.inventory`;
-    const inventorySurface = validateObjectSurface(building.inventory, new Set(['food']), new Set(['food']), inventoryPath);
+    const inventorySurface = validateObjectSurface(
+      building.inventory,
+      new Set(PHYSICAL_RESOURCE_KEYS),
+      new Set(),
+      inventoryPath,
+    );
     if (!inventorySurface.ok) return inventorySurface;
-    const food = building.inventory.food;
-    if (!Number.isSafeInteger(food) || food < 0) {
-      return failure('out-of-range', `${inventoryPath}.food`, 'Stored food must be a non-negative safe integer.');
-    }
-    const capacity = foodCapacity(building);
-    if (building.buildProgress < 1 || capacity <= 0 || food > capacity) {
-      return failure('out-of-range', inventoryPath, 'Food inventory requires a completed pantry/store and may not exceed its capacity.');
+    for (const [resource, amount] of Object.entries(building.inventory)) {
+      if (!Number.isSafeInteger(amount) || amount < 0) {
+        return failure('out-of-range', `${inventoryPath}.${resource}`, `Stored ${resource} must be a non-negative safe integer.`);
+      }
+      const capacity = resourceCapacity(building, resource);
+      if (building.buildProgress < 1 || capacity <= 0 || amount > capacity) {
+        return failure('out-of-range', `${inventoryPath}.${resource}`, `${resource} inventory requires a completed compatible store and may not exceed its capacity.`);
+      }
     }
   }
   if (building.founderStockpile === true) {
@@ -1111,7 +1260,7 @@ function validateCandidateGame(game) {
   const assignmentCounts = new Map();
   const actorIds = new Set();
   let maxActorId = 0;
-  let physicalFood = 0;
+  const physicalResources = Object.fromEntries(PHYSICAL_RESOURCE_KEYS.map(resource => [resource, 0]));
   let founderStockpiles = 0;
   for (let i = 0; i < game.buildings.length; i++) {
     const building = game.buildings[i];
@@ -1160,15 +1309,28 @@ function validateCandidateGame(game) {
     const tileKey = `${building.x},${building.y}`;
     if (occupied.has(tileKey)) return failure('duplicate-reference', path, 'Two buildings occupy the same tile.');
     occupied.set(tileKey, building);
-    physicalFood += building.inventory?.food || 0;
+    for (const resource of PHYSICAL_RESOURCE_KEYS) {
+      physicalResources[resource] += building.inventory?.[resource] || 0;
+    }
     if (building.founderStockpile === true) founderStockpiles += 1;
   }
 
   if (game.storyFlags.physicalFoodInventory !== true) {
     return failure('inconsistent-state', '$.state.game.storyFlags.physicalFoodInventory', 'Current saves require authoritative physical food inventory.');
   }
+  if (game.storyFlags.physicalSupplyWeb !== true) {
+    return failure('inconsistent-state', '$.state.game.storyFlags.physicalSupplyWeb', 'Current saves require the physical production supply web.');
+  }
   if (founderStockpiles > 1) return failure('inconsistent-state', '$.state.game.buildings', 'A realm may retain at most one founder stockpile.');
-  if (physicalFood !== game.resources.food) return failure('inconsistent-state', '$.state.game.resources.food', 'Global food must exactly mirror physical building inventory.');
+  for (const resource of PHYSICAL_RESOURCE_KEYS) {
+    if (physicalResources[resource] !== game.resources[resource]) {
+      return failure(
+        'inconsistent-state',
+        `$.state.game.resources.${resource}`,
+        `Global ${resource} must exactly mirror physical building inventory.`,
+      );
+    }
+  }
 
   for (let i = 0; i < game.citizens.length; i++) {
     const citizen = game.citizens[i];
@@ -1189,7 +1351,17 @@ function validateCandidateGame(game) {
       return failure('non-finite-number', `${path}.hp`, 'Citizen hp must be finite when present.');
     }
     if (citizen.home !== null && !buildings.has(citizen.home)) return failure('invalid-reference', `${path}.home`, 'Home must reference a current building.');
-    if (citizen._deliveryTarget !== null && citizen._deliveryTarget !== undefined && !buildings.has(citizen._deliveryTarget)) return failure('invalid-reference', `${path}._deliveryTarget`, 'Delivery target must reference a current building.');
+    if (citizen._deliveryTarget !== null && citizen._deliveryTarget !== undefined) {
+      if (!buildings.has(citizen._deliveryTarget)) {
+        return failure('invalid-reference', `${path}._deliveryTarget`, 'Delivery target must reference a current building.');
+      }
+      if (
+        PHYSICAL_RESOURCE_KEYS.includes(citizen.carrying)
+        && resourceCapacity(citizen._deliveryTarget, citizen.carrying) <= 0
+      ) {
+        return failure('invalid-reference', `${path}._deliveryTarget`, 'Physical cargo target must accept the carried resource.');
+      }
+    }
     if (citizen._foodTarget !== null && citizen._foodTarget !== undefined) {
       if (!buildings.has(citizen._foodTarget)) return failure('invalid-reference', `${path}._foodTarget`, 'Food target must reference a current building.');
       if (citizen._foodTarget.buildProgress < 1 || foodCapacity(citizen._foodTarget) <= 0) return failure('invalid-reference', `${path}._foodTarget`, 'Food target must reference a completed pantry/store.');
@@ -1296,6 +1468,21 @@ function validateCandidateGame(game) {
     if (!fields.ok) return fields;
     const numbers = validateFiniteFields(enemy, ['x', 'y', 'tx', 'ty', 'hp', 'maxHp', 'damage', 'plunderGoal', 'variant'], path);
     if (!numbers.ok) return numbers;
+    const raidRouteFields = ['raidPath', 'raidPathIdx', 'raidPlanEpoch', 'raidIntent', 'raidBreaches'];
+    const raidRouteFieldCount = raidRouteFields.filter(key => Object.hasOwn(enemy, key)).length;
+    if (raidRouteFieldCount !== 0 && raidRouteFieldCount !== raidRouteFields.length) {
+      return failure('inconsistent-state', path, 'Planned raid route fields must appear together.');
+    }
+    if (raidRouteFieldCount === raidRouteFields.length) {
+      if (enemy.raidPathIdx > enemy.raidPath.length) {
+        return failure('out-of-range', `${path}.raidPathIdx`, 'Raid path index is outside the waypoint array.');
+      }
+      const intent = validateRaidIntent(enemy.raidIntent, `${path}.raidIntent`, enemy);
+      if (!intent.ok) return intent;
+      if (enemy.retreating === true) {
+        return failure('inconsistent-state', path, 'Retreating enemies cannot retain an attack route.');
+      }
+    }
     if (enemy.type !== 'raider' || enemy.state !== 'approach' || !Number.isInteger(enemy.variant) || enemy.variant < 0 || enemy.variant > 2) return failure('invalid-enum', path, 'Unknown enemy type, state, or variant.');
     if (enemy.maxHp <= 0 || enemy.damage <= 0 || enemy.plunderGoal <= 0 || enemy.hp > enemy.maxHp) return failure('out-of-range', path, 'Enemy combat values are outside the current contract.');
     if (enemy.loot !== undefined) {

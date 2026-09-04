@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, TILE, createResourceStock, setSeed } from '../js/state.js?realm=197';
-import { checkRaids } from '../js/economy.js?realm=197';
-import { rankedRaidTargets, raidTargetForIndex } from '../js/raid-targeting.js?realm=197';
-import { updateEnemies } from '../js/combat.js?realm=197';
+import { G, MAP_H, MAP_W, TILE, createResourceStock, setSeed } from '../js/state.js?realm=198';
+import { checkRaids } from '../js/economy.js?realm=198';
+import { rankedRaidTargets, raidTargetForIndex } from '../js/raid-targeting.js?realm=198';
+import { updateEnemies } from '../js/combat.js?realm=198';
 
 function stats() {
   return {

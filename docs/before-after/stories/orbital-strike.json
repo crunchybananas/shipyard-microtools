@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "slug": "orbital-strike",
+  "title": "Orbital Strike found its fire director",
+  "appSlug": "orbital-strike",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "published",
+  "publishedAt": "2026-09-03",
+  "thesis": "Turn a compact browser FPS into an authored aerospace operation with one unforgettable player-controlled moment.",
+  "summary": "Orbital Strike moved from a sparse corridor prototype to a legible, atmospheric station assault built around charging and calling down an orbital penetrator.",
+  "versions": {
+    "before": {
+      "label": "Original corridor build",
+      "commit": "8b0c989a"
+    },
+    "after": {
+      "label": "Fire-director overhaul",
+      "commit": "7785163e"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "briefing",
+      "title": "From title screen to mission briefing",
+      "caption": "The opening now establishes the orbital geometry, mission state, and visual language before the player enters the station.",
+      "before": {
+        "src": "assets/orbital-strike/before-briefing.jpg",
+        "alt": "The original Orbital Strike start screen with a simple centered title and mission button."
+      },
+      "after": {
+        "src": "assets/orbital-strike/after-briefing.jpg",
+        "alt": "The revised fire-director mission briefing with a large orbital trajectory, telemetry, and launch control."
+      }
+    },
+    {
+      "id": "station",
+      "title": "From empty hallway to station machinery",
+      "caption": "A procedural octagonal interior, directional lighting, weapon model, and instrument-like HUD make the station readable as a place and a machine.",
+      "before": {
+        "src": "assets/orbital-strike/before-gameplay.jpg",
+        "alt": "The original gameplay view in a sparse rectangular station corridor."
+      },
+      "after": {
+        "src": "assets/orbital-strike/after-gameplay.jpg",
+        "alt": "The revised gameplay view inside a teal-lit octagonal station corridor with weapon and tactical displays."
+      }
+    },
+    {
+      "id": "impact",
+      "title": "A signature action the player owns",
+      "caption": "Exploration and combat now charge a targeted strike; the lock, beam, shockwave, and area damage make its arrival the run’s visual and mechanical payoff.",
+      "before": {
+        "src": "assets/orbital-strike/before-gameplay.jpg",
+        "alt": "The original Orbital Strike combat view without an orbital strike ability."
+      },
+      "after": {
+        "src": "assets/orbital-strike/after-impact.jpg",
+        "alt": "A brilliant orbital penetrator beam and expanding shockwave hitting the station floor."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "The station became a machine",
+      "body": "Union-boundary corridors, repeating ribs, panels, floor lanes, and purposeful light sources replaced the generic room geometry with a coherent industrial language."
+    },
+    {
+      "title": "The fantasy gained a verb",
+      "body": "Players earn strike charge through the mission, choose the impact point, and receive a readable lock-to-impact sequence with real area damage."
+    },
+    {
+      "title": "The cockpit explains itself",
+      "body": "Heading, mission progress, strike state, prompts, pause and completion states, and touch controls now behave as one responsive flight-instrument system."
+    }
+  ],
+  "builderNote": {
+    "quote": "This is so much better than the old one",
+    "context": "Reaction after comparing the preserved pre-overhaul build with the fire-director second pass."
+  },
+  "proof": [
+    {
+      "label": "Suite crawl",
+      "value": "64/64 desktop and mobile routes passed"
+    },
+    {
+      "label": "Gameplay checks",
+      "value": "Collision, shooting, strike, pause, restart, touch, and mission completion"
+    },
+    {
+      "label": "Workstream boundary",
+      "value": "The Island remained separate and untouched"
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/orbital-strike/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/7785163e/docs/orbital-strike",
+    "download": "assets/orbital-strike/montage.png"
+  },
+  "share": {
+    "summary": "See how Orbital Strike became a focused station assault with a player-targeted orbital penetrator as its defining moment.",
+    "image": "assets/orbital-strike/social.jpg"
+  }
+}

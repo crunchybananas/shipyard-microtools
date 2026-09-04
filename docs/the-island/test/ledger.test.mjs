@@ -11,11 +11,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   LEDGER_VERSION, LEDGER_KEY, HAND_KEY, MARK_KINDS, FLAG_MARKS,
-  MAX_MARKS_PER_RUNG, MAX_DRAFT,
-  emptyLedger, record, marksAt, inheritedAt, evidenceAt,
+  MAX_MARKS_PER_RUNG, MAX_DRAFT, MAX_DISPOSITION_OPS,
+  emptyLedger, record, marksAt, inheritedAt, evidenceAt, upstreamEventsAt,
   draftAt, tideFor, handsAbove,
-  sanitizeLedger, packLedger, applyLedger, localSource, newHandId, loadHandId,
-  DISPOSITIONS, dispose,
+  sanitizeLedger, packLedger, applyLedger, mergeLedgers, localSource, newHandId, loadHandId,
+  DISPOSITIONS, dispose, boundaryAt,
 } from '../js/ledger.js';
 
 // ---------------- recording ---------------------------------------------------
@@ -233,6 +233,11 @@ test('pack → apply round-trips a ledger', () => {
   assert.equal(draftAt(back, 3), draftAt(led, 3));
 });
 
+test('apply accepts only the current ledger epoch', () => {
+  const old = { v: LEDGER_VERSION - 1, marks: [{ k: 'valve', r: 1, h: 'a', n: 0 }], ops: [] };
+  assert.deepEqual(applyLedger(old), emptyLedger());
+});
+
 // ---------------- the local source --------------------------------------------
 
 function fakeIO() {
@@ -244,7 +249,7 @@ test('localSource persists marks under its own key and reloads them', () => {
   const io = fakeIO();
   const src = localSource(io);
   const led = src.load();
-  src.push(record(led, { kind: 'valve', rung: 1, hand: 'a' }));
+  src.pushMark(record(led, { kind: 'valve', rung: 1, hand: 'a' }));
 
   assert.ok(io.store.has(LEDGER_KEY), 'the stack outlives the save, under its own key');
   const reloaded = localSource(io).load();
@@ -258,12 +263,24 @@ test('localSource survives a corrupt payload without losing the island', () => {
   assert.deepEqual(localSource(io).load().marks, []);
 });
 
-test('localSource push is a no-op for a null mark', () => {
+test('localSource pushMark is a no-op for a null mark', () => {
   const io = fakeIO();
   const src = localSource(io);
   src.load();
-  src.push(null);
+  src.pushMark(null);
   assert.deepEqual(localSource(fakeIO()).load().marks, []);
+});
+
+test('localSource persists disposition operations through an explicit channel', () => {
+  const io = fakeIO();
+  const src = localSource(io);
+  const led = src.load();
+  const result = dispose(led, { kind: 'close', rung: 2, hand: 'a' });
+  src.pushDisposition(result.operation);
+
+  const reloaded = localSource(io).load();
+  assert.equal(boundaryAt(reloaded, 2), 'close');
+  assert.equal(src.push, undefined, 'the source has no ambiguous mark-or-operation method');
 });
 
 test('newHandId is 8 hex chars', () => {
@@ -385,15 +402,23 @@ test('an unknown disposition does nothing', () => {
   assert.equal(led.marks.length, 1);
 });
 
-test('a hostile ledger cannot forge seals or opens', () => {
+test('hostile disposition operations are validated, bounded, and reduced', () => {
   const led = sanitizeLedger({
     marks: [{ k: 'valve', r: 1, h: 'a', n: 0 }],
-    sealed: [0, -5, 9999, 'x', null, 2, 2, 2],
-    open: Array.from({ length: 500 }, (_, i) => i),
+    ops: [
+      null,
+      { k: 'burn', r: 2, h: 'a', n: 1 },
+      { k: 'open', r: 0, h: 'a', n: 2 },
+      { k: 'open', r: 2, h: '<script>', n: 3 },
+      { k: 'open', r: 2, h: 'a', n: 4 },
+      { k: 'close', r: 2, h: 'a', n: 5 },
+      ...Array.from({ length: MAX_DISPOSITION_OPS + 200 }, (_, i) =>
+        ({ k: 'tend', r: (i % 64) + 1, h: 'h' + i, n: i + 6 })),
+    ],
   });
-  assert.deepEqual(led.sealed, [2], 'out-of-range and duplicate seals are dropped');
-  assert.ok(led.open.length <= 64, 'and open is capped');
-  assert.ok(led.open.every((n) => n >= 1 && n <= 64));
+  assert.equal(boundaryAt(led, 2), 'close', 'the newest valid boundary is authoritative');
+  assert.ok(led.ops.length <= MAX_DISPOSITION_OPS, 'operation state is hard-capped');
+  assert.ok(led.ops.every((op) => DISPOSITIONS.includes(op.k) && op.r >= 1 && op.r <= 64));
 });
 
 test('dispositions survive the payload round-trip', () => {
@@ -402,6 +427,57 @@ test('dispositions survive the payload round-trip', () => {
   dispose(led, { kind: 'close', rung: 2, hand: 'a' });
   dispose(led, { kind: 'open', rung: 3, hand: 'a' });
   const back = applyLedger(JSON.parse(JSON.stringify(packLedger(led))));
-  assert.deepEqual(back.sealed, [2]);
-  assert.deepEqual(back.open, [3]);
+  assert.equal(boundaryAt(back, 2), 'close');
+  assert.equal(boundaryAt(back, 3), 'open');
+  assert.ok(back.ops.every((op) => Object.keys(op).sort().join(',') === 'h,k,n,r'));
+});
+
+test('OPEN and CLOSE supersede each other at one rung', () => {
+  const led = emptyLedger();
+  dispose(led, { kind: 'open', rung: 2, hand: 'a' });
+  assert.equal(boundaryAt(led, 2), 'open');
+  dispose(led, { kind: 'close', rung: 2, hand: 'a' });
+  assert.equal(boundaryAt(led, 2), 'close');
+  assert.equal(led.ops.filter((op) => op.r === 2 && ['open', 'close'].includes(op.k)).length, 1,
+    'the materialized ledger never contains contradictory boundary sets');
+  dispose(led, { kind: 'open', rung: 2, hand: 'b' });
+  assert.equal(boundaryAt(led, 2), 'open', 'a later observed operation wins across hands too');
+});
+
+test('CARRY tombstones survive stale remote merges and permit genuinely new work', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'me' });
+  record(led, { kind: 'dive', rung: 1, hand: 'me' });
+  const staleRemote = JSON.parse(JSON.stringify(packLedger(led)));
+
+  dispose(led, { kind: 'carry', rung: 1, hand: 'me' });
+  const merged = mergeLedgers(led, staleRemote);
+  assert.equal(merged.marks.length, 0, 'immutable remote copies stay behind the carry high-water mark');
+  assert.equal(merged.ops.filter((op) => op.k === 'carry' && op.h === 'me').length, 1);
+
+  const fresh = record(merged, { kind: 'valve', rung: 1, hand: 'me' });
+  assert.ok(fresh && fresh.n > merged.ops.find((op) => op.k === 'carry').n);
+  assert.equal(mergeLedgers(merged, staleRemote).marks.length, 1,
+    'post-carry work is active while pre-carry wire copies remain retired');
+});
+
+test('operation merges converge regardless of delivery order', () => {
+  const left = sanitizeLedger({
+    marks: [{ k: 'valve', r: 1, h: 'a', n: 1 }],
+    ops: [{ k: 'open', r: 2, h: 'a', n: 2 }],
+  });
+  const right = sanitizeLedger({
+    marks: [{ k: 'valve', r: 1, h: 'a', n: 1 }],
+    ops: [{ k: 'close', r: 2, h: 'b', n: 3 }],
+  });
+  assert.deepEqual(packLedger(mergeLedgers(left, right)), packLedger(mergeLedgers(right, left)));
+  assert.equal(boundaryAt(mergeLedgers(left, right), 2), 'close');
+});
+
+test('CLOSE blocks inheritance but not the adjacent upstream event required by replay', () => {
+  const led = emptyLedger();
+  record(led, { kind: 'valve', rung: 1, hand: 'past' });
+  dispose(led, { kind: 'close', rung: 1, hand: 'past' });
+  assert.equal(inheritedAt(led, 2).length, 0);
+  assert.deepEqual(upstreamEventsAt(led, 2, 'valve').map((mark) => mark.h), ['past']);
 });

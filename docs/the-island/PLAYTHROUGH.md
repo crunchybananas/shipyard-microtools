@@ -1,255 +1,272 @@
-# ABYME — Playthrough & Test Guide
+# ABYME — Playthrough and Test Guide
 
-*An island within an island.* A zero-build, three.js first-person Myst-like. This guide walks the **complete game in order** so you can test it end to end without ever getting stuck, plus every fast-travel shortcut, both endings, all secrets, and a tick-box test checklist.
+This is the developer-facing route for the current game. It names gates, state,
+and debug controls exactly enough to reproduce failures without preserving an old
+design contract.
 
-> Verified against source: `js/puzzles.js`, `js/main.js`, `js/world.js`, `index.html`. Flag names, gates, time windows, and debug calls below are exact.
+For a player-facing route, use [WALKTHROUGH.md](WALKTHROUGH.md).
 
----
+## Launch modes
 
-## 1. How to run + Controls
+Serve the directory over HTTP and open the game:
 
-### Open it
-- It's static ES modules — **serve the folder over any static server** and open `index.html` (file:// won't load ES modules / CDN three.js). From the game folder:
-  - `python3 -m http.server 8000` → open **`http://localhost:8000/`**
-  - or `npx serve` and open the printed URL.
-- Headphones recommended (all audio is synthesized live).
-- Title screen has **Begin** and (if a save exists) **Continue**. Begin wipes any save and starts the ~19s intro flight; a single click/tap during the intro **skips** it. You wake on the beach.
-
-### Debug build (the tester's master switch)
-Append **`?debug`** to the URL: **`http://localhost:8000/?debug`**
-This is the ONLY thing that creates the on-screen `#debug-panel` AND the `window.ABYME` console API. Without it none of the test aids exist (zero cost to players). `main.js:21`: `DEBUG = URLSearchParams(...).has('debug')`.
-
-### Controls
-| Input | Action |
-|---|---|
-| **Drag** (pointer down + move on the canvas) | Look around |
-| **W A S D** | Walk |
-| **Click** | "Touch the world" — fires the hotspot under the iris cursor (this is how nearly everything is used) |
-| **Drag a hotspot** | Two hotspots are *drag* type, not click: the **sun crank** and the **model lamp housing** (lens-aim/beam). Hold and drag those. |
-| **Click / Space** during a dive or ascent | After the prompt appears, accelerate the same crossing curve (no state is skipped). |
-| **J** | Journal (Field Notes) open/close |
-| **M** | Mute / unmute (persists) |
-| **C** | Reduced-motion comfort toggle (persists) |
-| **Esc** | Close journal / close reader |
-| Reader open | **←** prev page, **→ / Space** next page, **Esc** or click backdrop closes |
-
-While a **reading surface is open**, the reader owns input — J/M/C and walking do nothing until you close it.
-
----
-
-## 2. Tester's fast-travel toolkit (`?debug` only)
-
-### Debug PANEL (top-left, 8 collapsible groups) + the live STATE readout
-The `?debug` panel is grouped, labelled and tooltipped, with a 2-line live **state readout** at the top
-(level/region · encounter · tide+waterY · window · inv · stems · beamΔ · key flags · regions-seen · frags;
-the tide line turns **amber when tide>1**). Press **`` ` ``** (backtick) — or the **▾ hide** header button — to toggle the panel.
-- **Teleport:** `beach` · `study` · `stones` · `islet` · `cliff` · `bridge` · `dory` · `bluff` · `cellar↓`.
-- **Time & Tide:** `dawn` · `golden` · `night` · `❄ sun` · `drain` · `high` · `mist`, plus a **time** slider (0–24h → `W.time`) and a **tide** slider **(0–2)**. NOTE: tide **>1 RAISES** the sea above high-water (`waterY = -TIDE_DROP·(1-tide)`); the dive-levels use 1.35 / 1.65 / 1.9. `drain`→low, `high`→raised.
-- **Grant — surface chain:** `ruler+` · `ruler✓ bridge` · `bird✓` · `lens+` · `beam on` · `glyphs✓` · `glass+` · `ALL surface✓` (the whole surface chain at once).
-- **Grant — bluff / dive chain:** `shadow✓` · `hatch✓ code` (dials=[3,7,1,5]+`hatchOpen`) · `plumb+` · `dive armed`.
-- **Levels & dives — SEA-STRATA:** `L1 surface` · `L2 shallows` · `L3 midwater` · `L4 source` (each = `ABYME.goLevel(n)`: applies the LEVELS row — region + raised tide + spawn) · `dive ▼` / `dive ▼ i` (instant) · `ascend ▲` / `ascend ▲ i` · `bottom`.
-- **Encounters:** `bird sing` · `Watcher spawn` / `Watcher resolve` / `Watcher reset` · `keeper twist` · `carried ✓` · `Tide-Figure`.
-- **Endings** (collapsed) · **Power & Reset:** `ring bell` · `row oar` · `replay intro` · `bench (perf)` · `replay cines` · `mark lore read` · `clear lore` · `read log` · `read Q` · `frag+` / `frag clr` · `clr seen` · `save` · `reset flags` · `wipe ↻`.
-- **bench (perf)** — fixed Power-Ledger pose (time 12); read the fps/draws/tris/GPU-ms line (red if calls≥360, tris≥800k, or fps<58).
-
-### `window.ABYME` console API
-Handles: `player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI, composer, bloomPass`.
-
-```js
-// --- teleport / time ---
-ABYME.tp(-82, -42.5, 2.6)     // study (chart table)
-ABYME.tp(4, -104, 2.19)       // wake-up beach / dive plate
-ABYME.tp(135, -158, 0)        // standing stones
-ABYME.tp(138, -141, 0)        // islet reading-glass
-ABYME.tp(97, 32, Math.PI)     // bluff / hatch
-ABYME.tp(-26, -104, 0)        // the dory / oar
-ABYME.W.time = 6.5            // dawn (bird)        5.4–8.6
-ABYME.W.time = 18             // golden hour (hatch) 17.1–18.5
-ABYME.W.time = 22             // night (lamp/beam)  sunElev < -0.06
-
-// --- grant state directly ---
-ABYME.W.flags.readGlass = true        // reveal lens marks without the islet trip
-ABYME.W.lensPlaced = true             // (top-level field, NOT under flags!)
-
-// --- SEA-STRATA levels (PREFER goLevel over raw W.level — it applies the whole LEVELS row) ---
-ABYME.goLevel(3)    // jump to a level: region + raised tide + spawn  (1 surface · 2 shallows · 3 midwater · 4 source)
-ABYME.dive(true)    // run the real dive snap (true = instant) ; ABYME.ascend(true) to rise
-ABYME.watcher('spawn')        // L3 Watcher encounter: 'spawn' | 'resolve' | 'reset'
-ABYME.tideFigure()            // arm the L2 Tide-Figure encounter
-ABYME.read('keeper_logbook')  // open a lore fragment by id (marks readKeys + journal; deep pages unlock at depth)
-ABYME.state()                 // dump the live state line ; ABYME.resetFlags() clears puzzle flags for a fresh run
-// (raw `ABYME.W.level = 3` sets only the number — it does NOT apply the region/tide/spawn; use goLevel.)
-
-// --- jump to the deep beats / endings ---
-ABYME.bottom()      // W.level=MAX_DEPTH(4), plumbHung+dove, spawns leaning over the keeper → the TWIST fires
-ABYME.ascend()      // run one ascent cinematic (~28s); ascend(true) lands instantly, skips mode-gate
-ABYME.armOar()      // W.level=1 + returned=true → arms the oar
-ABYME.leave()       // startOarFinale() — the OAR ending directly
-ABYME.ring()        // startFinale() — the BELL ending directly (bypasses the twist lock)
-
-// --- inspectors / scrubbers ---
-ABYME.getTwist()    // {keeperRose, carried, rise, climbing, level}
-ABYME.getFinale()   // {kind:'bell'|'oar', t, shown}
-ABYME.bench(12)     // power pose ; ABYME.gpuMs() ; ABYME.setIntroT(t) (intro only)
-ABYME.bloomPass.enabled = false   // raw render for a clean screenshot
+```sh
+python3 -m http.server 8000
 ```
 
-> **Gotcha:** `lensPlaced`, `beamAngle`, `tide`, `tideTarget` are **top-level `W` fields, not in `W.flags`**. There is no panel chip for valve / crank / music-box / model-lens-set / beam-aim / bell / oar — test those by teleporting and clicking/dragging in-world, or via `ABYME.*`.
+- `http://localhost:8000/` — normal play.
+- `http://localhost:8000/?debug` — normal play plus GPU timing.
+- `http://localhost:8000/?debug&localstack` — explicit local test origin; remains
+  the required harness URL if the complete shared transport is enabled later.
+- `?report=last` or `?report=<timestamp>` — replay a settled-play report, or show
+  the captured thumbnail and reason for an observation-only report.
 
-**Fastest full skip to the dive:** click panel `+ruler → bird✓ → +lens → shadow✓ → code✓ → +plumb✓`, then in console `ABYME.W.lensPlaced = true`, teleport `study`, walk onto the plate.
+The state-changing developer panel is built only on `?debug&localstack`. Press
+backtick there to show or hide it. `?debug` by itself enables GPU timing without
+exposing mutation shortcuts.
 
-**Fastest both-endings test:** see §4.
+## Controls
 
----
+| Input | Action |
+|---|---|
+| Drag canvas | Look |
+| `W A S D` | Walk |
+| Click | Use the centered hotspot |
+| Drag a mechanism | Operate the sun crank or model lamp housing |
+| Click or `Space` during a crossing | Accelerate the authored crossing curve |
+| `J` | Open or close Field Notes |
+| `M` | Mute |
+| `C` | Reduced-motion toggle |
+| `Esc` | Close the active reading surface or Field Notes |
+| Backtick | Toggle developer panel |
+| `F8` | Capture a field report |
 
-## 3. The guided playthrough (surface puzzles in order)
+Readers own input while open. Field Notes also pause movement. **Trace a lead** is
+the only action that advances a hint tier; opening notes alone must never do so.
 
-Two chains run in **parallel** and converge at the brass plate: the **LENS chain** (bird → stones → lens → set lens → beam) and the **RULER/HATCH chain** (chest → crack → shimmer → dials → plumb → hook). The hard couplings are noted per step. The **sun crank is the silent prerequisite** for three timed beats — if you're stuck, you're almost always at the wrong `W.time`.
+## Debug panel
 
-You wake on the south beach (~4,−104). Walk WNW to the lighthouse study.
+The panel groups the current tools as follows:
 
-### A. The three free study tools (no gate — touch any time)
-1. **Brass VALVE** — `study`, chart-table edge (~−82.7,−38.9). Click hotspot **`valve`** → toggles the tide (eases ~13s). First click sets `valveTurned` (earns music stem 1). **Drain it** to walk out to the chest, the causeway, and the drowned gallery later.
-2. **Sun CRANK** — opposite table edge (~−86.7,−41.1). **DRAG** hotspot **`crank`** → sets `W.time` (and `crankUsed`). This is your hour control: **dawn 5.4–8.6**, **golden 17.1–18.5**, **night sunElev<−0.06 (≈ >20.6 or <4.6)**. (Debug: use the time slider.)
-3. **MUSIC BOX** — back-left wall shelf (~−88.6,−42.6). Click **`musicBox`** → plays **E·G·A·D·C** (sets `heardBox`). This is the **decoy** tune — the stones reject it. Listen, then let the bird correct it.
+- **Teleport:** beach, study, stones, islet, cliff, bridge, dory, bluff, cellar.
+- **Time & Tide:** dawn, golden, night, freeze sun, drain, high, mist, plus time
+  and tide sliders.
+- **Grant — surface chain:** ruler, ruler bridge, bird solve, lens, beam, beam
+  observation, signal shelf, reading glass, or the complete surface state.
+- **Grant — bluff / dive chain:** hatch shadow, hatch code, plumb, dive armed.
+- **Levels & dives:** L1 through L4, authored or instant descent/ascent, bottom.
+- **Encounters:** bird, Watcher controls, Lower Hand, depth gates, Tide-Figure.
+- **Ending dispositions:** tend, carry, open, close.
+- **Power & Reset:** benchmark pose, replay one-time scenes, mark readable
+  surfaces, clear notes, open key books, clear region sightings, save, soft reset,
+  or wipe and reload.
 
-### B. LENS chain
-4. **Hear the dawn BIRD** — set time to **dawn**, go to the **stones** (islet, 135,−146; debug `stones`). Stand within 38m and **wait** (~21–29s) — no click. The bird sings **E·G·A·G·C** (the box's 4th note bent UP). Sets `heardBird`. *Skip: panel `bird✓`.*
-5. **Play the STONES** — click the stones by **index** in bird order: **stone2 → stone3 → stone4 → stone3 → stone0**. `maxDist` is 13, so play the whole arc **from one vantage** where all five are visible (no need to walk up to each). Wrong note resets; playing the box's `[2,3,4,1,0]` is scolded. Correct full sequence sets **`birdSolved`** (stem 3) and slides the outcrop vault open. *Skip: `bird✓`.*
-6. **Take the FIRST LENS** — at the now-open vault outcrop SW of the arc (~124,−150). Click **`lensItem`** → sets `lensTaken`, adds `lens` to inventory. *Skip: panel `+lens`.*
-7. **Set the lens in the MODEL lighthouse** — return to `study`, **lean close over the model's tiny lighthouse lamp room** (`maxDist` 3.2). Click **`lensSlot`** → sets **`W.lensPlaced = true`** (top-level field) and consumes the lens. *No chip — use `ABYME.W.lensPlaced = true`.*
-8. **(Optional) Aim the BEAM / read the cliff glyphs** — set time to **night** so `W.lampLit` (lensPlaced && night) turns on. **DRAG** hotspot **`beamAim`** (the model lamp housing) to turn the beam; align it with the cliff azimuth while standing **within 70m of the cliff (57.5,14,50)**. Sets `glyphsSeen` (stem 5) and shows the glyphs. **This is a HINT only** — the hatch code is hard-coded `[3,7,1,5]`; you can dial it blind, so this step is skippable.
+Panel grants are state fixtures, not substitutes for the causal path. Use real
+hotspots whenever the behavior under test is a gate, interaction distance,
+animation, sound, or evidence write.
 
-### C. RULER / HATCH chain (can be done in parallel)
-9. **Open the CHEST, take the RULER** — drain the tide first, then walk to the exposed chest at (118,−176) (debug `ABYME.tp(118,-176,0)`). Click **`chest`** twice (open, then take). Sets `chestOpen` → `rulerTaken`, adds `ruler`. *Skip: panel `+ruler`.*
-10. **Lay the RULER over the model CRACK** — in `study`, lean over the model's eastern chasm (`maxDist` 3.2). Click **`crack`** → consumes ruler, sets **`rulerPlaced`** (stem 2). The real brass **bridge** rises at z=25 (x 35–59) — your land route to the bluff.
-11. **Reveal the HATCH** — set time to **golden hour**, cross the bridge to the bluff hatch (97,32; debug `bluff`). Click the pulsing **`shimmer`** ("troubled sand", `maxDist` 6) → sets **`shadowRevealed`**, exposing the four dials. *Skip: panel `shadow✓`.*
-12. **Set the DIALS to `3·7·1·5`** — click **`dial0`..`dial3`** to cycle each glyph (+1 mod 8). Set dial0=3, dial1=7, dial2=1, dial3=5. The instant `W.dials` equals `[3,7,1,5]` it sets **`hatchOpen`** (stem 4) and the lid slides open. *Skip: panel `code✓` (sets dials+shadowRevealed+hatchOpen).*
-13. **Take the PLUMB BOB** — descend the open hatch into the cellar (~97,19.5,18.5). Click **`plumb`** → sets `plumbTaken`, adds `plumb`. Journal: "the chart table has a hook." *Skip: panel `+plumb✓` (also hangs it).*
-14. **Hang the PLUMB on the HOOK** — return to `study`, look UP at the hook over the chart table (`maxDist` 6). Click **`hook`** → consumes plumb, sets **`plumbHung`**. The brass **PLATE** on the study floor is now live. *Skip: `+plumb✓`.*
+## Console surface
 
-### D. The DESCENT — the brass PLATE (two-touch dive)
-15. **Stand on the PLATE** (~−82.8,−41.4) — you must be **within ~1.0m of its centre** or it just whispers "Stand on it." Click **`plate`** (`maxDist` 3.5) **twice**: first touch = the **brink** ("there is no climbing back"); a second deliberate touch **commits** → sets `dove`, runs the ~21s dive cinematic, and lands you on the beach **one level deeper** (`W.level` +1, max 4). Stepping >1.25m off the plate cancels the brink.
-16. **Repeat the dive** at each level. `W.level` runs 1 (surface) → 4 (`MAX_DEPTH`, the bottom). So a manual run is **3 dives down**. Each 21s descent preserves its full authored pace unless you deliberately click or press Space after the acceleration prompt; that speeds up the same curve and still lands through the normal save/state boundary. *Skip: `ABYME.bottom()` jumps straight to the bottom leaning over the keeper.*
+`window.ABYME` exists in all builds with the bounded feedback and replay surface:
 
-What each level unlocks: **L2** inner door opens, coat + footprints + quarters journal + BELL appear, the Tide-Figure activates, and a tiny keeper figure stands on the model · **L3** the drowned hall breaches, the keeper speaks on arrival, the WATCHER activates, and deep re-read pages appear · **L4 (bottom)** the plate goes UP only (amber `plateGlow`) and the TWIST arms.
+```js
+ABYME.state()
+ABYME.report('note')
+ABYME.reports()
+ABYME.applyReport(report)     // settled-play reports only
+ABYME.importReport(json)
+```
 
-### E. The bottom TWIST (mandatory)
-17. At the bottom, **walk up to the tiny keeper figure on the chart-table model** (within 2.4m) — **no click**. Proximity fires `keeperTwist`: the figure turns, **rises** toward you, looms larger, and speaks ("There you are. I've been coming down for you."). Sets **`keeperRose`** immediately, locks you ~6s. *Fast path: `ABYME.bottom()` spawns you right at it.*
-> The twist is a **hard gate**: you cannot ring the deep bell until `keeperRose` is set.
+On `?debug&localstack`, it additionally exposes the local mutation and inspection
+surface used by the harness:
 
-Now choose an ending (§4).
+```js
+ABYME.W
+ABYME.player
+ABYME.game
+ABYME.notebook
+ABYME.refs
+ABYME.modelRefs
 
----
+ABYME.state()                 // structured progression, notes, stack, and view state
+ABYME.tp(x, z, yaw, pitch)    // teleport and refresh spatial LOD immediately
+ABYME.goLevel(1)              // 1 surface, 2 shallows, 3 inspection, 4 source
+ABYME.dive(true)              // instant debug descent by one stratum
+ABYME.ascend(true)            // instant debug ascent by one stratum
+ABYME.bottom()                // stand beside the Lower Hand at L4
 
-## 4. Both endings
+ABYME.watcher('spawn')        // also accepts 'resolve' or 'reset'
+ABYME.tideFigure()            // stage the L2 stillness encounter
+ABYME.getRegard()             // Lower Hand hold progress and completion
+ABYME.upstreamHandState()     // L2 transfer phase and scale-break state
 
-The plate (one hotspot) disambiguates by state: `goingUp = climbing || level>=MAX_DEPTH`. Every crossing is a **two-touch** (brink → commit); stepping off cancels.
+ABYME.read('keeper_logbook')  // open a readable surface by stable content key
+ABYME.resetFlags()            // soft reset run state; does not clear the stack
+ABYME.ending('tend')          // direct finale fixture; carry/open/close also valid
+ABYME.getFinale()
 
-### Ending A — THE OAR (return to the surface, leave changed)
-1. **The EMBRACE** — at the bottom after the twist, walk onto the plate. With `keeperRose && !climbing`, first touch arms a **separate embrace brink**; second touch commits → sets **`carried`** + `climbing`, starts the ascent **carrying him** (integration). *(Skip the embrace = the "plain climb": he stays below; same surface outcome but no `carried`.)*
-2. **Climb out** — two-touch the plate at each level (or `ABYME.ascend(true)` ×3) until `W.level` reaches 1. Reaching the surface clears `climbing` and sets **`returned`** (this **arms the oar**).
-3. **Row off** — walk to the dory at (−26,−102) (a nudge fires within 9m). Click **`oar`** (gate: `level≤1 && returned`) **twice** → `startOarFinale()`: the only look-back shot, the world shrinks to a tiny lit model, card **"you left the light on."**
-   - *Fast: `ABYME.armOar()` then click the oar, or `ABYME.leave()`.*
+```
 
-### Ending B — THE BELL (stay below, keep the light lit)
-- The bell appears at **L≥2** near the study (~−84,14.85,−40.4). Click **`bell`** (`maxDist` 2.2) once.
-- At the **bottom**, it's **locked until the twist** (`keeperRose`) — else it whispers "Not yet. Something at the chart table has lifted its head…". After the twist, clicking commits → `startFinale()`.
-- **Tone forks by depth at the moment of ringing:** ring at **L≥3 (deep)** WITHHOLDS — a held bittersweet golden hour, **no stars**, card **"you keep the light now."** Ring at **L2 (shallow)** keeps the full golden constellation parade, card "the tide brought you back."
-- *Fast: `ABYME.bottom()` → fire the twist → click the bell, or `ABYME.ring()`.*
+The signal route and data-driven instrument bindings are exported for tests:
 
-Both endings are terminal (mode-guarded). The only exit is **"Begin again"** (wipes the save + reloads).
+```js
+ABYME.BEAM_GLYPHS
+ABYME.SIGNAL_BINDINGS
+ABYME.HATCH_CODE
+```
 
----
+For a direct hatch fixture, copy `ABYME.HATCH_CODE`; do not transcribe a literal
+combination into a test. That keeps the physical atlas, runtime truth, and test
+setup aligned.
 
-## 5. Secrets & lore checklist (all optional — none gate the main chain)
+## Full causal playthrough
 
-Readable fragments (click → `UI.openReader`; first read drops a journal line):
-- **Bottle note** — wake-up beach (~6.5,−101). Click **`bottle`**. Always available.
-- **Stone inscription** — foot of the jetty (~−16,−103). Click **`inscription`**.
-- **Keeper's logbook** — study chart table (~−86.4,−39.3). Click **`logbook`** (6 pages). **Deep 7th page** only appears on a **re-read at L≥3**.
-- **Coat letter** — annex, on the keeper's coat. Click **`coatLetter`** — needs **L≥2** (coat is hidden above that). Dive once first.
-- **Quarters journal** — on the cot in the annex. Click **`quartersJournal`** — practically reached at **L≥2** (inner door). **Deep 4th page** at **L≥3**.
+### A. Surface circuit
 
-**SEA-STRATA per-level hidden readables** (each lives in its level's region, readable only there):
-- **Kelp slate** — L2, on the wade-line from the L2 spawn (~8,−101). Click **`kelpSlate`** (`when: W.level===2`). Diegetically hints the **Tide-Figure**.
-- **Bluff cairn** — L3, across the ruler-bridge on the bluff (~91.5,31.5), a faint cold ring on the top stone. Click **`bluffCairn`** (`when: W.level===3`). Hints the **Watcher**.
-- **Source note** — L4, on the study floor by the chart table (~−83.8,−41.8). Click **`sourceNote`** (`when: W.level===4`). Frames the keeper-look twist.
+1. Begin a fresh run and enter the lighthouse study.
+2. Turn the valve and verify the model basin and real bay drain together.
+3. With low tide, open the flats chest and take the ruler.
+4. Lay the ruler across the crack in the table model; verify the eastern bridge.
+5. Open the music box and listen through all five notes.
+6. Drag the crank to dawn and wait near the standing stones for the bird.
+7. Play the bird's corrected phrase on the five stones; take the lens from the
+   opened outcrop.
+8. Fit the lens to the model lighthouse.
+9. Drag to night, aim the model housing at the signal cliff, and observe all four
+   beam figures in order.
+10. Read the eight figure-to-instrument bindings on the signal-manual spines.
+11. Follow the selected bindings back to physical counts already exposed by play.
+12. Cross the ruler bridge, drag to golden hour, and touch the troubled sand.
+13. Enter those instrument readings on the four decimal hatch rings in beam order.
+14. Take the plumb from the cellar and hang it over the table model.
+15. Stand on the floor plate. First touch arms; second touch descends.
 
-**The deep-read economy** (cross-level, Meow-Wolf): the 4 CANONICAL deep-capable fragments — **stone** (deepFrom 2) · **logbook** (3) · **quarters** (3) · **music** (4) — each accretes a colder *journalDeep* line the first time you reach its deep page; reading **all 4** fires the **integration** payoff (a self-hand entry + whisper, once). A **"N of 4 read from the deep"** tally rides the journal header, and a count-aware whisper marks each. Two **bonus** deep-reads (**coat**@L3, **bottle**@L2) accrete + whisper but stay OUT of the 4-tally. *Audit: `ABYME.read(id)` at the right level, page to the last page; or panel `mark lore read`.*
+The L1 gate is deliberately exhaustive. It requires:
 
-**Tide-Figure** (L2 encounter — the shallow counterpart to the Watcher): a soft dark humanoid in the kelp. It **disperses if you wade at it**, and **resolves if you stand still and watch** (~2.6s of stillness → a chime, it sinks). *Arm: `ABYME.tideFigure()` or panel `Tide-Figure`.*
+```text
+valveTurned, crankUsed, rulerPlaced, heardBox, heardBird, birdSolved,
+lensPlaced, glyphsSeen, hatchCodeDecoded,
+shadowRevealed, hatchOpen, plumbHung
+```
 
-**Ambient detail:** drifting **fish-shadows** over the L2 kelp; two **lampblack tide-lines** (old + risen) on the jetty-foot standing stone (the keeper measured the rising sea — the logbook's "the new one has gone over it").
+`lensPlaced` is a top-level world field. The rest are progression flags. A malformed
+state with only `hatchOpen` or `plumbHung` must not cross.
 
-The **FOUND-LENS reveal** (the key to two hidden fragments):
-- **Take the reading glass** on the islet (~138,−141). Click **`readGlass`** → sets `readGlass`, adds `readglass`. Two lampblack marks fade up.
-  - **`lensMarkStudy`** — chart-table margin (study). **`lensMarkStone`** — high on stone #4 (islet).
-  - Both are **invisible/non-clickable until `readGlass` is set**. *Force without the trip: `ABYME.W.flags.readGlass = true`.*
+### B. Signal deduction assertions
 
-Vistas (observed, **no click** — at most a one-time proximity whisper):
-- **Drowned gallery** — drain the tide, look seaward from the beach (whisper "a road of wet stone" at tide<0.25).
-- **Vault Beneath** (inverted lighthouse) — open the hatch, look **east** through the cellar window.
-- **The Room That Disagrees** — open the hatch, stand at the cellar **west** window (fires `roomDisagrees`; its model floods inversely to your tide).
-- **Descent tally + recursion glint** — chart-table margin strokes (one per level; stays full after `returned`) and a sub-mm lit point deep in the model at night.
+Test the mechanism before a complete surface run:
 
-The **WATCHER** (deep shore, real island only):
-- Needs **`W.level≥3`** AND **`!watcherSeen`** (once per game). Move onto the open shore; it **drifts toward you when unwatched, freezes when watched**. Resolve by **REGARD** — keep it within ~35° of your gaze and <70m for **2.6 continuous seconds** (do NOT flee). Sets `watcherSeen`, it rises into a cold light and is gone. *Replay: `ABYME.W.flags.watcherSeen = false; ABYME.W.level = 3`.*
+1. Reveal the hatch without reading the shelf or seeing the beam. Every ring still
+   cycles `0…9`; information gates understanding, not physical input.
+2. Read the shelf and observe the beam. Confirm neither action changes a dial or
+   creates an exact-code note.
+3. Verify four independent decimal rings wrap to `0` and open only
+   when they match `ABYME.HATCH_CODE`.
+4. Confirm `hatchCodeDecoded` and `hatchOpen` become true in that same saved state.
 
-> Pruned from the model clone (full-scale island only): drowned gallery, jetty, quarters, vault drips/vista, watcher, all particle points. Don't hunt for them in the chart-table model.
+There is no fallback combination, hidden phrase, or alternate lock path.
 
----
+### C. Shallows gate
 
-## 6. Test checklist
+1. On L2, return to the study and touch the dead valve.
+2. Stay for the entire model → room → bay transfer. The gate requires
+   `upstreamHandWitnessed`, not merely proximity or an inherited mark.
+   Inspecting mid-score should show `upstreamHandSurged` become true when the water
+   moves, before the later `upstreamHandWitnessed` reveal.
+3. Find the Tide-Figure. Moving toward it quickly disperses it; facing it while
+   still completes `tideFigureSeen` after the hold.
+4. Confirm the plate refuses either partial state, then accepts both. Touch twice
+   to descend.
 
-**Setup**
-- [ ] App serves over a static server; `index.html` loads (no console errors). Fastest: `python3 -m http.server`.
-- [ ] `?debug` builds the `#debug-panel` and `window.ABYME` (type `ABYME` in console).
-- [ ] **Begin** starts the intro flight; a click skips it; you wake on the beach.
-- [ ] **Continue** appears only when a save exists and restores flags/level/time.
+L2 gate: `upstreamHandWitnessed + tideFigureSeen`.
 
-**Surface puzzles** (each fastest-trigger noted)
-- [ ] Valve drains/refills the tide; first turn earns stem 1 — `tide` chip or click `valve`.
-- [ ] Crank/time slider wheels the sky (dawn/golden/night) — `crank` drag or time slider.
-- [ ] Music box plays E·G·A·D·C — click `musicBox`.
-- [ ] Dawn bird sings E·G·A·G·C at the stones — time→6.5, `stones`, wait. (`bird✓` skips.)
-- [ ] **Stones solve from one vantage** (maxDist 13): stone2,3,4,3,0 → `birdSolved` + vault opens. (Verify you do NOT need to walk to each.)
-- [ ] Box tune `[2,3,4,1,0]` is rejected on the stones.
-- [ ] Take first lens (`lensItem`) → `+lens`.
-- [ ] Set lens in model (`lensSlot`) → `ABYME.W.lensPlaced=true`.
-- [ ] Beam at night aimed at cliff writes glyphs → `glyphsSeen` (optional/HINT).
-- [ ] Chest (tide down) → ruler; lay ruler on model crack → bridge rises at z=25. (`+ruler`.)
-- [ ] Golden-hour shimmer → `shadowRevealed`; dials to **3·7·1·5** → `hatchOpen`. (`shadow✓`/`code✓`.)
-- [ ] Plumb from cellar → hang on hook → `plumbHung`; plate goes live. (`+plumb✓`.)
+### D. Inspection gate
 
-**Descent / twist**
-- [ ] Plate is a **two-touch** dive; stepping off cancels the brink; "Stand on it." if >1m off.
-- [ ] Each dive increments `W.level` (1→4) via the ~21s cinematic.
-- [ ] Level reveals: L2 inner door/coat/footprints/bell/tiny figure; L3 keeper speaks + Watcher; L4 amber plateGlow.
-- [ ] **TWIST** fires by proximity to the tiny figure at the bottom (no click) → `keeperRose`. (`ABYME.bottom()`.)
+1. On L3, stand beside the study register until its count settles and records
+   `registerRead`.
+2. Meet the Watcher. It advances while unobserved and freezes when seen. Maintain
+   gaze until it resolves to `watcherSeen`.
+3. Confirm the plate refuses either partial state, then accepts both. Touch twice
+   to descend.
 
-**Endings**
-- [ ] **Embrace** (plate, keeperRose && !climbing, own two-touch) → `carried`; "two lights" text.
-- [ ] **Plain climb** (skip embrace) reaches surface without `carried`; keeper's spoken farewell.
-- [ ] Climbing to surface sets `returned` and arms the oar.
-- [ ] **OAR** ending (`oar`, two-touch) → look-back finale, "you left the light on." (`ABYME.armOar()` then click / `ABYME.leave()`.)
-- [ ] **BELL deep** (L≥3, after twist) → withheld, no stars, "you keep the light now." (`ABYME.bottom()`→twist→bell.)
-- [ ] **BELL shallow** (L2) → full constellation parade. (`level2` then click bell.)
-- [ ] Deep bell is **locked before the twist** ("Not yet…").
-- [ ] "Begin again" wipes the save and reloads.
+L3 gate: `registerRead + watcherSeen`.
 
-**Lore / secrets**
-- [ ] All 5 readable fragments open and log a journal line: bottle, inscription, logbook, coat letter (L≥2), quarters journal (L≥2).
-- [ ] Logbook deep page (re-read L≥3) and quarters deep page (L≥3) appear.
-- [ ] **Found-lens reveal**: take `readGlass` → `lensMarkStudy` + `lensMarkStone` become visible & clickable (and are invisible before). (`ABYME.W.flags.readGlass=true`.)
-- [ ] **Watcher** at L≥3 resolves by 2.6s of sustained regard → `watcherSeen`; drifts in when unwatched. (`watcherSeen=false; level=3` to replay.)
-- [ ] Vistas observed (no click): drowned gallery (tide down), vault-beneath (east window), Room That Disagrees (west window, floods inversely to tide).
-- [ ] Descent tally grows per level and stays full after `returned`; night recursion glint visible.
+### E. Source gate and disposition
 
-**Systems / polish**
-- [ ] **Music crossfade**: era music darkens as you descend (L2/L3+); stems 1–5 accrue as puzzles solve.
-- [ ] **Journal (J)**: every first-read/first-solve drops an entry; tab pulses on a new entry; keeper vs self hands render distinctly.
-- [ ] **Save/Continue**: every flag/inventory change autosaves to `localStorage 'abyme-save-v1'`; reload + Continue restores state; the plate brink pauses autosave.
-- [ ] **Sky/visuals**: orrery lamp + real sun track `W.time`; lamp burns and beam projects at night; golden-hour shimmer pulses only in the golden window.
-- [ ] **Power Ledger** (`bench` / `ABYME.bench()`): fps/draws/tris/GPU-ms readout stays in budget (not red: calls<360, tris<800k, fps≥58).
-- [ ] **M** mute and **C** reduced-motion both toggle and persist; **Esc** closes reader/journal.
+1. At L4, verify that simple proximity to the Lower Hand does not resolve it.
+2. Stand within regard distance, face it, stop moving, and hold for roughly 2.6
+   seconds. Confirm `lowerHandRegarded` and the appearance of the brass index.
+3. First index touch explicitly selects `tend`; later touches cycle in the stable
+   order `tend → carry → open → close → tend`.
+4. Confirm the plate refuses ascent until `dispositionChosen` is true.
+5. Touch twice to begin ascent.
+
+L4 gate: `lowerHandRegarded + dispositionChosen`.
+
+### F. Return and ending
+
+1. Use the plate twice at each stratum to ascend L4 → L3 → L2 → L1.
+2. Confirm the return sets `returned`, clears active climbing, preserves the chosen
+   disposition, and leaves the surface visibly changed.
+3. Ring the bell at depth: it sounds and no terminal mode begins.
+4. Lift the oar after returning: it moves and no terminal mode begins.
+5. At the returned surface plate, first touch arms the selected setting; second
+   touch calls the sole ending commit.
+6. Confirm `endingCommitted`, the matching stable ending note, and one common
+   golden-hour composition with choice-specific physical coda.
+7. Continue from the committed save. The finale may resume, but the stack operation
+   must not run twice.
+
+## Field Notes contract
+
+Verify these separately from world progression:
+
+- A fresh run has no unearned entries.
+- First observation writes one stable ID; repeats do not duplicate it.
+- Copy and sketches resolve from `content.js`, not from saved prose or substring
+  matching.
+- Opening Field Notes shows earned evidence in discovery order.
+- Opening Field Notes does not generate a hint.
+- **Trace a lead** chooses only an eligible unresolved thread and advances one tier.
+- A requested hint changes `hintLevels`, not `entries`, and never satisfies a gate.
+- Reading a later page records its own stable ID only when that page is reached.
+
+## Persistence contract
+
+- Run key: `abyme-save`.
+- Payload version: `1`.
+- The loader accepts only the current version and declared fields; there are no
+  compatibility or backup paths.
+- Current fields are sanitized. Unparseable or wrong-version payloads fail closed
+  to a fresh run.
+- `Begin again` clears the current run but does not clear the stack ledger.
+- Four hatch dials normalize to decimal values only.
+- Notebook persistence contains `{entries, hintLevels}` with stable IDs and data
+  arguments, never rendered copy.
+
+The stack has its own keys and lifetime. Use `?localstack` for tests that write.
+`ABYME.clearStack()` is an explicit developer operation, not part of Begin again.
+
+## Field reports
+
+`F8` or **⚑ field report** captures pose, facing, mode, state, performance, current
+save, and a screenshot. The lean JSON is copied and the full report downloads;
+the last ten are retained per origin. Settled play captures are replayable with
+`?report=last`, a timestamp, or `ABYME.applyReport(...)`. A transition, reader,
+Field Notes, writer, armed plate, or finale is recorded as observation-only: its URL
+shows the bounded captured frame and reason without fabricating a replayable state.
+
+Reports are origin-scoped. To move one between hosts, use `ABYME.importReport(...)`
+with the copied or downloaded JSON.
+
+## Verification commands
+
+```sh
+node --test test/*.test.mjs
+node tools/harness/saves.spec.mjs
+bash tools/harness/run.sh
+```
+
+The pure tests cover the save epoch, notebook semantics, challenge graph, content
+evidence, and stack ledger. The browser gate remains responsible for the full
+physical route, visuals, input ownership, console errors, and performance.

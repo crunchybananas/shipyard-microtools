@@ -16,6 +16,12 @@ export function syncGates(W) {
 import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
+// The lamp-room gallery is one physical contract shared by rendering and collision.
+// Player centres stop a handspan inside the brass rail, matching the original 0.10 m
+// inset while leaving the widened outer deck genuinely walkable rather than decorative.
+export const GALLERY_RADIUS = 3.75;
+export const GALLERY_RAIL_RADIUS = 3.55;
+export const GALLERY_PLAYER_RADIUS = GALLERY_RAIL_RADIUS - 0.10;
 
 // NEEDLE LITTER, as a property of the GROUND rather than as an object lying on it.
 //
@@ -55,6 +61,31 @@ export const SPOTS = {
   causewayB: new THREE.Vector2(112, -132),
   chasmBridgeZ: 25,                          // bridge crosses the chasm at this z
 };
+
+// One physical contract for the lens-vault outcrop. It is a sealed boulder with
+// a shallow exterior reliquary, not an enterable room. props.js and collision use
+// the same ellipse, facing and surface depth. The 0.28 m collision margin is the
+// player's body around the camera, so the eye never clips into either rock or slab.
+export const VAULT_OUTCROP = (() => {
+  const x = SPOTS.stones.x - 11, z = SPOTS.stones.y - 4;
+  const rotation = 0.7, radius = 3.2, scaleX = 1.3, scaleY = 0.9, scaleZ = 1.1;
+  const dx = SPOTS.stones.x - x, dz = SPOTS.stones.y - z, d = Math.hypot(dx, dz);
+  const faceX = dx / d, faceZ = dz / d;
+  const c = Math.cos(rotation), s = Math.sin(rotation);
+  const localFaceX = c * faceX - s * faceZ, localFaceZ = s * faceX + c * faceZ;
+  const renderX = radius * scaleX, renderZ = radius * scaleZ;
+  const faceRadius = 1 / Math.sqrt(
+    (localFaceX * localFaceX) / (renderX * renderX)
+      + (localFaceZ * localFaceZ) / (renderZ * renderZ));
+  return Object.freeze({
+    x, z, rotation, radius, scaleX, scaleY, scaleZ, renderX, renderZ,
+    colliderX: renderX + 0.28,
+    colliderZ: renderZ + 0.28,
+    faceX, faceZ,
+    faceRadius,
+    doorYaw: Math.atan2(faceX, faceZ),
+  });
+})();
 
 const LIGHTHOUSE_H = 13.5;
 const GALLERY_H = LIGHTHOUSE_H + 20.6;   // the lamp-room balcony floor (hub Phase B, the climb)
@@ -221,7 +252,7 @@ function buriedFloorAt(x, z) {
 
 export function walkableY(x, z, fromY) {
   // the lamp-room gallery: while up top, the lighthouse footprint IS the balcony floor (the climb)
-  if (GATES.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 3.3) return GALLERY_H;
+  if (GATES.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < GALLERY_RADIUS) return GALLERY_H;
 
   // the jetty deck: a real surface over the water (was a fall-through)
   if (Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz) return JETTY.y;
@@ -312,6 +343,21 @@ function ringBlockedGaps(x0, z0, x1, z1, cx, cz, r, gaps) {
 const LH_GAPS_OPEN = [[deg(160), deg(170)], [deg(5), deg(25)]];
 const LH_GAPS_SHUT = [[deg(160), deg(170)]];
 
+// The vault outcrop used to be visual-only. A player could cross its surface,
+// stand in its hollow backfaces, and mistake a shallow lens niche for a room.
+// Keep the rock solid after the slab opens: the lens sits at arm's reach behind
+// that slab. This is a destination invariant, not a stateful exception: no legal
+// player step ever ends inside the rendered stone.
+function vaultOutcropBlocked(x, z) {
+  const V = VAULT_OUTCROP;
+  const c = Math.cos(V.rotation), s = Math.sin(V.rotation);
+  const dx = x - V.x, dz = z - V.z;
+  const lx = c * dx - s * dz;
+  const lz = s * dx + c * dz;
+  return (lx * lx) / (V.colliderX * V.colliderX)
+    + (lz * lz) / (V.colliderZ * V.colliderZ) < 1;
+}
+
 // EDGES. A narrow walkable structure standing above its surroundings — the jetty
 // deck over the seabed, the drain's ramp trench cut into the stones pad — has SIDES,
 // and the player kept walking off them: a 2 m drop inside one 7 cm stride, and in the
@@ -336,9 +382,11 @@ function edgeBlocked(x0, z0, x1, z1) {
 
 export function wallBlocked(x0, z0, x1, z1) {
   // up on the lamp-room gallery: the only wall is the balcony rail (keeps you from the 20m drop)
-  if (GATES.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > 3.0;
+  if (GATES.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > GALLERY_PLAYER_RADIUS;
 
   if (edgeBlocked(x0, z0, x1, z1)) return true;
+
+  if (vaultOutcropBlocked(x1, z1)) return true;
 
   // lighthouse wall: the beach door + the annex doorway
   if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, GATES.annexOpen ? LH_GAPS_OPEN : LH_GAPS_SHUT)) return true;
@@ -522,9 +570,9 @@ export function buildTerrain() {
     sh.uniforms.uPathAmt = { value: 0.0 };   // driven by depth in main.js — see the paths block
     sh.uniforms.uLitterRect = { value: new THREE.Vector3(LITTER.cx, LITTER.cz, LITTER.size || 1) };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
-    // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. Those
-    // textures are no longer sampled here and nothing else loads them, so we drop the dead getTexture
-    // calls + uniforms entirely (saves loading sand.jpg + dunegrass.jpg and their VRAM uploads).
+    // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. The
+    // 3-D world no longer fetches either texture; dunegrass was deleted, while sand.jpg remains solely
+    // as the CSS-native shore-writing surface (see ASSETS.md).
     mat.userData.shader = sh; // so main.js can track uHaze to the active grade's fog
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nattribute float aSlope;\nvarying vec2 vLXZ;\nvarying vec3 vWPos;\nvarying float vTerH;\nvarying float vSlope;')

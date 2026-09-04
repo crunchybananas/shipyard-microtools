@@ -53,7 +53,7 @@ try {
   }, previewId);
 
   const family = await page.evaluate(async ({ actions, directions }) => {
-    const render = await import('./js/render.js?realm=197');
+    const render = await import('./js/render.js?realm=198');
     const game = window.G;
     game.debug.pauseRendering = true;
     game.gameTick = 1000;
@@ -246,10 +246,10 @@ try {
   await world.waitForTimeout(1600);
   const worldState = await world.evaluate(async () => {
     const ownership = await import(
-      './js/citizen-ownership.js?realm=197'
+      './js/citizen-ownership.js?realm=198'
     );
     const renderCache = await import(
-      './js/citizen-render-cache.js?realm=197'
+      './js/citizen-render-cache.js?realm=198'
     );
     const game = window.G;
     const citizen = game.citizens[0];

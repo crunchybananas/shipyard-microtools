@@ -1,342 +1,432 @@
-// walk.mjs — the FULL-GAME regression walk: wake-up → surface chain → dive → L2/L3/L4 →
-// twist → embrace → climb-out → both terminals. Real hotspot paths wherever possible.
-// The release gate: every assertion must hold, zero console errors.
-export default async function (h) {
+// walk.mjs — full future-facing route: observation → manipulation → crossing → account.
+//
+// This uses the shipped hotspot callbacks for every puzzle action and the pure
+// ChallengeGraph for threshold inspection. Long camera travel is skipped through the
+// public debug crossing, so the gate measures causality rather than GPU wall-clock.
+
+export default async function walk(h) {
   const R = { pass: [], fail: [] };
-  const ok = (name, cond) => (cond ? R.pass : R.fail).push(name);
+  const ok = (name, condition, detail = undefined) => (condition ? R.pass : R.fail)
+    .push(condition || detail === undefined ? name : `${name} :: ${JSON.stringify(detail)}`);
+  const port = process.env.SERVE_PORT || 8642;
+  const url = `http://127.0.0.1:${port}/the-island/?debug&mute&localstack`;
 
   const ready = async () => {
     for (let i = 0; i < 40; i++) {
-      const okb = await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false);
-      if (okb) return;
+      if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) return;
       await h.wait(1);
     }
     throw new Error('app never booted');
   };
-  await h.navigate('http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute');
-  await ready();
-  await h.evaluate(`localStorage.setItem('abyme-muted', '1'); localStorage.removeItem('abyme-save-v1'); 1`);
-  await h.navigate('http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute');
-  await ready();
-  await h.evaluate(`window.__errs = []; addEventListener('error', (e) => window.__errs.push(e.message)); document.getElementById('btn-begin').click(); 1`);
-  await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`);
-  await h.wait(2.5);
 
-  // fire 35: the undefined-visible leak — on a FRESH save the island-scale figure
-  // must be STRICTLY hidden (visible === false), and the model companion too
-  const uv = await h.evaluate(`(() => {
-    ABYME.game.tick(0.05, 0.5);
-    return { island: ABYME.refs.tinyFigure.visible === false,
-             comp: ABYME.game.modelRefs.tinyCompanion ? ABYME.game.modelRefs.tinyCompanion.visible === false : true };
+  const startFresh = async () => {
+    await h.navigate(url);
+    await ready();
+    await h.evaluate(`localStorage.clear(); localStorage.setItem('abyme-muted', '1'); 1`);
+    await h.navigate(url);
+    await ready();
+    await h.evaluate(`window.__walkErrors = [];
+      addEventListener('error', (event) => window.__walkErrors.push(event.message));
+      addEventListener('unhandledrejection', (event) => window.__walkErrors.push(String(event.reason)));
+      document.getElementById('btn-begin').click(); 1`);
+    await h.wait(1.5);
+    await h.evaluate(`ABYME.setIntroT(99); 1`);
+    await h.wait(2.2);
+  };
+
+  await h.send('Emulation.setDeviceMetricsOverride', {
+    width: 1280, height: 720, deviceScaleFactor: 1, mobile: false,
+  });
+  await startFresh();
+
+  const boot = await h.evaluate(`(async () => {
+    const schema = await import('/the-island/js/save-schema.js');
+    ABYME.resetFlags(); ABYME.W.flags.introDone = true;
+    const raw = localStorage.getItem(schema.SAVE_KEY);
+    const saved = raw && JSON.parse(raw);
+    return {
+      level:ABYME.W.level,
+      key:schema.SAVE_KEY,
+      version:schema.SAVE_VERSION,
+      savedVersion:saved?.v,
+      notebook:Array.isArray(saved?.notebook?.entries) && !!saved?.notebook?.hintLevels,
+      dials:Array.isArray(saved?.dials) && saved.dials.length === 4,
+    };
   })()`);
-  ok('P0.noBeachFigure(undefined-visible fix)', uv.island && uv.comp);
+  ok('BOOT.surface-play-state', boot.level === 1);
+  ok('SAVE.clean-epoch', boot.key === 'abyme-save' && boot.version === 2 && boot.savedVersion === 2);
+  ok('SAVE.future-payload', boot.notebook && boot.dials);
 
-  const p1 = await h.evaluate(`(() => {
-    const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const r = {};
-    r.boot = W.level === 1 && W.flags.introDone;
-    W.timeDrift = 0;
+  // The revealed wheels are always physical controls. Sources inform a player but
+  // never pin the mechanism or create an intermediate solved flag.
+  const isolatedDecoder = await h.evaluate(`(() => {
+    const hs = (id) => ABYME.game.interact.hotspots.find((spot) => spot.id === id);
+    const result = {};
+
+    ABYME.resetFlags(); ABYME.W.flags.introDone = true;
+    ABYME.W.flags.shadowRevealed = true;
+    hs('lore_signal_shelf').onClick(); ABYME.UI._readerPage(1); ABYME.UI.closeReader();
+    hs('dial0').onClick();
+    result.shelf = {
+      value:ABYME.W.dials[0], decoded:ABYME.W.flags.hatchCodeDecoded,
+      beam:ABYME.notebook.has('evidence.beam-glyphs'),
+      shelf:ABYME.notebook.has('artifact.signal-shelf.surface'),
+    };
+
+    ABYME.resetFlags(); ABYME.W.flags.introDone = true;
+    ABYME.W.flags.shadowRevealed = true;
+    ABYME.W.flags.glyphsSeen = true;
+    ABYME.notebook.record('evidence.beam-glyphs', { glyphs:[1,5,3,4] });
+    hs('dial0').onClick();
+    result.beam = {
+      value:ABYME.W.dials[0], decoded:ABYME.W.flags.hatchCodeDecoded,
+      beam:ABYME.notebook.has('evidence.beam-glyphs'),
+      shelf:ABYME.notebook.has('artifact.signal-shelf.surface'),
+    };
+    return result;
+  })()`);
+  ok('DECODER.shelf-alone-still-turns-wheels', isolatedDecoder.shelf.shelf && !isolatedDecoder.shelf.beam
+    && isolatedDecoder.shelf.value === 1 && !isolatedDecoder.shelf.decoded);
+  ok('DECODER.beam-alone-still-turns-wheels', isolatedDecoder.beam.beam && !isolatedDecoder.beam.shelf
+    && isolatedDecoder.beam.value === 1 && !isolatedDecoder.beam.decoded);
+
+  const surface = await h.evaluate(`(async () => {
+    const progression = await import('/the-island/js/progression.js');
+    const W = ABYME.W;
+    const game = ABYME.game;
+    const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
+    const out = {};
+
+    ABYME.resetFlags(); W.flags.introDone = true;
+    out.initialMissing = progression.missingRequirements('surface', W, ABYME.notebook);
+
+    hs('chest').onClick();
+    out.chestBlocked = !W.flags.chestOpen && !W.flags.rulerTaken;
+
     hs('valve').onClick(); W.tide = W.tideTarget;
-    r.valve = W.flags.valveTurned && W.tideTarget === 0;
+    out.valve = W.flags.valveTurned && W.tideTarget === 0
+      && ABYME.notebook.has('evidence.valve');
+
     hs('chest').onClick(); hs('chest').onClick();
-    r.ruler = W.flags.chestOpen && W.flags.rulerTaken && W.inventory.includes('ruler');
-    r.crackWhen = hs('crack').when();
+    out.chest = W.flags.chestOpen && W.flags.rulerTaken && W.inventory.includes('ruler');
+
     hs('crack').onClick();
-    r.bridge = W.flags.rulerPlaced && !W.inventory.includes('ruler');
+    out.ruler = W.flags.rulerPlaced && !W.inventory.includes('ruler')
+      && ABYME.notebook.has('evidence.ruler');
+
+    hs('crank').onDrag(48);
+    out.crank = W.flags.crankUsed && ABYME.notebook.has('evidence.crank');
+
+    for (const note of [2,3,4,3,0]) game._touchStone(note);
+    out.noSongs = !W.flags.birdSolved && game.stoneSeq.length === 0;
+
     hs('musicBox').onClick();
-    r.box = W.flags.heardBox;
-    for (const i of [2, 3, 4, 3, 0]) g._touchStone(i);
-    r.stones = W.flags.birdSolved;
+    out.box = W.flags.heardBox && ABYME.notebook.has('evidence.music-box');
+    for (const note of [2,3,4,3,0]) game._touchStone(note);
+    out.boxOnly = !W.flags.birdSolved && game.stoneSeq.length === 0;
+
+    W.time = 6.5; W.timeDrift = 0;
+    ABYME.tp(135, -158, 0, 0); game._birdSing();
+    out.bird = W.flags.heardBird && ABYME.notebook.has('evidence.bird');
+    for (const note of [2,3,4,3,0]) game._touchStone(note);
+    out.stones = W.flags.birdSolved && ABYME.notebook.has('mechanism.stone-vault');
+
     hs('lensItem').onClick();
-    r.lens = W.flags.lensTaken;
+    out.lensTaken = W.flags.lensTaken && W.inventory.includes('lens');
     hs('lensSlot').onClick();
-    r.lensPlaced = W.lensPlaced;
-    W.time = 22;
-    for (let i = 0; i < 4; i++) g.tick(0.05, i * 0.05);
-    r.lamp = W.lampLit;
-    W.beamAngle = Math.atan2(57.5 - (-85), 50 - (-40));
-    ABYME.tp(40, 38, 0, 0);
-    for (let i = 0; i < 6; i++) g.tick(0.05, 1 + i * 0.05);
-    r.glyphs = W.flags.glyphsSeen;
-    W.time = 17.8;
+    out.lensPlaced = W.lensPlaced && !W.inventory.includes('lens')
+      && ABYME.notebook.has('evidence.lens');
+
+    W.time = 17.8; W.timeDrift = 0; game.tick(0.05, 1);
+    out.shimmerAvailable = hs('shimmer').when();
     hs('shimmer').onClick();
-    r.shadow = W.flags.shadowRevealed;
-    W.dials = [3, 7, 1, 4];
-    hs('dial3').onClick();
-    r.hatch = W.flags.hatchOpen;
-    hs('plumb').onClick(); hs('hook').onClick();
-    r.plumb = W.flags.plumbHung;
-    r.stems = W.stems;
-    return r;
-  })()`);
-  for (const [k, v] of Object.entries(p1)) ok('P1.' + k, k === 'stems' ? v === 5 : v === true);
+    out.shadow = W.flags.shadowRevealed && ABYME.notebook.has('evidence.shadow-hatch');
 
-  // #139: the power budget is an assertion, not a habit — one full composer frame
-  // at the surface pose must stay inside the ceilings (generous over the observed
-  // 94-215 draws / 219-316k tris so real regressions trip it, noise doesn't)
-  const bud = await h.evaluate(`(() => {
-    ABYME.renderer.info.reset();
-    ABYME.composer.render();
-    const i = ABYME.renderer.info.render;
-    return { calls: i.calls, tris: i.triangles };
-  })()`);
-  ok('P1.budget(draws<340,tris<460k)', bud.calls < 340 && bud.tris < 460000);
-  console.log(`  power budget ${bud.calls} draws · ${bud.tris} triangles`);
+    W.time = 22; W.timeDrift = 0;
+    W.beamAngle = Math.atan2(57.5 - (-85), 50 - (-40));
+    ABYME.tp(40, 38, 0, 0); game.tick(0.1, 2);
+    out.glyphs = W.flags.glyphsSeen && ABYME.notebook.has('evidence.beam-glyphs');
 
-  await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const p = ABYME.refs.deskPlate.position;
-    ABYME.tp(p.x, p.z, 0, 0);
-    hs('plate').onClick();
-    hs('plate').onClick();
-    return 1;
-  })()`);
-  await h.wait(30);   // 21s cinematic + cold-profile first-compile margin
-  const p2 = await h.evaluate(`(() => ({ level: ABYME.W.level, dove: ABYME.W.flags.dove }))()`);
-  ok('P2.realDive→L2', p2.level === 2 && p2.dove);
-  // #135: the arrival vista fired once and released (the 30s wait spans the 2.4s hold)
-  const vz = await h.evaluate(`(() => ({ v2: ABYME.W.onceKeys.includes('vista2'), unlocked: !ABYME.player.locked }))()`);
-  ok('P2.vista(#135 held+released)', vz.v2 && vz.unlocked);
+    const beforeTurn = W.dials[0]; hs('dial0').onClick();
+    out.beamOnly = W.dials[0] === (beforeTurn + 1) % 10 && !W.flags.hatchCodeDecoded;
 
-  const p3 = await h.evaluate(`(() => {
-    const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const r = {};
-    r.slateWhen = hs('kelpSlate').when();
-    hs('kelpSlate').onClick();
-    r.reader = !document.getElementById('reader').classList.contains('hidden');
-    ABYME.UI.closeReader();
-    ABYME.tideFigure();
-    return r;
-  })()`);
-  await h.evaluate(`(() => { for (let i = 0; i < 70; i++) ABYME.game.tick(0.05, i * 0.05); return 1; })()`);
-  const p3b = await h.evaluate(`(() => ({ seen: ABYME.W.flags.tideFigureSeen }))()`);
-  ok('P3.kelpSlate', p3.slateWhen && p3.reader);
-  ok('P3.tideFigure(realRegard)', p3b.seen);
+    hs('lore_signal_shelf').onClick();
+    out.shelfOpen = W.reading && !ABYME.notebook.has('artifact.signal-shelf.surface');
+    ABYME.UI._readerPage(1);
+    out.shelfReader = ABYME.notebook.has('artifact.signal-shelf.surface');
+    ABYME.UI.closeReader(); game.tick(0.05, 3);
+    out.decodeWaitsForCorrectState = !W.flags.hatchCodeDecoded
+      && !ABYME.notebook.has('inference.hatch-code');
 
-  // #129: the era threshold — the reframe fires once, ~8s of L2 time in
-  await h.evaluate(`(() => { for (let i = 0; i < 110; i++) ABYME.game.tick(0.05, 4 + i * 0.05); return 1; })()`);
-  const pe = await h.evaluate(`(async () => ({
-    once: ABYME.W.onceKeys.includes('eraThreshold'),
-    j: ABYME.W.journal.some((x) => x.text.includes('it drowns in order')),
-    eraKey: (await import('/the-island/js/world.js')).LEVELS[2].era.key,
-  }))()`);
-  ok('P3.eraThreshold(once+journal+key)', pe.once && pe.j && pe.eraKey === 'arrival');
-
-  // #130 L2 era event: the climbers' rope — present, swinging, and a keepable read
-  const pr = await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const rope = ABYME.refs.climberRope;
-    const rot0 = rope ? Math.abs(rope.children[2].rotation.x) : -1;
-    hs('climberRope').onClick();
-    return { rope: !!rope, when: hs('climberRope').when(),
-             j: ABYME.W.journal.some((x) => x.text.includes('still swinging')) };
-  })()`);
-  ok('P3.ropeEvent(#130)', pr.rope && pr.when && pr.j);
-
-  // #131 round 1/4 — MOOR (L2): unlocked by the era threshold, keeps its journal
-  const rm = await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const when = hs('roundMoor').when();
-    hs('roundMoor').onClick();
-    for (let i = 0; i < 20; i++) g.tick(0.05, 10 + i * 0.05);
-    return { when, flag: ABYME.W.flags.roundMoor,
-             j: ABYME.W.journal.some((x) => x.text.includes('made his line fast')) };
-  })()`);
-  ok('P3.roundMoor(#131)', rm.when && rm.flag && rm.j);
-
-  // #132 FILE flow: read the commendation, take it, file it in the cabinet
-  const rf = await h.evaluate(`(() => {
-    const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const hc = hs('lore_commendation_copy');
-    hc.onClick(); ABYME.UI.closeReader();
-    hc.onClick();
-    const carried = W.recDisp.commendation_copy === 'carried';
-    const cabWhen = hs('recordCabinet').when();
-    hs('recordCabinet').onClick();
-    g.tick(0.05, 20);
-    return { carried, cabWhen, filed: W.recDisp.commendation_copy === 'filed',
-             j: W.journal.some((x) => x.text.includes('filed his record')),
-             stack: ABYME.refs.recordCabinet.getObjectByName('cabinetStack').visible };
-  })()`);
-  ok('P3.recordFile(#132)', rf.carried && rf.cabWhen && rf.filed && rf.j && rf.stack);
-
-  await h.evaluate(`(() => { ABYME.dive(true); ABYME.watcher('spawn'); return 1; })()`);
-  await h.evaluate(`(() => { for (let i = 0; i < 70; i++) ABYME.game.tick(0.05, i * 0.05); return 1; })()`);
-  const p4 = await h.evaluate(`(() => ({ level: ABYME.W.level, seen: ABYME.W.flags.watcherSeen }))()`);
-  ok('P4.L3', p4.level === 3);
-  ok('P4.watcher(realRegard)', p4.seen);
-
-  // #130 L3 era event: the capitals breach — mid-rise after 3.5s, at rest + kept by 10.5s
-  const pb = await h.evaluate(`(() => {
-    const midY = ABYME.refs.drownedGallery.position.y;
-    for (let i = 0; i < 140; i++) ABYME.game.tick(0.05, 4 + i * 0.05);
-    return { midY, endY: ABYME.refs.drownedGallery.position.y,
-             once: ABYME.W.onceKeys.includes('capitalsBreached'),
-             j: ABYME.W.journal.some((x) => x.text.includes('give the capitals back')) };
-  })()`);
-  ok('P4.breach(#130 mid+rest+journal)', pb.midY > 0.95 && pb.midY < 2.55 && pb.endY === 2.6 && pb.once && pb.j);
-
-  // #131 round 2/4 — LOG (L3)
-  const rl = await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const when = hs('roundLog').when();
-    hs('roundLog').onClick();
-    for (let i = 0; i < 20; i++) g.tick(0.05, 12 + i * 0.05);
-    return { when, flag: ABYME.W.flags.roundLog,
-             j: ABYME.W.journal.some((x) => x.text.includes('signed the day’s return')) };
-  })()`);
-  ok('P4.roundLog(#131)', rl.when && rl.flag && rl.j);
-
-  const p5 = await h.evaluate(`(() => {
-    ABYME.dive(true);
-    const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    ABYME.tp(-75.5, -74.6, 0, -0.4);
-    for (let i = 0; i < 4; i++) g.tick(0.05, i * 0.05);
-    const r = { level: W.level, phialWhen: hs('poolPhial').when() };
-    hs('poolPhial').onClick();
-    r.phial = W.flags.phialTaken;
-    ABYME.bottom();
-    return r;
-  })()`);
-  await h.evaluate(`(() => { for (let i = 0; i < 30; i++) ABYME.game.tick(0.05, i * 0.05); return 1; })()`);
-  await h.wait(7.5);
-  const p5b = await h.evaluate(`(() => ({ rose: ABYME.W.flags.keeperRose, unlocked: !ABYME.player.locked }))()`);
-  ok('P5.L4+phial', p5.level === 4 && p5.phialWhen && p5.phial);
-  ok('P5.keeperTwist(realProximity)', p5b.rose && p5b.unlocked);
-
-  // #130 L4 era event: the beam's farewell — one full pass at night, then dark for the stratum
-  const pf = await h.evaluate(`(() => {
-    ABYME.W.time = 23; ABYME.W.timeDrift = 0;
-    for (let i = 0; i < 300; i++) ABYME.game.tick(0.05, 8 + i * 0.05);
-    return { done: ABYME.W.flags.beamFarewell, doused: !ABYME.W.lampLit,
-             j: ABYME.W.journal.some((x) => x.text.includes('stopped performing')) };
-  })()`);
-  ok('P5.beamFarewell(#130 pass+dark+journal)', pf.done && pf.doused && pf.j);
-
-  // #131 round 3/4 — LIGHT (L4): lantern lit and STAYS lit after the tableau
-  const rg = await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const when = hs('roundLight').when();
-    hs('roundLight').onClick();
-    for (let i = 0; i < 240; i++) g.tick(0.05, 25 + i * 0.05);   // through the 10s tableau
-    const lg = ABYME.refs.cotLantern.getObjectByName('cotLanternGlass');
-    return { when, flag: ABYME.W.flags.roundLight, lit: lg.material.emissiveIntensity > 0.5,
-             j: ABYME.W.journal.some((x) => x.text.includes('lit his small lamp')) };
-  })()`);
-  ok('P5.roundLight(#131 lit+stays)', rg.when && rg.flag && rg.lit && rg.j);
-
-  // #132 KEEP flow: read the closure notice at the source, take it, leave it with him
-  const rk = await h.evaluate(`(() => {
-    const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const ho = hs('lore_closure_notice');
-    ho.onClick(); ABYME.UI.closeReader();
-    ho.onClick();
-    const carried = W.recDisp.closure_notice === 'carried';
-    const restWhen = hs('sourceRest').when();
-    hs('sourceRest').onClick();
-    g.tick(0.05, 45);
-    return { carried, restWhen, kept: W.recDisp.closure_notice === 'kept',
-             j: W.journal.some((x) => x.text.includes('left it with him at the source')),
-             pile: ABYME.refs.sourceRest.getObjectByName('sourceRestPile').visible };
-  })()`);
-  ok('P5.recordKeep(#132)', rk.carried && rk.restWhen && rk.kept && rk.j && rk.pile);
-
-  // #133: with L4 seen, all three shore pieces sit in their drowned poses
-  const sl = await h.evaluate(`(() => {
-    ABYME.game.tick(0.05, 60);
-    return { arm: ABYME.refs.jettyArm.position.y, bench: ABYME.refs.shoreBench.position.y,
-             skiff: ABYME.refs.shoreSkiff.position.y };
-  })()`);
-  ok('P5.shoreLost(#133 all sunk)', sl.arm < -1 && sl.bench < 0 && sl.skiff < 0);
-
-  await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const p = ABYME.refs.deskPlate.position;
-    ABYME.tp(p.x, p.z, 0, 0);
-    for (let i = 0; i < 3; i++) g.tick(0.05, i * 0.05);
-    hs('plate').onClick();
-    hs('plate').onClick();
-    return 1;
-  })()`);
-  await h.wait(30);
-  const p6 = await h.evaluate(`(() => ({ level: ABYME.W.level, carried: ABYME.W.flags.carried, climbing: ABYME.W.flags.climbing }))()`);
-  ok('P6.embrace+realAscent→L3', p6.level === 3 && p6.carried && p6.climbing);
-
-  await h.evaluate(`ABYME.ascend(true); ABYME.ascend(true); 1`);
-  await h.evaluate(`(() => { ABYME.tp(-83, -41, 2.2, 0); for (let i = 0; i < 30; i++) ABYME.game.tick(0.05, i * 0.05); return 1; })()`);
-  const p7 = await h.evaluate(`(() => {
-    const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    const r = { level: W.level, returned: W.flags.returned, climbing: W.flags.climbing, dried: W.flags.phialDried };
-    hs('phialDesk').onClick();
-    r.reader = !document.getElementById('reader').classList.contains('hidden');
-    ABYME.UI.closeReader();
-    r.snapshot = localStorage.getItem('abyme-save-v1');
-    return r;
-  })()`);
-  ok('P7.returned', p7.level === 1 && p7.returned && !p7.climbing);
-  ok('P7.phialDried+read', p7.dried && p7.reader);
-
-  // #131 round 4/4 — WIND (the box, back on the surface) + the completion journal
-  const rw = await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    hs('musicBox').onClick();
-    for (let i = 0; i < 30; i++) g.tick(0.05, 40 + i * 0.05);
-    return { flag: ABYME.W.flags.roundWind,
-             jw: ABYME.W.journal.some((x) => x.text.includes('wound the music box')),
-             all: ABYME.W.journal.some((x) => x.text.includes('Four rounds, kept')) };
-  })()`);
-  ok('P7.roundWind+all(#131)', rw.flag && rw.jw && rw.all);
-
-  // #133: the walk home — pass each drowned piece, hear it named, keep the sum
-  const sh2 = await h.evaluate(`(() => {
-    const g = ABYME.game;
-    for (const [x, z] of [[-18, -117], [24, -101], [-44, -110]]) {
-      ABYME.tp(x, z, 0, 0);
-      for (let i = 0; i < 4; i++) g.tick(0.05, 50 + i * 0.05);
+    for (let i = 0; i < ABYME.HATCH_CODE.length; i++) {
+      const remaining = (ABYME.HATCH_CODE[i] - W.dials[i] + 10) % 10;
+      for (let n = 0; n < remaining; n++) hs('dial' + i).onClick();
     }
-    return { keys: ['loss_arm', 'loss_bench', 'loss_skiff'].every((k) => ABYME.W.onceKeys.includes(k)),
-             j: ABYME.W.journal.some((x) => x.text.includes('gave up while I was down')) };
+    out.decimal = W.dials.every((value) => Number.isInteger(value) && value >= 0 && value <= 9);
+    out.hatch = W.flags.hatchCodeDecoded && W.flags.hatchOpen
+      && W.dials.join(',') === ABYME.HATCH_CODE.join(',');
+
+    hs('plumb').onClick();
+    out.plumbTaken = W.flags.plumbTaken && W.inventory.includes('plumb');
+    hs('hook').onClick();
+    out.plumbHung = W.flags.plumbHung && !W.inventory.includes('plumb')
+      && ABYME.notebook.has('evidence.plumb');
+
+    out.missing = progression.missingRequirements('surface', W, ABYME.notebook);
+    out.arm = progression.nextPlateAction({ world:W, notebook:ABYME.notebook, armed:false }).kind;
+    out.cross = progression.nextPlateAction({ world:W, notebook:ABYME.notebook, armed:true }).kind;
+    out.notes = W.notebook.entries.map((entry) => entry.id);
+
+    const schema = await import('/the-island/js/save-schema.js');
+    const persisted = JSON.parse(localStorage.getItem(schema.SAVE_KEY) || 'null');
+    out.persisted = persisted?.v === schema.SAVE_VERSION
+      && persisted?.flags?.plumbHung === true
+      && persisted?.flags?.hatchCodeDecoded === true
+      && persisted?.flags?.hatchOpen === true
+      && persisted?.dials?.join(',') === ABYME.HATCH_CODE.join(',')
+      && !persisted?.notebook?.entries?.some((entry) => entry.id === 'inference.hatch-code');
+    return out;
   })()`);
-  ok('P7.shoreNamed(#133)', sh2.keys && sh2.j);
 
-  await h.evaluate(`(() => {
-    const g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    ABYME.tp(-26, -102, 1.2, 0);
-    for (let i = 0; i < 3; i++) g.tick(0.05, i * 0.05);
-    hs('oar').onClick(); hs('oar').onClick();
-    return 1;
+  ok('SURFACE.gate-names-whole-circuit', surface.initialMissing.length === 12);
+  ok('SURFACE.chest-requires-drained-tide', surface.chestBlocked);
+  ok('SURFACE.valve-moves-basin-and-bay', surface.valve);
+  ok('SURFACE.chest-yields-ruler', surface.chest);
+  ok('SURFACE.ruler-makes-bridge', surface.ruler);
+  ok('SURFACE.crank-earns-the-hour', surface.crank);
+  ok('SURFACE.stones-reject-no-songs', surface.noSongs);
+  ok('SURFACE.music-box-is-first-source', surface.box);
+  ok('SURFACE.stones-reject-one-song', surface.boxOnly);
+  ok('SURFACE.dawn-bird-is-second-source', surface.bird);
+  ok('SURFACE.bird-sequence-opens-vault', surface.stones);
+  ok('SURFACE.vault-yields-lens', surface.lensTaken);
+  ok('SURFACE.lens-couples-lighthouses', surface.lensPlaced);
+  ok('SURFACE.golden-shadow-reveals-hatch', surface.shimmerAvailable && surface.shadow);
+  ok('SURFACE.beam-writes-ordered-figures', surface.glyphs);
+  ok('DECODER.revealed-wheels-always-turn', surface.beamOnly);
+  ok('DECODER.index-is-read-in-world', surface.shelfOpen && surface.shelfReader);
+  ok('DECODER.no-auto-solved-inference', surface.decodeWaitsForCorrectState);
+  ok('HATCH.wheels-are-decimal', surface.decimal);
+  ok('HATCH.physical-readings-open-stone', surface.hatch);
+  ok('SURFACE.cellar-yields-plumb', surface.plumbTaken);
+  ok('SURFACE.plumb-closes-circuit', surface.plumbHung);
+  ok('GATE.surface-ready', surface.missing.length === 0 && surface.arm === 'arm-descent' && surface.cross === 'descend');
+  ok('NOTES.route-is-earned-evidence', [
+    'evidence.valve', 'evidence.music-box', 'evidence.bird', 'evidence.beam-glyphs',
+    'artifact.signal-shelf.surface', 'evidence.plumb',
+  ].every((id) => surface.notes.includes(id)));
+  ok('SAVE.route-persists-current-contract', surface.persisted);
+
+  const level2 = await h.evaluate(`(async () => {
+    const progression = await import('/the-island/js/progression.js');
+    ABYME.dive(true);
+    const W = ABYME.W, game = ABYME.game;
+    const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
+    const before = progression.missingRequirements('level2', W, ABYME.notebook);
+
+    const plate = ABYME.refs.deskPlate.position;
+    ABYME.tp(plate.x, plate.z, 0, 0); hs('plate').onClick();
+    const blocked = W.level === 2 && !game.atBrink();
+
+    hs('valve').onClick();
+    const armed = game.upstreamState().active;
+    game.resolveUpstreamHand({ reveal:true });
+    const upstream = W.flags.upstreamHandWitnessed && ABYME.notebook.has('event.upstream-hand');
+
+    ABYME.tideFigure();
+    for (let i = 0; i < 30; i++) game.tick(0.1, 10 + i * 0.1);
+    const tideFigure = W.flags.tideFigureSeen && ABYME.notebook.has('encounter.tide-figure');
+    const missing = progression.missingRequirements('level2', W, ABYME.notebook);
+    const action = progression.nextPlateAction({ world:W, notebook:ABYME.notebook, armed:false }).kind;
+    return { level:W.level, before, blocked, armed, upstream, tideFigure, missing, action };
   })()`);
-  await h.wait(19);
-  const p8 = await h.evaluate(`(() => ({ fin: ABYME.getFinale && ABYME.getFinale() }))()`);
-  ok('P8.oarFinale', p8.fin && p8.fin.kind === 'oar' && p8.fin.shown);
+  ok('CROSSING.arrives-at-shallows', level2.level === 2);
+  ok('GATE.level2-blocks-two-unwitnessed-events', level2.before.length === 2 && level2.blocked);
+  ok('LEVEL2.dead-valve-reveals-upstream-hand', level2.armed && level2.upstream);
+  ok('LEVEL2.stillness-resolves-tide-figure', level2.tideFigure);
+  ok('GATE.level2-ready', level2.missing.length === 0 && level2.action === 'arm-descent');
 
-  // #134: the leave-coda reads back THIS walk (4 rounds, 1 filed, 1 kept, shore named)
-  const c8 = await h.evaluate(`document.querySelector('#finale .fin-coda').textContent`);
-  ok('P8.oarCoda(#134)', c8.includes('kept whole') && c8.includes('filed') && c8.includes('the arm'));
+  const level3 = await h.evaluate(`(async () => {
+    const progression = await import('/the-island/js/progression.js');
+    ABYME.dive(true);
+    const W = ABYME.W, game = ABYME.game;
+    const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
+    const before = progression.missingRequirements('level3', W, ABYME.notebook);
 
-  await h.evaluate(`localStorage.setItem('abyme-save-v1', \`${'${SNAP}'}\`); 1`.replace("`${SNAP}`", JSON.stringify(p7.snapshot)));
-  await h.navigate('http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute');
-  await ready();
-  await h.evaluate(`window.__errs = window.__errs || []; document.getElementById('btn-continue').click(); 1`);
-  await h.wait(2);
-  const p9 = await h.evaluate(`(() => {
-    const W = ABYME.W, g = ABYME.game, hs = (id) => g.interact.hotspots.find((s) => s.id === id);
-    ABYME.goLevel(2);
-    for (let i = 0; i < 3; i++) g.tick(0.05, i * 0.05);
-    const r = { bellWhen: hs('bell').when() };
+    const plate = ABYME.refs.deskPlate.position;
+    ABYME.tp(plate.x, plate.z, 0, 0); hs('plate').onClick();
+    const blocked = W.level === 3 && !game.atBrink();
+
+    ABYME.tp(-86.4, -39.3, 0, 0);
+    for (let i = 0; i < 20; i++) game.tick(0.1, 20 + i * 0.1);
+    const register = W.flags.registerRead && ABYME.notebook.has('evidence.register');
+
+    ABYME.watcher('spawn');
+    for (let i = 0; i < 30; i++) game.tick(0.1, 24 + i * 0.1);
+    const watcher = W.flags.watcherSeen && ABYME.notebook.has('encounter.watcher');
+    const missing = progression.missingRequirements('level3', W, ABYME.notebook);
+    const action = progression.nextPlateAction({ world:W, notebook:ABYME.notebook, armed:false }).kind;
+    return { level:W.level, before, blocked, register, watcher, missing, action };
+  })()`);
+  ok('CROSSING.arrives-at-inspection', level3.level === 3);
+  ok('GATE.level3-blocks-record-and-watcher', level3.before.length === 2 && level3.blocked);
+  ok('LEVEL3.register-requires-table-dwell', level3.register);
+  ok('LEVEL3.held-gaze-resolves-watcher', level3.watcher);
+  ok('GATE.level3-ready', level3.missing.length === 0 && level3.action === 'arm-descent');
+
+  const source = await h.evaluate(`(async () => {
+    const progression = await import('/the-island/js/progression.js');
+    ABYME.dive(true);
+    const W = ABYME.W, game = ABYME.game;
+    const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
+    const before = progression.missingRequirements('level4', W, ABYME.notebook);
+
+    const plate = ABYME.refs.deskPlate.position;
+    ABYME.tp(plate.x, plate.z, 0, 0); hs('plate').onClick();
+    const blocked = W.level === 4 && !game.atBrink();
+
+    ABYME.bottom();
+    const figure = new ABYME.THREE.Vector3();
+    game.modelRefs.tinyFigure.getWorldPosition(figure);
+    const dx = figure.x - ABYME.player.pos.x, dz = figure.z - ABYME.player.pos.z;
+    const toward = Math.atan2(-dx, -dz);
+    const yawError = Math.atan2(Math.sin(ABYME.player.yaw - toward), Math.cos(ABYME.player.yaw - toward));
+    const bottomFrames = Math.abs(yawError) < 0.02;
+    ABYME.player.yaw = toward + Math.PI;
+    for (let i = 0; i < 30; i++) game.tick(0.1, 30 + i * 0.1);
+    const proximityOnly = !W.flags.lowerHandRegarded;
+
+    ABYME.player.yaw = toward; game._lowerPrev = null;
+    for (let i = 0; i < 30; i++) game.tick(0.1, 34 + i * 0.1);
+    const regarded = W.flags.lowerHandRegarded && ABYME.notebook.has('encounter.lower-hand');
+    const choiceMissing = progression.missingRequirements('level4', W, ABYME.notebook);
+
+    ABYME.tp(plate.x, plate.z, 0, 0); hs('plate').onClick();
+    const blockedWithoutChoice = !game.atBrink();
+
+    hs('dispSet').onClick();
+    const selected = W.flags.dispositionChosen && W.disposition === 'tend'
+      && ABYME.notebook.has('evidence.disposition');
+    const missing = progression.missingRequirements('level4', W, ABYME.notebook);
+    const action = progression.nextPlateAction({ world:W, notebook:ABYME.notebook, armed:false }).kind;
+
     hs('bell').onClick();
-    r.rung = W.flags.bellRung;
-    return r;
+    const bellIsInstrument = !W.flags.endingCommitted && !ABYME.getFinale();
+    const diveRungs = ABYME.ledger().marks.filter((mark) => mark.k === 'dive').map((mark) => mark.r).sort();
+    return { level:W.level, before, blocked, bottomFrames, proximityOnly, regarded, choiceMissing,
+      blockedWithoutChoice, selected, missing, action, bellIsInstrument, diveRungs };
   })()`);
-  await h.wait(15);
-  const p9b = await h.evaluate(`(() => ({ fin: ABYME.getFinale && ABYME.getFinale(), errs: window.__errs || [] }))()`);
-  ok('P9.bellFinale', p9.bellWhen && p9.rung && p9b.fin && p9b.fin.kind === 'bell' && p9b.fin.shown);
-  // #134: the stay-coda on the restored snapshot (3 rounds at that point)
-  const c9 = await h.evaluate(`document.querySelector('#finale .fin-coda').textContent`);
-  ok('P9.bellCoda(#134)', c9.includes('three of his rounds') && c9.includes('the shore in the model'));
-  ok('P9.zeroErrors', (p9b.errs || []).length === 0);
+  ok('CROSSING.arrives-at-source', source.level === 4);
+  ok('CROSSING.commits-one-shared-act-per-rung', source.diveRungs.join(',') === '1,2,3');
+  ok('DEBUG.bottom-frames-the-lower-hand', source.bottomFrames);
+  ok('GATE.level4-blocks-regard-and-choice', source.before.length === 2 && source.blocked);
+  ok('LEVEL4.proximity-alone-does-not-resolve', source.proximityOnly);
+  ok('LEVEL4.gaze-plus-stillness-regards-hand', source.regarded);
+  ok('GATE.level4-still-needs-disposition', source.choiceMissing.length === 1
+    && source.choiceMissing[0] === 'dispositionChosen' && source.blockedWithoutChoice);
+  ok('LEVEL4.first-index-touch-explicitly-tends', source.selected);
+  ok('GATE.level4-ready-for-ascent', source.missing.length === 0 && source.action === 'arm-ascent');
+  ok('INSTRUMENT.bell-is-nonterminal', source.bellIsInstrument);
 
-  console.log('WALK PASS', R.pass.length, '/', R.pass.length + R.fail.length);
-  if (R.fail.length) console.log('FAILURES:', JSON.stringify(R.fail));
+  const returned = await h.evaluate(`(() => {
+    const W = ABYME.W, game = ABYME.game;
+    const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
+    game.flag('climbing');
+    const levels = [], landingSaves = [];
+    for (let i = 0; i < 3; i++) {
+      ABYME.ascend(true); levels.push(W.level);
+      const persisted = JSON.parse(localStorage.getItem('abyme-save'));
+      landingSaves.push(persisted.level === W.level
+        && persisted.pos.every((value, axis) => Math.abs(value - [ABYME.player.pos.x, ABYME.player.pos.y, ABYME.player.pos.z][axis]) < 1e-6));
+    }
+    const oar = hs('oar');
+    const oarAvailable = oar.when(); oar.onClick();
+    const oarIsInstrument = !W.flags.endingCommitted && !ABYME.getFinale();
+    const plate = ABYME.refs.deskPlate.position;
+    ABYME.tp(plate.x, plate.z, 0, 0);
+    hs('plate').onClick();
+    const armed = game.atBrink() && !W.flags.endingCommitted;
+    hs('plate').onClick();
+    ABYME.setFinaleT(10);
+    return {
+      levels, landingSaves, returned:W.flags.returned, climbing:W.flags.climbing,
+      returnNote:ABYME.notebook.has('return.surface'),
+      oarAvailable, oarIsInstrument, armed,
+      committed:W.flags.endingCommitted, kind:ABYME.getFinale()?.kind,
+      endingNote:ABYME.notebook.has('ending.tend'),
+      regions:{...W.regions},
+    };
+  })()`);
+  await h.wait(0.35);
+  const tendShown = await h.evaluate(`ABYME.getFinale()?.shown === true`);
+  ok('ASCENT.returns-through-every-level', returned.levels.join(',') === '3,2,1');
+  ok('ASCENT.destination-pose-saves-atomically', returned.landingSaves.every(Boolean));
+  ok('ASCENT.surface-state-and-note', returned.returned && !returned.climbing && returned.returnNote);
+  ok('INSTRUMENT.oar-is-nonterminal', returned.oarAvailable && returned.oarIsInstrument);
+  ok('ENDING.surface-plate-arms-before-commit', returned.armed);
+  ok('ENDING.tend-commits-at-returned-plate', returned.committed && returned.kind === 'tend'
+    && returned.endingNote && tendShown);
+  ok('JOURNEY.all-regions-visited', returned.regions.l2seen && returned.regions.l3seen && returned.regions.l4seen);
+
+  const branchResults = [];
+  for (const [choice, touches] of [['carry', 2], ['open', 3], ['close', 4]]) {
+    await startFresh();
+    const staged = await h.evaluate(`(() => {
+      const choice = ${JSON.stringify(choice)};
+      const touches = ${touches};
+      const W = ABYME.W, game = ABYME.game;
+      const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
+      ABYME.resetFlags(); W.flags.introDone = true; W.flags.plumbHung = true;
+      // Give OPEN real weight to carry uphill through the canonical landing seam;
+      // debug goLevel is intentionally non-causal, and every submerged valve is
+      // intentionally dead. A real dive from L3 records one rung-3 act and lands
+      // at L4, matching the history an ordinary full descent always creates.
+      if (choice === 'open') { ABYME.goLevel(3); ABYME.dive(true); }
+      else ABYME.goLevel(4);
+      ABYME.bottom();
+      W.flags.lowerHandRegarded = true; ABYME.notebook.record('encounter.lower-hand');
+      for (let i = 0; i < touches; i++) hs('dispSet').onClick();
+      const dial = W.disposition;
+      hs('bell').onClick();
+      const bellSafe = !W.flags.endingCommitted && !ABYME.getFinale();
+      W.flags.climbing = true;
+      ABYME.ascend(true); ABYME.ascend(true); ABYME.ascend(true);
+      hs('oar').onClick();
+      const oarSafe = !W.flags.endingCommitted && !ABYME.getFinale();
+      const plate = ABYME.refs.deskPlate.position;
+      ABYME.tp(plate.x, plate.z, 0, 0);
+      hs('plate').onClick(); const armed = game.atBrink();
+      hs('plate').onClick(); ABYME.setFinaleT(10);
+      return { choice, dial, bellSafe, oarSafe, armed,
+        committed:W.flags.endingCommitted,
+        finale:ABYME.getFinale()?.kind,
+        note:ABYME.notebook.has('ending.' + choice),
+        tideTarget:W.tideTarget,
+      };
+    })()`);
+    await h.wait(0.35);
+    staged.shown = await h.evaluate(`ABYME.getFinale()?.shown === true`);
+    staged.errors = await h.evaluate(`window.__walkErrors || []`);
+    branchResults.push(staged);
+  }
+
+  for (const branch of branchResults) {
+    ok(`ENDING.${branch.choice}-selected-by-four-stop-index`, branch.dial === branch.choice);
+    ok(`ENDING.${branch.choice}-commits-only-at-returned-plate`, branch.bellSafe && branch.oarSafe
+      && branch.armed && branch.committed && branch.finale === branch.choice && branch.note && branch.shown
+      && (branch.choice !== 'open' || branch.tideTarget > 1), branch);
+  }
+
+  const errors = [
+    ...(await h.evaluate(`window.__walkErrors || []`)),
+    ...branchResults.flatMap((branch) => branch.errors),
+  ];
+  ok('RUNTIME.zero-window-errors', errors.length === 0);
+
+  console.log(`WALK PASS ${R.pass.length} / ${R.pass.length + R.fail.length}`);
+  if (R.fail.length) {
+    console.log('FAILURES:', JSON.stringify(R.fail));
+    console.log('WINDOW ERRORS:', JSON.stringify(errors));
+    process.exitCode = 1;
+  }
 }

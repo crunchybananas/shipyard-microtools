@@ -40,6 +40,11 @@ export const POSES = [
     note: 'the collapsed drain on the stones pad: the hole you can fall into' },
   { name: 'stones-drain-inside', at: [131, -150], look: [140, -150], tide: 0, time: 11,
     note: 'standing IN the buried chamber, looking back at the ramp — is there a way out?' },
+  { name: 'vault-sealed', at: [129.7, -149.1], look: [126.6, -149.6], pitch: -0.28, tide: 0, time: 16.5,
+    note: 'the lens outcrop before the bird answers — the slab should read as sealed stone' },
+  { name: 'vault-open', at: [129.7, -149.1], look: [126.6, -149.6], pitch: -0.28, tide: 0, time: 16.5,
+    then: `ABYME.game.flag('birdSolved'); ABYME.game.anim.vault = 1;`,
+    note: 'the same legal pose after the slab drops — a shallow lens niche, never a room' },
   { name: 'study-musicbox', at: [-85, -40], look: [-88.6, -42.6], tide: 1, time: 11,
     note: 'the music box shelf in the study' },
   { name: 'study-wide', at: [-82, -37], look: [-88, -43], tide: 1, time: 11,
@@ -80,7 +85,7 @@ export default async function (h) {
   const DIR = process.env.SHOT_DIR || 'shots';
   mkdirSync(DIR, { recursive: true });
   const only = process.env.SHOT_ONLY ? new Set(process.env.SHOT_ONLY.split(',')) : null;
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute';
+  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
   const ready = async () => {
     for (let i = 0; i < 40; i++) {
@@ -94,7 +99,7 @@ export default async function (h) {
     { width: 1280, height: 800, deviceScaleFactor: 2, mobile: false });
   await h.navigate(URL); await ready();
   await h.evaluate(`localStorage.setItem('abyme-muted','1');
-    ['abyme-save-v1','abyme-ledger-v1'].forEach(k => localStorage.removeItem(k)); 1`);
+    ['abyme-save','abyme-ledger-v2'].forEach(k => localStorage.removeItem(k)); 1`);
   await h.navigate(URL); await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
   await h.wait(2);

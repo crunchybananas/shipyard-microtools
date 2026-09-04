@@ -3,20 +3,20 @@
 import assert from 'node:assert/strict';
 import {
   G, MAP_H, MAP_W, TILE, createResourceStock, setSeed,
-} from '../js/state.js?realm=197';
-import { makeCitizen } from '../js/world.js?realm=197';
-import { updateCitizens } from '../js/citizens.js?realm=197';
-import { sendCitizenHome } from '../js/citizen-shelter.js?realm=197';
+} from '../js/state.js?realm=198';
+import { makeCitizen } from '../js/world.js?realm=198';
+import { updateCitizens } from '../js/citizens.js?realm=198';
+import { sendCitizenHome } from '../js/citizen-shelter.js?realm=198';
 import {
   claimCitizenAssignment,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=197';
+} from '../js/citizen-ownership.js?realm=198';
 import {
   assignCitizenResidence,
   citizenIsIndoors,
-} from '../js/residences.js?realm=197';
-import { resetPathfindingService } from '../js/pathfinding-service.js?realm=197';
+} from '../js/residences.js?realm=198';
+import { resetPathfindingService } from '../js/pathfinding-service.js?realm=198';
 
 function resetCore() {
   resetPathfindingService();
@@ -39,7 +39,7 @@ function resetCore() {
       citizensDied: 0, raidsSurvived: 0, enemiesKilled: 0, goldEarned: 0,
       daysLived: 0, housesEvolved: 0, scenariosWon: [], everHadBuilding: {},
     },
-    storyFlags: { physicalFoodInventory: true }, namedCharacters: {},
+    storyFlags: { physicalFoodInventory: true, physicalSupplyWeb: true }, namedCharacters: {},
     avatar: null, wonder: null, _undoStack: [],
   });
 }

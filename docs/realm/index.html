@@ -285,6 +285,25 @@ body.title-active #hud,body.title-active #build-bar,body.title-active #missions,
 .workforce-priority-btn:hover,.workforce-priority-btn:focus-visible{border-color:rgba(245,201,74,0.62);color:#fff;outline:none}
 .workforce-priority-btn.active{border-color:#f5c94a;background:rgba(245,201,74,0.18);color:#ffe7a0;box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
 .workforce-policy-detail{margin-top:0.42rem;line-height:1.35}
+.supply-ledger{position:relative;margin:0.62rem 0;padding:0.58rem 0.58rem 0.52rem;border:1px solid rgba(214,168,100,0.28);border-radius:8px;background:linear-gradient(145deg,rgba(68,50,24,0.22),rgba(12,24,24,0.55));overflow:hidden}
+.supply-ledger:before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(#e8c06c,#65b88c)}
+.supply-ledger-head{display:flex;align-items:baseline;justify-content:space-between;gap:0.4rem;margin-bottom:0.46rem;color:#d8bc7c;font:700 0.66rem/1.2 Georgia,serif}
+.supply-ledger-head strong{max-width:58%;color:#eff8e8;font-family:inherit;font-size:0.61rem;font-weight:700;line-height:1.25;text-align:right}
+.supply-ledger-thread{display:grid;gap:0.44rem}
+.supply-flow-row{display:grid;grid-template-columns:minmax(52px,0.8fr) minmax(42px,1fr) auto;align-items:center;gap:0.38rem}
+.supply-flow-label{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:0.2rem;color:rgba(255,255,255,0.84);font-size:0.65rem;line-height:1}
+.supply-flow-label small{grid-column:2;color:rgba(255,255,255,0.36);font-size:0.52rem;line-height:1.2}
+.supply-flow-meter{position:relative;height:5px;border-radius:9px;background:rgba(255,255,255,0.09);overflow:hidden}
+.supply-flow-stored,.supply-flow-inbound{position:absolute;top:0;bottom:0}
+.supply-flow-stored{left:0;background:linear-gradient(90deg,#9f7135,#e2bb62)}
+.supply-flow-inbound{background:repeating-linear-gradient(135deg,rgba(101,184,140,0.88) 0 3px,rgba(101,184,140,0.34) 3px 6px);animation:supply-route-pulse 1.8s ease-in-out infinite}
+.supply-flow-value{min-width:38px;color:rgba(255,255,255,0.72);font:600 0.58rem/1.1 'SF Mono',Monaco,monospace;text-align:right}
+.supply-inbound-count{display:block;margin-top:0.12rem;color:#86d9ad;font-family:inherit;font-size:0.48rem;font-weight:600;line-height:1.1;white-space:nowrap}
+.supply-ledger-output{display:flex;justify-content:space-between;gap:0.5rem;margin-top:0.46rem;padding-top:0.38rem;border-top:1px dashed rgba(214,168,100,0.23);color:rgba(255,255,255,0.46);font-size:0.58rem}
+.supply-ledger-output strong{color:#f1cf82}
+.supply-ledger p{margin:0.42rem 0 0;color:rgba(255,255,255,0.48);font-size:0.57rem;line-height:1.35}
+@keyframes supply-route-pulse{0%,100%{opacity:.46}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.supply-flow-inbound{animation:none}}
 
 /* Toast — type-aware styles */
 #toast{position:fixed;top:5.15rem;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(11,18,32,0.86),rgba(8,12,24,0.78));color:#d8ecff;padding:0.62rem 1.25rem;border-radius:8px;font-size:1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.35s;z-index:100;text-align:center;border:1px solid rgba(147,197,253,0.55);box-shadow:0 8px 26px rgba(0,0,0,0.42),inset 0 1px 0 rgba(255,255,255,0.12);backdrop-filter:blur(10px);max-width:min(420px,70vw);line-height:1.35}
@@ -324,7 +343,7 @@ body.title-active #hud,body.title-active #build-bar,body.title-active #missions,
 #speed button:hover,#save-controls button:hover{background:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.07));border-color:rgba(231,203,126,0.32);transform:translateY(-1px)}
 
 /* Info panel */
-#info-panel{position:fixed;top:calc(3rem + 240px);right:0.8rem;width:230px;max-height:calc(100vh - 3rem - 240px - 0.8rem);overflow-y:auto;overscroll-behavior:contain;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:0.75rem 0.9rem;z-index:15;backdrop-filter:blur(12px);font-size:0.78rem;line-height:1.5;display:none;box-shadow:0 4px 24px rgba(0,0,0,0.5);transform:translateX(20px);opacity:0;transition:transform 0.2s ease,opacity 0.2s ease}
+#info-panel{--info-panel-top:calc(3rem + 240px);position:fixed;top:var(--info-panel-top);right:0.8rem;width:230px;max-height:calc(100vh - var(--info-panel-top) - 0.8rem);overflow-y:auto;overscroll-behavior:contain;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:0.75rem 0.9rem;z-index:15;backdrop-filter:blur(12px);font-size:0.78rem;line-height:1.5;display:none;box-shadow:0 4px 24px rgba(0,0,0,0.5);transform:translateX(20px);opacity:0;transition:transform 0.2s ease,opacity 0.2s ease}
 #info-panel.ip-visible{transform:translateX(0);opacity:1}
 .ip-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem}
 .ip-title{font-weight:700;font-size:0.85rem}
@@ -354,7 +373,7 @@ body.title-active #hud,body.title-active #build-bar,body.title-active #missions,
 .upgrade-btn{display:block;margin-top:0.5rem;width:100%;padding:0.35rem 0.5rem;background:#3d7a42;color:#fff;border:1px solid #5a9c5f;border-radius:6px;cursor:pointer;font-size:var(--fs-sm);font-family:inherit;text-align:left;line-height:1.4;transition:background 0.15s}
 .upgrade-btn:hover{background:#4e8f54}
 .upgrade-btn.disabled{background:#3a3a3a;border-color:#555;cursor:not-allowed;opacity:0.6}
-@media(max-width:600px){#info-panel{top:auto;bottom:5.5rem;right:0.4rem;width:200px;max-height:calc(100vh - 6.3rem);font-size:0.72rem}}
+@media(max-width:600px){#info-panel{top:auto;bottom:5.5rem;right:0.4rem;width:min(220px,calc(100vw - 0.8rem));max-height:calc(100vh - 6.3rem);font-size:0.72rem}}
 
 /* Minimap */
 #minimap{position:fixed;bottom:5.1rem;right:0.9rem;width:184px;height:184px;border:1px solid rgba(209,170,96,0.52);border-radius:8px;z-index:10;cursor:pointer;background:#0d1110;image-rendering:auto;box-shadow:0 10px 28px rgba(0,0,0,0.48),inset 0 0 0 1px rgba(255,235,180,0.08),inset 0 0 24px rgba(126,93,44,0.20);opacity:0.95}
@@ -1210,6 +1229,6 @@ const realmStartup = {
 globalThis.realmStartup = realmStartup;
 startupButton.addEventListener('click', () => realmStartup.request());
 </script>
-<script type="module" src="js/main.js?realm=197" onerror="globalThis.realmStartup.fail()"></script>
+<script type="module" src="js/main.js?realm=198" onerror="globalThis.realmStartup.fail()"></script>
 </body>
 </html>

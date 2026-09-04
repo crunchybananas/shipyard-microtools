@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=197';
-import { renderBoats, renderFlocks, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=197';
-import { makeAtlasLoader } from './atlas-loader.js?realm=197';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=197';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=198';
+import { renderBoats, renderFlocks, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=198';
+import { makeAtlasLoader } from './atlas-loader.js?realm=198';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=198';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,7 +15,7 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=197';
+} from './sprite-source-contract.js?realm=198';
 import {
   CARGO_DIRECTIONS,
   CARGO_FRAMES,
@@ -24,7 +24,7 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from './cargo-source-contract.js?realm=197';
+} from './cargo-source-contract.js?realm=198';
 import {
   ENEMY_ACTIONS,
   ENEMY_DIRECTIONS,
@@ -32,21 +32,21 @@ import {
   ENEMY_RUNTIME_ATLASES,
   ENEMY_VARIANTS,
   enemyAtlasFrameRect,
-} from './enemy-sprite-contract.js?realm=197';
+} from './enemy-sprite-contract.js?realm=198';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=197';
+} from './render-resolution.js?realm=198';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=197';
+} from './citizen-presentation.js?realm=198';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=197';
-import { staffingCount } from './citizen-ownership.js?realm=197';
+} from './citizen-render-cache.js?realm=198';
+import { staffingCount } from './citizen-ownership.js?realm=198';
 
 let C, ctx;
 let logicalW, logicalH;

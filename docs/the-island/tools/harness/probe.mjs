@@ -14,7 +14,7 @@
 // after every slice.
 
 export default async function (h) {
-  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute';
+  const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
   const ready = async () => {
     for (let i = 0; i < 40; i++) {
       if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) return;
@@ -25,7 +25,7 @@ export default async function (h) {
 
   await h.navigate(URL); await ready();
   await h.evaluate(`localStorage.setItem('abyme-muted','1');
-    ['abyme-save-v1','abyme-ledger-v1'].forEach(k => localStorage.removeItem(k)); 1`);
+    ['abyme-save','abyme-ledger-v2'].forEach(k => localStorage.removeItem(k)); 1`);
   await h.navigate(URL); await ready();
   await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
   await h.wait(2);
@@ -406,6 +406,7 @@ export default async function (h) {
       ['annex',       -82.9, -32.2], ['plate',     -82.8, -41.4], ['lh outside',  -79, -46],
       ['wake beach',     4, -104], ['jetty',       -18, -110.5], ['dory',         -26, -102],
       ['stones',       135, -146], ['islet',       138, -141],   ['stones pad W', 130, -148],
+      ['vault outcrop',127.7,-149.4],
       ['drain mouth',  139, -150], ['chest',       118, -176],   ['causeway A',    48, -78],
       ['causeway B',   112, -132], ['bluff',        97,  32],    ['bridge W',      36,  25],
       ['cliff',       57.5,  50], ['forest',       -30,  40],

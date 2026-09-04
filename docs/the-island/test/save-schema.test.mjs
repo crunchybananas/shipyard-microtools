@@ -1,221 +1,242 @@
-// save-schema.test.mjs — headless node tests for the save contract (#74).
-//
-// Run:  node --test "docs/the-island/test/*.test.mjs"
-//
-// save-schema.js is dependency-free (no three.js / DOM / localStorage) exactly
-// so this file can exercise the full save→load round-trip and the v1→v2
-// migration without a browser. world.js itself imports 'three' via the page
-// importmap and is not node-loadable — which is why the schema lives apart.
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  SAVE_VERSION, SAVE_KEY, SAVE_KEY_PREV, SAVE_FIELDS, MIGRATIONS,
-  packSave, applySave, migrateSave,
+  SAVE_VERSION, SAVE_KEY, SAVE_FLAG_DEFAULTS, SAVE_FIELDS, packSave, applySave,
+  isCurrentSavePayload,
 } from '../js/save-schema.js';
 
-// A W-shaped fixture covering the persisted subset (mirrors world.js defaults).
-// applySave only requires flags/regions to exist as objects (merge targets);
-// everything else is assigned outright.
 function freshState() {
   return {
     time: 7.4,
     tide: 1, tideTarget: 1,
     lensPlaced: false,
     beamAngle: 2.2,
+    disposition: 'tend',
+    endingOutcome: null,
     flags: {
       introDone: false, enteredStudy: false, valveTurned: false, crankUsed: false,
       rulerTaken: false, rulerPlaced: false, chestOpen: false, heardBox: false,
       heardBird: false, birdSolved: false, lensTaken: false, shadowRevealed: false,
-      glyphsSeen: false, hatchOpen: false, plumbTaken: false, plumbHung: false,
-      dove: false, climbing: false, keeperSilenced: false, returned: false, bellRung: false,
+      glyphsSeen: false, hatchCodeDecoded: false, hatchOpen: false,
+      plumbTaken: false, plumbHung: false, dove: false, climbing: false,
+      returned: false, upstreamHandSurged: false, upstreamHandWitnessed: false, registerRead: false,
+      lowerHandRegarded: false, dispositionChosen: false, endingCommitted: false,
     },
     stems: 0,
     inventory: [],
-    journal: [],
+    notebook: { entries: [], hintLevels: {} },
     onceKeys: [],
-    readKeys: [],
+    recDisp: {},
     dials: [0, 0, 0, 0],
     playerPos: null,
     playerLook: null,
     level: 1,
-    regions: { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] },
+    regions: { l2seen: false, l3seen: false, l4seen: false },
   };
 }
 
-test('payload is stamped with the current version and exactly the table fields', () => {
-  const p = packSave(freshState(), null);
-  assert.equal(p.v, SAVE_VERSION);
-  assert.equal(SAVE_VERSION, 3);
-  const expected = new Set(['v', ...SAVE_FIELDS.map((f) => f.key)]);
-  assert.deepEqual(new Set(Object.keys(p)), expected);
-  assert.equal(SAVE_KEY, 'abyme-save-v1'); // frozen: renaming orphans every save
-  assert.equal(SAVE_KEY_PREV, 'abyme-save-v1-prev'); // frozen too: the begin-anew stash (#56)
+test('the current contract has one clean storage key', () => {
+  const payload = packSave(freshState(), null);
+  assert.equal(payload.v, 2);
+  assert.equal(SAVE_VERSION, 2);
+  assert.equal(SAVE_KEY, 'abyme-save');
+  assert.deepEqual(new Set(Object.keys(payload)), new Set(['v', ...SAVE_FIELDS.map((f) => f.key)]));
+  assert.deepEqual(Object.keys(payload.flags), Object.keys(SAVE_FLAG_DEFAULTS));
+  assert.ok(!('journal' in payload));
+  assert.ok(!('readKeys' in payload));
+  assert.ok(!('fragmentsFound' in payload.regions));
 });
 
-test('save → load round-trips every field through JSON', () => {
-  const a = freshState();
-  a.time = 18.25;
-  a.tideTarget = 0.4; a.tide = 0.7; // mid-drain: the TARGET is what persists
-  a.lensPlaced = true;
-  a.beamAngle = 1.1;
-  a.flags.introDone = true; a.flags.rulerTaken = true; a.flags.chestOpen = true; a.flags.dove = true;
-  a.stems = 3;
-  a.inventory = ['lens', 'plumb'];
-  a.journal = [{ text: 'the same sand', sketch: '' }];
-  a.onceKeys = ['introFlight'];
-  a.readKeys = ['frag-01', 'frag-07'];
-  a.dials = [2, 0, 3, 1];
-  a.level = 3;
-  a.regions = { l2seen: true, l3seen: true, l4seen: false, fragmentsFound: ['f1'] };
+test('save and load round-trip stable evidence and the full progression state', () => {
+  const before = freshState();
+  before.time = 18.25;
+  before.tideTarget = 0.4;
+  before.lensPlaced = true;
+  before.beamAngle = 1.1;
+  before.disposition = 'carry';
+  before.endingOutcome = { kind: 'carry', removed: 7 };
+  before.flags.endingCommitted = true;
+  before.flags.hatchCodeDecoded = true;
+  before.flags.hatchOpen = true;
+  before.flags.upstreamHandSurged = true;
+  before.flags.upstreamHandWitnessed = true;
+  before.flags.dispositionChosen = true;
+  before.stems = 4;
+  before.inventory = ['lens', 'plumb'];
+  before.notebook.entries = [
+    { id: 'evidence.beam-glyphs', args: { glyphs: [1, 5, 3, 4] } },
+    { id: 'artifact.signal-shelf.surface' },
+  ];
+  before.notebook.hintLevels = { 'signal-hatch': 1 };
+  before.onceKeys = ['introFlight'];
+  before.recDisp = { field_slip: 'kept' };
+  before.dials = [5, 1, 4, 6];
+  before.level = 3;
+  before.regions = { l2seen: true, l3seen: true, l4seen: false };
+  const wire = JSON.parse(JSON.stringify(packSave(before, {
+    pos: { x: 4.5, y: 0, z: -104.25 }, yaw: 2.1, pitch: -0.4,
+  })));
 
-  // the player-like ctx: position AND facing persist (#58, v3)
-  const pos = { x: 4.5, y: 0, z: -104.25 };
-  const wire = JSON.parse(JSON.stringify(packSave(a, { pos, yaw: 2.1, pitch: -0.4 })));
-
-  const b = freshState();
-  applySave(b, wire);
-
-  assert.equal(b.time, 18.25);
-  assert.equal(b.tide, 0.4);
-  assert.equal(b.tideTarget, 0.4);
-  assert.equal(b.lensPlaced, true);
-  assert.equal(b.beamAngle, 1.1);
-  assert.equal(b.flags.introDone, true);
-  assert.equal(b.flags.rulerTaken, true);
-  assert.equal(b.flags.dove, true);
-  assert.equal(b.flags.bellRung, false); // untouched default survives the merge
-  assert.equal(b.stems, 3);
-  assert.deepEqual(b.inventory, ['lens', 'plumb']);
-  assert.deepEqual(b.journal, [{ text: 'the same sand', sketch: '' }]);
-  assert.deepEqual(b.onceKeys, ['introFlight']);
-  assert.deepEqual(b.readKeys, ['frag-01', 'frag-07']);
-  assert.deepEqual(b.dials, [2, 0, 3, 1]);
-  assert.equal(b.level, 3);
-  assert.deepEqual(b.regions, { l2seen: true, l3seen: true, l4seen: false, fragmentsFound: ['f1'] });
-  assert.deepEqual(b.playerPos, [4.5, 0, -104.25]); // plain array; world.js makes the Vector3
-  assert.deepEqual(b.playerLook, [2.1, -0.4]);      // the facing rides along (#58)
+  const after = freshState();
+  assert.equal(applySave(after, wire), true);
+  assert.equal(after.time, 18.25);
+  assert.equal(after.tide, 0.4);
+  assert.equal(after.tideTarget, 0.4);
+  assert.equal(after.disposition, 'carry');
+  assert.deepEqual(after.endingOutcome, { kind: 'carry', removed: 7 });
+  assert.equal(after.flags.endingCommitted, true);
+  assert.equal(after.flags.hatchCodeDecoded, true);
+  assert.equal(after.flags.hatchOpen, true);
+  assert.equal(after.flags.upstreamHandSurged, true);
+  assert.equal(after.flags.upstreamHandWitnessed, true);
+  assert.equal(after.stems, 4);
+  assert.deepEqual(after.inventory, ['lens', 'plumb']);
+  assert.deepEqual(after.notebook, before.notebook);
+  assert.deepEqual(after.onceKeys, ['introFlight']);
+  assert.deepEqual(after.recDisp, { field_slip: 'kept' });
+  assert.deepEqual(after.dials, [5, 1, 4, 6]);
+  assert.equal(after.level, 3);
+  assert.deepEqual(after.regions, before.regions);
+  assert.deepEqual(after.playerPos, [4.5, 0, -104.25]);
+  assert.deepEqual(after.playerLook, [2.1, -0.4]);
 });
 
-test('a synthetic v1 payload (no version int) migrates and loads', () => {
-  // exactly what world.js wrote before the version stamp existed — including a
-  // flags object from before chestOpen was persisted at all.
-  const v1 = {
-    time: 9.1,
-    tide: 0,
-    lensPlaced: false,
-    beamAngle: 2.2,
-    flags: { introDone: true, enteredStudy: true, valveTurned: true, rulerTaken: true },
-    stems: 1,
-    inventory: ['ruler'],
-    journal: [],
-    level: 1,
-    onceKeys: [], readKeys: [], dials: [1, 1, 1, 1],
-    regions: { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] },
-    pos: [10, 0, -90],
-  };
+test('the upstream physical effect persists before its later observation', () => {
+  const before = freshState();
+  before.tideTarget = 1.44;
+  before.flags.upstreamHandSurged = true;
+  before.flags.upstreamHandWitnessed = false;
 
-  const migrated = migrateSave(JSON.parse(JSON.stringify(v1)));
-  assert.equal(migrated.v, SAVE_VERSION);
-  // v1→v2 heuristic: the taken ruler proves the chest lid was open
-  assert.equal(migrated.flags.chestOpen, true);
-
-  const w = freshState();
-  applySave(w, JSON.parse(JSON.stringify(v1)));
-  assert.equal(w.flags.chestOpen, true);
-  assert.equal(w.flags.rulerTaken, true);
-  assert.equal(w.time, 9.1);
-  assert.equal(w.tide, 0); // tide 0 (drained) must survive ?? — falsy but valid
-  assert.equal(w.stems, 1);
-  assert.deepEqual(w.inventory, ['ruler']);
-  assert.deepEqual(w.dials, [1, 1, 1, 1]);
-  assert.deepEqual(w.playerPos, [10, 0, -90]);
-  assert.equal(w.playerLook, null); // pre-v3: no facing in the save
+  const after = freshState();
+  assert.equal(applySave(after, JSON.parse(JSON.stringify(packSave(before)))), true);
+  assert.equal(after.tideTarget, 1.44);
+  assert.equal(after.flags.upstreamHandSurged, true);
+  assert.equal(after.flags.upstreamHandWitnessed, false);
 });
 
-test('a v2 payload (pre-look) migrates to v3 with the facing unset', () => {
-  const migrated = migrateSave({ v: 2, flags: {} });
-  assert.equal(migrated.v, SAVE_VERSION);
-  const w = freshState();
-  w.playerLook = [1, 1]; // a stale pre-load value must not survive the apply
-  applySave(w, { v: 2, flags: { introDone: true } });
-  assert.equal(w.playerLook, null);
-  assert.equal(w.flags.introDone, true);
-});
-
-test('v1 migration respects an explicit chestOpen:false', () => {
-  const migrated = migrateSave({ flags: { rulerTaken: true, chestOpen: false } });
-  assert.equal(migrated.flags.chestOpen, false); // present in the save = trusted
-});
-
-test('mid-dive saves land the dive on load — any version', () => {
-  // flag('dove') saves at the plate-touch; W.level increments seconds later at
-  // the dive-cinematic snap. Quit in that window and the save says dove+level 1.
+test('anything except the current payload version is rejected without mutating state', () => {
   for (const payload of [
-    { flags: { dove: true }, level: 1 },                    // v1 shape
-    { v: 2, flags: { dove: true }, level: 1 },              // v2 shape
-    { v: 3, flags: { dove: true }, level: 1 },              // current shape
+    { time: 9, journal: [{ text: 'old' }] },
+    { v: 3, time: 9, readKeys: ['old'] },
+    { v: 1, time: 9 },
   ]) {
-    const w = freshState();
-    applySave(w, payload);
-    assert.equal(w.level, 2, `dive not landed for payload v=${payload.v ?? 1}`);
+    const state = freshState();
+    assert.equal(applySave(state, payload), false);
+    assert.equal(state.time, 7.4);
+    assert.deepEqual(state.notebook.entries, []);
   }
 });
 
-test('an empty/partial payload lands every documented default', () => {
-  const w = freshState();
-  w.time = 12; w.beamAngle = 0.5; // pre-load values the ?? fallbacks should keep
-  applySave(w, {});
-  assert.equal(w.time, 12);
-  assert.equal(w.beamAngle, 0.5);
-  assert.equal(w.tide, 1);
-  assert.equal(w.tideTarget, 1);
-  assert.equal(w.lensPlaced, false);
-  assert.equal(w.stems, 0);
-  assert.deepEqual(w.inventory, []);
-  assert.deepEqual(w.journal, []);
-  assert.deepEqual(w.onceKeys, []);
-  assert.deepEqual(w.readKeys, []);
-  assert.deepEqual(w.dials, [0, 0, 0, 0]);
-  assert.equal(w.level, 1);
-  assert.equal(w.playerPos, null);
-  assert.equal(w.playerLook, null);
-});
-
-test('malformed dials/look reset; regions/flags merges keep new default keys', () => {
-  const w = freshState();
-  applySave(w, {
-    v: 3,
-    dials: [1, 2],                       // wrong length → reset
-    look: [1.5],                         // wrong length → null (fallback facing)
-    regions: { l2seen: true },           // no fragmentsFound in the save
-    flags: { introDone: true },          // sparse flags
+test('malformed current data is normalized at the boundary', () => {
+  const state = freshState();
+  const applied = applySave(state, {
+    v: 2,
+    flags: { introDone: true, valveTurned: 'yes', retiredFlag: true },
+    inventory: ['lens', 'lens', 'retired-item', 4, 'phial'],
+    recDisp: {
+      field_slip: 'kept',
+      closure_notice: 'burned',
+      retired_record: 'carried',
+    },
+    notebook: {
+      entries: [null, { id: 'retired.answer' }, { id: 'evidence.valve' }, { id: 'evidence.valve' }, { nope: true }],
+      hintLevels: { retired: 2, 'surface-circuit': 99, negative: -1, float: 1.5 },
+    },
+    dials: [3, 10, -1, 5],
+    regions: { l2seen: 1 },
+    pos: [1, 'bad', 3],
+    look: [1],
+    disposition: 'invented',
+    endingOutcome: { kind: 'carry', removed: -5 },
   });
-  assert.deepEqual(w.dials, [0, 0, 0, 0]);
-  assert.equal(w.playerLook, null);
-  const w2 = freshState();
-  applySave(w2, { v: 3, look: ['a', 'b'] }); // non-numeric → null
-  assert.equal(w2.playerLook, null);
-  assert.equal(w.regions.l2seen, true);
-  assert.deepEqual(w.regions.fragmentsFound, []); // default key survived the merge
-  assert.equal(w.flags.introDone, true);
-  assert.equal(w.flags.valveTurned, false);       // default flag survived the merge
+  assert.equal(applied, true);
+  assert.deepEqual(state.notebook, {
+    entries: [{ id: 'evidence.valve' }],
+    hintLevels: { 'surface-circuit': 2 },
+  });
+  assert.deepEqual(state.dials, [3, 0, 0, 5]);
+  assert.deepEqual(state.regions, { l2seen: true, l3seen: false, l4seen: false });
+  assert.equal(state.playerPos, null);
+  assert.equal(state.playerLook, null);
+  assert.equal(state.disposition, 'tend');
+  assert.equal(state.endingOutcome, null);
+  assert.equal(state.flags.introDone, true);
+  assert.equal(state.flags.valveTurned, false);
+  assert.equal('retiredFlag' in state.flags, false);
+  assert.deepEqual(state.inventory, ['lens', 'phial']);
+  assert.deepEqual(state.recDisp, { field_slip: 'kept' });
 });
 
-test('a payload from a NEWER build loads best-effort, never wipes', () => {
-  const w = freshState();
-  applySave(w, { v: 99, time: 3.3, level: 2, someFutureField: { deep: true } });
-  assert.equal(w.time, 3.3);
-  assert.equal(w.level, 2);
-});
+test('ending commitment, disposition, and outcome remain one consistent unit', () => {
+  const valid = freshState();
+  valid.disposition = 'carry';
+  valid.endingOutcome = { kind: 'carry', removed: 7 };
+  valid.flags.endingCommitted = true;
+  const validWire = packSave(valid);
+  assert.deepEqual(validWire.endingOutcome, { kind: 'carry', removed: 7 });
+  assert.equal(validWire.flags.endingCommitted, true);
 
-test('the migration chain is contiguous and ends at SAVE_VERSION', () => {
-  // guards the next person who bumps SAVE_VERSION without writing the step
-  let v = 1;
-  for (const m of MIGRATIONS) {
-    assert.equal(m.from, v, 'migration chain has a gap');
-    assert.equal(m.to, v + 1, 'migrations must step one version at a time');
-    v = m.to;
+  for (const payload of [
+    { v: 2, disposition: 'open', endingOutcome: { kind: 'carry', removed: 7 }, flags: { endingCommitted: true } },
+    { v: 2, disposition: 'carry', endingOutcome: null, flags: { endingCommitted: true } },
+    { v: 2, disposition: 'close', endingOutcome: { kind: 'close' }, flags: { endingCommitted: false } },
+  ]) {
+    const state = freshState();
+    assert.equal(applySave(state, payload), true);
+    assert.equal(state.flags.endingCommitted, false);
+    assert.equal(state.endingOutcome, null);
   }
-  assert.equal(v, SAVE_VERSION, 'no migration path reaches SAVE_VERSION');
+
+  const inconsistent = freshState();
+  inconsistent.disposition = 'open';
+  inconsistent.endingOutcome = { kind: 'carry', removed: 3 };
+  inconsistent.flags.endingCommitted = true;
+  const packed = packSave(inconsistent);
+  assert.equal(packed.flags.endingCommitted, false);
+  assert.equal(packed.endingOutcome, null);
+});
+
+test('current save recognition is non-mutating and version-exact', () => {
+  const payload = packSave(freshState());
+  assert.equal(isCurrentSavePayload(payload), true);
+  assert.equal(isCurrentSavePayload({ ...payload, v: 1 }), false);
+  assert.equal(isCurrentSavePayload(null), false);
+});
+
+test('packing cannot expand the contract with accidental runtime state', () => {
+  const state = freshState();
+  state.flags.retiredFlag = true;
+  state.inventory = ['plumb', 'retired-item', 'plumb'];
+  state.recDisp = { transfer_offer: 'filed', mystery: 'carried', field_slip: 'burned' };
+  const payload = packSave(state);
+  assert.equal('retiredFlag' in payload.flags, false);
+  assert.deepEqual(payload.inventory, ['plumb']);
+  assert.deepEqual(payload.recDisp, { transfer_offer: 'filed' });
+});
+
+test('crossing flags never rewrite the saved rung', () => {
+  const state = freshState();
+  assert.equal(applySave(state, { v: 2, flags: { dove: true }, level: 1 }), true);
+  assert.equal(state.level, 1);
+  assert.equal(state.flags.dove, true);
+});
+
+test('hatch flags persist only as one exact solved mechanical state', () => {
+  const solved = freshState();
+  solved.dials = [5, 1, 4, 6];
+  solved.flags.hatchCodeDecoded = true;
+  solved.flags.hatchOpen = true;
+  const wire = packSave(solved);
+  assert.equal(wire.flags.hatchCodeDecoded, true);
+  assert.equal(wire.flags.hatchOpen, true);
+
+  for (const broken of [
+    { dials: [5, 1, 4, 6], flags: { hatchCodeDecoded: true, hatchOpen: false } },
+    { dials: [5, 1, 4, 5], flags: { hatchCodeDecoded: true, hatchOpen: true } },
+  ]) {
+    const state = freshState();
+    assert.equal(applySave(state, { v: 2, ...broken }), true);
+    assert.equal(state.flags.hatchCodeDecoded, false);
+    assert.equal(state.flags.hatchOpen, false);
+  }
 });

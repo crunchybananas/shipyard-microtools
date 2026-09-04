@@ -1,109 +1,191 @@
 # THE ISLAND: ABYME — Walkthrough
 
-A player-facing walk through the intended journey, in plain language — what to do, and *why* each step follows from the last. For the exhaustive tester's guide (debug API, fast-travel, exact flag names, both endings' internals), see **[PLAYTHROUGH.md](PLAYTHROUGH.md)**.
+This is the intended player route. It explains each relationship without reducing
+the buried hatch to a printed combination. The pleasure of that lock is carrying
+observations from the island into the final setting yourself.
 
-> This is a spoiler document. The game is meant to be oblique — if you want to discover it cold, stop here.
+## Before you begin
 
----
-
-## What the game is
-
-You wake on the beach of an island with a lighthouse. There is a study at the lighthouse, and on its table a **model of the whole island** — sea, tower, study, and all. The island wants you to **light the lamp, open the way down, and descend** — level by level into a deeper, dimmer copy of the same island — to find what the light was lit for. At the bottom is a choice. The whole arc is grief becoming **integration**: you do not defeat anything; you go down, you find what was waiting, and you decide whether to carry it back up.
-
-Everything is operated by **touching the world** (clicking the hotspot under your cursor). A few things are **dragged** (the sun crank, the model's lamp housing). The **Journal (J)** is your memory — every discovery writes a line, and *the most recent lines hint at what to do next.* If you are ever lost, **open the journal.**
-
----
-
-## Controls
+Most actions happen by touching the world under the center iris. Two mechanisms
+are dragged rather than clicked: the sun crank and the model lighthouse housing.
 
 | Input | Action |
 |---|---|
-| **Drag** on the view | Look around |
-| **W A S D** | Walk |
-| **Click** | Touch / use the thing under the cursor |
-| **Drag** a hotspot | Only two: the **sun crank** and the **model's lamp housing** |
-| **Click / Space** during a crossing | After the prompt appears, let the descent or climb gather speed |
-| **J** | Journal (your field notes — read this when stuck) |
-| **M** / **C** | Mute · reduced-motion comfort |
-| **Esc** | Close reader / journal |
+| Drag the view | Look |
+| `W A S D` | Walk |
+| Click | Touch or use the centered hotspot |
+| Drag a mechanism | Move the sun crank or lighthouse beam |
+| `J` | Open or close Field Notes |
+| `M` | Mute |
+| `C` | Toggle reduced motion |
+| `Esc` | Close an open reading surface or Field Notes |
 
----
+Field Notes contain only observations you have earned. They do not silently tell
+you what to do next. If you want help, open them and choose **Trace a lead**. Each
+request reveals one more step from a thread supported by your evidence.
 
-## The journey
+## 1. Learn what the model controls
 
-### 0. Wake on the beach
-You start on the south beach. There's a **bottle** with a note near where you wake (read it). Walk to the **lighthouse** — it's the obvious landmark — and go into the **study**.
+Walk from the beach to the lighthouse study. The table holds a working model of
+the entire island.
 
-### 1. The study's three tools (touch them in any order)
-The study is your control room. On and around the chart table:
-- **The valve** — turning it **drains the bay** (and refills it). Drain the sea to expose things the tide is hiding (a chest out on the flats, a stone causeway, a drowned gallery). Turn it now; you'll want the chest later.
-- **The sun crank** — **drag** it to turn the hours. This is your clock: you'll need **dawn**, **golden hour**, and **night** for three different beats. Whenever a step "doesn't happen," you're usually at the wrong time of day.
-- **The music box** — plays five notes (**E · G · A · D · C**). Remember the tune. It's *almost* right — the island will correct it.
+Touch or operate the three obvious instruments:
 
-### 2. The stones (the lens chain)
-1. **Crank to dawn.** Go out to the **ring of standing stones** on the islet. Stand near them and **wait** — a bird sings the music box's tune, but it **bends the fourth note up**: **E · G · A · G · C**. The bird corrects the box.
-2. **Play that corrected tune on the stones.** Each stone is a note; click them in the bird's order. You can play the whole sequence **from one spot** where all five are in view — you don't have to walk up to each one. Get it right and the **outcrop vault slides open**.
-3. **Take the lens** from the open vault.
+- Turn the **brass valve**. The model basin and real bay fall together.
+- Drag the **sun crank**. The model lamp pulls the real sun through the day.
+- Open the **music box** and listen to its five notes. One tooth looks worked over.
 
-> **★ This is where most people get stuck. The lens is not the prize — it's a key.** It's a lighthouse lamp's eye. **Carry it back to the study and lean in close over the tiny model lighthouse's lamp room, and touch it there.** (The journal entry you just earned says exactly this.) That sets the real lighthouse's lamp.
+Look closely at the model. Its moving point corresponds to where you are standing
+outside. This is the game's grammar: fit or alter something at model scale, then
+look for the full-sized consequence.
 
-### 3. Light the beam, read the cliff (optional but illuminating)
-With the lens set, **crank to night** — the lamp lights. **Drag the model's lamp housing** to swing the real beam across the sea cliff; when it lands, the cliff shows **four glyphs**. These are a **hint for the hatch code** below. (You can skip this — the code can be dialed without it — but it's the intended "aha.")
+## 2. Raise the eastern bridge
 
-### 4. The chest, the ruler, the bridge (the way down begins)
-This chain runs in parallel with the stones and is the one that actually **opens the route to the descent**:
-1. With the **tide drained**, walk out to the **chest** on the flats and open it — take the **brass ruler**.
-2. Back in the study, **lean over the model's cracked chasm and lay the ruler across it.** A real **brass bridge** rises out east, spanning the gap — your land route to the **bluff**.
-3. Cross the bridge to the bluff. **Crank to golden hour** — the low sun reveals a patch of **troubled sand**. Touch it: a **buried hatch** slides clear, sealed by **four glyph dials.**
-4. **Dial the code** the cliff glyphs showed you (**3 · 7 · 1 · 5**). The hatch opens.
-5. Go down into the cellar and take the **plumb bob**. (The journal notes: *the chart table has a hook.*)
-6. Back in the study, **look up at the hook over the table and hang the plumb.** It swings dead-center over the model's beach — over a **brass plate set in the floor.** The plate is now live.
+Leave the tide drained and return toward the flats. The low water exposes a
+half-buried chest. Open it, then touch it again to take the brass ruler.
 
-### 5. The descent
-**Stand on the brass plate** (you have to be right on its center) and touch it. The first touch is the **brink** — a warning. Touch again to **commit**, and you dive one level deeper, waking on the same beach in a dimmer copy of the island.
+Back in the study, lay the ruler across the crack in the table model. A full-sized
+measured bridge rises across the eastern chasm. You will need it to reach the
+bluff, but there is more to learn before its buried lock can open.
 
-**Repeat the dive.** There are **four levels total**; from the surface, that's **three dives down** to the bottom. Each arrival revisits somewhere you know and changes what it means:
-- **One down — the shallows:** the wake-up shore has become a drowned **kelp forest**, with fish-shadows drifting over it. A soft dark figure stands among the fronds — the **Tide-Figure**. Don't wade at it (it scatters like silt); **stand still and watch**, and it settles and lets go. The keeper's quarters are open now: a coat still warm, footprints your size, a journal on the cot, and a **bell** in the annex. A wax slate is tangled in the kelp.
-- **Two down — the inspection years:** you return to higher ground above that same shore and watch the **drowned hall rise through the water**. The keeper speaks when you arrive. A **Watcher** walks in from the deep shore; hold it in your gaze rather than running. The keeper's cairn waits across the ruler-bridge on the bluff.
-- **Three down — the bottom:** the study is cold and far, and a note weighted with stone lies near the table. There is nowhere deeper; the plate only goes **up** now. Approach the tiny keeper on the model to make the turn.
+## 3. Earn the lighthouse lens
 
-### 6. The bottom (the turn)
-At the bottom, **walk up to the tiny keeper figure on the chart-table model** — don't click, just approach. It turns, **rises** toward you, and speaks: *"There you are. I've been coming down for you."* That's the turn the whole descent was for. After this, you can choose your ending.
+Use the crank to bring the island to dawn, then go to the standing stones. Wait
+near the ring and listen for the bird. It repeats the music-box phrase with one
+important correction: the fourth note rises instead of falling.
 
----
+Play the corrected five-note phrase on the stones. You can stand where the whole
+ring is visible and touch them in sequence. A wrong note simply clears the phrase;
+listen again and retry. The correct phrase opens the outcrop vault.
 
-## The two endings
+Take the lens and carry it to the table model. Fit it into the miniature
+lighthouse, not the full-sized tower. At night the real lamp now burns.
 
-### The Oar — return, changed
-1. After the turn, step onto the plate. Now it **carries him up with you** (touch to arm, touch again to commit — this is the embrace / integration).
-2. **Climb out** — touch the plate at each level until you reach the surface. Reaching the top **arms the oar.**
-3. Walk to the **dory** on the beach and touch the **oar** twice. You row off; the island shrinks behind you. *"You left the light on."*
+## 4. Make the signal readable
 
-### The Bell — stay, keep the light
-- A **bell** appears two levels down, near the study. Ring it to end.
-- At the **bottom**, the bell is **locked until the turn** has happened. After it, ringing keeps the light lit and ends there.
-- The ending's tone shifts by how deep you ring it — deep is a held, starless hush (*"you keep the light now"*); shallower keeps the full golden-hour, starlit close (*"the tide brought you back"*).
+This is a physical deduction routed across several objects.
 
-Both endings are final. The only way back is **Begin again.**
+First, set night with the sun crank. Drag the miniature lighthouse housing until
+the full beam crosses the marked cliff. Watch the beam return **four figures in an
+order**. Field Notes remember that an ordered signal was observed, but do not
+replace looking at it.
 
----
+Second, inspect the shelf of **eight signal manuals** in the study. Each spine
+binds one of the same figures to a named working instrument. No spine prints a
+value, and the shelf does not select or order four of them.
 
-## Optional discoveries (the world is deeper than the main path)
+Now combine the sources:
 
-None of these gate the ending — they're the story unfolding as you explore:
-- **Readable fragments** — found in any order: the bottle note (beach), a stone inscription (jetty), the **keeper's logbook** (study), a **letter on the coat** and a **journal on the cot** (down a level or two), and a **hidden marker on each dive-level** — a wax slate in the L2 kelp, a cairn on the L3 bluff, a note on the cold floor at the bottom. Each one read adds a line to your journal.
-- **The deep readings** — the keeper wrote some things that only surface *the deeper you go*. Re-read the **logbook**, the **cot-journal**, the **standing stone**, and the **music-box note** from far enough down and each gives up a colder, truer page — your journal keeps a tally (*"N of 4 read from the deep"*). Read all four and they close into one understanding: you were always both the one who went down and the one who kept the light. (The unsent letter and the bottle note hide deeper pages too.)
-- **The reading glass** — on the islet. Take it, and faint **lampblack marks** you couldn't see before surface — one in the study, one high on a stone. The keeper wrote the true things small.
-- **Vistas** (just look, no click): the **drowned gallery** when the tide is out; the **inverted vault** through the cellar's east window; **the room that disagrees** at the west window — a second study whose model floods *opposite* to your tide.
-- **The Watcher** (two levels down): a figure on the deep shore that drifts toward you when you look away and freezes when you look at it. **Don't run.** Hold it in your gaze for a few seconds — *regard* it — and it lifts its head, lets go, and rises away as a small cold light. Some things down there only want to be seen.
+1. Start with the first figure written by the beam.
+2. Find that figure on a spine and follow its instrument name back into the world.
+3. Take the unambiguous count already exposed by that instrument’s construction.
+4. Repeat for the remaining three figures without changing their order.
 
----
+The selected route passes through the five-ring tide staff, the lighthouse’s single
+lens eye, the music cylinder’s fourth filed tooth, and all six stones in the arc.
+Those four physical readings are the hatch setting.
 
-## If you're stuck — the short version
+## 5. Reveal and open the buried hatch
 
-1. **Open the journal (J).** The last entries always hint at the next move.
-2. **Wrong time of day** is the most common block — crank to **dawn** (bird), **golden hour** (hatch), **night** (lamp).
-3. **The lens from the stones goes into the model's lamp room** — back in the study, lean in close over the little lighthouse and touch it.
-4. **The ruler from the chest goes over the model's crack** — that raises the bridge to the bluff, where the descent begins.
-5. **Drain the tide** (valve) to reach the chest.
-6. Everything funnels to the **brass plate** on the study floor. To light it up: set the lens, raise the bridge, open the hatch (code **3·7·1·5**), take the plumb, hang it on the hook.
+Cross the ruler bridge to the eastern bluff. Use the crank to reach golden hour.
+Low light catches a patch of troubled sand; touch it to uncover the hatch and its
+four decimal rings.
+
+The rings always turn once uncovered. Set them to the four readings derived from
+the beam, the instrument index, and the instruments themselves. Read the rings left
+to right in the beam’s order. The hatch opens only on the complete physical answer.
+
+Descend into the cellar and take the plumb bob. Return to the study and hang it on
+the hook above the table. It comes to rest over the model beach, aligned with the
+brass plate in the floor.
+
+## 6. Cross the surface threshold
+
+Stand on the center of the plate and touch it. A first touch arms the crossing; a
+second commits it. Stepping away lets the vibration settle.
+
+The surface plate requires the complete causal path, not merely its last flag. If
+it stays cold, check that you have actually:
+
+- turned the valve and used the sun crank;
+- raised the ruler bridge;
+- heard both the music box and dawn bird, then solved the stones;
+- fitted the lens and observed the beam figures;
+- read the eight-volume instrument index and followed its selected bindings;
+- revealed and opened the hatch;
+- taken and hung the plumb.
+
+The crossing wakes you on the same island one stratum lower. From here on, each
+level asks for evidence found in that changed world before the plate will answer.
+
+## 7. The shallows
+
+The water is higher and kelp crosses the old route.
+
+Return to the study and touch the valve. It is mechanically dead here, but the act
+performed above is still connected. Stay near it long enough to witness the
+transfer travel from model to room to bay.
+
+Find the Tide-Figure among the flooded growth. Chasing it muddies the water and
+makes it disperse. Keep it in view, stop moving, and wait. A wax slate in the kelp
+records the same contrast if you want a diegetic clue.
+
+When Field Notes contain both observations, stand on the plate and touch twice to
+descend again.
+
+## 8. The inspection stratum
+
+The drowned hall has breached the water and a Watcher moves along the shore.
+
+Return to the study and remain beside the chart table until the register finishes
+counting the hands that have worked above. This is a timed observation, not a
+button.
+
+Then meet the Watcher. It advances when your attention leaves it and freezes under
+your gaze. Face it continuously for a few seconds. Do not trade sight for distance.
+When it resolves and the register is recorded, the plate accepts another two-touch
+descent.
+
+## 9. The source and the Lower Hand
+
+At the bottom, the instruments no longer behave as surface conveniences. Look
+closely at the wet line, the changed study, and the smaller figure below.
+
+The Lower Hand is not an object to collect and not a disguised player. Regard it:
+move close enough to see it clearly, face it, then become still. Hold that attention
+until the encounter settles.
+
+A brass index beside the plate now exposes four positions. Touch it once to select
+**tend**; subsequent touches cycle **carry**, **open**, and **close**. The choice is
+physical and visible. None is labeled good or bad:
+
+- **tend** leaves the current transfer in place;
+- **carry** reverses this hand's accumulated interventions;
+- **open** joins the upper and lower basins;
+- **close** seals the boundary between them.
+
+Choose one, then use the plate twice. At the bottom the arrows point upward.
+
+## 10. Return and commit
+
+Continue using the plate twice at each stratum. The ascent is now one-way; the game
+does not ask you to replay solved surface puzzles while climbing.
+
+When you return to the original beach, revisit the study. Stand on the same brass
+plate. The first touch names the selected setting; the second commits it to the
+persistent stack and begins the ending.
+
+The bell can still be rung and the returned oar can still be lifted. They are
+world instruments, not alternate exits. The plate is the sole ending threshold.
+
+## Optional discoveries
+
+Readable records, markings revealed by the reading glass, the drowned gallery,
+the inverted vault, shore writing, the quarters, and the room that disagrees add
+context without substituting for the required evidence. Some surfaces expose a
+deeper page on lower strata. Field Notes record each page only when you actually
+reach it.
+
+If you are lost, do not search for a generic objective marker. Open Field Notes,
+review what is observed, and request **Trace a lead** only when you want the island
+to narrow the next relationship.

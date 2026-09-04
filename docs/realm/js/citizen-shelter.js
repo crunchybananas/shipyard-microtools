@@ -4,26 +4,26 @@
 // only coordinates the citizen activity/path fields needed to physically
 // reach, enter, and leave that owned home.
 
-import { G, MAP_H, MAP_W, getDayPeriod, rngInt } from './state.js?realm=197';
+import { G, MAP_H, MAP_W, getDayPeriod, rngInt } from './state.js?realm=198';
 import {
   assignCitizenResidence,
   citizenAtResidencePortal,
   citizenHasValidResidence,
   residencePortalForCitizen,
-} from './residences.js?realm=197';
-import { setCitizenActivity } from './citizen-activity.js?realm=197';
+} from './residences.js?realm=198';
+import { setCitizenActivity } from './citizen-activity.js?realm=198';
 import {
   blacklistCitizenTarget,
   citizenTargetIsBlacklisted,
   clearCitizenPath,
   pathCitizenTo,
-} from './citizen-navigation.js?realm=197';
-import { citizenIdleLoiterTarget } from './citizen-work.js?realm=197';
+} from './citizen-navigation.js?realm=198';
+import { citizenIdleLoiterTarget } from './citizen-work.js?realm=198';
 
 const RAID_SHELTER_INTERRUPTIBLE = new Set([
   'idle', 'find_job', 'walk_to_work', 'working', 'foraging', 'eating',
   'walk_to_eat', 'waiting_for_food', 'go_home', 'sleep', 'leisure',
-  'seek_shelter', 'flee',
+  'seek_shelter', 'flee', 'needs_delivery',
 ]);
 
 const DELIVERY_OBLIGATION_ACTIVITIES = new Set([
@@ -31,11 +31,16 @@ const DELIVERY_OBLIGATION_ACTIVITIES = new Set([
 ]);
 
 export const CITIZEN_NIGHT_EXEMPT_ACTIVITIES = new Set([
-  'sleep', 'go_home', 'walk_to_deliver', 'deliver', 'needs_delivery',
+  'sleep', 'go_home', 'walk_to_deliver', 'deliver',
   'walk_to_eat', 'eating',
 ]);
 
 function citizenHasDeliveryObligation(citizen) {
+  if (
+    citizen.activity.kind === 'needs_delivery'
+    && !citizen._deliveryTarget
+    && !G.buildings.includes(citizen.assignment?.building)
+  ) return false;
   return !!(citizen.carrying && citizen.carryAmount > 0)
     || DELIVERY_OBLIGATION_ACTIVITIES.has(citizen.activity.kind);
 }

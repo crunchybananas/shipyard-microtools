@@ -8,24 +8,40 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import {
   W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight,
   isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH,
-  LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, hands, evidence, writings,
-  recordWriting, sanitizeWriting, clearStack, disposeStack, syncStack, isShared,
+  LEVELS, TIDE_DROP, HAND, ledger, draft, tideAt, effectiveTideAt, hands, evidence, writings,
+  recordAct, recordWriting, sanitizeWriting, clearStack, disposeStack, syncStack, onStackSync, isShared,
   handId, LOCAL_STACK,
 } from './world.js';
-import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates } from './terrain.js';
-import { buildWorld, instantiateModel, collectRefs, NAMES, SHELF_MARKS, SHELF_STATS, spineAtlas } from './props.js';
+import { SPOTS, heightAt, walkableY, wallBlocked, colliders, GATES, syncGates, VAULT_OUTCROP } from './terrain.js';
+import {
+  buildWorld, instantiateModel, collectRefs, NAMES,
+  SHELF_BINDING_MARKS, SIGNAL_BINDINGS, BEAM_GLYPHS, HATCH_CODE,
+} from './props.js';
 import { RELIEF } from './assets.js';   // relief asked-vs-applied, for tools/harness/relief.mjs
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
 import { UI } from './ui.js';
-import { KEEPER, T, finaleCoda, SHELF_TITLES } from './content.js';
+import { Notebook } from './notebook.js';
+import { SAVE_KEY, SAVE_FLAG_DEFAULTS, packSave } from './save-schema.js';
+import {
+  REPORT_VERSION, REPORT_THUMBNAIL_MAX_CHARS, OBSERVATION_ONLY, observationOnly, parseFieldReport,
+  parseReplayReport, stablePlayReplay,
+} from './report-schema.js';
+import { KEEPER, T, finaleCoda, LORE } from './content.js';
+import {
+  FINALE_KINDS, finaleTableau, sampleFinaleTableau,
+} from './finale-tableaux.js';
 import A from './audio.js';
 import { Baker, mergeGeometries, clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED, addDrive, runDrives } from './util.js';
 
 const canvas = document.getElementById('scene');
 const DEBUG = new URLSearchParams(location.search).has('debug');
+// Mutation tools are a local playtest surface, never part of the public game.
+// Field reports remain available everywhere; state-changing shortcuts require
+// both an explicit debug URL and the isolated local ledger.
+const DEBUG_MUTATIONS = DEBUG && LOCAL_STACK;
 
 // ?diag — surface render/shader errors + the GPU string ON-SCREEN, so a machine that renders black
 // can be diagnosed without ever opening the dev console (the black-screen box couldn't be reproduced
@@ -258,7 +274,7 @@ addDrive((w) => w.atTop, (dt, elapsed) => {
   // the foreshadow ring shows the NEXT rung's real waterline — including the draft
   // your own work on this one has already put there. The vista from the top is the
   // first place the law is visible: you can see what you are about to leave someone.
-  const nextTide = tideAt(Math.min(W.level + 1, MAX_DEPTH));
+  const nextTide = effectiveTideAt(Math.min(W.level + 1, MAX_DEPTH));
   foreshadow.position.y = -TIDE_DROP * (1 - nextTide) + 0.06;
   foreshadow.material.opacity = 0.30 + Math.sin(elapsed * 0.9) * 0.08;
 });
@@ -631,6 +647,16 @@ const crowGeo = (() => {
   ]);
 })();
 
+// The merged body includes the feet, so its actual bounding box is the only honest
+// ground-contact datum. Root each species by its sole instead of burying the toes at
+// y=terrain and then disguising the error with a whole-body hover.
+gullGeo.computeBoundingBox();
+crowGeo.computeBoundingBox();
+const BIRD_SOLE = {
+  gull: -gullGeo.boundingBox.min.y,
+  crow: -crowGeo.boundingBox.min.y,
+};
+
 // ---------------- perched shore gulls ----------------
 // gulls resting on the south shingle — the first life you meet at the wake-up beach. They startle and
 // flush off when you come close, and settle back once you've moved on. Static when perched (verifiable);
@@ -650,10 +676,10 @@ const perched = [];
     const z = -98 - rngP() * 22;
     const h = heightAt(x, z);
     if (h < 0.25 || h > 2.2) continue;       // dry shingle above the waterline only
-    const g = mk();
-    g.position.set(x, h, z);
+    const g = mk(), py = h + BIRD_SOLE.gull;
+    g.position.set(x, py, z);
     g.rotation.y = (rngP() - 0.5) * 1.7;     // facing roughly seaward (yaw 0 = −z), spread
-    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngP() * TAU, flush: 0, cool: 0, species: 'gull' };
+    g.userData = { px: x, py, pz: z, groundY: h, yaw: g.rotation.y, ph: rngP() * TAU, flush: 0, cool: 0, species: 'gull' };
     scene.add(g);
     perched.push(g);
     placed++;
@@ -679,10 +705,10 @@ const perched = [];
     const h = heightAt(x, z);
     if (h < 2.0 || h > 12) continue;                                          // inland dune / tree line, dry
     if (Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 14) continue;
-    const g = mkCrow();
-    g.position.set(x, h, z);
+    const g = mkCrow(), py = h + BIRD_SOLE.crow;
+    g.position.set(x, py, z);
     g.rotation.y = rngC() * TAU;
-    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngC() * TAU, flush: 0, cool: 0, species: 'crow' };
+    g.userData = { px: x, py, pz: z, groundY: h, yaw: g.rotation.y, ph: rngC() * TAU, flush: 0, cool: 0, species: 'crow' };
     scene.add(g);
     perched.push(g);
     pc++;
@@ -692,16 +718,48 @@ const perched = [];
 // ---------------- actors ----------------
 const player = new Player(camera, canvas);
 const interact = new Interactions(camera, player, canvas);
+const notebook = new Notebook(W, (change) => {
+  save(player);
+  UI.notebookChanged?.(change);
+});
 const game = new Game({
-  refs, modelRefs, modelAnchor, interact, player,
+  refs, modelRefs, modelRoot, modelAnchor, interact, player, notebook,
   onDive: startDive,
   onAscend: () => startAscent(false),  // #12 stage 2: the in-play way UP
-  onFinale: startFinale,               // the bell — descent terminal (at the bottom)
-  onLeave: startOarFinale,             // the oar — integration terminal (at the surface, #22)
+  onEnding: commitEnding,
   onClimb: (up) => startClimb(up),     // hub Phase B: the lamp-room climb
 });
 
-UI.init();
+// Enter a rung from the offline mirror immediately, then reconcile a shared pull
+// without freezing the crossing. The effective tide includes any already-spent L2
+// Upstream Hand, so a late stranger can add draft without erasing the spectacle's
+// permanent rise. `snap` is for a crossing; Continue keeps the saved water and only
+// moves monotonically toward newly arrived work.
+function pullStackAt(level, { snap = false } = {}) {
+  const localTide = effectiveTideAt(level);
+  if (snap) W.tide = W.tideTarget = localTide;
+  else if (localTide > W.tideTarget + 1e-6) W.tideTarget = localTide;
+  return syncStack(level);
+}
+
+// Every completed pull reports here—including world.js's eager Firebase upgrade,
+// which may finish after Continue. One reconciliation path keeps evidence, tide,
+// persistence, and the no-swimming arrival invariant in lockstep.
+onStackSync(() => {
+  // The ledger mirror is global, so an older rung's pull can still bring in work
+  // inherited by the rung the player occupies now. Always reconcile CURRENT state;
+  // filtering by the originally requested rung makes out-of-order shared reads stale.
+  const level = W.level;
+  game.refreshStack();
+  const sharedTide = effectiveTideAt(level);
+  if (sharedTide <= W.tideTarget + 1e-6) return;
+  const safe = spawnAboveWater(player.pos.clone(), player.eye, sharedTide);
+  if (safe.distanceToSquared(player.pos) > 1e-6) player.spawn(safe, player.yaw, player.pitch);
+  W.tideTarget = sharedTide;                    // shared cost arrives; it never recedes
+  save(player);
+});
+
+UI.init({ notebook });
 
 // ---------------- settings (#59): the keeper's instruments, adjusted ----------------
 // Device preferences, not save state (like abyme-muted): look speed, invert-Y, volume,
@@ -760,6 +818,42 @@ let MODE = 'title';
 let intro = null;
 let dive = null;
 let finale = null;
+let climbTimer = null;
+let introSkip = null;
+const introTimers = new Set();
+const runTimers = new Set();
+
+function scheduleIntro(callback, delayMs) {
+  const timer = setTimeout(() => {
+    introTimers.delete(timer);
+    callback();
+  }, delayMs);
+  introTimers.add(timer);
+  return timer;
+}
+
+function cancelIntro() {
+  intro = null;
+  for (const timer of introTimers) clearTimeout(timer);
+  introTimers.clear();
+  if (introSkip) canvas.removeEventListener('pointerdown', introSkip);
+  introSkip = null;
+  scene.remove(spray);
+}
+
+function scheduleRun(callback, delayMs) {
+  const timer = setTimeout(() => {
+    runTimers.delete(timer);
+    callback();
+  }, delayMs);
+  runTimers.add(timer);
+  return timer;
+}
+
+function clearRunSchedule() {
+  for (const timer of runTimers) clearTimeout(timer);
+  runTimers.clear();
+}
 
 const titleEl = document.getElementById('title-screen');
 const btnBegin = document.getElementById('btn-begin');
@@ -767,18 +861,30 @@ const btnContinue = document.getElementById('btn-continue');
 const titleActions = document.getElementById('title-actions');
 const beginConfirm = document.getElementById('begin-confirm');
 
+function dismissTitle(instant = false) {
+  titleEl.setAttribute('aria-hidden', 'true');
+  titleEl.inert = true;
+  if (instant) {
+    titleEl.style.display = 'none';
+    return;
+  }
+  titleEl.classList.add('fading');
+  setTimeout(() => { titleEl.style.display = 'none'; }, 2500);
+}
+
 if (hasSave()) btnContinue.classList.remove('hidden');
 
 btnBegin.addEventListener('click', () => {
-  // a fresh start discards any old save — and Begin sits one pixel from Continue, so that
+  // A fresh start discards the current run — and Begin sits one pixel from Continue, so that
   // is never a single click (#56): with a save present, swap the menu row for a confirm
-  // beat first. The eventual wipe() stashes the outgoing payload one slot deep
-  // (SAVE_KEY_PREV) as a last-resort undo.
+  // beat first.
   if (hasSave()) {
     titleActions.classList.add('hidden');
     beginConfirm.classList.remove('hidden');
     return;
   }
+  wipe();
+  resetRunState({ persist: false });
   beginIntro();
 });
 document.getElementById('btn-begin-back').addEventListener('click', () => {
@@ -789,30 +895,36 @@ document.getElementById('btn-begin-confirm').addEventListener('click', () => {
   // W is still at its defaults on the title screen, so begin IN PLACE — the old
   // wipe()+reload bounced the page and flashed the title back up for a beat ("a second
   // window that just says Begin, then fades"); no reload is needed here.
-  wipe();        // world.js stashes the outgoing save under SAVE_KEY_PREV before clearing
+  wipe();
+  resetRunState({ persist: false });
   beginIntro();
 });
 btnContinue.addEventListener('click', () => {
   A.init();
   if (load()) {
+    // The source may have become shared while the title waited. Reconcile the
+    // saved rung now; boot's eager pull necessarily ran against the default L1.
+    pullStackAt(W.level);
     // stems restore from the flags that earned them, not a counter
     const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen', 6: 'keeperSong' };
     for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
-    titleEl.classList.add('fading');
-    const pos = W.playerPos || new THREE.Vector3(4, 0, -104);
-    // the facing persists too (#58): [yaw, pitch] from the save, falling back
-    // to the historical hardcoded beach facing for pre-v3 saves.
+    dismissTitle();
+    const savedPos = W.playerPos || new THREE.Vector3(4, 0, -104);
+    const pos = W.tideTarget > 1
+      ? spawnAboveWater(savedPos.clone(), player.eye, W.tideTarget)
+      : savedPos;
+    // Facing persists as [yaw, pitch], with the beach arrival as the clean fallback.
     let [yaw, pitch] = W.playerLook || [2.72, 0];
-    // a save written below the drained-tide line predates the basin rim
-    // block — those spots have no walkable exit; the tide returns you
-    // (and the saved facing is meaningless at the fallback spot)
+    // If a player quits while standing on terrain later covered by their saved
+    // tide, resume at the beach instead of inside an unwalkable basin.
     if (heightAt(pos.x, pos.z) < -2.2) { pos.set(4, 0, -104); yaw = 2.72; pitch = 0; }
     player.spawn(pos, yaw, pitch);
     player.locked = false;
     interact.enabled = true;
     MODE = 'play';
     UI.fadeIn();
-    UI.showHint();
+    if (W.flags.endingCommitted) commitEnding(W.disposition);
+    else UI.showHint();
   }
 });
 
@@ -851,47 +963,55 @@ function rehydrateFromReport() {
   // runs AFTER that assignment (see the call site at the end of the module).
   const G = window.ABYME;
   if (!G || !G.applyReport) { console.warn('[abyme] ?report= ran before the game was ready'); return false; }
-  titleEl.style.display = 'none';        // no title flash, no Begin gate
-  A.init();                              // audio
+  A.init();                              // stems restore only after audio exists
+  let out;
+  try {
+    out = G.applyReport(rep);             // save, stems, level, pose — all of it
+  } catch (error) {
+    offerImport(q, ring.length, error.message, rep);
+    return false;
+  }
+  dismissTitle(true);                    // no title flash, no Begin gate
   UI.fadeIn();
-  const out = G.applyReport(rep);        // save, stems, level, pose — all of it
   UI.showHint();
-  if (rep.state && rep.state.time !== undefined) W.time = rep.state.time;
   console.log('[abyme] rehydrated report', rep.t, out);
-  if (rep.note) setTimeout(() => UI.whisper('Back at: ' + rep.note), 900);
+  if (rep.note) scheduleRun(() => UI.whisper('Back at: ' + rep.note), 900);
   return true;
 }
 
-if (sessionStorage.getItem('abyme-autostart')) {
-  sessionStorage.removeItem('abyme-autostart');
-  titleEl.style.display = 'none';   // a replay reload ('begin again') must not flash the title
-  beginIntro(true);
-}
-
 function beginIntro(instant = false) {
+  cancelIntro();
+  scene.add(spray);
   A.init();
   // let the title hold a breath over the first seconds of sea (skipped on a replay reload,
   // where the title is already hidden — no second "Begin" flash)
-  if (!instant) setTimeout(() => titleEl.classList.add('fading'), 1400);
+  if (!instant) scheduleIntro(() => dismissTitle(), 1400);
   UI.cinematic(true);
   UI.fadeIn();
+  // The ledger outlives a run. An OPEN boundary can carry a bounded amount of
+  // deeper water back to the surface, so Begin enters the current stack rather
+  // than silently restoring an authored dry island.
+  pullStackAt(1, { snap: true });
   setIntroLanding();        // aim the approach to land exactly on the standing frame
   MODE = 'intro';
   intro = { t: 0, dur: 19 };
-  const skip = () => { if (intro) intro.t = intro.dur; canvas.removeEventListener('pointerdown', skip); };
+  introSkip = () => {
+    if (intro) intro.t = intro.dur;
+    canvas.removeEventListener('pointerdown', introSkip);
+    introSkip = null;
+  };
   // #61: on a replay ('begin again') the viewer has seen the approach — arm the skip
   // instantly; a first-time viewer still gets a 1.5s guard against an accidental tap
-  setTimeout(() => canvas.addEventListener('pointerdown', skip), instant ? 0 : 1500);
+  scheduleIntro(() => { if (introSkip) canvas.addEventListener('pointerdown', introSkip); }, instant ? 0 : 1500);
   // #61: the skip was undiscoverable — say it once, early, in the whisper voice
-  setTimeout(() => { if (intro && intro.t < intro.dur - 4) UI.whisper(T.click_and_the_sea); }, 4000);
+  scheduleIntro(() => { if (intro && intro.t < intro.dur - 4) UI.whisper(T.click_and_the_sea); }, 4000);
 }
 
 function endIntro() {
-  intro = null;
+  cancelIntro();
   MODE = 'play';
-  scene.remove(spray);
   UI.cinematic(false);
-  player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); // == the flight's final frame: no cut
+  player.spawn(introLanding, SPAWN_YAW, SPAWN_PITCH); // == the flight's final frame: no cut
   player.locked = false;
   interact.enabled = true;
   UI.whisper(T.the_tide_brought_you);
@@ -943,6 +1063,9 @@ function armTravelHurry(run, label) {
 }
 
 function startDive() {
+  // The crossing supersedes any live room-scale answer before the island begins
+  // its 240x transform; keep the consequence, withhold its later copy.
+  game.resolveUpstreamHand({ reveal: false });
   MODE = 'dive';
   player.locked = true;
   interact.enabled = false;
@@ -964,6 +1087,28 @@ function startDive() {
   };
   armTravelHurry(dive, 'click or press Space to let the tide hurry');
   UI.whisper(T.down_is_the_only);
+}
+
+function completeDescent() {
+  if (W.level >= MAX_DEPTH) return false;
+  // The shared act and the local world commit together at landing. Until this
+  // point the cinematic is cancellable and must not leave a phantom rung behind.
+  recordAct('dive', player);
+  W.level += 1;
+  W.flags.dove = true;
+  pullStackAt(W.level, { snap: true });
+  if (W.level >= 2) W.regions.l2seen = true;
+  if (W.level >= 3) W.regions.l3seen = true;
+  if (W.level >= 4) W.regions.l4seen = true;
+  const L = LEVELS[W.level];
+  player.spawn(
+    spawnAboveWater(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2])),
+    L.spawn.yaw,
+    L.spawn.pitch,
+  );
+  notebook.record({ 2: 'arrival.shallows', 3: 'arrival.inspection', 4: 'arrival.source' }[W.level]);
+  save(player);
+  return { level: W.level, id: L.id, region: L.region, tide: W.tideTarget, encounter: L.encounter };
 }
 
 function tickDive(dt) {
@@ -991,22 +1136,7 @@ function tickDive(dt) {
     dive.snapDone = true;
     diveGroup.scale.setScalar(1);
     diveGroup.position.set(0, 0, 0);
-    W.level = Math.min(W.level + 1, MAX_DEPTH); // one recursion deeper each dive
-    // SEA-STRATA: drop into THIS level's place — its spawn + raised tide (the same island, drowned further)
-    const L = LEVELS[W.level];
-    // Pull whoever is above this rung (a no-op offline, and never awaited — the
-    // draft and the evidence re-read the ledger, so strangers appear when they land)
-    syncStack(W.level);
-    // THE DRAFT (STACK.md §3.2): the rung's authored waterline PLUS everything the
-    // rungs above displaced onto it. Solve the surface efficiently and you land in
-    // a puddle; brute-force the whole chain and they inherit a flood — same island,
-    // same puzzles, less of it above water.
-    if (W.level > 1) W.tide = W.tideTarget = tideAt(W.level);
-    if (W.level >= 2) W.regions.l2seen = true;
-    if (W.level >= 3) W.regions.l3seen = true;
-    if (W.level >= 4) W.regions.l4seen = true;
-    save(player);
-    player.spawn(spawnAboveWater(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2])), L.spawn.yaw, L.spawn.pitch);
+    completeDescent();
   }
   if (f >= 1) {
     dive.hurryCleanup?.();
@@ -1019,7 +1149,7 @@ function tickDive(dt) {
     interact.enabled = true;
     UI.cinematic(false);
     UI.fadeIn(false);
-    setTimeout(() => document.getElementById('curtain').classList.remove('white'), 800);
+    scheduleRun(() => document.getElementById('curtain').classList.remove('white'), 800);
     beginVista(W.level);   // #135: the first sighting holds (re-locks briefly; skippable)
     // the same island, more drowned each time — the sameness is the wound
     UI.whisper({
@@ -1027,18 +1157,11 @@ function tickDive(dt) {
       3: 'The same sand — the colour going out of it.',
       4: 'The same room, gone cold and far. Below it, a light still burns.',
     }[W.level] || 'Down, and down.');
-    if (W.level === 2) setTimeout(() => UI.whisper(T.somewhere_above_a_door), 6000);
-    // from level 3 down, the keeper answers your arrival — the first 'I' in the
-    // game: a drowned voice under the floor, his words in quotes (#14)
-    if (W.level >= 3) setTimeout(() => {
-      A.say(W.level >= 4 ? 'keeper_arrive_deep' : 'keeper_arrive_shallow', W.level >= 4 ? 'resigned' : 'curious');
+    // From level 3 down a separate hand answers. It never tells the player who
+    // either figure is; the physical stack remains larger than one biography.
+    if (W.level >= 3) scheduleRun(() => {
+      A.keeperVoice(W.level >= 4 ? 'resigned' : 'curious');
       UI.whisper(W.level >= 4 ? KEEPER.arrive.deep : KEEPER.arrive.shallow);
-      // the journal fills with a hand that isn't yours — the keeper's, blurring
-      // into your own field notes the deeper you go (#21)
-      UI.addJournal(W.level >= 4
-        ? 'You are deeper than I ever went — or I am writing this through you now. I can no longer tell which of us holds the pen.'
-        : 'I drew the bay drained so the sea could not take her twice. The model does not lie; it only hopes. (This is not my handwriting. And yet I know it.)',
-        '', 'keeper');
     }, 3600);
   }
 }
@@ -1050,20 +1173,21 @@ function tickDive(dt) {
 // settle, started from a debug hook (ABYME.ascend). The owner's ending forks (ring-vs-climb,
 // who-you-are, the final camera) layer ON TOP later — none of them are decided here.
 let ascent = null;
-let keeperFarewell = false;   // transient: the arrival names the keeper's silence (#12 stage 3)
-let keeperCarried = false;    // transient: the arrival names that he rose WITH you (the twist, #item4)
 function startAscent(instant = false) {
   if (W.level <= 1) { if (!instant) UI.whisper(T.there_is_no_level); return false; }
-  if (instant) { landAscent(); return true; } // debug/verify: skip the cinematic AND the mode-gate
+  if (instant) {
+    game.resolveUpstreamHand({ reveal: false });
+    landAscent();
+    return true;
+  } // debug/verify: skip the cinematic AND the mode-gate
   if (MODE !== 'play') return false;
+  game.resolveUpstreamHand({ reveal: false });
   MODE = 'ascend';
   player.locked = true;
   interact.enabled = false;
   UI.cinematic(true);
   renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); // one-time drop for the 240x zoom
   farSea.visible = false;
-  keeperFarewell = false;          // reset; landAscent sets one of these on the silencing ascent
-  keeperCarried = false;
   A.duckAmbient(true);             // the world draws quiet as you rise — the held silence (#12 s3)
   // pivot: the chart table in THIS world — the world collapses toward the very place its
   // own model stands, becoming that model one level up
@@ -1080,7 +1204,6 @@ function landAscent() {
   // the snap: the shrunk world becomes the model above; you stand at its chart table
   diveGroup.scale.setScalar(1);
   diveGroup.position.set(0, 0, 0);
-  const wasLevel = W.level;
   W.level = Math.max(W.level - 1, 1); // one recursion shallower — clamp at the surface
   if (W.level <= 1) {
     W.flags.climbing = false; // back at the surface — a new descent is possible
@@ -1089,44 +1212,18 @@ function landAscent() {
     // fingerprint, driven in puzzles _apply by W.flags.returned). Fork-neutral; not an ending.
     if (!W.flags.returned) {
       W.flags.returned = true;
-      if (W.flags.carried) {
-        UI.whisper(T.back_at_the_surface_2);
-        UI.addJournal(T.i_have_been_all, '', 'self');
-      } else {
-        UI.whisper(T.back_at_the_surface_3);
-        UI.addJournal(T.i_have_been_all_2, '', 'self');
-      }
-      // POINT THE WAY OUT: the climb-out terminal (#22) is the dory, ~80 m south on the wake-up
-      // beach. Name it, or a player re-dives / rings the bell and never finds the choice the
-      // whole fork exists to offer. (The oar also glints on hover once armed; this draws them to it.)
-      setTimeout(() => { if (W.level <= 1 && MODE === 'play') UI.whisper(T.down_on_the_beach); }, 6800);
-    }
-  }
-  // the keeper falls silent behind you (#12 stage 3): the first time you turn back from the
-  // depths, his voice gives one last fading line — then the floor below goes quiet for good.
-  // You leave him where he chose to stay, and you leave the light BURNING (integration, not
-  // abandonment). The arrival (tickAscent f>=1) names the silence.
-  if (!W.flags.keeperSilenced && wasLevel >= 3) {
-    W.flags.keeperSilenced = true;
-    if (W.flags.carried) {
-      // THE TWIST (#item4): you turned him around and rose CARRYING him — his voice is no longer
-      // BELOW you but at your shoulder. No farewell; he is not left behind. (Wordless: the held
-      // breath of two climbing as one — the arrival names it.)
-      keeperCarried = true;
-      UI.addJournal(T.i_did_not_leave, '', 'self');
-    } else {
-      // the climb-out without the embrace: he stays below, tending the light; you leave it BURNING
-      A.say('keeper_farewell', 'resigned');
-      UI.whisper(KEEPER.farewell);
-      keeperFarewell = true;
-      UI.addJournal(T.i_went_all_the, '', 'self');
+      UI.whisper('The surface room receives the weight of the lower ones. The plate remains warm.');
+      notebook.record('return.surface');
     }
   }
   // SEA-STRATA: arriving a level shallower, the sea recedes to that level's tide (surface = 1)
-  W.tide = W.tideTarget = (W.level > 1 ? tideAt(W.level) : 1);
-  save(player);
+  pullStackAt(W.level, { snap: true });
   // rise out at the study / chart table of the level above (canon: you climb to the chart table)
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
+  // Commit the rung and its landing pose as one save boundary. Saving before spawn
+  // paired the shallower level with the departed deep position if the page closed on
+  // this frame, leaving Continue to reconstruct a state that never existed.
+  save(player);
 }
 function tickAscent(dt) {
   ascent.t += dt * (ascent.hurry ? 4.5 : 1);
@@ -1162,7 +1259,7 @@ function tickAscent(dt) {
     interact.enabled = true;
     UI.cinematic(false);
     UI.fadeIn(false);
-    setTimeout(() => document.getElementById('curtain').classList.remove('white'), 800);
+    scheduleRun(() => document.getElementById('curtain').classList.remove('white'), 800);
     A.duckAmbient(false);  // the surface sounds return — the held silence releases (#12 s3)
     // up, and the colour comes back — the inverse of the dive's curdle
     UI.whisper({
@@ -1170,14 +1267,6 @@ function tickAscent(dt) {
       2: 'One level up. The colour creeps back into things.',
       3: 'Up, and the room warms by a degree.',
     }[W.level] || 'Up. And up.');
-    // name it, the once it happens — the integration beat
-    if (keeperCarried) {
-      keeperCarried = false;
-      setTimeout(() => UI.whisper(T.his_voice_is_beside), 5200);
-    } else if (keeperFarewell) {
-      keeperFarewell = false;
-      setTimeout(() => UI.whisper(T.below_you_the_voice), 5200);
-    }
   }
 }
 
@@ -1190,11 +1279,13 @@ function tickAscent(dt) {
 // the lamp). Set atTop BEFORE spawn so syncCamera snaps to the gallery height, not the study floor.
 function startClimb(up) {
   if (MODE !== 'play') return;
+  if (climbTimer !== null) clearTimeout(climbTimer);
   player.locked = true;
   interact.enabled = false;
   UI.fadeOut(false, false);
   A.duckAmbient(true);
-  setTimeout(() => {
+  climbTimer = setTimeout(() => {
+    climbTimer = null;
     if (up) {
       W.atTop = true;
       player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 1.6, 0, SPOTS.lighthouse.y - 1.9), 5.59, -0.10);
@@ -1213,19 +1304,25 @@ function startClimb(up) {
 }
 
 
-// #134: assemble THIS player's walk for the ending's read-back coda, then let it
-// surface late and quiet (after the terminal's own line has had its beat)
-function revealFinaleCoda(kind, delayMs) {
+// #134: assemble THIS player's walk for the ending's read-back coda. Visibility is
+// driven by the same deterministic score as the physical tableau below; a wall-clock
+// timer could drift away from a reduced-motion or debug-scrubbed finale.
+function prepareFinaleCoda(kind, result) {
   const s = {
     rounds: ['roundMoor', 'roundLog', 'roundLight', 'roundWind'].filter((k) => W.flags[k]).length,
     filed: Object.values(W.recDisp || {}).filter((d) => d === 'filed').length,
     kept: Object.values(W.recDisp || {}).filter((d) => d === 'kept').length,
     lossesNamed: ['loss_arm', 'loss_bench', 'loss_skiff'].filter((k) => W.onceKeys?.includes(k)).length,
+    removed: result?.removed || 0,
   };
   const el = document.querySelector('#finale .fin-coda');
   if (!el) return;
-  el.innerHTML = finaleCoda(kind, s).map((l) => `<div>${l}</div>`).join('');
-  setTimeout(() => el.classList.add('show'), delayMs);
+  el.replaceChildren(...finaleCoda(kind, s).map((line) => {
+    const row = document.createElement('div');
+    row.textContent = line;
+    return row;
+  }));
+  return el;
 }
 
 // #135 (AAA-B1): the VISTA — a stratum's first sighting is a composed, HELD frame:
@@ -1234,6 +1331,8 @@ function revealFinaleCoda(kind, delayMs) {
 // this holds the shot exactly once per stratum. L1's vista is the intro itself.
 let vistaT = null;
 function releaseVista() {
+  removeEventListener('pointerdown', releaseVista);
+  removeEventListener('keydown', releaseVista);
   if (vistaT == null) return;
   vistaT = null;
   player.locked = false;
@@ -1253,165 +1352,117 @@ function beginVista(lv) {
 }
 addDrive(() => vistaT != null, (dt) => { vistaT += dt; if (vistaT > 2.4) releaseVista(); });
 
-// ---------------- the finale ----------------
-// THE DISPOSITION IS PERFORMED HERE (STACK.md §6). Both terminals route through
-// this: whatever the player set on the brass index is applied to the LEDGER at the
-// moment they take an ending, and the coda says what actually happened using the
-// real numbers. Applied once — an ending is terminal, but a double-fire would
-// double-seal or double-count the marks it took back.
-function performDisposition() {
-  if (W._dispDone) return null;
-  W._dispDone = true;
-  const kind = W.disposition || 'tend';
-  const res = disposeStack(kind);
-  const line = T['coda_' + kind];
-  if (line) UI.addJournal(line.replace('{n}', String(res && res.removed != null ? res.removed : 0)), '', 'self');
-  return res;
+// ---------------- one ending, four physical dispositions --------------------
+// The ending is committed only after the full return. Every path begins at the dry
+// east-room refuge, then gives the selected operation its own world-scale image.
+// The pure score in finale-tableaux.js keeps equal timing and testable differences;
+// this block only applies that score to existing island, water, door, and light state.
+const FINALE_BODY_CLASSES = FINALE_KINDS.map((kind) => `finale-${kind}`);
+function setFinaleBody(kind = null) {
+  document.body.classList.remove('finale-active', 'finale-reduced-motion', ...FINALE_BODY_CLASSES);
+  if (!kind) return;
+  document.body.classList.add('finale-active', `finale-${kind}`);
+  if (W.reduceMotion) document.body.classList.add('finale-reduced-motion');
 }
 
-function startFinale() {
+function offsetFromLighthouse(out, offset) {
+  return out.set(LH.x + offset[0], LH.y + offset[1], LH.z + offset[2]);
+}
+
+function applyFinaleFrame(frame) {
+  W.time = frame.hour;
+  W.tide = W.tideTarget = frame.tide;
+  offsetFromLighthouse(camera.position, frame.camera);
+  offsetFromLighthouse(_cinV, frame.look);
+  camera.lookAt(_cinV);
+  if (refs.innerDoor) {
+    const ud = refs.innerDoor.userData;
+    refs.innerDoor.rotation.y = (ud.closedY || 0) + frame.door * (ud.swingY ?? 1.5);
+  }
+  for (let i = 0; i < 5; i++) {
+    skyMat.uniforms.uConstelGlow.value[i] = frame.constellation[i] || 0;
+  }
+}
+
+function commitEnding(kind = W.disposition) {
+  if (MODE === 'finale') return;
+  const choice = FINALE_KINDS.includes(kind) ? kind : 'tend';
+  W.disposition = choice;
+  // A committed save resumes the image and its exact outcome but never repeats
+  // the ledger operation. The notebook is a view, not authority for this result.
+  const result = W.flags.endingCommitted ? W.endingOutcome : disposeStack(choice);
+  if (!W.flags.endingCommitted) {
+    W.endingOutcome = choice === 'carry'
+      ? { kind: choice, removed: result?.removed || 0 }
+      : { kind: choice };
+    W.flags.endingCommitted = true;
+    notebook.record(`ending.${choice}`, choice === 'carry' ? { removed: W.endingOutcome.removed } : undefined);
+    save(player);
+  }
+  startDispositionFinale(choice, result || W.endingOutcome);
+}
+
+function startDispositionFinale(kind, result = null) {
+  const tableau = finaleTableau(kind);
+  game.resolveUpstreamHand({ reveal: false });
   MODE = 'finale';
-  performDisposition();
   player.locked = true;
   interact.enabled = false;
-  A.musicStop();   // the bell finale owns the soundscape (the era bed fades out)
+  UI.closeJournal();
+  UI.closeReader();
+  UI.closeSandWriter(false);
+  UI.clearWhispers();
+  UI.hideCinematicHint();
+  A.musicStop();
+  A.duckAmbient(true);
   UI.cinematic(true);
-  // the resolution must land warm, never inheriting the descent's curdle (#22)
+  UI.fadeOut(false, true);
+  setFinaleBody(kind);
+  W.level = 1;
+  W.flags.climbing = false;
+  W.flags.returned = true;
   W._finaleWarm = true;
-  // fork the TONE by depth: level 2 keeps the loved golden parade (constellation
-  // + gathered stems); ringing deeper WITHHOLDS — the bottom sounds like the
-  // bottom, a held bittersweet golden hour the stars never reach
-  const deep = W.level >= 3;
-  A.bellToll(deep);
-  if (deep) setTimeout(() => A.keeperVoice('resigned'), 4200); // the keeper, still below
+  W._finaleLamp = true;
+  farSea.visible = true;
+  diveGroup.scale.setScalar(1);
+  diveGroup.position.set(0, 0, 0);
+  const frame = sampleFinaleTableau(kind, 0, { reducedMotion: W.reduceMotion });
+  finale = { kind, tableau, t: 0, frame, shown: false, codaShown: false };
+  applyFinaleFrame(frame);
+
   const line1 = document.querySelector('#finale .fin-line1');
-  if (line1) line1.textContent = deep ? 'you keep the light now' : 'the tide brought you back';
-  finale = { kind: 'bell', t: 0, deep, camStart: camera.position.clone(), quatStart: camera.quaternion.clone() };
-  revealFinaleCoda('bell', 5200);
+  const line2 = document.querySelector('#finale .fin-line2');
+  if (line1) line1.textContent = tableau.line;
+  if (line2) line2.textContent = 'the island remains';
+  const coda = prepareFinaleCoda(kind, result);
+  coda?.classList.remove('show');
+  A.bellToll(true);
+  finale.fadeTimer = setTimeout(() => UI.fadeIn(false), 260);
 }
 
-// ---------------- the oar — the integration terminal (#22, owner fork: choice + The Oar) ----
-// The climb-out's missing last breath. Reached only after climbing all the way out
-// (W.flags.returned, at the surface): you row off the wake-up beach, the camera swings
-// to the only look-BACK shot in the game, and the whole world shrinks 240x toward the
-// island's heart until it is a tiny lit model floating on the dark sea — the recursion
-// seen once more, chosen and warm. Held golden hour, no stars (those belong to the bell's
-// 'stay'). The bell is struck at the bottom; the oar is rowed at the top. Reuses the
-// finale's cinematic spine (re-aimed low-and-back) + the ascent's inverse-swell scale math.
-let oarSea = null;   // a dark water disc filling the farSea ring's centre hole under the model
-function startOarFinale() {
-  if (MODE === 'finale') return;   // idempotent: never stack a second terminal / sea disc
-  MODE = 'finale';
-  performDisposition();
-  player.locked = true;
-  interact.enabled = false;
-  A.musicStop();   // leaving owns the soundscape from here
-  UI.cinematic(true);
-  W._finaleWarm = true;            // the clean warm grade, exempt from the descent curdle (#22)
-  A.duckAmbient(true);             // the shore draws quiet as you push off
-  farSea.visible = false;          // the oarSea disc replaces it — no double-shaded overlap (power)
-  // the look-back shot: start low beside the dory, drift seaward and rise a touch,
-  // always gazing back at the island as it shrinks to a model on the water
-  const camStartPos = new THREE.Vector3(-26, 2.6, -116);
-  const pivot = new THREE.Vector3(2, 0.9, -64); // the island's heart — the model collapses here
-  camera.position.copy(camStartPos);
-  // a dark sea under the model: farSea is a RingGeometry(310,9000) with a 310-unit hole at
-  // the origin that the full-size island normally fills; once the island shrinks away the
-  // model would float over a void, so lay a flat dark disc across the gap for the terminal.
-  oarSea = new THREE.Mesh(new THREE.CircleGeometry(1400, 48),
-    new THREE.MeshBasicMaterial({ color: 0x10333c }));
-  oarSea.rotation.x = -Math.PI / 2;
-  oarSea.position.set(pivot.x, 0.03, pivot.z);
-  scene.add(oarSea);
-  // the low sea-level look-back exposes interior-only shells the island was never built to
-  // be seen-from-the-sea with (the vault vista's inverted lighthouse, the drowned gallery,
-  // the annex/cellar innards — backstage that only reads from inside). Hide them for the
-  // terminal; the game ends here, so nothing needs restoring.
-  for (const nm of ['vaultVista', 'vaultDrips', 'drownedGallery', 'quarters']) {
-    core.traverse((o) => { if (o.name === nm) o.visible = false; });
-  }
-  const lookAt = pivot.clone().add(new THREE.Vector3(0, 2, 0)); // aim a touch high so the model rides just below frame-centre
-  finale = {
-    kind: 'oar', t: 0, pivot, lookAt,
-    camStart: camStartPos.clone(),
-    camEnd: new THREE.Vector3(-30, 9.5, -178),  // drift seaward (south) and rise a little: the long look back
-    quatStart: camera.quaternion.clone(),
-  };
-  const line1 = document.querySelector('#finale .fin-line1');
-  if (line1) line1.textContent = 'you left the light on';
-  // the rower's own realization, at peace, fades in as you pull away — NOT the keeper (no
-  // keeper styling, no leading ellipsis, so it doesn't re-read as his voice after his silence)
-  setTimeout(() => { if (finale && finale.kind === 'oar') UI.whisper(T.the_way_out_was); }, 4400);
-  // one warm bell-partial as the island becomes a model (the withheld, leitmotif-warm toll)
-  setTimeout(() => { if (finale && finale.kind === 'oar') A.bellToll(true); }, 9500);
-  revealFinaleCoda('oar', 7000);   // #134: the look-back reads back this player's walk
-}
-
-function tickOarFinale(dt) {
-  const e = easeInOut(clamp(finale.t / 16, 0, 1));
-  // hold a bittersweet golden hour — the night, and its stars, never come
-  W.time = lerp(W.time, 17.6, 1 - Math.exp(-dt * 0.5));
-  for (let i = 0; i < 5; i++) skyMat.uniforms.uConstelGlow.value[i] = 0;
-  // camera: rise and drift seaward off the beach, always looking back at the island
-  camera.position.lerpVectors(finale.camStart, finale.camEnd, e);
-  _cinQ.setFromRotationMatrix(_cinM.lookAt(camera.position, finale.lookAt, _cinUp));
-  camera.quaternion.slerpQuaternions(finale.quatStart, _cinQ, Math.min(1, finale.t * 0.3));
-  // the whole world shrinks toward the island's heart, becoming a tiny lit model floating on
-  // the dark sea (the inverse-swell, run one last time) — clamped to a readable model size
-  // (1/48), not the dive's vanishing 1/240 speck: the held final image must stay legible.
-  const sf = clamp((finale.t - 4.5) / 8, 0, 1);
-  const s = Math.exp(easeInOut(sf) * Math.log(1 / 48));
-  diveGroup.scale.setScalar(s);
-  diveGroup.position.set(
-    finale.pivot.x * (1 - s),
-    finale.pivot.y * (1 - s),
-    finale.pivot.z * (1 - s));
-  // the card rises (held shot, no fade): 'you left the light on'
-  if (finale.t > 13 && !finale.shown) {
-    finale.shown = true;
-    document.getElementById('finale').classList.remove('hidden');
-    requestAnimationFrame(() => document.getElementById('finale').classList.add('show'));
-    document.getElementById('btn-again').addEventListener('click', () => {
-      wipe();
-      sessionStorage.setItem('abyme-autostart', '1');
-      location.reload();
-    });
-  }
+function beginAgainFromFinale() {
+  wipe();
+  sessionStorage.setItem('abyme-autostart', '1');
+  location.reload();
 }
 
 function tickFinale(dt) {
   finale.t += dt;
-  if (finale.kind === 'oar') { tickOarFinale(dt); return; }
-  const f = clamp(finale.t / 18, 0, 1);
-  // surface (level 2): wheel the day into night so the constellation can land.
-  // deep: hold a bittersweet golden hour — the night, and its stars, never come.
-  if (finale.deep) W.time = lerp(W.time, 17.6, 1 - Math.exp(-dt * 0.5));
-  else W.time = (W.time + dt * 1.6) % 24;
-  // rise above the island, gaze back down at the lighthouse
-  const e = easeInOut(f);
-  camera.position.set(
-    lerp(finale.camStart.x, LH.x + 60, e),
-    lerp(finale.camStart.y, LH.y + 90, e),
-    lerp(finale.camStart.z, LH.z - 110, e));
-  // gaze down at the lighthouse, then lift to the north sky as the
-  // credits land — that's where the constellation waits
-  const lookY = lerp(LH.y + 8, LH.y + 260, easeInOut(clamp((finale.t - 8) / 6, 0, 1)));
-  _cinQ.setFromRotationMatrix(_cinM.lookAt(camera.position, _cinV.set(LH.x, lookY, LH.z), _cinUp));
-  camera.quaternion.slerpQuaternions(finale.quatStart, _cinQ, Math.min(1, f * 4));
-  // the constellation ignites note by note as the day wheels into night — but
-  // the deep ending withholds it: no night comes, so the stars never gather
-  for (let i = 0; i < 5; i++) {
-    skyMat.uniforms.uConstelGlow.value[i] = finale.deep ? 0 : clamp((finale.t - (6 + i * 0.9)) / 1.2, 0, 1);
-  }
-  if (finale.t > 9 && !finale.shown) {
+  const progress = clamp(finale.t / finale.tableau.timing.duration, 0, 1);
+  finale.frame = sampleFinaleTableau(finale.kind, progress, { reducedMotion: W.reduceMotion });
+  applyFinaleFrame(finale.frame);
+  const revealAt = W.reduceMotion ? 2.2 : finale.tableau.timing.revealAt;
+  const codaAt = W.reduceMotion ? 2.8 : finale.tableau.timing.codaAt;
+  if (finale.t >= revealAt && !finale.shown) {
     finale.shown = true;
-    document.getElementById('finale').classList.remove('hidden');
-    requestAnimationFrame(() => document.getElementById('finale').classList.add('show'));
-    document.getElementById('btn-again').addEventListener('click', () => {
-      wipe();
-      sessionStorage.setItem('abyme-autostart', '1');
-      location.reload();
-    });
+    const card = document.getElementById('finale');
+    card.classList.remove('hidden');
+    requestAnimationFrame(() => card.classList.add('show'));
+    document.getElementById('btn-again').addEventListener('click', beginAgainFromFinale, { once: true });
+  }
+  if (finale.t >= codaAt && !finale.codaShown) {
+    finale.codaShown = true;
+    document.querySelector('#finale .fin-coda')?.classList.add('show');
   }
 }
 
@@ -1464,8 +1515,9 @@ const _introLookV = new THREE.Vector3();
 // qualifies and is returned untouched — a first-time player's arrival is unchanged.
 // It is also the right image: the more water you displaced, the further up the
 // shore the tide sets you down.
-function spawnAboveWater(pos, eye = 1.65) {
-  const clears = (x, z) => walkableY(x, z) + eye > waterY() + 0.3;
+function spawnAboveWater(pos, eye = 1.65, tide = W.tide) {
+  const arrivalWaterY = -TIDE_DROP * (1 - tide);
+  const clears = (x, z) => walkableY(x, z) + eye > arrivalWaterY + 0.3;
   if (clears(pos.x, pos.z)) return pos;
   const e = 0.7;
   const gentle = (x, z) => Math.hypot(
@@ -1483,10 +1535,12 @@ function spawnAboveWater(pos, eye = 1.65) {
 
 const SPAWN_POS = new THREE.Vector3(4, 0, -104);
 const SPAWN_YAW = 2.19, SPAWN_PITCH = 0.05;
+const introLanding = SPAWN_POS.clone();
 function setIntroLanding() {
   // place the camera exactly at the standing frame, then aim the approach curves'
   // final points at it so the glide eases seamlessly into gameplay
-  player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH);
+  introLanding.copy(spawnAboveWater(SPAWN_POS.clone(), player.eye, W.tideTarget));
+  player.spawn(introLanding, SPAWN_YAW, SPAWN_PITCH);
   const eye = camera.position.clone();
   const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
   INTRO_PATH.points[INTRO_PATH.points.length - 1].copy(eye);
@@ -1511,12 +1565,15 @@ const spray = (() => {
   p.name = 'introSpray';
   return p;
 })();
-scene.add(spray);
+if (sessionStorage.getItem('abyme-autostart')) {
+  sessionStorage.removeItem('abyme-autostart');
+  dismissTitle(true);               // a replay reload ('begin again') must not flash the title
+  resetRunState({ persist: false });
+  beginIntro(true);
+}
 let saveTimer = 0;
 
-// #58: the 12s autosave used to be the ONLY writer, so closing the tab could
-// throw away up to 12s of play (and, before v3, the facing never persisted at
-// all). Flush a save when the page goes away — pagehide for real closes and
+// Flush the autosave when the page goes away — pagehide for real closes and
 // navigations, visibilitychange→hidden for tab switches and the mobile-Safari
 // cases where pagehide never fires. Same guard as the timer: only mid-play,
 // never poised on the brink of a dive (the journal will not follow you down).
@@ -1526,7 +1583,9 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 
 function applyAtmosphere(elapsed, dt) {
   const g = gradeAt(W.time);
-  renderer.toneMappingExposure = g.exposure; // per-grade tone (#2): noon airy, night crushed
+  const tableauFrame = MODE === 'finale' ? finale?.frame : null;
+  const tableauLights = tableauFrame?.lights;
+  renderer.toneMappingExposure = g.exposure * (tableauFrame?.exposure ?? 1); // per-grade tone (#2): noon airy, night crushed
   sunDir(W.time, _sunV);
   moonDir(W.time, _moonV);
   const el = sunElevation(W.time);
@@ -1550,15 +1609,17 @@ function applyAtmosphere(elapsed, dt) {
   // WOW pass (anti-flat): a stronger directional KEY + a lower ambient FILL = sculptural chiaroscuro
   // instead of flat even light. Keeps the per-grade COLOUR identity (only contrast changes), so the
   // melancholy reads as depth, not washout.
-  sun.intensity = (night > 0.6 ? 0.5 * night : g.sunInt * 2.95 * clamp((el + 0.06) / 0.2, 0.05, 1)) * (1 - mistCur * 0.3);
+  sun.intensity = (night > 0.6 ? 0.5 * night : g.sunInt * 2.95 * clamp((el + 0.06) / 0.2, 0.05, 1))
+    * (1 - mistCur * 0.3) * (tableauLights?.sun ?? 1);
 
   hemi.color.copy(g.hemiSky);
   hemi.groundColor.copy(g.hemiGnd);
-  hemi.intensity = lerp(0.44, 0.15, night);
-  scene.environmentIntensity = lerp(0.38, 0.08, night);
+  hemi.intensity = lerp(0.44, 0.15, night) * (tableauLights?.hemi ?? 1);
+  scene.environmentIntensity = lerp(0.38, 0.08, night) * (tableauLights?.hemi ?? 1);
 
   scene.fog.color.copy(g.fog);
-  scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1) * (1 + mistCur * 2.4);
+  scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1) * (1 + mistCur * 2.4)
+    * (tableauFrame?.fog ?? 1);
   skyMat.uniforms.uMist.value = mistCur;
 
   // the coat remembers its keeper — one quiet line, up close, once
@@ -1596,9 +1657,7 @@ function applyAtmosphere(elapsed, dt) {
         if (camera.position.distanceTo(_youV) < 2.2) {
           game.once('youOnModel', () => {
             UI.whisper(T.there_you_are_a);
-            // the discovery lands in the journal, not just the air — and names the abyme
-            // without naming who you are (fork-neutral: self-recognition, not identity).
-            UI.addJournal(T.a_mark_has_appeared, '', 'self');
+            notebook.record('evidence.model-marker');
           });
         }
       }
@@ -1641,8 +1700,8 @@ function applyAtmosphere(elapsed, dt) {
   // study glow: warm by night, faint by day — and the partner's warm window
   // goes dark the deeper you descend (one prop change per level, #13)
   const windowFade = Math.max(1 - 0.42 * Math.max(0, W.level - 2), 0.12);
-  studyLight.intensity = lerp(4, 16, night) * windowFade;
-  lampSpill.intensity = W.lampLit ? 220 : 0;
+  studyLight.intensity = lerp(4, 16, night) * windowFade * (tableauLights?.study ?? 1);
+  lampSpill.intensity = (W.lampLit ? 220 : 0) * (tableauLights?.beacon ?? 1);
   cellarLight.intensity = W.flags.hatchOpen ? 9 : 0;
   cellarFill.intensity = W.flags.hatchOpen ? 3.4 : 0;
   // the vault's cold lamp, with a slow drowned pulse — lit only with the cellar open
@@ -1675,9 +1734,11 @@ function applyAtmosphere(elapsed, dt) {
   }
   // the keeper's lamp burns one level down, with a faint lamp-oil flicker — and stays
   // warm after the return (integration relights the hearth: "two lights now")
-  keeperLamp.intensity = ((W.level >= 2 || W.flags.returned) ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
+  keeperLamp.intensity = ((W.level >= 2 || W.flags.returned) ? 26 : 0)
+    * (1 + 0.05 * Math.sin(elapsed * 6.3)) * (tableauLights?.refuge ?? 1);
   // the jetty beacon: a low warm glow by day, a real beacon by night
-  jettyLamp.intensity = lerp(3, 20, night) * (1 + 0.07 * Math.sin(elapsed * 4.7));
+  jettyLamp.intensity = lerp(3, 20, night) * (1 + 0.07 * Math.sin(elapsed * 4.7))
+    * (tableauLights?.jetty ?? 1);
 
   // #27: lights leave the shader entirely while dark (see POINT_LIGHTS note)
   for (const L of POINT_LIGHTS) L.visible = L.intensity > 0.01;
@@ -1765,7 +1826,8 @@ function applyAtmosphere(elapsed, dt) {
 // ---------------- gulls ----------------
 // at dawn the first gull leaves the gyre and takes the gallery rail,
 // east side, facing the sun — wings folded, riding the keeper's view
-const GULL_PERCH = new THREE.Vector3(LH.x + 3.05, LH.y + 21.95, LH.z);
+const GULL_PERCH_R = 3.55;
+const GULL_PERCH = new THREE.Vector3(LH.x + GULL_PERCH_R, LH.y + 21.95, LH.z);
 let perchT = 0;
 let perchCried = false;   // #64: one cry as the dawn percher takes the rail
 
@@ -1794,7 +1856,7 @@ function tickGulls(elapsed, dt) {
     let flapAmp = 0.5;
     if (g === gulls[0] && settle > 0) {
       // SPIRAL IN — do not lerp through the building. A straight line from the gyre
-      // (radius 24, 32 m up) to the rail (radius 3.05, 21.95 m up) passes THROUGH the
+      // (radius 24, 32 m up) to the rail (radius 3.55, 21.95 m up) passes THROUGH the
       // lantern and the dome, and at mid-settle it parks the bird inside them: the owner
       // caught it at dawn with a wing out through the copper, "seems like a bird caught
       // in the tower?". Interpolating in the gyre's own polar frame instead — radius,
@@ -1803,7 +1865,7 @@ function tickGulls(elapsed, dt) {
       // rail and the rail is outside everything. It also just looks right: a gull
       // wheeling down onto a handrail rather than sliding down a wire.
       const gy = LH.y + u.h + Math.sin(a * 2.3) * 2;
-      const rr = lerp(u.radius, 3.05, settle);
+      const rr = lerp(u.radius, GULL_PERCH_R, settle);
       let da = -a;                                    // the perch sits at bearing 0
       da = Math.atan2(Math.sin(da), Math.cos(da));    // take the short way round
       const ra = a + da * settle;
@@ -1819,6 +1881,16 @@ function tickGulls(elapsed, dt) {
   }
 }
 
+// A startled bird earns its disappearance. The first 0.9 s is the close burst the
+// old motion had; the following curve carries it another 82 m toward open water over
+// 5.4 s. Only then—26 m up and reduced to a speck—does it leave the draw list.
+const BIRD_LAUNCH_S = 0.9;
+const BIRD_EXIT_S = 5.4;
+const BIRD_VISIBLE_FLIGHT_S = BIRD_LAUNCH_S + BIRD_EXIT_S;
+const BIRD_EXIT_DISTANCE = 82;
+const BIRD_EXIT_RISE = 26;
+const BIRD_RETURN_COOLDOWN = 8;
+
 function tickPerched(elapsed, dt) {
   const day = 1 - clamp((-sunElevation(W.time) - 0.02) / 0.15, 0, 1);
   const active = day > 0.3 && MODE !== 'dive' && W.level === 1;
@@ -1828,43 +1900,89 @@ function tickPerched(elapsed, dt) {
     if (!active) { g.visible = false; continue; }
     const d = Math.hypot(pp.x - u.px, pp.z - u.pz);
     if (u.flush === 0) {
-      // perched + idle: a gentle bob and a slow look-around
+      // Perched means PERCHED. The baked feet and body share one geometry, so moving
+      // or yawing the root makes the toes hover and skate. Hold the sole exactly on
+      // terrain; the folded wings carry the tiny breath below.
       g.visible = true; g.rotation.x = 0;
-      g.position.set(u.px, u.py + Math.sin(elapsed * 1.5 + u.ph) * 0.012, u.pz);
-      g.rotation.y = u.yaw + Math.sin(elapsed * 0.45 + u.ph) * 0.18;
+      g.position.set(u.px, u.py, u.pz);
+      g.rotation.y = u.yaw;
       // #64: the lone caw of an island gone quiet — rare, and only within earshot
       if (u.species === 'crow' && d < 60 && Math.random() < dt * 0.008) {
         A.crowCaw(clamp(0.22 * (1 - d / 70), 0.04, 0.22), undefined, { x: u.px, z: u.pz, ref: 30 });   // #63
       }
       if (d < 3.6) {
-        u.flush = 0.001;                                   // startle → flush
+        // Freeze both the initial away vector and a mostly radial island-exit vector.
+        // Recomputing either from the moving player bends a fleeing bird back toward
+        // the camera; a radial bias keeps shore gulls over the sea and crows out of trees.
+        let ax = u.px - pp.x, az = u.pz - pp.z;
+        let al = Math.hypot(ax, az) || 1; ax /= al; az /= al;
+        let ox = u.px - SPOTS.mainCenter.x, oz = u.pz - SPOTS.mainCenter.y;
+        let ol = Math.hypot(ox, oz) || 1; ox /= ol; oz /= ol;
+        let ex = ax * 0.35 + ox * 0.94, ez = az * 0.35 + oz * 0.94;
+        const el = Math.hypot(ex, ez) || 1; ex /= el; ez /= el;
+        u.flyX = ax; u.flyZ = az; u.exitX = ex; u.exitZ = ez;
+        const side = Math.sin(u.ph) < 0 ? -1 : 1;
+        u.sideX = -ez * side; u.sideZ = ex * side;
+        u.flush = 0.001;                                   // startle → continuous flight clock
         // #64: the burst-up finally makes a sound — a close startled cry
         if (u.species === 'crow') A.crowCaw(0.3, true, { x: u.px, z: u.pz, ref: 20 }); else A.gullCry(0.3, { x: u.px, z: u.pz, ref: 20 });   // #63
       }
-    } else if (u.flush < 1) {
-      // flush: a quick climb up + away (flew off)
-      u.flush = Math.min(1, u.flush + dt / 0.9);
-      const e = u.flush;
-      const dx = u.px - pp.x, dz = u.pz - pp.z, dl = Math.hypot(dx, dz) || 1;
-      g.position.set(u.px + (dx / dl) * e * 5, u.py + e * 7, u.pz + (dz / dl) * e * 5);
-      g.rotation.x = -e * 0.6;                             // nose up, climbing
-      g.visible = e < 0.97;
-      if (e >= 1) u.cool = 14;
+    } else if (u.flush < BIRD_VISIBLE_FLIGHT_S) {
+      // FLUSH: burst clear of the feet, then turn that launch into a long quadratic
+      // departure. Position is continuous at 0.9 s; yaw follows the actual tangent.
+      u.flush = Math.min(BIRD_VISIBLE_FLIGHT_S, u.flush + dt);
+      const t = u.flush;
+      const oldX = g.position.x, oldZ = g.position.z;
+      let x, y, z;
+      if (t <= BIRD_LAUNCH_S) {
+        const e = smoothstep(0, BIRD_LAUNCH_S, t);
+        x = u.px + u.flyX * 5 * e;
+        y = u.py + 7 * e;
+        z = u.pz + u.flyZ * 5 * e;
+        g.rotation.x = -Math.sin(e * Math.PI * 0.5) * 0.58;
+      } else {
+        const e = clamp((t - BIRD_LAUNCH_S) / BIRD_EXIT_S, 0, 1);
+        const a = 1 - e, q0 = a * a, q1 = 2 * a * e, q2 = e * e;
+        const p0x = u.flyX * 5, p0z = u.flyZ * 5;
+        const p1x = u.flyX * 30 + u.sideX * 12, p1z = u.flyZ * 30 + u.sideZ * 12;
+        x = u.px + p0x * q0 + p1x * q1 + u.exitX * BIRD_EXIT_DISTANCE * q2;
+        z = u.pz + p0z * q0 + p1z * q1 + u.exitZ * BIRD_EXIT_DISTANCE * q2;
+        y = u.py + 7 * q0 + 16 * q1 + BIRD_EXIT_RISE * q2;
+        g.rotation.x = lerp(-0.58, -0.10, smoothstep(0, 0.75, e));
+      }
+      g.position.set(x, y, z);
+      const mx = x - oldX, mz = z - oldZ;
+      if (mx * mx + mz * mz > 1e-8) {
+        const aim = Math.atan2(mx, mz);
+        const turn = Math.atan2(Math.sin(aim - g.rotation.y), Math.cos(aim - g.rotation.y));
+        g.rotation.y += turn * clamp(dt * 5, 0, 1);
+      }
+      g.visible = true;
+      if (u.flush >= BIRD_VISIBLE_FLIGHT_S) u.cool = BIRD_RETURN_COOLDOWN;
     } else {
-      // gone: hidden; settle back once the cooldown elapses and the coast is clear
+      // Gone only after the bird is a far-water speck. It may reset once the player
+      // has left this patch of shore; by then its removal was below visual scale.
       g.visible = false;
       u.cool -= dt;
-      if (u.cool <= 0 && d > 14) u.flush = 0;
+      if (u.cool <= 0 && d > 22) u.flush = 0;
     }
     // wings: swept-back/folded at rest, snap open + flap fast on takeoff (spread leads the
     // climb). Rest pose = the FOLD_* constants from addWings; chord stretches back out as
     // the wing opens.
     if (g.lw) {
-      const spread = u.flush === 0 ? 0 : clamp(u.flush * 5, 0, 1);
-      const flap = 0.18 + Math.sin(elapsed * 22 + u.ph) * 0.72;
-      g.rw.rotation.y = lerp(FOLD_Y, 0, spread); g.rw.rotation.z = lerp(-FOLD_Z, flap, spread);
-      g.lw.rotation.y = lerp(-FOLD_Y, 0, spread); g.lw.rotation.z = lerp(FOLD_Z, -flap, spread);
-      g.lw.scale.z = g.rw.scale.z = lerp(FOLD_CHORD, 1, spread);
+      if (u.flush === 0) {
+        const breath = Math.sin(elapsed * 0.9 + u.ph) * 0.012;
+        g.rw.rotation.y = FOLD_Y; g.rw.rotation.z = -FOLD_Z - breath;
+        g.lw.rotation.y = -FOLD_Y; g.lw.rotation.z = FOLD_Z + breath;
+        g.lw.scale.z = g.rw.scale.z = FOLD_CHORD;
+      } else {
+        const spread = clamp(u.flush / 0.18, 0, 1);
+        const glide = smoothstep(0.7, BIRD_VISIBLE_FLIGHT_S, u.flush);
+        const flap = 0.12 + Math.sin(elapsed * 20 + u.ph) * lerp(0.72, 0.24, glide);
+        g.rw.rotation.y = lerp(FOLD_Y, 0, spread); g.rw.rotation.z = lerp(-FOLD_Z, flap, spread);
+        g.lw.rotation.y = lerp(-FOLD_Y, 0, spread); g.lw.rotation.z = lerp(FOLD_Z, -flap, spread);
+        g.lw.scale.z = g.rw.scale.z = lerp(FOLD_CHORD, 1, spread);
+      }
     }
   }
 }
@@ -1876,17 +1994,99 @@ player.onFootstep = (kind, pos) => {
   // wet seabed sparkles underfoot
   if ((1 - W.tide) > 0.5 && heightAt(pos.x, pos.z) < 0) {
     biolume.material.uniforms.uFlare.value = 9;
-    setTimeout(() => { biolume.material.uniforms.uFlare.value = 6; }, 350);
+    scheduleRun(() => { biolume.material.uniforms.uFlare.value = 6; }, 350);
   }
 };
 
+// One in-memory new-run boundary, shared by the title's Begin path and the debug
+// reset. Storage policy stays with the caller: a new run forgets its save first,
+// while resetFlags replaces it in place and deliberately preserves THE STACK.
+function resetRunState({ persist = true } = {}) {
+  UI.closeReader();
+  UI.closeJournal();
+  UI.closeSandWriter(false);
+  UI.clearWhispers();
+  cancelIntro();
+  clearRunSchedule();
+  releaseVista();
+  if (climbTimer !== null) { clearTimeout(climbTimer); climbTimer = null; }
+  if (dive) { dive.hurryCleanup?.(); dive.stopDiveSweep?.(); dive = null; }
+  if (ascent) { ascent.hurryCleanup?.(); ascent = null; }
+  if (finale) {
+    clearTimeout(finale.fadeTimer);
+    finale = null;
+  }
+  setFinaleBody();
+  document.getElementById('btn-again')?.removeEventListener('click', beginAgainFromFinale);
+  const finaleCard = document.getElementById('finale');
+  finaleCard?.classList.remove('show');
+  finaleCard?.classList.add('hidden');
+  finaleCard?.querySelector('.fin-coda')?.classList.remove('show');
+  document.getElementById('curtain')?.classList.remove('white');
+
+  W.flags = { ...SAVE_FLAG_DEFAULTS };
+  W.level = 1; W.tide = W.tideTarget = 1; W.stems = 0;
+  W.time = 7.4; W.timeDrift = 1 / 240;
+  W.lensPlaced = false; W.lampLit = false; W.atTop = false;
+  W.beamAngle = 2.2; W.dials = [0, 0, 0, 0]; W.inventory = [];
+  W.reading = false; W.notesOpen = false; W.writing = false;
+  W._finaleWarm = false; W._finaleLamp = false;
+  W.onceKeys = []; W.recDisp = {}; W.disposition = 'tend';
+  W.endingOutcome = null;
+  W.regions = { l2seen: false, l3seen: false, l4seen: false };
+  notebook.reset(false);
+  game.resetRuntime();
+  A.resetScore();
+
+  for (const owner of A.ambientDuckOwners()) A.duckAmbient(false, owner);
+  MODE = 'play';
+  renderer.setPixelRatio(BASE_DPR);
+  farSea.visible = true;
+  diveGroup.scale.setScalar(1);
+  diveGroup.position.set(0, 0, 0);
+  player.locked = false;
+  interact.enabled = true;
+  UI.cinematic(false);
+  UI.hideCinematicHint();
+  UI.fadeIn(false);
+  introLanding.copy(spawnAboveWater(SPAWN_POS.clone(), player.eye, W.tideTarget));
+  player.spawn(introLanding, SPAWN_YAW, SPAWN_PITCH);
+  if (persist) save(player);
+  return 'run reset (in-world)';
+}
+
 // ---------------- debug ----------------
+function currentReportCapture() {
+  const unsettled = intro ? 'the arrival' : dive ? 'a descent' : ascent ? 'an ascent'
+    : finale ? 'the finale' : climbTimer !== null ? 'the lamp stair'
+      : vistaT !== null ? 'a vista' : game.atBrink() ? 'an armed plate'
+        : W.reading ? 'a reading surface' : W.notesOpen ? 'the field notes'
+          : W.writing ? 'the shore writer' : null;
+  return MODE === 'play' && !unsettled
+    ? stablePlayReplay(MODE, W.atTop)
+    : observationOnly(MODE, unsettled ? `${unsettled} is active` : `${MODE || 'unknown'} mode is active`);
+}
+
+function makeReportThumbnail() {
+  try {
+    for (const [maxWidth, quality] of [[360, 0.48], [240, 0.38]]) {
+      const scale = Math.min(1, maxWidth / renderer.domElement.width);
+      const thumb = document.createElement('canvas');
+      thumb.width = Math.max(1, Math.round(renderer.domElement.width * scale));
+      thumb.height = Math.max(1, Math.round(renderer.domElement.height * scale));
+      thumb.getContext('2d')?.drawImage(renderer.domElement, 0, 0, thumb.width, thumb.height);
+      const data = thumb.toDataURL('image/jpeg', quality);
+      if (data.length <= REPORT_THUMBNAIL_MAX_CHARS) return data;
+    }
+  } catch (_) { /* the downloaded report still carries its full-size attempt */ }
+  return null;
+}
+
 {
-  // The debug panel + ABYME hooks are built for ALL builds now (owner request: backtick (`) opens
-  // debug even without ?debug — the panel just starts hidden for players). The GPU timer stays
-  // DEBUG-only: its timer-query polling costs real GPU time, so players never pay for it.
+  // State-changing playtest hooks exist only on ?debug&localstack. The public build
+  // retains the small field-report surface below but cannot mutate the stack.
   if (DEBUG) gpuTimer = makeGpuTimer(renderer); // Power Ledger: real GPU-frame-ms in the debug readout
-  window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI, composer, bloomPass,
+  window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, notebook, THREE, UI, composer, bloomPass,
     bench: (t = 12) => { W.time = t; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); }, // fixed Power-Ledger pose
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
     gpuMode: () => (gpuTimer ? gpuTimer.mode : null),
@@ -1904,18 +2104,22 @@ player.onFootstep = (kind, pos) => {
     glintStyle: (v) => (v === undefined ? interact.glintStyle : interact.setGlintStyle(v)),
     interact,   // hotspots + hover state, for tools/harness/glint.mjs
     gulls, perched, // flying + grounded birds, for motion/anatomy review gates
-    SHELF_MARKS, SHELF_TITLES, SHELF_STATS, spineAtlas,   // the lettered spines, for tools/harness/spines.mjs
+    SHELF_BINDING_MARKS, SIGNAL_BINDINGS, BEAM_GLYPHS, HATCH_CODE,
     RELIEF,     // relief asked-vs-applied, for tools/harness/relief.mjs
     // THE STACK (STACK.md) — inspect what the rungs above displaced onto this one.
     // hand = who you are to the stack; ledger() = the raw marks; draft(n) = the
     // inherited water in tide units; tideAt(n) = baseline + draft; evidence(n) =
     // the inherited marks worth rendering (slice 4).
-    hand: HAND, ledger, draft, tideAt, hands, evidence, writings,
+    hand: HAND, ledger, draft, tideAt, effectiveTideAt, hands, evidence, writings,
+    upstreamHandState: () => game.upstreamState(),
+    ambientDuckOwners: () => A.ambientDuckOwners(),
+    audioScore: () => A.scoreState(),
+    pendingRunTimers: () => runTimers.size,
     recordWriting: (text) => recordWriting(text, player), sanitizeWriting,
     clearStack, syncStack, isShared, localStack: LOCAL_STACK,
     // collision oracle for tools/harness/probe.mjs — the playtest probe hunts
     // phantom walls and fall-throughs, and blaming one needs the raw rules.
-    terrain: { walkableY, wallBlocked, heightAt, colliders, GATES, SPOTS },
+    terrain: { walkableY, wallBlocked, heightAt, colliders, GATES, SPOTS, VAULT_OUTCROP },
     // Draw every collider footprint as a red ring laid on the walkable surface.
     // The playtest question "is this wall real?" is only answerable by seeing the
     // collision and the geometry in the same frame. Debug-only, built on demand.
@@ -1931,10 +2135,26 @@ player.onFootstep = (kind, pos) => {
         m.renderOrder = 999;
         g.add(m);
       }
+      const v = VAULT_OUTCROP;
+      const vm = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.1, 32, 1, true), mat);
+      vm.position.set(v.x, walkableY(v.x, v.z) + 0.6, v.z);
+      vm.rotation.y = v.rotation;
+      vm.scale.set(v.colliderX, 1, v.colliderZ);
+      vm.renderOrder = 999;
+      g.add(vm);
       scene.add(g);
-      return colliders().length;
+      return colliders().length + 1;
     },
-    setIntroT: (t) => { if (intro) intro.t = t; },
+    // A debug time jump completes the whole visible transition, not just its
+    // camera clock. Setting the clock past the end used to let endIntro cancel
+    // the title's delayed dismissal, so browser gates could play a correct world
+    // behind an opaque menu and even capture that menu as their "visual" proof.
+    setIntroT: (t) => {
+      if (!intro) return false;
+      intro.t = clamp(t, 0, intro.dur);
+      if (intro.t >= intro.dur) dismissTitle(true);
+      return true;
+    },
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
     setMist: (m) => { mistCur = clamp(m, 0, 1); },
     getMist: () => mistCur,
@@ -1942,24 +2162,28 @@ player.onFootstep = (kind, pos) => {
     getDive: () => dive && { t: dive.t, dur: dive.dur, hurry: !!dive.hurry, snapDone: dive.snapDone },
     ascend: (instant = false) => startAscent(instant),  // #12 stage 1: the dive run backward
     getAscent: () => ascent && { t: ascent.t, dur: ascent.dur, hurry: !!ascent.hurry, snapDone: ascent.snapDone },
-    armOar: () => { W.level = 1; W.flags.returned = true; },   // #22: arm the oar terminal (the climb-out)
-    leave: () => startOarFinale(),                              // #22: trigger the oar terminal (the surface end)
-    ring: () => startFinale(),                                  // the bell terminal (the bottom end) — regression check
-    bottom: () => {                                             // item 4: jump to the bottom, leaning over the keeper
-      W.level = MAX_DEPTH; W.flags.plumbHung = true; W.flags.dove = true;
-      const fp = new THREE.Vector3(); game.modelRefs.tinyFigure.getWorldPosition(fp);
-      player.spawn(new THREE.Vector3(fp.x + 0.8, 0, fp.z + 0.8), Math.atan2(-0.8, -0.8), -0.5);
+    ending: (kind = W.disposition) => {
+      W.level = 1; W.flags.returned = true; W.flags.dispositionChosen = true;
+      commitEnding(kind);
     },
-    getTwist: () => ({ keeperRose: !!W.flags.keeperRose, carried: !!W.flags.carried,
-      rise: +game._keeperRise.toFixed(2), climbing: !!W.flags.climbing, level: W.level }),
+    bottom: () => {
+      window.ABYME.goLevel(MAX_DEPTH);
+      const fp = new THREE.Vector3(); game.modelRefs.tinyFigure.getWorldPosition(fp);
+      // Engine forward is (-sin yaw, -cos yaw). From the +x/+z offset the
+      // figure therefore lies at yaw atan2(+x,+z), not the target delta's
+      // negation. Keep this helper a truthful review pose, not a view away.
+      player.spawn(new THREE.Vector3(fp.x + 0.8, 0, fp.z + 0.8), Math.atan2(0.8, 0.8), -0.5);
+    },
+    getRegard: () => ({ regarded: !!W.flags.lowerHandRegarded,
+      hold: +(game._lowerRegard || 0).toFixed(2), climbing: !!W.flags.climbing, level: W.level }),
     getFinale: () => finale && { kind: finale.kind, t: finale.t, shown: !!finale.shown },
     // --- testing toolkit (loop #118): Sea-Strata level jumps + encounter/state handles ---
     goLevel: (n) => {                                  // jump to a level the RIGHT way (apply its LEVELS row)
       n = Math.max(1, Math.min(n | 0, MAX_DEPTH));
       const L = LEVELS[n];
       W.level = n;
-      syncStack(n);
-      W.tide = W.tideTarget = tideAt(n);               // raised tide + inherited draft (set both: skip the 13s ease)
+      if (n >= 2) W.flags.dove = true;
+      pullStackAt(n, { snap: true });                    // raised tide + inherited draft, plus any permanent authored rise
       if (n >= 2) W.regions.l2seen = true;
       if (n >= 3) W.regions.l3seen = true;
       if (n >= 4) W.regions.l4seen = true;
@@ -1971,19 +2195,24 @@ player.onFootstep = (kind, pos) => {
     dive: (instant = false) => {                       // the missing counterpart to ascend()
       if (W.level >= MAX_DEPTH) { UI.whisper(T.already_at_the_bottom); return false; }
       W.flags.plumbHung = true;                         // arm the plate so the mechanic is valid
-      if (instant) return window.ABYME.goLevel(Math.min(W.level + 1, MAX_DEPTH));
+      if (instant) {
+        game.resolveUpstreamHand({ reveal: false });
+        const landing = completeDescent();
+        beginVista(W.level);
+        return landing;
+      }
       if (MODE !== 'play') return false;
       startDive();
       return true;
     },
     watcher: (cmd) => {                                 // 'spawn' | 'resolve' | 'reset' (the L3 grief figure)
       const w = game.refs.watcher; if (!w) return null;
-      if (cmd === 'resolve') { W.flags.watcherSeen = true; return 'resolved'; }
+      if (cmd === 'resolve') return game.resolveEncounter('watcher') ? 'resolved' : 'already resolved';
       if (cmd === 'reset') {
         W.flags.watcherSeen = false; w.visible = false; w.scale.setScalar(1);
         w.position.set(24, heightAt(24, -88) || 0, -88); game._watcherRegard = 0; return 'reset';
       }
-      if (W.level < 3) W.level = 3;                      // Watcher only active at L>=3
+      if (W.level < 3) window.ABYME.goLevel(3);           // apply the canonical rung transition
       W.flags.watcherSeen = false;
       const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
       const wx = player.pos.x + fx * 12, wz = player.pos.z + fz * 12;
@@ -1998,6 +2227,8 @@ player.onFootstep = (kind, pos) => {
     // same browser can read reports directly. applyReport() restores the whole thing:
     // paste a report and stand exactly where the reporter stood, seeing what they saw.
     report: (note = '', withShot = true) => {
+      const replay = currentReportCapture();
+      const saveSnapshot = packSave(W, player);
       save(player);
       let shot = null;
       if (withShot) {
@@ -2006,18 +2237,20 @@ player.onFootstep = (kind, pos) => {
           shot = renderer.domElement.toDataURL('image/jpeg', 0.7);
         } catch (e) { shot = null; }
       }
+      const thumbnail = replay.kind === OBSERVATION_ONLY && shot ? makeReportThumbnail() : null;
       const rep = {
-        v: 1, t: new Date().toISOString(), note,
+        v: REPORT_VERSION, t: new Date().toISOString(), note,
         pos: [player.pos.x, player.pos.y, player.pos.z].map((n) => +n.toFixed(2)),
         yaw: +player.yaw.toFixed(3), pitch: +player.pitch.toFixed(3),
-        mode: MODE,
+        mode: MODE, replay,
         state: window.ABYME.state(),
         perf: { fps: +fps.toFixed(0), draws: renderer.info.render.calls, tris: renderer.info.render.triangles,
           gpuMs: gpuTimer ? +gpuTimer.ms.toFixed(1) : null, dpr: renderer.getPixelRatio() },
         ua: navigator.userAgent,
-        save: JSON.parse(localStorage.getItem('abyme-save-v1') || 'null'),
+        save: saveSnapshot,
+        ...(thumbnail ? { thumbnail } : {}),
       };
-      const lean = JSON.stringify(rep);                     // the paste-to-chat blob (no screenshot)
+      const lean = JSON.stringify(rep);                     // the paste-to-chat blob (no full-size screenshot)
       try { navigator.clipboard?.writeText(lean); } catch (e) {}
       try {
         const ring = JSON.parse(localStorage.getItem('abyme-reports') || '[]');
@@ -2035,44 +2268,40 @@ player.onFootstep = (kind, pos) => {
       return rep;
     },
     applyReport: (rep) => {                              // stand where the reporter stood
-      if (typeof rep === 'string') rep = JSON.parse(rep);
-      if (rep.save) {
-        localStorage.setItem('abyme-save-v1', JSON.stringify(rep.save));
-        if (load()) {
-          const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen', 6: 'keeperSong' };
-          for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
-        }
-      }
-      if (rep.pos) player.spawn(new THREE.Vector3(rep.pos[0], 0, rep.pos[2]), rep.yaw ?? 0, rep.pitch ?? 0);
+      const replay = parseReplayReport(rep);
+      // Validate before touching the current run. A replay is a complete run boundary,
+      // not a field overlay: no cinematic, delayed note, reader, score node, or queued
+      // whisper from the run being replaced may survive into the reported frame.
+      A.init();
+      resetRunState({ persist: false });
+      localStorage.setItem(SAVE_KEY, JSON.stringify(replay.save));
+      if (!load()) throw new Error('field report save was rejected');
+      const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen', 6: 'keeperSong' };
+      for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
+      W.atTop = replay.atTop;
+      syncGates(W); // gallery collision must exist before Player.spawn resolves its floor
+      player.spawn(new THREE.Vector3(...replay.pos), replay.yaw, replay.pitch);
       player.locked = false; interact.enabled = true; MODE = 'play';
-      return { at: rep.pos, level: W.level, note: rep.note || '' };
+      return { at: replay.pos, atTop: replay.atTop, level: W.level, note: replay.report.note || '' };
     },
     // Reports live in localStorage, which is scoped PER ORIGIN — one filed on the
     // deployed site is invisible on localhost and vice versa. This is the way across:
     // paste the blob F8 put on your clipboard (or the contents of the downloaded
     // JSON) and it joins this browser's ring, addressable by ?report=<t> like any
-    // other. Screenshots are dropped: the ring has never stored them.
+    // other. Full-size screenshots are dropped; bounded observation thumbnails
+    // remain with non-replayable reports so the URL can still show what was seen.
     importReport: (x) => {
-      let rep = x;
-      if (typeof rep === 'string') rep = JSON.parse(rep);
-      if (!rep || !rep.pos || !rep.t) throw new Error('that does not look like a field report');
-      delete rep.shot;
+      const { report: rep } = parseFieldReport(x);
+      const stored = { ...rep };
+      delete stored.shot;
       const ring = JSON.parse(localStorage.getItem('abyme-reports') || '[]');
-      if (!ring.some((r) => r.t === rep.t)) ring.push(rep);
+      if (!ring.some((r) => r.t === stored.t)) ring.push(stored);
       while (ring.length > 10) ring.shift();
       localStorage.setItem('abyme-reports', JSON.stringify(ring));
-      return rep.t;
+      return stored.t;
     },
     reports: () => JSON.parse(localStorage.getItem('abyme-reports') || '[]'),
-    resetFlags: () => {                                 // in-world soft reset (no reload) for replaying chains
-      Object.keys(W.flags).forEach((k) => { W.flags[k] = false; });
-      W.level = 1; W.tide = W.tideTarget = 1; W.stems = 0;
-      W.lensPlaced = false; W.beamAngle = 2.2; W.dials = [0, 0, 0, 0]; W.inventory = [];
-      W.onceKeys = []; W.readKeys = [];
-      W.regions = { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] };
-      save(player);
-      return 'flags reset (in-world)';
-    },
+    resetFlags: resetRunState,                       // canonical in-world reset for deterministic replay
     tideFigure: () => {                                // spawn/reset the L2 Tide-Figure ~12m ahead, for testing
       if (W.level !== 2) window.ABYME.goLevel(2);
       W.flags.tideFigureSeen = false;
@@ -2092,12 +2321,14 @@ player.onFootstep = (kind, pos) => {
       const bd = Math.abs(((W.beamAngle - CLIFF_AZ + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
       return {
         level: W.level, levelId: L.id, region: L.region || 'none', encounter: L.encounter,
+        atTop: W.atTop,
         time: +W.time.toFixed(2), window: isDawn() ? 'dawn' : isGolden() ? 'golden' : isNight() ? 'night' : 'day',
         sunFrozen: W.timeDrift === 0,
         tide: +W.tide.toFixed(2), tideTarget: +W.tideTarget.toFixed(2), waterY: +waterY().toFixed(2),
         beamDelta: +bd.toFixed(3),
-        regions: { l2: W.regions.l2seen, l3: W.regions.l3seen, l4: W.regions.l4seen, fragments: W.regions.fragmentsFound.slice() },
+        regions: { l2: W.regions.l2seen, l3: W.regions.l3seen, l4: W.regions.l4seen },
         inventory: W.inventory.slice(), stems: W.stems, once: W.onceKeys.length,
+        notebook: { entries: W.notebook.entries.length, deep: notebook.deepCount(), hints: { ...W.notebook.hintLevels } },
         // THE STACK (STACK.md §3.2): what the rungs above displaced onto this one.
         // draft is in tide units — tideAt() is the tide this rung ACTUALLY sits at,
         // its authored LEVELS baseline plus everything inherited.
@@ -2105,12 +2336,73 @@ player.onFootstep = (kind, pos) => {
           hand: handId(), shared: isShared(), draft: +draft().toFixed(3), tideAt: +tideAt().toFixed(3),
           hands: hands(), marks: ledger().marks.length, evidence: evidence().length,
         },
-        flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'tideFigureSeen', 'bellRung', 'readGlass', 'phialTaken', 'phialDried', 'beamDeepSeen', 'keeperSong'].filter((k) => F[k]),
+        flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchCodeDecoded', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'upstreamHandSurged', 'upstreamHandWitnessed', 'registerRead', 'watcherSeen', 'tideFigureSeen', 'lowerHandRegarded', 'dispositionChosen', 'endingCommitted', 'readGlass', 'phialTaken', 'phialDried', 'beamDeepSeen', 'keeperSong'].filter((k) => F[k]),
       };
     },
   };
-  buildDebugPanel();   // AFTER window.ABYME is assigned — the panel readout + buttons reference it
+  if (!DEBUG_MUTATIONS) {
+    // Keep the public collaboration surface intentionally tiny. Report replay is
+    // allowed to restore this browser's own local state; world/ledger mutation
+    // shortcuts exist only on ?debug&localstack.
+    const { report, applyReport, importReport, reports, state } = window.ABYME;
+    window.ABYME = Object.freeze({ report, applyReport, importReport, reports, state });
+  }
+  if (DEBUG_MUTATIONS) buildDebugPanel();
+  installFieldReportUI();
 }
+
+let reportNoteWasLocked = false;
+function closeFieldReportPrompt() {
+  const noteEl = document.getElementById('note-overlay');
+  if (!noteEl) return;
+  noteEl.hidden = true;
+  player.locked = reportNoteWasLocked;
+}
+
+function openFieldReportPrompt() {
+  const noteEl = document.getElementById('note-overlay');
+  const noteText = document.getElementById('note-text');
+  if (!noteEl || !noteText) { window.ABYME.report(''); return; }
+  if (!noteEl.hidden) return;
+  reportNoteWasLocked = player.locked;
+  player.locked = true;
+  try { document.exitPointerLock?.(); } catch (_) {}
+  noteText.value = '';
+  noteEl.hidden = false;
+  setTimeout(() => noteText.focus(), 0);
+}
+
+function submitFieldReport() {
+  const noteText = document.getElementById('note-text');
+  const note = (noteText?.value || '').trim();
+  let rep;
+  try { rep = window.ABYME.report(note); }
+  catch (error) { UI.whisper(error.message, 5200); return; }
+  closeFieldReportPrompt();
+  // Refreshing this URL returns to the exact reported frame.
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set('report', rep.t);
+    history.replaceState(null, '', u);
+  } catch (_) {}
+}
+
+function installFieldReportUI() {
+  const noteEl = document.getElementById('note-overlay');
+  const noteText = document.getElementById('note-text');
+  addEventListener('keydown', (e) => {
+    if (e.code === 'F8') { e.preventDefault(); openFieldReportPrompt(); }
+  });
+  document.getElementById('dbg-report')?.addEventListener('click', openFieldReportPrompt);
+  noteEl?.querySelector('#note-send')?.addEventListener('click', submitFieldReport);
+  noteEl?.querySelector('#note-cancel')?.addEventListener('click', closeFieldReportPrompt);
+  noteText?.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.code === 'Enter' && !e.shiftKey) { e.preventDefault(); submitFieldReport(); }
+    if (e.code === 'Escape') { e.preventDefault(); closeFieldReportPrompt(); }
+  });
+}
+
 function buildDebugPanel() {
   const A = window.ABYME;
   const tp = (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch);
@@ -2134,19 +2426,27 @@ function buildDebugPanel() {
     bird: () => { W.flags.heardBox = W.flags.heardBird = W.flags.birdSolved = true; W.stems = Math.max(W.stems, 3); },
     lens: () => { W.flags.lensTaken = true; if (!W.inventory.includes('lens')) W.inventory.push('lens'); },
     beamOn: () => { W.flags.lensTaken = true; W.lensPlaced = true; if (W.time > 4.6 && W.time < 20.6) W.time = 22; W.beamAngle = CLIFF_AZ; },
-    glyphs: () => { W.flags.glyphsSeen = true; W.stems = Math.max(W.stems, 5); },
+    glyphs: () => {
+      W.flags.glyphsSeen = true;
+      notebook.record('evidence.beam-glyphs', { glyphs: [...BEAM_GLYPHS] });
+    },
+    signalShelf: () => notebook.readLore('signal_shelf', 'surface'),
     glass: () => { W.flags.readGlass = true; if (!W.inventory.includes('readglass')) W.inventory.push('readglass'); },
     allSurface: () => {
-      ['valveTurned', 'crankUsed', 'chestOpen', 'rulerTaken', 'rulerPlaced', 'heardBox', 'heardBird', 'birdSolved', 'lensTaken', 'glyphsSeen', 'shadowRevealed', 'hatchOpen', 'plumbTaken', 'plumbHung'].forEach((f) => { W.flags[f] = true; });
-      W.lensPlaced = true; W.dials = [3, 7, 1, 5]; W.beamAngle = CLIFF_AZ; W.stems = 5;
-      W.inventory = W.inventory.filter((x) => x !== 'ruler' && x !== 'lens');
-      if (!W.inventory.includes('plumb')) W.inventory.push('plumb');
+      ['valveTurned', 'crankUsed', 'chestOpen', 'rulerTaken', 'rulerPlaced', 'heardBox', 'heardBird', 'birdSolved', 'lensTaken', 'glyphsSeen', 'hatchCodeDecoded', 'shadowRevealed', 'hatchOpen', 'plumbTaken', 'plumbHung'].forEach((f) => { W.flags[f] = true; });
+      W.lensPlaced = true; W.dials = [...HATCH_CODE]; W.beamAngle = CLIFF_AZ; W.stems = 5;
+      if (!notebook.has('evidence.beam-glyphs')) notebook.record('evidence.beam-glyphs', { glyphs: [...BEAM_GLYPHS] });
+      if (!notebook.hasReadLore('signal_shelf')) notebook.readLore('signal_shelf', 'surface');
+      W.inventory = W.inventory.filter((x) => x !== 'ruler' && x !== 'lens' && x !== 'plumb');
+      for (const kind of ['valve', 'crank', 'chest', 'ruler', 'stones', 'lens', 'hatch', 'plumb']) {
+        recordAct(kind, player);
+      }
     },
     // Grant — bluff / dive chain
     shadow: () => { W.flags.shadowRevealed = true; },
-    hatch: () => { W.dials = [3, 7, 1, 5]; W.flags.shadowRevealed = W.flags.hatchOpen = true; W.stems = Math.max(W.stems, 4); },
+    hatch: () => { W.dials = [...HATCH_CODE]; W.flags.shadowRevealed = W.flags.hatchCodeDecoded = W.flags.hatchOpen = true; W.stems = Math.max(W.stems, 5); },
     plumb: () => { W.flags.plumbTaken = true; if (!W.inventory.includes('plumb')) W.inventory.push('plumb'); },
-    diveArm: () => { W.flags.plumbTaken = W.flags.plumbHung = true; if (!W.inventory.includes('plumb')) W.inventory.push('plumb'); },
+    diveArm: () => { W.flags.plumbTaken = W.flags.plumbHung = true; W.inventory = W.inventory.filter((x) => x !== 'plumb'); },
     // Levels & dives (SEA-STRATA)
     L1: () => A.goLevel(1), L2: () => A.goLevel(2), L3: () => A.goLevel(3), L4: () => A.goLevel(4),
     dive: () => A.dive(false), diveI: () => A.dive(true), asc: () => A.ascend(false), ascI: () => A.ascend(true),
@@ -2154,18 +2454,26 @@ function buildDebugPanel() {
     // Encounters
     birdSing: () => { tp(SPOTS.stones.x, SPOTS.stones.y - 12, 0); if (game._birdSing) game._birdSing(); },   // tp first — _birdSing no-ops >38m
     wSpawn: () => A.watcher('spawn'), wResolve: () => A.watcher('resolve'), wReset: () => A.watcher('reset'),
-    twist: () => { A.bottom(); W.onceKeys = W.onceKeys.filter((k) => k !== 'keeperTwist'); W.flags.keeperRose = true; },
-    carried: () => { W.flags.keeperRose = true; W.flags.carried = true; }, tideFig: () => A.tideFigure(),
-    // Endings
-    ring: () => A.ring(), oar: () => { A.armOar(); A.leave(); }, replayIntro: () => A.setIntroT(0),
+    regard: () => { A.bottom(); game.resolveLowerHand(); },
+    tideFig: () => A.tideFigure(),
+    depthGates: () => {
+      ['upstreamHandWitnessed', 'tideFigureSeen', 'registerRead', 'watcherSeen', 'lowerHandRegarded', 'dispositionChosen'].forEach((key) => { W.flags[key] = true; });
+    },
+    // Ending commitments
+    tend: () => A.ending('tend'), carry: () => A.ending('carry'),
+    open: () => A.ending('open'), close: () => A.ending('close'),
+    replayIntro: () => A.setIntroT(0),
     // Power & Reset
     bench: () => { W.time = 12; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); },
     replayCine: () => { W.onceKeys.length = 0; },
-    markLore: () => { W.readKeys = ['keeper_logbook', 'coat_letter', 'stone_inscription', 'music_note', 'bottle_note', 'quarters_journal', 'lens_mark_study', 'lens_mark_stone', 'kelp_slate', 'bluff_cairn', 'source_note', 'pool_phial', 'model_margin', 'drain_ledger', 'commendation_copy', 'closure_notice', 'field_slip', 'transfer_offer']; },
-    clearLore: () => { W.readKeys.length = 0; },
+    markLore: () => {
+      for (const [id, lore] of Object.entries(LORE)) {
+        if (lore.notes?.surface && !notebook.has(lore.notes.surface)) notebook.readLore(id, 'surface');
+        if (lore.deep?.length && lore.notes?.deep && !notebook.has(lore.notes.deep)) notebook.readLore(id, 'deep');
+      }
+    },
+    clearNotes: () => notebook.reset(),
     readLog: () => UI.openReader('keeper_logbook'), readQ: () => UI.openReader('quarters_journal'),
-    fragAdd: () => { W.regions.fragmentsFound.push('test-' + W.regions.fragmentsFound.length); },
-    fragClear: () => { W.regions.fragmentsFound.length = 0; },
     clrRegions: () => { W.regions.l2seen = W.regions.l3seen = W.regions.l4seen = false; },
     saveNow: () => save(player), wipe: () => { wipe(); location.reload(); }, reset: () => A.resetFlags(),
   };
@@ -2175,7 +2483,7 @@ function buildDebugPanel() {
       ['beach', 'beach', 'Wake-up / dive-landing beach (4,-104)'], ['study', 'study', 'Lighthouse study / chart table — the hub (valve, crank, model, plate, hook, bell)'],
       ['stones', 'stones', 'Standing-stones vantage — all 5 in view'], ['islet', 'islet', 'Reading-glass islet (138,-141) — grab the brass glass + lens-mark stone'],
       ['cliff', 'cliff', 'In front of the glyph cliff — watch the lighthouse beam write glyphs'], ['bridge', 'bridge', 'Chasm bridge deck (needs ruler✓ first, or you fall)'],
-      ['dory', 'dory', 'Beached dory / oar — the surface LEAVE terminal'], ['bluff', 'bluff', 'Bluff hatch TOP (surface pad above the cellar)'],
+      ['dory', 'dory', 'Beached dory and its optional oar'], ['bluff', 'bluff', 'Bluff hatch TOP (surface pad above the cellar)'],
       ['cellar', 'cellar↓', 'DOWN into the cellar/vault interior (auto-opens the hatch) — plumb, vault vista, room-that-disagrees'],
     ] },
     { title: 'Time & Tide', open: true, items: [
@@ -2187,36 +2495,38 @@ function buildDebugPanel() {
     { title: 'Grant — surface chain', open: false, items: [
       ['ruler', 'ruler+', 'Grant the ruler item (rulerTaken + inventory, de-duped)'], ['rulerPlace', 'ruler✓ bridge', 'Place the ruler → raises the chasm bridge (rulerPlaced, stem 2)'],
       ['bird', 'bird✓', 'Solve the stones in one tap (opens the lens vault). Use Encounters→"bird sing" to actually hear it'], ['lens', 'lens+', 'Grant the first lens item (does NOT place it — use "beam on")'],
-      ['beamOn', 'beam on', 'Place the lens + go to night + aim the beam at the cliff. Teleport→cliff to see the glyphs light'], ['glyphs', 'glyphs✓', 'Grant glyphsSeen (the beam endgame) + stem 5, without perfect alignment'],
+      ['beamOn', 'beam on', 'Place the lens + go to night + aim the beam at the cliff. Teleport→cliff to see the glyphs light'], ['glyphs', 'beam read', 'Record the four beam glyphs without solving their numbers'],
+      ['signalShelf', 'index read', 'Read the eight figure-to-instrument bindings without viewing the beam'],
       ['glass', 'glass+', 'Grant the reading glass — fades up the two lampblack lens-marks (study + stone)'], ['allSurface', 'ALL surface✓', 'Grant the ENTIRE surface→dive-armed chain + stems 1–5. Does NOT dive — leaves you at L1, plate armed'],
     ] },
     { title: 'Grant — bluff / dive chain', open: false, items: [
-      ['shadow', 'shadow✓', 'Reveal the 4 hatch glyph dials (the golden-hour shimmer click)'], ['hatch', 'hatch✓ code', 'Set dials to 3·7·1·5 + open the hatch (stem 4)'],
-      ['plumb', 'plumb+', 'Grant the plumb-bob item (does NOT hang it)'], ['diveArm', 'dive armed', 'Hang the plumb → the dive plate goes live (plumbHung). Adds plumb to inventory'],
+      ['shadow', 'shadow✓', 'Reveal the four hatch numeral dials (the golden-hour shimmer click)'], ['hatch', 'hatch✓ code', `Set numeral dials to ${HATCH_CODE.join('·')} + open the hatch`],
+      ['plumb', 'plumb+', 'Grant the plumb-bob item (does NOT hang it)'], ['diveArm', 'dive armed', 'Hang the plumb → the dive plate goes live (plumbHung). Consumes the held plumb'],
     ] },
     { title: 'Levels & dives — SEA-STRATA', open: true, items: [
       ['L1', 'L1 surface', 'Jump to L1 (surface): LEVELS[1] spawn (4,-104), tide 1.0, regions cleared'], ['L2', 'L2 shallows', 'Jump to L2 (shallows): raised tide 1.35, region2 visible, marks l2seen'],
-      ['L3', 'L3 midwater', 'Jump to L3 (midwater): drowned-hall overlook, raised tide 1.65, region3 visible (Watcher active)'], ['L4', 'L4 source', 'Jump to L4 (bottom): study spawn, raised tide 1.9, region4 visible (keeper twist)'],
-      ['dive', 'dive ▼', 'Run the REAL 21s dive cinematic (+1 level). Auto-arms the plate'], ['diveI', 'dive ▼ i', 'Instant dive: +1 level with LEVELS spawn/tide/region applied, no cinematic'],
+      ['L3', 'L3 midwater', 'Jump to L3 (midwater): drowned-hall overlook, raised tide 1.65, region3 visible (Watcher active)'], ['L4', 'L4 source', 'Jump to L4 (bottom): study spawn, raised tide 1.9, region4 visible'],
+      ['dive', 'dive ▼', 'Run the 21s crossing directly for cinematic review'], ['diveI', 'dive ▼ i', 'Force the next level instantly for visual review'],
       ['asc', 'ascend ▲', 'Run the REAL 28s ascent cinematic (−1 level)'], ['ascI', 'ascend ▲ i', 'Instant ascent: −1 level, no cinematic'],
-      ['bottom', 'bottom', 'Jump to the bottom (L4) leaning over the keeper figure — fires the twist proximity'],
+      ['bottom', 'bottom', 'Jump to the bottom (L4) beside the lower hand'],
     ] },
     { title: 'Encounters', open: true, items: [
       ['birdSing', 'bird sing', 'Teleport to the stones + force the dawn songbird to sing now (set time→dawn for full audio)'], ['wSpawn', 'Watcher spawn', 'Spawn/reset the Watcher ~12m ahead (forces L≥3). Hold its gaze ~2.6s to resolve it for real'],
       ['wResolve', 'Watcher resolve', 'Force-resolve the Watcher (watcherSeen) — it lifts its head and dissolves'], ['wReset', 'Watcher reset', 'Reset the Watcher to its origin + clear watcherSeen so it can be re-tested'],
-      ['twist', 'keeper twist', 'Force the bottom twist: jump to the bottom + set keeperRose (the figure has risen)'], ['carried', 'carried ✓', 'Set the "rose with you" branch (keeperRose+carried) to test the carried ending'],
+      ['regard', 'lower hand✓', 'Complete the bottom regard challenge while leaving the figure separate'], ['depthGates', 'depth gates✓', 'Grant the L2, L3 and L4 embodied evidence gates'],
       ['tideFig', 'Tide-Figure', 'Spawn the L2 Tide-Figure ~12m ahead (forces L2). Stand still and watch ~2.6s to resolve it; wade toward it and it disperses'],
     ] },
-    { title: 'Endings', open: false, items: [
-      ['ring', 'ring bell', 'BELL ending (accept the loop). Tone forks by depth — set the level first'], ['oar', 'row oar', 'OAR ending (leave, changed): arms + runs the look-back finale'],
+    { title: 'Ending dispositions', open: false, items: [
+      ['tend', 'tend', 'Commit TEND at the returned surface plate'], ['carry', 'carry', 'Commit CARRY at the returned surface plate'],
+      ['open', 'open', 'Commit OPEN at the returned surface plate'], ['close', 'close', 'Commit CLOSE at the returned surface plate'],
       ['replayIntro', 'replay intro', 'Restart the 19s intro flight (if one is live; else wipe+reload)'],
     ] },
     { title: 'Power & Reset', open: false, items: [
       ['bench', 'bench (perf)', 'Fixed power-benchmark pose (noon + identical spawn) so the readout below is comparable run-to-run'],
       ['replayCine', 'replay cines', 'Clear onceKeys so every one-time cinematic can fire again — the #1 reason a beat "won’t replay"'],
-      ['markLore', 'mark lore read', 'Mark every lore fragment read (audit the deep-reveal economy). Use "read log/Q" to actually display them'], ['clearLore', 'clear lore', 'Empty readKeys so first-read lines + deep reveals fire fresh'],
+      ['markLore', 'mark lore read', 'Record every surface and later artifact entry in the notebook'], ['clearNotes', 'clear notes', 'Empty stable notebook evidence and requested hint tiers'],
       ['readLog', 'read log', 'Open the keeper’s logbook reader (deep page at L≥3)'], ['readQ', 'read Q', 'Open the quarters journal reader (deep page at L≥3)'],
-      ['fragAdd', 'frag+', 'Push a test id into regions.fragmentsFound (exercise the strata persistence)'], ['fragClear', 'frag clr', 'Empty regions.fragmentsFound'], ['clrRegions', 'clr seen', 'Clear l2/l3/l4 seen — re-test "first reach" growth'],
+      ['clrRegions', 'clr seen', 'Clear l2/l3/l4 seen — re-test first-reach growth'],
       ['saveNow', 'save', 'Force a save() of current state + position'], ['reset', 'reset flags', 'Soft-reset all flags/level/tide/inventory/onceKeys to defaults WITHOUT reloading'], ['wipe', 'wipe ↻', 'Wipe the save + reload for a clean first-run — the cure for stale state'],
     ] },
   ];
@@ -2232,65 +2542,12 @@ function buildDebugPanel() {
     ${groups.map(grp).join('')}
     <div id="dbg-fps"></div>`;
   document.body.appendChild(el);
-  el.style.display = DEBUG ? '' : 'none';   // players: hidden by default, revealed with backtick (`)
+  el.style.display = 'none';   // deliberately opt-in even in local debug; backtick reveals it
   // hide/show the panel (owner request): the "hide" header collapses it; backtick (`) toggles it back.
   const hideBtn = el.querySelector('#dbg-hide');
   if (hideBtn) hideBtn.addEventListener('click', () => { el.style.display = 'none'; });
   addEventListener('keydown', (e) => {
     if (e.code === 'Backquote') { e.preventDefault(); el.style.display = (el.style.display === 'none') ? '' : 'none'; }
-    // the field report works from ANYWHERE, panel open or not (debug-together).
-    if (e.code === 'F8') { e.preventDefault(); askNote(); }
-  });
-  el.querySelector('#dbg-report')?.addEventListener('click', () => askNote());
-  // --- LEAVING A NOTE ---------------------------------------------------------
-  // The report payload has carried a `note` field since it was written, and until now
-  // NOTHING COULD FILL IT: both triggers passed a hardcoded ''. The original attempt
-  // used prompt(), embedded browser panes block modal dialogs silently, and the fix
-  // was to drop the note rather than replace the input — so the one field that says
-  // what is actually wrong always arrived empty, and the owner reasonably could not
-  // find where to type. This is that input, as a DOM overlay we own and no pane can
-  // swallow.
-  //
-  // The screenshot is unaffected by the overlay: toDataURL reads the WebGL canvas,
-  // and this is DOM on top of it. So the report can be assembled on submit and still
-  // shows the world exactly as it looked when F8 was pressed.
-  const noteEl = document.getElementById('note-overlay');
-  const noteText = document.getElementById('note-text');
-  let noteWasLocked = false;
-  const closeNote = () => {
-    if (!noteEl) return;
-    noteEl.hidden = true;
-    player.locked = noteWasLocked;          // hand movement back exactly as we found it
-  };
-  const askNote = () => {
-    if (!noteEl || !noteText) { A.report(''); return; }   // never lose a report to a missing overlay
-    if (!noteEl.hidden) return;
-    noteWasLocked = player.locked;
-    player.locked = true;                   // freeze the world while they type
-    try { document.exitPointerLock?.(); } catch (_) {}
-    noteText.value = '';
-    noteEl.hidden = false;
-    setTimeout(() => noteText.focus(), 0);
-  };
-  const sendNote = () => {
-    const note = (noteText?.value || '').trim();
-    closeNote();
-    const rep = A.report(note);
-    // stamp the URL so a plain REFRESH lands back in this exact frame. This is what
-    // makes the loop work: report a bug, keep playing, and when a fix ships just
-    // reload to check the same spot rather than trying to walk back to it.
-    try {
-      const u = new URL(location.href);
-      u.searchParams.set('report', rep.t);
-      history.replaceState(null, '', u);
-    } catch (_) {}
-  };
-  noteEl?.querySelector('#note-send')?.addEventListener('click', sendNote);
-  noteEl?.querySelector('#note-cancel')?.addEventListener('click', closeNote);
-  noteText?.addEventListener('keydown', (e) => {
-    e.stopPropagation();                    // never let W/A/S/D typed into the note walk the player
-    if (e.code === 'Enter' && !e.shiftKey) { e.preventDefault(); sendNote(); }
-    if (e.code === 'Escape') { e.preventDefault(); closeNote(); }
   });
 
   const tslider = el.querySelector('#dbg-time'); tslider.value = W.time;
@@ -2307,7 +2564,7 @@ function buildDebugPanel() {
     s1.textContent = `L${s.level} ${s.levelId} · ${s.region} · ${s.encounter} · tide ${s.tide}${s.tide !== s.tideTarget ? '→' + s.tideTarget : ''} (y${s.waterY}) · ${s.window} ${s.time}h${s.sunFrozen ? ' ❄' : ''}`;
     s1.className = s.tide > 1 ? 'raised' : '';
     const seen = [s.regions.l2 && '2', s.regions.l3 && '3', s.regions.l4 && '4'].filter(Boolean).join('') || '—';
-    s2.textContent = `inv:[${s.inventory.join(',') || '—'}] · stems ${s.stems} · once ${s.once} · beamΔ${s.beamDelta} · ${s.flags.join(' ') || 'no key flags'} · seen:${seen} frags:${s.regions.fragments.length}`;
+    s2.textContent = `inv:[${s.inventory.join(',') || '—'}] · stems ${s.stems} · once ${s.once} · notes ${s.notebook.entries} (${s.notebook.deep} deep) · beamΔ${s.beamDelta} · ${s.flags.join(' ') || 'no key flags'} · seen:${seen}`;
     s2.className = s.flags.length ? '' : 'dim';
     const calls = renderer.info.render.calls, tris = renderer.info.render.triangles;
     const gms = gpuTimer ? gpuTimer.ms : 0;
@@ -2398,7 +2655,7 @@ renderer.setAnimationLoop((tMs) => {
   syncGates(W);
   // idle drift of the sun — barely perceptible, but the island lives
   if (MODE === 'play') W.time = (W.time + W.timeDrift * dt) % 24;
-  if (MODE === 'play') A.musicTo(W.level);   // the era music bed follows the descent (crossfades by level)
+  if (MODE === 'play') A.musicTo(W.level);   // the generative era bed retargets with the descent
 
   if (MODE === 'intro' && intro) {
     intro.t += dt;
@@ -2429,11 +2686,13 @@ renderer.setAnimationLoop((tMs) => {
 
   if (MODE === 'dive' && dive) tickDive(dt);
   if (MODE === 'ascend' && ascent) tickAscent(dt);
-  if (MODE === 'finale' && finale) tickFinale(dt);
 
-  if (!W.reading && !W.writing) player.update(dt); // read/write surfaces hold the player's hand still
+  if (!W.reading && !W.notesOpen && !W.writing) player.update(dt); // reading surfaces hold the player's hand still
   game.tick(dt, elapsed);
   runDrives(W, dt, elapsed);   // #73: the self-gating per-entity drives
+  // Finale state is deliberately last: the gameplay tick keeps the returned world
+  // alive, then the chosen tableau owns its waterline, threshold, and camera.
+  if (MODE === 'finale' && finale) tickFinale(dt);
   tickModelGate(dt);
   // #6: re-aim the tree LOD at the player every ~0.35s (hysteresis lives in the partition)
   treeLodTimer -= dt;
@@ -2484,14 +2743,32 @@ renderer.setAnimationLoop((tMs) => {
 // The card that comes up when ?report= finds nothing. Kept next to rehydrateFromReport
 // because they are one feature: the URL either lands you in the frame, or it tells you
 // precisely why it could not and hands you the way through.
-function offerImport(asked, ringSize) {
+function offerImport(asked, ringSize, replayError = '', report = null) {
   const el = document.getElementById('import-overlay');
   const ta = document.getElementById('import-text');
   const why = document.getElementById('import-why');
   if (!el || !ta) { console.warn('[abyme] ?report=' + asked + ' matched nothing'); return; }
-  why.textContent = ringSize === 0
+  const title = el.querySelector('.sheet-title');
+  if (title) title.textContent = replayError
+    ? 'That report cannot be replayed'
+    : 'That report isn’t in this browser';
+  why.textContent = replayError
+    ? `That report cannot be replayed: ${replayError}.`
+    : ringSize === 0
     ? `This browser has no reports at all, and ?report=${asked} asked for one. Reports are stored per site — one you filed on a different address (the deployed site vs. localhost) is not visible here.`
     : `No report here matches "${asked}". This browser holds ${ringSize}; try ?report=last, or paste the one you want.`;
+  el.querySelector('.report-observation')?.remove();
+  if (replayError && typeof report?.thumbnail === 'string' && report.thumbnail.startsWith('data:image/')) {
+    const figure = document.createElement('figure');
+    figure.className = 'report-observation';
+    const image = document.createElement('img');
+    image.src = report.thumbnail;
+    image.alt = `Captured ${report.mode || 'observation'} world frame`;
+    const caption = document.createElement('figcaption');
+    caption.textContent = 'Captured world frame (observation only)';
+    figure.append(image, caption);
+    ta.before(figure);
+  }
   el.hidden = false;
   setTimeout(() => ta.focus(), 0);
   const close = () => { el.hidden = true; };

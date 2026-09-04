@@ -1,12 +1,9 @@
 // audio.js — nearly every sound is synthesized: the surf gain is driven by the
 // same wave function the water shader displaces, so the swell you hear is the
 // swell you see, and solved puzzles add permanent stems to the island's score.
-// The one exception is the keeper's VOICE (say()) — a real recording, played
-// through the same drowned bus as the synth murmur so it stays one floor down.
 
 import { STONE_NOTES } from './props.js';
 import { clamp, lerp } from './util.js';
-import { loadAudioBuffer, evictAudio } from './assets.js';
 
 let ctx = null;
 
@@ -231,12 +228,23 @@ const A = {
     }
   },
 
-  // the brink of a dive: the world holds its breath. Surf and wind pull back
-  // to near-silence so the choice to descend stands in the quiet alone; it
-  // swells back as the dive carries you down (or when you step away).
-  duckAmbient(on) {
-    if (!this.ready) return;
-    this.amb.gain.setTargetAtTime(on ? 0.05 : 1, ctx.currentTime, on ? 0.45 : 1.4);
+  // The brink of a dive and authored beats can overlap now that the Upstream Hand
+  // leaves control live. Give independent systems ownership of the held breath:
+  // releasing one must not swell the surf while another still needs the quiet.
+  // Ordinary gameplay beats share one owner; long-running independent effects name
+  // their own owner so releasing one cannot restore the surf beneath another.
+  duckAmbient(on, owner = 'gameplay') {
+    this._ambientDuckOwners ||= new Set();
+    const key = String(owner || 'gameplay');
+    if (on) this._ambientDuckOwners.add(key);
+    else this._ambientDuckOwners.delete(key);
+    const ducked = this._ambientDuckOwners.size > 0;
+    if (this.ready) this.amb.gain.setTargetAtTime(ducked ? 0.05 : 1, ctx.currentTime, ducked ? 0.45 : 1.4);
+    return ducked;
+  },
+
+  ambientDuckOwners() {
+    return [...(this._ambientDuckOwners || [])].sort();
   },
 
   // ---------------- one-shots ----------------
@@ -436,6 +444,51 @@ const A = {
     o.connect(g).connect(this.fx); o.start(t0); o.stop(t0 + 0.06);
   },
 
+  // THE UPSTREAM HAND: make the scale break audible. A bright mechanism falls
+  // through the audible range toward a room-sized pressure tone while four brass
+  // ticks mark the miniature wheel. It is a one-shot graph—zero steady-state DSP.
+  upstreamHand(at = null) {
+    if (!this._running()) return;
+    const t0 = ctx.currentTime;
+    const out = this._out(at, this.fx);
+    const body = ctx.createGain();
+    body.gain.setValueAtTime(0.0001, t0);
+    body.gain.exponentialRampToValueAtTime(0.16, t0 + 0.65);
+    body.gain.exponentialRampToValueAtTime(0.22, t0 + 4.8);
+    body.gain.exponentialRampToValueAtTime(0.0001, t0 + 8.2);
+    const low = ctx.createBiquadFilter(); low.type = 'lowpass'; low.Q.value = 0.8;
+    low.frequency.setValueAtTime(5200, t0);
+    low.frequency.exponentialRampToValueAtTime(180, t0 + 6.8);
+    body.connect(low).connect(out);
+    const voices = [];
+    for (const [type, start, end, vol] of [
+      ['sine', 1760, 55, 1],
+      ['triangle', 1320, 82.4, 0.42],
+    ]) {
+      const o = ctx.createOscillator(); o.type = type;
+      o.frequency.setValueAtTime(start, t0);
+      o.frequency.exponentialRampToValueAtTime(end, t0 + 7.4);
+      const g = ctx.createGain(); g.gain.value = vol;
+      o.connect(g).connect(body); o.start(t0); o.stop(t0 + 8.3);
+      voices.push(o);
+    }
+    const stopTicks = [0.15, 0.48, 0.86, 1.32].map((when, i) =>
+      this.pluck(1568 * Math.pow(0.84, i), when, 0.11 - i * 0.012, 1.9, at));
+
+    // Leaving L2 resolves the visual score immediately. Return the same kind of
+    // cancellation handle as pluck() so its descending pressure voice and any
+    // not-yet-started ticks cannot leak for eight seconds into the next stratum.
+    return () => {
+      const now = ctx.currentTime;
+      try {
+        body.gain.cancelScheduledValues(now);
+        body.gain.setTargetAtTime(0.0001, now, 0.025);
+        voices.forEach((o) => { try { o.stop(now + 0.14); } catch (_) {} });
+        stopTicks.forEach((stop) => stop?.());
+      } catch (_) {}
+    };
+  },
+
   valveRush(on) {
     if (!this.ready) return;
     if (on && !this._rush) {
@@ -473,7 +526,9 @@ const A = {
     if (!this.ready || this.stems.includes(n)) return;
     this.stems.push(n);
     const mk = (build) => { const g = ctx.createGain(); g.gain.value = 0; build(g); g.connect(this.music); g.gain.setTargetAtTime(1, ctx.currentTime, 4); return g; };
-    const drone = (freq, vol) => mk((g) => {
+    const drone = (freq, vol) => {
+      const voices = [];
+      const gain = mk((g) => {
       for (const det of [-3, 4]) {
         const o = ctx.createOscillator(); o.frequency.value = freq; o.detune.value = det;
         const og = ctx.createGain(); og.gain.value = vol;
@@ -483,9 +538,22 @@ const A = {
         lfo.connect(lg).connect(f.frequency);
         o.connect(f).connect(og).connect(g);
         o.start(); lfo.start();
+        voices.push(o, lfo);
       }
-    });
+      });
+      this._stemStops[n] = () => {
+        const now = ctx.currentTime;
+        try {
+          gain.gain.cancelScheduledValues(now);
+          gain.gain.setValueAtTime(0.0001, now);
+          voices.forEach((node) => { try { node.stop(now); } catch (_) {} });
+          gain.disconnect();
+        } catch (_) {}
+      };
+      return gain;
+    };
     this._stemGains = this._stemGains || {};
+    this._stemStops = this._stemStops || {};
     switch (n) {
       case 1: this._stemGains[1] = drone(110, 0.05); break;  // A2 root
       case 2: this._stemGains[2] = drone(164.8, 0.04); break; // E3 fifth
@@ -521,6 +589,31 @@ const A = {
         break;
       }
     }
+  },
+
+  resetScore() {
+    for (const key of ['_arp', '_pulse', '_shimmer', '_sixth']) {
+      clearInterval(this[key]);
+      this[key] = null;
+    }
+    for (const stop of Object.values(this._stemStops || {})) stop();
+    this._stemStops = {};
+    this._stemGains = {};
+    this.stems = [];
+    this._lastRound = null;
+    this._lastTheme = null;
+    this.musicStop();
+  },
+
+  scoreState() {
+    return {
+      stems: [...this.stems],
+      drones: Object.keys(this._stemStops || {}).map(Number).sort((a, b) => a - b),
+      intervals: {
+        arp: this._arp != null, pulse: this._pulse != null,
+        shimmer: this._shimmer != null, sixth: this._sixth != null,
+      },
+    };
   },
 
   bellToll(withhold = false) {
@@ -622,50 +715,6 @@ const A = {
     setTimeout(() => { try { fb.gain.value = 0; del.disconnect(); fb.disconnect(); drown.disconnect(); vg.disconnect(); } catch (_) {} }, 2600);
   },
 
-  // The keeper's REAL voice (bm_george, Kokoro-82M) for the lines in content.js
-  // KEEPER — played through the SAME drowned bus as keeperVoice() (lowpass to a
-  // murmur + one-floor-down echo) so recorded speech still sounds overheard from
-  // below, never a clean narrator. Lazy-loaded + cached via the asset manifest;
-  // if the clip can't load (offline / missing), it falls back to the FM murmur,
-  // so the keeper always speaks one way or another. register is for that fallback.
-  say(id, register = 'curious', eyeLevel = false) {
-    if (!this._running()) return;   // muted/halted: don't even decode the clip (#68)
-    loadAudioBuffer(id, ctx).then((buf) => {
-      const vg = ctx.createGain(); vg.gain.value = eyeLevel ? 1.0 : 0.85; vg.connect(this.fx);
-      const drown = ctx.createBiquadFilter(); drown.type = 'lowpass';
-      // eye-level (the twist): the water thins — he is right at your face now, clearer + less echo
-      drown.frequency.value = eyeLevel ? 5200 : 1500; drown.Q.value = 0.6; drown.connect(vg);
-      const del = ctx.createDelay(0.6); del.delayTime.value = 0.19;
-      const fb = ctx.createGain(); fb.gain.value = eyeLevel ? 0.12 : 0.34;
-      drown.connect(del); del.connect(fb).connect(del); del.connect(vg);
-      const src = ctx.createBufferSource(); src.buffer = buf; src.connect(drown);
-      src.start();
-      src.onended = () => setTimeout(() => {
-        try { fb.gain.value = 0; src.disconnect(); del.disconnect(); fb.disconnect(); drown.disconnect(); vg.disconnect(); } catch (_) {}
-        evictAudio(id);   // free the decoded PCM — voice is one-shot; re-decode on the rare replay
-      }, 1200);   // let the one-floor-down echo ring out before tearing the bus down
-    }).catch(() => this.keeperVoice(register));   // offline / missing asset → the synth murmur, as before
-  },
-
-  // the keeper RISES (the twist): a slow upward glide — the inverse of the descent's
-  // dropping pitch — as the figure comes up to meet your eye at the bottom of the nest.
-  keeperRise() {
-    if (!this.ready) return;
-    const t0 = ctx.currentTime;
-    const o = ctx.createOscillator(); o.type = 'sine';
-    o.frequency.setValueAtTime(88, t0);
-    o.frequency.exponentialRampToValueAtTime(330, t0 + 2.6);   // pitch RISES, inverting the dive's drop
-    const ov = ctx.createOscillator(); ov.type = 'sine';       // a shimmer a fifth above
-    ov.frequency.setValueAtTime(132, t0);
-    ov.frequency.exponentialRampToValueAtTime(495, t0 + 2.6);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0, t0);
-    g.gain.linearRampToValueAtTime(0.16, t0 + 0.5);
-    g.gain.linearRampToValueAtTime(0, t0 + 2.8);
-    o.connect(g); ov.connect(g); g.connect(this.music);
-    o.start(t0); o.stop(t0 + 2.9); ov.start(t0); ov.stop(t0 + 2.9);
-  },
-
   // ---------------- the era MUSIC bed: GENERATIVE (owner: the canned stems were not great) ----
   // The color-psychology arc made HEARD by the island's own synth voice, not a 12-second loop:
   // per-level ROOT from the leitmotif's own family (E G A D C), a breathing two-osc drone + fifth,
@@ -686,7 +735,6 @@ const A = {
     { root: 98.00, cutoff: 620, det: 7, gapLo: 11, gapHi: 17, breath: 19, vol: 0.95, arr: 'rising', oct: 2, step: 1.0, jitter: 0.6 },  // L2 G2 — the arrival years
     { root: 110.0, cutoff: 420, det: 11, gapLo: 14, gapHi: 21, breath: 23, vol: 0.90, arr: 'measured', oct: 1, step: 1.2, jitter: 0 }, // L3 A2 — the inspection years
     { root: 73.42, cutoff: 300, det: 16, gapLo: 17, gapHi: 25, breath: 28, vol: 0.85, arr: 'sinking', oct: 1, step: 2.4, jitter: 0.9 },// L4 D2 — the last winter
-    { root: 65.41, cutoff: 220, det: 22, gapLo: 22, gapHi: 31, breath: 34, vol: 0.80, arr: 'sinking', oct: 1, step: 3.0, jitter: 1.2 },// L5 C2 — the near-dark floor
   ],
   _buildBed() {
     const bed = { master: ctx.createGain() };
@@ -732,7 +780,7 @@ const A = {
     // a sparse fragment of the leitmotif, transposed into the era key (LEIT is rooted on E;
     // multiplying by root/E2's octave keeps the figure, moves the mode). Depth thins it.
     const lv = this._musicLevel || 1;
-    const era = this._ERAS[Math.max(1, Math.min(5, lv))];
+    const era = this._ERAS[Math.max(1, Math.min(this._ERAS.length - 1, lv))];
     const depth = Math.max(0, lv - 1);
     const T = (era.root / 82.41) / 2 * (era.oct || 1);      // era octave over the bed register
     // #137: the era chooses the PHRASING of the same five notes
@@ -769,14 +817,14 @@ const A = {
   _bedTick() {
     if (!this._bed || this._bedStopped) return;
     if (this._running() && this._musicLevel >= 1) this._bedMelody();
-    const era = this._ERAS[Math.max(1, Math.min(5, this._musicLevel || 1))];
+    const era = this._ERAS[Math.max(1, Math.min(this._ERAS.length - 1, this._musicLevel || 1))];
     const gap = era.gapLo + Math.random() * (era.gapHi - era.gapLo);
     this._bedTimer = setTimeout(() => this._bedTick(), gap * 1000);
   },
   musicTo(level) {
     // halted (muted #68 / pre-unlock #62): skip — called every play frame, catches up on resume.
     if (!this._running()) return;
-    const lv = Math.max(1, Math.min(5, level | 0));
+    const lv = Math.max(1, Math.min(this._ERAS.length - 1, level | 0));
     if (this._musicLevel === lv && this._bed && !this._bedStopped) return;
     const wasStopped = this._bedStopped;
     this._musicLevel = lv;

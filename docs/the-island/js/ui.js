@@ -3,23 +3,59 @@
 import { W } from './world.js';
 import { MAX_WRITING_LENGTH } from './ledger.js';
 import A from './audio.js';
-import { SKETCHES, LORE, DEEP_FRAGMENTS } from './content.js';
+import { SKETCHES_BY_ID, LORE } from './content.js';
 
 const $ = (id) => document.getElementById(id);
 
+// The same eight figures used by the world atlas, redrawn as ink so a copied beam
+// order remains exact in the book. The value in data-glyph is the factual source.
+const FIELD_GLYPHS = Object.freeze([
+  '<circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="2.5" class="fill"/>',
+  '<path d="M20 6 33 31H7Z"/>',
+  '<path d="M5 20c5-8 10 8 15 0s10 8 15 0"/>',
+  '<path d="M21 20c0-5-8-5-8 1 0 8 15 9 15-2 0-14-23-13-23 4 0 14 29 17 31-4"/>',
+  '<path d="M20 34V7M8 17 20 7l12 10"/>',
+  '<path d="M25 7a13 13 0 1 0 0 26c-8-3-8-23 0-26Z"/>',
+  '<rect x="8" y="8" width="24" height="24"/><path d="M8 20h24"/>',
+  '<path d="M20 5v30M5 20h30"/><circle cx="20" cy="20" r="5"/>',
+]);
+
+const makeGlyphRubbing = (glyphs) => {
+  const row = document.createElement('div');
+  row.className = 'glyph-rubbing';
+  row.setAttribute('aria-label', 'Four beam figures, in copied order');
+  glyphs.forEach((glyph, index) => {
+    const cell = document.createElement('span');
+    cell.className = 'glyph-mark';
+    cell.dataset.glyph = String(glyph);
+    cell.setAttribute('aria-label', `beam figure ${index + 1}`);
+    cell.innerHTML = `<svg viewBox="0 0 40 40" aria-hidden="true">${FIELD_GLYPHS[glyph] || ''}</svg>`;
+    row.append(cell);
+  });
+  return row;
+};
+
 export const UI = {
-  init() {
+  init({ notebook } = {}) {
+    if (!notebook) throw new Error('UI requires a Notebook');
+    this.notebook = notebook;
     this.whisperEl = $('whisper');
     this.curtain = $('curtain');
     this.letterbox = $('letterbox');
     this.journalEl = $('journal');
     this.journalEntries = $('journal-entries');
+    this.journalFolios = $('journal-folios');
+    this.journalLeafTitle = $('journal-leaf-title');
+    this.journalLeafDeck = $('journal-leaf-deck');
+    this.journalCausal = $('journal-causal');
+    this.journalLeadTitle = $('journal-lead-title');
     this.journalTab = $('journal-tab');
     this.soundTab = $('sound-tab');
     this.motionTab = $('motion-tab');
     this.hint = $('controls-hint');
     this.cinematicHint = $('cinematic-hint');
-    this.journalBearing = $('journal-bearing');
+    this.journalHint = $('journal-hint');
+    this.journalHintText = $('journal-hint-text');
     this.readerEl = $('reader');
     this.readerTitle = $('reader-title');
     this.readerBody = $('reader-body');
@@ -34,8 +70,14 @@ export const UI = {
     this._reader = null;
     this._whisperTimer = null;
     this._whisperQueue = [];
+    this._journalFolio = null;
 
     this.journalTab.addEventListener('click', () => this.toggleJournal());
+    this.journalHint.addEventListener('click', () => this.traceLead());
+    this.journalFolios.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-folio]');
+      if (button) this.selectJournalFolio(button.dataset.folio);
+    });
     this.soundTab.addEventListener('click', () => this.toggleMute());
     this.soundTab.classList.toggle('muted', A.muted); // reflect the persisted/?param state
     this.motionTab.addEventListener('click', () => this.toggleMotion());
@@ -84,8 +126,12 @@ export const UI = {
         e.preventDefault();
         return;
       }
+      if (W.notesOpen) {
+        if (e.code === 'KeyJ' || e.code === 'Escape') this.closeJournal();
+        e.preventDefault();
+        return;
+      }
       if (e.code === 'KeyJ') this.toggleJournal();
-      if (e.code === 'Escape') this.journalEl.classList.add('hidden');
       if (e.code === 'KeyM') this.toggleMute();
       if (e.code === 'KeyC') this.toggleMotion();   // comfort/reduced-motion, key parity with M + J
     });
@@ -97,15 +143,10 @@ export const UI = {
   // enough (W.level >= deepFrom) — the same object says more the further down you've gone.
   openReader(loreId) {
     const lore = LORE[loreId];
-    if (!lore || W.reading) return;
+    if (!lore || W.reading || W.notesOpen || W.writing) return;
     const deepUnlocked = lore.deep && W.level >= (lore.deepFrom ?? 99);
     const pages = deepUnlocked ? lore.pages.concat(lore.deep) : lore.pages.slice();
     this._reader = { id: loreId, lore, page: 0, pages, surfaceLen: lore.pages.length };
-    // first time read: remember it (persists) and let the journal note that it was found
-    if (!W.readKeys.includes(loreId)) {
-      W.readKeys.push(loreId);
-      if (lore.journal) this.addJournal(lore.journal, '', 'self');
-    }
     W.reading = true;
     this.readerEl.classList.remove('hidden');
     this._renderReader();
@@ -154,38 +195,14 @@ export const UI = {
     this.readerPageno.textContent = r.pages.length > 1 ? `${r.page + 1} / ${r.pages.length}` : '';
     this.readerPrev.disabled = r.page === 0;
     this.readerNext.disabled = r.page >= r.pages.length - 1;
-    // the first time the player actually reaches a fragment's deep page, the deep read
-    // accretes its OWN journal line (the keeper's colder hand) — so the story assembles as
-    // you descend, the same object saying more the further down you've gone (Meow-Wolf).
-    if (isDeep && r.lore.journalDeep && !W.regions.fragmentsFound.includes(r.id)) {
-      W.regions.fragmentsFound.push(r.id);
-      this.addJournal(r.lore.journalDeep, '', 'keeper');
-      if (DEEP_FRAGMENTS.includes(r.id)) {
-        // the canonical set — a count-AGNOSTIC cue (#76: no prose may assume "four") that the
-        // deep-read is a SYSTEM accreting; the close is _maybeIntegrate's own whisper.
-        const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
-        if (deep < DEEP_FRAGMENTS.length) {
-          this.whisper(
-            deep === 1 ? 'It said more this time — because you came back to it from further down. Others here will do the same, if you return to them deeper.'
-            : deep === DEEP_FRAGMENTS.length - 1 ? 'One remains unread from below. Then they will want to be laid side by side.'
-            : 'Another turns its colder hand. The deeper readings are starting to rhyme with one another.', 5200);
-        }
-        this._maybeIntegrate();
-      } else {
-        // a BONUS deep reading — not one of the four that close the circle, but it deepens the story
-        // all the same; a quieter acknowledgement, and it stays out of the 'N of 4' tally.
-        this.whisper('This one, too, says more from the deep — a page you would have walked past, on the way down.', 5000);
-      }
+    // Aggregate notes are earned only after the player reaches the last page they
+    // summarize. Merely opening a multi-page object cannot grant unread evidence.
+    if (!isDeep && r.page === r.surfaceLen - 1 && !this.notebook.hasReadLore(r.id, 'surface')) {
+      this.notebook.readLore(r.id, 'surface');
     }
-  },
-  // when EVERY deep-reading fragment has been read at depth, they close into one: the
-  // grief→integration payoff — a final self-hand entry naming the shape, and a whisper. Once.
-  _maybeIntegrate() {
-    if (W.onceKeys.includes('deepIntegrated')) return;
-    if (!DEEP_FRAGMENTS.every((id) => W.regions.fragmentsFound.includes(id))) return;
-    W.onceKeys.push('deepIntegrated');
-    this.addJournal('Every one of them said more the deeper I read it. Laid end to end they stop being his story and become the shape of the thing: whoever washes up is who went down; there is no bottom but the one you make; the wrong note is not the flaw but the playing; turn the light to face the deep — and climb back toward it carrying what you found. One person, holding both ends of the same rope. That is the whole of it.', '', 'self');
-    this.whisper('The fragments close like a hand. There was only ever one of you — the one who fell, and the one who keeps the light. Hold both, and climb.', 6000);
+    if (isDeep && r.page === r.pages.length - 1 && !this.notebook.hasReadLore(r.id, 'deep')) {
+      this.notebook.readLore(r.id, 'deep');
+    }
   },
 
   // ---- sound: a visible toggle (and the M key), kept in sync ----
@@ -215,6 +232,26 @@ export const UI = {
     if (this._whisperQueue.length >= 3) this._whisperQueue.shift();
     this._whisperQueue.push({ text, holdMs });
     if (!this._whisperTimer) this._nextWhisper();
+  },
+  whisperNow(text, holdMs = 4200) {
+    // Reversible controls report the state that exists now. Any older queued state
+    // is false the instant the dial moves again, so it must not get a later turn.
+    this.clearWhispers();
+    this.whisperEl.textContent = text;
+    this.whisperEl.classList.add('show');
+    this._whisperTimer = setTimeout(() => {
+      this.whisperEl.classList.remove('show');
+      this._whisperTimer = setTimeout(() => this._nextWhisper(), 1500);
+    }, holdMs * this._readPace);
+  },
+  clearWhispers() {
+    clearTimeout(this._whisperTimer);
+    this._whisperTimer = null;
+    this._whisperQueue.length = 0;
+    if (this.whisperEl) {
+      this.whisperEl.classList.remove('show');
+      this.whisperEl.textContent = '';
+    }
   },
   _nextWhisper() {
     // A story cue spoken behind an opaque reader or journal is not a cue. Deep
@@ -260,7 +297,7 @@ export const UI = {
     // grammar instead of naming keys the visitor does not have
     try {
       if (matchMedia('(pointer: coarse)').matches) {
-        this.hint.innerHTML = 'drag to look &middot; <b>hold</b> to walk &middot; tap to touch &middot; open <b>✦</b> when lost';
+        this.hint.innerHTML = 'drag to look &middot; <b>hold</b> to walk &middot; tap to touch &middot; <b>✦</b> for field notes';
       }
     } catch (_) {}
     this.hint.classList.add('show');
@@ -273,77 +310,111 @@ export const UI = {
 
   // ---- journal ----
   toggleJournal() {
+    if (W.reading || W.writing) return;
     this.journalEl.classList.toggle('hidden');
-    // re-render on open: a loaded save fills W.journal after init()
-    if (!this.journalEl.classList.contains('hidden')) this.renderJournal();
+    const open = !this.journalEl.classList.contains('hidden');
+    W.notesOpen = open;
+    this.journalTab.setAttribute('aria-expanded', String(open));
+    this.journalTab.setAttribute('aria-label', open ? 'Close field notes' : 'Open field notes');
+    if (open) {
+      this._journalFolio = this.notebook.activeFolioId();
+      this.renderJournal();
+    }
   },
-  addJournal(text, sketch = '', hand = 'self') {
-    if (W.journal.some((j) => j.text === text)) return;
-    W.journal.push({ text, sketch, hand });
+  closeJournal() {
+    this.journalEl.classList.add('hidden');
+    W.notesOpen = false;
+    this.journalTab.setAttribute('aria-expanded', 'false');
+    this.journalTab.setAttribute('aria-label', 'Open field notes');
+  },
+  notebookChanged(change) {
+    if (this.journalEl.classList.contains('hidden')) {
+      this._journalFolio = this.notebook.activeFolioId();
+    }
     this.renderJournal();
+    if (!['record', 'revise'].includes(change?.type)) return;
     this.journalTab.classList.remove('pulse');
     void this.journalTab.offsetWidth; // restart the animation
     this.journalTab.classList.add('pulse');
   },
-  renderJournal() {
-    // codex tally: how many fragments have given up their DEEPEST pages (the cross-level deep-read
-    // economy) — a persistent progress cue in the header so the assembly is legible (loop #137)
-    const h2 = this.journalEl.querySelector('h2');
-    if (h2) {
-      const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
-      // #132: the record drawer — what the player has done with the record of a life
-      const disp = Object.values(W.recDisp || {});
-      const filedN = disp.filter((d) => d === 'filed').length;
-      const keptN = disp.filter((d) => d === 'kept').length;
-      const bits = [];
-      if (deep > 0) bits.push(`${deep} of ${DEEP_FRAGMENTS.length} read from the deep`);
-      if (filedN + keptN > 0) bits.push(`the record: ${filedN} filed · ${keptN} kept`);
-      h2.innerHTML = bits.length
-        ? `Field Notes<span class="deep-tally">${bits.join(' — ')}</span>`
-        : 'Field Notes';
-    }
-    if (this.journalBearing) this.journalBearing.textContent = this.currentBearing();
-    if (!W.journal.length) {
-      this.journalEntries.innerHTML = '<div class="empty">Nothing written yet. The island will dictate.</div>';
-      return;
-    }
-    this.journalEntries.innerHTML = W.journal.map((j) => {
-      const sk = j.sketch || (SKETCHES.find(([m]) => j.text.includes(m))?.[1] ?? '');
-      const cls = j.hand === 'keeper' ? 'entry keeper' : 'entry';
-      return `<div class="${cls}">${j.text}${sk ? `<div class="sketch">${sk}</div>` : ''}</div>`;
-    }).join('');
+  selectJournalFolio(id) {
+    const exists = this.notebook.folios().some((folio) => folio.id === id);
+    if (!exists) return;
+    this._journalFolio = id;
+    this.renderJournal();
   },
+  traceLead() {
+    this.notebook.requestHint();
+    this.renderJournal();
+  },
+  renderJournal() {
+    const book = this.notebook.fieldbook();
+    const selected = book.folios.find((folio) => folio.id === this._journalFolio)
+      || book.folios.find((folio) => folio.id === book.activeFolioId)
+      || book.folios[0];
+    this._journalFolio = selected.id;
 
-  // The journal is memory, but memory should still point somewhere. This is a
-  // state-derived bearing, not a quest HUD and not another saved entry: it names
-  // one physical relationship the player already has enough evidence to follow.
-  currentBearing() {
-    const F = W.flags;
-    if (!F.enteredStudy) return 'The lighthouse is the one landmark that answers from everywhere on the shore.';
-    if (!F.valveTurned) return 'The brass valve beside the chart table is joined to the tide outside.';
-    if (!F.rulerTaken) return W.tideTarget > 0.5
-      ? 'The chest is under high water again. The brass valve can uncover the flats.'
-      : 'The drained flats have uncovered a chest the high water kept.';
-    if (!F.rulerPlaced) return 'The ruler is bridge-work in miniature. The model carries a crack of its own.';
-    if (!F.heardBox) return 'The music box in the study is holding five notes, and one of them does not sit easily.';
-    if (!F.birdSolved) return F.heardBird
-      ? 'The dawn bird returned the box’s five notes with one correction. The standing stones will take them in that order.'
-      : 'At dawn, something living waits among the standing stones long enough to answer the box.';
-    if (!F.lensTaken) return 'The corrected stones opened the outcrop. What they uncovered is still there.';
-    if (!W.lensPlaced) return 'The lens is an eye for a lighthouse. The little lamp room on the chart-table model is missing one.';
-    if (!F.glyphsSeen) return 'At night the fitted lamp casts a beam. Its housing on the model can turn that beam toward the far cliff.';
-    if (!F.shadowRevealed) return 'The beam left four figures. Golden-hour light makes the disturbed sand on the far bluff betray itself.';
-    if (!F.hatchOpen) return 'Four buried dials wait beneath the bluff. They answer to the figures the beam wrote.';
-    if (!F.plumbTaken) return 'The opened hatch has made a way into the vault below the bluff.';
-    if (!F.plumbHung) return 'The plumb was made to hang. A bare hook waits over the chart table.';
-    if (W.level >= 4 && !F.keeperRose) return 'There is nowhere deeper. The smallest figure in the model is no longer only a marker.';
-    if (W.level >= 4 && F.keeperRose && !F.carried) return 'The bell can keep the light here. The plate can carry what was found back through the years.';
-    if (F.climbing && W.level > 1) return 'The plate remembers the way upward. Each touch carries the weight one stratum closer to air.';
-    if (F.returned) return 'The dory is still on the wake-up beach. Its oar is no longer only driftwood.';
-    if (W.level > 1) return 'The same brass plate waits in the same study. It has one direction left at this depth.';
-    return 'The plumb has found the brass plate beneath it. Stand at its centre and touch once to listen, twice to choose.';
+    for (const button of this.journalFolios.querySelectorAll('button[data-folio]')) {
+      const folio = book.folios.find(({ id }) => id === button.dataset.folio);
+      const current = button.dataset.folio === selected.id;
+      button.classList.toggle('active', current);
+      button.classList.toggle('has-marks', !!folio?.marks.length);
+      button.classList.toggle('current-gate', button.dataset.folio === book.activeFolioId);
+      button.setAttribute('aria-pressed', String(current));
+    }
+
+    this.journalLeafTitle.textContent = selected.title;
+    this.journalLeafDeck.textContent = selected.deck;
+    this.journalEntries.replaceChildren();
+    if (!selected.marks.length) {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'No marks on this leaf.';
+      this.journalEntries.append(empty);
+    } else {
+      for (const note of selected.marks) {
+        const row = document.createElement('article');
+        row.className = `field-mark ${note.markKind}`;
+        row.dataset.noteId = note.id;
+        const source = document.createElement('span');
+        source.className = 'mark-label';
+        source.textContent = note.label;
+        const body = document.createElement('p');
+        body.className = 'mark-copy';
+        body.textContent = note.text;
+        row.append(source, body);
+        if (note.rubbing?.kind === 'glyph-order') {
+          row.append(makeGlyphRubbing(note.rubbing.glyphs));
+        } else {
+          const sketch = note.sketchId && SKETCHES_BY_ID[note.sketchId];
+          if (sketch) {
+            const drawing = document.createElement('div');
+            drawing.className = 'sketch';
+            drawing.setAttribute('aria-hidden', 'true');
+            drawing.innerHTML = sketch;
+            row.append(drawing);
+          }
+        }
+        this.journalEntries.append(row);
+      }
+    }
+
+    this.journalCausal.replaceChildren();
+    for (const node of book.trace) {
+      const item = document.createElement('li');
+      item.className = node.complete ? 'complete' : 'open';
+      item.textContent = node.label;
+      this.journalCausal.append(item);
+    }
+
+    this.journalLeadTitle.textContent = book.lead.summary;
+    this.journalHint.disabled = !book.lead.canTrace;
+    this.journalHintText.textContent = book.lead.text
+      || (book.lead.canTrace
+        ? 'A relation in these marks can be pressed darker.'
+        : book.gate.missing.length
+          ? 'No further line is supported by the marks on hand.'
+          : 'This line is closed.');
+    this.journalHintText.classList.toggle('empty', !book.lead.text);
   },
 };
-
-// the journal's marginalia sketches (SKETCHES) now live in content.js, beside the
-// keeper's lines — renderJournal() above imports them (loop #84, the content layer).

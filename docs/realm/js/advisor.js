@@ -1,5 +1,5 @@
-import { G, BUILDINGS } from './state.js?realm=197';
-import { staffingCount } from './citizen-ownership.js?realm=197';
+import { G, BUILDINGS } from './state.js?realm=198';
+import { staffingCount } from './citizen-ownership.js?realm=198';
 
 const TIPS = [
   { id: 'lowfood', check: () => G.resources.food < 20, text: "Stored food is running low. Staff a food source and keep pantry space available!", cooldown: 600 },

@@ -4,21 +4,20 @@
 
 import * as THREE from 'three';
 import { clamp, lerp, lerpColor, smoothstep, TAU, mulberry32, SEED } from './util.js';
-import { SAVE_KEY, SAVE_KEY_PREV, packSave, applySave } from './save-schema.js';
+import { SAVE_KEY, SAVE_VERSION, SAVE_FLAG_DEFAULTS, packSave, applySave } from './save-schema.js';
 import {
   FLAG_MARKS, DISPOSITIONS, localSource, loadHandId,
   record as ledgerRecord, dispose as ledgerDispose,
-  draftAt, tideFor, handsAbove, evidenceAt, writingsAt, sanitizeWriting,
+  draftAt, tideFor, handsAbove, evidenceAt, writingsAt, upstreamEventsAt,
+  sanitizeWriting, MAX_DRAFT,
 } from './ledger.js';
 export { DISPOSITIONS };
 export { sanitizeWriting };
 
 export const SCALE_MODEL = 1 / 240;
 
-// the deepest reachable descent for now. The decay system (gradeBias) and the
-// prop divergence run to L5+, but L5 is the keeper's near-dark floor — an empty
-// near-black room until a keeper + a warm lamp inhabit it (#14/#15). So the
-// playable descent bottoms at L4 (isolation-blue, still legible) until then.
+// The authored descent has four strata. Progression gates and color divergence
+// share this boundary; adding a stratum means extending both contracts together.
 export const MAX_DEPTH = 4;
 
 export const W = {
@@ -48,56 +47,26 @@ export const W = {
   beamAngle: 2.2,        // radians, azimuth of the beam
 
   // progression flags
-  flags: {
-    introDone: false,
-    enteredStudy: false,
-    valveTurned: false,
-    crankUsed: false,
-    rulerTaken: false,
-    rulerPlaced: false,
-    chestOpen: false,
-    heardBox: false,
-    heardBird: false,
-    birdSolved: false,
-    lensTaken: false,
-    shadowRevealed: false,
-    glyphsSeen: false,
-    hatchOpen: false,
-    plumbTaken: false,
-    plumbHung: false,
-    carried: false,       // the twist's embrace happened (the pair exists; #53 figures key off this)
-    dove: false,          // level 2: one recursion down
-    climbing: false,      // one-way ascent mode: reached the bottom, now rising back up (#12)
-    keeperSilenced: false,// the keeper's last words spoken on the first ascent; then silence (#12)
-    returned: false,      // climbed all the way back to the surface: the return left its mark (#12)
-    bellRung: false,
-    // fire 35: EVERY flag the code reads gets a default. An absent flag in a boolean
-    // chain leaks undefined — `(a || undefined) && b` — and three.js renders
-    // visible:undefined (it only culls on === false). The beach figure taught us.
-    readGlass: false, phialTaken: false, phialDried: false, keeperSong: false,
-    tideFigureSeen: false, watcherSeen: false, keeperRose: false, beamDeepSeen: false,
-    beamFarewell: false, roundMoor: false, roundLog: false, roundLight: false,
-    roundWind: false,
-  },
+  flags: { ...SAVE_FLAG_DEFAULTS },
 
-  stems: 0,              // musical layers earned (0..5)
-  inventory: [],         // 'ruler' | 'lens' | 'plumb'
+  stems: 0,              // musical layers earned (0..6)
+  inventory: [],         // 'ruler' | 'lens' | 'plumb' | 'readglass' | 'phial'
   recDisp: {},          // #132: the inspector's record — per-artifact null | 'carried' | 'filed' | 'kept'
-  journal: [],           // [{text, sketch}]
+  notebook: { entries: [], hintLevels: {} }, // stable evidence ids + requested hint tiers
   onceKeys: [],          // one-time cinematics already played
-  readKeys: [],          // lore fragment ids the player has READ (the unfolding story; saved)
   reading: false,        // transient: the reading surface is open (input paused while reading)
+  notesOpen: false,      // transient: the field notebook owns input
   writing: false,        // transient: the shore-writing surface owns keyboard + movement
-  dials: [0, 0, 0, 0],   // hatch glyph dials
+  dials: [0, 0, 0, 0],   // four decimal hatch numerals
   playerPos: null,       // saved position
-  playerLook: null,      // saved facing [yaw, pitch] radians, or null (pre-v3 saves; #58)
+  playerLook: null,      // saved facing [yaw, pitch] radians, or null before first save
   level: 1,
-  // SEA-STRATA (loop #117): persisted explored-state per drowned region — which deeper
-  // levels you have reached + the fragments found, so the Meow-Wolf map stays "grown".
-  regions: { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] },
+  // Persist only authored regions reached. Read evidence belongs to `notebook`.
+  regions: { l2seen: false, l3seen: false, l4seen: false },
   // THE DISPOSITION (STACK.md §6): which of the four the player has selected at the
   // plate. Not applied until they take an ending — until then it is only an intent.
   disposition: 'tend',
+  endingOutcome: null,  // committed typed result; required to replay a truthful coda
 };
 
 // ---------------- celestial mechanics (fantasy sky, art-directed) -------------
@@ -141,7 +110,7 @@ export function mistTargetAt(t) {
   return Math.min(m, ceil);
 }
 
-// ---------------- the five master grades -------------------------------------
+// ---------------- the four master grades -------------------------------------
 // Only these palettes exist; every hour interpolates between them.
 // exposure (last arg) feeds renderer.toneMappingExposure per grade — the ACES tonemap
 // was running at a FIXED 1.06, so the five grades differed only in hue, never in TONE.
@@ -184,15 +153,14 @@ const _grade = G(0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // scratch, mutated in place
 // its 1:240 model bias together (one WorldState). Casts precomputed — no
 // per-frame allocation. The grammar of a life, abstracted; no biography.
 // The casts carry the EMOTION through chroma, not darkness — saturated and
-// hue-separated, sequenced as a felt descent: sickly-warm false comforts up top
-// (sodium green, jaundice gold) draining into cold isolation, then a dead violet
-// floor. Depth itself is supplied by the dark multiplier, not by muddy casts.
+// hue-separated, sequenced as a felt descent from living green through measured
+// steel into cold isolation. Depth itself is supplied by the dark multiplier,
+// not by muddy casts.
 const ERA_CASTS = [
   null,                       // L1 — the last day: surface, no cast
   new THREE.Color(0x74a83e), // L2 — the arrival years: living warm green (wonder, not sickness)
   new THREE.Color(0x8f9aa6), // L3 — the inspection years: steel grey-blue (measurement)
   new THREE.Color(0x2f6cc8), // L4 — the last winter: cold isolation blue
-  new THREE.Color(0x573a72), // L5+ — dead violet, the keeper's near-dark floor
 ];
 // ---- SEA-STRATA level-areas (loop #117): the canonical per-level descriptor table ----
 // Each dive-level is a deeper register of the SAME island, drowned further by a rising
@@ -215,6 +183,12 @@ export const LEVELS = [
   { id: 'source',   era: { key: 'lastwinter', name: 'the last winter' },     region: 'region4',  spawn: { pos: [-82.8, 0, -41.4], yaw: 2.19, pitch: 0.02 },  tide: 1.9,  encounter: 'keeper' },
 ];
 
+// All authored strata plus the hostile-ledger cap fit below this ceiling. Deep
+// tides have always been allowed above the debug slider's 2.0; easing must honor
+// the same range or a late shared merge can leave the valve rushing forever.
+export const MAX_TIDE = LEVELS[MAX_DEPTH].tide + MAX_DRAFT;
+export const UPSTREAM_TIDE_RISE = 0.06;
+
 const _BIAS_KEYS = ['skyTop', 'skyHorizon', 'sunCol', 'hemiSky', 'hemiGnd', 'fog', 'water', 'waterShallow'];
 const _LUM_FLOOR = 0.045; // no channel crushes to unresolvable black (night × depth)
 
@@ -230,7 +204,6 @@ const ERA_GRADES = [
   { tint: 0.22, desat: 0.07, dark: 0.93, fogMul: 1.22 },   // L2 — the arrival years
   { tint: 0.30, desat: 0.34, dark: 0.80, fogMul: 1.50 },   // L3 — the inspection years
   { tint: 0.28, desat: 0.55, dark: 0.66, fogMul: 1.80 },   // L4 — the last winter
-  { tint: 0.55, desat: 0.50, dark: 0.50, fogMul: 2.05 },   // L5+ — the near-dark floor
 ];
 
 function gradeBias(g, level) {
@@ -282,8 +255,8 @@ export function gradeAt(t) {
   _grade.fogDen = lerp(a.fogDen, b.fogDen, f);
   _grade.exposure = lerp(a.exposure, b.exposure, f);
   // the finale is the resolution — it must NOT inherit the descent's curdle.
-  // W._finaleWarm forces the clean (level-1) grade so the ending lands warm,
-  // not desaturated by how deep you rang the bell (#22).
+  // W._finaleWarm forces the clean surface grade so the chosen disposition
+  // resolves in warmth rather than inheriting the descent's cold register.
   return gradeBias(_grade, W._finaleWarm ? 1 : W.level);
 }
 
@@ -297,10 +270,8 @@ export function wavePhase(timeSec) {
 }
 
 // ---------------- save / load --------------------------------------------------
-// The save contract — WHAT persists, the payload version int, and the v(N)→v(N+1)
-// migrations — lives in save-schema.js (#74): one field descriptor table instead
-// of hand-enumerated fields here. This file only owns the storage I/O and the
-// plain-array → THREE.Vector3 conversion at the boundary.
+// The current save contract lives in save-schema.js. This file owns storage I/O
+// and the plain-array → THREE.Vector3 conversion at the runtime boundary.
 
 // `player` is the live player-like ({ pos, yaw, pitch }) — position AND facing
 // persist (#58), so callers pass the player itself, not just its position.
@@ -311,23 +282,28 @@ export function save(player) {
 }
 
 export function load() {
-  let raw = null;
   try {
-    raw = localStorage.getItem(SAVE_KEY);
+    const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return false;
-    applySave(W, JSON.parse(raw)); // migrates old payloads, applies the field table
+    if (!applySave(W, JSON.parse(raw))) {
+      localStorage.removeItem(SAVE_KEY);
+      return false;
+    }
     W.playerPos = W.playerPos ? new THREE.Vector3(...W.playerPos) : null;
     return true;
   } catch (_) {
-    // #140: a corrupt save fails safe to a fresh start — but the payload is
-    // PRESERVED (the first autosave would otherwise clobber the evidence ~12s in)
-    try { if (raw !== null) localStorage.setItem(SAVE_KEY + '-corrupt', raw); } catch (_2) { /* private mode */ }
+    // Invalid current data is not another format to preserve. Remove it so the
+    // next interaction starts from the one supported contract.
+    try { localStorage.removeItem(SAVE_KEY); } catch (_2) { /* private mode */ }
     return false;
   }
 }
 
 export const hasSave = () => {
-  try { return !!localStorage.getItem(SAVE_KEY); } catch (_) { return false; }
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    return !!raw && JSON.parse(raw)?.v === SAVE_VERSION;
+  } catch (_) { return false; }
 };
 
 // ---------------- the stack's ledger (STACK.md §3.1/§3.2) ---------------------
@@ -349,9 +325,9 @@ export const HAND = loadHandId(_io);
 
 // THE SOURCE (STACK.md §8). Local by default and ALWAYS: the island must be whole
 // with the wire cut, so the game boots on the local stack and never waits for a
-// network. If — and only if — a `stack-config.js` exists beside this file, the
-// source is upgraded in place to the shared one. A missing config is not an error,
-// it is the normal build; the dynamic import simply fails and is swallowed.
+// network. A `stack-config.js` only upgrades the source when the transport declares
+// support for the complete marks + dispositions contract. Missing config or a
+// partial transport leaves the canonical local source untouched.
 let _source = localSource(_io);
 let _shared = false;
 // Harnesses that write must never touch the permanent shared stack. The explicit
@@ -363,7 +339,11 @@ export const LOCAL_STACK = (() => {
 if (!LOCAL_STACK) import('./stack-config.js')
   .then(async (cfg) => {
     if (!cfg || !cfg.FIREBASE_CONFIG) return;
-    const { firestoreSource } = await import('./ledger-firebase.js');
+    const { firestoreSource, SUPPORTS_SHARED_DISPOSITIONS } = await import('./ledger-firebase.js');
+    // A partial shared source would make CARRY lie: the local tombstone could not
+    // protect against a later remote merge. Stay wholly local until the transport
+    // supports the complete mark + disposition contract.
+    if (!SUPPORTS_SHARED_DISPOSITIONS) return;
     const src = firestoreSource(cfg.FIREBASE_CONFIG, _io);
     src.load();          // seed from the same local mirror, so nothing is lost in the swap
     _source = src;
@@ -382,11 +362,30 @@ export const isShared = () => _shared;
 // HAND, or it claims marks are being filed under a hand that is not writing them.
 export const handId = () => (_source.uid && _source.uid()) || HAND;
 
-// Pull the rungs above this one. A no-op on the local source, and never awaited by
-// the game: the draft and the evidence re-read the ledger every rung change, so
-// results simply appear when they arrive.
+// Consumers can render the mirror immediately and subscribe to its eventual
+// reconciliation. This also covers the boot race where the Firebase source
+// upgrades after a deep Continue already pulled the local source.
+const _stackSyncListeners = new Set();
+export function onStackSync(fn) {
+  if (typeof fn !== 'function') return () => {};
+  _stackSyncListeners.add(fn);
+  return () => _stackSyncListeners.delete(fn);
+}
+
+// Pull the rungs above this one. Local resolves immediately; shared resolves when
+// the mirror has merged. Callers may ignore the promise (offline-first boot), but
+// rung arrival uses it to refresh a tide/evidence pass if strangers land late.
 export function syncStack(level = W.level) {
-  if (_source.sync) { try { _source.sync(level); } catch (_) { /* offline */ } }
+  const rung = Math.max(1, level | 0);
+  let pull;
+  if (_source.sync) {
+    try { pull = Promise.resolve(_source.sync(rung)).catch(() => _source.load()); }
+    catch (_) { pull = Promise.resolve(_source.load()); }
+  } else pull = Promise.resolve(_source.load());
+  return pull.then((led) => {
+    for (const fn of _stackSyncListeners) { try { fn(rung, led); } catch (_) {} }
+    return led;
+  });
 }
 
 export const ledger = () => _source.load();
@@ -406,7 +405,7 @@ export function recordAct(kind, player) {
     hand: (_source.uid && _source.uid()) || HAND,
     at: p ? [p.x, p.y, p.z] : null,
   });
-  if (mark) _source.push(mark);
+  if (mark) _source.pushMark(mark);
   return mark;
 }
 
@@ -421,12 +420,28 @@ export const draft = (level = W.level) => draftAt(_source.load(), level);
 export const tideAt = (level = W.level) =>
   tideFor(_source.load(), level, (LEVELS[level] || LEVELS[1]).tide);
 
+// The ledger describes inherited water; one authored consequence sits on top of
+// it. The consequence and its observation are deliberately separate persisted
+// facts: water moves at the surge, while evidence is earned later at the reveal.
+// This keeps an interrupted score idempotent without claiming it was witnessed.
+export const effectiveTideAt = (level = W.level) => {
+  const spent = W.flags?.upstreamHandSurged === true;
+  const rise = level === 2 && spent ? UPSTREAM_TIDE_RISE : 0;
+  return clamp(tideAt(level) + rise, 0, MAX_TIDE);
+};
+
 // How many distinct hands have worked at or above this rung (the chart tally's
 // new unit — hands, not levels).
 export const hands = (level = W.level) => handsAbove(_source.load(), level);
 
 // The inherited marks worth SHOWING, for the evidence pass (slice 4).
 export const evidence = (level = W.level) => evidenceAt(_source.load(), level);
+
+// Event observation is intentionally not inheritance. A CLOSE boundary still
+// blocks water and ordinary evidence, but the adjacent rung can witness the act
+// above it; otherwise a persisted CLOSE could make a clean replay impossible.
+export const upstreamEvents = (level = W.level, kind = 'valve') =>
+  upstreamEventsAt(_source.load(), level, kind);
 
 // The generous mark: one line per hand per rung, persisted in the same append-only
 // ledger but carrying zero draft. The renderer reads inherited + this hand's fresh
@@ -440,7 +455,7 @@ export function recordWriting(text, player = null) {
     at: p ? [p.x, p.y, p.z] : null,
     text,
   });
-  if (mark) _source.push(mark);
+  if (mark) _source.pushMark(mark);
   return mark;
 }
 
@@ -458,20 +473,12 @@ export const clearStack = () => { _source.clear(); };
 export function disposeStack(kind) {
   const led = _source.load();
   const res = ledgerDispose(led, { kind, rung: W.level, hand: (_source.uid && _source.uid()) || HAND });
-  if (res) _source.push(res);   // any non-null result forces the ledger to disk
+  if (res) _source.pushDisposition(res.operation);
   return res;
 }
 
 export const disposition = () => W.disposition || 'tend';
 
 export function wipe() {
-  // Begin-anew safety net (#56): stash the outgoing payload one slot deep
-  // before clearing, so a mistaken fresh start stays recoverable (a single-slot
-  // undo — the NEXT wipe overwrites it). Restore by copying SAVE_KEY_PREV back
-  // over SAVE_KEY; every wipe path (title screen, debug panel) gets this.
-  try {
-    const cur = localStorage.getItem(SAVE_KEY);
-    if (cur !== null) localStorage.setItem(SAVE_KEY_PREV, cur);
-  } catch (_) { /* private mode: nothing to stash */ }
   try { localStorage.removeItem(SAVE_KEY); } catch (_) {}
 }

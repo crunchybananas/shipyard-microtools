@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=197';
-import { generateWorld } from '../js/world.js?realm=197';
-import { checkRaids } from '../js/economy.js?realm=197';
-import { updateSoldiers } from '../js/soldiers.js?realm=197';
-import { updateEnemies } from '../js/combat.js?realm=197';
-import { depositFood } from '../js/building-inventory.js?realm=197';
+import { G, MAP_H, MAP_W, TILE, setSeed } from '../js/state.js?realm=198';
+import { generateWorld } from '../js/world.js?realm=198';
+import { checkRaids } from '../js/economy.js?realm=198';
+import { updateSoldiers } from '../js/soldiers.js?realm=198';
+import { updateEnemies } from '../js/combat.js?realm=198';
+import { depositFood } from '../js/building-inventory.js?realm=198';
 
 function stats() {
   return {
@@ -18,6 +18,7 @@ function stats() {
 }
 
 function resetEncounter() {
+  G.map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(TILE.GRASS));
   G.soldiers = [];
   G.enemies = [];
   G.projectiles = [];
@@ -30,6 +31,7 @@ function resetEncounter() {
     wheat: 0, flour: 0, planks: 0, tools: 0,
   };
   G.stats = stats();
+  G.storyState = { lastProverbSeason: null, raid: null };
   G.namedCharacters = {};
   G._raidSpawnCount = 0;
   G._raidStolen = null;
@@ -130,6 +132,68 @@ assert.equal(liveGuard.hp, 71, 'live raider did not take its valid attack turn')
 assert.equal(G.enemies[0], liveRaider);
 assert.equal(G.stats.enemiesKilled, 0);
 
+function moraleRaider(id, { hp = 30, retreating = false } = {}) {
+  return {
+    x: 10 + id, y: 20, tx: 40, ty: 40,
+    hp, maxHp: 30, damage: 7, plunderGoal: 30,
+    type: 'raider', state: 'approach', variant: id % 3,
+    retreating,
+  };
+}
+
+function prepareMoraleEncounter(enemies) {
+  resetEncounter();
+  const objective = finishedBuilding('storehouse', 40, 40);
+  G.buildings.push(objective);
+  G.buildingGrid[objective.y][objective.x] = objective;
+  G.enemies = enemies;
+  G._raidSpawnCount = 5;
+  G.storyState.raid = { day: 8, killsStart: 0, deathsStart: 0 };
+  G.day = 8;
+  G.gameTick = 60;
+  return objective;
+}
+
+// Successful withdrawals are not casualties. Four comrades already leaving
+// cannot frighten the final active fighter when nobody has died.
+const missionActive = moraleRaider(4);
+prepareMoraleEncounter([
+  moraleRaider(0, { retreating: true }),
+  moraleRaider(1, { retreating: true }),
+  moraleRaider(2, { retreating: true }),
+  moraleRaider(3, { retreating: true }),
+  missionActive,
+]);
+updateEnemies();
+assert.notEqual(missionActive.retreating, true, 'successful withdrawals were counted as morale casualties');
+
+// Exactly three deaths in a five-raider band is exactly 60%, so the two
+// survivors hold. A fourth death crosses the strict line and breaks the last.
+const exactSurvivors = [moraleRaider(3), moraleRaider(4)];
+prepareMoraleEncounter([
+  moraleRaider(0, { hp: 0 }),
+  moraleRaider(1, { hp: 0 }),
+  moraleRaider(2, { hp: 0 }),
+  ...exactSurvivors,
+]);
+updateEnemies();
+assert.equal(G.stats.enemiesKilled, 3);
+assert.ok(exactSurvivors.every(enemy => !enemy.retreating), 'exactly 60% casualties broke morale');
+
+const brokenSurvivor = moraleRaider(4);
+prepareMoraleEncounter([
+  moraleRaider(0, { hp: 0 }),
+  moraleRaider(1, { hp: 0 }),
+  moraleRaider(2, { hp: 0 }),
+  moraleRaider(3, { hp: 0 }),
+  brokenSurvivor,
+]);
+updateEnemies();
+assert.equal(G.stats.enemiesKilled, 4);
+assert.equal(brokenSurvivor.retreating, true, 'more than 60% casualties did not break morale');
+assert.equal(G._raidSpawnCount, 0);
+assert.equal(G.notificationLog.filter(entry => entry.text === 'The raiders break and flee!').length, 1);
+
 function finishedBuilding(type, x, y) {
   return {
     type, x, y, hp: 100, active: true,
@@ -209,7 +273,11 @@ function runFirstRaid(seed, side) {
     ticks++;
   }
 
-  assert.ok(ticks < 5000, `first raid did not resolve for seed ${seed}, side ${side}`);
+  assert.ok(ticks < 5000, `first raid did not resolve for seed ${seed}, side ${side}: ${JSON.stringify({
+    enemies: G.enemies.map(enemy => ({ x: enemy.x, y: enemy.y, tx: enemy.tx, ty: enemy.ty, hp: enemy.hp, retreating: enemy.retreating, attackTimer: enemy.attackTimer, engagedHp: enemy.engaged?.hp, pathIdx: enemy.raidPathIdx, pathLength: enemy.raidPath?.length, objectiveId: enemy.raidIntent?.objectiveId })),
+    soldiers: G.soldiers.map(soldier => ({ x: soldier.x, y: soldier.y, hp: soldier.hp })),
+    buildings: G.buildings.map(building => ({ type: building.type, x: building.x, y: building.y, hp: building.hp })),
+  })}`);
   assert.equal(lethalEnemyTurns, 0);
   assert.equal(G.soldiers.length, 3, `undead damage cost a defender for seed ${seed}, side ${side}`);
   assert.equal(G.stats.citizensDied, 0, `first raid recorded a false defender death for seed ${seed}, side ${side}`);

@@ -29,7 +29,7 @@ try {
   await barracksBuildButton.waitFor({ state: 'visible' });
   assert.equal(await barracksBuildButton.isEnabled(), true, 'military scenario advertised barracks but could not afford one');
   const immediateSave = await page.evaluate(async () => {
-    const saveState = await import('./js/save-state.js?realm=197');
+    const saveState = await import('./js/save-state.js?realm=198');
     const prepared = saveState.prepareSave(saveState.serializeGame({ savedAt: 189 }));
     return {
       ok: prepared.ok,
@@ -45,9 +45,9 @@ try {
   );
 
   const setup = await page.evaluate(async () => {
-    const state = await import('./js/state.js?realm=197');
-    const ownership = await import('./js/citizen-ownership.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const state = await import('./js/state.js?realm=198');
+    const ownership = await import('./js/citizen-ownership.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const g = window.G;
     Object.assign(g.resources, { wood: 100, stone: 100, food: 20, gold: 50, iron: 20, planks: 20 });
     for (const row of g.fog) row.fill(true);
@@ -111,8 +111,8 @@ try {
   assert.deepEqual(trained, { soldiers: 1, name: queued.name, queued: false });
   await page.evaluate(async () => {
     window.G.debug.step(900);
-    const ownership = await import('./js/citizen-ownership.js?realm=197');
-    const ui = await import('./js/ui.js?realm=197');
+    const ownership = await import('./js/citizen-ownership.js?realm=198');
+    const ui = await import('./js/ui.js?realm=198');
     const barracks = window.G.buildingGrid[40][46];
     const activeCivilians = window.G.citizens.filter(citizen => citizen.assignment?.building === barracks);
     ownership.transitionCitizenActivity(activeCivilians[0], 'idle', 'idle-wait');
@@ -137,8 +137,8 @@ try {
   await advanceButton.click();
   assert.equal(await page.evaluate(() => document.body.classList.contains('company-objective-placement')), true, 'Advance control did not enter ground placement');
   const advance = await page.evaluate(async () => {
-    const render = await import('./js/render.js?realm=197');
-    const pathfinding = await import('./js/pathfinding.js?realm=197');
+    const render = await import('./js/render.js?realm=198');
+    const pathfinding = await import('./js/pathfinding.js?realm=198');
     const g = window.G;
     const soldier = g.soldiers[0];
     let target = null;

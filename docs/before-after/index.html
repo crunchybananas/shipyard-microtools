@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A living record of how the Crunchy Bananas micro apps change, with real before-and-after screens and notes from the build."
+    />
+    <meta name="theme-color" content="#e7e9e6" />
+    <link rel="canonical" href="https://crunchybananas.github.io/shipyard-microtools/before-after/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Crunchy Bananas" />
+    <meta property="og:title" content="Before / After — Micro app field record" />
+    <meta
+      property="og:description"
+      content="A living record of what changed across the Crunchy Bananas micro apps."
+    />
+    <meta property="og:url" content="https://crunchybananas.github.io/shipyard-microtools/before-after/" />
+    <meta
+      property="og:image"
+      content="https://crunchybananas.github.io/shipyard-microtools/before-after/assets/orbital-strike/social.jpg"
+    />
+    <meta
+      property="og:image:alt"
+      content="Before-and-after gameplay views of Orbital Strike, from a dark prototype corridor to a detailed station fire director."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Before / After — Micro app field record" />
+    <meta
+      name="twitter:description"
+      content="A living record of what changed across the Crunchy Bananas micro apps."
+    />
+    <meta
+      name="twitter:image"
+      content="https://crunchybananas.github.io/shipyard-microtools/before-after/assets/orbital-strike/social.jpg"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Before-and-after gameplay views of Orbital Strike, from a dark prototype corridor to a detailed station fire director."
+    />
+    <title>Before / After — Micro app field record</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body data-page="archive">
+    <a class="skip-link" href="#main">Skip to the record</a>
+    <div id="app" class="app-shell">
+      <aside class="ledger" aria-label="App status ledger">
+        <a class="wordmark" href="../">Crunchy Bananas</a>
+        <p class="record-name">Before / After</p>
+        <p class="ledger-intro">
+          A living field record of what changed, what we learned, and what is still in motion.
+        </p>
+        <div id="ledger-summary" class="ledger-summary" aria-live="polite">
+          <span>Loading the record…</span>
+        </div>
+        <nav class="ledger-nav" aria-label="Archive navigation">
+          <a href="#latest">Latest comparison</a>
+          <a href="#stories">Build stories</a>
+          <a href="#app-status">All apps</a>
+        </nav>
+        <div id="app-status" class="app-status" aria-label="All micro app statuses"></div>
+      </aside>
+
+      <main id="main" class="content-surface" tabindex="-1">
+        <section id="latest" class="latest-record" aria-labelledby="latest-heading">
+          <div class="section-heading">
+            <h1 id="latest-heading">Latest comparison</h1>
+            <p id="archive-updated">Reading the archive…</p>
+          </div>
+          <div id="latest-story" class="loading-block" aria-live="polite">
+            <p>Loading the latest build story…</p>
+          </div>
+        </section>
+
+        <section id="stories" class="story-index" aria-labelledby="stories-heading">
+          <div class="section-heading">
+            <h2 id="stories-heading">Build stories</h2>
+            <p>Newest first. Each entry keeps the screens, decisions, and a shareable summary together.</p>
+          </div>
+          <div id="story-list" class="story-list"></div>
+        </section>
+      </main>
+    </div>
+    <noscript>This archive needs JavaScript to load its comparison records.</noscript>
+  </body>
+</html>

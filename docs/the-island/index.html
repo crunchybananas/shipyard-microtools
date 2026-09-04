@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Island — ABYME</title>
-  <meta name="description" content="ABYME: an island within an island. A Myst-inspired first-person mystery built from pure web tech — a world synthesized almost entirely in code, with a single real voice at the bottom of it.">
+  <meta name="description" content="ABYME: an island within an island. A Myst-inspired first-person mystery built from pure web tech, with a voice rising from the bottom of it.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏝️</text></svg>">
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.webmanifest">
@@ -30,7 +30,7 @@
   <div id="hotlabel"></div>
 
   <!-- title / menu -->
-  <div id="title-screen">
+  <div id="title-screen" role="dialog" aria-modal="true" aria-label="The Island">
     <div class="title-inner">
       <h1>THE&nbsp;ISLAND</h1>
       <div class="subtitle">A&nbsp;B&nbsp;Y&nbsp;M&nbsp;E</div>
@@ -46,7 +46,7 @@
           <button id="btn-begin-back" class="title-btn">Back</button>
         </div>
       </div>
-      <div class="title-foot">headphones recommended &middot; a world made of code, and a voice at the bottom that isn't</div>
+      <div class="title-foot">headphones recommended &middot; every answer leaves a tide below</div>
       <!-- THE SHARED TIDE (STACK.md §8). Hidden until world.js confirms the shared
            stack is actually configured, so a local-only build never claims to send
            anything. Revealed on the TITLE screen rather than mid-game: the first
@@ -69,7 +69,7 @@
   <div id="cinematic-hint" aria-live="polite"></div>
 
   <!-- control hint -->
-  <div id="controls-hint">drag to look &middot; <b>W A S D</b> to walk &middot; click to touch &middot; <b>J</b> when lost</div>
+  <div id="controls-hint">drag to look &middot; <b>W A S D</b> to walk &middot; click to touch &middot; <b>J</b> for field notes</div>
 
   <!-- THE NOTE. F8 captures where you are and what you see; this is where you say what
        is wrong with it. It is a DOM overlay and not prompt(), deliberately: embedded
@@ -183,16 +183,38 @@
   </div>
 
   <!-- journal -->
-  <button id="journal-tab" title="Journal (J)">✦</button>
-  <div id="journal" class="hidden">
-    <h2>Field Notes</h2>
-    <div id="journal-bearing" aria-live="polite"></div>
-    <div id="journal-entries"></div>
-    <div class="journal-foot">J to close</div>
+  <button id="journal-tab" title="Field notes (J)" aria-label="Open field notes" aria-expanded="false">✦</button>
+  <div id="journal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="journal-title">
+    <header class="journal-head">
+      <span class="journal-overline">FIELD BOOK · FIVE LEAVES</span>
+      <h2 id="journal-title">Field notes</h2>
+    </header>
+    <nav id="journal-folios" aria-label="Field-book leaves">
+      <button type="button" data-folio="room" aria-controls="journal-leaf">THE ROOM</button>
+      <button type="button" data-folio="changed" aria-controls="journal-leaf">WHAT I CHANGED</button>
+      <button type="button" data-folio="arrived" aria-controls="journal-leaf">WHERE IT ARRIVED</button>
+      <button type="button" data-folio="hands" aria-controls="journal-leaf">OTHER HANDS</button>
+      <button type="button" data-folio="return" aria-controls="journal-leaf">RETURN</button>
+    </nav>
+    <section id="journal-leaf" aria-labelledby="journal-leaf-title">
+      <h3 id="journal-leaf-title"></h3>
+      <p id="journal-leaf-deck"></p>
+      <div id="journal-entries" class="folio-marks"></div>
+    </section>
+    <aside id="journal-facing" aria-label="Current causal sketch">
+      <span class="journal-overline">CURRENT LINE</span>
+      <h3 id="journal-lead-title"></h3>
+      <ol id="journal-causal"></ol>
+      <div id="journal-lead">
+        <button id="journal-hint" type="button">Trace this lead</button>
+        <div id="journal-hint-text" aria-live="polite"></div>
+      </div>
+    </aside>
+    <div class="journal-foot">choose a leaf · J or Esc to close</div>
   </div>
 
   <!-- the reading surface: open a book / letter / inscription and read it in fragments -->
-  <div id="reader" class="hidden">
+  <div id="reader" class="hidden" role="dialog" aria-modal="true" aria-labelledby="reader-title">
     <div class="reader-page">
       <div class="reader-title" id="reader-title"></div>
       <div class="reader-body" id="reader-body"></div>
