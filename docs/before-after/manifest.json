@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T15:10:00Z",
+  "updatedAt": "2026-09-04T16:20:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,18 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "the-island",
+      "title": "The Island stopped being a diagram of a place",
+      "appSlug": "the-island",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "published",
+      "publishedAt": "2026-09-04",
+      "data": "stories/the-island.json",
+      "href": "./the-island/",
+      "cover": "assets/the-island/social.jpg"
+    },
     {
       "slug": "realm",
       "title": "Realm stopped being populated by wobble toys",
@@ -267,8 +279,8 @@
       "slug": "the-island",
       "title": "The Island",
       "category": "Games",
-      "status": "separate-workstream",
-      "story": null
+      "status": "published",
+      "story": "the-island"
     },
     {
       "slug": "token-lens",

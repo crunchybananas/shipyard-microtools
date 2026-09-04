@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "slug": "the-island",
+  "title": "The Island stopped being a diagram of a place",
+  "appSlug": "the-island",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "published",
+  "publishedAt": "2026-09-04",
+  "thesis": "The same opening beat — you wash up on a shore beneath a lighthouse — told three ways: as a flat picture you clicked through, as a world you could walk but not believe, and as somewhere that behaves like a place while you stand in it.",
+  "summary": "In February The Island was a 2D SVG point-and-click: flat shapes, arrow buttons, one still frame per location. June replaced it wholesale with ABYME, a walkable 3D island. What followed was the harder half — giving that world surfaces, weather, wildlife and depth, so it stopped reading as untextured geometry.",
+  "versions": {
+    "before": {
+      "label": "Earlier builds — Feb SVG, Jun first-3D",
+      "commit": "0ec63afa"
+    },
+    "after": {
+      "label": "Current main",
+      "commit": "4ee44681"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "medium",
+      "title": "From a picture of a beach to a beach",
+      "caption": "Both are the opening location. February was a 2D SVG scene: flat fills, a circle for the moon, triangles for trees, and arrow buttons to step between static frames — you looked at the island rather than stood on it. Today the same beat is a first-person world you walk with WASD, and the line that greets you is unchanged: the tide brought you back.",
+      "before": {
+        "src": "assets/the-island/before-svg.jpg",
+        "alt": "The Island in February: a flat 2D SVG night scene of a beach with a circular moon, triangular trees and directional arrow buttons beneath it."
+      },
+      "after": {
+        "src": "assets/the-island/after-world.jpg",
+        "alt": "The Island today: a first-person 3D shore with wet pebbles, driftwood, gulls standing at the waterline and a lighthouse in haze beyond the treeline."
+      }
+    },
+    {
+      "id": "surface",
+      "title": "The world was built in June; the surfaces took the rest of the summer",
+      "caption": "Left is the first playable 3D build (afc3b6b4, 11 June) from the same spawn point, once its opening camera hands over. The geometry and the composition were already right — the lighthouse sits where it sits now. What it had no answer for was surface: bare flat-shaded sand, spiky grass standing in for undergrowth, an empty shoreline. The right-hand frame is the same view after the texturing and life passes: pebble shingle at the tideline, driftwood, layered vegetation, gulls, and haze doing the work of distance.",
+      "before": {
+        "src": "assets/the-island/before-untextured.jpg",
+        "alt": "The first 3D build of The Island: flat-shaded low-poly terrain with bare sand, sparse spiky grass and no wildlife, under a plain sky."
+      },
+      "after": {
+        "src": "assets/the-island/after-world.jpg",
+        "alt": "The same view today: textured pebble shingle, driftwood, denser vegetation, gulls at the waterline and atmospheric haze around the lighthouse."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "The medium changed, not just the art",
+      "body": "February's build could only ever show you a location. ABYME replaced the SVG scene graph with a real-time 3D world, which turns the same puzzle content into a place you occupy — you find things by looking around rather than by exhausting the clickable regions of a frame."
+    },
+    {
+      "title": "Surfaces stopped being flat colour",
+      "body": "The first 3D pass shipped untextured, which is why it read as a model rather than a shore. The fix was relief rather than tiled colour: normal maps derived from generated height, so stone, sand and bark catch raking light while the palette stays under the era grade's control. Tiled colour was tried and rejected — at arm's length it pixelated into a grid."
+    },
+    {
+      "title": "The island got inhabitants and weather",
+      "body": "Gulls and crows that land, perch and take off; a tide that moves; light that travels through the day. Motion is what separates a diorama from a place, and most of it is incidental rather than scripted — it happens whether or not you are watching."
+    },
+    {
+      "title": "It became something you can finish",
+      "body": "Behind the view there is now a save format under contract, a notebook that records what you have actually seen, and an executable walk that drives the whole game end to end in CI — so the story can be completed, and can be proven to still complete after every change."
+    }
+  ],
+  "builderNote": {
+    "quote": "I really want to be wow'd.",
+    "context": "The owner's standing bar for this game, recorded verbatim in its quality-loop mission doc, and the reason this is published rather than filed as finished. The Feb-to-now leap is the easy story — changing medium always looks dramatic. The June-to-now comparison is the one that matters, because it is four months of work on surfaces and life that never shows up as a new feature."
+  },
+  "proof": [
+    {
+      "label": "Captured",
+      "value": "All three builds driven through their real Begin gate at the same spawn, with the opening camera allowed to hand over — no debug flythrough or posed camera."
+    },
+    {
+      "label": "February",
+      "value": "0ec63afa, 2 Feb 2026 — 2D SVG point-and-click, one still frame per location."
+    },
+    {
+      "label": "First 3D",
+      "value": "afc3b6b4, 11 Jun 2026 — walkable world, untextured; its opening camera runs 21 seconds before it hands you the controls."
+    },
+    {
+      "label": "Today",
+      "value": "4ee44681, 4 Sep 2026 — textured surfaces, wildlife, tide and day cycle, with an end-to-end walk gate in CI."
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/the-island/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/4ee44681/docs/the-island",
+    "download": "assets/the-island/montage.png"
+  },
+  "share": {
+    "summary": "The same opening beach, three ways: a flat SVG frame you clicked through, an untextured 3D model you could walk, and a shore with pebbles, gulls and weather.",
+    "image": "assets/the-island/social.jpg"
+  }
+}
