@@ -95,20 +95,35 @@ try {
   await page.goto(`${base}/orbital-strike/index.html`, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof window.game !== 'undefined', null, { timeout: 10_000 });
 
+  // Count iterations of the GAME's own loop by wrapping the render call it makes
+  // every frame. This is the honest liveness signal: update() throwing means
+  // render() is never reached and rAF is never re-armed, so the count freezes.
+  // Game-time is not usable here — it stops legitimately when the player dies or
+  // pauses, and it crawls under CI's software renderer (no GPU).
+  await page.evaluate(() => {
+    window.__frames = 0;
+    const renderer = window.game.renderer;
+    const original = renderer.render.bind(renderer);
+    renderer.render = (...args) => { window.__frames++; return original(...args); };
+  });
+
   // Start the mission through the real button, as a player would.
   await page.click('#startBtn');
   await page.waitForTimeout(400);
   record('mission starts', await page.evaluate(() => window.game.gameState === 'playing'));
 
-  // THE regression check: a real rAF loop must keep advancing the clock. A throw
-  // anywhere in update() leaves requestAnimationFrame un-armed and freezes this.
-  const clockAdvance = await page.evaluate(async () => {
-    const before = window.game.clockTime;
-    await new Promise(r => setTimeout(r, 1000));
-    return window.game.clockTime - before;
+  // THE regression check: the loop must keep coming back round. Frame count, not
+  // wall-clock rate — CI's software renderer is slow and that is not a defect.
+  const framesRun = await page.evaluate(async () => {
+    const before = window.__frames;
+    await new Promise(r => setTimeout(r, 3000));
+    return window.__frames - before;
   });
-  record('game loop keeps running (rAF re-armed)', clockAdvance > 0.3,
-    `clock advanced ${clockAdvance.toFixed(2)}s in 1s`);
+  // Binary signal on purpose: a dead loop renders EXACTLY zero. Anything above
+  // that means rAF is still coming round, however slow the renderer is. CI's
+  // SwiftShader manages roughly 1 fps on this scene, so don't assert a rate.
+  record('game loop keeps running (rAF re-armed)', framesRun >= 2,
+    `${framesRun} frames in 3s`);
 
   // Movement — real key events through the real handlers.
   const moved = await page.evaluate(() => ({ x: window.game.player.x, z: window.game.player.z }));
@@ -176,15 +191,16 @@ try {
   });
   record('E opens a station terminal', interact === 'terminal');
 
-  // After all that, the loop must STILL be alive — this catches a throw introduced by
-  // any of the interactions above, not just by the first frame.
-  const stillAlive = await page.evaluate(async () => {
-    const before = window.game.clockTime;
-    await new Promise(r => setTimeout(r, 800));
-    return window.game.clockTime - before;
+  // After all that, the loop must STILL be alive — catches a throw introduced by any
+  // of the interactions above, not just on the first frame. Frame count again, so a
+  // player death during a slow headless run doesn't read as a failure.
+  const framesAfter = await page.evaluate(async () => {
+    const before = window.__frames;
+    await new Promise(r => setTimeout(r, 3000));
+    return window.__frames - before;
   });
-  record('loop still alive after all input', stillAlive > 0.2,
-    `clock advanced ${stillAlive.toFixed(2)}s`);
+  record('loop still alive after all input', framesAfter >= 2,
+    `${framesAfter} frames in 3s, state=${await page.evaluate(() => window.game.gameState)}`);
 
   record('no uncaught page errors', pageErrors.length === 0, pageErrors.slice(0, 3).join(' | '));
   record('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '));
