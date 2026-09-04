@@ -202,9 +202,20 @@ scene.add(new THREE.HemisphereLight(0x3a557f, 0x070f1c, 1.1));
 const moonlight = new THREE.DirectionalLight(0xbcd0ff, 0.85);
 moonlight.position.copy(MOON_DIR).multiplyScalar(400);
 scene.add(moonlight);
-const lamplight = new THREE.PointLight(0xffe9b0, 900, 420, 2);
+const lamplight = new THREE.PointLight(0xffe9b0, 26000, 520, 2);
 lamplight.position.set(0, 30, 0);
 scene.add(lamplight);
+
+// The beam is a LIGHT, not just a shaft of geometry. A spot bound to the same
+// bearing means a hull inside the wedge is genuinely illuminated by it — the
+// game's one mechanic ("the beam reveals them") made physical rather than a
+// number multiplying an alpha.
+const beamLight = new THREE.SpotLight(0xfff0c0, 900000, SPAWN * 1.45, 0.30, 0.55, 2);
+beamLight.position.set(0, 39.8, 0);
+const beamTarget = new THREE.Object3D();
+scene.add(beamTarget);
+beamLight.target = beamTarget;
+scene.add(beamLight);
 
 // ── Lighthouse ────────────────────────────────────────────
 const lighthouse = new THREE.Group();
@@ -249,22 +260,25 @@ beamMat.uniforms.uIntensity.value = 1;
 if (beamMat.uniforms.uFlip) beamMat.uniforms.uFlip.value = 1;
 if (beamMat.uniforms.uMist) beamMat.uniforms.uMist.value = 0.55;
 const BEAM_LEN = SPAWN * 1.25;
-const beamMesh = new THREE.Mesh(new THREE.ConeGeometry(BEAM_LEN * 0.15, BEAM_LEN, 26, 1, true), beamMat);
+const beamMesh = new THREE.Mesh(new THREE.ConeGeometry(BEAM_LEN * 0.21, BEAM_LEN, 30, 1, true), beamMat);
 beamMesh.geometry.translate(0, -BEAM_LEN / 2, 0);   // apex at the origin
 beamMesh.rotation.x = Math.PI / 2;                   // lay it flat, pointing -Z
 const beamPivot = new THREE.Group();
 beamPivot.position.set(0, 39.8, 0);
 beamPivot.add(beamMesh);
-beamMesh.rotation.x = Math.PI / 2 - 0.10;            // tip it slightly down onto the sea
+// Aim the shaft so its axis meets the sea out at the spawn ring. Tipped only
+// slightly, the beam left the lantern at 40m and was still ~30m above the water
+// where the ships are — a wedge of light floating over the scene, touching nothing.
+beamMesh.rotation.x = Math.PI / 2 - Math.atan(39.8 / (SPAWN * 0.92));
 scene.add(beamPivot);
 
 // ── Ship meshes ───────────────────────────────────────────
 const HULL_GEO = {};
 for (const [key, pts] of Object.entries(HULLS)) {
   const shape = new THREE.Shape();
-  pts.forEach(([x, y], i) => (i ? shape.lineTo(x * 0.26, -y * 0.26) : shape.moveTo(x * 0.26, -y * 0.26)));
+  pts.forEach(([x, y], i) => (i ? shape.lineTo(x * 0.46, -y * 0.46) : shape.moveTo(x * 0.46, -y * 0.46)));
   shape.closePath();
-  const geo = new THREE.ExtrudeGeometry(shape, { depth: 3.6, bevelEnabled: true, bevelSize: 0.3, bevelThickness: 0.3, bevelSegments: 1 });
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: 6.4, bevelEnabled: true, bevelSize: 0.5, bevelThickness: 0.5, bevelSegments: 1 });
   geo.center();
   geo.rotateY(Math.PI / 2);          // beam-on to the lantern
   HULL_GEO[key] = geo;
@@ -275,7 +289,7 @@ function makeShipMesh(typeKey) {
   const hull = new THREE.Mesh(HULL_GEO[typeKey], new THREE.MeshStandardMaterial({
     color: 0x9fa8ba, roughness: 0.72, metalness: 0.05,
   }));
-  hull.position.y = 2.6;
+  hull.position.y = 3.4;
   g.add(hull);
   // Running lights: red to port, green to starboard, white at the masthead. The
   // canvas build shipped none, in a game whose only verb is signalling with light.
@@ -283,13 +297,13 @@ function makeShipMesh(typeKey) {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({
       map: GLOW_TEX, color: col, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending,
     }));
-    s.position.set(x, y, z); s.scale.setScalar(7.5); g.add(s);
+    s.position.set(x, y, z); s.scale.setScalar(3.2); g.add(s);
     return s;
   };
   g.userData.lamps = [
-    lamp(0, 4.0, 5.2, 0xff4444),
-    lamp(0, 4.0, -5.2, 0x44ff88),
-    lamp(0, 8.5, 0, 0xfff6dd),
+    lamp(0, 4.2, 9.0, 0xff4444),
+    lamp(0, 4.2, -9.0, 0x44ff88),
+    lamp(0, 11.5, 0, 0xfff6dd),
   ];
   g.userData.hull = hull;
   return g;
@@ -496,14 +510,19 @@ document.addEventListener('keydown', (e) => {
 // ── Scene sync ────────────────────────────────────────────
 function syncScene() {
   beamPivot.rotation.y = -beam.angle;
+  // Keep the spot on the same bearing as the shaft, aimed at the sea where the
+  // cone meets it, and tinted by whatever signal is being flashed.
+  const ba = beam.angle - Math.PI / 2;
+  beamTarget.position.set(Math.cos(ba) * SPAWN * 0.92, 0, Math.sin(ba) * SPAWN * 0.92);
   beamMat.uniforms.uTime.value = time * 0.016;
   const flash = signalFlashColor;
-  beamMat.uniforms.uColor.value.set(
-    flash === 'green' ? 0x22c55e : flash === 'red' ? 0xef4444 : flash === 'white' ? 0xffffff : 0xfff0c0,
-  );
+  const beamHex = flash === 'green' ? 0x22c55e : flash === 'red' ? 0xef4444 : flash === 'white' ? 0xffffff : 0xfff0c0;
+  beamMat.uniforms.uColor.value.set(beamHex);
+  beamLight.color.set(beamHex);
+  beamLight.intensity = 900000 * (0.85 + 0.15 * Math.sin(time * 0.08));
   wu.uTime.value = time * 0.016;
   const pulse = 0.86 + 0.14 * Math.sin(time * 0.08);
-  lamplight.intensity = 900 * pulse;
+  lamplight.intensity = 2600 * pulse;
 
   for (const ship of ships) {
     if (!ship.mesh) {
@@ -514,14 +533,19 @@ function syncScene() {
     ship.mesh.position.set(Math.cos(a) * ship.distance, 0, Math.sin(a) * ship.distance);
     ship.mesh.rotation.y = -a + Math.PI / 2;          // bow towards the light
     ship.mesh.position.y = Math.sin(time * 0.04 + ship.angle * 3) * 0.5;   // ride the swell
-    const seen = ship.seen && !ship.signaled && !ship.wrecked ? 0.22 : 0;
+    const seen = ship.seen && !ship.signaled && !ship.wrecked ? 0.38 : 0;
     const vis = Math.max(ship.lit, seen) * ship.opacity;
     const hull = ship.mesh.userData.hull;
     hull.material.emissive = hull.material.emissive || new THREE.Color();
-    hull.material.color.setHex(ship.wrecked ? 0x7f1d1d : ship.signaled ? 0x1f7a4d : 0xb9c3d6);
+    const base = ship.wrecked ? 0x7f1d1d : ship.signaled ? 0x1f7a4d : 0xb9c3d6;
+    hull.material.color.setHex(base);
+    if (!ship.wrecked && !ship.signaled) {
+      // Warm the hull towards the lamp as the beam holds it.
+      hull.material.color.lerp(new THREE.Color(0xfff0cd), ship.lit * 0.55);
+    }
     hull.material.emissive.setHex(ship.signaled ? 0x0d3a24 : 0x111c2c);
-    hull.material.emissiveIntensity = 0.35 + ship.lit * 0.9;
-    hull.material.opacity = Math.max(0.18, vis);
+    hull.material.emissiveIntensity = 0.12 + ship.lit * 0.18;
+    hull.material.opacity = Math.max(0.55, vis);
     hull.material.transparent = true;
     for (const l of ship.mesh.userData.lamps) l.material.opacity = 0.35 + vis * 0.6;
   }
@@ -547,6 +571,36 @@ resize();
 // The HTML calls these directly, and a module has no global scope.
 window.startGame = startGame;
 window.flashSignal = flashSignal;
+
+// ?debug exposes the watch for posed captures and playtests, the same way the
+// island exposes ABYME. Screenshots were being taken at whatever moment the clock
+// happened to land on, which is a poor way to photograph a rotating light.
+if (new URLSearchParams(location.search).has('debug')) {
+  window.BEACON = {
+    get ships() { return ships; },
+    beam, camera, scene, renderer, wu,
+    spawnShip, render,
+    // Place a vessel exactly: bearing in turns (0..1), distance in metres.
+    place(typeKey, bearingTurns, distance, lit = 1) {
+      spawnShip();
+      const ship = ships[ships.length - 1];
+      ship.typeKey = typeKey;
+      ship.type = SHIP_TYPES[typeKey];
+      ship.angle = bearingTurns * Math.PI * 2;
+      ship.distance = distance;
+      ship.lit = lit;
+      ship.seen = lit > 0.5;
+      if (ship.mesh) { scene.remove(ship.mesh); ship.mesh = null; }
+      return ship;
+    },
+    clear() {
+      for (const s of ships) if (s.mesh) scene.remove(s.mesh);
+      ships.length = 0;
+    },
+    setBeam(turns) { beam.angle = turns * Math.PI * 2; },
+    freeze() { running = false; },
+  };
+}
 
 // Idle scene behind the title card, so the watch is already running when you arrive.
 (function idle() {
