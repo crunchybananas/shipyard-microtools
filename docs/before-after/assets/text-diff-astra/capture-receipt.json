@@ -1,0 +1,142 @@
+{
+  "capturedAt": "2026-09-04T23:40:11.408Z",
+  "fixture": "scripts/workbench-fixture.mjs",
+  "captures": [
+    {
+      "version": "original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8",
+      "scene": "desktop",
+      "filename": "original-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "ba291c7f4b083de66043dd69b92e936aabe253c4ea48795398c651cb7ef2cd66",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Text Diff — Shipyard Microtools",
+      "sourceScroll": 0
+    },
+    {
+      "version": "original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8",
+      "scene": "mobile",
+      "filename": "original-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "5544ddee3c5a2b853e91e371a4347c4d807bb0d7f5efc8397061a93e79b3b724",
+      "scrollX": 0,
+      "scrollY": 722,
+      "title": "Text Diff — Shipyard Microtools",
+      "sourceScroll": 0
+    },
+    {
+      "version": "fable",
+      "commit": "6fb98ea9408eb18996e40aad8ff104bb368955cd",
+      "scene": "desktop",
+      "filename": "fable-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "55178617757e7e884b6e8284348eeade0ee57870943cf2372dfd3c6f7eb47db5",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Text Diff",
+      "sourceScroll": 0
+    },
+    {
+      "version": "fable",
+      "commit": "6fb98ea9408eb18996e40aad8ff104bb368955cd",
+      "scene": "mobile",
+      "filename": "fable-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "1d35b755f87393b7ba9da8de9ba41d01d6954be75910f0c1a033d141d28ab035",
+      "scrollX": 0,
+      "scrollY": 769,
+      "title": "Text Diff",
+      "sourceScroll": 0
+    },
+    {
+      "version": "baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "scene": "desktop",
+      "filename": "baseline-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "9b58b70063a6e77b2f5570c2bcad801d55783219754d240c9f4db887db0fd735",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Text Diff",
+      "sourceScroll": 0
+    },
+    {
+      "version": "baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "scene": "mobile",
+      "filename": "baseline-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "c0f8b7917caebab8b35c0fd0136256e13593e7e5f8d12ef7dfb012a87f786b00",
+      "scrollX": 0,
+      "scrollY": 931,
+      "title": "Text Diff",
+      "sourceScroll": 0
+    },
+    {
+      "version": "astra",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+      "scene": "desktop",
+      "filename": "astra-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "eee511491c888b58b695273b2aab832d3bac75466d2d9f0c1d6487a9d65c4014",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Text Diff — Crunchy Bananas",
+      "sourceScroll": 0
+    },
+    {
+      "version": "astra",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+      "scene": "mobile",
+      "filename": "astra-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "7a5483f09d63ea32971dd5160e6c315254d8d7b43dc963e0eaccf642ad078e37",
+      "scrollX": 0,
+      "scrollY": 707,
+      "title": "Text Diff — Crunchy Bananas",
+      "sourceScroll": 0
+    }
+  ]
+}

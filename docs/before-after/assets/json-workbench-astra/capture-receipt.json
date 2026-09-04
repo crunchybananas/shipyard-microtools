@@ -1,0 +1,142 @@
+{
+  "capturedAt": "2026-09-04T23:39:37.743Z",
+  "fixture": "scripts/workbench-fixture.mjs",
+  "captures": [
+    {
+      "version": "original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8",
+      "scene": "desktop",
+      "filename": "original-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "e57818de955f60cc48a3e5ef6c3d59dfedf1621a3ffe26121c3ce0d2c1819322",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "JSON Formatter — Shipyard Microtools",
+      "sourceScroll": 0
+    },
+    {
+      "version": "original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8",
+      "scene": "mobile",
+      "filename": "original-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "47300455506ede4f8b4508c876f20738eb4ddcd7c3ff9f085a579065f3057f6d",
+      "scrollX": 0,
+      "scrollY": 469,
+      "title": "JSON Formatter — Shipyard Microtools",
+      "sourceScroll": 0
+    },
+    {
+      "version": "fable",
+      "commit": "3acc1c7b316376b156402983bfffc714a2dc18b9",
+      "scene": "desktop",
+      "filename": "fable-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "b371578df6b40a0d3a848086a5c1a583def010bc19623dd1d10cdbece7de1414",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "JSON Formatter",
+      "sourceScroll": 0
+    },
+    {
+      "version": "fable",
+      "commit": "3acc1c7b316376b156402983bfffc714a2dc18b9",
+      "scene": "mobile",
+      "filename": "fable-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "53ed0bea2981a0c3e49ab2e706c6040136a461142d23d3bc92b1bc162c4f8845",
+      "scrollX": 0,
+      "scrollY": 469,
+      "title": "JSON Formatter",
+      "sourceScroll": 0
+    },
+    {
+      "version": "baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "scene": "desktop",
+      "filename": "baseline-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "1b8f4e982e9f9c4856076ccba8f8615322e03b322306d8ef1c0ada492b324289",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "JSON Formatter",
+      "sourceScroll": 0
+    },
+    {
+      "version": "baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "scene": "mobile",
+      "filename": "baseline-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "088644ec568edcdf60fa476719fcec0eaed14cbe20edcee2f84855b146c38b8c",
+      "scrollX": 0,
+      "scrollY": 547,
+      "title": "JSON Formatter",
+      "sourceScroll": 0
+    },
+    {
+      "version": "astra",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+      "scene": "desktop",
+      "filename": "astra-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "00afcf36aaea4cc693d55c3de28d72c6e364d8ee58c1cf9975a1731ead8aab9d",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "JSON Workbench — Crunchy Bananas",
+      "sourceScroll": 0
+    },
+    {
+      "version": "astra",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+      "scene": "mobile",
+      "filename": "astra-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "d63528c18cbe21e9898be2780027148b70a66bbbc3bc23bf6b5a8b10380bacea",
+      "scrollX": 0,
+      "scrollY": 600,
+      "title": "JSON Workbench — Crunchy Bananas",
+      "sourceScroll": 0
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 2,
+  "slug": "text-diff-astra",
+  "title": "Text Diff, from comparison to review",
+  "appSlug": "text-diff",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "in-revision",
+  "publishedAt": null,
+  "updatedAt": "2026-09-04T23:39:00Z",
+  "thesis": "A useful comparison helps you move through a revision, understand the changed words, and take an exact patch away with you.",
+  "summary": "Four recorded revisions: the original line diff, the repository-credited Claude Fable 5 word and split views, the suite refresh, and Astra’s bounded worker, focused change navigation, and tested patch export.",
+  "versions": {
+    "before": {
+      "label": "Original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8"
+    },
+    "after": {
+      "label": "Astra workbench",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0"
+    }
+  },
+  "lineage": [
+    {
+      "id": "original",
+      "label": "Original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8",
+      "summary": "The first release used a line-by-line longest-common-subsequence table and a unified output. The creating commit does not record a model.",
+      "provenance": {
+        "model": null,
+        "note": "The original creation commit contains no model credit.",
+        "evidence": {
+          "kind": "unrecorded"
+        }
+      }
+    },
+    {
+      "id": "fable",
+      "label": "Words & split view",
+      "commit": "6fb98ea9408eb18996e40aad8ff104bb368955cd",
+      "summary": "The July update added word-level emphasis, aligned split views, and real line numbers. The commit explicitly credits Claude Fable 5. These useful features are retained in the review workflow.",
+      "provenance": {
+        "model": "Claude Fable 5",
+        "note": "This is the exact repository credit, not an independently verified account of the model run.",
+        "evidence": {
+          "kind": "commit-trailer",
+          "commit": "6fb98ea9408eb18996e40aad8ff104bb368955cd",
+          "quote": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+        }
+      }
+    },
+    {
+      "id": "baseline",
+      "label": "Deployed baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "summary": "The deployed baseline wrapped the existing comparison engine in the pale suite design. The September suite-overhaul commit has no model attribution; this composite state stays unassigned.",
+      "provenance": {
+        "model": null,
+        "note": "This snapshot includes several contributors. The material suite refresh at 13f4a628 does not name its model.",
+        "evidence": {
+          "kind": "unrecorded"
+        }
+      }
+    },
+    {
+      "id": "astra",
+      "label": "Astra workbench",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+      "summary": "A dark review surface adds change-group navigation, optional context folding, local text files, and unified patch download. A cancellable worker computes bounded shortest-edit comparisons, while large reviews render one page of rows at a time.",
+      "provenance": {
+        "model": "GPT-6 Astra",
+        "note": "This implementation pass records its model credit in the pinned source commit.",
+        "evidence": {
+          "kind": "commit-trailer",
+          "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+          "quote": "Co-Authored-By: GPT-6 Astra <noreply@openai.com>"
+        }
+      }
+    }
+  ],
+  "captureProtocol": "Isolated Git archives rendered in the same Playwright Chromium session, device scale 1, 100% zoom, with scripts/workbench-fixture.mjs. JSON uses Explore when that revision supports it; Astra selects latitude. Text Diff uses split view on desktop when available and unified on mobile. Mobile scrolls to the result panel; desktop starts at the page top. No UI is reconstructed or retouched. Browser version, scroll positions, source commits, and image hashes are recorded in capture-receipt.json.",
+  "captureReceipt": "assets/text-diff-astra/capture-receipt.json",
+  "comparisons": [
+    {
+      "id": "desktop",
+      "title": "Desktop · 1440 × 900",
+      "caption": "The same example is loaded and processed in each pinned revision. Desktop shows the page top; mobile aligns the working output near the top. Earlier releases have only the views they actually implemented.",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "before": {
+        "src": "assets/text-diff-astra/original-desktop.jpg",
+        "alt": "Text Diff, Original, desktop capture of the same North Atlantic example."
+      },
+      "after": {
+        "src": "assets/text-diff-astra/astra-desktop.jpg",
+        "alt": "Text Diff, Astra workbench, desktop capture of the same North Atlantic example."
+      },
+      "frames": {
+        "original": {
+          "src": "assets/text-diff-astra/original-desktop.jpg",
+          "alt": "Text Diff, Original, desktop capture of the same North Atlantic example."
+        },
+        "fable": {
+          "src": "assets/text-diff-astra/fable-desktop.jpg",
+          "alt": "Text Diff, Words & split view, desktop capture of the same North Atlantic example."
+        },
+        "baseline": {
+          "src": "assets/text-diff-astra/baseline-desktop.jpg",
+          "alt": "Text Diff, Deployed baseline, desktop capture of the same North Atlantic example."
+        },
+        "astra": {
+          "src": "assets/text-diff-astra/astra-desktop.jpg",
+          "alt": "Text Diff, Astra workbench, desktop capture of the same North Atlantic example."
+        }
+      }
+    },
+    {
+      "id": "mobile",
+      "title": "Mobile · 390 × 844",
+      "caption": "The same example is loaded and processed in each pinned revision. Desktop shows the page top; mobile aligns the working output near the top. Earlier releases have only the views they actually implemented.",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "before": {
+        "src": "assets/text-diff-astra/original-mobile.jpg",
+        "alt": "Text Diff, Original, mobile capture of the same North Atlantic example."
+      },
+      "after": {
+        "src": "assets/text-diff-astra/astra-mobile.jpg",
+        "alt": "Text Diff, Astra workbench, mobile capture of the same North Atlantic example."
+      },
+      "frames": {
+        "original": {
+          "src": "assets/text-diff-astra/original-mobile.jpg",
+          "alt": "Text Diff, Original, mobile capture of the same North Atlantic example."
+        },
+        "fable": {
+          "src": "assets/text-diff-astra/fable-mobile.jpg",
+          "alt": "Text Diff, Words & split view, mobile capture of the same North Atlantic example."
+        },
+        "baseline": {
+          "src": "assets/text-diff-astra/baseline-mobile.jpg",
+          "alt": "Text Diff, Deployed baseline, mobile capture of the same North Atlantic example."
+        },
+        "astra": {
+          "src": "assets/text-diff-astra/astra-mobile.jpg",
+          "alt": "Text Diff, Astra workbench, mobile capture of the same North Atlantic example."
+        }
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "Move between changes without losing context",
+      "body": "Previous and next controls navigate change groups and select their first row. Focus on changes keeps three neighboring lines and offers explicit expansion of omitted context. Large full-document reviews use 400-row pages; navigation can jump directly to an off-page change."
+    },
+    {
+      "title": "Keep hard comparisons off the interface thread",
+      "body": "The old algorithm allocated a quadratic table on the main thread. A worker now searches a bounded Myers edit path. Limits on file size, line count, work, and elapsed time stop difficult comparisons with an explanation. Cancellation or new input invalidates old results immediately."
+    },
+    {
+      "title": "Export a patch that applies",
+      "body": "Download includes every change, independent of collapsed context or the visible page. Tests apply the patch with Git and compare the resulting file exactly. Missing final newlines are represented in both the UI and the patch. Line endings are normalized to LF."
+    },
+    {
+      "title": "Make filtering an explicit choice",
+      "body": "Ignore edge whitespace affects comparison only and never silently changes the source. Patch export is disabled while that filter is enabled so a filtered review cannot masquerade as an exact patch."
+    }
+  ],
+  "builderNote": null,
+  "proof": [
+    {
+      "label": "Diff correctness",
+      "value": "600 deterministic randomized cases reconstruct both input documents. Twelve exported patches apply with Git, including empty files and final-newline changes."
+    },
+    {
+      "label": "Large-file behavior",
+      "value": "A 20,000-line file with one changed line is covered by engine and real file-upload browser checks. The full review renders at most 400 rows per page."
+    },
+    {
+      "label": "Browser behavior",
+      "value": "Word emphasis, split and unified modes, change navigation, patch download, stale-output invalidation, and cancellation verified on desktop and mobile."
+    },
+    {
+      "label": "Limits",
+      "value": "2 MiB and 20,000 lines per document; at most 1,400 edit steps and an 8-second timeout. Difficult comparisons fail explicitly rather than returning an approximate patch."
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/text-diff/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/b6d24b9b496bc52a8a33036500169064e87665c0/docs/text-diff/",
+    "download": "assets/text-diff-astra/montage.png"
+  },
+  "share": {
+    "summary": "Four recorded revisions: the original line diff, the repository-credited Claude Fable 5 word and split views, the suite refresh, and Astra’s bounded worker, focused change navigation, and tested patch export.",
+    "image": "assets/text-diff-astra/social.jpg"
+  }
+}

@@ -66,3 +66,39 @@ Once a story becomes `published`, treat its JSON, captures, quotes, and commit r
 - `queued` and `in-revision` records may change during review. The append-only boundary begins when their status changes to `published`.
 
 This policy keeps links trustworthy and lets the archive show iteration—including directions that were promising but not yet right.
+
+
+## Model lineage (schema 2)
+
+New stories can record more than two revisions. Existing schema-1 stories, route slugs, scene hashes, source refs, and captures remain valid and unchanged.
+
+A schema-2 story keeps `versions.before`, `versions.after`, and each comparison's `before` and `after` images as aliases of its lineage endpoints. This allows existing consumers to keep reading a binary pair. The additional fields are:
+
+- `lineage`: an ordered array of revisions with unique `id`, `label`, full `commit`, product `summary`, and `provenance`.
+- `provenance.model`: the exact credited model name, or `null` for unrecorded provenance. Never infer attribution from a date, writing style, author account, or the name of the current task.
+- `provenance.evidence`: either `unrecorded`, or `commit-trailer` with the exact `quote` and its source `commit`. The verifier checks the complete trailer against Git and requires that evidence commit to be an ancestor of the captured revision. This records repository credit; it does not independently verify a historical model run.
+- `comparisons[].viewport`: the capture width and height. `frames` maps every lineage ID to a real image at those exact dimensions. Desktop and mobile are separate capture scenes.
+- `captureProtocol`: the actual input and interaction recipe. `captureReceipt` links to the browser, commits, scroll offsets, dimensions, and SHA-256 image hashes produced by the capture script.
+- `updatedAt`: the dated review update, used to put current in-review work in the archive without falsely marking it published.
+- `builderNote`: may be `null` in schema 2. Do not fabricate owner feedback to fill a template.
+
+The viewer supports one complete revision, a wipe between any two revisions, and side-by-side frames (stacked on a phone). Revision IDs, comparison mode, and capture scene persist in the share URL. Native controls and arrow/Home/End navigation make the sequence usable with a keyboard. The sidebar follows an app's current story pointer, while older records remain indexed.
+
+### Reproduce the workbench evidence
+
+The source of each revision is extracted with `git archive` into an isolated temporary directory. No historical checkout, Realm directory, or Island directory is changed.
+
+```sh
+node --test scripts/workbench-engine.test.mjs
+node scripts/verify-workbenches.mjs
+node scripts/capture-workbench-lineage.mjs json-workbench-astra text-diff-astra
+node scripts/render-workbench-share.mjs json-workbench-astra text-diff-astra
+node scripts/verify-before-after.mjs
+node scripts/verify-story-lineage.mjs
+```
+
+The browser tools use the existing `@playwright/test` dependency. `PLAYWRIGHT_MODULE` can point at an installed module when using a linked dependency environment. Optional `WORKBENCH_REPORT_DIR` and `LINEAGE_REPORT_DIR` save QA screenshots outside the source tree.
+
+Capture source JPEGs are 1440×900 and 390×844, at device scale 1. Transient success notifications settle before capture, every source editor starts at its top, and the mouse is moved away. Mobile aligns the result panel near the top to keep it readable. Exact scroll offsets are retained in the receipt. Share cards are 1200×630; four-revision montages are 1800×1480. They are HTML compositions of the actual captures, with labels outside the screenshots.
+
+Use `CAPTURE_OUTPUT_DIR` and `SHARE_OUTPUT_DIR` for comparison runs that must not replace evidence. Both generators refuse to overwrite a published story's assets without an alternate output directory. Keep the story in revision until its owner reviews it.

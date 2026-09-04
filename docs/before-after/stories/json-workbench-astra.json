@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 2,
+  "slug": "json-workbench-astra",
+  "title": "JSON Workbench, from formatter to inspector",
+  "appSlug": "json-formatter",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "in-revision",
+  "publishedAt": null,
+  "updatedAt": "2026-09-04T23:39:00Z",
+  "thesis": "The value you need can be several objects deep. Keep the source beside its structure, make every path searchable, and preserve the document exactly when formatting it.",
+  "summary": "Four recorded revisions: the original formatter, the repository-credited Claude Fable 5 tree view, the suite refresh, and the Astra workbench with searchable JSON Pointers, precise values, and lossless formatting.",
+  "versions": {
+    "before": {
+      "label": "Original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8"
+    },
+    "after": {
+      "label": "Astra workbench",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0"
+    }
+  },
+  "lineage": [
+    {
+      "id": "original",
+      "label": "Original",
+      "commit": "7d9e4d81efd2a30a5ff20b719946bd3edc7916d8",
+      "summary": "The first shipped formatter offered text input, highlighted output, validation, minification, and copying. Its creating commit does not record a model.",
+      "provenance": {
+        "model": null,
+        "note": "The original creation commit contains no model credit.",
+        "evidence": {
+          "kind": "unrecorded"
+        }
+      }
+    },
+    {
+      "id": "fable",
+      "label": "Tree & navigation",
+      "commit": "3acc1c7b316376b156402983bfffc714a2dc18b9",
+      "summary": "The July update added a collapsible tree and source-position error navigation. Its commit explicitly credits Claude Fable 5. Those interaction goals carry into the new workbench.",
+      "provenance": {
+        "model": "Claude Fable 5",
+        "note": "This is the exact repository credit, not an independently verified account of the model run.",
+        "evidence": {
+          "kind": "commit-trailer",
+          "commit": "3acc1c7b316376b156402983bfffc714a2dc18b9",
+          "quote": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+        }
+      }
+    },
+    {
+      "id": "baseline",
+      "label": "Deployed baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "summary": "The deployed baseline inherited the pale suite styling and the existing tree. The September suite-overhaul commit has no model attribution; this composite state stays unassigned.",
+      "provenance": {
+        "model": null,
+        "note": "This snapshot includes several contributors. The material suite refresh at 13f4a628 does not name its model.",
+        "evidence": {
+          "kind": "unrecorded"
+        }
+      }
+    },
+    {
+      "id": "astra",
+      "label": "Astra workbench",
+      "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+      "summary": "A dark, two-pane workbench keeps the source in view. Search by key, value, or JSON Pointer; select a result to inspect and copy it. A position-aware parser preserves number lexemes and duplicate keys through formatting and download.",
+      "provenance": {
+        "model": "GPT-6 Astra",
+        "note": "This implementation pass records its model credit in the pinned source commit.",
+        "evidence": {
+          "kind": "commit-trailer",
+          "commit": "b6d24b9b496bc52a8a33036500169064e87665c0",
+          "quote": "Co-Authored-By: GPT-6 Astra <noreply@openai.com>"
+        }
+      }
+    }
+  ],
+  "captureProtocol": "Isolated Git archives rendered in the same Playwright Chromium session, device scale 1, 100% zoom, with scripts/workbench-fixture.mjs. JSON uses Explore when that revision supports it; Astra selects latitude. Text Diff uses split view on desktop when available and unified on mobile. Mobile scrolls to the result panel; desktop starts at the page top. No UI is reconstructed or retouched. Browser version, scroll positions, source commits, and image hashes are recorded in capture-receipt.json.",
+  "captureReceipt": "assets/json-workbench-astra/capture-receipt.json",
+  "comparisons": [
+    {
+      "id": "desktop",
+      "title": "Desktop · 1440 × 900",
+      "caption": "The same example is loaded and processed in each pinned revision. Desktop shows the page top; mobile aligns the working output near the top. Earlier releases have only the views they actually implemented.",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "before": {
+        "src": "assets/json-workbench-astra/original-desktop.jpg",
+        "alt": "JSON Workbench, Original, desktop capture of the same North Atlantic example."
+      },
+      "after": {
+        "src": "assets/json-workbench-astra/astra-desktop.jpg",
+        "alt": "JSON Workbench, Astra workbench, desktop capture of the same North Atlantic example."
+      },
+      "frames": {
+        "original": {
+          "src": "assets/json-workbench-astra/original-desktop.jpg",
+          "alt": "JSON Workbench, Original, desktop capture of the same North Atlantic example."
+        },
+        "fable": {
+          "src": "assets/json-workbench-astra/fable-desktop.jpg",
+          "alt": "JSON Workbench, Tree & navigation, desktop capture of the same North Atlantic example."
+        },
+        "baseline": {
+          "src": "assets/json-workbench-astra/baseline-desktop.jpg",
+          "alt": "JSON Workbench, Deployed baseline, desktop capture of the same North Atlantic example."
+        },
+        "astra": {
+          "src": "assets/json-workbench-astra/astra-desktop.jpg",
+          "alt": "JSON Workbench, Astra workbench, desktop capture of the same North Atlantic example."
+        }
+      }
+    },
+    {
+      "id": "mobile",
+      "title": "Mobile · 390 × 844",
+      "caption": "The same example is loaded and processed in each pinned revision. Desktop shows the page top; mobile aligns the working output near the top. Earlier releases have only the views they actually implemented.",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "before": {
+        "src": "assets/json-workbench-astra/original-mobile.jpg",
+        "alt": "JSON Workbench, Original, mobile capture of the same North Atlantic example."
+      },
+      "after": {
+        "src": "assets/json-workbench-astra/astra-mobile.jpg",
+        "alt": "JSON Workbench, Astra workbench, mobile capture of the same North Atlantic example."
+      },
+      "frames": {
+        "original": {
+          "src": "assets/json-workbench-astra/original-mobile.jpg",
+          "alt": "JSON Workbench, Original, mobile capture of the same North Atlantic example."
+        },
+        "fable": {
+          "src": "assets/json-workbench-astra/fable-mobile.jpg",
+          "alt": "JSON Workbench, Tree & navigation, mobile capture of the same North Atlantic example."
+        },
+        "baseline": {
+          "src": "assets/json-workbench-astra/baseline-mobile.jpg",
+          "alt": "JSON Workbench, Deployed baseline, mobile capture of the same North Atlantic example."
+        },
+        "astra": {
+          "src": "assets/json-workbench-astra/astra-mobile.jpg",
+          "alt": "JSON Workbench, Astra workbench, mobile capture of the same North Atlantic example."
+        }
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "Follow a value all the way to its source",
+      "body": "Search matches keys, values, and escaped JSON Pointers. Each result selects the exact syntax-tree node, reports its source line, and offers Copy pointer and Copy value. The document and selection have separate copy actions."
+    },
+    {
+      "title": "Formatting keeps the data intact",
+      "body": "The old JSON.parse / JSON.stringify round trip could round large integers or discard duplicate keys. The new parser keeps the original number and string tokens and every key entry. Duplicate keys remain visible with an ambiguity warning; exported JSON retains them."
+    },
+    {
+      "title": "Errors stay available until resolved",
+      "body": "Validation identifies the line and column and selects the source error on demand. Invalid or edited input immediately disables copying and download of stale output. File reads cannot overwrite a later edit."
+    },
+    {
+      "title": "The working area gets the screen",
+      "body": "Source and structure sit side by side on desktop, with the selected value beneath. Mobile stacks the panels and keeps the output scrollable. Native disclosure buttons support keyboard use. Rows are revealed in batches, with explicit file, value-count, and nesting limits."
+    }
+  ],
+  "builderNote": null,
+  "proof": [
+    {
+      "label": "Data integrity",
+      "value": "Exact large-number lexemes, duplicate keys, escaped pointers, primitive roots, and malformed inputs verified."
+    },
+    {
+      "label": "Browser behavior",
+      "value": "File loading, copying, source navigation, safe text rendering, and JSON download checked at 1440×900 and 390×844."
+    },
+    {
+      "label": "Limits",
+      "value": "2 MiB input, 50,000 values, and 128 nesting levels. These are explicit inspection limits; oversized documents are rejected."
+    },
+    {
+      "label": "Review state",
+      "value": "Implementation and captures are ready for review. This story records no owner endorsement."
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/json-formatter/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/b6d24b9b496bc52a8a33036500169064e87665c0/docs/json-formatter/",
+    "download": "assets/json-workbench-astra/montage.png"
+  },
+  "share": {
+    "summary": "Four recorded revisions: the original formatter, the repository-credited Claude Fable 5 tree view, the suite refresh, and the Astra workbench with searchable JSON Pointers, precise values, and lossless formatting.",
+    "image": "assets/json-workbench-astra/social.jpg"
+  }
+}

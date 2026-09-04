@@ -144,7 +144,7 @@
       const mark = make("span", "status-mark");
       mark.setAttribute("aria-hidden", "true");
       const name = app.name || app.title || app.slug || "Untitled app";
-      const story = storyByAppSlug.get(app.slug);
+      const story = stories.find(record => record.slug === app.story) || storyByAppSlug.get(app.slug);
       const href = story
         ? storyRoute(story)
         : app.href || (app.slug ? `../${app.slug}/` : null);
@@ -187,6 +187,8 @@
   function createComparison(scene, options) {
     const safeScene = scene && typeof scene === "object" ? scene : {};
     const title = safeScene.title || "Before and after";
+    const beforeLabel = safeScene.beforeLabel || "Before";
+    const afterLabel = safeScene.afterLabel || "After";
     const figure = make("figure", "comparison-module");
     const stage = make("div", "comparison-stage");
     const beforePicture = make("div", "comparison-picture comparison-picture--before");
@@ -207,8 +209,8 @@
     beforePicture.append(beforeImage);
     afterPicture.append(afterImage);
 
-    const beforeTag = make("span", "comparison-tag comparison-tag--before", "Before");
-    const afterTag = make("span", "comparison-tag comparison-tag--after", "After");
+    const beforeTag = make("span", "comparison-tag comparison-tag--before", beforeLabel);
+    const afterTag = make("span", "comparison-tag comparison-tag--after", afterLabel);
     const seam = make("span", "comparison-seam");
     seam.setAttribute("aria-hidden", "true");
     const handle = make("span", "comparison-handle", "↔");
@@ -264,12 +266,12 @@
   }
 
   function storyDate(record, story) {
-    return (story && story.publishedAt) || (record && record.publishedAt) || null;
+    return (story && (story.publishedAt || story.updatedAt)) || (record && (record.publishedAt || record.updatedAt)) || null;
   }
 
   function storyDateLabel(record, story) {
     const value = storyDate(record, story);
-    return value ? formatDate(value, false) : "Revision open";
+    return value ? `${formatDate(value, false)}${(story?.status || record?.status) === 'in-revision' ? ' · revision open' : ''}` : "Revision open";
   }
 
   async function renderArchive(manifest) {
@@ -356,6 +358,7 @@
   }
 
   function createSceneBrowser(story) {
+    if (Array.isArray(story.lineage) && story.lineage.length > 1) return createLineageBrowser(story);
     const comparisons = Array.isArray(story.comparisons) ? story.comparisons : [];
     const wrapper = make("div", "scene-browser");
     if (!comparisons.length) {
@@ -439,6 +442,111 @@
       if (index >= 0 && index !== activeIndex) select(index, false, false);
     });
     return wrapper;
+  }
+
+  function createLineageBrowser(story) {
+    const versions = story.lineage;
+    const scenes = story.comparisons;
+    const params = new URLSearchParams(location.search);
+    const versionId = (id, fallback) => versions.some(version => version.id === id) ? id : fallback;
+    let selected = versionId(params.get('revision'), versions.at(-1).id);
+    let from = versionId(params.get('from'), versions[0].id);
+    let to = versionId(params.get('to'), versions.at(-1).id);
+    let mode = ['single', 'wipe', 'side'].includes(params.get('view')) ? params.get('view') : 'single';
+    let sceneIndex = scenes.findIndex(scene => scene.id === location.hash.slice(1));
+    if (sceneIndex < 0) sceneIndex = matchMedia('(max-width: 620px)').matches ? Math.max(0, scenes.findIndex(scene => scene.id === 'mobile')) : 0;
+    const wrapper = make('div', 'lineage-browser');
+    const timeline = make('div', 'lineage-timeline');
+    timeline.setAttribute('role', 'group'); timeline.setAttribute('aria-label', 'Recorded revisions');
+    const buttons = versions.map((version, index) => {
+      const button = make('button', 'revision-button'); button.type = 'button';
+      button.append(make('span', 'revision-order', `${index + 1}`), make('strong', '', version.label), make('span', 'revision-model', version.provenance.model || 'Model unrecorded'));
+      button.addEventListener('click', () => { selected = version.id; mode = 'single'; draw(true); });
+      button.addEventListener('keydown', event => {
+        let target = null;
+        if (event.key === 'ArrowRight') target = (index + 1) % versions.length;
+        if (event.key === 'ArrowLeft') target = (index - 1 + versions.length) % versions.length;
+        if (event.key === 'Home') target = 0;
+        if (event.key === 'End') target = versions.length - 1;
+        if (target === null) return;
+        event.preventDefault(); selected = versions[target].id; mode = 'single'; draw(true); buttons[target].focus();
+      });
+      timeline.append(button); return button;
+    });
+    const toolbar = make('div', 'lineage-toolbar');
+    const views = make('div', 'lineage-views'); views.setAttribute('role', 'group'); views.setAttribute('aria-label', 'Comparison presentation');
+    const viewButtons = [['single', 'One revision'], ['wipe', 'Wipe'], ['side', 'Side by side']].map(([id, label]) => {
+      const button = make('button', 'plain-button', label); button.type = 'button';
+      button.onclick = () => { mode = id; draw(true); }; views.append(button); return { id, button };
+    });
+    const sceneLabel = make('label', 'capture-size', 'Capture ');
+    const size = make('select'); size.setAttribute('aria-label', 'Capture size');
+    scenes.forEach((scene, index) => { const option = make('option', '', scene.title); option.value = index; size.append(option); });
+    size.onchange = () => { sceneIndex = Number(size.value); draw(true); }; sceneLabel.append(size);
+    toolbar.append(views, sceneLabel);
+    const pair = make('div', 'lineage-pair');
+    function selector(label, value, change) {
+      const field = make('label', '', label); const select = make('select');
+      select.setAttribute('aria-label', label);
+      versions.forEach(version => { const option = make('option', '', `${version.label} · ${version.provenance.model || 'model unrecorded'}`); option.value = version.id; select.append(option); });
+      select.value = value; select.onchange = () => { change(select.value); draw(true); }; field.append(select); pair.append(field); return select;
+    }
+    const leftSelect = selector('Left revision', from, value => { from = value; });
+    const rightSelect = selector('Right revision', to, value => { to = value; });
+    const panel = make('div', 'lineage-panel');
+    const description = make('div', 'lineage-description');
+    const announcement = make('p', 'lineage-announcement'); announcement.setAttribute('role', 'status');
+    function frame(version, scene) {
+      const figure = make('figure', 'revision-frame');
+      const img = make('img'); img.src = validUrl(scene.frames[version.id].src); img.alt = scene.frames[version.id].alt;
+      img.width = scene.viewport.width; img.height = scene.viewport.height;
+      img.decoding = 'async';
+      figure.append(img);
+      const caption = make('figcaption', '', `${version.label} · ${version.commit.slice(0, 8)}`);
+      addLink(caption, 'Open full-size capture', scene.frames[version.id].src, '');
+      figure.append(caption); return figure;
+    }
+    function provenance(version) {
+      const block = make('div', 'revision-note');
+      block.append(make('h3', '', version.label), make('p', '', version.summary));
+      const details = make('details', 'provenance'); details.append(make('summary', '', 'Capture & provenance'));
+      details.append(make('p', '', version.provenance.model ? `Repository credit: ${version.provenance.model}. ${version.provenance.note}` : `Model unrecorded. ${version.provenance.note}`));
+      addLink(details, `Source at ${version.commit.slice(0, 8)}`, `https://github.com/crunchybananas/shipyard-microtools/tree/${version.commit}/docs/${story.appSlug}/`, '');
+      if (version.provenance.evidence.kind === 'commit-trailer') {
+        details.append(make('p', '', version.provenance.evidence.quote));
+        addLink(details, 'Read the attribution commit', `https://github.com/crunchybananas/shipyard-microtools/commit/${version.provenance.evidence.commit}`, '');
+      }
+      details.append(make('p', '', story.captureProtocol));
+      block.append(details); return block;
+    }
+    function draw(updateUrl = false) {
+      const scene = scenes[sceneIndex]; const version = versions.find(item => item.id === selected);
+      const left = versions.find(item => item.id === from), right = versions.find(item => item.id === to);
+      size.value = sceneIndex; leftSelect.value = from; rightSelect.value = to;
+      buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(mode === 'single' && versions[index].id === selected)));
+      viewButtons.forEach(({ id, button }) => button.setAttribute('aria-pressed', String(id === mode)));
+      pair.hidden = mode === 'single'; panel.dataset.size = scene.id;
+      panel.className = `lineage-panel lineage-panel--${mode}`;
+      panel.replaceChildren(); description.replaceChildren();
+      if (mode === 'single') { panel.append(frame(version, scene)); description.append(provenance(version)); }
+      else {
+        if (mode === 'side') panel.append(frame(left, scene), frame(right, scene));
+        else {
+          const comparison = createComparison({ title: `${left.label} / ${right.label}`, caption: scene.caption, beforeLabel: left.label, afterLabel: right.label, before: scene.frames[from], after: scene.frames[to] }, { eager: true });
+          const stage = comparison.querySelector('.comparison-stage'); stage.style.aspectRatio = `${scene.viewport.width} / ${scene.viewport.height}`; stage.style.minHeight = '0';
+          panel.append(comparison);
+        }
+        description.append(provenance(left)); if (from !== to) description.append(provenance(right));
+      }
+      announcement.textContent = `${scene.title}: ${mode === 'single' ? version.label : `${left.label} compared with ${right.label}`}.`;
+      if (updateUrl) {
+        const url = new URL(location.href); url.searchParams.set('revision', selected); url.searchParams.set('from', from); url.searchParams.set('to', to); url.searchParams.set('view', mode); url.hash = scene.id;
+        history.replaceState(null, '', url);
+      }
+    }
+    wrapper.append(timeline, toolbar, pair, announcement, panel, description);
+    window.addEventListener('hashchange', () => { const index = scenes.findIndex(scene => scene.id === location.hash.slice(1)); if (index >= 0) { sceneIndex = index; draw(); } });
+    draw(); return wrapper;
   }
 
   function createChanges(story) {
@@ -528,6 +636,8 @@
     addLink(actions, "Open the live app", links.live, "action-link");
     addLink(actions, "View the source", links.source, "action-link");
     addLink(actions, "Download the montage", links.download, "action-link", { download: true });
+    addLink(actions, "Download social card", story.share?.image, "action-link", { download: true });
+    if (story.captureReceipt) addLink(actions, "Capture receipt", story.captureReceipt, "action-link");
     actions.append(
       copyButton("Copy link", () => window.location.href, status),
       copyButton("Copy summary", (story.share && story.share.summary) || story.summary || story.thesis, status),

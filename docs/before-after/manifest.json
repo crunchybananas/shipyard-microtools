@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T19:05:00Z",
+  "updatedAt": "2026-09-04T23:39:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,32 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "json-workbench-astra",
+      "title": "JSON Workbench, from formatter to inspector",
+      "appSlug": "json-formatter",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "in-revision",
+      "publishedAt": null,
+      "updatedAt": "2026-09-04T23:39:00Z",
+      "data": "stories/json-workbench-astra.json",
+      "href": "./json-workbench-astra/",
+      "cover": "assets/json-workbench-astra/social.jpg"
+    },
+    {
+      "slug": "text-diff-astra",
+      "title": "Text Diff, from comparison to review",
+      "appSlug": "text-diff",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "in-revision",
+      "publishedAt": null,
+      "updatedAt": "2026-09-04T23:39:00Z",
+      "data": "stories/text-diff-astra.json",
+      "href": "./text-diff-astra/",
+      "cover": "assets/text-diff-astra/social.jpg"
+    },
     {
       "slug": "beacon",
       "title": "Beacon left the box, then left the canvas",
@@ -191,10 +217,10 @@
     },
     {
       "slug": "json-formatter",
-      "title": "JSON Formatter",
+      "title": "JSON Workbench",
       "category": "Build tools",
-      "status": "queued",
-      "story": null
+      "status": "in-revision",
+      "story": "json-workbench-astra"
     },
     {
       "slug": "kraken-attack",
@@ -284,8 +310,8 @@
       "slug": "text-diff",
       "title": "Text Diff",
       "category": "Build tools",
-      "status": "queued",
-      "story": null
+      "status": "in-revision",
+      "story": "text-diff-astra"
     },
     {
       "slug": "the-island",

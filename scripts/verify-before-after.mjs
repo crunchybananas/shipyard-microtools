@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, posix, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const archiveRoot = resolve(repoRoot, 'docs/before-after');
@@ -325,7 +326,7 @@ function checkStory(story, record, appBySlug, surfaceBySlug) {
   const label = `stories/${record.slug}.json`;
   if (!checkRecord(story, label)) return;
 
-  check(story.schemaVersion === 1, `${label}.schemaVersion must be 1`);
+  check([1, 2].includes(story.schemaVersion), `${label}.schemaVersion must be 1 or 2`);
   check(story.slug === record.slug, `${label}.slug must match its manifest record`);
   check(story.title === record.title, `${label}.title must match its manifest record`);
   check(story.appSlug === record.appSlug, `${label}.appSlug must match its manifest record`);
@@ -363,6 +364,69 @@ function checkStory(story, record, appBySlug, surfaceBySlug) {
     }
   }
 
+  if (story.schemaVersion === 2) {
+    check(Array.isArray(story.lineage) && story.lineage.length >= 2, `${label}.lineage needs at least two revisions`);
+    checkString(story.captureProtocol, `${label}.captureProtocol`);
+    const seen = new Set();
+    for (const version of (Array.isArray(story.lineage) ? story.lineage : [])) {
+      const versionLabel = `${label}.lineage.${version?.id}`;
+      if (!checkRecord(version, versionLabel)) continue;
+      check(typeof version.id === 'string' && SLUG_PATTERN.test(version.id) && !seen.has(version.id), `${versionLabel} needs a unique valid id`);
+      seen.add(version.id);
+      checkString(version.label, `${versionLabel}.label`);
+      checkString(version.summary, `${versionLabel}.summary`);
+      checkCommit(version.commit, `${versionLabel}.commit`);
+      if (!checkRecord(version.provenance, `${versionLabel}.provenance`)) continue;
+      const provenance = version.provenance;
+      checkStringOrNull(provenance.model, `${versionLabel}.provenance.model`);
+      checkString(provenance.note, `${versionLabel}.provenance.note`);
+      if (!checkRecord(provenance.evidence, `${versionLabel}.provenance.evidence`)) continue;
+      const evidence = provenance.evidence;
+      check(['commit-trailer', 'unrecorded'].includes(evidence.kind), `${versionLabel} has an unsupported evidence kind`);
+      if (evidence.kind === 'unrecorded') check(provenance.model === null, `${versionLabel} cannot attribute an unrecorded model`);
+      else if (evidence.kind === 'commit-trailer') {
+        checkCommit(evidence.commit, `${versionLabel}.evidence.commit`);
+        checkString(evidence.quote, `${versionLabel}.evidence.quote`);
+        checkString(provenance.model, `${versionLabel}.provenance.model`);
+        try {
+          const body = execFileSync('git', ['show', '-s', '--format=%B', evidence.commit], { cwd: repoRoot, encoding: 'utf8' });
+          check(body.split('\n').includes(evidence.quote) && evidence.quote.startsWith(`Co-Authored-By: ${provenance.model} <`) && /^Co-Authored-By: .+ <[^>\n]+>$/.test(evidence.quote), `${versionLabel} model credit must match an exact repository trailer`);
+          execFileSync('git', ['merge-base', '--is-ancestor', evidence.commit, version.commit], { cwd: repoRoot, stdio: 'ignore' });
+          checks++;
+        } catch { check(false, `${versionLabel} attribution must resolve and belong to this revision's ancestry`); }
+      }
+    }
+    const lineage = Array.isArray(story.lineage) ? story.lineage : [];
+    const receiptPath = safeRelativePath(story.captureReceipt, /^assets\/[a-z0-9-]+\/capture-receipt\.json$/, `${label}.captureReceipt`);
+    check(story.captureReceipt === `assets/${story.slug}/capture-receipt.json`, `${label} capture receipt must belong to this story`);
+    const receipt = receiptPath ? readJson(receiptPath, `${label} capture receipt`) : null;
+    if (receipt) {
+      const captures = Array.isArray(receipt.captures) ? receipt.captures : [];
+      const scenes = Array.isArray(story.comparisons) ? story.comparisons : [];
+      check(captures.length === lineage.length * scenes.length, `${label} receipt must cover every frame exactly once`);
+      for (const version of lineage) for (const scene of scenes) {
+        const matches = captures.filter(capture => capture.version === version.id && capture.scene === scene.id);
+        check(matches.length === 1, `${label} receipt must uniquely identify ${version.id}/${scene.id}`);
+        const capture = matches[0];
+        if (!capture) continue;
+        check(capture.commit === version.commit, `${label} capture commit must match ${version.id}`);
+        check(capture.deviceScaleFactor === 1 && capture.viewport?.width === scene.viewport?.width && capture.viewport?.height === scene.viewport?.height, `${label} capture environment differs from its frame`);
+        checkString(capture.browser, `${label} capture browser`);
+        const frame = scene.frames?.[version.id];
+        check(frame?.src === `assets/${story.slug}/${capture.filename}`, `${label} capture filename must match its frame`);
+        if (frame?.src) {
+          const path = safeRelativePath(frame.src, ASSET_PATTERN, `${label} capture asset`);
+          if (path && existsSync(path)) check(createHash('sha256').update(readFileSync(path)).digest('hex') === capture.sha256, `${label} capture hash mismatch: ${version.id}/${scene.id}`);
+        }
+      }
+    }
+    check(lineage[0]?.commit === story.versions?.before?.commit && lineage.at(-1)?.commit === story.versions?.after?.commit, `${label} legacy before/after refs must match lineage endpoints`);
+    for (let i = 1; i < lineage.length; i++) {
+      try { execFileSync('git', ['merge-base', '--is-ancestor', lineage[i - 1].commit, lineage[i].commit], { cwd: repoRoot, stdio: 'ignore' }); checks++; }
+      catch { check(false, `${label} lineage commits must follow repository ancestry`); }
+    }
+  }
+
   check(Array.isArray(story.comparisons) && story.comparisons.length > 0, `${label}.comparisons must be a non-empty array`);
   const comparisonIds = new Set();
   for (const [index, comparison] of (Array.isArray(story.comparisons) ? story.comparisons : []).entries()) {
@@ -373,6 +437,24 @@ function checkStory(story, record, appBySlug, surfaceBySlug) {
     comparisonIds.add(comparison.id);
     checkString(comparison.title, `${comparisonLabel}.title`);
     checkString(comparison.caption, `${comparisonLabel}.caption`);
+
+    if (story.schemaVersion === 2) {
+      const viewport = comparison.viewport;
+      check(viewport && Number.isInteger(viewport.width) && viewport.width > 0 && Number.isInteger(viewport.height) && viewport.height > 0, `${comparisonLabel} requires positive viewport dimensions`);
+      if (checkRecord(comparison.frames, `${comparisonLabel}.frames`)) {
+        const ids = (Array.isArray(story.lineage) ? story.lineage : []).map(version => version.id);
+        check(Object.keys(comparison.frames).length === ids.length && Object.keys(comparison.frames).every(id => ids.includes(id)), `${comparisonLabel} frames must exactly cover the lineage`);
+        for (const id of ids) {
+          const frame = comparison.frames[id];
+          if (!checkRecord(frame, `${comparisonLabel}.frames.${id}`)) continue;
+          checkString(frame.alt, `${comparisonLabel}.frames.${id}.alt`);
+          check(typeof frame.src === 'string' && frame.src.startsWith(`assets/${story.slug}/`), `${comparisonLabel} frame must stay in its story assets`);
+          const size = checkAsset(frame.src, `${comparisonLabel}.frames.${id}.src`, true);
+          if (size && viewport) check(size.width === viewport.width && size.height === viewport.height, `${comparisonLabel}.${id} capture dimensions must match the recorded viewport`);
+        }
+        check(comparison.before?.src === comparison.frames[ids[0]]?.src && comparison.after?.src === comparison.frames[ids.at(-1)]?.src, `${comparisonLabel} legacy images must match lineage endpoints`);
+      }
+    }
 
     const dimensions = {};
     for (const side of ['before', 'after']) {
@@ -401,7 +483,7 @@ function checkStory(story, record, appBySlug, surfaceBySlug) {
     checkString(change.body, `${changeLabel}.body`);
   }
 
-  if (checkRecord(story.builderNote, `${label}.builderNote`)) {
+  if ((story.schemaVersion === 1 || story.builderNote !== null) && checkRecord(story.builderNote, `${label}.builderNote`)) {
     checkString(story.builderNote.quote, `${label}.builderNote.quote`);
     checkString(story.builderNote.context, `${label}.builderNote.context`);
   }
