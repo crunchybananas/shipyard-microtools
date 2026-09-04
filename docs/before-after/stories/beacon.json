@@ -16,7 +16,7 @@
     },
     "after": {
       "label": "Full-bleed sea",
-      "commit": "71b921af"
+      "commit": "5204a2fc"
     }
   },
   "comparisons": [
@@ -93,7 +93,7 @@
   ],
   "links": {
     "live": "https://crunchybananas.github.io/shipyard-microtools/beacon/",
-    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/71b921af/docs/beacon",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/5204a2fc/docs/beacon",
     "download": "assets/beacon/montage.png"
   },
   "share": {
