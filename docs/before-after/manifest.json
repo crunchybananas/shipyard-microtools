@@ -225,8 +225,8 @@
       "slug": "realm",
       "title": "Realm",
       "category": "Games",
-      "status": "queued",
-      "story": null
+      "status": "published",
+      "story": "realm"
     },
     {
       "slug": "regex-tester",

@@ -246,6 +246,15 @@ a {
   background: var(--red);
 }
 
+/* The rows that actually have something to read carry the accent; the rest stay quiet.
+   Without this the four documented apps looked identical to the twenty-eight that are
+   still queued, which is what made the archive hard to navigate. */
+.status-item[data-status="documented"] a,
+.status-item[data-status="published"] a,
+.status-item[data-status="complete"] a {
+  font-weight: 600;
+}
+
 .status-state {
   color: var(--muted);
   font-size: 0.68rem;
@@ -389,7 +398,11 @@ a {
   background: var(--film);
 }
 
-.comparison-picture--after {
+/* BEFORE is the clipped layer, revealed from the LEFT edge out to the seam, so the
+   convention holds everywhere: before on the left, after on the right. --position is
+   the seam, which is also the invisible range thumb's position, so the boundary always
+   sits exactly under the pointer. AFTER is the unclipped layer beneath it. */
+.comparison-picture--before {
   z-index: 2;
   overflow: hidden;
   clip-path: inset(0 calc(100% - var(--position)) 0 0);
@@ -407,11 +420,11 @@ a {
 }
 
 .comparison-tag--before {
-  right: 0.75rem;
+  left: 0.75rem;
 }
 
 .comparison-tag--after {
-  left: 0.75rem;
+  right: 0.75rem;
 }
 
 .comparison-seam {
@@ -1023,11 +1036,11 @@ noscript {
   }
 
   .comparison-tag--before {
-    right: 0.5rem;
+    left: 0.5rem;
   }
 
   .comparison-tag--after {
-    left: 0.5rem;
+    right: 0.5rem;
   }
 
   .view-button {

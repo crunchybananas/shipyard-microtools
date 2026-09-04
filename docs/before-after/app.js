@@ -100,6 +100,14 @@
     const documentedSlugs = new Set(
       stories.map((story) => story && story.appSlug).filter(Boolean),
     );
+    // An app that HAS a story should send you to the story — this is the before/after
+    // archive, so sending every sidebar row off to the live app was the one thing the
+    // reader could not have wanted here.
+    const storyByAppSlug = new Map(
+      stories
+        .filter((story) => story && typeof story.appSlug === "string")
+        .map((story) => [story.appSlug, story]),
+    );
 
     if (summary) {
       summary.replaceChildren();
@@ -114,8 +122,20 @@
     const heading = make("h2", "app-status-heading", "App status");
     const list = make("ul", "status-list");
 
-    apps.forEach((app) => {
-      if (!app || typeof app !== "object") return;
+    // Apps with a story on file sort to the top. This is the before/after archive, so
+    // the handful of apps that actually HAVE a comparison are the reason to be here —
+    // alphabetical order buried them among two dozen rows with nothing to read.
+    const ordered = apps
+      .filter((app) => app && typeof app === "object")
+      .map((app, index) => ({ app, index }))
+      .sort((a, b) => {
+        const aDoc = storyByAppSlug.has(a.app.slug) ? 0 : 1;
+        const bDoc = storyByAppSlug.has(b.app.slug) ? 0 : 1;
+        return aDoc - bDoc || a.index - b.index;   // stable within each group
+      })
+      .map((entry) => entry.app);
+
+    ordered.forEach((app) => {
       const item = make("li", "status-item");
       const status = String(
         app.status || (documentedSlugs.has(app.slug) ? "documented" : "awaiting record"),
@@ -124,8 +144,17 @@
       const mark = make("span", "status-mark");
       mark.setAttribute("aria-hidden", "true");
       const name = app.name || app.title || app.slug || "Untitled app";
-      const href = app.href || (app.slug ? `../${app.slug}/` : null);
+      const story = storyByAppSlug.get(app.slug);
+      const href = story
+        ? storyRoute(story)
+        : app.href || (app.slug ? `../${app.slug}/` : null);
       const link = addLink(item, name, href, "");
+      if (link) {
+        link.title = story
+          ? `Read the ${name} before / after story`
+          : `Open ${name} — no story on file yet`;
+        if (!story) link.classList.add("status-link--app");
+      }
       if (!link) item.append(make("span", "", name));
       const state = make("span", "status-state", status);
       item.prepend(mark);
@@ -145,10 +174,14 @@
     return button;
   }
 
+  // --position is the seam, measured from the left edge, and BEFORE occupies the
+  // region left of it. So the value is "how much of the before image is shown":
+  // 100 is before-only, 0 is after-only. Dragging the handle right wipes the after
+  // image away to the right, which is the way these sliders are read.
   function comparisonText(value) {
-    if (value <= 0) return "Before only";
-    if (value >= 100) return "After only";
-    return `Split view, ${value}% after`;
+    if (value <= 0) return "After only";
+    if (value >= 100) return "Before only";
+    return `Split view, ${100 - value}% after`;
   }
 
   function createComparison(scene, options) {
@@ -187,14 +220,14 @@
     range.max = "100";
     range.step = "1";
     range.value = "50";
-    range.setAttribute("aria-label", `Compare ${title}: reveal the after image`);
+    range.setAttribute("aria-label", `Compare ${title}: drag left to reveal the after image`);
 
     const controls = make("div", "comparison-controls");
     const readout = make("span", "comparison-readout");
     const buttons = [
-      createViewButton("Before", 0, update),
+      createViewButton("Before", 100, update),
       createViewButton("Split", 50, update),
-      createViewButton("After", 100, update),
+      createViewButton("After", 0, update),
     ];
 
     function update(nextValue) {
@@ -204,8 +237,8 @@
       const wording = comparisonText(value);
       range.setAttribute("aria-valuetext", wording);
       readout.textContent = wording;
-      beforeTag.hidden = value >= 100;
-      afterTag.hidden = value <= 0;
+      beforeTag.hidden = value <= 0;
+      afterTag.hidden = value >= 100;
       buttons.forEach((button) => {
         button.setAttribute("aria-pressed", Number(button.dataset.value) === value ? "true" : "false");
       });
