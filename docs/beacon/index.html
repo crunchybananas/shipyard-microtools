@@ -91,6 +91,16 @@ const SHIP_TYPES = {
 const TYPE_KEYS = Object.keys(SHIP_TYPES);
 
 // ── Game state ────────────────────────────────────────────
+// Scene geometry. The canvas now fills the window, so width and height are
+// independent; R is the PLAY RADIUS (where ships appear) and every gameplay
+// distance is expressed as a fraction of it rather than of the canvas edge.
+let W = 0, H = 0, R = 0, cx = 0, cy = 0;
+const SPAWN_R = 1.0, SAFE_R = 0.27, ROCK_R = 0.25, BEAM_R = 1.06;
+// The approach is a SEA SURFACE seen from the lantern, not a flat radar disc:
+// squash the field vertically so distant ships ride up towards the horizon and
+// never above it. Everything anchored to the field (beam, rocks, fog) takes the
+// same squash, so the beam still visibly falls on the ships it is lighting.
+const FIELD_KY = 0.40;
 let beam = { angle: 0, speed: 0.012, width: 0.28 };
 let ships = [];
 let signalQueue = [];
@@ -102,28 +112,65 @@ let running = false, gameOver = false;
 let time = 0;
 let stars = [];
 let waves = [];
+let glints = [];   // specular scintillation on the swell
+let moon = { x: 0, y: 0, r: 0 };
 
 // ── Resize ────────────────────────────────────────────────
 function resize() {
-  const s = Math.min(window.innerWidth, window.innerHeight - 120, 900);
-  if (s === canvas.width && s === canvas.height) return;
-  const prev = canvas.width;
-  canvas.width = s; canvas.height = s;
-  if (stars.length && prev > 0) {
-    // Rescale the existing layout so the world stays stable across resizes
-    const k = s / prev;
-    for (const st of stars) { st.x *= k; st.y *= k; }
-    for (const w of waves) { w.y *= k; }
+  // Fill the window. The old build sized the canvas to a SQUARE of
+  // min(innerWidth, innerHeight - 120, 900), which on any landscape display left
+  // ~46% of the width as dead black bars and never grew past 900px.
+  const w = Math.max(320, window.innerWidth);
+  const h = Math.max(320, window.innerHeight);
+  if (w === canvas.width && h === canvas.height) return;
+  const prevW = canvas.width, prevH = canvas.height;
+  canvas.width = W = w; canvas.height = H = h;
+  cx = W / 2; cy = H * 0.82;
+  // Ships arrive from the horizon on every bearing. Width bounds how far out they
+  // can sit; the squashed vertical reach must stop AT the horizon, never above it.
+  const horizon = H * 0.52;
+  R = Math.min(W * 0.46, (cy - horizon) / FIELD_KY);
+
+  if (stars.length && prevW > 0 && prevH > 0) {
+    const kx = W / prevW, ky = H / prevH;
+    for (const st of stars) { st.x *= kx; st.y *= ky; }
+    for (const wv of waves) { wv.y *= ky; }
     return;
   }
   stars = [];
-  for (let i = 0; i < 120; i++) {
-    stars.push({ x: Math.random()*s, y: Math.random()*s*0.5, r: 0.3+Math.random()*1.2, phase: Math.random()*Math.PI*2 });
+  const starCount = Math.round(120 * (W * H) / (780 * 780));
+  for (let i = 0; i < starCount; i++) {
+    stars.push({ x: Math.random()*W, y: Math.random()*H*0.55, r: 0.3+Math.random()*1.2, phase: Math.random()*Math.PI*2 });
   }
+  // Swell: many more lines than before, denser and flatter near the horizon so the
+  // water reads as a receding plane rather than a stack of identical sine waves.
   waves = [];
-  for (let i = 0; i < 8; i++) {
-    waves.push({ y: s*0.55 + i*18, amp: 2+Math.random()*3, freq: 0.015+Math.random()*0.01, phase: Math.random()*Math.PI*2 });
+  const horizonY = H * 0.52;
+  for (let i = 0; i < 34; i++) {
+    const t = i / 33;                       // 0 at horizon, 1 at the foot of the frame
+    const y = horizonY + Math.pow(t, 1.7) * (H - horizonY);
+    waves.push({
+      y, t,
+      amp: 0.6 + t * 5.5,                   // swell grows towards the viewer
+      freq: 0.026 - t * 0.016,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.010 + t * 0.030,
+    });
   }
+  // Specular glints riding the swell — the sea's scintillation.
+  glints = [];
+  for (let i = 0; i < 170; i++) {
+    const t = Math.pow(Math.random(), 0.6);
+    glints.push({
+      x: Math.random() * W,
+      y: horizonY + Math.pow(t, 1.7) * (H - horizonY),
+      t,
+      len: 2 + t * 12,
+      phase: Math.random() * Math.PI * 2,
+      rate: 0.02 + Math.random() * 0.05,
+    });
+  }
+  moon = { x: W * 0.76, y: horizonY - H * 0.20, r: Math.max(16, H * 0.030) };
 }
 window.addEventListener('resize', resize);
 resize();
@@ -243,16 +290,16 @@ function spawnShip() {
   const typeKey = TYPE_KEYS[typeIdx];
   const type = SHIP_TYPES[typeKey];
   const angle = Math.random() * Math.PI * 2;
-  const s = canvas.width;
   ships.push({
     typeKey, type,
     angle,
-    distance: s * 0.52,
-    speed: 0.15 + Math.random() * 0.15 + wave * 0.02,
+    distance: R * SPAWN_R,
+    speed: (0.15 + Math.random() * 0.15 + wave * 0.02) * (R / 405),   // keep crossing time constant as the field grows
     lit: 0, // how visible (0-1, decays)
     signaled: false,
     wrecked: false,
-    safeDistance: s * 0.14,
+    safeDistance: R * SAFE_R,
+    seen: false,        // has the beam ever identified this ship?
     opacity: 1,
   });
 }
@@ -327,6 +374,9 @@ function checkSignals() {
     signalQueue = [];
     audio.rescue();
     updateHUD();
+    // First successful rescue: the instruction has been understood, so retire it.
+    const guide = document.getElementById('guide');
+    if (guide && guide.style.opacity !== '0') guide.style.opacity = '0';
   } else if (signalQueue.length >= required.length + 2) {
     // Too many wrong signals — clear and penalize
     signalQueue = [];
@@ -335,7 +385,6 @@ function checkSignals() {
 
 // ── Update ────────────────────────────────────────────────
 function update() {
-  const s = canvas.width;
   time++;
 
   // Beam rotation
@@ -354,6 +403,10 @@ function update() {
     let angleDiff = ((ship.angle - beam.angle) % (Math.PI*2) + Math.PI*3) % (Math.PI*2) - Math.PI;
     if (Math.abs(angleDiff) < beam.width / 2) {
       ship.lit = Math.min(1, ship.lit + 0.15);
+      // Once the beam has held a ship long enough to read its silhouette, the
+      // keeper KNOWS it is out there. Before, that knowledge vanished with the
+      // beam and the ship became invisible again for the rest of the sweep.
+      if (ship.lit > 0.55) ship.seen = true;
     } else {
       ship.lit = Math.max(0, ship.lit - 0.008);
     }
@@ -394,49 +447,137 @@ function update() {
 }
 
 // ── Render ────────────────────────────────────────────────
-function render() {
-  const s = canvas.width;
-  const cx = s / 2, cy = s * 0.82;
-  ctx.clearRect(0, 0, s, s);
-
-  // Sky
-  const sky = ctx.createLinearGradient(0, 0, 0, s * 0.6);
-  sky.addColorStop(0, '#060a18');
-  sky.addColorStop(1, '#0e1525');
+function drawSky() {
+  const horizonY = H * 0.52;
+  const sky = ctx.createLinearGradient(0, 0, 0, horizonY);
+  sky.addColorStop(0.00, '#03060f');
+  sky.addColorStop(0.55, '#071021');
+  sky.addColorStop(0.88, '#0d1c33');
+  sky.addColorStop(1.00, '#17304f');          // the air just above the water holds light longest
   ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, s, s * 0.6);
+  ctx.fillRect(0, 0, W, horizonY + 1);
 
-  // Stars
+  // Milky band — a soft diagonal wash, so the sky is not a flat field of dots.
+  ctx.save();
+  ctx.translate(W * 0.5, horizonY * 0.42);
+  ctx.rotate(-0.32);
+  const milky = ctx.createLinearGradient(0, -H * 0.13, 0, H * 0.13);
+  milky.addColorStop(0, 'rgba(90,120,190,0)');
+  milky.addColorStop(0.5, 'rgba(120,150,220,0.055)');
+  milky.addColorStop(1, 'rgba(90,120,190,0)');
+  ctx.fillStyle = milky;
+  ctx.fillRect(-W, -H * 0.13, W * 2, H * 0.26);
+  ctx.restore();
+
+  // Stars — colour and size variance, and they thin out towards the horizon haze.
   for (const st of stars) {
-    const a = 0.3 + 0.3 * Math.sin(time * 0.03 + st.phase);
-    ctx.fillStyle = `rgba(255,240,220,${a})`;
+    const haze = Math.min(1, (horizonY - st.y) / (horizonY * 0.5));
+    const a = (0.25 + 0.35 * Math.sin(time * 0.03 + st.phase)) * Math.max(0.15, haze);
+    ctx.fillStyle = st.r > 1.0 ? `rgba(200,220,255,${a})` : `rgba(255,244,226,${a})`;
     ctx.beginPath();
     ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Ocean
-  const ocean = ctx.createLinearGradient(0, s * 0.5, 0, s);
-  ocean.addColorStop(0, '#0a1628');
-  ocean.addColorStop(1, '#060e1e');
-  ctx.fillStyle = ocean;
-  ctx.fillRect(0, s * 0.5, s, s * 0.5);
+  // Moon, low and hazed, with the halo that gives the night its colour.
+  const halo = ctx.createRadialGradient(moon.x, moon.y, moon.r * 0.5, moon.x, moon.y, moon.r * 9);
+  halo.addColorStop(0, 'rgba(198,214,255,0.16)');
+  halo.addColorStop(0.35, 'rgba(160,185,240,0.06)');
+  halo.addColorStop(1, 'rgba(140,170,230,0)');
+  ctx.fillStyle = halo;
+  ctx.beginPath(); ctx.arc(moon.x, moon.y, moon.r * 9, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(226,234,255,0.92)';
+  ctx.beginPath(); ctx.arc(moon.x, moon.y, moon.r, 0, Math.PI * 2); ctx.fill();
+  // maria — faint, so it reads as a moon and not a disc
+  ctx.fillStyle = 'rgba(186,198,228,0.55)';
+  ctx.beginPath(); ctx.arc(moon.x - moon.r*0.28, moon.y - moon.r*0.18, moon.r*0.30, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(moon.x + moon.r*0.26, moon.y + moon.r*0.24, moon.r*0.20, 0, Math.PI*2); ctx.fill();
 
-  // Wave lines
-  ctx.strokeStyle = 'rgba(60,100,160,0.15)';
-  ctx.lineWidth = 1;
+  // Horizon glow: the sea meets the sky in light, not a hard edge.
+  const hg = ctx.createLinearGradient(0, horizonY - H * 0.06, 0, horizonY + H * 0.03);
+  hg.addColorStop(0, 'rgba(70,110,170,0)');
+  hg.addColorStop(0.6, 'rgba(96,140,205,0.13)');
+  hg.addColorStop(1, 'rgba(70,110,170,0)');
+  ctx.fillStyle = hg;
+  ctx.fillRect(0, horizonY - H * 0.06, W, H * 0.09);
+}
+
+function drawSea() {
+  const horizonY = H * 0.52;
+  const ocean = ctx.createLinearGradient(0, horizonY, 0, H);
+  ocean.addColorStop(0.00, '#0d1e33');
+  ocean.addColorStop(0.30, '#0a1728');
+  ocean.addColorStop(1.00, '#04091530');
+  ctx.fillStyle = ocean;
+  ctx.fillRect(0, horizonY, W, H - horizonY);
+
+  // Moonlight path — a shimmering column under the moon, widening towards the viewer.
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
   for (const w of waves) {
+    const spread = 22 + w.t * W * 0.16;
+    const dx = Math.sin(time * w.speed * 0.7 + w.phase) * 8 * w.t;
+    const g = ctx.createLinearGradient(moon.x - spread + dx, 0, moon.x + spread + dx, 0);
+    g.addColorStop(0, 'rgba(150,180,240,0)');
+    g.addColorStop(0.5, `rgba(175,205,255,${0.09 + w.t * 0.13})`);
+    g.addColorStop(1, 'rgba(150,180,240,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(moon.x - spread + dx, w.y - (0.6 + w.t * 2), spread * 2, 1.2 + w.t * 3.2);
+  }
+  ctx.restore();
+
+  // Swell. Each line is drawn twice: a dark trough and a lit crest just above it,
+  // which is what makes a moving surface out of what used to be flat strokes.
+  for (const w of waves) {
+    const drift = time * w.speed;
     ctx.beginPath();
-    for (let x = 0; x < s; x += 4) {
-      const y = w.y + Math.sin(x * w.freq + time * 0.02 + w.phase) * w.amp;
+    for (let x = 0; x <= W; x += 6) {
+      const y = w.y + Math.sin(x * w.freq + drift + w.phase) * w.amp
+                    + Math.sin(x * w.freq * 2.3 + drift * 1.4) * w.amp * 0.35;
       x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
+    ctx.strokeStyle = `rgba(6,12,24,${0.30 + w.t * 0.28})`;
+    ctx.lineWidth = 1 + w.t * 2.2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 6) {
+      const y = w.y - (0.8 + w.t * 1.6)
+                    + Math.sin(x * w.freq + drift + w.phase) * w.amp
+                    + Math.sin(x * w.freq * 2.3 + drift * 1.4) * w.amp * 0.35;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = `rgba(130,175,235,${0.09 + w.t * 0.19})`;
+    ctx.lineWidth = 1;
     ctx.stroke();
   }
 
+  // Scintillation — brief specular flashes so the sea is never entirely still.
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (const gl of glints) {
+    const f = Math.sin(time * gl.rate + gl.phase);
+    if (f < 0.45) continue;
+    const a = (f - 0.45) / 0.55 * (0.14 + gl.t * 0.30);
+    const x = gl.x + Math.sin(time * 0.01 + gl.phase) * 6 * gl.t;
+    ctx.strokeStyle = `rgba(190,215,255,${a})`;
+    ctx.lineWidth = 0.8 + gl.t * 1.4;
+    ctx.beginPath();
+    ctx.moveTo(x - gl.len / 2, gl.y);
+    ctx.lineTo(x + gl.len / 2, gl.y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  drawSky();
+  drawSea();
+
   // Rocks (danger zone indicator)
   ctx.beginPath();
-  ctx.arc(cx, cy, s * 0.13, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy, R * ROCK_R, R * ROCK_R * FIELD_KY, 0, 0, Math.PI * 2);
   ctx.strokeStyle = 'rgba(239,68,68,0.15)';
   ctx.lineWidth = 2;
   ctx.setLineDash([4, 8]);
@@ -446,23 +587,80 @@ function render() {
   // Ships (drawn BEFORE beam so beam illuminates them)
   for (const ship of ships) {
     const sx = cx + Math.cos(ship.angle - Math.PI/2) * ship.distance;
-    const sy = cy + Math.sin(ship.angle - Math.PI/2) * ship.distance;
-    const vis = ship.lit * ship.opacity;
+    const sy = cy + Math.sin(ship.angle - Math.PI/2) * ship.distance * FIELD_KY;
+    // A ship the beam has already identified leaves a faint silhouette, so the
+    // keeper can still act on it between sweeps. The beam still does the
+    // REVEALING — an unseen ship is invisible exactly as before — but knowledge,
+    // once earned, is no longer erased every rotation.
+    const known = ship.seen && !ship.signaled && !ship.wrecked ? 0.17 : 0;
+    const vis = Math.max(ship.lit, known) * ship.opacity;
     if (vis < 0.02) continue;
 
     ctx.save();
     ctx.globalAlpha = vis;
-    const scale = 0.8 + (1 - ship.distance / (s * 0.52)) * 0.4;
+    // Depth: a ship at the horizon should read as far away. The old range was only
+    // 0.8..1.2, which on a small square barely registered; across a full-width sea
+    // it needs to carry the distance.
+    const depth = 1 - ship.distance / (R * SPAWN_R);
+    const scale = (0.6 + depth * 0.9) * Math.max(1, R / 520);
 
+    // Hull shading: superstructure catches the sky, the waterline sits in shadow.
+    // A flat fill made every vessel a paper cut-out regardless of how well lit.
+    const hull = ctx.createLinearGradient(0, sy - 24 * scale, 0, sy + 12 * scale);
     if (ship.wrecked) {
-      ctx.fillStyle = '#ef4444';
+      hull.addColorStop(0, '#ff6b6b'); hull.addColorStop(1, '#7f1d1d');
       ctx.globalAlpha *= 0.6;
     } else if (ship.signaled) {
-      ctx.fillStyle = '#22c55e';
+      hull.addColorStop(0, '#5ef2a0'); hull.addColorStop(1, '#12603a');
     } else {
-      ctx.fillStyle = '#c0c8d8';
+      // Lit ships warm towards the lamp; unlit ones stay cold and near-silhouette.
+      const warm = ship.lit;
+      hull.addColorStop(0, `rgb(${190 + warm * 55}, ${198 + warm * 45}, ${214 + warm * 20})`);
+      hull.addColorStop(0.55, `rgb(${120 + warm * 60}, ${131 + warm * 52}, ${152 + warm * 30})`);
+      hull.addColorStop(1, `rgb(${44 + warm * 40}, ${52 + warm * 34}, ${68 + warm * 24})`);
     }
+    ctx.fillStyle = hull;
+    // Reflection first, under the hull: a wavering column of the ship's own light.
+    ctx.save();
+    ctx.globalAlpha = vis * 0.4;
+    ctx.translate(sx, sy + 8 * scale);
+    ctx.scale(1, -0.55);
+    ctx.filter = 'blur(2px)';
+    ship.type.draw(ctx, 0, -8 * scale, scale);
+    ctx.restore();
+
     ship.type.draw(ctx, sx, sy, scale);
+
+    // Running lights — red to port, green to starboard, white at the masthead.
+    // A game about signal lights should show that its ships carry them.
+    const litUp = 0.35 + vis * 0.65;
+    const lamp = (lx, ly, col, rad) => {
+      const g = ctx.createRadialGradient(sx + lx, sy + ly, 0, sx + lx, sy + ly, rad);
+      g.addColorStop(0, col.replace('ALPHA', String(0.95 * litUp)));
+      g.addColorStop(0.35, col.replace('ALPHA', String(0.35 * litUp)));
+      g.addColorStop(1, col.replace('ALPHA', '0'));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(sx + lx, sy + ly, rad, 0, Math.PI * 2); ctx.fill();
+    };
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    lamp(-26 * scale, -2 * scale, 'rgba(255,70,70,ALPHA)', 7 * scale);
+    lamp( 26 * scale, -2 * scale, 'rgba(70,255,130,ALPHA)', 7 * scale);
+    lamp(  0,        -20 * scale, 'rgba(255,248,225,ALPHA)', 6 * scale);
+    ctx.restore();
+
+    // Wake — a short bright scar on the water behind the hull.
+    ctx.save();
+    ctx.globalAlpha = vis * 0.28;
+    ctx.strokeStyle = 'rgba(180,215,255,0.9)';
+    ctx.lineWidth = 1.2 * scale;
+    ctx.beginPath();
+    ctx.moveTo(sx - 30 * scale, sy + 10 * scale);
+    ctx.lineTo(sx - 46 * scale, sy + 13 * scale);
+    ctx.moveTo(sx + 30 * scale, sy + 10 * scale);
+    ctx.lineTo(sx + 46 * scale, sy + 13 * scale);
+    ctx.stroke();
+    ctx.restore();
 
     // Ship type label when well-lit
     if (vis > 0.5 && !ship.signaled && !ship.wrecked) {
@@ -486,7 +684,8 @@ function render() {
 
   // Beam
   ctx.save();
-  const beamLen = s * 0.55;
+  ctx.translate(cx, cy); ctx.scale(1, FIELD_KY); ctx.translate(-cx, -cy);
+  const beamLen = R * BEAM_R;
   const beamX = cx + Math.cos(beam.angle - Math.PI/2) * beamLen;
   const beamY = cy + Math.sin(beam.angle - Math.PI/2) * beamLen;
   const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, beamLen);
@@ -500,52 +699,162 @@ function render() {
   grad.addColorStop(0.3, beamColor + '0.2)');
   grad.addColorStop(1, beamColor + '0)');
 
+  // Three stacked wedges: a narrow hot core, the beam proper, and a wide soft
+  // scatter through the haze. One flat wedge read as a paper triangle.
+  ctx.globalCompositeOperation = 'lighter';
+  const wedge = (widthMul, alphaMul) => {
+    const g = ctx.createRadialGradient(cx, cy, 8, cx, cy, beamLen);
+    g.addColorStop(0, beamColor + (0.42 * alphaMul) + ')');
+    g.addColorStop(0.28, beamColor + (0.17 * alphaMul) + ')');
+    g.addColorStop(0.7, beamColor + (0.05 * alphaMul) + ')');
+    g.addColorStop(1, beamColor + '0)');
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, beamLen, beam.angle - Math.PI/2 - beam.width*widthMul/2, beam.angle - Math.PI/2 + beam.width*widthMul/2);
+    ctx.closePath();
+    ctx.fillStyle = g;
+    ctx.fill();
+  };
+  wedge(2.6, 0.34);    // haze scatter
+  wedge(1.0, 1.00);    // the beam
+  wedge(0.34, 0.85);   // hot core
+
+  // The swell inside the beam catches it. Re-stroke the wave crests that fall in
+  // the wedge, brightly — this is what makes the light land ON the sea instead of
+  // hovering above it as a translucent triangle.
+  ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx, cy);
   ctx.arc(cx, cy, beamLen, beam.angle - Math.PI/2 - beam.width/2, beam.angle - Math.PI/2 + beam.width/2);
   ctx.closePath();
-  ctx.fillStyle = grad;
-  ctx.fill();
+  ctx.clip();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);          // crests live in screen space
+  ctx.globalCompositeOperation = 'lighter';
+  for (const w of waves) {
+    const drift = time * w.speed;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 6) {
+      const y = w.y - (0.8 + w.t * 1.6)
+                    + Math.sin(x * w.freq + drift + w.phase) * w.amp
+                    + Math.sin(x * w.freq * 2.3 + drift * 1.4) * w.amp * 0.35;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = beamColor + (0.16 + w.t * 0.30) + ')';
+    ctx.lineWidth = 1 + w.t * 1.6;
+    ctx.stroke();
+  }
+  ctx.restore();
   ctx.restore();
 
   // Fog overlay (thicker at edges)
-  const fog = ctx.createRadialGradient(cx, cy, s * 0.15, cx, cy, s * 0.55);
+  ctx.save();
+  ctx.translate(cx, cy); ctx.scale(1, FIELD_KY); ctx.translate(-cx, -cy);
+  const fog = ctx.createRadialGradient(cx, cy, R * 0.29, cx, cy, R * BEAM_R);
   const fogDensity = Math.min(0.7, 0.3 + wave * 0.04);
   fog.addColorStop(0, 'rgba(15,20,35,0)');
   fog.addColorStop(0.5, `rgba(15,20,35,${fogDensity * 0.3})`);
   fog.addColorStop(1, `rgba(15,20,35,${fogDensity})`);
   ctx.fillStyle = fog;
-  ctx.fillRect(0, 0, s, s);
+  // In squashed space the canvas is taller than H, so overfill generously.
+  ctx.fillRect(-W, cy - (H / FIELD_KY), W * 3, (H / FIELD_KY) * 2);
+  ctx.restore();
 
-  // Lighthouse
+  // Lighthouse — a built structure rather than a triangle and two circles.
+  const u = Math.max(1, R / 405);
+  const baseY = cy, topY = cy - 58 * u;
   ctx.save();
-  // Tower
-  ctx.fillStyle = '#d4d4d4';
+
+  // Surf breaking on the rock
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const surf = 0.5 + 0.5 * Math.sin(time * 0.045);
+  ctx.strokeStyle = `rgba(150,195,245,${0.10 + surf * 0.13})`;
+  ctx.lineWidth = 1.6 * u;
   ctx.beginPath();
-  ctx.moveTo(cx - 8, cy);
-  ctx.lineTo(cx - 5, cy - 30);
-  ctx.lineTo(cx + 5, cy - 30);
-  ctx.lineTo(cx + 8, cy);
+  ctx.ellipse(cx, baseY + 7 * u, (26 + surf * 5) * u, (9 + surf * 2) * u, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Rock
+  const rock = ctx.createLinearGradient(0, baseY - 6 * u, 0, baseY + 12 * u);
+  rock.addColorStop(0, '#39404e');
+  rock.addColorStop(1, '#161a22');
+  ctx.fillStyle = rock;
+  ctx.beginPath();
+  ctx.moveTo(cx - 30 * u, baseY + 11 * u);
+  ctx.lineTo(cx - 19 * u, baseY - 2 * u);
+  ctx.lineTo(cx - 8 * u, baseY + 1 * u);
+  ctx.lineTo(cx + 10 * u, baseY - 3 * u);
+  ctx.lineTo(cx + 21 * u, baseY + 2 * u);
+  ctx.lineTo(cx + 31 * u, baseY + 11 * u);
   ctx.closePath();
   ctx.fill();
-  // Lamp room
-  ctx.fillStyle = '#ffeebb';
+
+  // Tapered tower, lit from the lantern above so it has a bright and a shadow side
+  const tower = ctx.createLinearGradient(cx - 11 * u, 0, cx + 11 * u, 0);
+  tower.addColorStop(0, '#5b6472');
+  tower.addColorStop(0.42, '#d8dee8');
+  tower.addColorStop(0.72, '#aeb6c4');
+  tower.addColorStop(1, '#4a515e');
+  ctx.fillStyle = tower;
   ctx.beginPath();
-  ctx.arc(cx, cy - 34, 7, 0, Math.PI * 2);
+  ctx.moveTo(cx - 11 * u, baseY);
+  ctx.lineTo(cx - 7 * u, topY + 12 * u);
+  ctx.lineTo(cx + 7 * u, topY + 12 * u);
+  ctx.lineTo(cx + 11 * u, baseY);
+  ctx.closePath();
   ctx.fill();
-  // Lamp glow
-  const lampGlow = ctx.createRadialGradient(cx, cy - 34, 3, cx, cy - 34, 30);
-  lampGlow.addColorStop(0, 'rgba(255,238,180,0.6)');
-  lampGlow.addColorStop(1, 'rgba(255,238,180,0)');
-  ctx.fillStyle = lampGlow;
+
+  // Two painted bands — the detail that makes it read as a lighthouse at a glance
+  ctx.fillStyle = 'rgba(150,60,55,0.55)';
+  for (const f of [0.34, 0.66]) {
+    const y = baseY + (topY + 12 * u - baseY) * f;
+    const halfW = 11 * u + (7 * u - 11 * u) * f;
+    ctx.fillRect(cx - halfW, y, halfW * 2, 5 * u);
+  }
+
+  // Gallery deck and railing beneath the lantern
+  ctx.fillStyle = '#39404e';
+  ctx.fillRect(cx - 11 * u, topY + 8 * u, 22 * u, 4 * u);
+  ctx.strokeStyle = 'rgba(190,200,215,0.5)';
+  ctx.lineWidth = Math.max(0.6, 0.9 * u);
+  for (let i = -3; i <= 3; i++) {
+    ctx.beginPath();
+    ctx.moveTo(cx + i * 3 * u, topY + 8 * u);
+    ctx.lineTo(cx + i * 3 * u, topY + 2 * u);
+    ctx.stroke();
+  }
+
+  // Lantern room: glass, then the burning core, then the bloom
+  ctx.fillStyle = 'rgba(28,34,46,0.9)';
+  ctx.fillRect(cx - 8 * u, topY - 10 * u, 16 * u, 12 * u);
+  const lampPulse = 0.86 + 0.14 * Math.sin(time * 0.08);
+  const core = ctx.createRadialGradient(cx, topY - 4 * u, 0, cx, topY - 4 * u, 9 * u);
+  core.addColorStop(0, `rgba(255,252,235,${lampPulse})`);
+  core.addColorStop(0.5, `rgba(255,232,170,${0.75 * lampPulse})`);
+  core.addColorStop(1, 'rgba(255,220,150,0)');
+  ctx.fillStyle = core;
+  ctx.beginPath(); ctx.arc(cx, topY - 4 * u, 9 * u, 0, Math.PI * 2); ctx.fill();
+  // Roof
+  ctx.fillStyle = '#2b3240';
   ctx.beginPath();
-  ctx.arc(cx, cy - 34, 30, 0, Math.PI * 2);
+  ctx.moveTo(cx - 10 * u, topY - 10 * u);
+  ctx.lineTo(cx, topY - 19 * u);
+  ctx.lineTo(cx + 10 * u, topY - 10 * u);
+  ctx.closePath();
   ctx.fill();
-  // Base rock
-  ctx.fillStyle = '#2a2a35';
-  ctx.beginPath();
-  ctx.ellipse(cx, cy + 4, 20, 8, 0, 0, Math.PI * 2);
-  ctx.fill();
+
+  // Bloom around the whole lantern, drawn additively so it sits in the air
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const bloom = ctx.createRadialGradient(cx, topY - 4 * u, 2 * u, cx, topY - 4 * u, 52 * u);
+  bloom.addColorStop(0, `rgba(255,240,200,${0.30 * lampPulse})`);
+  bloom.addColorStop(0.4, `rgba(255,228,170,${0.09 * lampPulse})`);
+  bloom.addColorStop(1, 'rgba(255,220,150,0)');
+  ctx.fillStyle = bloom;
+  ctx.beginPath(); ctx.arc(cx, topY - 4 * u, 52 * u, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+
   ctx.restore();
 }
 
@@ -578,8 +887,10 @@ function startGame() {
   setTimeout(spawnShip, 500);
   if (rafId) cancelAnimationFrame(rafId);
   loop();
-  // Fade guide
-  setTimeout(() => { document.getElementById('guide').style.opacity = '0'; }, 6000);
+  // The guide used to fade after six seconds whether or not you had understood
+  // it. Keep it until the first ship is signalled correctly — then it has done
+  // its job and can get out of the way.
+  document.getElementById('guide').style.opacity = '';
 }
 
 function endGame() {

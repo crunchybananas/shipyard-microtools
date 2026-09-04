@@ -22,6 +22,7 @@ const SUPPORT_PAGES = [
   { name: 'before-after-orbital-strike', path: '/before-after/orbital-strike/index.html' },
   { name: 'before-after-realm', path: '/before-after/realm/index.html' },
   { name: 'before-after-the-island', path: '/before-after/the-island/index.html' },
+  { name: 'before-after-beacon', path: '/before-after/beacon/index.html' },
   { name: 'before-after-demo-hub', path: '/before-after/demo-hub/index.html' },
   { name: 'before-after-demo-hub-night-harbor', path: '/before-after/demo-hub-night-harbor/index.html' },
 ];

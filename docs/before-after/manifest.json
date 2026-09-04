@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T16:20:00Z",
+  "updatedAt": "2026-09-04T17:40:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,18 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "beacon",
+      "title": "Beacon was a small square of dark in a black room",
+      "appSlug": "beacon",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "published",
+      "publishedAt": "2026-09-04",
+      "data": "stories/beacon.json",
+      "href": "./beacon/",
+      "cover": "assets/beacon/social.jpg"
+    },
     {
       "slug": "the-island",
       "title": "The Island stopped being a diagram of a place",
@@ -97,8 +109,8 @@
       "slug": "beacon",
       "title": "Beacon",
       "category": "Games",
-      "status": "queued",
-      "story": null
+      "status": "published",
+      "story": "beacon"
     },
     {
       "slug": "chronicle",

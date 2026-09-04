@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "slug": "beacon",
+  "title": "Beacon was a small square of dark in a black room",
+  "appSlug": "beacon",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "published",
+  "publishedAt": "2026-09-04",
+  "thesis": "A game about light was rendering almost none of it — and was doing so inside a 780-pixel box with the rest of the screen painted black.",
+  "summary": "Beacon asks you to identify ships by their silhouette as a lighthouse beam sweeps them, then flash the right signal. The idea was sound; the presentation was not. The playfield was a fixed square that used barely half the window, ships were flat grey cut-outs floating above the horizon, and the lighthouse was a triangle with two circles on top. It is now a full-width sea with a moon, a swell that carries light, and ships that show the running lights the whole game is about.",
+  "versions": {
+    "before": {
+      "label": "Square-canvas build",
+      "commit": "71b921af"
+    },
+    "after": {
+      "label": "Full-bleed sea",
+      "commit": "71b921af"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "field",
+      "title": "The watch used barely half the window",
+      "caption": "Both frames are the same moment of the same wave at 1440×900. The old build sized its canvas to a square of min(innerWidth, innerHeight − 120, 900) — 780×780 here — and centred it, so roughly 46% of the width was painted black and it never grew past 900px however large your display. The field is now the window, and the sea runs to both edges.",
+      "before": {
+        "src": "assets/beacon/before-watch.jpg",
+        "alt": "Beacon before: a small square playfield centred in a wide black frame, with a faint lighthouse and two pale ship shapes."
+      },
+      "after": {
+        "src": "assets/beacon/after-watch.jpg",
+        "alt": "Beacon after: a full-width moonlit sea with a layered swell, a lighthouse on its rock, and several ships at different distances."
+      }
+    },
+    {
+      "id": "surface",
+      "title": "The light had nothing to fall on",
+      "caption": "Same crop of the approach, enlarged. Before: ships hung above the horizon line because the field was a flat disc rather than a sea surface, the beam was one translucent wedge laid over the dark, and the swell was ten identical sine lines. After: the field is squashed into a ground plane so vessels ride the water, the beam is three stacked wedges that re-light every wave crest they cross, and each ship carries red-to-port, green-to-starboard and masthead-white lamps — the signals the game is named for.",
+      "before": {
+        "src": "assets/beacon/before-detail.jpg",
+        "alt": "Detail before: flat grey ship silhouettes above the horizon, a plain translucent beam wedge, and a lighthouse drawn as a triangle with a circle."
+      },
+      "after": {
+        "src": "assets/beacon/after-detail.jpg",
+        "alt": "Detail after: a tapered banded lighthouse with gallery railing and glowing lantern on a rock ringed by surf, with the beam lighting individual wave crests."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "The canvas became the window",
+      "body": "resize() built a square from min(innerWidth, innerHeight − 120, 900). Width and height are now independent and the canvas fills the viewport at every size — verified at 390×844, 768×1024, 1440×900 and 1920×1080, including resizing mid-game. Every gameplay distance was re-expressed as a fraction of a play radius rather than of the canvas edge, so the rules did not change when the frame did."
+    },
+    {
+      "title": "The disc became a sea",
+      "body": "Ships approach the lighthouse on a bearing, and the field was drawn as a flat circle — so a ship due north was painted in the sky. The field is now squashed vertically into a ground plane bounded by the horizon, and the beam, the rock ring and the fog take the same squash, so light still visibly falls on the vessels it is lighting."
+    },
+    {
+      "title": "The beam lands on the water",
+      "body": "It was a single translucent wedge sitting over the dark. It is now a hot core, the beam proper and a wide haze scatter — and, clipped to the wedge, every wave crest inside it is re-stroked in the beam's own colour. That last part is what stops the light hovering above the sea like coloured paper."
+    },
+    {
+      "title": "Ships carry the lights the game is about",
+      "body": "Vessels were single flat fills. They now have hull shading from deck to waterline, a wavering reflection beneath them, a wake, and running lights — red to port, green to starboard, white at the masthead. In a game whose whole verb is signalling with coloured light, the ships not carrying any was the strangest omission of all."
+    },
+    {
+      "title": "The keeper is allowed to learn",
+      "body": "The instruction faded after six seconds whether or not you had understood it; it now stays until your first successful rescue. And a ship the beam has already identified leaves a faint silhouette instead of vanishing back into the dark for the rest of the sweep — the beam still does the revealing, but knowledge, once earned, is no longer erased every rotation."
+    }
+  ],
+  "builderNote": {
+    "quote": "Are you actually happy with that result? That needs something way beyond what you did.",
+    "context": "The owner's response to the first attempt, which resized the canvas, fixed the projection, and stopped there — a correctly proportioned version of the same flat picture, presented as an improvement. It was not one. The art pass above is the second attempt: sky, sea, light, structure and vessels, rather than layout arithmetic."
+  },
+  "proof": [
+    {
+      "label": "Field",
+      "value": "780×780 of a 1440×900 window before (46% of the width unused); the full viewport after."
+    },
+    {
+      "label": "Responsive",
+      "value": "Canvas fills the window at 390×844, 768×1024, 1440×900 and 1920×1080, and survives two resizes mid-game."
+    },
+    {
+      "label": "Errors",
+      "value": "Zero page or console errors across every viewport and a full wave played out."
+    },
+    {
+      "label": "Still open",
+      "value": "Ship silhouettes are still simple polygons; weather and sea state do not yet change with the wave."
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/beacon/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/71b921af/docs/beacon",
+    "download": "assets/beacon/montage.png"
+  },
+  "share": {
+    "summary": "A game about light was rendering almost none of it, inside a 780-pixel box with the rest of the screen painted black. See the sea it turned into.",
+    "image": "assets/beacon/social.jpg"
+  }
+}
