@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
   "slug": "beacon",
-  "title": "Beacon was a small square of dark in a black room",
+  "title": "Beacon left the box, then left the canvas",
   "appSlug": "beacon",
   "surfaceSlug": null,
   "kind": "app",
   "status": "published",
   "publishedAt": "2026-09-04",
-  "thesis": "A game about light was rendering almost none of it — and was doing so inside a 780-pixel box with the rest of the screen painted black.",
-  "summary": "Beacon asks you to identify ships by their silhouette as a lighthouse beam sweeps them, then flash the right signal. The idea was sound; the presentation was not. The playfield was a fixed square that used barely half the window, ships were flat grey cut-outs floating above the horizon, and the lighthouse was a triangle with two circles on top. It is now a full-width sea with a moon, a swell that carries light, and ships that show the running lights the whole game is about.",
+  "thesis": "A game about light was rendering almost none of it, inside a 780-pixel box with the rest of the screen painted black. Fixing the box was not the work; fixing the light was.",
+  "summary": "Beacon asks you to identify ships by silhouette as a lighthouse beam sweeps them, then flash the right signal. It shipped as a fixed square canvas that used barely half the window, with flat grey cut-outs floating above the horizon. It became a full-width painted sea — and then a real one, rendered in WebGL with the open-ocean shader from The Island, so the moon lays an actual glitter road on the water and the beam is a volume of light rather than a translucent triangle.",
   "versions": {
     "before": {
       "label": "Square-canvas build",
       "commit": "71b921af"
     },
     "after": {
-      "label": "Full-bleed sea",
-      "commit": "5204a2fc"
+      "label": "WebGL sea",
+      "commit": "PENDING"
     }
   },
   "comparisons": [
@@ -45,9 +45,26 @@
         "src": "assets/beacon/after-detail.jpg",
         "alt": "Detail after: a tapered banded lighthouse with gallery railing and glowing lantern on a rock ringed by surf, with the beam lighting individual wave crests."
       }
+    },
+    {
+      "id": "webgl",
+      "title": "Then it stopped being a drawing of a sea",
+      "caption": "Left is the canvas art pass — genuinely better, and still a painting: the swell is stroked sine lines, the moon path is hand-placed gradients, and the beam brightens crests because I told it which crests to brighten. Right is the same watch in WebGL, using The Island's open-ocean shader. The glitter road is specular reflection of an actual moon direction, the horizon fog is an exp2 lane, and the beam is a volumetric shaft the ships sit inside. Nothing about the game changed: ships were always polar, so (angle, distance) became world space directly and the wave logic is untouched.",
+      "before": {
+        "src": "assets/beacon/canvas-watch.jpg",
+        "alt": "Beacon's canvas art pass: a painted night sea with stroked swell lines, a hand-drawn moon path and a flat beam wedge."
+      },
+      "after": {
+        "src": "assets/beacon/after-webgl.jpg",
+        "alt": "Beacon in WebGL: a shader sea with a real moon glitter road, a volumetric light shaft, and 3D ships showing red, green and white running lights."
+      }
     }
   ],
   "changes": [
+    {
+      "title": "The sea became a real one",
+      "body": "The canvas version faked perspective by squashing a circular field, and faked water with sine strokes and gradients. Beacon now renders in WebGL with makeFarSeaMaterial lifted from The Island — drifting facets, sky-mirror Fresnel, an exp2 fog lane into the horizon, and a glitter road computed from the moon's direction rather than drawn under it. makeBeamMaterial gives the lantern a volumetric shaft. Both were portable because they carry no dependency on the island's terrain or asset pipeline; its OTHER water material, which samples a terrain heightmap to blend a shoreline, was deliberately left behind — Beacon is all open water."
+    },
     {
       "title": "The canvas became the window",
       "body": "resize() built a square from min(innerWidth, innerHeight − 120, 900). Width and height are now independent and the canvas fills the viewport at every size — verified at 390×844, 768×1024, 1440×900 and 1920×1080, including resizing mid-game. Every gameplay distance was re-expressed as a fraction of a play radius rather than of the canvas edge, so the rules did not change when the frame did."
@@ -67,13 +84,21 @@
     {
       "title": "The keeper is allowed to learn",
       "body": "The instruction faded after six seconds whether or not you had understood it; it now stays until your first successful rescue. And a ship the beam has already identified leaves a faint silhouette instead of vanishing back into the dark for the rest of the sweep — the beam still does the revealing, but knowledge, once earned, is no longer erased every rotation."
+    },
+    {
+      "title": "The port was small because the game was already polar",
+      "body": "Ships have always carried (angle, distance) around the lantern, so they map to world space as (cos a * d, 0, sin a * d) with no change to spawning, the beam-intersection test, the wreck radius or the wave curve. The only thing that had to go was the renderer — including the hand-rolled FIELD_KY squash, which a real camera does correctly for free. The ship silhouettes are the canvas build's own polygon outlines, extruded, so the fleet kept its drawn identity."
     }
   ],
   "builderNote": {
-    "quote": "Are you actually happy with that result? That needs something way beyond what you did.",
-    "context": "The owner's response to the first attempt, which resized the canvas, fixed the projection, and stopped there — a correctly proportioned version of the same flat picture, presented as an improvement. It was not one. The art pass above is the second attempt: sky, sea, light, structure and vessels, rather than layout arithmetic."
+    "quote": "Would going full webgl be hard or are you avoiding the hard part?",
+    "context": "Yes — I had recommended a hybrid, WebGL sea under a 2D overlay, and the honest reason was that it looked like less work. It was also the worse design: compositing would have meant replicating the 3D camera's projection in 2D to line ships up against the shader horizon. Going all the way was both better and, because the game was already polar, smaller than the compromise."
   },
   "proof": [
+    {
+      "label": "Renderer",
+      "value": "2D canvas -> WebGL (three 0.180, the version The Island already pins). Sea and beam shaders vendored from the-island/js/shaders.js."
+    },
     {
       "label": "Field",
       "value": "780×780 of a 1440×900 window before (46% of the width unused); the full viewport after."
@@ -88,7 +113,7 @@
     },
     {
       "label": "Still open",
-      "value": "Ship silhouettes are still simple polygons; weather and sea state do not yet change with the wave."
+      "value": "The sea shader is copied rather than shared; if a third app needs it, it should move to docs/shared/. Sea state does not yet change with the wave."
     }
   ],
   "links": {
@@ -97,7 +122,7 @@
     "download": "assets/beacon/montage.png"
   },
   "share": {
-    "summary": "A game about light was rendering almost none of it, inside a 780-pixel box with the rest of the screen painted black. See the sea it turned into.",
+    "summary": "A game about light was rendering almost none of it. It escaped a 780-pixel box, then escaped the canvas entirely — the moon now lays a real glitter road on a shader sea.",
     "image": "assets/beacon/social.jpg"
   }
 }

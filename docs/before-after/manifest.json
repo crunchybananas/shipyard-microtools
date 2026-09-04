@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T17:40:00Z",
+  "updatedAt": "2026-09-04T19:05:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -10,7 +10,7 @@
   "stories": [
     {
       "slug": "beacon",
-      "title": "Beacon was a small square of dark in a black room",
+      "title": "Beacon left the box, then left the canvas",
       "appSlug": "beacon",
       "surfaceSlug": null,
       "kind": "app",
