@@ -3265,3 +3265,35 @@ body[data-demo="orbital-strike"] .game-wrapper > .suite-home {
     min-height: 54px;
   }
 }
+
+
+/* Look-sensitivity control on the pause overlay. Clicks inside .overlay are already
+   excluded from the fire path, so dragging this cannot discharge the weapon. */
+.pause-setting {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: -18px 0 30px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a8cac6;
+}
+.pause-setting-label { white-space: nowrap; }
+.pause-setting input[type="range"] {
+  flex: 1 1 200px;
+  min-width: 140px;
+  accent-color: var(--phosphor, #a8f2df);
+  cursor: pointer;
+}
+.pause-setting input[type="range"]:focus-visible {
+  outline: 2px solid var(--phosphor, #a8f2df);
+  outline-offset: 4px;
+}
+.pause-setting-value {
+  min-width: 3.4em;          /* reserve width so the row doesn't reflow while dragging */
+  text-align: right;
+  color: var(--phosphor, #a8f2df);
+  font-variant-numeric: tabular-nums;
+}

@@ -7,6 +7,13 @@ class OrbitalStrike {
     this.camera = null;
     this.renderer = null;
     this.player = { x: 0, y: 1.5, z: 0, health: 100, maxHealth: 100 };
+    // Look rates in radians per pixel of input, times the player's saved multiplier.
+    // The old fixed 0.002 needed ~3140px of mouse travel for a full 360, roughly half
+    // the speed of a typical FPS default; 0.0035 turns in ~1795px. Touch is dragged in
+    // absolute screen distance rather than deltas, so it carries its own base rate.
+    this.MOUSE_LOOK_RATE = 0.0035;
+    this.TOUCH_LOOK_RATE = 0.006;
+    this.lookSensitivity = this.loadLookSensitivity();
     // Reusable world-space player position; refreshed by syncPlayerPos() rather than
     // rebuilt at each call site, so every consumer reads the same current value.
     this.playerPos = new THREE.Vector3(this.player.x, this.player.y, this.player.z);
@@ -644,8 +651,9 @@ class OrbitalStrike {
     
     document.addEventListener('mousemove', e => {
       if (this.mouse.locked && this.gameState === 'playing') {
-        this.yaw -= e.movementX * 0.002;
-        this.pitch -= e.movementY * 0.002;
+        const rate = this.MOUSE_LOOK_RATE * this.lookSensitivity;
+        this.yaw -= e.movementX * rate;
+        this.pitch -= e.movementY * rate;
         this.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.pitch));
       }
     });
@@ -680,6 +688,14 @@ class OrbitalStrike {
     if (restartButton) restartButton.onclick = () => this.startGame();
     if (extractionButton) extractionButton.onclick = () => this.returnToBriefing();
     if (resumeButton) resumeButton.onclick = () => this.resumeGame();
+
+    const sensitivitySlider = this.byId('lookSensitivity');
+    if (sensitivitySlider) {
+      sensitivitySlider.value = String(this.lookSensitivity);
+      // `input` so the readout tracks the drag live; the value persists on each step.
+      sensitivitySlider.addEventListener('input', event => this.setLookSensitivity(event.target.value));
+      this.setLookSensitivity(this.lookSensitivity);
+    }
 
     document.querySelectorAll('.touch-key').forEach(button => {
       const release = event => {
@@ -725,8 +741,9 @@ class OrbitalStrike {
     this.renderer.domElement.addEventListener('pointermove', event => {
       if (!touchLook || event.pointerId !== touchLook.id) return;
       event.preventDefault();
-      this.yaw -= (event.clientX - touchLook.x) * 0.006;
-      this.pitch -= (event.clientY - touchLook.y) * 0.006;
+      const touchRate = this.TOUCH_LOOK_RATE * this.lookSensitivity;
+      this.yaw -= (event.clientX - touchLook.x) * touchRate;
+      this.pitch -= (event.clientY - touchLook.y) * touchRate;
       this.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.pitch));
       touchLook.x = event.clientX;
       touchLook.y = event.clientY;
@@ -736,6 +753,28 @@ class OrbitalStrike {
     };
     this.renderer.domElement.addEventListener('pointerup', endTouchLook);
     this.renderer.domElement.addEventListener('pointercancel', endTouchLook);
+  }
+
+  // Persisted so a player sets the gimbal rate once, not every mission. Storage can
+  // throw outright (private mode, blocked site data), so every access is guarded and
+  // falls back to the default rather than taking the constructor down with it.
+  loadLookSensitivity() {
+    try {
+      const saved = Number.parseFloat(localStorage.getItem('orbital-strike:look-sensitivity'));
+      if (Number.isFinite(saved)) return Math.min(2.5, Math.max(0.4, saved));
+    } catch (_) { /* storage unavailable — use the default */ }
+    return 1;
+  }
+
+  setLookSensitivity(value) {
+    const next = Number.parseFloat(value);
+    if (!Number.isFinite(next)) return;
+    this.lookSensitivity = Math.min(2.5, Math.max(0.4, next));
+    try {
+      localStorage.setItem('orbital-strike:look-sensitivity', String(this.lookSensitivity));
+    } catch (_) { /* storage unavailable — keep it for this session only */ }
+    const readout = this.byId('lookSensitivityValue');
+    if (readout) readout.textContent = `${this.lookSensitivity.toFixed(1)}\u00d7`;
   }
 
   requestPointerLock() {
