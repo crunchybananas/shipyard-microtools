@@ -1,0 +1,35 @@
+# Orbital Strike's control gate. verify-demos.mjs loads the page and fails on
+# console errors, but it only ever sees the briefing screen — the mission has to
+# START before the game loop runs. That is how a ReferenceError inside update()
+# shipped with every control dead while the page still "loaded clean".
+#
+# This drives a real requestAnimationFrame loop with real key events and asserts
+# the clock keeps advancing; any throw in update() leaves rAF un-armed.
+#
+# Path-filtered (same shape as island-walk) so the docs-only deploy path stays
+# dependency-free and only pays for a browser when this game actually changes.
+name: orbital-strike
+on:
+  push:
+    paths: ['docs/orbital-strike/**', 'scripts/verify-orbital-strike.mjs']
+  pull_request:
+    paths: ['docs/orbital-strike/**', 'scripts/verify-orbital-strike.mjs']
+jobs:
+  controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 9.12.2
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: install chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: verify the controls
+        run: node scripts/verify-orbital-strike.mjs
