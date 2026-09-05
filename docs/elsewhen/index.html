@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e6edf3">
+  <meta name="description" content="Leave a gesture in time. Join your past selves to play an instrument and solve small impossibilities. A local, tactile experiment from Waggle.">
+  <title>Elsewhen — an instrument for your past selves</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="home" href="../" aria-label="Back to Waggle micro tools"><span aria-hidden="true">↖</span> Waggle</a>
+    <span class="edition">A small experiment in being more than one person</span>
+    <div class="header-actions">
+      <button id="sound" class="text-button" aria-pressed="false"><span class="sound-mark" aria-hidden="true">♪</span> <span id="sound-label">Enable sound</span></button>
+      <button id="help" class="help-button" aria-label="How to play Elsewhen">?</button>
+    </div>
+  </header>
+  <main>
+    <section class="experience" aria-label="Elsewhen time instrument">
+      <div class="introduction">
+        <h1>Elsewhen<span class="title-period">.</span></h1>
+        <p class="premise">An instrument for<br>your past selves.</p>
+        <div class="study-copy">
+          <span id="study-number" class="study-number">Study 1 of 4</span>
+          <h2 id="study-title">A little company</h2>
+          <p id="instruction">Leave a hand on the left bell. Then hold the right bell yourself.</p>
+          <button id="hint-toggle" class="quiet-button" aria-expanded="false" aria-controls="hint">A little guidance</button>
+          <p id="hint" class="hint" hidden></p>
+        </div>
+        <div class="study-progress" id="study-progress">
+          <div class="progress-track" role="progressbar" aria-label="Study progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-fill"></span></div>
+          <span id="progress-label">Two bells. Two versions of you.</span>
+        </div>
+        <div class="completion" id="completion" hidden>
+          <span class="completion-mark" aria-hidden="true">✳</span>
+          <p id="reward"></p>
+          <button id="next-study" class="quiet-button">Next study <span aria-hidden="true">↗</span></button>
+        </div>
+        <button id="visitor" class="visitor-button"><span aria-hidden="true">▷</span> Hear a visitor’s hands</button>
+      </div>
+
+      <div class="machine">
+        <div class="machine-top"><span id="mode-label">Touch a bell. It remembers a sound.</span><span id="lap-label">8 seconds, returning</span></div>
+        <div id="stage" class="stage" tabindex="0" aria-label="Time instrument. Bells use keys 1 through 7. Press Space to arm recording, then hold a bell key. Escape cancels." aria-describedby="stage-caption">
+          <canvas id="instrument" aria-hidden="true"></canvas>
+          <div id="bells" class="bells" role="group" aria-label="Seven bells"></div>
+          <div class="record-count" id="record-count" hidden><span></span><strong id="record-seconds">8.0</strong><small>seconds left</small></div>
+        </div>
+        <p class="stage-caption" id="stage-caption"><span id="gesture-hint">Every hand you leave repeats its last eight seconds.</span><span class="key-hint">Bells <kbd>1</kbd>–<kbd>7</kbd></span></p>
+        <div class="transport">
+          <button id="record" class="record-button"><span class="record-dot" aria-hidden="true"></span><span id="record-label">Leave a hand</span><kbd>space</kbd></button>
+          <button id="play" class="play-button" aria-label="Pause time" aria-pressed="false">Ⅱ</button>
+          <div class="timeline" id="timeline" aria-hidden="true"><div id="time-fill"></div><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <button id="speed" class="speed-button" aria-label="Playback speed: 1 times">1×</button>
+          <button id="restart" class="restart-button" aria-label="Restart the eight-second loop">↺</button>
+        </div>
+      </div>
+
+      <aside class="memory-shelf" aria-label="Recorded hands">
+        <div class="shelf-heading"><h2>Your other hands</h2><span id="hand-count">0 / 6</span></div>
+        <p class="empty-hands" id="empty-hands">The next thing you do<br>could keep happening.</p>
+        <ol id="hands" class="hands"></ol>
+        <div class="shelf-bottom">
+          <p id="save-status">Your studies stay in this browser.</p>
+          <button id="keepsake" class="keepsake-button">Keep this moment <span aria-hidden="true">↗</span></button>
+          <button id="undo" class="quiet-button" disabled>Undo last change</button>
+        </div>
+      </aside>
+    </section>
+
+    <nav class="studies" aria-label="Choose a study" id="studies"></nav>
+    <footer class="footnote"><span>One person. A few borrowed seconds.</span><span>Made of gestures, glass, and time.</span></footer>
+  </main>
+  <div id="notice" role="status" aria-live="polite" class="notice"></div>
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <button class="dialog-close" data-close aria-label="Close help">×</button>
+    <p class="dialog-kicker">Welcome to Elsewhen</p>
+    <h2 id="help-title">You can leave<br>a little of yourself here.</h2>
+    <p>Touch the bells to hear them. Choose <strong>Leave a hand</strong>, then press and move across the instrument. Release to turn that gesture into a repeating memory.</p>
+    <p>A still gesture leaves a still hand. A moving gesture leaves a path. Each memory repeats on the same eight-second clock. The part after you release holds your last position.</p>
+    <p>Make a <strong>twin</strong>, play a memory <strong>backward</strong>, or move it one <strong>beat</strong> ahead. Up to six memories can keep you company.</p>
+    <div class="help-keys"><span><kbd>1</kbd>–<kbd>7</kbd> Hold a bell</span><span><kbd>space</kbd> Arm / finish a hand</span><span><kbd>esc</kbd> Cancel a recording</span></div>
+    <p class="small-print">Sound begins after you interact. Each study saves in this browser. Nothing is uploaded. Export a recording to keep a copy elsewhere.</p>
+    <button data-close class="primary-button">Let me try</button>
+  </dialog>
+  <dialog id="keepsake-dialog" aria-labelledby="keepsake-title">
+    <button class="dialog-close" data-close aria-label="Close keepsake">×</button>
+    <p class="dialog-kicker">A record of being here</p>
+    <h2 id="keepsake-title">Keep this moment.</h2>
+    <label for="score-name">Give it a name</label>
+    <input id="score-name" maxlength="80" autocomplete="off" value="A little borrowed time">
+    <div class="keepsake-actions">
+      <button id="save-score" class="primary-button">Save the drawing <small>A printable SVG score</small></button>
+      <button id="save-recording" class="secondary-button">Save the recording <small>Open it here to play it again</small></button>
+      <button id="share" class="secondary-button">Copy a replay link <small>Your gestures travel inside the link</small></button>
+    </div>
+    <label class="import-label" for="import">Open an Elsewhen recording<input id="import" type="file" accept=".json,application/json"></label>
+    <label id="share-fallback" hidden>Copy this replay link<input id="share-url" readonly></label>
+    <p id="dialog-status" class="small-print" role="status" aria-live="polite"></p>
+  </dialog>
+  <noscript><p class="noscript">Elsewhen needs JavaScript to record and replay your gestures. Enable it, then reload this page.</p></noscript>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

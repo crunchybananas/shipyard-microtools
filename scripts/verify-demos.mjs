@@ -12,7 +12,7 @@ import { chromium } from '@playwright/test';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const docsRoot = resolve(repoRoot, 'docs');
 
-const EXPECTED_DEMO_COUNT = 31;
+const EXPECTED_DEMO_COUNT = 32;
 // `the-island` is being developed independently. `before-after` is a support
 // page crawled separately; `ember` and `morphogen` are generated/ignored build
 // output, not canonical source demos.

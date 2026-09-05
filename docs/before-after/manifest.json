@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T19:05:00Z",
+  "updatedAt": "2026-09-05T04:10:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -151,6 +151,13 @@
       "slug": "dev-terminal",
       "title": "Dev Terminal",
       "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "elsewhen",
+      "title": "Elsewhen",
+      "category": "Creative",
       "status": "queued",
       "story": null
     },

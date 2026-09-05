@@ -74,6 +74,16 @@ Classic falling blocks with a nautical twist.
 
 ## 🌊 Experiences
 
+### Elsewhen
+An instrument for your past selves. Record a gesture, leave it playing, then join it with another. Four short studies turn recorded hands into simultaneous chords, moving phrases, and a meeting with your own reversed twin. Seven synthesized glass bells, six independent hands, and one eight-second clock. Each study saves locally; export a playable recording, a replay link, or a printable SVG score.
+
+| | Vanilla |
+|---|---|
+| **Demo** | [Play](https://crunchybananas.github.io/shipyard-microtools/elsewhen/) |
+| **Source** | `docs/elsewhen/` |
+
+**Tech:** Canvas 2D, Web Audio synthesis, Pointer Events, localStorage — no dependencies or network requests. Verify with `node scripts/verify-elsewhen.mjs`.
+
 ### Fathom 🆕
 Scroll 10,935 meters down a lost anchor chain to the floor of the Challenger Deep. A single HTML file with zero dependencies — the descent is told entirely by the browser: scroll-driven CSS animations (`animation-timeline: scroll()`/`view()`), oklch color interpolation, CSS motion paths, the Popover API with `@starting-style`, a fully synthesized Web Audio soundscape (no audio files), a sonar ping that reveals what hides in the dark, and pointer-reactive bioluminescence. Two dozen hand-drawn SVG inhabitants at their true depths.
 

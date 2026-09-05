@@ -1374,7 +1374,7 @@
         <div class="masthead-note">Small apps for the browser</div>
         <div class="masthead-status">
           <span class="status-dot" aria-hidden="true"></span>
-          32 apps
+          33 apps
         </div>
       </div>
     </header>
@@ -1443,7 +1443,7 @@
           </div>
 
           <div class="result-status" role="status" aria-live="polite" aria-atomic="true">
-            <strong id="result-count">32</strong>
+            <strong id="result-count">33</strong>
             <span id="result-label">apps shown</span>
           </div>
         </div>
@@ -1492,6 +1492,20 @@
 
     <script>
       const DEMOS = [
+        {
+          slug: "elsewhen",
+          title: "Elsewhen",
+          category: "Creative",
+          description: "Leave a gesture in time. Join your past selves to play seven bells and solve small impossibilities.",
+          tags: ["Time", "Sound", "Gestures"],
+          layout: "prominent",
+          tone: "blue",
+          preview: {
+            src: "./assets/hub-previews/elsewhen.png",
+            position: "50% 42%",
+            loading: "eager",
+          },
+        },
         {
           slug: "orbital-strike",
           title: "Orbital Strike",
@@ -1956,8 +1970,8 @@
         ["starlight-orchestra", "Starlight Orchestra"],
       ];
 
-      if (DEMOS.length !== 32) {
-        throw new Error(`Gallery registry must contain 32 demos; found ${DEMOS.length}.`);
+      if (DEMOS.length !== 33) {
+        throw new Error(`Gallery registry must contain 33 demos; found ${DEMOS.length}.`);
       }
 
       const grid = document.querySelector("#demo-grid");
