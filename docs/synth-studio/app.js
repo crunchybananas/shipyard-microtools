@@ -1,1251 +1,1047 @@
-/**
- * Synth Studio - Main Application
- * UI bindings, keyboard input, recording/export, and presets
- */
+import {
+  TRACKS,
+  SESSION_NAMES,
+  STORAGE_KEY,
+  createProject,
+  validateProject,
+  clone,
+  clamp,
+  degreeMidi,
+  noteName,
+  audible,
+  rng,
+  songBars,
+  locateBar,
+  barSeconds,
+  stepSeconds,
+  macroAt,
+  eventsForStep,
+} from "./score.mjs";
+import { SoundEngine, renderAudio, encodeWav, TAIL_SECONDS } from "./audio.mjs";
+import { Orbit } from "./orbit.mjs";
+const $ = (id) => document.getElementById(id);
+const escape = (value) =>
+  String(value).replace(
+    /[&<>"']/g,
+    (char) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        char
+      ],
+  );
+const minutes = (seconds) =>
+  `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+const keys = ["a", "s", "d", "f", "g", "h", "j", "k"];
+let project = createProject(),
+  restoreMessage = "";
+try {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) project = validateProject(JSON.parse(raw));
+} catch {
+  restoreMessage =
+    "The saved session could not be opened. Your stored copy is untouched; a fresh session is ready.";
+}
+let engine,
+  context,
+  starting = false,
+  playing = false,
+  runToken = 0,
+  mode = "song",
+  selectedTrack = -1;
+let nextBar = 0,
+  nextStep = 0,
+  barStart = 0,
+  barTempo = project.bpm,
+  barSwing = project.swing,
+  loopBar = 0;
+let scheduledScene = project.scene,
+  scheduledLocation,
+  queuedScene = null,
+  endTime = null,
+  timer,
+  queue = [],
+  lastFrame = null;
+let capture = null,
+  captureRequested = false,
+  macro = {
+    x: project.scenes[project.scene].color,
+    y: project.scenes[project.scene].space,
+  };
+let dragging = false,
+  saveTimer,
+  toastTimer,
+  rendering = false,
+  variation = 1,
+  sliderGesture = false;
+const history = [],
+  recentFrames = [];
+const orbit = new Orbit($("orbit"));
 
-// Global state
-let audioContext = null;
-let synth = null;
-let effects = null;
-let drums = null;
-let sequencer = null;
-let visualizer = null;
-let masterGain = null;
-let isAudioInitialized = false;
-
-// Recording state
-let mediaRecorder = null;
-let recordedChunks = [];
-let isRecording = false;
-
-// Persistence state
-const STORAGE_KEY = 'synth-studio-project';
-let pendingProjectState = null;
-let persistTimer = null;
-
-// Keyboard mappings
-const KEY_MAP = {
-  'a': 'C3', 'w': 'C#3', 's': 'D3', 'e': 'D#3', 'd': 'E3',
-  'f': 'F3', 't': 'F#3', 'g': 'G3', 'y': 'G#3', 'h': 'A3',
-  'u': 'A#3', 'j': 'B3', 'k': 'C4', 'o': 'C#4', 'l': 'D4',
-  'p': 'D#4', ';': 'E4', "'": 'F4'
-};
-
-// Presets
-const PRESETS = {
-  bass: {
-    waveform: 'sawtooth',
-    octave: -1,
-    detune: 0,
-    attack: 0.01,
-    decay: 0.2,
-    sustain: 0.6,
-    release: 0.3,
-    filterCutoff: 400,
-    filterResonance: 5,
-    filterEnvAmount: 2000
-  },
-  lead: {
-    waveform: 'square',
-    octave: 0,
-    detune: 10,
-    attack: 0.01,
-    decay: 0.1,
-    sustain: 0.8,
-    release: 0.2,
-    filterCutoff: 2000,
-    filterResonance: 2,
-    filterEnvAmount: 500
-  },
-  pad: {
-    waveform: 'sine',
-    octave: 0,
-    detune: 5,
-    attack: 0.5,
-    decay: 0.3,
-    sustain: 0.7,
-    release: 1.0,
-    filterCutoff: 1000,
-    filterResonance: 1,
-    filterEnvAmount: 0
-  },
-  pluck: {
-    waveform: 'triangle',
-    octave: 0,
-    detune: 0,
-    attack: 0.001,
-    decay: 0.3,
-    sustain: 0,
-    release: 0.2,
-    filterCutoff: 3000,
-    filterResonance: 3,
-    filterEnvAmount: 5000
-  },
-  brass: {
-    waveform: 'sawtooth',
-    octave: 0,
-    detune: 15,
-    attack: 0.08,
-    decay: 0.2,
-    sustain: 0.6,
-    release: 0.15,
-    filterCutoff: 1500,
-    filterResonance: 2,
-    filterEnvAmount: 3000
-  },
-  strings: {
-    waveform: 'sawtooth',
-    octave: 0,
-    detune: 8,
-    attack: 0.3,
-    decay: 0.1,
-    sustain: 0.9,
-    release: 0.5,
-    filterCutoff: 2500,
-    filterResonance: 1,
-    filterEnvAmount: 0
-  }
-};
-
-/**
- * Initialize audio system
- */
-async function initAudio() {
-  if (isAudioInitialized) return;
-  
+function notify(message) {
+  $("toast").textContent = message;
+  $("toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 4500);
+}
+function checkpoint() {
+  history.push(clone(project));
+  if (history.length > 24) history.shift();
+  $("undo").disabled = false;
+  $("undo-project").disabled = false;
+}
+function persist() {
+  clearTimeout(saveTimer);
   try {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Create master gain with limiter
-    masterGain = audioContext.createGain();
-    masterGain.gain.value = 0.7;
-    
-    // Create limiter (compressor with high ratio)
-    const limiter = audioContext.createDynamicsCompressor();
-    limiter.threshold.value = -3;
-    limiter.knee.value = 0;
-    limiter.ratio.value = 20;
-    limiter.attack.value = 0.001;
-    limiter.release.value = 0.1;
-    
-    // Initialize components
-    synth = new Synthesizer(audioContext);
-    effects = new EffectsChain(audioContext);
-    drums = new DrumMachine(audioContext);
-    sequencer = new Sequencer(audioContext);
-    visualizer = new Visualizer(audioContext);
-    
-    // Connect signal chain
-    // Synth -> Effects -> Master
-    synth.connect(effects.input);
-    effects.connect(masterGain);
-    
-    // Drums -> Master (bypass effects for punch)
-    drums.connect(masterGain);
-    
-    // Master -> Limiter -> Visualizer -> Output
-    masterGain.connect(limiter);
-    limiter.connect(visualizer.getInput());
-    visualizer.getInput().connect(audioContext.destination);
-    
-    // Initialize visualizer
-    visualizer.init(
-      document.getElementById('waveform-canvas'),
-      document.getElementById('spectrum-canvas'),
-      document.getElementById('adsr-canvas')
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+    $("save-state").textContent = "Saved on this device";
+  } catch {
+    $("save-state").textContent = "Download a project to keep your work";
+  }
+}
+function changed() {
+  $("save-state").textContent = "Saving…";
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persist, 220);
+  orbit.dirty = true;
+}
+function edit(action, render = true) {
+  checkpoint();
+  action();
+  if (engine) {
+    engine.project = project;
+    engine.updateMix();
+  }
+  changed();
+  if (render) renderAll();
+}
+function scene() {
+  return project.scenes[project.scene];
+}
+function setMode(next) {
+  mode = next;
+  $("song-mode").classList.toggle("active", mode === "song");
+  $("loop-mode").classList.toggle("active", mode === "loop");
+  $("song-mode").setAttribute("aria-pressed", mode === "song");
+  $("loop-mode").setAttribute("aria-pressed", mode === "loop");
+}
+function chordLabel(degree) {
+  const root = degreeMidi(project.root, degree),
+    intervals = [2, 4, 6].map(
+      (n) => degreeMidi(project.root, degree + n) - root,
     );
-    
-    // Set up sequencer callbacks
-    sequencer.onSynthTrigger = (note, velocity, time) => {
-      // For sequencer, use a short note scheduled at the step time
-      synth.playNote(note, velocity, time, 0.15);
-    };
-
-    sequencer.onDrumTrigger = (drumType, velocity, time) => {
-      drums.play(drumType, velocity, time);
-    };
-
-    sequencer.onStep = (step) => {
-      updateStepIndicator(step);
-    };
-
-    // Restore saved project into the engines
-    if (pendingProjectState) {
-      try {
-        applyProjectToEngines(pendingProjectState);
-      } catch (error) {
-        console.warn('Failed to restore saved project:', error);
-      }
-    }
-
-    isAudioInitialized = true;
-    console.log('Audio initialized successfully');
-    
-    // Update initial ADSR visualization
-    updateADSRVisualization();
-    
-  } catch (error) {
-    console.error('Failed to initialize audio:', error);
-  }
+  const name = noteName(root).replace(/\d+$/, "");
+  return (
+    name +
+    (intervals[1] === 6
+      ? "ø7"
+      : intervals[0] === 3
+        ? "m7"
+        : intervals[2] === 11
+          ? "maj7"
+          : "7")
+  );
 }
-
-/**
- * Resume audio context (required for user interaction)
- */
-async function resumeAudio() {
-  if (audioContext && audioContext.state === 'suspended') {
-    await audioContext.resume();
-  }
-}
-
-// ===== UI Setup =====
-
-document.addEventListener('DOMContentLoaded', () => {
-  pendingProjectState = loadStoredProject();
-
-  setupKeyboard();
-  setupSequencerGrid();
-  setupStepIndicator();
-  setupControls();
-  setupKeyboardInput();
-  setupPersistence();
-
-  // Restore saved project into the UI (engines get it on audio init)
-  if (pendingProjectState) {
-    applyProjectToUI(pendingProjectState);
-  }
-
-  // Initialize audio on first user interaction
-  document.body.addEventListener('click', async () => {
-    await initAudio();
-    await resumeAudio();
-  }, { once: true });
-  
-  document.body.addEventListener('keydown', async () => {
-    await initAudio();
-    await resumeAudio();
-  }, { once: true });
-});
-
-/**
- * Set up on-screen keyboard
- */
-function setupKeyboard() {
-  const keyboard = document.getElementById('keyboard');
-  const notes = [
-    { note: 'C3', white: true, key: 'A' },
-    { note: 'C#3', white: false, key: 'W' },
-    { note: 'D3', white: true, key: 'S' },
-    { note: 'D#3', white: false, key: 'E' },
-    { note: 'E3', white: true, key: 'D' },
-    { note: 'F3', white: true, key: 'F' },
-    { note: 'F#3', white: false, key: 'T' },
-    { note: 'G3', white: true, key: 'G' },
-    { note: 'G#3', white: false, key: 'Y' },
-    { note: 'A3', white: true, key: 'H' },
-    { note: 'A#3', white: false, key: 'U' },
-    { note: 'B3', white: true, key: 'J' },
-    { note: 'C4', white: true, key: 'K' },
-    { note: 'C#4', white: false, key: 'O' },
-    { note: 'D4', white: true, key: 'L' },
-    { note: 'D#4', white: false, key: 'P' },
-    { note: 'E4', white: true, key: ';' }
+function renderScenes() {
+  const focused = $("scenes").contains(document.activeElement)
+    ? document.activeElement.dataset.scene
+    : undefined;
+  const subtitles = [
+    "A spark in the dark",
+    "Find the pulse",
+    "Room to disappear",
+    "The long way home",
   ];
-  
-  let whiteKeyIndex = 0;
-  const whiteKeyWidth = 100 / notes.filter(n => n.white).length;
-  
-  notes.forEach((noteInfo, index) => {
-    const key = document.createElement('button');
-    key.type = 'button';
-    key.className = noteInfo.white ? 'white-key' : 'black-key';
-    key.dataset.note = noteInfo.note;
-    key.setAttribute('aria-label', `Play ${noteInfo.note} with keyboard key ${noteInfo.key}`);
-    key.setAttribute('aria-pressed', 'false');
-
-    const setKeyActive = (active) => {
-      key.classList.toggle('active', active);
-      key.setAttribute('aria-pressed', String(active));
+  $("scenes").innerHTML = project.scenes
+    .map(
+      (s, i) =>
+        `<button class="scene ${i === project.scene ? "active" : ""} ${i === queuedScene ? "queued" : ""}" data-scene="${i}" aria-pressed="${i === project.scene}" aria-label="Launch ${escape(s.name)}"><span class="scene-top"><span class="scene-name">${escape(s.name)}</span><span class="scene-number">${i + 1}</span></span><span class="scene-bottom"><span>${i === queuedScene ? "Queued for next bar" : subtitles[i]}</span><span>${i === project.scene ? (playing ? "Playing" : "Selected") : "↗"}</span></span><span class="scene-progress"></span></button>`,
+    )
+    .join("");
+  if (focused !== undefined)
+    $("scenes")
+      .querySelector(`[data-scene="${focused}"]`)
+      ?.focus({ preventScroll: true });
+  $("pattern-heading").textContent = `Inside ${scene().name}`;
+  $("scene-help").textContent =
+    queuedScene !== null
+      ? `${project.scenes[queuedScene].name} arrives at the next bar.`
+      : playing
+        ? "Launch a scene. It lands on the next bar."
+        : "Four scenes. One continuous night.";
+}
+function renderTracks() {
+  $("tracks").innerHTML = TRACKS.map(
+    (track, i) =>
+      `<div class="track-row ${audible(project, i) ? "" : "muted"}" style="--track:${track.color}" data-track="${i}"><div class="track-controls"><button class="track-name ${selectedTrack === i ? "selected" : ""}" data-voice="${i}" aria-label="Edit ${track.name}" aria-expanded="${selectedTrack === i}"><i></i>${track.name}</button><button class="mini" data-mute="${i}" aria-label="Mute ${track.name}" aria-pressed="${project.tracks[i].muted}">M</button><button class="mini" data-solo="${i}" aria-label="Solo ${track.name}" aria-pressed="${project.tracks[i].solo}">S</button></div><div class="step-row">${scene()
+        .patterns[i].map((cell, s) => stepHTML(i, s, cell))
+        .join("")}</div></div>`,
+  ).join("");
+}
+function stepHTML(track, step, cell) {
+  const label = TRACKS[track].drum
+    ? ""
+    : noteName(degreeMidi(project.root + (track === 3 ? -12 : 0), cell.n));
+  return `<button class="step ${cell.v ? "on" : ""} ${cell.v > 0.9 ? "accent" : ""} ${playing && lastFrame?.step === step ? "current" : ""}" data-step="${step}" data-track="${track}" aria-label="${TRACKS[track].name} step ${step + 1}${label ? ", " + label : ""}" aria-pressed="${!!cell.v}" title="${cell.v ? Math.round(cell.v * 100) + "% velocity" : "Add note"}">${cell.v ? label : ""}</button>`;
+}
+function renderEditor() {
+  const open = selectedTrack >= 0;
+  $("voice-editor").hidden = !open;
+  if (!open) return;
+  const track = TRACKS[selectedTrack],
+    params = project.tracks[selectedTrack];
+  $("voice-editor").style.setProperty("--track", track.color);
+  $("voice-name").textContent = `${track.name} / ${track.voice}`;
+  $("voice-help").textContent = track.drum
+    ? "Shape the voice across every scene."
+    : "Notes follow the key and chord progression.";
+  $("track-level").value = params.level * 100;
+  $("track-tone").value = params.tone * 100;
+  $("track-pan").value = params.pan * 100;
+  $("piano-roll").parentElement.hidden = track.drum;
+  $("piano-help").hidden = track.drum;
+  if (!track.drum)
+    $("piano-roll").innerHTML = Array.from({ length: 15 }, (_, row) => {
+      const n = 14 - row,
+        label = noteName(
+          degreeMidi(project.root + (selectedTrack === 3 ? -12 : 0), n),
+        );
+      return `<span class="note-label">${label}</span>${scene()
+        .patterns[selectedTrack].map(
+          (cell, step) =>
+            `<button class="piano-cell ${cell.v && cell.n === n ? "on" : ""}" data-note="${n}" data-step="${step}" aria-pressed="${!!cell.v && cell.n === n}" aria-label="${label}, step ${step + 1}"></button>`,
+        )
+        .join("")}`;
+    }).join("");
+}
+function renderArrangement() {
+  $("arrangement").innerHTML = project.arrangement
+    .map(
+      (part, i) =>
+        `<div class="arrangement-part ${playing && mode === "song" && lastFrame?.section === i ? "active" : ""}" style="--bars:${part.bars}"><span class="part-number">${String(i + 1).padStart(2, "0")}</span><div class="part-fields"><select data-section="${i}" aria-label="Section ${i + 1} scene">${project.scenes.map((s, j) => `<option value="${j}" ${j === part.scene ? "selected" : ""}>${escape(s.name)}</option>`).join("")}</select><label><input data-bars="${i}" type="number" min="1" max="16" value="${part.bars}" aria-label="Section ${i + 1} bars"> bars</label></div><button class="remove-part" data-remove="${i}" aria-label="Remove section ${i + 1}" ${project.arrangement.length === 1 ? "disabled" : ""}>×</button></div>`,
+    )
+    .join("");
+  $("song-duration").textContent =
+    `${songBars(project)} bars / ${minutes(songBars(project) * barSeconds(project.bpm))}`;
+  $("add-section").disabled =
+    project.arrangement.length >= 8 || songBars(project) >= 64;
+}
+function renderMacro() {
+  $("pad-crosshair").style.left = `${macro.x * 100}%`;
+  $("pad-crosshair").style.top = `${(1 - macro.y) * 100}%`;
+  $("color").value = Math.round(macro.x * 100);
+  $("space").value = Math.round(macro.y * 100);
+  $("color-value").textContent = Math.round(macro.x * 100);
+  $("space-value").textContent = Math.round(macro.y * 100);
+  const motion = scene().motion.filter(Boolean);
+  $("motion-path").setAttribute(
+    "d",
+    motion
+      .map(
+        (point, i) => `${i ? "L" : "M"}${point.x * 220},${(1 - point.y) * 166}`,
+      )
+      .join(" "),
+  );
+  $("motion-toggle").disabled = !motion.length;
+  $("motion-toggle").setAttribute("aria-pressed", scene().motionEnabled);
+  const recording = captureRequested || capture !== null;
+  $("capture-motion").setAttribute("aria-pressed", recording);
+  document.body.classList.toggle("recording", recording);
+  $("capture-motion").innerHTML =
+    `<span class="record-dot"></span>${captureRequested ? "Starts next bar…" : capture ? `Capturing ${capture.count}/16` : "Capture motion"}`;
+  $("motion-indicator").textContent = recording
+    ? "Capturing"
+    : scene().motionEnabled
+      ? "Motion loop"
+      : "Live";
+}
+function renderAll() {
+  $("tempo").value = project.bpm;
+  $("key").value = project.root;
+  $("swing").value = project.swing * 100;
+  $("volume").value = project.master * 100;
+  $("key-caption").textContent =
+    noteName(project.root).replace(/\d+$/, "") + " minor";
+  $("chord-caption").textContent = scene().harmony.map(chordLabel).join(" / ");
+  $("project-title").value = project.title;
+  $("custom-session").hidden = SESSION_NAMES.includes(project.title);
+  $("custom-session").textContent = project.title;
+  $("session").value = SESSION_NAMES.includes(project.title)
+    ? SESSION_NAMES.indexOf(project.title)
+    : "custom";
+  renderScenes();
+  renderTracks();
+  renderEditor();
+  renderArrangement();
+  renderMacro();
+  $("live-keys").innerHTML = keys
+    .map(
+      (key, i) =>
+        `<button class="live-key" data-key="${i}" aria-label="Play ${noteName(degreeMidi(project.root, 7 + i))}">${key.toUpperCase()}<small>${noteName(degreeMidi(project.root, 7 + i))}</small></button>`,
+    )
+    .join("");
+  orbit.dirty = true;
+}
+function transportUI() {
+  document.body.classList.toggle("playing", playing);
+  $("play-label").textContent = playing ? "Stop" : "Play";
+  $("play").setAttribute("aria-label", playing ? "Stop" : "Play");
+  $("play-icon").innerHTML = playing
+    ? '<path d="M7 6h10v12H7Z"/>'
+    : '<path d="m8 5 11 7-11 7Z"/>';
+  $("audio-state").textContent = context
+    ? `${context.sampleRate / 1000} kHz / stereo`
+    : "Sound starts with you";
+  $("orbit-status").textContent = playing
+    ? `${scene().name} / six voices in orbit`
+    : "Six voices, waiting for you";
+}
+async function ensureAudio() {
+  if (!context || context.state === "closed") {
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio)
+      throw new Error(
+        "Audio is not available in this browser. Try a current Chrome, Safari, or Firefox.",
+      );
+    context = new Audio({ latencyHint: "interactive" });
+    context.addEventListener("statechange", () => {
+      if (playing && context.state !== "running")
+        stop("Audio interrupted. Press Play to continue.");
+    });
+  }
+  await context.resume();
+  if (context.state !== "running")
+    throw new Error("Audio is suspended. Press Play again to enable sound.");
+}
+async function start() {
+  if (starting || playing) return;
+  starting = true;
+  const token = ++runToken;
+  $("play").disabled = true;
+  try {
+    await ensureAudio();
+    if (token !== runToken) return;
+    engine?.stop();
+    engine = new SoundEngine(context, project);
+    playing = true;
+    nextBar = 0;
+    nextStep = 0;
+    loopBar = 0;
+    queue = [];
+    queuedScene = null;
+    endTime = null;
+    lastFrame = null;
+    scheduledScene = project.scene;
+    barStart = context.currentTime + 0.075;
+    transportUI();
+    renderScenes();
+    timer = setInterval(schedule, 25);
+    schedule();
+  } catch (error) {
+    notify(error.message);
+    $("transport-status").textContent = "Press Play to enable audio";
+  } finally {
+    starting = false;
+    $("play").disabled = false;
+  }
+}
+function stop(message = "Ready when you are") {
+  ++runToken;
+  playing = false;
+  clearInterval(timer);
+  queue = [];
+  endTime = null;
+  queuedScene = null;
+  capture = null;
+  captureRequested = false;
+  engine?.stop();
+  engine = null;
+  lastFrame = null;
+  $("transport-status").textContent = message;
+  $("bar-display").innerHTML = '01<span class="time-divider">.</span>1';
+  macro = { x: scene().color, y: scene().space };
+  transportUI();
+  renderScenes();
+  renderTracks();
+  renderArrangement();
+  renderMacro();
+  orbit.dirty = true;
+}
+function schedule() {
+  if (!playing) return;
+  const now = context.currentTime;
+  if (endTime !== null) return;
+  // A delayed background timer must never dump missed notes into the output.
+  if (barStart + (nextStep / 16) * barSeconds(barTempo) < now - 0.25) {
+    stop("Timing paused. Press Play to restart.");
+    return;
+  }
+  if (endTime !== null) return;
+  for (let scheduled = 0; scheduled < 32; scheduled++) {
+    if (nextStep === 0) {
+      if (queuedScene !== null) {
+        scheduledScene = queuedScene;
+        queuedScene = null;
+        loopBar = 0;
+        setMode("loop");
+      }
+      scheduledLocation =
+        mode === "song"
+          ? locateBar(project, nextBar)
+          : { scene: scheduledScene, localBar: loopBar, section: -1 };
+      if (!scheduledLocation) {
+        endTime = barStart;
+        return;
+      }
+      barTempo = project.bpm;
+      barSwing = project.swing;
+    }
+    const time =
+      barStart +
+      (60 / barTempo / 4) * (nextStep + (nextStep % 2 ? barSwing : 0));
+    if (time >= now + 0.12) return;
+    const index = scheduledLocation.scene,
+      s = project.scenes[index];
+    if (captureRequested && nextStep === 0) {
+      captureRequested = false;
+      capture = { scene: index, count: 0, values: Array(16).fill(null) };
+    }
+    const capturing = capture && capture.scene === index;
+    const point = capturing || dragging ? { ...macro } : macroAt(s, nextStep);
+    const frame = {
+      ...scheduledLocation,
+      bar: nextBar,
+      step: nextStep,
+      time,
+      macro: point,
+      events: eventsForStep(
+        { ...project, bpm: barTempo },
+        index,
+        scheduledLocation.localBar,
+        nextStep,
+      ),
     };
-    
-    if (noteInfo.white) {
-      key.innerHTML = `
-        <span class="note-label">${noteInfo.note}</span>
-        <span class="key-hint">${noteInfo.key}</span>
-      `;
-      key.style.width = `${whiteKeyWidth}%`;
-      whiteKeyIndex++;
-    } else {
-      key.innerHTML = `<span class="key-hint">${noteInfo.key}</span>`;
-      // Position black keys
-      const offset = (whiteKeyIndex - 1) * whiteKeyWidth + whiteKeyWidth * 0.7;
-      key.style.left = `${offset}%`;
-    }
-    
-    // Mouse events
-    key.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      playNote(noteInfo.note);
-      setKeyActive(true);
-    });
-    
-    key.addEventListener('mouseup', () => {
-      stopNote(noteInfo.note);
-      setKeyActive(false);
-    });
-    
-    key.addEventListener('mouseleave', () => {
-      if (key.classList.contains('active')) {
-        stopNote(noteInfo.note);
-        setKeyActive(false);
-      }
-    });
-    
-    // Touch events
-    key.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      playNote(noteInfo.note);
-      setKeyActive(true);
-    });
-    
-    key.addEventListener('touchend', () => {
-      stopNote(noteInfo.note);
-      setKeyActive(false);
-    });
-
-    key.addEventListener('keydown', (e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
-        e.preventDefault();
-        playNote(noteInfo.note);
-        setKeyActive(true);
-      }
-    });
-
-    key.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        stopNote(noteInfo.note);
-        setKeyActive(false);
-      }
-    });
-
-    key.addEventListener('blur', () => {
-      stopNote(noteInfo.note);
-      setKeyActive(false);
-    });
-    
-    keyboard.appendChild(key);
-  });
-}
-
-/**
- * Set up computer keyboard input
- */
-function setupKeyboardInput() {
-  const activeKeys = new Set();
-  
-  document.addEventListener('keydown', async (e) => {
-    // Ignore if typing in input
-    if (e.target.matches('input, select, textarea, button')) return;
-    
-    const key = e.key.toLowerCase();
-    
-    // Prevent repeat
-    if (activeKeys.has(key)) return;
-    
-    // Note input
-    if (KEY_MAP[key]) {
-      e.preventDefault();
-      activeKeys.add(key);
-      playNote(KEY_MAP[key]);
-      highlightKey(KEY_MAP[key], true);
-    }
-    
-    // Octave shift
-    if (key === 'z' && synth) {
-      const octave = Math.max(-2, synth.params.octave - 1);
-      synth.setParam('octave', octave);
-      document.getElementById('octave').value = octave;
-      document.getElementById('octave-value').textContent = octave;
-      schedulePersist();
-    }
-    if (key === 'x' && synth) {
-      const octave = Math.min(2, synth.params.octave + 1);
-      synth.setParam('octave', octave);
-      document.getElementById('octave').value = octave;
-      document.getElementById('octave-value').textContent = octave;
-      schedulePersist();
-    }
-    
-    // Space for play/stop
-    if (key === ' ') {
-      e.preventDefault();
-      togglePlayback();
-    }
-  });
-  
-  document.addEventListener('keyup', (e) => {
-    const key = e.key.toLowerCase();
-    
-    if (KEY_MAP[key]) {
-      activeKeys.delete(key);
-      stopNote(KEY_MAP[key]);
-      highlightKey(KEY_MAP[key], false);
-    }
-  });
-}
-
-/**
- * Highlight keyboard key
- */
-function highlightKey(note, active) {
-  const key = document.querySelector(`[data-note="${note}"]`);
-  if (key) {
-    key.classList.toggle('active', active);
-    key.setAttribute('aria-pressed', String(active));
-  }
-}
-
-/**
- * Play a note
- */
-function playNote(note) {
-  if (!synth) return;
-  synth.noteOn(note, 0.8);
-}
-
-/**
- * Stop a note
- */
-function stopNote(note) {
-  if (!synth) return;
-  synth.noteOff(note);
-}
-
-/**
- * Set up sequencer grid
- */
-function setupSequencerGrid() {
-  const tracks = document.querySelectorAll('.seq-track');
-  
-  tracks.forEach(track => {
-    const trackId = track.dataset.track;
-    const stepsContainer = track.querySelector('.track-steps');
-    
-    // Create 16 steps
-    for (let i = 0; i < 16; i++) {
-      const step = document.createElement('button');
-      step.type = 'button';
-      step.className = 'step';
-      step.dataset.step = i;
-      step.setAttribute('aria-label', `${trackId} step ${i + 1}`);
-      step.setAttribute('aria-pressed', 'false');
-      
-      step.addEventListener('click', () => {
-        if (!sequencer) return;
-        const isActive = sequencer.toggleStep(trackId, i);
-        step.classList.toggle('active', isActive);
-        step.setAttribute('aria-pressed', String(isActive));
-        schedulePersist();
-      });
-      
-      stepsContainer.appendChild(step);
-    }
-    
-    // Track note selector (for synth tracks)
-    const noteSelect = track.querySelector('.track-note');
-    if (noteSelect) {
-      noteSelect.addEventListener('change', () => {
-        if (!sequencer) return;
-        sequencer.setTrackNote(trackId, noteSelect.value);
-      });
-    }
-  });
-}
-
-/**
- * Set up step indicator
- */
-function setupStepIndicator() {
-  const indicator = document.getElementById('step-indicator');
-  for (let i = 0; i < 16; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'dot';
-    dot.dataset.step = i;
-    indicator.appendChild(dot);
-  }
-}
-
-/**
- * Update step indicator
- */
-function updateStepIndicator(step) {
-  const dots = document.querySelectorAll('.step-indicator .dot');
-  const steps = document.querySelectorAll('.step');
-  
-  dots.forEach((dot, i) => {
-    dot.classList.toggle('active', i === step);
-  });
-  
-  steps.forEach(s => {
-    const stepIndex = parseInt(s.dataset.step);
-    s.classList.toggle('current', stepIndex === step);
-    if (stepIndex === step) s.setAttribute('aria-current', 'step');
-    else s.removeAttribute('aria-current');
-  });
-}
-
-/**
- * Set up all controls
- */
-function setupControls() {
-  // Waveform selector
-  document.querySelectorAll('.wave-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.wave-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      if (synth) synth.setParam('waveform', btn.dataset.wave);
-      schedulePersist();
-    });
-  });
-  
-  // Oscillator controls
-  setupSlider('octave', 'octave', (v) => v, 0);
-  setupSlider('detune', 'detune', (v) => v, 0);
-  
-  // Filter controls
-  setupSlider('filter-cutoff', 'filterCutoff', (v) => `${Math.round(v)} Hz`);
-  setupSlider('filter-resonance', 'filterResonance', (v) => v.toFixed(1));
-  setupSlider('filter-env-amount', 'filterEnvAmount', (v) => Math.round(v));
-  
-  // ADSR controls
-  setupSlider('attack', 'attack', (v) => `${Math.round(v * 1000)}ms`);
-  setupSlider('decay', 'decay', (v) => `${Math.round(v * 1000)}ms`);
-  setupSlider('sustain', 'sustain', (v) => `${Math.round(v * 100)}%`);
-  setupSlider('release', 'release', (v) => `${Math.round(v * 1000)}ms`);
-  
-  // LFO controls
-  setupSlider('lfo-rate', 'lfoRate', (v) => `${v.toFixed(1)} Hz`);
-  setupSlider('lfo-depth', 'lfoDepth', (v) => Math.round(v));
-  
-  document.querySelectorAll('.lfo-target-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.lfo-target-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      if (synth) synth.setParam('lfoTarget', btn.dataset.target);
-      schedulePersist();
-    });
-  });
-  
-  // Master volume
-  const masterSlider = document.getElementById('master-volume');
-  masterSlider.addEventListener('input', () => {
-    const value = parseFloat(masterSlider.value);
-    if (masterGain) masterGain.gain.value = value;
-    document.getElementById('master-volume-value').textContent = `${Math.round(value * 100)}%`;
-  });
-  
-  // Effects
-  setupEffectControls();
-  
-  // Visualization toggle
-  document.querySelectorAll('.viz-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.viz-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      if (visualizer) visualizer.setMode(btn.dataset.viz);
-    });
-  });
-  
-  // BPM control
-  const bpmInput = document.getElementById('bpm');
-  bpmInput.addEventListener('change', () => {
-    if (sequencer) sequencer.setBPM(parseInt(bpmInput.value));
-  });
-  
-  // Swing control
-  const swingSlider = document.getElementById('swing');
-  swingSlider.addEventListener('input', () => {
-    if (sequencer) sequencer.setSwing(parseFloat(swingSlider.value));
-  });
-  
-  // Transport controls
-  document.getElementById('play-btn').addEventListener('click', togglePlayback);
-  document.getElementById('stop-btn').addEventListener('click', stopPlayback);
-  document.getElementById('record-btn').addEventListener('click', toggleRecording);
-  
-  // Preset selector
-  document.getElementById('preset-select').addEventListener('change', (e) => {
-    if (e.target.value && PRESETS[e.target.value]) {
-      loadPreset(PRESETS[e.target.value]);
-    }
-  });
-  
-  // Export button
-  document.getElementById('export-btn').addEventListener('click', exportWAV);
-  
-  // Save button
-  document.getElementById('save-btn').addEventListener('click', saveProject);
-  
-  // Level meter animation
-  setInterval(updateLevelMeter, 50);
-}
-
-/**
- * Set up a slider control
- */
-function setupSlider(id, param, format, defaultVal = null) {
-  const slider = document.getElementById(id);
-  const valueDisplay = document.getElementById(`${id}-value`);
-  
-  slider.addEventListener('input', () => {
-    const value = parseFloat(slider.value);
-    if (synth) synth.setParam(param, value);
-    if (valueDisplay) valueDisplay.textContent = format(value);
-    
-    // Update ADSR visualization
-    if (['attack', 'decay', 'sustain', 'release'].includes(param)) {
-      updateADSRVisualization();
-    }
-  });
-}
-
-/**
- * Set up effects controls
- */
-function setupEffectControls() {
-  // Delay
-  document.getElementById('delay-enabled').addEventListener('change', (e) => {
-    if (effects) effects.setDelayEnabled(e.target.checked);
-  });
-  
-  ['delay-time', 'delay-feedback', 'delay-mix'].forEach(id => {
-    document.getElementById(id).addEventListener('input', updateDelay);
-  });
-  
-  // Reverb
-  document.getElementById('reverb-enabled').addEventListener('change', (e) => {
-    if (effects) effects.setReverbEnabled(e.target.checked);
-  });
-  
-  ['reverb-decay', 'reverb-mix'].forEach(id => {
-    document.getElementById(id).addEventListener('input', updateReverb);
-  });
-  
-  // Distortion
-  document.getElementById('distortion-enabled').addEventListener('change', (e) => {
-    if (effects) effects.setDistortionEnabled(e.target.checked);
-  });
-  
-  document.getElementById('distortion-amount').addEventListener('input', () => {
-    const amount = parseFloat(document.getElementById('distortion-amount').value);
-    if (effects) effects.setDistortionAmount(amount);
-  });
-}
-
-function updateDelay() {
-  if (!effects) return;
-  const time = parseFloat(document.getElementById('delay-time').value);
-  const feedback = parseFloat(document.getElementById('delay-feedback').value);
-  const mix = parseFloat(document.getElementById('delay-mix').value);
-  effects.setDelayParams(time, feedback, mix);
-}
-
-function updateReverb() {
-  if (!effects) return;
-  const decay = parseFloat(document.getElementById('reverb-decay').value);
-  const mix = parseFloat(document.getElementById('reverb-mix').value);
-  effects.setReverbParams(decay, mix);
-}
-
-/**
- * Update ADSR visualization
- */
-function updateADSRVisualization() {
-  if (!visualizer) return;
-  
-  const attack = parseFloat(document.getElementById('attack').value);
-  const decay = parseFloat(document.getElementById('decay').value);
-  const sustain = parseFloat(document.getElementById('sustain').value);
-  const release = parseFloat(document.getElementById('release').value);
-  
-  visualizer.drawADSR(attack, decay, sustain, release);
-}
-
-/**
- * Update level meter
- */
-function updateLevelMeter() {
-  if (!visualizer) return;
-  const level = visualizer.getPeakLevel();
-  const meter = document.getElementById('meter-bar');
-  meter.style.width = `${level * 100}%`;
-  meter.parentElement?.setAttribute('aria-valuenow', String(Math.round(level * 100)));
-}
-
-/**
- * Toggle playback
- */
-function togglePlayback() {
-  if (!sequencer) return;
-  
-  const playBtn = document.getElementById('play-btn');
-  
-  if (sequencer.isPlaying) {
-    sequencer.stop();
-    playBtn.classList.remove('playing');
-    playBtn.textContent = '▶';
-    playBtn.setAttribute('aria-label', 'Play sequence');
-  } else {
-    sequencer.start();
-    playBtn.classList.add('playing');
-    playBtn.textContent = '⏸';
-    playBtn.setAttribute('aria-label', 'Pause sequence');
-  }
-}
-
-/**
- * Stop playback
- */
-function stopPlayback() {
-  if (!sequencer) return;
-  
-  sequencer.stop();
-  document.getElementById('play-btn').classList.remove('playing');
-  document.getElementById('play-btn').textContent = '▶';
-  document.getElementById('play-btn').setAttribute('aria-label', 'Play sequence');
-  
-  // Clear step highlights
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('current'));
-  document.querySelectorAll('.step-indicator .dot').forEach(d => d.classList.remove('active'));
-}
-
-/**
- * Toggle recording
- */
-async function toggleRecording() {
-  if (!audioContext) return;
-  
-  const recordBtn = document.getElementById('record-btn');
-  const indicator = document.getElementById('recording-indicator');
-  
-  if (isRecording) {
-    // Stop recording
-    mediaRecorder.stop();
-    recordBtn.classList.remove('recording');
-    recordBtn.setAttribute('aria-pressed', 'false');
-    indicator.classList.add('hidden');
-    isRecording = false;
-  } else {
-    // Start recording
-    try {
-      const dest = audioContext.createMediaStreamDestination();
-      masterGain.connect(dest);
-      
-      mediaRecorder = new MediaRecorder(dest.stream, {
-        mimeType: 'audio/webm'
-      });
-      
-      recordedChunks = [];
-      
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          recordedChunks.push(e.data);
-        }
-      };
-      
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'synth-studio-recording.webm';
-        a.click();
-        URL.revokeObjectURL(url);
-      };
-      
-      mediaRecorder.start();
-      recordBtn.classList.add('recording');
-      recordBtn.setAttribute('aria-pressed', 'true');
-      indicator.classList.remove('hidden');
-      isRecording = true;
-      
-    } catch (error) {
-      console.error('Recording failed:', error);
-    }
-  }
-}
-
-/**
- * Schedule the sequencer pattern into an offline synth/drum pair.
- * Every event is scheduled at its real pattern time (steps repeat every 16).
- */
-function scheduleExportEvents(offlineSynth, offlineDrums, tracks, stepDuration, totalSteps, swing) {
-  const noteDuration = 0.15; // Match the live sequencer gate time
-
-  for (let step = 0; step < totalSteps; step++) {
-    const patternStep = step % 16;
-    // Same swing rule as Sequencer.getSwingOffset (off-beats only)
-    const swingOffset = (patternStep % 2 === 1) ? stepDuration * swing : 0;
-    const time = step * stepDuration + swingOffset;
-
-    // Check each track
-    for (const [trackId, track] of Object.entries(tracks)) {
-      if (track.steps[patternStep]) {
-        if (trackId.startsWith('synth')) {
-          // Schedule synth note at its pattern time
-          offlineSynth.playNote(track.note, track.velocity, time, noteDuration);
-        } else {
-          // Schedule drum hit
-          offlineDrums.play(trackId, track.velocity, time);
-        }
+    if (capturing) {
+      capture.values[nextStep] = { ...point };
+      capture.count++;
+      if (capture.count === 16) {
+        frame.captured = { scene: index, values: clone(capture.values) };
+        capture = null;
       }
     }
-  }
-}
-
-/**
- * Export as WAV
- */
-async function exportWAV() {
-  if (!audioContext || !sequencer) return;
-
-  // Pattern timing: 64 steps = 4 passes through the 16-step pattern
-  const stepDuration = sequencer.getStepDuration();
-  const totalSteps = 64;
-  const patternLength = totalSteps * stepDuration;
-
-  // Leave room for the final note's release and any effect tails
-  let tail = synth.params.release + 0.5;
-  if (document.getElementById('delay-enabled').checked) {
-    tail = Math.max(tail, parseFloat(document.getElementById('delay-time').value) * 4);
-  }
-  if (document.getElementById('reverb-enabled').checked) {
-    tail = Math.max(tail, parseFloat(document.getElementById('reverb-decay').value));
-  }
-
-  // Create offline context sized to the full pattern plus tail
-  const duration = patternLength + tail;
-  const sampleRate = audioContext.sampleRate;
-  const offlineCtx = new OfflineAudioContext(2, Math.ceil(sampleRate * duration), sampleRate);
-
-  // Create offline synth and drums
-  const offlineSynth = new Synthesizer(offlineCtx);
-  const offlineDrums = new DrumMachine(offlineCtx);
-  const offlineEffects = new EffectsChain(offlineCtx);
-  const offlineMaster = offlineCtx.createGain();
-  offlineMaster.gain.value = masterGain ? masterGain.gain.value : 0.7;
-
-  // Copy synth settings
-  Object.assign(offlineSynth.params, synth.params);
-  // Object.assign skips setParam side effects; sync the LFO nodes so an
-  // LFO-modulated patch renders the same offline as it sounds live
-  offlineSynth.setParam('lfoRate', synth.params.lfoRate);
-  offlineSynth.setParam('lfoDepth', synth.params.lfoDepth);
-
-  // Connect
-  offlineSynth.connect(offlineEffects.input);
-  offlineEffects.connect(offlineMaster);
-  offlineDrums.connect(offlineMaster);
-  offlineMaster.connect(offlineCtx.destination);
-
-  // Copy effect settings (params before enable so mix levels are set)
-  offlineEffects.setDelayParams(
-    parseFloat(document.getElementById('delay-time').value),
-    parseFloat(document.getElementById('delay-feedback').value),
-    parseFloat(document.getElementById('delay-mix').value)
-  );
-  offlineEffects.setDelayEnabled(document.getElementById('delay-enabled').checked);
-  const reverbDecay = parseFloat(document.getElementById('reverb-decay').value);
-  offlineEffects.setReverbParams(
-    reverbDecay,
-    parseFloat(document.getElementById('reverb-mix').value)
-  );
-  offlineEffects.setReverbEnabled(document.getElementById('reverb-enabled').checked);
-  offlineEffects.setDistortionAmount(parseFloat(document.getElementById('distortion-amount').value));
-  offlineEffects.setDistortionEnabled(document.getElementById('distortion-enabled').checked);
-
-  // The reverb impulse response is generated asynchronously; make sure it is
-  // in place before rendering starts
-  offlineEffects.reverb.convolver.buffer = await offlineEffects.generateImpulseResponse(reverbDecay);
-
-  // Schedule all pattern events at their real times
-  scheduleExportEvents(offlineSynth, offlineDrums, sequencer.tracks, stepDuration, totalSteps, sequencer.swing);
-
-  // Render
-  const buffer = await offlineCtx.startRendering();
-  
-  // Convert to WAV
-  const wav = audioBufferToWav(buffer);
-  const blob = new Blob([wav], { type: 'audio/wav' });
-  
-  // Download
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'synth-studio-export.wav';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-/**
- * Convert AudioBuffer to WAV format
- */
-function audioBufferToWav(buffer) {
-  const numChannels = buffer.numberOfChannels;
-  const sampleRate = buffer.sampleRate;
-  const format = 1; // PCM
-  const bitDepth = 16;
-  
-  const bytesPerSample = bitDepth / 8;
-  const blockAlign = numChannels * bytesPerSample;
-  
-  const samples = buffer.length;
-  const dataSize = samples * blockAlign;
-  const bufferSize = 44 + dataSize;
-  
-  const arrayBuffer = new ArrayBuffer(bufferSize);
-  const view = new DataView(arrayBuffer);
-  
-  // WAV header
-  writeString(view, 0, 'RIFF');
-  view.setUint32(4, bufferSize - 8, true);
-  writeString(view, 8, 'WAVE');
-  writeString(view, 12, 'fmt ');
-  view.setUint32(16, 16, true); // fmt chunk size
-  view.setUint16(20, format, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * blockAlign, true);
-  view.setUint16(32, blockAlign, true);
-  view.setUint16(34, bitDepth, true);
-  writeString(view, 36, 'data');
-  view.setUint32(40, dataSize, true);
-  
-  // Interleave channels and write samples
-  const channels = [];
-  for (let i = 0; i < numChannels; i++) {
-    channels.push(buffer.getChannelData(i));
-  }
-  
-  let offset = 44;
-  for (let i = 0; i < samples; i++) {
-    for (let ch = 0; ch < numChannels; ch++) {
-      const sample = Math.max(-1, Math.min(1, channels[ch][i]));
-      const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-      view.setInt16(offset, intSample, true);
-      offset += 2;
-    }
-  }
-  
-  return arrayBuffer;
-}
-
-function writeString(view, offset, string) {
-  for (let i = 0; i < string.length; i++) {
-    view.setUint8(offset + i, string.charCodeAt(i));
-  }
-}
-
-/**
- * Load a preset
- */
-function loadPreset(preset) {
-  if (!synth) return;
-  
-  // Update synth params
-  for (const [key, value] of Object.entries(preset)) {
-    synth.setParam(key, value);
-  }
-  
-  // Update UI
-  if (preset.waveform) {
-    document.querySelectorAll('.wave-btn').forEach(btn => {
-      const active = btn.dataset.wave === preset.waveform;
-      btn.classList.toggle('active', active);
-      btn.setAttribute('aria-pressed', String(active));
+    engine.schedule(frame, time);
+    queue.push(frame);
+    recentFrames.push({
+      time,
+      scene: index,
+      step: nextStep,
+      bar: nextBar,
+      notes: frame.events.length,
     });
-  }
-  
-  const updates = {
-    'octave': preset.octave,
-    'detune': preset.detune,
-    'attack': preset.attack,
-    'decay': preset.decay,
-    'sustain': preset.sustain,
-    'release': preset.release,
-    'filter-cutoff': preset.filterCutoff,
-    'filter-resonance': preset.filterResonance,
-    'filter-env-amount': preset.filterEnvAmount
-  };
-  
-  for (const [id, value] of Object.entries(updates)) {
-    if (value !== undefined) {
-      const slider = document.getElementById(id);
-      if (slider) {
-        slider.value = value;
-        slider.dispatchEvent(new Event('input'));
-      }
+    if (recentFrames.length > 128) recentFrames.shift();
+    nextStep++;
+    if (nextStep === 16) {
+      nextStep = 0;
+      nextBar++;
+      loopBar++;
+      barStart += barSeconds(barTempo);
     }
   }
-  
-  updateADSRVisualization();
 }
-
-/**
- * Gather the full project state (patch + patterns + effects)
- */
-function getProjectState() {
-  return {
-    synth: { ...synth.params },
-    sequencer: sequencer.getState(),
-    effects: {
-      delayEnabled: document.getElementById('delay-enabled').checked,
-      delayTime: parseFloat(document.getElementById('delay-time').value),
-      delayFeedback: parseFloat(document.getElementById('delay-feedback').value),
-      delayMix: parseFloat(document.getElementById('delay-mix').value),
-      reverbEnabled: document.getElementById('reverb-enabled').checked,
-      reverbDecay: parseFloat(document.getElementById('reverb-decay').value),
-      reverbMix: parseFloat(document.getElementById('reverb-mix').value),
-      distortionEnabled: document.getElementById('distortion-enabled').checked,
-      distortionAmount: parseFloat(document.getElementById('distortion-amount').value)
+function onFrame(frame) {
+  const previousScene = project.scene;
+  project.scene = frame.scene;
+  lastFrame = frame;
+  if (previousScene !== project.scene) {
+    macro = { ...frame.macro };
+    renderAll();
+    changed();
+  }
+  if (!dragging && !sliderGesture && !capture && !captureRequested)
+    macro = scene().motionEnabled
+      ? { ...frame.macro }
+      : { x: scene().color, y: scene().space };
+  if (frame.captured) {
+    project.scenes[frame.captured.scene].motion = frame.captured.values;
+    project.scenes[frame.captured.scene].motionEnabled = true;
+    changed();
+    notify("Motion captured. This bar now plays back with your track.");
+  }
+  $("bar-display").innerHTML =
+    `${String(frame.bar + 1).padStart(2, "0")}<span class="time-divider">.</span>${Math.floor(frame.step / 4) + 1}`;
+  $("transport-status").textContent =
+    `${mode === "song" ? "Song" : "Loop"} / ${scene().name}`;
+  $("orbit-status").textContent =
+    `${scene().name} / ${chordLabel(scene().harmony[frame.localBar % 4])}`;
+  document
+    .querySelectorAll(".step.current")
+    .forEach((el) => el.classList.remove("current"));
+  document
+    .querySelectorAll(`.step[data-step="${frame.step}"]`)
+    .forEach((el) => el.classList.add("current"));
+  document
+    .querySelectorAll(".scene-progress")
+    .forEach(
+      (el, i) =>
+        (el.style.width =
+          i === project.scene ? `${((frame.step + 1) / 16) * 100}%` : "0"),
+    );
+  document
+    .querySelectorAll(".arrangement-part")
+    .forEach((el, i) =>
+      el.classList.toggle("active", mode === "song" && i === frame.section),
+    );
+  renderMacro();
+  orbit.trigger(frame.events);
+}
+function animate(now) {
+  if (playing) {
+    while (queue.length && queue[0].time <= context.currentTime)
+      onFrame(queue.shift());
+    if (endTime !== null && context.currentTime >= endTime) {
+      $("transport-status").textContent = "Letting the echoes settle";
+      if (context.currentTime >= endTime + TAIL_SECONDS)
+        stop("Song finished. Make it yours.");
+    }
+  }
+  const phase = lastFrame
+    ? lastFrame.bar * 16 +
+      lastFrame.step +
+      Math.min(
+        1,
+        (context.currentTime - lastFrame.time) / stepSeconds(project.bpm),
+      )
+    : 0;
+  orbit.draw(
+    project,
+    {
+      playing,
+      step: lastFrame?.step ?? -1,
+      phase,
+      spectrum: engine?.spectrum(),
     },
-    masterVolume: parseFloat(document.getElementById('master-volume').value)
-  };
+    now,
+  );
+  requestAnimationFrame(animate);
 }
-
-/**
- * Save project state (persists and downloads as JSON)
- */
-function saveProject() {
-  if (!synth || !sequencer) return;
-
-  persistState();
-
-  const json = JSON.stringify(getProjectState(), null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+function launch(index) {
+  if (captureRequested || capture) {
+    capture = null;
+    captureRequested = false;
+    notify("Motion capture cancelled for the scene change.");
+  }
+  if (playing) {
+    queuedScene = index;
+    renderScenes();
+    renderMacro();
+  } else {
+    project.scene = index;
+    scheduledScene = index;
+    macro = { x: scene().color, y: scene().space };
+    changed();
+    renderAll();
+  }
+}
+function moveMacro(x, y) {
+  macro = { x: clamp(x, 0, 1), y: clamp(y, 0, 1) };
+  scene().color = macro.x;
+  scene().space = macro.y;
+  if (!capture && !captureRequested) scene().motionEnabled = false;
+  if (engine) engine.setMacro(macro.x, macro.y, context.currentTime, true);
+  changed();
+  renderMacro();
+  orbit.dirty = true;
+}
+function updateFromPointer(event) {
+  const rect = $("motion-pad").getBoundingClientRect();
+  moveMacro(
+    (event.clientX - rect.left) / rect.width,
+    1 - (event.clientY - rect.top) / rect.height,
+  );
+}
+async function liveNote(index) {
+  const token = runToken;
+  try {
+    await ensureAudio();
+    if (token !== runToken) return;
+    if (!engine) engine = new SoundEngine(context, project);
+    engine.setMacro(macro.x, macro.y);
+    engine.trigger(
+      {
+        track: 5,
+        velocity: 0.68,
+        notes: [degreeMidi(project.root, 7 + index)],
+        duration: 0.19,
+      },
+      context.currentTime + 0.005,
+    );
+    orbit.trigger([{ track: 5, velocity: 0.7 }]);
+    transportUI();
+  } catch (error) {
+    notify(error.message);
+  }
+}
+function download(bytes, name, type) {
+  const url = URL.createObjectURL(new Blob([bytes], { type }));
+  const a = document.createElement("a");
   a.href = url;
-  a.download = 'synth-studio-project.json';
+  a.download = name;
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+function filename() {
+  return (
+    project.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "nightshift"
+  );
+}
+function replaceProject(value) {
+  stop();
+  checkpoint();
+  project = value;
+  macro = { x: scene().color, y: scene().space };
+  selectedTrack = -1;
+  setMode("song");
+  renderAll();
+  changed();
+}
+function exportLength() {
+  const bars = $("export-mode").value === "song" ? songBars(project) : 4;
+  $("export-length").textContent = minutes(
+    bars * barSeconds(project.bpm) + TAIL_SECONDS,
+  );
 }
 
-// ===== Persistence (localStorage) =====
-
-/**
- * Load the saved project from localStorage
- */
-function loadStoredProject() {
-  try {
-    const json = localStorage.getItem(STORAGE_KEY);
-    if (!json) return null;
-    const project = JSON.parse(json);
-    return (project && typeof project === 'object') ? project : null;
-  } catch (error) {
-    console.warn('Failed to load saved project:', error);
-    return null;
-  }
+$("key").innerHTML = Array.from(
+  { length: 12 },
+  (_, i) =>
+    `<option value="${48 + i}">${noteName(48 + i).replace(/\d+$/, "")} minor</option>`,
+).join("");
+$("beat-ruler").innerHTML = Array.from(
+  { length: 16 },
+  (_, i) =>
+    `<span class="${i % 4 === 0 ? "major" : ""}">${i % 4 === 0 ? i / 4 + 1 : "·"}</span>`,
+).join("");
+$("play").addEventListener("click", () => (playing ? stop() : start()));
+$("scenes").addEventListener("click", (e) => {
+  const el = e.target.closest("[data-scene]");
+  if (el) launch(+el.dataset.scene);
+});
+$("song-mode").addEventListener("click", () => {
+  const restart = playing;
+  stop();
+  setMode("song");
+  if (restart) start();
+});
+$("loop-mode").addEventListener("click", () => {
+  setMode("loop");
+  scheduledScene = project.scene;
+  loopBar = lastFrame?.localBar ?? 0;
+  queuedScene = null;
+  renderScenes();
+});
+$("session").addEventListener("change", (e) => {
+  replaceProject(createProject(+e.target.value));
+  notify(`${project.title} loaded. Undo brings back your previous session.`);
+});
+$("undo").addEventListener("click", () => {
+  if (!history.length) return;
+  stop();
+  project = history.pop();
+  macro = { x: scene().color, y: scene().space };
+  if (engine) engine.project = project;
+  renderAll();
+  changed();
+  $("undo").disabled = !history.length;
+  $("undo-project").disabled = !history.length;
+  notify("Last edit undone.");
+});
+$("tempo").addEventListener("change", (e) => {
+  const bpm = clamp(Math.round(+e.target.value || 114), 70, 160);
+  edit(() => (project.bpm = bpm));
+  if (playing) notify("Tempo changes at the next bar.");
+});
+$("key").addEventListener("change", (e) =>
+  edit(() => (project.root = +e.target.value)),
+);
+function bindRange(id, action) {
+  const input = $(id);
+  input.addEventListener("pointerdown", () => {
+    checkpoint();
+    sliderGesture = true;
+  });
+  input.addEventListener("keydown", (e) => {
+    if (
+      [
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+      ].includes(e.key)
+    )
+      checkpoint();
+  });
+  input.addEventListener("input", () => {
+    action(+input.value);
+    changed();
+  });
+  input.addEventListener("change", () => {
+    sliderGesture = false;
+  });
 }
-
-/**
- * Persist the current project to localStorage
- */
-function persistState() {
-  if (!synth || !sequencer) return;
-
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(getProjectState()));
-  } catch (error) {
-    console.warn('Failed to save project:', error);
-  }
-}
-
-/**
- * Debounced persist - call after any edit
- */
-function schedulePersist() {
-  clearTimeout(persistTimer);
-  persistTimer = setTimeout(persistState, 400);
-}
-
-/**
- * Set up auto-persistence and the reset button
- */
-function setupPersistence() {
-  // Sliders, checkboxes, and selects all bubble input/change to the document
-  document.addEventListener('input', schedulePersist);
-  document.addEventListener('change', schedulePersist);
-
-  document.getElementById('reset-btn').addEventListener('click', resetProject);
-}
-
-/**
- * Clear the saved project and reload with defaults
- */
-function resetProject() {
-  if (!confirm('Reset all patterns and settings to defaults?')) return;
-
-  clearTimeout(persistTimer);
-  pendingProjectState = null;
-
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (error) {
-    console.warn('Failed to clear saved project:', error);
-  }
-
-  location.reload();
-}
-
-/**
- * Restore a saved project into the UI controls (safe before audio init)
- */
-function applyProjectToUI(project) {
-  const patch = project.synth || {};
-  const fx = project.effects || {};
-  const seq = project.sequencer || {};
-
-  // Waveform buttons
-  if (patch.waveform) {
-    document.querySelectorAll('.wave-btn').forEach(btn => {
-      const active = btn.dataset.wave === patch.waveform;
-      btn.classList.toggle('active', active);
-      btn.setAttribute('aria-pressed', String(active));
-    });
-  }
-
-  // LFO target buttons
-  if (patch.lfoTarget) {
-    document.querySelectorAll('.lfo-target-btn').forEach(btn => {
-      const active = btn.dataset.target === patch.lfoTarget;
-      btn.classList.toggle('active', active);
-      btn.setAttribute('aria-pressed', String(active));
-    });
-  }
-
-  // Sliders - dispatch input so value displays reformat via existing handlers
-  const sliderValues = {
-    'octave': patch.octave,
-    'detune': patch.detune,
-    'attack': patch.attack,
-    'decay': patch.decay,
-    'sustain': patch.sustain,
-    'release': patch.release,
-    'filter-cutoff': patch.filterCutoff,
-    'filter-resonance': patch.filterResonance,
-    'filter-env-amount': patch.filterEnvAmount,
-    'lfo-rate': patch.lfoRate,
-    'lfo-depth': patch.lfoDepth,
-    'delay-time': fx.delayTime,
-    'delay-feedback': fx.delayFeedback,
-    'delay-mix': fx.delayMix,
-    'reverb-decay': fx.reverbDecay,
-    'reverb-mix': fx.reverbMix,
-    'distortion-amount': fx.distortionAmount,
-    'master-volume': project.masterVolume,
-    'swing': seq.swing
+bindRange("swing", (value) => (project.swing = value / 100));
+bindRange("volume", (value) => {
+  project.master = value / 100;
+  engine?.updateMix();
+});
+bindRange("color", (value) => moveMacro(value / 100, macro.y));
+bindRange("space", (value) => moveMacro(macro.x, value / 100));
+for (const [id, param, factor] of [
+  ["track-level", "level", 100],
+  ["track-tone", "tone", 100],
+  ["track-pan", "pan", 100],
+])
+  bindRange(id, (value) => {
+    if (selectedTrack < 0) return;
+    project.tracks[selectedTrack][param] = value / factor;
+    engine?.updateMix();
+    engine?.setMacro(macro.x, macro.y);
+  });
+$("motion-pad").addEventListener("pointerdown", (event) => {
+  checkpoint();
+  dragging = true;
+  $("motion-pad").setPointerCapture(event.pointerId);
+  updateFromPointer(event);
+});
+$("motion-pad").addEventListener("pointermove", (event) => {
+  if (dragging) updateFromPointer(event);
+});
+for (const event of ["pointerup", "pointercancel", "lostpointercapture"])
+  $("motion-pad").addEventListener(event, () => {
+    dragging = false;
+    persist();
+  });
+$("motion-pad").addEventListener("keydown", (event) => {
+  const changes = {
+    ArrowLeft: [-1, 0],
+    ArrowRight: [1, 0],
+    ArrowUp: [0, 1],
+    ArrowDown: [0, -1],
   };
-
-  for (const [id, value] of Object.entries(sliderValues)) {
-    if (value === undefined || value === null) continue;
-    const slider = document.getElementById(id);
-    if (slider) {
-      slider.value = value;
-      slider.dispatchEvent(new Event('input'));
-    }
+  if (!changes[event.key]) return;
+  event.preventDefault();
+  checkpoint();
+  const [x, y] = changes[event.key],
+    amount = event.shiftKey ? 0.1 : 0.02;
+  moveMacro(macro.x + x * amount, macro.y + y * amount);
+});
+$("capture-motion").addEventListener("click", async () => {
+  if (capture || captureRequested) {
+    capture = null;
+    captureRequested = false;
+    renderMacro();
+    notify("Motion capture cancelled.");
+    return;
   }
-
-  // Effect toggles
-  const checkboxes = {
-    'delay-enabled': fx.delayEnabled,
-    'reverb-enabled': fx.reverbEnabled,
-    'distortion-enabled': fx.distortionEnabled
-  };
-
-  for (const [id, value] of Object.entries(checkboxes)) {
-    if (value === undefined) continue;
-    const box = document.getElementById(id);
-    if (box) box.checked = !!value;
+  checkpoint();
+  setMode("loop");
+  scheduledScene = project.scene;
+  queuedScene = null;
+  if (!playing) await start();
+  if (!playing) return;
+  captureRequested = true;
+  renderMacro();
+  notify("Capture starts at the next bar. Move the pad for one bar.");
+});
+$("motion-toggle").addEventListener("click", () =>
+  edit(() => (scene().motionEnabled = !scene().motionEnabled)),
+);
+$("tracks").addEventListener("click", (event) => {
+  const step = event.target.closest(".step");
+  if (step) {
+    const i = +step.dataset.track,
+      s = +step.dataset.step;
+    checkpoint();
+    const cell = scene().patterns[i][s];
+    cell.v = event.shiftKey ? (cell.v > 0.9 ? 0.55 : 1) : cell.v ? 0 : 0.65;
+    changed();
+    const temp = document.createElement("template");
+    temp.innerHTML = stepHTML(i, s, cell);
+    step.replaceWith(temp.content);
+    $("tracks")
+      .querySelector(`.step[data-track="${i}"][data-step="${s}"]`)
+      ?.focus({ preventScroll: true });
+    renderEditor();
+    return;
   }
-
-  // BPM
-  if (seq.bpm) {
-    document.getElementById('bpm').value = seq.bpm;
+  const mute = event.target.closest("[data-mute]"),
+    solo = event.target.closest("[data-solo]"),
+    voice = event.target.closest("[data-voice]");
+  if (mute) {
+    const i = +mute.dataset.mute;
+    edit(() => (project.tracks[i].muted = !project.tracks[i].muted));
+    $("tracks")
+      .querySelector(`[data-mute="${i}"]`)
+      ?.focus({ preventScroll: true });
   }
-
-  // Pattern grid
-  if (seq.pattern) {
-    for (const [trackId, data] of Object.entries(seq.pattern)) {
-      const trackEl = document.querySelector(`.seq-track[data-track="${trackId}"]`);
-      if (!trackEl || !Array.isArray(data.steps)) continue;
-
-      trackEl.querySelectorAll('.step').forEach((stepEl, i) => {
-        const active = !!data.steps[i];
-        stepEl.classList.toggle('active', active);
-        stepEl.setAttribute('aria-pressed', String(active));
+  if (solo) {
+    const i = +solo.dataset.solo;
+    edit(() => (project.tracks[i].solo = !project.tracks[i].solo));
+    $("tracks")
+      .querySelector(`[data-solo="${i}"]`)
+      ?.focus({ preventScroll: true });
+  }
+  if (voice) {
+    const index = +voice.dataset.voice;
+    selectedTrack = selectedTrack === index ? -1 : index;
+    renderTracks();
+    renderEditor();
+    if (selectedTrack >= 0) {
+      $("voice-editor").scrollIntoView({
+        block: "nearest",
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
       });
-
-      const noteSelect = trackEl.querySelector('.track-note');
-      if (noteSelect && data.note) {
-        noteSelect.value = data.note;
-      }
+      $("track-level").focus({ preventScroll: true });
     }
-  }
-}
-
-/**
- * Restore a saved project into the audio engines (after audio init)
- */
-function applyProjectToEngines(project) {
-  if (project.synth) {
-    for (const [param, value] of Object.entries(project.synth)) {
-      synth.setParam(param, value);
-    }
-  }
-
-  if (project.sequencer) {
-    sequencer.loadState(project.sequencer);
-  }
-
-  const fx = project.effects;
-  if (fx) {
-    if ([fx.delayTime, fx.delayFeedback, fx.delayMix].every(Number.isFinite)) {
-      effects.setDelayParams(fx.delayTime, fx.delayFeedback, fx.delayMix);
-    }
-    effects.setDelayEnabled(!!fx.delayEnabled);
-    if ([fx.reverbDecay, fx.reverbMix].every(Number.isFinite)) {
-      effects.setReverbParams(fx.reverbDecay, fx.reverbMix);
-    }
-    effects.setReverbEnabled(!!fx.reverbEnabled);
-    if (Number.isFinite(fx.distortionAmount)) {
-      effects.setDistortionAmount(fx.distortionAmount);
-    }
-    effects.setDistortionEnabled(!!fx.distortionEnabled);
-  }
-
-  if (Number.isFinite(project.masterVolume)) {
-    masterGain.gain.value = project.masterVolume;
-  }
-}
-
-// Handle window resize
-window.addEventListener('resize', () => {
-  if (visualizer) {
-    visualizer.resizeCanvases();
-    updateADSRVisualization();
   }
 });
+$("voice-close").addEventListener("click", () => {
+  const previous = selectedTrack;
+  selectedTrack = -1;
+  renderTracks();
+  renderEditor();
+  $("tracks")
+    .querySelector(`[data-voice="${previous}"]`)
+    ?.focus({ preventScroll: true });
+});
+$("clear-track").addEventListener("click", () => {
+  if (selectedTrack >= 0)
+    edit(() => scene().patterns[selectedTrack].forEach((cell) => (cell.v = 0)));
+});
+$("piano-roll").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-note]");
+  if (!button) return;
+  const n = +button.dataset.note,
+    s = +button.dataset.step;
+  edit(() => {
+    const cell = scene().patterns[selectedTrack][s];
+    cell.v = cell.v && cell.n === n ? 0 : 0.7;
+    cell.n = n;
+  });
+  $("piano-roll")
+    .querySelector(`[data-note="${n}"][data-step="${s}"]`)
+    ?.focus({ preventScroll: true });
+});
+$("variation").addEventListener("click", () => {
+  edit(() => {
+    const random = rng(variation++ * 7391 + project.scene * 37);
+    for (const i of [2, 3, 5])
+      scene().patterns[i].forEach((cell, s) => {
+        if (random() < 0.28) {
+          cell.v = cell.v ? 0 : 0.3 + random() * 0.45;
+          if (i > 2) cell.n = [0, 2, 4, 6, 7, 9, 11][Math.floor(random() * 7)];
+        }
+      });
+  });
+  notify("A new rhythmic variation. Undo takes you back.");
+});
+$("arrangement").addEventListener("change", (event) => {
+  const bars = event.target.dataset.bars,
+    section = event.target.dataset.section;
+  if (bars !== undefined) {
+    const value = clamp(Math.round(+event.target.value || 1), 1, 16);
+    if (songBars(project) - project.arrangement[+bars].bars + value > 64) {
+      event.target.value = project.arrangement[+bars].bars;
+      notify("Keep the arrangement within 64 bars.");
+      return;
+    }
+    stop();
+    edit(() => (project.arrangement[+bars].bars = value));
+  }
+  if (section !== undefined) {
+    const value = +event.target.value;
+    stop();
+    edit(() => (project.arrangement[+section].scene = value));
+  }
+});
+$("arrangement").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-remove]");
+  if (!button || project.arrangement.length === 1) return;
+  stop();
+  edit(() => project.arrangement.splice(+button.dataset.remove, 1));
+});
+$("add-section").addEventListener("click", () => {
+  if (project.arrangement.length >= 8 || songBars(project) >= 64) return;
+  stop();
+  edit(() =>
+    project.arrangement.push({
+      scene: project.scene,
+      bars: Math.min(8, 64 - songBars(project)),
+    }),
+  );
+});
+$("live-keys").addEventListener("pointerdown", (event) => {
+  const key = event.target.closest("[data-key]");
+  if (key) {
+    key.setPointerCapture(event.pointerId);
+    key.classList.add("pressed");
+    liveNote(+key.dataset.key);
+  }
+});
+for (const name of ["pointerup", "pointercancel"])
+  $("live-keys").addEventListener(name, (event) =>
+    event.target.closest("[data-key]")?.classList.remove("pressed"),
+  );
+// Native button activation covers keyboard and assistive technology; pointer plays on down.
+$("live-keys").addEventListener("click", (event) => {
+  if (event.detail === 0) {
+    const key = event.target.closest("[data-key]");
+    if (key) liveNote(+key.dataset.key);
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (
+    event.ctrlKey ||
+    event.metaKey ||
+    event.altKey ||
+    event.repeat ||
+    document.querySelector("dialog[open]") ||
+    event.target.matches("input,select,textarea,[contenteditable=true]")
+  )
+    return;
+  if (event.code === "Space" && !event.target.closest("button")) {
+    event.preventDefault();
+    playing ? stop() : start();
+  } else if (/^[1-4]$/.test(event.key)) {
+    event.preventDefault();
+    launch(+event.key - 1);
+  } else if (keys.includes(event.key.toLowerCase())) {
+    event.preventDefault();
+    const index = keys.indexOf(event.key.toLowerCase());
+    $("live-keys")
+      .querySelector(`[data-key="${index}"]`)
+      ?.classList.add("pressed");
+    liveNote(index);
+  }
+});
+document.addEventListener("keyup", (event) => {
+  const index = keys.indexOf(event.key.toLowerCase());
+  if (index >= 0)
+    $("live-keys")
+      .querySelector(`[data-key="${index}"]`)
+      ?.classList.remove("pressed");
+});
+$("project-menu").addEventListener("click", () =>
+  $("project-dialog").showModal(),
+);
+$("project-title").addEventListener("change", (event) => {
+  const title = event.target.value.trim();
+  if (!title) {
+    event.target.value = project.title;
+    return;
+  }
+  edit(() => (project.title = title));
+});
+$("save-project").addEventListener("click", () => {
+  persist();
+  download(
+    JSON.stringify(project, null, 2),
+    `${filename()}.nightshift.json`,
+    "application/json",
+  );
+  notify("Project downloaded.");
+});
+$("load-project").addEventListener("click", () => $("project-file").click());
+$("project-file").addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    if (file.size > 256 * 1024)
+      throw new Error("Choose a Nightshift project smaller than 256 KB.");
+    const value = validateProject(JSON.parse(await file.text()));
+    replaceProject(value);
+    $("project-dialog").close();
+    notify(`${project.title} opened. Undo restores the previous session.`);
+  } catch (error) {
+    notify(
+      error instanceof SyntaxError
+        ? "That file is not valid JSON. Choose a Nightshift project."
+        : error.message,
+    );
+  } finally {
+    event.target.value = "";
+  }
+});
+$("export-open").addEventListener("click", () => {
+  exportLength();
+  $("export-dialog").showModal();
+});
+$("export-mode").addEventListener("change", exportLength);
+$("render-wav").addEventListener("click", async () => {
+  if (rendering) return;
+  rendering = true;
+  const snapshot = clone(project),
+    exportMode = $("export-mode").value,
+    name = filename();
+  $("render-wav").disabled = true;
+  $("render-wav").textContent = "Rendering your track…";
+  $("render-status").textContent =
+    "Rendering the score, mix, effects, and motion. You can keep editing.";
+  try {
+    const { buffer, bars } = await renderAudio(snapshot, exportMode);
+    download(
+      encodeWav(buffer),
+      `${name}${exportMode === "loop" ? "-scene" : ""}.wav`,
+      "audio/wav",
+    );
+    $("render-status").textContent =
+      `Downloaded ${bars} bars with the final echoes. ${minutes(buffer.duration)} of stereo audio.`;
+    notify("Your WAV is ready.");
+  } catch (error) {
+    $("render-status").textContent = error.message;
+  } finally {
+    rendering = false;
+    $("render-wav").disabled = false;
+    $("render-wav").textContent = "Render WAV";
+  }
+});
+$("undo-project").addEventListener("click", () => $("undo").click());
+$("help-open").addEventListener("click", () => $("help-dialog").showModal());
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && (playing || starting)) {
+    stop("Stopped while away. Press Play to return.");
+    persist();
+  }
+});
+window.addEventListener("pagehide", () => {
+  if (saveTimer) persist();
+  stop();
+});
+window.addEventListener("blur", () =>
+  document
+    .querySelectorAll(".live-key.pressed")
+    .forEach((key) => key.classList.remove("pressed")),
+);
+// Read-only diagnostics make timing, persistence, and audio behavior inspectable.
+window.Nightshift = Object.freeze({
+  snapshot: () => ({
+    project: clone(project),
+    playing,
+    mode,
+    queuedScene,
+    step: lastFrame?.step ?? -1,
+    bar: lastFrame?.bar ?? -1,
+    scene: project.scene,
+    capturing: !!capture || captureRequested,
+    activeSources: engine?.nodes.size ?? 0,
+    audioState: context?.state ?? "uninitialized",
+    recentFrames: clone(recentFrames),
+  }),
+});
+renderAll();
+requestAnimationFrame(animate);
+if (restoreMessage) notify(restoreMessage);
