@@ -107,7 +107,7 @@ function checkUniqueSlugs(records, label) {
 
 function discoverTrackedApps() {
   try {
-    return execFileSync('git', ['ls-files', '--', 'docs/*/index.html'], {
+    return execFileSync('git', ['ls-files', '--', ':(glob)docs/*/index.html'], {
       cwd: repoRoot,
       encoding: 'utf8',
     })
