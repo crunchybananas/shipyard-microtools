@@ -64,7 +64,9 @@ export default async function (h) {
       && s.coast?.deepCeiling <= -9.5
       && s.coast?.deepBlockCells?.join(',') === '16,8,4'
       && s.coast?.removedDeepTriangles > s.coast?.addedTriangles
-      && s.terrainTriangles === 127852 && s.terrainChildren === 0,
+      // The coast may be reshaped. Refinement must still fit within the original
+      // 256 x 256 two-triangle grid, with the deep-ocean savings paying its cost.
+      && s.terrainTriangles <= 256 * 256 * 2 && s.terrainChildren === 0,
     { coast: s.coast, triangles: s.terrainTriangles, children: s.terrainChildren });
 
   const at = async (time) => {

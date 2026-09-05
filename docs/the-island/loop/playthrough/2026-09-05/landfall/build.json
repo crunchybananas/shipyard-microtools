@@ -1,0 +1,107 @@
+{
+  "source": "local Landfall revision",
+  "runtimeSha256": {
+    "assets/harbor-rooms.glb": "19e071f65c3350a5b0aba472b7636a2e4bcb2afa52e48d7c7f206cca14adfc9d",
+    "assets/landfall.glb": "b30c512e61edcd4f4d5dab4e2df7ab6d7fea4611213a6a90e43e55088f730906",
+    "index.html": "04589fe9c1516630291cfbb9b53fe04c03ad5b5015e612b5f10368be9df47c13",
+    "js/assets.js": "dbc4c457b3104bd2df42ba9ff288f35c579e210f29ef83d856e970ad409f0a7b",
+    "js/audio.js": "8e6bcd31707e97fedc379ae1f182d0c58f778369f1852da6d3ec12ba50eff5e0",
+    "js/content.js": "95b3c297056a808711eeeab19c0f93ea6f8bd4f23d93c21f5064f40520ca4e41",
+    "js/dispositions.js": "a6d71ab48ca5f4d00960b9762ba0c82db53a1bcff323042ad31ba67b12954b76",
+    "js/finale-tableaux.js": "05735cc420533c109d58561f2ea14315d1e34c11fc4d29f08f8a1bc677092dba",
+    "js/harbor.js": "b9797380d05d44c5c8ca14e53674405cd55e98658d989255c806c4cce40fd985",
+    "js/interact.js": "2cf68a03bce691ce274bdff0c7d977d8df7e347a0018c2ddcbca27e13831df09",
+    "js/landfall.js": "101c3dce95d891717aa9a3b2f44c24e20266b9d00e2defc99921c5ff621fc325",
+    "js/ledger-firebase.js": "e7d9a45694492edc6447da32ea9ca5917b60c3cec71cb65813bbd2929929b244",
+    "js/ledger.js": "13d1cbf0c74f8ce0c699130ba9168d63ae37e59ea0dca3938f3b9169b5bd6570",
+    "js/main.js": "aaf4fefcf2d21ce5bc717ee05f6e7f5626af7dabada23e74f7f4a5e65430fbae",
+    "js/notebook-schema.js": "c70deacedd858b857127d31d093e1562da682b5fe353013cadbaee9e44260176",
+    "js/notebook.js": "986d981650fb27b84b8be3072724f39bbecd54b9d527ff254a6588dca4bf0851",
+    "js/player.js": "ba12776fbef1c114e6ee316df302f654e7fb783ec4808f85c8a1ec3adcb50bb0",
+    "js/progression.js": "df679f33a68bbb558c35b8bcc6b22b1b46968522bd1d964474a2280db6a9d80b",
+    "js/props.js": "dc36ba0628092a3675937cd4a024d5018e58a240fd6857d5dddf6847a442c089",
+    "js/puzzle-runtime.js": "6b068c170053830856cadc2a23b57cd437a74a6554df91e2ae46506c1e6520d6",
+    "js/puzzles.js": "79d670d165824b20ed2f5ea963409ab6b423d62d6f1f492dbf8804b5963e4c9e",
+    "js/refuge.js": "97c8dcbb79d22e1446c423d036532a2b1085555298b80d7b08cfd990673d8825",
+    "js/regions/index.js": "87fd7b7ff0bb4982813716458a02150ff3458febf68c0dfed51417c972564082",
+    "js/regions/l2_shallows.js": "d3caa2846887b80920db876375a24028a78f9bd668a7e44055d261d9adedc849",
+    "js/regions/l3_gallery.js": "51761c0a0236ac8f4a2b2f3055f8051ba775f3c63d5984d2d475721e69fe62ff",
+    "js/regions/l4_seabed.js": "344ab7611e8e31abf8d2d0be87858582c23b2896c5970fb82a4c7e4906434ff9",
+    "js/report-schema.js": "4978309f3c633e81333f6a9fca2fd76ce077c9ec644f3717260e406cd5256374",
+    "js/save-schema.js": "7f8493054a104ff883d77205d44c85f94aa4a93c58c1374de1cc3f7ec8af4694",
+    "js/shaders.js": "55dbb55438930fb0efcb606ea51a95f04decb775965e42c6d857e15a2a8876f2",
+    "js/stack-config.js": "4d2a6e931e33a5bb1bcdb4a3fefad483467022d4d5cf2227ab2425bbbf140b40",
+    "js/terrain.js": "bbe4fb730015d1d1826b325a524a44b47604c31bfe6ae6e647f8c426fd1dde8a",
+    "js/tower-course.js": "1fe21d2dcd80795857569f898a3a7679ccffa625bda8b710ad9f625216733df7",
+    "js/ui.js": "330214cf5f2ddcfcbe690a5f0469036b8c4b15932403bea824bf218b0a2170ad",
+    "js/upstream-hand.js": "0bfe05fdfb20840741dd693628a7d051109e8f4c6fb35955f388ec026c46028f",
+    "js/util.js": "740fa45675d2a6cf5ff5188ee3af62d455f52f033d7a01f2f67d15dce21903ea",
+    "js/world.js": "96322fb7cf03b38d8f7d18c0e053de46a8099d768390dd8a2125d5008f04e5f8",
+    "style.css": "d91f93c6908993587426f746ba34f4d9f76c2f9312a656224686bd40e895e643"
+  },
+  "landfall": {
+    "parts": {
+      "towerShaft": {
+        "triangles": 11224,
+        "vertices": 44416
+      },
+      "towerShaftFar": {
+        "triangles": 672,
+        "vertices": 1344
+      },
+      "towerStair": {
+        "triangles": 1992,
+        "vertices": 1328
+      },
+      "towerRails": {
+        "triangles": 3688,
+        "vertices": 2016
+      },
+      "vaultRib": {
+        "triangles": 204,
+        "vertices": 136
+      },
+      "archiveFurniture": {
+        "triangles": 288,
+        "vertices": 192
+      },
+      "basaltA": {
+        "triangles": 152,
+        "vertices": 5226
+      },
+      "basaltB": {
+        "triangles": 152,
+        "vertices": 5226
+      },
+      "headlandArch": {
+        "triangles": 204,
+        "vertices": 104
+      },
+      "windPineWood": {
+        "triangles": 952,
+        "vertices": 522
+      },
+      "windPineNeedles": {
+        "triangles": 3528,
+        "vertices": 8820
+      },
+      "windPineFar": {
+        "triangles": 284,
+        "vertices": 180
+      }
+    },
+    "totalTriangles": 23340,
+    "bytes": 2081688
+  },
+  "captures": 161,
+  "review": {
+    "moments": 103,
+    "sourceCaptures": 161,
+    "groupedPages": 18,
+    "repeatedFrames": 40,
+    "method": "Consecutive artifact pages are grouped. Revisited text and perceptually similar frames at the same depth are folded into the action record. All original captures remain available."
+  },
+  "artifacts": 23,
+  "pages": 56,
+  "endings": 4
+}

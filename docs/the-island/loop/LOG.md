@@ -12,6 +12,82 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 46 — 2026-09-05 — Landfall: the tower and rooms below
+
+**Implemented locally:** Rebuilt the lighthouse shaft in Blender around a continuous
+83-tread spiral, with real windows, handrails, an open lantern landing and a watch
+book. The lens opens the stair in daylight as well as at night. The cellar now
+connects to the western study through two stone steps. Damp papers in a hinged
+bread tin add an account of the keeper, boatwright and visitor working together;
+the opened lid and tower visit persist.
+
+The second Blender kit adds vault ribs, basalt, a coastal arch and wind pines.
+A western inlet changes the headland, while terrain, water and collision retain one
+height authority. Underground views no longer look through the overlying hillside.
+Limewash, damp stone and a cold vault replace flat underground walls; relief on the
+older boulders is quieter. The miniature and distant pines use simpler geometry.
+
+**Evidence:** Syntax green; pure contracts **115/115**; complete browser release
+gate green, including **Landfall 21/21**, **Harbor 11/11**, **walk 69/69** and
+coverage **21/21**. Peak **514 calls / 991,263 triangles**, with nine point lights,
+stays under the existing budget. Phone hold-to-walk and release **2/2**.
+
+The new `playthrough/2026-09-05/landfall/` review contains **161 source captures**,
+**103 illustrated moments**, **56 pages / 23 artifacts**, and all four endings.
+**40 repeated frames** are folded and **18 continuation pages** grouped, while
+every final-route capture remains accessible. Actual collision movement proves
+the tower, drain, cellar and western room in both directions. Viewer **9/9** covers
+images, links, folding and mobile touch. Captures report zero browser errors.
+Source and homecoming saves, runtime fingerprints, Blender source and verification
+are included or linked. The previous room revision remains an archive.
+
+**Debt:** Fixed a real rereading bug: an earlier surface read could make the next
+touch carry a record before its newly available deeper pages were opened. Reading
+now precedes carrying at the current depth. The terrain check now enforces the
+original grid's geometry budget instead of pinning the old coast's exact count.
+The original canopy shapes, simple study geometry and broad environmental forms
+still need authored refinement. This revision is not a claim of AAA completion.
+No private narration or identifying biography is included. Not publicly deployed.
+
+**Next tick suggestion:** Author the main study and surrounding forest as a coherent
+approach, then judge their scale and story pacing in a full walk at ordinary speed.
+
+---
+
+## 45 — 2026-09-05 — an inhabited island and a complete return
+
+**Implemented locally:** Rewrote the manuscript around three distinct hands: the
+keeper, the boatwright, and a visitor. Practical care, unfinished work, and the
+possibility of coming home now connect the surface room, the deep workbench, and
+the return. The east room uses original Blender geometry: a repaired chair, a
+creased blanket, two mugs, a small boat, and ordinary things left within reach.
+Pulling out the chair and carrying the boat home leave persistent physical changes;
+launching it changes both the bay and its miniature. All four endings have revised
+titles and afterwords. No identifying biography or private source is included.
+
+The first receiver return now has its own progression flag and ledger event, and
+no longer masquerades as the final homecoming. The open east-room doorway is also
+walkable. The capture harness uses earned prerequisites through every crossing.
+
+**Evidence:** Recursive syntax passed; unit tests **112/112**; complete browser
+release gate green, including coverage **21/21**, room **11/11**, and walk
+**69/69**. Real keyboard entry and pointer interaction passed. Deep-scene peak
+**497 calls / 977,479 triangles** stayed within the existing gate. The review
+folder at `playthrough/2026-09-05/` contains **133 captured stages**, all four
+endings, **52 pages across 21 artifacts**, exact actions and state, six original
+baseline views, and the Blender render. Its offline viewer passed at desktop and
+390px mobile widths. Captures produced zero browser errors. These are scripted
+route captures with walking and long transitions skipped, not a continuous manual
+recording. This revision has not been publicly deployed.
+
+**Debt:** Cleared the receiver-return coverage failure, stale reset assertion,
+and doorway collision mismatch. The capture manifest records the final runtime.
+
+**Next tick suggestion:** Play the new manuscript in the world at an ordinary
+walking pace and use the stage viewer to mark any line that still explains too much.
+
+---
+
 ## loop-fire 44 — 2026-09-03 — live field reports: birds touch earth; the lens vault becomes real
 
 **Shipped:** Three reports arrived through the game's own F8 field recorder while the

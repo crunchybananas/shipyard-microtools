@@ -1,0 +1,140 @@
+The Island — Landfall local verification, 2026-09-05
+
+Status: implemented and verified locally; not committed or publicly deployed.
+
+Recursive ES-module syntax: green.
+Pure contracts: 115 / 115.
+Complete browser release gate: green (output below).
+Review viewer: 9 / 9, including every image, unique chapter links, folding, deep links, desktop, 390px phone layout and touch expansion.
+Phone movement: 2 / 2, actual touch hold climbs the first tower flight and release stops it.
+Capture audit: 161 real screenshots; four distinct ending kinds; zero captured browser errors.
+Review: 103 illustrated moments; 18 continuation pages grouped; 40 repeated frames folded. No source capture deleted from the final route.
+Manuscript: 56 pages across 23 artifacts.
+
+The route uses disclosed long-travel and encounter-placement fixtures. The tower and underground routes run through actual player collision in both directions.
+The image sorter was rerun after correcting compatibility with the host Python version; runtime captures were preserved.
+
+serving /private/tmp/island-landfall-r2/docs on http://127.0.0.1:8774
+== saves schema ==
+SAVES 24 / 24
+== coverage ==
+COVERAGE PASS 21 / 21
+== runtime reset ownership ==
+RUNTIME-RESET PASS 6 / 6
+== the upstream hand ==
+  ok   fixture stays on the local stack
+  ok   ordinary L1 valve input records the canonical one-mark fixture
+  ok   L2 inherits exactly one valve mark from another hand
+  ok   the public event state is idle before the dead wheel is touched
+  ok   ordinary L2 valve input arms the Upstream Hand without moving water
+  ok   the event names the inherited valve and its remote source hand
+  ok   the dead-wheel beat stays visible and under player control
+  ok   the tide is still unchanged one second into the event
+  ok   the hand moves through more than one authored phase
+  ok   the chart-table model visibly answers the upstream act
+  ok   the wall-scale hand becomes materially present
+  ok   the world-space reach grows beyond zero
+  ok   the tide surge commits exactly once and by exactly +0.06 before its reveal
+  ok   the public state exposes the surge while it happens
+  ok   the whole physical beat leaves movement and interactions intact
+  ok   the peak frame stays inside the island power ceiling
+  ok   going big does not add a tenth point light
+  ok   the event cleans every transient visual channel away
+  ok   re-clicking the dead wheel cannot replay or compound the hand
+  ok   a late ledger merge composes new draft with the permanent surge
+  ok   an out-of-order old-rung pull still reconciles the current rung
+  ok   leaving and revisiting L2 keeps the surge in the waterline
+  ok   save/reload keeps the event spent and cannot resurrect it
+  ok   a clean L2 dead wheel cannot invent an upstream hand
+  ok   a max-draft L2 surge rises +0.06 above 2 and settles without reversing
+  ok   Continue reconciles the saved rung and keeps a late-risen arrival above water
+  ok   the same-hand valve mark is the honest offline fallback
+  ok   reduced motion holds the model, filament, wall and bay as spatial tableaux
+  ok   the plate and Upstream Hand can own the ambient hush together
+  ok   plate release preserves the Hand hush and a real crossing takes clean ownership
+  ok   committing a disposition resolves the active hand without leaking across the finale
+  ok   the complete Upstream Hand path raises no browser errors
+  power baseline 500 calls / 989633 tris · peak 514 calls / 991263 tris
+UPSTREAM-HAND 32 / 32
+== the writing in the sand ==
+WRITING 19 / 19
+== the finished terrain ==
+TERRAIN-FINISH 10 / 10
+== the player-facing journey ==
+EXPERIENCE PASS 22 / 22
+== the doors ==
+DOORS 6 / 6
+  {"name":"studyDoor","hinge":5.15,"worstTip":5.149,"worstAtDeg":345,"closedDeg":345,"swingDeg":-52}
+  {"name":"innerDoor","hinge":5.3,"worstTip":5.291,"worstAtDeg":15,"closedDeg":15,"swingDeg":85.9}
+== bloom ==
+BLOOM 3 / 3
+  threshold 1.05 · dimmest that must glow 1.311 (?) · 11 emissive materials
+== the shell ==
+SHELL 5 / 5
+    0 / 2640 sky-rays — up past the annex door (the reported frame)
+    0 / 228 sky-rays — past the beach door frame (the reported frame)
+    0 / 2640 sky-rays — the window wall lintel band
+    0 / 2640 sky-rays — the beach door lintel band
+   85 / 2640 sky-rays  (expected) — out through the beach door
+== relief ==
+RELIEF 8 / 8
+  12/12 reliefs applied · sand ripples analytic
+== the gulls ==
+GULLS 7 / 7
+  closest approach 1.43 m clear, at radius 3.55 / y 35.43
+  grounded anatomy 2256 verts · eyes 336 · feet 240 · wing 10 verts
+  sole error 0.0000 m · root drift 0.0000 m · wing breath 0.021 rad
+  exit 6.32 s · 82.0 m out · 26.0 m up · max 28.9 m/s
+== the lens-vault outcrop ==
+VAULT-OUTCROP 8 / 8
+  radial seal 72/72 before · 72/72 after
+  lens 1.78 m away from legal pose 129.15, -148.13
+  reported point solid
+== the trees ==
+TREES 13 / 13
+  litter mask 1024px · 0.981 at the trunk · 0.039 away
+  4 silhouettes · 8 geometries · 4572/4092/3216/2226/928/1048/832/760 verts · trunk 102 · fringe 0.26
+== the tabletop ==
+TABLETOP 29 / 29
+  chart ±1.22 · model ±0.9 · working margin 0.320 m
+  logbook                x   -1.18..-0.926  z   0.001..0.702
+  returnSheet            x   -1.18..-0.948  z   0.001..0.3
+  lensMarkStudy          x   -1.11..-1.01   z   -0.52..-0.18
+  phialDesk              x  -1.113..-0.987  z   0.805..1.028
+  apparatusPlate2        x   0.909..1.171   z   0.569..0.831
+  apparatusMark2         x   0.945..1.135   z   0.605..0.795
+  apparatusPlate0        x  -1.174..-0.906  z  -1.014..-0.746
+  apparatusMark0         x  -1.137..-0.943  z  -0.977..-0.783
+  apparatusPlate7        x  -0.125..0.085   z  -1.145..-0.935
+  apparatusMark7         x  -0.096..0.056   z  -1.116..-0.964
+  chartTally             x   0.976..1.153   z  -0.198..0.195
+  crankHandle            x    -1.2..-0.928  z  -0.607..-0.347
+  lore_closure_notice    x   0.432..0.668   z   -1.16..-0.96
+TABLETOP OK
+== the glare ==
+GLARE 8 / 8
+  brass 0.38 · chart rail 0.55
+  hot     0%  clipped     0%  mean luma  88.9  — the chart table, sun through the study window
+  hot  0.01%  clipped     0%  mean luma  72.8  — the west margin, low and close
+== the signal index ==
+SPINES 20 / 20
+  figures 1 5 3 4 → instruments → readings 5 1 4 6
+  8 index volumes · 8-instrument atlas · 10-dial atlas
+== the hover glint ==
+GLINT 25 / 25
+  musicBox             13 mats · peak emissive lum 0.0655
+  valveWheel           5 mats · peak emissive lum 0.0655
+  logbook              11 mats · peak emissive lum 0.0655
+  lore_closure_notice  1 mats · peak emissive lum 0.0655
+== the inhabited room ==
+HARBOR 11 / 11
+== the tower and underground rooms ==
+LANDFALL 21 / 21
+== the walk ==
+WALK PASS 69 / 69
+gate green
+
+== review-viewer.mjs ==
+REVIEW-VIEWER 9 / 9
+== landfall-touch.mjs ==
+LANDFALL-TOUCH 2 / 2 {"start":13.748192771084337,"holding":{"walking":true,"y":13.996385542168674},"released":true}

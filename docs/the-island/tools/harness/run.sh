@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run.sh — the release gate, end to end: static server + headless Chrome + the
-# 64-assertion full-game walk + the field-note contract. Exit 0 = ship.
+# 69-assertion full-game walk + the field-note contract. Exit 0 = ship.
 #
 #   SERVE_PORT (default 8642)   CDP_PORT (default 9223)   CHROME_BIN (autodetect)
 #
@@ -158,10 +158,18 @@ echo "== the hover glint =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/glint.mjs" | tee "$WORK/glint.out"
 grep -q "GLINT 25 / 25" "$WORK/glint.out" || { echo "GLINT FAILED"; exit 1; }
 
+echo "== the inhabited room =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/harbor.mjs" | tee "$WORK/harbor.out"
+grep -q "HARBOR 11 / 11" "$WORK/harbor.out" || { echo "HARBOR FAILED"; exit 1; }
+
+echo "== the tower and underground rooms =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/landfall.mjs" | tee "$WORK/landfall.out"
+grep -q 'LANDFALL 21 / 21' "$WORK/landfall.out" || exit 1
+
 echo "== the walk =="
 # Every puzzle action goes through its shipped hotspot. Crossing travel uses the public
-# instant transition so local and software-GL runs enforce the same 64 assertions: the
+# instant transition so local and software-GL runs enforce the same 69 assertions: the
 # instrument-routed decoder, every depth gate, held regard, return, and all dispositions.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/walk.mjs" | tee "$WORK/walk.out"
-grep -q "WALK PASS 64 / 64" "$WORK/walk.out" || { echo "WALK FAILED"; exit 1; }
+grep -q "WALK PASS 69 / 69" "$WORK/walk.out" || { echo "WALK FAILED"; exit 1; }
 echo "gate green"

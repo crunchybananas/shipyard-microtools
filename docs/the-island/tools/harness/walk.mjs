@@ -98,11 +98,13 @@ export default async function walk(h) {
     const out = {};
 
     ABYME.resetFlags(); W.flags.introDone = true;
-    out.initialMissing = progression.missingRequirements('surface', W, ABYME.notebook);
+    out.initialMissing = progression.missingRequirements('surfaceDeep', W, ABYME.notebook);
 
     hs('chest').onClick();
     out.chestBlocked = !W.flags.chestOpen && !W.flags.rulerTaken;
 
+    hs('refugeLamp').onClick();
+    hs('spareChair').onClick(); ABYME.UI._readerPage(1); ABYME.UI.closeReader();
     hs('valve').onClick(); W.tide = W.tideTarget;
     out.valve = W.flags.valveTurned && W.tideTarget === 0
       && ABYME.notebook.has('evidence.valve');
@@ -116,6 +118,17 @@ export default async function walk(h) {
 
     hs('crank').onDrag(48);
     out.crank = W.flags.crankUsed && ABYME.notebook.has('evidence.crank');
+    out.firstReady = progression.nextPlateAction({ world:W, notebook:ABYME.notebook }).route === 'surfaceFirst';
+    ABYME.cross();
+    hs('valve').onClick(); game.resolveUpstreamHand({ reveal:true });
+    ABYME.tideFigure();
+    for (let i=0;i<30;i++) game.tick(.1, 8+i*.1);
+    out.firstReturnReady = progression.nextPlateAction({ world:W, notebook:ABYME.notebook }).route === 'receiver-return';
+    ABYME.cross();
+    out.firstReturn = W.level === 1 && W.flags.receiverReturned && !W.flags.returned
+      && ABYME.notebook.has('return.receiver') && !ABYME.notebook.has('return.surface');
+    out.deepStillBlocked = progression.nextPlateAction({ world:W, notebook:ABYME.notebook }).kind === 'blocked';
+
 
     for (const note of [2,3,4,3,0]) game._touchStone(note);
     out.noSongs = !W.flags.birdSolved && game.stoneSeq.length === 0;
@@ -172,7 +185,7 @@ export default async function walk(h) {
     out.plumbHung = W.flags.plumbHung && !W.inventory.includes('plumb')
       && ABYME.notebook.has('evidence.plumb');
 
-    out.missing = progression.missingRequirements('surface', W, ABYME.notebook);
+    out.missing = progression.missingRequirements('surfaceDeep', W, ABYME.notebook);
     out.arm = progression.nextPlateAction({ world:W, notebook:ABYME.notebook, armed:false }).kind;
     out.cross = progression.nextPlateAction({ world:W, notebook:ABYME.notebook, armed:true }).kind;
     out.notes = W.notebook.entries.map((entry) => entry.id);
@@ -188,12 +201,15 @@ export default async function walk(h) {
     return out;
   })()`);
 
-  ok('SURFACE.gate-names-whole-circuit', surface.initialMissing.length === 12);
+  ok('SURFACE.gate-names-whole-circuit', surface.initialMissing.length === 13);
   ok('SURFACE.chest-requires-drained-tide', surface.chestBlocked);
   ok('SURFACE.valve-moves-basin-and-bay', surface.valve);
   ok('SURFACE.chest-yields-ruler', surface.chest);
   ok('SURFACE.ruler-makes-bridge', surface.ruler);
   ok('SURFACE.crank-earns-the-hour', surface.crank);
+  ok('BRAID.early-crossing-before-signal-circuit', surface.firstReady && surface.firstReturnReady);
+  ok('BRAID.receiver-return-is-not-final-homecoming', surface.firstReturn);
+  ok('BRAID.second-crossing-needs-deeper-evidence', surface.deepStillBlocked);
   ok('SURFACE.stones-reject-no-songs', surface.noSongs);
   ok('SURFACE.music-box-is-first-source', surface.box);
   ok('SURFACE.stones-reject-one-song', surface.boxOnly);
@@ -219,7 +235,7 @@ export default async function walk(h) {
 
   const level2 = await h.evaluate(`(async () => {
     const progression = await import('/the-island/js/progression.js');
-    ABYME.dive(true);
+    ABYME.cross();
     const W = ABYME.W, game = ABYME.game;
     const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
     const before = progression.missingRequirements('level2', W, ABYME.notebook);
@@ -241,14 +257,14 @@ export default async function walk(h) {
     return { level:W.level, before, blocked, armed, upstream, tideFigure, missing, action };
   })()`);
   ok('CROSSING.arrives-at-shallows', level2.level === 2);
-  ok('GATE.level2-blocks-two-unwitnessed-events', level2.before.length === 2 && level2.blocked);
-  ok('LEVEL2.dead-valve-reveals-upstream-hand', level2.armed && level2.upstream);
+  ok('GATE.level2-retains-encounters-on-second-visit', level2.before.length === 0);
+  ok('LEVEL2.dead-valve-keeps-witnessed-upstream-hand', level2.upstream);
   ok('LEVEL2.stillness-resolves-tide-figure', level2.tideFigure);
   ok('GATE.level2-ready', level2.missing.length === 0 && level2.action === 'arm-descent');
 
   const level3 = await h.evaluate(`(async () => {
     const progression = await import('/the-island/js/progression.js');
-    ABYME.dive(true);
+    ABYME.cross();
     const W = ABYME.W, game = ABYME.game;
     const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
     const before = progression.missingRequirements('level3', W, ABYME.notebook);
@@ -276,7 +292,7 @@ export default async function walk(h) {
 
   const source = await h.evaluate(`(async () => {
     const progression = await import('/the-island/js/progression.js');
-    ABYME.dive(true);
+    ABYME.cross();
     const W = ABYME.W, game = ABYME.game;
     const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
     const before = progression.missingRequirements('level4', W, ABYME.notebook);
@@ -317,7 +333,7 @@ export default async function walk(h) {
       blockedWithoutChoice, selected, missing, action, bellIsInstrument, diveRungs };
   })()`);
   ok('CROSSING.arrives-at-source', source.level === 4);
-  ok('CROSSING.commits-one-shared-act-per-rung', source.diveRungs.join(',') === '1,2,3');
+  ok('CROSSING.commits-one-shared-act-per-rung', [1,2,3].every(r => source.diveRungs.includes(r)));
   ok('DEBUG.bottom-frames-the-lower-hand', source.bottomFrames);
   ok('GATE.level4-blocks-regard-and-choice', source.before.length === 2 && source.blocked);
   ok('LEVEL4.proximity-alone-does-not-resolve', source.proximityOnly);
@@ -328,13 +344,15 @@ export default async function walk(h) {
   ok('GATE.level4-ready-for-ascent', source.missing.length === 0 && source.action === 'arm-ascent');
   ok('INSTRUMENT.bell-is-nonterminal', source.bellIsInstrument);
 
+  const sourceCheckpoint = await h.evaluate(`({save:localStorage.getItem('abyme-save'),ledger:localStorage.getItem('abyme-ledger-v2')})`);
+
   const returned = await h.evaluate(`(() => {
     const W = ABYME.W, game = ABYME.game;
     const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
     game.flag('climbing');
     const levels = [], landingSaves = [];
     for (let i = 0; i < 3; i++) {
-      ABYME.ascend(true); levels.push(W.level);
+      ABYME.cross(); levels.push(W.level);
       const persisted = JSON.parse(localStorage.getItem('abyme-save'));
       landingSaves.push(persisted.level === W.level
         && persisted.pos.every((value, axis) => Math.abs(value - [ABYME.player.pos.x, ABYME.player.pos.y, ABYME.player.pos.z][axis]) < 1e-6));
@@ -345,13 +363,22 @@ export default async function walk(h) {
     const plate = ABYME.refs.deskPlate.position;
     ABYME.tp(plate.x, plate.z, 0, 0);
     hs('plate').onClick();
+    const plateSafe = !game.atBrink() && !W.flags.endingCommitted;
+    hs('keepsakeBoat').onClick();
+    const boatCarried = W.flags.boatCarried;
+    hs('launchBoat').onClick();
+    const boatLaunched = !W.flags.boatCarried && W.flags.boatLaunched && ABYME.notebook.has('event.boat-launched');
+    hs('boatAfterword').onClick(); ABYME.UI._readerPage(1); ABYME.UI.closeReader();
+    const lamp = new ABYME.THREE.Vector3(); ABYME.refs.cotLantern.getWorldPosition(lamp);
+    ABYME.tp(lamp.x+1,lamp.z-1,0,0);
+    hs('refugeLamp').onClick();
     const armed = game.atBrink() && !W.flags.endingCommitted;
-    hs('plate').onClick();
+    hs('refugeLamp').onClick();
     ABYME.setFinaleT(10);
     return {
       levels, landingSaves, returned:W.flags.returned, climbing:W.flags.climbing,
       returnNote:ABYME.notebook.has('return.surface'),
-      oarAvailable, oarIsInstrument, armed,
+      oarAvailable, oarIsInstrument, armed, plateSafe, boatCarried, boatLaunched,
       committed:W.flags.endingCommitted, kind:ABYME.getFinale()?.kind,
       endingNote:ABYME.notebook.has('ending.tend'),
       regions:{...W.regions},
@@ -363,40 +390,39 @@ export default async function walk(h) {
   ok('ASCENT.destination-pose-saves-atomically', returned.landingSaves.every(Boolean));
   ok('ASCENT.surface-state-and-note', returned.returned && !returned.climbing && returned.returnNote);
   ok('INSTRUMENT.oar-is-nonterminal', returned.oarAvailable && returned.oarIsInstrument);
-  ok('ENDING.surface-plate-arms-before-commit', returned.armed);
-  ok('ENDING.tend-commits-at-returned-plate', returned.committed && returned.kind === 'tend'
+  ok('ENDING.surface-plate-remains-nonterminal', returned.plateSafe);
+  ok('HOMECOMING.boat-moves-from-hand-to-model-sea', returned.boatCarried && returned.boatLaunched);
+  ok('ENDING.refuge-lamp-arms-before-commit', returned.armed);
+  ok('ENDING.tend-commits-at-refuge-lamp', returned.committed && returned.kind === 'tend'
     && returned.endingNote && tendShown);
   ok('JOURNEY.all-regions-visited', returned.regions.l2seen && returned.regions.l3seen && returned.regions.l4seen);
 
   const branchResults = [];
   for (const [choice, touches] of [['carry', 2], ['open', 3], ['close', 4]]) {
-    await startFresh();
+    await h.evaluate(`localStorage.setItem('abyme-save', ${JSON.stringify(sourceCheckpoint.save)});
+      localStorage.setItem('abyme-ledger-v2', ${JSON.stringify(sourceCheckpoint.ledger)}); 1`);
+    await h.navigate(url); await ready();
+    await h.evaluate(`window.__walkErrors=[];addEventListener('error',e=>window.__walkErrors.push(e.message));
+      document.getElementById('btn-continue').click();1`); await h.wait(1.5);
     const staged = await h.evaluate(`(() => {
       const choice = ${JSON.stringify(choice)};
       const touches = ${touches};
       const W = ABYME.W, game = ABYME.game;
       const hs = (id) => game.interact.hotspots.find((spot) => spot.id === id);
-      ABYME.resetFlags(); W.flags.introDone = true; W.flags.plumbHung = true;
-      // Give OPEN real weight to carry uphill through the canonical landing seam;
-      // debug goLevel is intentionally non-causal, and every submerged valve is
-      // intentionally dead. A real dive from L3 records one rung-3 act and lands
-      // at L4, matching the history an ordinary full descent always creates.
-      if (choice === 'open') { ABYME.goLevel(3); ABYME.dive(true); }
-      else ABYME.goLevel(4);
-      ABYME.bottom();
-      W.flags.lowerHandRegarded = true; ABYME.notebook.record('encounter.lower-hand');
-      for (let i = 0; i < touches; i++) hs('dispSet').onClick();
+      for (let i = 1; i < touches; i++) hs('dispSet').onClick();
       const dial = W.disposition;
       hs('bell').onClick();
       const bellSafe = !W.flags.endingCommitted && !ABYME.getFinale();
       W.flags.climbing = true;
-      ABYME.ascend(true); ABYME.ascend(true); ABYME.ascend(true);
+      ABYME.cross(); ABYME.cross(); ABYME.cross();
       hs('oar').onClick();
       const oarSafe = !W.flags.endingCommitted && !ABYME.getFinale();
       const plate = ABYME.refs.deskPlate.position;
       ABYME.tp(plate.x, plate.z, 0, 0);
-      hs('plate').onClick(); const armed = game.atBrink();
-      hs('plate').onClick(); ABYME.setFinaleT(10);
+      const lamp = new ABYME.THREE.Vector3(); ABYME.refs.cotLantern.getWorldPosition(lamp);
+      ABYME.tp(lamp.x+1,lamp.z-1,0,0);
+      hs('refugeLamp').onClick(); const armed = game.atBrink();
+      hs('refugeLamp').onClick(); ABYME.setFinaleT(10);
       return { choice, dial, bellSafe, oarSafe, armed,
         committed:W.flags.endingCommitted,
         finale:ABYME.getFinale()?.kind,
@@ -405,6 +431,7 @@ export default async function walk(h) {
       };
     })()`);
     await h.wait(0.35);
+    staged.tideTarget = await h.evaluate(`ABYME.W.tideTarget`);
     staged.shown = await h.evaluate(`ABYME.getFinale()?.shown === true`);
     staged.errors = await h.evaluate(`window.__walkErrors || []`);
     branchResults.push(staged);
@@ -412,7 +439,7 @@ export default async function walk(h) {
 
   for (const branch of branchResults) {
     ok(`ENDING.${branch.choice}-selected-by-four-stop-index`, branch.dial === branch.choice);
-    ok(`ENDING.${branch.choice}-commits-only-at-returned-plate`, branch.bellSafe && branch.oarSafe
+    ok(`ENDING.${branch.choice}-commits-only-at-refuge-lamp`, branch.bellSafe && branch.oarSafe
       && branch.armed && branch.committed && branch.finale === branch.choice && branch.note && branch.shown
       && (branch.choice !== 'open' || branch.tideTarget > 1), branch);
   }

@@ -33,6 +33,10 @@ import { DISPOSITION_IDS, dispositionOperation, nextDisposition } from './dispos
 // #132: the inspector's record — every LORE entry flagged record:true participates
 // in the FILE-or-KEEP economy (read → take → cabinet or source).
 const REC_IDS = Object.keys(LORE).filter((id) => LORE[id].record);
+// Newly exposed writing gets a reading before the next touch can carry a record.
+// Otherwise a surface read silently prevents its later pages from being opened.
+const recordReadAtDepth = (id, notebook) => notebook?.hasReadLore(id,
+  LORE[id].deep?.length && W.level >= (LORE[id].deepFrom ?? 99) ? 'deep' : 'surface');
 
 // The tide gauge's top ring — cut by the keeper above every waterline the descent
 // has, "measured, not yet met". Under THE STACK it is the one mark in the world that
@@ -607,7 +611,7 @@ export class Game {
         if (action.kind === 'descend') {
           this.onDive();
         } else if (action.kind === 'ascend') {
-          this.flag('climbing');
+          if (action.route !== 'receiver-return') this.flag('climbing');
           this.onAscend();
         }
       },
@@ -617,13 +621,13 @@ export class Game {
     // the foot of the tower stair: when the lamp is lit, climb to the lamp-room gallery + the vista.
     I.add({
       id: 'climbStair', targets: [R.stairFoot], label: 'the stair to the lamp', maxDist: 2.8,
-      when: () => W.lampLit && !W.atTop,
+      when: () => W.lensPlaced && !W.atTop,
       onClick: () => this.onClimb(true),
     });
     // the rope across the foot, before the lamp is lit — names what lighting it opens
     I.add({
       id: 'stairRope', targets: [R.stairRope, R.stairFoot], label: 'a rope across the stair', maxDist: 2.8,
-      when: () => !W.lampLit && !W.atTop,
+      when: () => !W.lensPlaced && !W.atTop,
       onClick: () => UI.whisper(T.the_stair_is_roped),
     });
     // the descend ring on the gallery — the way back down to the working room
@@ -708,11 +712,11 @@ export class Game {
     // drainFlood rises past its shelf — filed to a cabinet that floods).
     if (R.drainLedger) I.add({
       id: 'drainLedger', targets: [R.drainLedger],
-      label: () => (this.notebook?.hasReadLore('drain_ledger') ? 'a water-swollen ledger — take it' : 'a water-swollen ledger'),
+      label: () => (recordReadAtDepth('drain_ledger', this.notebook) ? 'a water-swollen ledger — take it' : 'a water-swollen ledger'),
       maxDist: 2.6,
       when: () => !W.recDisp.drain_ledger,       // #132: a record — gone once carried
       onClick: () => {
-        if (this.notebook?.hasReadLore('drain_ledger')) {
+        if (recordReadAtDepth('drain_ledger', this.notebook)) {
           W.recDisp.drain_ledger = 'carried';
           UI.whisper(T.folded_into_my_coat);
           save(this.player);
@@ -729,7 +733,7 @@ export class Game {
         A.chime();
         UI.whisper(W.level >= MAX_DEPTH
           ? 'One clear note crosses the bottom water and returns unchanged.'
-          : 'The bell answers once. Nothing opens.');
+          : 'A clear note from the little bell. It carries a long way over the water.');
       },
     });
 
@@ -821,7 +825,7 @@ export class Game {
           W.flags.roundLight = true;
           this._recordEvidence('event.refuge-lit');
           A.chime();
-          UI.whisper('A dry circle of floor appears around the cot.');
+          UI.whisper('The wick catches. A blue blanket, two cups, a chair with a mended rung.');
           save(this.player);
         } else if (action.kind === 'arm-ending') {
           this._refugeBrink = true;
@@ -834,7 +838,7 @@ export class Game {
           this.onEnding(W.disposition || 'tend');
         } else if (action.kind === 'keep-light') {
           A.crankTick();
-          UI.whisper('The wick holds. The boards inside the threshold are dry.');
+          UI.whisper('The lamp is burning steadily. There is still room beside the table.');
         }
       },
     });
@@ -944,12 +948,12 @@ export class Game {
         id: 'lore_' + id, targets: [R['lore_' + id]],
         // #132: a record artifact grows a second phase — read it, then TAKE it
         label: lore.record
-          ? () => (this.notebook?.hasReadLore(id) ? (pl.label || lore.title) + ' — take it' : pl.label || lore.title)
+          ? () => (recordReadAtDepth(id, this.notebook) ? (pl.label || lore.title) + ' — take it' : pl.label || lore.title)
           : pl.label || lore.title,
         maxDist: pl.maxDist ?? 2.8,
         when: () => (!gate || gate()) && !W.recDisp[id],
         onClick: () => {
-          if (lore.record && this.notebook?.hasReadLore(id)) {
+          if (lore.record && recordReadAtDepth(id, this.notebook)) {
             W.recDisp[id] = 'carried';
             UI.whisper(T.folded_into_my_coat);
             save(this.player);
@@ -1297,7 +1301,7 @@ export class Game {
     ease('shaft', W.lampLit ? 0.5 : 0, 1.5);
     // hub Phase B: the stair is roped off until the lamp is lit — lighting it opens the climb
     // (this is `tick`, not `_apply` — refs are reached via this.refs here, NOT the `R` param)
-    if (this.refs.stairRope) this.refs.stairRope.visible = !W.lampLit;
+    if (this.refs.stairRope) this.refs.stairRope.visible = !W.lensPlaced;
 
     // golden-hour shimmer on the buried hatch
     const shimmerOn = canRevealShimmer(W, isGolden()) && !F.shadowRevealed;
@@ -1633,7 +1637,7 @@ export class Game {
     if (!this.flag('lowerHandRegarded')) return false;
     this._recordEvidence(NOTE_IDS.lowerHand);
     A.chime();
-    UI.whisper('The small figure turns and holds one hand against the model’s flooded shore.');
+    UI.whisper('The small figure turns. After a while, it rests its hands on the table.');
     return true;
   }
 

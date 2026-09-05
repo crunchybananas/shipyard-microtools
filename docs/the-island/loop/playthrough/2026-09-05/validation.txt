@@ -1,0 +1,52 @@
+The Island — local revision validation — 2026-09-05
+
+STATUS
+Implemented and verified locally. This record does not claim a public deployment.
+build.json records SHA-256 hashes of the runtime used by this review.
+
+CHECKS
+Recursive JavaScript syntax: passed.
+Node unit tests: 112 passed, 0 failed.
+Complete browser release gate: green.
+  Save contract: 24/24; story coverage: 21/21; runtime reset: 6/6.
+  Upstream Hand: 32/32; writing: 19/19; terrain finish: 10/10.
+  Experience: 22/22; doors: 6/6; bloom: 3/3; shell: 5/5.
+  Relief: 8/8; gulls: 7/7; outcrop: 8/8; trees: 13/13.
+  Tabletop: 29/29; glare: 8/8; signal index: 20/20; glint: 25/25.
+  Inhabited room: 11/11; complete causal walk: 69/69.
+The room check includes real keyboard entry, a real pointer click on the chair,
+boat height at the water, matching model geometry, and persistence after reload.
+Measured deep-scene peak: 497 draw calls / 977,479 triangles, within the existing
+525-call / 1,000,000-triangle deep-scene gate. This is not an all-device FPS claim.
+
+REVIEW ARTIFACTS
+133 captured stages across 13 chapters, including all four endings.
+21 readable artifacts / 52 pages in the complete manuscript.
+Four final afterword frames refreshed after the final coda wording change.
+Capture run: zero browser errors.
+Offline viewer: all 133 images decoded, chapter filter worked, no horizontal
+overflow at 1440px desktop or 390px mobile. Overview images also decoded.
+Original-build baseline: six diagnostic scene views plus its original manuscript.
+The baseline did not complete its route: it failed return.receiver coverage;
+its unit suite also exposed a stale runtime-reset assertion (110/111 passed).
+
+METHOD
+This is a scripted route audit, not an uninterrupted manual recording. It uses
+real hotspot callbacks and crossing prerequisites. Walking and long crossing
+animations are skipped; daylight is advanced for readable views. Encounter
+fixtures position the existing figure, then use the live gaze interaction.
+No puzzle inventory or prerequisite flags are granted along the captured route.
+Each ending starts from the same earned source checkpoint and uses the live
+return and lamp commitment. Stage JSON records actions, displayed prose and state.
+
+BLENDER
+Original mesh source and reproducible generator are in tools/blender.
+8 runtime parts / 16,244 triangles / 1,716,348-byte GLB.
+No external model, image, or private narrative source is included.
+
+REPRODUCE
+From the-island:
+  bash tools/harness/syntax.sh
+  node --test test/*.test.mjs
+  bash tools/harness/run.sh
+See PLAYTHROUGH.md for capture commands and tools/harness/README.md for the gate.

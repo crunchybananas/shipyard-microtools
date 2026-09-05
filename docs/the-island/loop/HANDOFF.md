@@ -6,9 +6,10 @@ route in [../PLAYTHROUGH.md](../PLAYTHROUGH.md).
 
 ## Product sentence
 
-A player alters a live model of a lighthouse island, descends through the costs those
-acts send downward, regards another hand living with the result, then climbs back to
-choose what relation should remain between levels.
+A player makes a refuge in a lighthouse, changes a live island model, follows the
+water into rooms kept by other people, and returns to try an unfinished boat.
+The tone is quiet, humane wonder; the keeper, boatwright and visitor have distinct
+voices. See SPINE.md for the current fictional narrative contract.
 
 ## Non-negotiable contracts
 
@@ -56,12 +57,13 @@ instructions; it does not invent a second route.
 
 Current gates:
 
-- L1 → L2: complete surface circuit, solve the signal through its instrument
-  route, open the hatch, and hang the plumb.
-- L2 → L3: witnessed Upstream Hand plus regarded Tide-Figure.
-- L3 → L4: settled register plus regarded Watcher.
+- First L1 → L2: refuge lamp, valve, ruler and sun crank.
+- First L2 → L1: witnessed Upstream Hand plus regarded Tide-Figure. Sets `receiverReturned`, not `returned`.
+- Second L1 → L2: complete the music, lens, signal, hatch and plumb circuit.
+- Second L2 → L3: both earlier encounters persist.
+- L3 → L4: settled register plus regarded shore visitor.
 - L4 → ascent: regarded Lower Hand plus chosen disposition.
-- returned L1 → ending: two-touch plate commit.
+- Returned L1 → ending: two touches on the refuge lamp.
 
 Every crossing uses the same arm/commit grammar and disarms when the player steps off.
 
@@ -75,13 +77,13 @@ index.
 ### One ending threshold
 
 The bottom index selects `tend | carry | open | close`. The selected operation is
-committed only by the returned surface plate after the full ascent. Every choice gets
+committed only by the returned refuge lamp after the full ascent. Every choice gets
 the same final visual dignity and a truthful physical coda. The bell and oar are
 nonterminal world instruments.
 
 ### Clean run persistence
 
-The run key is `abyme-save`, with payload version `1`. The loader accepts only the
+The run key is `abyme-save`, with payload version `2`. The loader accepts only the
 current version and declared fields, sanitizing current values at the boundary.
 Change the version when the shape changes; do not add aliases, backup slots, or
 recovery branches to gameplay.
@@ -99,12 +101,20 @@ The stack ledger is intentionally separate and outlives Begin again.
 | Stable evidence and hint requests | `js/notebook.js` |
 | Prose, readable surfaces, sketches, hint threads | `js/content.js` |
 | Physical signal, instrument, and dial assets | `js/props.js` |
+| Blender tower, vaults, coast, pines and drying-room tin | `js/landfall.js` |
+| Shared Blender stair layout and player tread surface | `js/tower-course.js` |
 | Hotspots and world application | `js/puzzles.js` |
 | Crossings, finale, reports, debug tools | `js/main.js` |
 | Notebook presentation and readers | `js/ui.js`, `style.css` |
 
 Put new truth in one owner and test that owner. Avoid mirrored constant tables in
 docs, UI, and harnesses; import runtime exports where exact values matter.
+
+The tower is a continuous walking route once the lens is fitted. `atTop` is derived
+from the player's height; `towerVisited` records actual gallery arrival. The cellar
+and western study are reached through the hatch ramp, not a surface teleport.
+The drying-room tin records `archiveTinOpened` and restores its lid on Continue.
+These optional rooms add evidence and character without extra crossing gates.
 
 ## Content standard
 
@@ -172,3 +182,22 @@ Nothing is protected merely because it shipped. The authorities above are protec
 because they keep change coherent. Remove obsolete data and old paths when a design
 changes; do not leave compatibility names, dormant terminals, or prose-based adapters
 behind.
+
+
+## Blender room and boat
+
+`assets/harbor-rooms.glb` is preloaded through the asset manifest before the world
+is cloned. `harbor.js` attaches the room parts, tide bench and source workbench.
+The model cache shares geometry; it never races an asynchronous clone. Room and
+region roots are pruned from the miniature as before. The sailing hull is manually
+shared by the full island and miniature, after baking the glTF node's Y-up transform.
+
+`placeMade`, `boatCarried`, and `boatLaunched` are sanitized save flags. The boat
+is optional after the complete return. Its launch is guarded both at the visible
+hotspot and inside its callback. No text or private source material enters a save.
+
+The initial room is physically open in `terrain.syncGates`, matching the open-door
+animation. Its ground is flattened below the new floor. `harbor.mjs` checks real
+keyboard entrance and pointer selection, then boat restoration and water contact.
+`ABYME.cross()` validates the production gate while skipping only the camera trip;
+use it for causal captures. Legacy level fixtures do not prove progression.

@@ -204,3 +204,13 @@ export function nextPlateAction({ world, notebook, maxDepth = 4, armed = false }
   if (missing.length) return { kind: 'blocked', gate, missing };
   return { kind: armed ? 'descend' : 'arm-descent' };
 }
+
+// Landing is a separate boundary from the plate touch: both instant harness travel
+// and the full scale-change cinematic must commit the same route and save state.
+export function ascentLanding(world) {
+  const level = Math.max(1, world.level - 1);
+  if (level > 1) return { level, route: 'intermediate' };
+  if (!world.flags.receiverReturned) return { level, route: 'receiver' };
+  if (world.flags.dispositionChosen && !world.flags.returned) return { level, route: 'home' };
+  return { level, route: 'surface' };
+}

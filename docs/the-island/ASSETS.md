@@ -81,3 +81,34 @@ Before adding or replacing a texture:
 Most WebGL texture work came from the Bender asset pipeline; the two CSS-native
 textures preserve their embedded local MFLUX provenance above. Copy only accepted,
 live output into `assets/`; the runtime repository is not a candidate archive.
+
+
+## Original Blender environment kit — September 2026
+
+| Runtime asset | Bytes | Geometry | Ownership |
+|---|---:|---|---|
+| `harbor-rooms.glb` | 1,716,348 | 8 consolidated parts; 16,244 triangles | Original procedural Blender geometry, created for this project |
+| `landfall.glb` | 2,081,688 | 12 parts; 23,340 triangles including alternative LODs | Original procedural Blender geometry, created for this project |
+
+The kit contains the east-room floor, daybed, creased blanket, kettle, cups,
+spare chair, carved bird mobile, stitched boat, tide bench and source cradle.
+It adds no texture images, external models or external asset licenses. The existing
+12 WebGL textures and two CSS-native textures retain their original ownership.
+The manifest owns 14 WebGL assets: 12 textures and two models.
+
+Source: `tools/blender/harbor-rooms.blend`. Generator:
+`tools/blender/harbor_rooms.py`, Blender 5.2.1 LTS. `geometry.json` records per-part
+counts, and `east-room.png` is a render of that actual source. The source and
+runtime kit contain fictional room objects only, with no private narration.
+
+Each part has one vertex-color material and one draw. The runtime keeps shared
+geometry between boat scales; it bakes glTF's node transform before positioning the
+hull against the actual waterline. The room adds no point lights.
+
+The Landfall kit adds an open masonry lighthouse shaft, 83 treads, handrails,
+vault ribs, a drying table, basalt, a coastal arch and wind pines. The miniature
+uses a 672-triangle shaft; pines swap to a 284-triangle silhouette at distance.
+`tools/blender/landfall.py` reads the layout embedded in `js/tower-course.js`, so
+the visible treads and player floor agree. `landfall-geometry.json` records every
+part and `landfall.blend` preserves the editable source. The assembly reuses the
+owned rock relief texture and adds no point lights.

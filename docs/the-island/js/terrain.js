@@ -6,14 +6,16 @@ import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.j
 // #77: terrain is a DETERMINISTIC LEAF again — no live world import. The four pieces of
 // world state collision depends on arrive through GATES, synced once per frame by main
 // (syncGates). Headless probes drive GATES directly; nothing here reads W.
-export const GATES = { atTop: false, bridgeUp: false, hatchOpen: false, annexOpen: false };
+export const GATES = { atTop: false, bridgeUp: false, hatchOpen: false, annexOpen: false, towerOpen: false };
 export function syncGates(W) {
   GATES.atTop = !!W.atTop;
+  GATES.towerOpen = !!W.lensPlaced;
   GATES.bridgeUp = !!W.flags.rulerPlaced;
   GATES.hatchOpen = !!W.flags.hatchOpen;
-  GATES.annexOpen = W.level >= 2 || !!W.flags.returned;
+  GATES.annexOpen = true; // The refuge is reachable before the first crossing.
 }
 import { getTexture } from './assets.js';
+import { TOWER, TOWER_TOP, stairSurface, stairPose } from './tower-course.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
 // The lamp-room gallery is one physical contract shared by rendering and collision.
@@ -50,7 +52,7 @@ const SEA_FLOOR = -13;
 // landmarks (north = +z, east = +x)
 export const SPOTS = {
   mainCenter: new THREE.Vector2(-30, 40),
-  lighthouse: new THREE.Vector2(-85, -40),   // coastal headland; flattened pad, h = 13.5
+  lighthouse: new THREE.Vector2(TOWER.x, TOWER.z),   // coastal headland; flattened pad, h = 13.5
   beach: new THREE.Vector2(4, -98),
   bluff: new THREE.Vector2(85, 25),
   hatch: new THREE.Vector2(97, 32),          // flattened pad, h = 23.5
@@ -167,8 +169,22 @@ export function heightAt(x, z) {
     if (mask > 0) h = lerp(h, Math.min(h, -8.5), Math.pow(mask, 1.3));
   }
 
+  // A bitten western headland gives the tower a distinct coast to stand above.
+  // This inlet is outside the arrival path and the lighthouse foundations; every
+  // rendered coast, water-depth lookup and movement probe reads the same cut.
+  {
+    const d = Math.hypot((x + 140) / 30, (z + 54) / 22);
+    const cut = 1 - smoothstep(.50, 1.28, d);
+    h = lerp(h, Math.min(h, -5.4 + .4 * Math.sin(z * .22)), cut * cut);
+  }
+
   // ---- flattened pads for structures ----
   h = padFlatten(h, x, z, SPOTS.lighthouse, 11, LIGHTHOUSE_H);
+  // The annex extends beyond the main pad's flat centre. Remove terrain under
+  // its actual floor, rather than allowing a grass mound through the furniture.
+  const annexD = Math.hypot(x - (SPOTS.lighthouse.x + Math.sin(Math.PI / 12) * 8.1),
+    z - (SPOTS.lighthouse.y + Math.cos(Math.PI / 12) * 8.1));
+  h = lerp(h, LIGHTHOUSE_H - 0.025, 1 - smoothstep(2.85, 3.6, annexD));
   h = padFlatten(h, x, z, SPOTS.stones, 13, STONES_H);
   h = padFlatten(h, x, z, SPOTS.hatch, 8, HATCH_H);
   // bridge approach pads: small radius so their skirts never refill the
@@ -243,7 +259,9 @@ function buriedFloorAt(x, z) {
   // the vault under the bluff (reached by the hatch stair)
   if (GATES.hatchOpen) {
     const lx = x - SPOTS.hatch.x, lz = z - SPOTS.hatch.y;
-    if (lx > -4.5 && lx < 4.5 && lz < -8.6 && lz > -17) return HATCH_H - 5.2;
+    if (lx > -4.8 && lx < 4.5 && lz < -8.6 && lz > -17) return HATCH_H - 5.2;
+    if (lx >= -5.5 && lx <= -4.5 && lz < -11 && lz > -15.6) return lx > -5 ? 18.0 : 17.75;
+    if (lx > -16.3 && lx < -5.5 && lz < -8.3 && lz > -18.8) return 17.5;
   }
   // the drain chamber under the standing-stones pad
   if (x > 127.8 && x < 136.2 && z > -154.2 && z < -145.8) return 4.0;
@@ -251,8 +269,12 @@ function buriedFloorAt(x, z) {
 }
 
 export function walkableY(x, z, fromY) {
-  // the lamp-room gallery: while up top, the lighthouse footprint IS the balcony floor (the climb)
-  if (GATES.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < GALLERY_RADIUS) return GALLERY_H;
+  // Resolve a flight from the floor already occupied, never from XZ alone.
+  if (GATES.towerOpen) {
+    const tread = stairSurface(x, z, fromY);
+    if (tread !== null) return tread;
+  }
+  if ((GATES.atTop || fromY >= TOWER_TOP - .35) && Math.hypot(x - TOWER.x, z - TOWER.z) < GALLERY_RADIUS) return TOWER_TOP;
 
   // the jetty deck: a real surface over the water (was a fall-through)
   if (Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz) return JETTY.y;
@@ -380,10 +402,25 @@ function edgeBlocked(x0, z0, x1, z1) {
   return false;
 }
 
-export function wallBlocked(x0, z0, x1, z1) {
-  // up on the lamp-room gallery: the only wall is the balcony rail (keeps you from the 20m drop)
-  if (GATES.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > GALLERY_PLAYER_RADIUS;
+export function wallBlocked(x0, z0, x1, z1, fromY) {
+  if (GATES.towerOpen && fromY > TOWER.base + .45 && fromY < TOWER_TOP - .3) {
+    if (stairSurface(x0, z0, fromY) !== null) return stairSurface(x1, z1, fromY, .12) === null;
+  }
+  if (GATES.atTop || fromY >= TOWER_TOP - .3) {
+    const r = Math.hypot(x1 - LHX, z1 - LHZ);
+    if (r > GALLERY_PLAYER_RADIUS) return true;
+    if (r >= 2.38) return false;
+    // The deck has a real central opening. Only the stair landing crosses it.
+    const end = stairPose(1), angle = Math.atan2(x1 - LHX, z1 - LHZ);
+    const d = Math.atan2(Math.sin(angle - end.angle), Math.cos(angle - end.angle));
+    if (Math.abs(d) < .29 && r > 1.07) return false;
+    return stairSurface(x1, z1, fromY, .12) === null;
+  }
 
+  if (Number.isFinite(fromY) && fromY < 19 && fromY > 16 && GATES.hatchOpen) {
+    if (x1 > 84.35 && x1 < 88.25 && z1 > 16.8 && z1 < 20.0) return true;
+    if (x1 > 83.1 && x1 < 89.5 && z1 > 20.95 && z1 < 23.05) return true;
+  }
   if (edgeBlocked(x0, z0, x1, z1)) return true;
 
   if (vaultOutcropBlocked(x1, z1)) return true;
@@ -557,6 +594,7 @@ export function buildTerrain() {
   // island inherits the same hole — recursion demands it)
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
+    sh.uniforms.uBuriedView = { value: 0 };
     sh.uniforms.uTexAmt = { value: 0.7 };   // strength of the procedural sand-grain luminance detail
     // waterline pass (#47/#38): the tide line, in OBJECT space so the 1:240 clone inherits it
     sh.uniforms.uWaterY = { value: 0 };
@@ -583,7 +621,7 @@ export function buildTerrain() {
         vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-        uniform vec3 uHaze; uniform float uTexAmt;
+        uniform vec3 uHaze; uniform float uTexAmt; uniform float uBuriedView;
         uniform float uWaterY; uniform float uTime; uniform float uSunUp;
         uniform sampler2D uCaustic;
         uniform sampler2D uLitter; uniform float uLitterOn; uniform vec3 uLitterRect;
@@ -593,7 +631,10 @@ export function buildTerrain() {
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
       .replace('#include <clipping_planes_fragment>',
-        `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;\n#include <clipping_planes_fragment>`)
+        `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;
+         if (uBuriedView > .5 && uBuriedView < 1.5 && vLXZ.x > 79.0 && vLXZ.x < 161.0 && vLXZ.y > -9.0 && vLXZ.y < 47.0) discard;
+         if (uBuriedView > 1.5 && vLXZ.x > 127.0 && vLXZ.x < 143.0 && vLXZ.y > -155.0 && vLXZ.y < -145.0) discard;
+         #include <clipping_planes_fragment>`)
       // MICRO-RELIEF (loop #152, owner: "depth on meshes"): the ground was flat-lit — with the tiling
       // grain gone, the bare low-poly facets showed through. Add a tangent-free, derivative-based
       // detail-normal bump (Mikkelsen) driven by procedural sand grain + gentle wind ripples, so the

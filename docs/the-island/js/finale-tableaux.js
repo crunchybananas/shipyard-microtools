@@ -28,7 +28,7 @@ const freezeTableau = (spec) => Object.freeze({
 export const FINALE_TABLEAUX = Object.freeze({
   tend: freezeTableau({
     id: 'tend',
-    line: 'you remain with what was left',
+    line: 'You take the evening watch.',
     hour: 17.25,
     camera: { control: v(-9, 18, -25), end: v(-19, 31.5, -71) },
     look: { control: v(2, 4, -8), end: v(13, -4.5, -27) },
@@ -41,7 +41,7 @@ export const FINALE_TABLEAUX = Object.freeze({
   }),
   carry: freezeTableau({
     id: 'carry',
-    line: 'you take your weight back',
+    line: 'You bring the water home.',
     hour: 7.15,
     camera: { control: v(48, 15, -8), end: v(92, 4.5, -40) },
     look: { control: v(58, -4, -36), end: v(88, -13.5, -73) },
@@ -54,7 +54,7 @@ export const FINALE_TABLEAUX = Object.freeze({
   }),
   open: freezeTableau({
     id: 'open',
-    line: 'the water runs both ways',
+    line: 'A channel between the rooms.',
     hour: 19.1,
     camera: { control: v(-15, 24, -75), end: v(100, -6.5, -86) },
     look: { control: v(28, -8, -64), end: v(88, -12.5, -62) },
@@ -67,7 +67,7 @@ export const FINALE_TABLEAUX = Object.freeze({
   }),
   close: freezeTableau({
     id: 'close',
-    line: 'the boundary holds',
+    line: 'Enough for tonight.',
     hour: 18.2,
     camera: { control: v(-0.8, 2.4, 3), end: v(-3.2, 2.5, 1.6) },
     look: { control: v(2.1, 2.1, 6.8), end: v(1.8, 1.2, 5.8) },

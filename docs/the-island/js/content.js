@@ -7,15 +7,9 @@
 // A voice from a lower landing. It asks about consequences visible from below; it never
 // names the player, explains itself, or resolves into a secret identity.
 export const KEEPER = {
-  look: {
-    3: '“Was it dry where you stood?”',
-    4: '“Did you see what the water carried?”',
-  },
-  arrive: {
-    shallow: '“It rose when the wheel turned.”',
-    deep: '“I thought the water was mine.”',
-  },
-  farewell: '“Do you know where it went?”',
+  look: { 3: '“There used to be a table there. We all fitted round it.”', 4: '“You can put that down for a while.”' },
+  arrive: { shallow: '“I heard the wheel. Come and see.”', deep: '“I kept making the boat smaller. I thought it might be easier.”' },
+  farewell: '“The kettle will need filling.”',
 };
 
 // The shelf is a routing index, never an answer key. Each stamped figure names one
@@ -44,227 +38,426 @@ export const SIGNAL_HATCH_CODE = Object.freeze(SIGNAL_ROUTE.map((glyph) => {
 // Every readable has stable surface/deep notebook IDs. Pages expose traces and records;
 // they do not add an authorial interpretation to the notebook.
 export const LORE = {
-  keeper_logbook: { era: 'spanning', eraDeep: 'inspection',
-    kind: 'book', hand: 'keeper', title: 'The Keeper’s Logbook',
+  watch_book: {
+    era: 'spanning', kind: 'book', hand: 'keeper', title: 'The watch book',
     pages: [
-      '3 April. Wind southwest. Lamp trimmed 18:40. Lens clear. Mean high water 4 cm above the printed table.',
-      '17 May. New line cut on the third stair. The old line is below water at neap tide.',
-      '2 June. Table model begun at one to two hundred and forty. Basin, channel, bridge, tower. All levels taken from the island.',
-      '19 June. A valve fitted beneath the basin. The model loses water when the bay does. Discharge not visible from the study.',
-    ],
-    deepFrom: 3,
-    deep: [
-      'BOARD QUERY: Where is displaced water received?\n\nREPLY: [the ruled space is blank; the paper is worn through where a word was erased.]',
-    ],
-    notes: { surface: 'evidence.logbook.surface', deep: 'evidence.logbook.deep' },
+      'Three boats through before dark. The last had no running light. I kept the beam on the channel until she was clear. Then I came down for the soup.',
+      'A page in a smaller hand:\n\nI counted the stairs. You were right: eighty-three. I still think you could have come down when I called.\n\nThere is a small circle of dried soup beside the reply: Fair.'
+    ], notes: { surface: 'artifact.watch-book' }
   },
-  // A routing index, not a cipher: the beam selects figures; the bindings name
-  // instruments whose physical readings the player has earned elsewhere.
-  signal_shelf: { era: 'spanning',
-    kind: 'shelf', hand: 'keeper', title: 'The instrument index',
-    place: { prop: 'none', label: 'the instrument index', maxDist: 3.0, glow: 'gilt' },
+  drying_papers: {
+    era: 'inspection', kind: 'letter', hand: 'inspector', title: 'Papers in a bread tin',
     pages: [
-      'Eight narrow harbour manuals. Each spine binds one stamped figure to an instrument: sun crank, tide staff, basin wheel, music teeth, stone arc, lamp eye, survey rule, or plumb line.',
-      'The stamps match the forms cut into the cliff. No values are printed; the bindings point back into the working room and the island beyond it.',
-    ],
-    notes: { surface: 'artifact.signal-shelf.surface' },
+      'We had six tins and considerably more than six tins of paper. We started with the names. The measurements could be taken again.',
+      'The boatwright stood in the doorway passing sheets to the keeper. I dried them on the table. At some point we stopped being careful about whose handwriting was whose.\n\nPlease leave the lid loose. They are still damp.'
+    ], notes: { surface: 'artifact.drying-papers' }
   },
-  coat_letter: { era: 'spanning', eraDeep: 'lastwinter',
-    kind: 'letter', hand: 'keeper', title: 'A letter, folded small',
-    pages: [
-      'The east room is dry. The blue blanket is in the chest. The kettle draws from the rain tank, not the sea.',
-      'No account is required at the door. Come in wet if you must.\n\n— K.',
+  "keeper_logbook": {
+    "era": "spanning",
+    "eraDeep": "inspection",
+    "kind": "book",
+    "hand": "keeper",
+    "title": "The keeper’s working book",
+    "pages": [
+      "First clear evening. The lens took all day to clean. By supper the boats were answering from the channel. I watched until the last one passed, though the soup was getting cold.",
+      "Water at the third stair again. The printed table says it should be dry. I have cut a new mark beside the old one. For now I am keeping both.",
+      "Began the island on the table. One to two hundred and forty, including the crack in the eastern path. The boatwright asked whether I meant to put the draught under the door in it too.",
+      "The little valve works. The bay falls when I empty the basin. I called her in to see the road come out of the water. She stayed a long time at the window. I went back to the valve."
     ],
-    deepFrom: 3,
-    deep: [
-      'Inside the fold: EAST ROOM — repaired latch; dry boards; spare key beneath the blue cup.',
+    "deepFrom": 3,
+    "deep": [
+      "Her question is written below the figures: Where does the water go?\n\nI wrote several answers. None came from going down to look."
     ],
-    notes: { surface: 'evidence.coat-letter.surface', deep: 'evidence.coat-letter.deep' },
+    "notes": {
+      "surface": "evidence.logbook.surface",
+      "deep": "evidence.logbook.deep"
+    }
   },
-  stone_inscription: { era: 'founding',
-    kind: 'inscription', hand: 'keeper', title: 'Cut into the standing stone',
-    pages: [
-      'WE WHO WENT DOWN\nLEFT THE LIGHT FOR\nWHOEVER WASHES UP',
+  "signal_shelf": {
+    "era": "spanning",
+    "kind": "shelf",
+    "hand": "keeper",
+    "title": "The instrument index",
+    "place": {
+      "prop": "none",
+      "label": "the instrument index",
+      "maxDist": 3,
+      "glow": "gilt"
+    },
+    "pages": [
+      "Eight small harbour manuals, rubbed pale where they were pulled from the shelf. Each stamped figure belongs to an instrument: sun crank, tide staff, basin wheel, music teeth, stone arc, lamp eye, survey rule, or plumb line.",
+      "A pencilled note on the shelf: The bindings are right even where the books are out of date.\n\nThe same stamps are cut into the cliff. There are no readings printed here."
     ],
-    deepFrom: 2,
-    deep: [
-      'Below the old cut, bared by the higher tide:\n\nTHE HILL HELD.\nTHE HALL DID NOT.\nBOTH WERE OUR WORK.',
-    ],
-    notes: { surface: 'evidence.standing-stone.surface', deep: 'evidence.standing-stone.deep' },
+    "notes": {
+      "surface": "artifact.signal-shelf.surface"
+    }
   },
-  // The first current measurement most players find.
-  bottle_note: { era: 'lastday',
-    kind: 'letter', hand: 'keeper', title: 'A note in a bottle, washed up',
-    pages: [
-      'The bottle was sealed at the jetty at low water. Wind southwest. If it returns to this beach, the west current has reversed.',
-      'The lamp room is unlocked. The rain tank is sound. The east room is dry.',
+  "coat_letter": {
+    "era": "spanning",
+    "eraDeep": "lastwinter",
+    "kind": "letter",
+    "hand": "boatwright",
+    "title": "A letter in the coat",
+    "pages": [
+      "I have put the blue blanket in the east room. The kettle has rainwater in it. The cup with the bent handle is yours if you want it.",
+      "You left halfway through telling me about the boat. The bit where you had to start the stern again. I would like to hear the rest.\n\nI will be in when you come back."
     ],
-    deepFrom: 2,
-    deep: [
-      'On the back: RETURN OBSERVED. Water 11 cm above the mark. Bottle intact.',
+    "deepFrom": 3,
+    "deep": [
+      "A later line, in softer pencil:\n\nI fixed the latch. You can open it from either side now."
     ],
-    notes: { surface: 'evidence.bottle.surface', deep: 'evidence.bottle.deep' },
+    "notes": {
+      "surface": "evidence.coat-letter.surface",
+      "deep": "evidence.coat-letter.deep"
+    }
   },
-  // L2: two recorded trials, enough to compare without an instruction.
-  kelp_slate: { era: 'arrival',
-    kind: 'inscription', hand: 'keeper', title: 'A wax slate, tangled in the kelp',
-    pages: [
-      'FIRST WADE. Dark form at twelve paces. Closed distance: form broke apart; water clouded with silt.',
-      'SECOND WADE. Held position. Form surfaced once. One low note crossed the bay. Duration: nine breaths.',
+  "stone_inscription": {
+    "era": "founding",
+    "kind": "inscription",
+    "hand": "founders",
+    "title": "On the standing stone",
+    "pages": [
+      "WE BUILT THE STEPS WIDE\nENOUGH TO WALK UP TOGETHER"
     ],
-    notes: { surface: 'evidence.kelp-slate.surface' },
+    "deepFrom": 2,
+    "deep": [
+      "A smaller cut below the water stain:\n\nTHE BOATS ARE TIED ABOVE THE HALL.\nBRING THE DOGS FIRST."
+    ],
+    "notes": {
+      "surface": "evidence.standing-stone.surface",
+      "deep": "evidence.standing-stone.deep"
+    }
   },
-  // L3: a measured change in the Watcher's distance.
-  bluff_cairn: { era: 'inspection',
-    kind: 'inscription', hand: 'keeper', title: 'A cairn on the bluff, scratched in the top stone',
-    pages: [
-      'Cairn rebuilt above the wet line. Drowned hall roof visible to the east.',
-      'The shore figure was twelve paces nearer after I checked the hall. No wake. No footprints. It did not advance while observed.',
+  "bottle_note": {
+    "era": "lastday",
+    "kind": "letter",
+    "hand": "boatwright",
+    "title": "A note sent by water",
+    "pages": [
+      "If this comes ashore near you, the light is still working. The door below it opens with a lift and a push. It swells in the wet.",
+      "I put a very small boat in the east room. There is a split along one side. Please leave it as it is for now. I am trying something."
     ],
-    notes: { surface: 'evidence.bluff-cairn.surface' },
+    "deepFrom": 2,
+    "deep": [
+      "The bottle came back.\n\nI sent it out again with a fresh cork. There may still be someone on the other shore."
+    ],
+    "notes": {
+      "surface": "evidence.bottle.surface",
+      "deep": "evidence.bottle.deep"
+    }
   },
-  // L4: conservation evidence, not a final instruction.
-  source_note: { era: 'lastwinter',
-    kind: 'letter', hand: 'keeper', title: 'A transfer sheet, weighted with a stone',
-    pages: [
-      'TRANSFER TEST 4. Upper basin lowered: 28 cm. Lower pool raised: 28 cm. Delay: eleven seconds.',
-      'Return test incomplete. Wheel seized after reversal. Pressure remained on both sides of the plate.',
+  "kelp_slate": {
+    "era": "arrival",
+    "kind": "inscription",
+    "hand": "boatwright",
+    "title": "The boatwright’s wax slate",
+    "pages": [
+      "I saw someone between the weeds and went splashing over. By the time I got there the water was empty. I felt foolish calling out to it.",
+      "Next morning I sat on the dry end of the bench. After a while a head came up. We stayed like that. Then it made a low sound, almost a note, and I found I had been holding my breath."
     ],
-    notes: { surface: 'evidence.transfer-sheet.surface' },
+    "notes": {
+      "surface": "evidence.kelp-slate.surface"
+    }
   },
-  // The room's safety changes from barricade to chosen shelter across its two reads.
-  quarters_journal: { era: 'inspection', eraDeep: 'lastwinter',
-    kind: 'book', hand: 'keeper', title: 'A journal kept by the cot',
-    pages: [
-      'Could not sleep through the west gale. Moved the chair against the inner door.',
-      'Drew the island again from memory. The channel is too narrow. The east room remains dry in every version.',
-      'Lamp trimmed at dusk. Cot lamp left burning until morning.',
+  "bluff_cairn": {
+    "era": "inspection",
+    "kind": "inscription",
+    "hand": "inspector",
+    "title": "Pencil under the cairn",
+    "pages": [
+      "He kept appearing nearer whenever I looked at the hall. I thought he wanted me to leave. I put my bag down so I could watch without having to carry it.",
+      "He raised his head at last. I had been expecting a face I knew. There was only someone waiting, as wet as I was."
     ],
-    deepFrom: 3,
-    deep: [
-      'Later: moved the chair away from the door. Slept with it open. Rain reached the threshold; the east boards stayed dry.',
-    ],
-    notes: { surface: 'evidence.quarters-journal.surface', deep: 'evidence.quarters-journal.deep' },
+    "notes": {
+      "surface": "evidence.bluff-cairn.surface"
+    }
   },
-  // Legible only through the reading glass.
-  lens_mark_study: { era: 'inspection',
-    kind: 'inscription', hand: 'keeper', title: 'Lampblack, too small to read by eye',
-    pages: [
-      'Through the glass: LENS ROTATION 04:10. Beam crossed the west cliff at 04:13. Four figures returned from the cut face.',
-      'Order copied in the margin as figures only. No numerals are written here.',
+  "source_note": {
+    "era": "lastwinter",
+    "kind": "letter",
+    "hand": "keeper",
+    "title": "Beside the unfinished boat",
+    "pages": [
+      "This was going to be the good boat. I cut six sterns for it. Each was a little closer to what I had drawn. The first one is under the bench. There is nothing much wrong with it.",
+      "She stitched the split with blue thread while I was finding a better piece of wood. It leaks a little. She says we can put it in the shallows and see.\n\nI have left room beside it."
     ],
-    deepFrom: 3,
-    deep: [
-      'A second hand added: CLIFF DRY. HALL FLOODED. Same figures visible on both faces.',
-    ],
-    notes: { surface: 'evidence.lens-study.surface', deep: 'evidence.lens-study.deep' },
+    "notes": {
+      "surface": "evidence.transfer-sheet.surface"
+    }
   },
-  lens_mark_stone: { era: 'inspection',
-    kind: 'inscription', hand: 'keeper', title: 'Scratched into the stone, hair-fine',
-    pages: [
-      'Through the glass: thirty-seven short strokes, grouped by five. Five longer strokes cross the groups at different angles.',
-      'The stone is polished at palm height. The polish overlaps several generations of cuts.',
+  "quarters_journal": {
+    "era": "inspection",
+    "eraDeep": "lastwinter",
+    "kind": "book",
+    "hand": "keeper",
+    "title": "The book beside the pillow",
+    "pages": [
+      "I could hear the wind through the latch, so I put a chair against the door. Later I woke to the sound of the chair moving. It was only the house settling. I stayed awake anyway.",
+      "The boatwright brought another chair. Its lower rung is the wrong wood. We sat until the kettle ran dry. I did not once get up to look at the model."
     ],
-    deepFrom: 3,
-    deep: [
-      'Below the tide line are more strokes, softened but still deliberate. One ends above the water; another continues beneath it.',
+    "deepFrom": 3,
+    "deep": [
+      "I moved the first chair back to the table.\n\nThe door still rattles. Last night I slept through it."
     ],
-    notes: { surface: 'evidence.lens-stone.surface', deep: 'evidence.lens-stone.deep' },
+    "notes": {
+      "surface": "evidence.quarters-journal.surface",
+      "deep": "evidence.quarters-journal.deep"
+    }
   },
-  // A physical round trip between the dry upper pool and the fifth water ring.
-  pool_phial: { era: 'lastwinter',
-    kind: 'letter', hand: 'keeper', title: 'A note sealed in a phial, dried and unrolled',
-    pages: [
-      'POOL TEST. Phial wedged at dry datum: +14.8 m. It can clear the lip only when the basin reaches the fifth ring.',
-      'Paper dried after recovery. Salt line inside the glass: 3 mm below the cork.',
+  "lens_mark_study": {
+    "era": "inspection",
+    "kind": "inscription",
+    "hand": "keeper",
+    "title": "Writing beneath the reading glass",
+    "pages": [
+      "She was halfway through a story when the beam touched the cliff. I asked her to wait while I copied the figures. When I looked up she was carrying the cups through to the other room.",
+      "The figures return after dark, in the same order. I have left space for them here. I have also left space for the end of her story."
     ],
-    notes: { surface: 'evidence.pool-phial.surface' },
+    "deepFrom": 3,
+    "deep": [
+      "I took the book down to the hall. The ledge where they kept the winter cups was underwater. My own cup was still dry above."
+    ],
+    "notes": {
+      "surface": "evidence.lens-study.surface",
+      "deep": "evidence.lens-study.deep"
+    }
   },
-  // The institutional measurements lag the island's instruments.
-  drain_ledger: { record: true, era: 'inspection',
-    kind: 'book', hand: 'inspector', title: 'A tide ledger, water-swollen',
-    pages: [
-      'DISTRICT OF LIGHTS — QUARTERLY RETURN. Mean high water: +4 cm against table. Keeper’s staff checked against survey chain: exact.',
-      'SECOND QUARTER. Mean high water: +11 cm. Boat-store stair wet at third step during neap. Printed table unchanged.',
+  "lens_mark_stone": {
+    "era": "inspection",
+    "kind": "inscription",
+    "hand": "founders",
+    "title": "On the smooth side of the stone",
+    "pages": [
+      "Thirty-seven shallow strokes, in groups of five. A few have been rubbed smooth by a thumb.",
+      "Beside them, small words:\n\ni made this bit smooth so your hand can rest here"
     ],
-    deepFrom: 3,
-    deep: [
-      'FINAL RETURN. Archive floor flooded before inspection. Station figures accepted. Printed table withdrawn.',
+    "deepFrom": 3,
+    "deep": [
+      "The next line was covered by sand:\n\nthere is room for two hands"
     ],
-    notes: { surface: 'evidence.drain-ledger.surface', deep: 'evidence.drain-ledger.deep' },
+    "notes": {
+      "surface": "evidence.lens-stone.surface",
+      "deep": "evidence.lens-stone.deep"
+    }
   },
-  // A retained recommendation whose provenance remains physically uncertain.
-  commendation_copy: { record: true, era: 'inspection',
-    kind: 'letter', hand: 'inspector', title: 'A carbon copy, kept',
-    place: { parent: 'quarters', pos: [-0.35, 0.44, 1.05], rx: -Math.PI / 2 + 0.06, rz: 0.3, prop: 'sheet', label: 'a carbon copy, kept', maxDist: 2.6, gate: 'quarters' },
-    pages: [
-      'CARBON RETAINED — RECOMMENDATION FOR COMMENDATION. Returns exact. Lens work within tolerance. Light outages: none. Recommendation submitted despite pending station review.',
+  "pool_phial": {
+    "era": "lastwinter",
+    "kind": "letter",
+    "hand": "keeper",
+    "title": "Paper inside the little phial",
+    "pages": [
+      "A water mark and a date have blurred together. Beneath them, still legible:\n\nSaved from the high pool. The boatwright wanted to know whether it would taste of rain.",
+      "A pencilled answer on the folded edge:\n\nIt did."
     ],
-    deepFrom: 3,
-    deep: [
-      'The retained sheet is top carbon. No impression from an original page is visible beneath it. The signature line is blank.',
-    ],
-    notes: { surface: 'evidence.commendation.surface', deep: 'evidence.commendation.deep' },
+    "notes": {
+      "surface": "evidence.pool-phial.surface"
+    }
   },
-  // A closure proposal without the fields that would make it an order.
-  closure_notice: { record: true, era: 'lastwinter',
-    kind: 'letter', hand: 'inspector', title: 'A notice of review, folded small',
-    place: { pos: [-84.45, 14.475, -41.06], ry: 0.35, prop: 'fold', label: 'a paper, folded small', maxDist: 2.8 },
-    pages: [
-      'NOTICE OF REVIEW — DISTRICT OF LIGHTS. Station cost exceeds traffic served. Proposed action: extinguish light; recover instruments and great lens; offer mainland transfer.',
+  "drain_ledger": {
+    "record": true,
+    "era": "inspection",
+    "kind": "book",
+    "hand": "inspector",
+    "title": "The visitor’s tide ledger",
+    "pages": [
+      "District visit. The keeper’s gauge is accurate. Water stands four centimetres above the table. I have entered the measured figure and asked for the table to be corrected.",
+      "Second visit. Eleven centimetres now. The boatwright showed me the wet stair. I said a correction was pending. She asked whether I had brought any dry socks."
     ],
-    deepFrom: 4,
-    deep: [
-      'The effective date and authorising signature are blank. In the margin: RECEIPT NOT ACKNOWLEDGED.',
+    "deepFrom": 3,
+    "deep": [
+      "Final visit. The archive floor had flooded before I arrived. We carried the loose sheets upstairs in bread tins. The keeper gave me his spare socks.\n\nI have stopped writing PENDING against the water."
     ],
-    notes: { surface: 'evidence.closure.surface', deep: 'evidence.closure.deep' },
+    "notes": {
+      "surface": "evidence.drain-ledger.surface",
+      "deep": "evidence.drain-ledger.deep"
+    }
   },
-  // Measurements on the smallest visible chart-table margin.
-  field_slip: { record: true, era: 'inspection',
-    kind: 'letter', hand: 'inspector', title: 'A field slip, pinched under the cairn',
-    place: { parent: 'bluffCairn', pos: [0.18, 0.62, 0.14], rx: -Math.PI / 2 + 0.2, rz: -0.4, prop: 'sheet', label: 'a field slip, pinched under stone', maxDist: 2.8, gate: 'l3' },
-    pages: [
-      'FIELD SLIP — wind SW, moderate. Glass falling. North bluff ascent: 22 minutes. Cairn at crest not shown on survey.',
+  "commendation_copy": {
+    "record": true,
+    "era": "inspection",
+    "handDeep": "keeper",
+    "kind": "letter",
+    "hand": "inspector",
+    "title": "A recommendation, kept",
+    "place": {
+      "parent": "quarters",
+      "pos": [
+        -0.35,
+        0.44,
+        1.05
+      ],
+      "rx": -1.5107963267948965,
+      "rz": 0.3,
+      "prop": "sheet",
+      "label": "a carbon copy, kept",
+      "maxDist": 2.6,
+      "gate": "quarters"
+    },
+    "pages": [
+      "Recommendation: the light has remained in service through three winters without a missed night. The lens work is exact. The keeper has done the work of a larger station.\n\nI would like this said somewhere he can read it."
     ],
-    deepFrom: 3,
-    deep: [
-      'Reverse: tower 21.4 m; stair 83 treads; mean high water +11 cm; oil 146 L. Column headed KEEPER RELIEF is blank.',
+    "deepFrom": 3,
+    "deep": [
+      "The signature line is empty. Along the bottom, in the keeper’s hand:\n\nI kept waiting for this to make it easier to stop."
     ],
-    notes: { surface: 'evidence.field-slip.surface', deep: 'evidence.field-slip.deep' },
+    "notes": {
+      "surface": "evidence.commendation.surface",
+      "deep": "evidence.commendation.deep"
+    }
   },
-  transfer_offer: { record: true, era: 'lastwinter',
-    kind: 'letter', hand: 'inspector', title: 'An offer of transfer, never burnt',
-    place: { parent: 'quarters', pos: [0.95, 0.02, 1.35], ry: 0.7, prop: 'fold', label: 'a letter, wedged behind the stove', maxDist: 2.6, gate: 'quarters' },
-    pages: [
-      'DISTRICT OF LIGHTS — NOTICE OF VACANCY. Mainland station available from spring quarter. Housing included. Two assistants. Application invited.',
+  "closure_notice": {
+    "record": true,
+    "era": "lastwinter",
+    "handDeep": "boatwright",
+    "kind": "letter",
+    "hand": "inspector",
+    "title": "The proposed closure",
+    "place": {
+      "pos": [
+        -84.45,
+        14.475,
+        -41.06
+      ],
+      "ry": 0.35,
+      "prop": "fold",
+      "label": "a paper, folded small",
+      "maxDist": 2.8
+    },
+    "pages": [
+      "District of Lights. Proposed closure. The light and its instruments may be transferred when a replacement route is established. A response is requested before the next supply boat.\n\nThe date has been folded into the crease."
     ],
-    deepFrom: 4,
-    deep: [
-      'Draft on reverse, unsent: TRANSFER DECLINED. Reason field first reads STATION REQUIRES KEEPER, then is struck through. No replacement reason.',
+    "deepFrom": 4,
+    "deep": [
+      "Across the back, in the boatwright’s hand:\n\nWe could have a window that looks at something other than the light. I am only saying we could."
     ],
-    notes: { surface: 'evidence.transfer-offer.surface', deep: 'evidence.transfer-offer.deep' },
+    "notes": {
+      "surface": "evidence.closure.surface",
+      "deep": "evidence.closure.deep"
+    }
   },
-  model_margin: { era: 'lastwinter',
-    kind: 'inscription', hand: 'keeper', title: 'The model’s margin, under the glass',
-    pages: [
-      'Under the glass: SCALE 1:240. ERROR AT WEST CHANNEL: +0.8 mm. ERROR AT UPPER POOL: -0.3 mm.',
-      'A smaller model is drawn inside the lamp room. Its basin is marked FULL; the surrounding sea is marked LOW.',
+  "field_slip": {
+    "record": true,
+    "era": "inspection",
+    "handDeep": "keeper",
+    "kind": "letter",
+    "hand": "inspector",
+    "title": "A field slip under the stone",
+    "place": {
+      "parent": "bluffCairn",
+      "pos": [
+        0.18,
+        0.62,
+        0.14
+      ],
+      "rx": -1.3707963267948966,
+      "rz": -0.4,
+      "prop": "sheet",
+      "label": "a field slip, pinched under stone",
+      "maxDist": 2.8,
+      "gate": "l3"
+    },
+    "pages": [
+      "The bluff took me most of the morning. I wrote twenty-two minutes in the return. It was what the last visitor had written.\n\nThe boatwright caught up carrying a chair. She did not mention the time."
     ],
-    notes: { surface: 'evidence.model-margin.surface' },
+    "deepFrom": 3,
+    "deep": [
+      "Reverse: tower, twenty-one metres; stair, eighty-three treads. Under RELIEF, the keeper has written:\n\nSomeone who will stay for supper."
+    ],
+    "notes": {
+      "surface": "evidence.field-slip.surface",
+      "deep": "evidence.field-slip.deep"
+    }
   },
-  // A repair record; the bird remains an independent observation.
-  music_note: { era: 'spanning', eraDeep: 'lastwinter',
-    kind: 'letter', hand: 'keeper', title: 'A note folded into the music box',
-    pages: [
-      'Fourth tooth catches again. Filed it. Worse.',
-      'Box sequence after filing: E · G · A · D · C. Dawn bird answers from the stone arc.',
+  "transfer_offer": {
+    "record": true,
+    "era": "lastwinter",
+    "handDeep": "keeper",
+    "kind": "letter",
+    "hand": "inspector",
+    "title": "An offer, never burnt",
+    "place": {
+      "parent": "quarters",
+      "pos": [
+        0.95,
+        0.02,
+        1.35
+      ],
+      "ry": 0.7,
+      "prop": "fold",
+      "label": "a letter, wedged behind the stove",
+      "maxDist": 2.6,
+      "gate": "quarters"
+    },
+    "pages": [
+      "A place is available at the mainland station. Two assistants share the watch. There is a garden behind the house, though the soil needs work.\n\nThe visitor has added: I have seen it. There is room."
     ],
-    deepFrom: 4,
-    deep: [
-      'Inside fold: BIRD, FOURTH NOTE HIGH. 04:52. Clear sky.',
+    "deepFrom": 4,
+    "deep": [
+      "An unfinished reply:\n\nI know how to keep this light going. I do not yet know what I would do in the mornings if someone else took a turn."
     ],
-    notes: { surface: 'evidence.music-note.surface', deep: 'evidence.music-note.deep' },
+    "notes": {
+      "surface": "evidence.transfer-offer.surface",
+      "deep": "evidence.transfer-offer.deep"
+    }
   },
+  "model_margin": {
+    "era": "lastwinter",
+    "kind": "inscription",
+    "hand": "keeper",
+    "title": "In the model’s margin",
+    "pages": [
+      "SCALE 1:240. A pencilled island sits inside the drawn lighthouse. There is another lighthouse on it, and a smaller island on that.",
+      "A different hand has added a tiny chair beside the smallest table. It is much too large for the scale."
+    ],
+    "notes": {
+      "surface": "evidence.model-margin.surface"
+    }
+  },
+  "music_note": {
+    "era": "spanning",
+    "eraDeep": "lastwinter",
+    "kind": "letter",
+    "hand": "keeper",
+    "title": "A note inside the music box",
+    "pages": [
+      "Fourth tooth catches again. Filed it. Worse.\n\nShe laughed when I said I could fix the song. She asked whether the bird had complained.",
+      "After filing: E · G · A · D · C.\n\nThe bird still answers from the stones at dawn. It waits for the box to finish before it starts."
+    ],
+    "deepFrom": 4,
+    "deep": [
+      "Inside the fold:\n\nThe bird takes the fourth note higher. We left the window open to hear it again."
+    ],
+    "notes": {
+      "surface": "evidence.music-note.surface",
+      "deep": "evidence.music-note.deep"
+    }
+  },
+  "spare_place": {
+    "era": "spanning",
+    "kind": "letter",
+    "hand": "boatwright",
+    "title": "Under the spare chair",
+    "pages": [
+      "This rung came off a different chair. I could have stained it to match. Then I would have had to wait for it to dry, and you were already putting the kettle on.",
+      "I will bring the boat tomorrow. We can try it in the basin. There is no need to clear the whole table."
+    ],
+    "notes": {
+      "surface": "evidence.spare-place"
+    }
+  },
+  "boat_return": {
+    "era": "lastwinter",
+    "kind": "letter",
+    "hand": "boatwright",
+    "title": "The little boat",
+    "pages": [
+      "The stitches are still visible along its side. One end sits lower than the other. It has been in the water and come back with a little sand inside.",
+      "Under the seat, a word cut into the wood:\n\nAgain."
+    ],
+    "notes": {
+      "surface": "evidence.boat-return"
+    }
+  }
 };
 
 // ---- FIELD NOTES ------------------------------------------------------------
@@ -274,14 +467,22 @@ const dispositionCount = (world, disposition) => Object.values(world.recDisp)
   .filter((value) => value === disposition).length;
 
 export const FIELD_NOTES = Object.freeze({
+  'place.lamp-gallery': { text: 'I climbed the eighty-three treads. Both ends of the causeway are visible from the gallery.', sketchId: 'model-marker' },
+  'artifact.watch-book': { text: 'The keeper watched the last unlit boat clear the channel. Another hand counted the stairs.', sketchId: 'model-marker' },
+  'artifact.drying-papers': { text: 'Three people carried papers into the western room in bread tins. They saved the names first.', sketchId: 'register' },
+  'event.archive-opened': { text: 'I opened a tin on the drying table in the western study.', sketchId: 'register' },
+  'evidence.spare-place': { text: 'The spare chair has a replaced rung. A note underneath invites the keeper to try the boat.', sketchId: 'disposition' },
+  'evidence.boat-return': { text: 'The small boat came back with sand inside. Its blue stitches are still visible.', sketchId: 'lower-hand' },
+  'event.place-made': { text: 'I pulled out the spare chair beside the table.', sketchId: 'disposition' },
+  'event.boat-launched': { text: 'I set the stitched boat in the basin. It floats with one end a little low.', sketchId: 'lower-hand' },
   'arrival.shallows': { text: 'The shallows are higher. Kelp crosses the old footpath.', sketchId: 'upstream-hand' },
   'arrival.inspection': { text: 'Water reaches the drowned hall roof. The study window is below the tide line.', sketchId: 'register' },
   'arrival.source': { text: 'The fifth gauge ring is wet. The upper stone pool is full.', sketchId: 'lower-hand' },
-  'return.receiver': { text: 'The dry-room lamp is still burning. Water left above was received in the shallows.', sketchId: 'upstream-hand' },
-  'return.surface': { text: 'The original beach is smaller. The lit east room remains above water.', sketchId: 'disposition' },
+  'return.receiver': { text: "Back from the shallows. The lamp is still burning in the east room.", sketchId: 'upstream-hand' },
+  'return.surface': { text: "Back at the original study. The east room is above the changed waterline.", sketchId: 'disposition' },
   'evidence.model-marker': { text: 'A moving point on the table model matches my position on the island.', sketchId: 'model-marker' },
 
-  'event.refuge-lit': { text: 'One dry circle of floor around the cot. Lamp oil: half a cup.', sketchId: 'disposition' },
+  'event.refuge-lit': { text: "The cot lamp is lit. The east room is dry.", sketchId: 'disposition' },
   'evidence.valve': { text: 'Turning the brass valve lowers the model basin and the bay together.', sketchId: 'valve' },
   'evidence.music-box': { text: 'The music box plays E · G · A · D · C. Its fourth tooth has been filed twice.', sketchId: 'bird' },
   'evidence.ruler': { text: 'The brass ruler spans the crack in the model. A measured bridge now spans the eastern chasm.', sketchId: 'ruler' },
@@ -316,14 +517,14 @@ export const FIELD_NOTES = Object.freeze({
   'evidence.study-model': { text: 'The study model matches the island at one to two hundred and forty, including this room.', sketchId: 'model-marker' },
   'evidence.study-unchanged': { text: 'On return, the cup, chair, dust, and clock hand occupy their earlier positions.' },
   'collection.climber.cmTallies': { text: 'Thirty-seven short strokes in groups of five; a palm-wide hollow beside them.' },
-  'collection.climber.cmFormal': { text: '“I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.”' },
-  'collection.climber.cmPlain': { text: '“went down for my brother. came up with the weather.”' },
-  'collection.climber.cmUnfinished': { text: '“day nine below. the lamp is” — the cut ends mid-line.' },
-  'collection.climber.cmChild': { text: '“im not lost. dont come down.”' },
+  'collection.climber.cmFormal': { text: '“I CAME DOWN LATE. THEY MADE A PLACE FOR ME.”' },
+  'collection.climber.cmPlain': { text: '“left my coat on the third stair. anyone can have it.”' },
+  'collection.climber.cmUnfinished': { text: '“day nine below. more tea, less measuring” — the cut ends mid-line.' },
+  'collection.climber.cmChild': { text: '“i can hear you up there”' },
   'collection.climbers-complete': { text: 'Five distinct hands appear at five depths. None is listed in the station log.' },
-  'collection.hall.cgRoof': { text: '“WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH.” Water now stands above it.' },
+  'collection.hall.cgRoof': { text: '“WE MADE THE TABLE LONGER EACH WINTER.” Water now stands above it.' },
   'collection.hall.cgCount': { text: '“WE COUNTED OURSELVES EACH WINTER —” The number is effaced.' },
-  'collection.hall.cgLight': { text: '“WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT.”' },
+  'collection.hall.cgLight': { text: '“WHEN WE MOVED UPHILL WE TOOK THE TABLE.”' },
   'collection.hall-complete': { text: 'All three hall inscriptions use the same plural hand.' },
   'collection.lampblack.lmValve': { text: 'TEST 6 — upper basin minus 9; lower basin plus 9.' },
   'collection.lampblack.lmBox': { text: 'Fourth tooth filed twice. Pitch fell both times.' },
@@ -350,37 +551,37 @@ export const FIELD_NOTES = Object.freeze({
   'event.rounds-complete': { text: 'Mooring, return, cot lamp, and music box have each been tended once.' },
   'evidence.completed-song': { text: 'The standing stones accept six notes when the fallen stone carries the added low tone.', sketchId: 'bird' },
   'evidence.disposition': { text: 'The mechanism can hold, reverse, join, or seal the transfer. Each changes both sides of the plate.', sketchId: 'disposition' },
-  'evidence.logbook.surface': { text: 'The log records rising water, a one-to-240 model, and a valve whose discharge cannot be seen from the study.', sketchId: 'valve' },
-  'evidence.logbook.deep': { text: 'The Board asked where displaced water was received. The reply was erased through the paper.', sketchId: 'register' },
-  'evidence.coat-letter.surface': { text: 'An unsent letter says the east room is dry and no account is required at its door.' },
-  'evidence.coat-letter.deep': { text: 'Inside the fold: repaired latch, dry boards, spare key beneath the blue cup.' },
-  'evidence.standing-stone.surface': { text: 'The stone reads: WE WHO WENT DOWN / LEFT THE LIGHT FOR / WHOEVER WASHES UP.' },
-  'evidence.standing-stone.deep': { text: 'A lower cut reads: THE HILL HELD. / THE HALL DID NOT. / BOTH WERE OUR WORK.' },
-  'evidence.bottle.surface': { text: 'The bottle was released at low water to test whether the west current would return it.' },
-  'evidence.bottle.deep': { text: 'The back records its return intact, with water 11 cm above the mark.' },
-  'evidence.kelp-slate.surface': { text: 'The slate records two approaches to the kelp form: pursuit scattered it; waiting preceded one low note.', sketchId: 'tide-figure' },
-  'evidence.bluff-cairn.surface': { text: 'The cairn note says the shore figure moved twelve paces while the writer looked away.', sketchId: 'watcher' },
-  'evidence.transfer-sheet.surface': { text: 'Transfer test: upper basin fell 28 cm; lower pool rose 28 cm. The attempted reversal seized.' },
-  'evidence.quarters-journal.surface': { text: 'The cot journal records a barred door, repeated island drawings, and the east room staying dry.' },
-  'evidence.quarters-journal.deep': { text: 'A later entry records the chair moved away and the door left open overnight.' },
-  'evidence.lens-study.surface': { text: 'Lampblack records four figures reflected from the west cliff after the lens rotated.', sketchId: 'beam-glyphs' },
-  'evidence.lens-study.deep': { text: 'A second hand reports the same figures on the dry cliff and flooded hall.' },
-  'evidence.lens-stone.surface': { text: 'The glass reveals grouped strokes and overlapping palm-polish on the stone.' },
-  'evidence.lens-stone.deep': { text: 'More deliberate strokes continue below the tide line.' },
-  'evidence.pool-phial.surface': { text: 'The phial clears the upper pool lip only when the basin reaches the fifth ring.' },
-  'evidence.drain-ledger.surface': { text: 'The ledger measurements rise from +4 cm to +11 cm while the printed table stays unchanged.' },
-  'evidence.drain-ledger.deep': { text: 'The final return accepts the station figures after the archive floods.' },
-  'evidence.commendation.surface': { text: 'A retained carbon lists exact returns, acceptable lens work, and no light outages.' },
-  'evidence.commendation.deep': { text: 'The top carbon has no underlying original impression and no signature.' },
-  'evidence.closure.surface': { text: 'An unsigned review proposes closing the station, recovering the lens, and offering a transfer.' },
-  'evidence.closure.deep': { text: 'The notice has no effective date. Its receipt was never acknowledged.' },
-  'evidence.field-slip.surface': { text: 'The inspector timed the bluff ascent and found a cairn absent from the survey.' },
-  'evidence.field-slip.deep': { text: 'The reverse measures tower, stair, water, and oil. KEEPER RELIEF is blank.' },
-  'evidence.transfer-offer.surface': { text: 'The mainland vacancy included housing and two assistants.' },
-  'evidence.transfer-offer.deep': { text: 'An unsent refusal has its only stated reason struck through.' },
-  'evidence.model-margin.surface': { text: 'The model margin lists scale errors and shows a smaller model with a full basin inside a low sea.' },
-  'evidence.music-note.surface': { text: 'The box plays E · G · A · D · C. A note says filing the fourth tooth made it worse.', sketchId: 'bird' },
-  'evidence.music-note.deep': { text: 'Inside the fold: BIRD, FOURTH NOTE HIGH. 04:52. Clear sky.' },
+  'evidence.logbook.surface': { text: "The keeper built a working model. The boatwright watched the water leave the bay.", sketchId: 'valve' },
+  'evidence.logbook.deep': { text: "The boatwright asked where the water went. The keeper wrote answers before going down to look.", sketchId: 'register' },
+  'evidence.coat-letter.surface': { text: "The boatwright left a blanket, a cup and an invitation to finish a story." },
+  'evidence.coat-letter.deep': { text: "The latch was repaired so the door opens from either side." },
+  'evidence.standing-stone.surface': { text: "The first settlers built the steps wide enough to walk up together." },
+  'evidence.standing-stone.deep': { text: "The lower inscription says the boats are above the hall and the dogs should go first." },
+  'evidence.bottle.surface': { text: "A note gives directions to the light. It mentions a small split boat left in the east room." },
+  'evidence.bottle.deep': { text: "The bottle returned and was sent out again with a fresh cork." },
+  'evidence.kelp-slate.surface': { text: "The boatwright lost the figure by approaching. Sitting on the bench, she heard its low note.", sketchId: 'tide-figure' },
+  'evidence.bluff-cairn.surface': { text: "The visitor watched the shore figure after putting down the bag. It raised its head.", sketchId: 'watcher' },
+  'evidence.transfer-sheet.surface': { text: "The keeper made six sterns. The boatwright stitched the split with blue thread." },
+  'evidence.quarters-journal.surface': { text: "The keeper blocked the door with a chair. Later the boatwright brought another chair." },
+  'evidence.quarters-journal.deep': { text: "The keeper moved the chair back to the table and slept through the rattling door." },
+  'evidence.lens-study.surface': { text: "The keeper interrupted a story to copy the beam. Space remains for both on the page.", sketchId: 'beam-glyphs' },
+  'evidence.lens-study.deep': { text: "The keeper found the winter cup ledge flooded in the lower hall." },
+  'evidence.lens-stone.surface': { text: "Beside the tallies, someone smoothed a place for a hand." },
+  'evidence.lens-stone.deep': { text: "The covered line says there is room for two hands." },
+  'evidence.pool-phial.surface': { text: "The paper records water from the high pool. The boatwright said it tasted of rain." },
+  'evidence.drain-ledger.surface': { text: "The visitor recorded rising water. The boatwright asked whether the visitor had dry socks." },
+  'evidence.drain-ledger.deep': { text: "The archive flooded. They carried sheets upstairs in bread tins." },
+  'evidence.commendation.surface': { text: "A visitor recommended recognition for the keeper’s uninterrupted work." },
+  'evidence.commendation.deep': { text: "The keeper hoped recognition would make it easier to stop." },
+  'evidence.closure.surface': { text: "The District proposed closure when a replacement route was established." },
+  'evidence.closure.deep': { text: "The boatwright suggested a window facing away from the light." },
+  'evidence.field-slip.surface': { text: "The visitor copied an earlier walking time. The boatwright arrived carrying a chair." },
+  'evidence.field-slip.deep': { text: "The keeper wrote that relief could mean someone who stayed for supper." },
+  'evidence.transfer-offer.surface': { text: "A mainland station offered shared watches and a garden." },
+  'evidence.transfer-offer.deep': { text: "An unfinished reply wonders what the keeper would do if someone else took a watch." },
+  'evidence.model-margin.surface': { text: "Someone drew a spare chair beside the smallest table. It exceeds the scale." },
+  'evidence.music-note.surface': { text: "The fourth tooth was filed. The bird waits for the box to finish before answering.", sketchId: 'bird' },
+  'evidence.music-note.deep': { text: "The bird raises the fourth note. The window was left open to hear it again." },
 
   'ending.tend': { text: 'The transfer is held at its present level. The lamp continues to turn.', sketchId: 'disposition' },
   'ending.carry': { text: ({ removed = 0 } = {}) => `The mechanism is reversed across ${removed} interventions. Water retreats below and returns above.`, sketchId: 'disposition' },
@@ -436,13 +637,13 @@ export const CLIMBERS = [
   { id: 'cmTallies', noteId: 'collection.climber.cmTallies',
     whisper: 'Thirty-seven short strokes, grouped by five. The stone is smooth beside them.' },
   { id: 'cmFormal', noteId: 'collection.climber.cmFormal',
-    whisper: 'An old formal hand, every letter ruled straight: “I DESCENDED IN MY SIXTIETH YEAR. THE SEA WAS ALREADY IN THE PARLOUR.”' },
+    whisper: 'An old formal hand, every letter ruled straight: “I CAME DOWN LATE. THEY MADE A PLACE FOR ME.”' },
   { id: 'cmPlain', noteId: 'collection.climber.cmPlain',
-    whisper: 'A plain hand on the stone: “went down for my brother. came up with the weather.”' },
+    whisper: 'A plain hand on the stone: “left my coat on the third stair. anyone can have it.”' },
   { id: 'cmUnfinished', noteId: 'collection.climber.cmUnfinished',
-    whisper: 'A hurried hand, low on the cairn: “day nine below. the lamp is” — and it stops.' },
+    whisper: 'A hurried hand, low on the cairn: “day nine below. more tea, less measuring” — and it stops.' },
   { id: 'cmChild', noteId: 'collection.climber.cmChild',
-    whisper: 'Small letters, close to the cold floor, in a hand still learning its letters: “im not lost. dont come down.”' },
+    whisper: 'Small letters, close to the cold floor, in a hand still learning its letters: “i can hear you up there”' },
 ];
 export const CLIMBERS_CLOSE = {
   noteId: 'collection.climbers-complete',
@@ -453,11 +654,11 @@ export const CLIMBERS_CLOSE = {
 // Three monumental lines share the plural hand cut into the standing stone.
 export const CONGREGATION = [
   { id: 'cgRoof', noteId: 'collection.hall.cgRoof',
-    line: 'WE RAISED THE ROOF ABOVE THE SPRING TIDE’S REACH' },
+    line: 'WE MADE THE TABLE LONGER EACH WINTER' },
   { id: 'cgCount', noteId: 'collection.hall.cgCount',
-    line: 'WE COUNTED OURSELVES EACH WINTER — …' },
+    line: 'WHOEVER ARRIVED WAS GIVEN A CUP' },
   { id: 'cgLight', noteId: 'collection.hall.cgLight',
-    line: 'WHEN THE WATER CAME WE WENT UP THE HILL AND BUILT A LIGHT' },
+    line: 'WHEN WE MOVED UPHILL WE TOOK THE TABLE' },
 ];
 export const CONGREGATION_CLOSE = {
   noteId: 'collection.hall-complete',
@@ -529,92 +730,89 @@ export const SKETCHES_BY_ID = Object.freeze({
 // Immediate sensory feedback for active mechanics. Persistent evidence belongs in
 // FIELD_NOTES; requested guidance belongs in HINT_THREADS.
 export const T = {
-  the_sea_no_longer: 'The sea no longer answers the wheel down here.',
-  // The same instrument obeys, lags, is audited, then refuses across the descent.
-  the_wheel_turns_and: 'The wheel turns. The sky follows after a delay.',
-  the_hour_will_not: 'The wheel turns freely. The sky does not move.',
-  the_register_has_one: 'The register begins in one hand. Later entries use different pressure and slant.',
-  the_register_counts_the: 'The register counts {n} distinct hands at this table.',
-  // The fifth ring is a visible threshold, not an interpreted prophecy.
-  the_top_ring_stands: 'The top ring stands {gap} m clear of the water. Fresh-cut. Nothing has ever reached it.',
-  the_water_is_at: 'The water is at the fifth ring.',
-  // The lower gauge makes the upstream transfer visible.
-  it_has_to_go_somewhere: 'The lower gauge rises as the upper basin falls.',
-  below_the_window_the: 'Below the window, the sea obeys.',
-  the_crank_resists_as: 'The crank resists, as if the hours themselves have taken on water.',
-  the_little_lamp_drags: 'The little lamp drags the real sun with it.',
-  the_fourth_note_does: 'The fourth tooth catches. The note falls silent.',
-  the_song_comes_up: 'The song comes up slow and flat, as through water.',
-  fallen_and_long_silent: 'Fallen, and long silent. Knocking on it is like knocking on a door with no room behind it.',
-  the_fallen_stone_hums: 'The fallen stone now carries the low note heard across the kelp.',
-  the_hinges_remember_how: 'The hinges remember how.',
-  a_cartographer_s_brass: 'A fifteen-centimetre cartographer’s rule. Brass, straight, unmarked by salt.',
-  across_the_island_something: 'Across the island, something vast settles into place.',
-  you_do_not_need: 'The etched marks align with the model’s survey grid.',
-  far_above_glass_settles: 'Far above, glass settles into brass.',
-  on_the_model_s: 'On the model beach, a rice-grain bottle is corked around a curl of paper.',
-  even_here_a_staff: 'A staff the height of an eyelash stands in the model sea. It has five rings; the top is pale.',
-  cold_as_seawater_clear: 'Cold as seawater, clear as morning — a lamp’s eye, far too fine for a pocket.',
-  the_sand_slides_from: 'The sand slides from a brass door, dialled shut.',
-  stone_breath_long_held: 'The brass door drops inward. Cold air lifts from a lit stair below.',
-  heavier_than_it_looks: 'The brass weight pulls the cord vertical.',
-  it_hangs_dead_centre: 'The plumb hangs over the model beach. The floor plate lies on the same vertical line.',
-  stand_on_it: 'The plate vibrates beneath the plumb line.',
-  the_stair_is_roped: 'The stair is roped off and dark. The lamp socket beside it is empty.',
-  a_line_cut_low: 'Cut low into the wet stone: “RETURN FLOW +11 SEC.”',
-  locked_not_from_this: 'The latch turns. The hinges do not move.',
-  glass_and_brass_wedged: 'Glass and brass are wedged below the dry pool lip, beyond a hand’s reach.',
-  the_bottom_of_the: 'The bottom of the world, and the pool is finally full. The phial rides the risen water, and your hand closes around it.',
-  a_keeper_s_reading: 'A keeper’s reading glass. Through it, the faint marks resolve — there is writing everywhere you did not see.',
-  that_is_all_of: 'Nine lampblack marks found. Their measurements agree.',
-  the_stones_hum_lower: 'The stones hum lower here, as through water.',
-  e_g_a_d: 'E, G, A, D, C — with the fallen stone’s lower note beneath them. All six stones sound.',
-  the_stones_refuse_the: 'The stones refuse the box’s song. Something out here sings it differently.',
-  the_outcrop_opens_like: 'The outcrop opens like a held breath.',
-  some_corrections_only_ever: 'The fourth stone answers the higher pitch.',
-  the_bird_sings_the: 'The bird sings the box’s song. Almost.',
-  the_bay_gives_up: 'The bay gives up a road of wet stone.',
-  the_lighthouse_remembers_its: 'The full lighthouse lens seats. Its beam falls through the tower onto the lit model lamp.',
-  the_beam_writes_on: 'The beam returns four figures from the west cliff.',
-  the_risen_capitals_catch: 'Four figures reflect from the capitals above the drowned hall, in the same order as the cliff.',
-  far_out_on_the: 'The beam catches on the drowned hall and holds for one circuit.',
-  a_chart_table_and: 'A chart table. And on it — this island. This lighthouse. This room.',
-  centimetre_marks_underfoot_tall: 'Centimetre marks underfoot, tall as doorways.',
-  the_dory_and_its: 'The beached dory holds one unused oar. Its line remains fast to the jetty.',
-  you_set_the_phial: 'You set the phial from the high pool on the chart table. In the dry air of the study, the little roll of paper loosens from the glass at last.',
-  the_inner_door_stands: 'The inner door stands open. A coat is warm. Damp footprints lead inward.',
-  you_have_stood_here: 'The chair, cup, dust, and clock hand occupy their earlier positions.',
-  another_study_west_of: 'A facing study contains a drained model basin and a lit model lamp.',
-  a_bell_buoy_listing: 'A bell-buoy, listing in the drowned channel. It keeps ringing anyway.',
-  you_did_not_run: 'Under a held gaze, the figure raises its head and breaks into a cold light.',
-  far_along_the_shore: 'A small cold light stands on the far shore for three breaths, then goes dark.',
-  you_stop_wading_for: 'When movement stops, the form surfaces and sends one low note across the water.',
-  faint_from_the_kelp: 'Faint, from the kelp: the note it laid, still crossing the water now and then.',
-  click_and_the_sea: 'Click, and the sea will hurry.',
-  the_tide_brought_you: 'The tide brought you back.',
-  down_is_the_only: 'The plate’s lower ring is lit. Its upper ring is dark.',
-  there_is_no_level: 'There is no level above the surface. Not yet.',
-  you_run_the_mechanism: 'The mechanism reverses. The level marks pass upward one by one.',
-  salt_and_lamp_oil: 'Salt and lamp oil, still.',
-  far_down_a_light: 'Far down, a light is still lit.',
-  there_you_are_a: 'A lit point appears on the model shore.',
-  the_ground_gives_you: 'The ground gives you back.',
-  already_at_the_bottom: 'Already at the bottom.',
-  everything_down_here_is: 'Marks below the water line have sharper edges than those above.',
-  the_rope_is_still: 'The rope is still moving. Nothing down here should still be moving.',
-  the_water_over_the: 'The water over the hall is moving. Something is coming up.',
-  the_light_passes_under: 'The light passes under the water — once, all the way around.',
-  the_line_takes_the: 'The line settles into the cleat’s worn turns.',
-  one_true_line_signed: 'The observed water level is signed beneath the earlier entries.',
-  the_small_flame_takes: 'The small flame takes. The dark backs off by one cot’s width.',
-  wound_the_way_he: 'The spring takes one full turn. The cylinder begins to move.',
-  folded_into_my_coat: 'The folded record fits inside the coat lining.',
-  the_drawer_takes_it: 'The record rests beside the District returns.',
-  left_with_him_at: 'Weighted on the source slab, above the wet line.',
-  the_jetty_s_outer: 'The jetty’s outer arm is a shadow under green water.',
-  the_bench_faces_the: 'The bench faces the sea from inside it now. The seat goes awash with every third wave. The water holds it now.',
-  the_skiff_is_off: 'The skiff is off its blocks and rides at the old anchor, half a gunwale under. The water holds it now.',
-  field_report_taken_copied: 'Note sent — position, view, state and a screenshot went with it.',
+  "the_sea_no_longer": "The sea no longer answers the wheel down here.",
+  "the_wheel_turns_and": "The wheel turns. The sky follows after a delay.",
+  "the_hour_will_not": "The wheel turns freely. The sky does not move.",
+  "the_register_has_one": "The first pages are in the keeper’s hand. Later on, other people took a watch.",
+  "the_register_counts_the": "{n} different hands have kept this book. Some have left only a line.",
+  "the_top_ring_stands": "The top ring stands {gap} m clear of the water. Fresh-cut. Nothing has ever reached it.",
+  "the_water_is_at": "The water is at the fifth ring.",
+  "it_has_to_go_somewhere": "The lower gauge rises as the upper basin falls.",
+  "below_the_window_the": "Below the window, the sea obeys.",
+  "the_crank_resists_as": "The crank is stiff. The sky moves a little after your hand stops.",
+  "the_little_lamp_drags": "The little lamp drags the real sun with it.",
+  "the_fourth_note_does": "The fourth tooth catches. The note falls silent.",
+  "the_song_comes_up": "The song comes up slow and flat, as through water.",
+  "fallen_and_long_silent": "A stone on its side. A tap gives a dull knock.",
+  "the_fallen_stone_hums": "The fallen stone now carries the low note heard across the kelp.",
+  "the_hinges_remember_how": "The lid sticks, then opens with a long creak.",
+  "a_cartographer_s_brass": "A fifteen-centimetre cartographer’s rule. Brass, straight, unmarked by salt.",
+  "across_the_island_something": "Across the island, something vast settles into place.",
+  "you_do_not_need": "The etched marks align with the model’s survey grid.",
+  "far_above_glass_settles": "Far above, glass settles into brass.",
+  "on_the_model_s": "On the model beach, a rice-grain bottle is corked around a curl of paper.",
+  "even_here_a_staff": "A staff the height of an eyelash stands in the model sea. It has five rings; the top is pale.",
+  "cold_as_seawater_clear": "The lens is cold through your sleeve. A small flaw catches the light.",
+  "the_sand_slides_from": "The sand slides from a brass door, dialled shut.",
+  "stone_breath_long_held": "The brass door drops inward. Cold air lifts from a lit stair below.",
+  "heavier_than_it_looks": "The brass weight pulls the cord vertical.",
+  "it_hangs_dead_centre": "The plumb hangs over the model beach. The floor plate lies on the same vertical line.",
+  "stand_on_it": "The brass plate is underfoot beside the table. Move onto its centre to cross.",
+  "the_stair_is_roped": "The stair is roped off and dark. The lamp socket beside it is empty.",
+  "a_line_cut_low": "Cut low into the wet stone: “RETURN FLOW +11 SEC.”",
+  "locked_not_from_this": "The latch turns. The hinges do not move.",
+  "glass_and_brass_wedged": "Glass and brass are wedged below the dry pool lip, beyond a hand’s reach.",
+  "the_bottom_of_the": "The bottom of the world, and the pool is finally full. The phial rides the risen water, and your hand closes around it.",
+  "a_keeper_s_reading": "A keeper’s reading glass. Through it, the faint marks resolve — there is writing everywhere you did not see.",
+  "that_is_all_of": "Nine lampblack marks found. Their measurements agree.",
+  "the_stones_hum_lower": "The stones hum lower here, as through water.",
+  "e_g_a_d": "E, G, A, D, C — with the fallen stone’s lower note beneath them. All six stones sound.",
+  "the_stones_refuse_the": "The fourth note rings wrong. The dawn bird sang that part differently.",
+  "the_outcrop_opens_like": "A slab slides into the rock. Behind it, a lens on a dry shelf.",
+  "some_corrections_only_ever": "The fourth stone answers the higher pitch.",
+  "the_bird_sings_the": "The bird sings the box’s song. Almost.",
+  "the_bay_gives_up": "The bay gives up a road of wet stone.",
+  "the_lighthouse_remembers_its": "The full lighthouse lens seats. Its beam falls through the tower onto the lit model lamp.",
+  "the_beam_writes_on": "The beam returns four figures from the west cliff.",
+  "the_risen_capitals_catch": "Four figures reflect from the capitals above the drowned hall, in the same order as the cliff.",
+  "far_out_on_the": "The beam catches on the drowned hall and holds for one circuit.",
+  "a_chart_table_and": "The table holds a model of the island. There is a light in its tiny window.",
+  "centimetre_marks_underfoot_tall": "The ruler marks are taller than you now.",
+  "the_dory_and_its": "The beached dory holds one unused oar. Its line remains fast to the jetty.",
+  "you_set_the_phial": "You set the phial from the high pool on the chart table. In the dry air of the study, the little roll of paper loosens from the glass at last.",
+  "the_inner_door_stands": "The door to the east room is open.",
+  "you_have_stood_here": "The cup is where you left it. The window is open a little.",
+  "another_study_west_of": "A facing study contains a drained model basin and a lit model lamp.",
+  "a_bell_buoy_listing": "A bell-buoy, listing in the drowned channel. It keeps ringing anyway.",
+  "you_did_not_run": "Under a held gaze, the figure raises its head and breaks into a cold light.",
+  "far_along_the_shore": "A small cold light stands on the far shore for three breaths, then goes dark.",
+  "you_stop_wading_for": "When movement stops, the form surfaces and sends one low note across the water.",
+  "faint_from_the_kelp": "Faint, from the kelp: the note it laid, still crossing the water now and then.",
+  "click_and_the_sea": "Click, and the sea will hurry.",
+  "the_tide_brought_you": "The light is on. A path leads up from the beach.",
+  "down_is_the_only": "The plate’s lower ring is lit. Its upper ring is dark.",
+  "there_is_no_level": "This is the surface. The east room is through the open door.",
+  "you_run_the_mechanism": "The room draws smaller. The table above comes into view.",
+  "salt_and_lamp_oil": "The familiar smell of lamp oil. The kettle has cooled.",
+  "far_down_a_light": "A light burns in the room below.",
+  "there_you_are_a": "A lit point appears on the model shore.",
+  "the_ground_gives_you": "Sand underfoot again.",
+  "already_at_the_bottom": "The line ends here.",
+  "everything_down_here_is": "Marks below the water line have sharper edges than those above.",
+  "the_rope_is_still": "A rope swings above the weeds. Someone tied it recently.",
+  "the_water_over_the": "The water over the hall is moving. Something is coming up.",
+  "the_light_passes_under": "The light passes under the water — once, all the way around.",
+  "the_line_takes_the": "The line settles into the cleat’s worn turns.",
+  "one_true_line_signed": "The observed water level is signed beneath the earlier entries.",
+  "the_small_flame_takes": "The wick catches. The blue blanket comes into view.",
+  "wound_the_way_he": "The spring takes one full turn. The cylinder begins to move.",
+  "folded_into_my_coat": "The folded record fits inside the coat lining.",
+  "the_drawer_takes_it": "The record rests beside the District returns.",
+  "left_with_him_at": "Weighted on the source slab, above the wet line.",
+  "the_jetty_s_outer": "The jetty’s outer arm is a shadow under green water.",
+  "the_bench_faces_the": "Water washes over the bench seat. There is still a dry place at one end.",
+  "the_skiff_is_off": "The skiff has lifted off its blocks. Its line is still tied to the old anchor.",
+  "field_report_taken_copied": "Note sent — position, view, state and a screenshot went with it."
 };
 
 // ---- finale observations ----------------------------------------------------
@@ -622,16 +820,15 @@ export const T = {
 // scoring it. Unknown retired ending kinds deliberately produce no copy.
 export function finaleCoda(kind, s = {}) {
   const lines = [];
-  if (kind === 'tend') lines.push('water held at the marked line', 'lamp circuit continuing');
+  if (kind === 'tend') lines.push('water held at the marked line', 'The evening watch begins. The east-room window stays lit.');
   if (kind === 'carry') {
     const removed = Math.max(0, Number(s.removed ?? 0) || 0);
-    lines.push(`${removed} intervention${removed === 1 ? '' : 's'} reversed`, 'water retreating below and returning above');
+    lines.push(`${removed} intervention${removed === 1 ? '' : 's'} reversed`, 'Water retreats below and returns above. There is room to beach the little boat.');
   }
-  if (kind === 'open') lines.push('upper and lower basins joined', 'both gauges moving toward one level');
-  if (kind === 'close') lines.push('plate sealed', 'upper pressure zero; lower pressure holding');
+  if (kind === 'open') lines.push('upper and lower basins joined', 'Both gauges settle. For a while, the rooms share the sound of water.');
+  if (kind === 'close') lines.push('plate sealed', 'The transfer stops here. The water below remains. In the east room, a cup beside the kettle.');
   if (!lines.length) return [];
-  if (s.rounds > 0) lines.push(`${s.rounds} maintenance round${s.rounds === 1 ? '' : 's'} completed`);
-  if (s.filed > 0) lines.push(`${s.filed} record${s.filed === 1 ? '' : 's'} filed in the quarters cabinet`);
-  if (s.kept > 0) lines.push(`${s.kept} record${s.kept === 1 ? '' : 's'} weighted at the source`);
+  if (s.filed > 0) lines.push('The papers you filed are in the east-room cabinet.');
+  if (s.kept > 0) lines.push('The papers you left below are weighted above the water.');
   return lines;
 }

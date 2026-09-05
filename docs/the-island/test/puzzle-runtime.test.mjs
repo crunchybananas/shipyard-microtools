@@ -4,7 +4,7 @@ import { resetPuzzleRuntimeState } from '../js/puzzle-runtime.js';
 
 const RUNTIME_FIELDS = [
   'anim', 'stoneSeq', 'songSeq', 'birdTimer', 'boxPlaying', 'glyphsLit', 'hallLit',
-  '_brink', '_pendHour', '_pendHold', '_crankAcc', '_crankAcc2', '_eraLineT',
+  '_brink', '_refugeBrink', '_pendHour', '_pendHold', '_crankAcc', '_crankAcc2', '_eraLineT',
   '_lawT', '_breachT', '_farewellT', '_farewellA0', '_regT', '_buoyT', '_buoyRing',
   '_watcherRegard', '_tideRegard', '_tfPrev', 'watcherEchoT', 'tideFigureEchoT',
   '_lowerLook', '_lowerLookTarget', '_lowerRegard', '_lowerPrev',

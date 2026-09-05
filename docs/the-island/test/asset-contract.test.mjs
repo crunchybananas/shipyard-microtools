@@ -14,7 +14,7 @@ const manifestBody = manifestSource.match(/export const MANIFEST = \{([\s\S]*?)\
 assert.ok(manifestBody, 'assets.js must expose one statically auditable MANIFEST');
 
 const manifestRows = [...manifestBody.matchAll(
-  /^\s{2}([a-z0-9_]+):\s*\{\s*\n\s*kind:\s*'texture',\s*file:\s*'([^']+)',\s*bytes:\s*(\d+),/gm,
+  /^\s{2}([a-z0-9_]+):\s*\{\s*\n\s*kind:\s*'(?:texture|model)',\s*file:\s*'([^']+)',\s*bytes:\s*(\d+),/gm,
 )].map(([, id, file, bytes]) => ({ id, file, bytes: Number(bytes) }));
 
 function filesBelow(dir) {
@@ -42,7 +42,7 @@ const cssAssets = [...styleSource.matchAll(/url\(\s*['"]?assets\/([^'"\)]+)['"]?
   .map((match) => match[1]);
 
 test('every WebGL manifest row is consumed and matches its file', () => {
-  assert.equal(manifestRows.length, 12, 'update the documented WebGL texture count with deliberate additions');
+  assert.equal(manifestRows.length, 14, 'update the documented WebGL asset count with deliberate additions');
   for (const { id, file, bytes } of manifestRows) {
     assert.match(runtimeJs, new RegExp(`['"]${id}['"]`), `${id} has no JavaScript consumer`);
     assert.equal(statSync(join(ASSET_DIR, file)).size, bytes, `${file} byte count is stale`);

@@ -191,6 +191,10 @@ export const UI = {
     const isDeep = r.page >= r.surfaceLen;  // a colder, later hand for the pages from the deep
     this.readerTitle.textContent = r.lore.title;
     this.readerBody.textContent = r.pages[r.page];
+    const readerHand = (isDeep && r.lore.handDeep) || r.lore.hand || 'keeper';
+    this.readerEl.dataset.hand = readerHand;
+    const byline = document.getElementById('reader-hand');
+    if (byline) byline.textContent = ({ keeper: 'The keeper', boatwright: 'The boatwright', inspector: 'The visitor', founders: 'From the old hall' })[readerHand] || '';
     this.readerBody.classList.toggle('keeper-deep', isDeep);
     this.readerPageno.textContent = r.pages.length > 1 ? `${r.page + 1} / ${r.pages.length}` : '';
     this.readerPrev.disabled = r.page === 0;

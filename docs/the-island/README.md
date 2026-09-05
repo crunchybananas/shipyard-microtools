@@ -1,11 +1,13 @@
 # THE ISLAND — ABYME
 
-*An island within an island.* ABYME is a first-person mystery about changing a
-miniature world, descending into the consequences, and returning to decide what
-should cross between levels.
+*An island within an island.* ABYME is a first-person journey through a lighthouse island and its live
+miniature. A keeper, a boatwright and a visitor leave ordinary traces in an
+impossible place. The player makes a refuge, follows the water down, and returns
+to an unfinished boat.
 
-It is a static Three.js application with no build step. Geometry, materials,
-weather, water, animation, and audio are synthesized at runtime.
+It is a static Three.js application with no build step. Original furniture, cloth,
+boats, lighthouse masonry, spiral stairs, vault ribs, wind pines and coastal rock
+are authored in Blender and loaded as two GLBs.
 
 ## Run it
 
@@ -29,7 +31,8 @@ from the same `WorldState`, so a small physical act has one full-sized consequen
 - the ruler laid across a model crack becomes the eastern bridge;
 - the lens fitted to the model lighthouse lights the real tower;
 - the aimed beam writes an ordered signal on the cliff;
-- the plumb hung over the model wakes the brass crossing plate.
+- the plumb hung over the model extends the crossing beyond the shallows;
+- a stitched boat launched into the model sea appears at full size offshore.
 
 The hatch is a circuit through the island. The beam supplies four figures in order.
 Eight signal-manual spines bind those figures to working instruments, never to
@@ -39,19 +42,26 @@ an eye, a filed tooth, sounding stones—then set four decimal dials at the hatc
 The plate descends through four strata of the same island. Every threshold has an
 authored evidence gate:
 
-1. **Surface:** complete the model circuit, decode and open the hatch, hang the
-   plumb.
-2. **Shallows:** witness the dead valve transfer water from above and hold still
-   with the Tide-Figure.
-3. **Inspection:** let the study register finish its count and hold the Watcher in
-   view.
-4. **Source:** regard the Lower Hand without approaching it as a prize, then set
-   one of four physical dispositions.
+1. **Surface:** light the east-room refuge, lower the water, place the ruler and turn the sun. The first crossing does not require the complete instrument circuit.
+2. **Shallows, first visit:** witness the Upstream Hand and wait with the Tide-Figure, then return to the surface. The lamp is still lit.
+3. **Surface, second visit:** compare the music box and bird; follow the lens, figures, shadow, hatch and plumb into the deeper crossing.
+4. **Inspection:** let the study register settle and hold the shore visitor in view.
+5. **Source:** regard the Lower Hand, read beside the unfinished boat, and select a physical disposition.
 
-The climb returns through the same plate. Back at the surface, a final two-touch
-commit applies the selected disposition: **tend**, **carry**, **open**, or
-**close**. They are operations on the persistent stack, not morality labels. The
-bell and oar remain usable world instruments; neither is an ending switch.
+The climb returns through every level. In the east room, the stitched boat can be
+taken to the model sea. One persistent state places the same hull at both scales.
+The chair, boat and observed notes survive Continue.
+
+A final two-touch commitment at the **small refuge lamp** applies **tend**,
+**carry**, **open**, or **close**. The plate, bell and oar remain nonterminal.
+Each ending has a distinct water result and a quiet continuation afterward.
+
+The lighthouse also has a physical climb: eighty-three treads around an open shaft,
+three windows onto the coast, and a lantern gallery above the whole island. Fitting
+the lens opens the stair in daylight as well as at night. A watch book waits above.
+Under the bluff, the cellar opens east onto an inverted lighthouse and west into
+another study. Damp papers in a bread tin add a small account of work shared.
+The drain under the standing stones is a separate chamber, reached by its own ramp.
 
 ## Field Notes
 
@@ -65,7 +75,7 @@ a gate.
 
 ## Persistence
 
-The current run lives at `abyme-save`, payload version `1`. The loader accepts only
+The current run lives at `abyme-save`, payload version `2`. The loader accepts only
 that version and its declared fields, sanitizing current values at the boundary;
 there are no migration or backup branches in gameplay code.
 
@@ -90,9 +100,22 @@ complete mark, tombstone, outbox, and rules contract.
 | `js/progression.js` | pure challenge graph, gate requirements, plate decisions |
 | `js/notebook.js` | stable earned evidence and explicitly requested hint tiers |
 | `js/content.js` | field-note copy, hint threads, readable artifacts, sketches |
+| `js/harbor.js` | Blender room assembly, spare chair and two-scale boat homecoming |
+| `js/landfall.js` | Blender tower, vaults, coast, pines and persistent drying-room tin |
+| `js/tower-course.js` | Shared staircase layout, tread heights and movement course |
 | `js/props.js` | structures, glyph/instrument/dial atlases, model clone |
 | `js/puzzles.js` | physical interactions and state-to-scene application |
 | `js/main.js` | boot, crossings, return, ending commit, debug and field reports |
 
 Developer routes and exact debug calls live in [PLAYTHROUGH.md](PLAYTHROUGH.md).
 The spoiler-light player route lives in [WALKTHROUGH.md](WALKTHROUGH.md).
+
+
+## Review every stage
+
+Open [the playthrough folder](loop/playthrough/2026-09-05/index.html) for the complete
+route, four endings, before/after views and every readable page. The exporter is
+`tools/harness/capture-playthrough.mjs`; its output labels skipped travel and
+encounter fixtures explicitly. The Blender source is
+[tools/blender/harbor-rooms.blend](tools/blender/harbor-rooms.blend), reproducible
+with the Python generator beside it.

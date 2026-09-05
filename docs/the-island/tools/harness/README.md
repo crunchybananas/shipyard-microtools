@@ -127,3 +127,25 @@ gate that has guarded every fire since the walk was born:
 CI: `.github/workflows/island-walk.yml` runs the same `run.sh` gate on every push or
 pull request touching `docs/the-island/**`, then uploads current golden images for
 human inspection. Local and CI runs use the same assertion counts and failure rules.
+
+
+## Inhabited room and complete playthrough
+
+`harbor.mjs` checks initial room access with keyboard movement, selects the new
+Blender chair with real pointer input, checks floor clearance, and verifies boat
+geometry, water contact, two-scale ownership, Continue and reduced motion.
+
+`capture-playthrough.mjs` exports a complete causal route and all four endings to
+`loop/playthrough/2026-09-05/revised` (override with `PLAYTHROUGH_DIR`). It writes
+133 JPEG screenshots, an offline HTML viewer, exact stage text and state, the
+full manuscript, and earned source/homecoming saves. `playthrough-html.mjs` renders
+the static viewer. It uses no fetch, external fonts, or server-side dependencies,
+so the viewer also opens directly from a folder.
+
+```sh
+SERVE_PORT=8734 CDP_PORT=9494 bash tools/harness/one.sh capture-playthrough.mjs
+```
+
+The revised walk has 69 assertions. Its crossings use `ABYME.cross()`, which checks
+the same gate as a plate touch and grants no prerequisites. The first loop returns
+to the surface before the deep circuit is complete; the final ending is at the lamp.

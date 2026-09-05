@@ -1,0 +1,39 @@
+{
+  "generator": "Blender 5.2.1 LTS",
+  "parts": {
+    "roomStructure": {
+      "triangles": 6460,
+      "vertices": 3378
+    },
+    "roomCloth": {
+      "triangles": 3360,
+      "vertices": 1785
+    },
+    "roomCeramics": {
+      "triangles": 1038,
+      "vertices": 596
+    },
+    "spareChair": {
+      "triangles": 608,
+      "vertices": 336
+    },
+    "keepsakeBoat": {
+      "triangles": 604,
+      "vertices": 352
+    },
+    "listeningMobile": {
+      "triangles": 484,
+      "vertices": 274
+    },
+    "tideBench": {
+      "triangles": 1498,
+      "vertices": 844
+    },
+    "sourceCradle": {
+      "triangles": 2192,
+      "vertices": 1211
+    }
+  },
+  "totalTriangles": 16244,
+  "glbBytes": 1716348
+}

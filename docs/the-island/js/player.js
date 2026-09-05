@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { clamp, lerp, TAU } from './util.js';
 import { walkableY, wallBlocked, heightAt } from './terrain.js';
 import { W, waterY } from './world.js';
+import { TOWER, TOWER_TOP } from './tower-course.js';
 
 const _wish = new THREE.Vector2();   // scratch: the per-frame movement wish (no alloc in update())
 
@@ -119,6 +120,7 @@ export class Player {
     // so an arrival always resolves to the surface).
     const groundY = walkableY(this.pos.x, this.pos.z, this.pos.y);
     this.pos.y = groundY;
+    if (Math.hypot(this.pos.x - TOWER.x, this.pos.z - TOWER.z) < 4) W.atTop = groundY >= TOWER_TOP - .3;
     this.camera.position.set(
       this.pos.x,
       groundY + this.eye + Math.sin(this.bobPhase) * 0.045 * this.bobAmp * (W.reduceMotion ? 0 : 1),
@@ -233,7 +235,7 @@ export class Player {
       if (hereY >= waterY() - 0.45) return false;        // no walking in
       if (thereY < hereY - 0.05) return false;           // submerged: only upslope
     }
-    if (wallBlocked(this.pos.x, this.pos.z, nx, nz)) return false;
+    if (wallBlocked(this.pos.x, this.pos.z, nx, nz, hereY)) return false;
     return true;
   }
 

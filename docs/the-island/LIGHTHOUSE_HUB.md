@@ -15,9 +15,9 @@ A player entering the study should understand the room in this order:
 4. **Signal shelf:** eight manuals are close enough to compare as one index, but
    separated from the beam's cliff so the deduction requires memory or Field Notes.
 5. **Floor plate:** the threshold is physically under the model beach. It stays
-   visually secondary until the plumb completes the circuit.
-6. **Tower stair:** lighting the lamp opens the climb to the gallery and its exterior
-   confirmation.
+   visually secondary until the refuge, valve, ruler and crank make the first crossing possible.
+6. **Tower stair:** fitting the lens opens the physical stair to the gallery in daylight
+   or darkness. Eighty-three treads pass three real windows; height follows walking.
 7. **Quarters and records:** these deepen the place without competing with the
    surface circuit.
 
@@ -37,7 +37,7 @@ Every required surface interaction has a local action and a distant confirmation
 | Fit lens to model lighthouse | Tower lamp can burn at night | Two lighthouse lenses answer together |
 | Drag model lamp housing | Beam crosses the cliff | Four projected figures gain an order |
 | Read signal shelf | Eight figure–instrument bindings become available | The route points back into the room and island |
-| Hang plumb above model | Floor plate wakes | Model beach and crossing plate align |
+| Hang plumb above model | Floor plate permits the deeper crossing | Model beach and crossing plate align |
 
 These are physical facts, not arbitrary inventory locks. If an action cannot be
 understood by looking at both scales, improve the staging before adding explanatory
@@ -86,13 +86,14 @@ The plate is the sole threshold across all strata. It uses one consistent gramma
 3. second touch commits;
 4. stepping away disarms it.
 
-On the surface, it remains cold until the full model circuit is complete. On lower
-strata, it reports the local missing evidence through its material response and a
-brief line. At the source it points upward. After the full climb, it commits the
-bottom disposition at the returned surface.
+On the first surface visit, the refuge lamp, valve, ruler and sun crank prepare the
+crossing. After the first return, the music, lens, signal, hatch and plumb complete
+the deeper circuit. On lower strata it reports the local missing evidence through
+its material response and a brief line. At the source it points upward. After the
+full return it remains a world instrument; the small refuge lamp commits the ending.
 
 The bell and oar can answer touch with sound or movement, but never compete with the
-plate as terminal authority.
+refuge lamp as terminal authority.
 
 ## The hub across strata
 
@@ -105,7 +106,7 @@ means.
 | Shallows | Discover that an act above still arrives below through the dead valve |
 | Inspection | Let the register count the hands and costs that the surface concealed |
 | Source | Read the wet consequences, regard the Lower Hand, set a disposition |
-| Returned surface | See what endured, then commit the chosen relation at the plate |
+| Returned surface | Try the unfinished boat, then commit at the small refuge lamp |
 
 The Lower Hand remains visually and narratively separate. The scene asks for regard,
 not collection, substitution, or a reveal that collapses two figures into one.

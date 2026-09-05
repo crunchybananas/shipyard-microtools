@@ -1,3 +1,5 @@
+import { attachLandfall } from './landfall.js';
+import { TOWER, TOWER_TOP, stairPose } from './tower-course.js';
 // main.js — boot, light, loop. ABYME: an island within an island.
 
 import * as THREE from 'three';
@@ -17,7 +19,8 @@ import {
   buildWorld, instantiateModel, collectRefs, NAMES,
   SHELF_BINDING_MARKS, SIGNAL_BINDINGS, BEAM_GLYPHS, HATCH_CODE,
 } from './props.js';
-import { RELIEF } from './assets.js';   // relief asked-vs-applied, for tools/harness/relief.mjs
+import { RELIEF, loadModel } from './assets.js';
+import { attachHarborRooms } from './harbor.js';   // relief asked-vs-applied, for tools/harness/relief.mjs
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
@@ -30,6 +33,7 @@ import {
   parseReplayReport, stablePlayReplay,
 } from './report-schema.js';
 import { KEEPER, T, finaleCoda, LORE } from './content.js';
+import { ascentLanding, nextPlateAction } from './progression.js';
 import {
   FINALE_KINDS, finaleTableau, sampleFinaleTableau,
 } from './finale-tableaux.js';
@@ -243,7 +247,10 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
+const [harborKit, landfallKit] = await Promise.all([loadModel('harbor_rooms'), loadModel('landfall')]);
 const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, l3motes, vaultDrips } = buildWorld();
+const harbor = attachHarborRooms(core, harborKit);
+const landfall = attachLandfall(core, landfallKit);
 const modelRoot = instantiateModel(core, modelAnchor);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
@@ -730,6 +737,9 @@ const game = new Game({
   onClimb: (up) => startClimb(up),     // hub Phase B: the lamp-room climb
 });
 
+harbor.bind({ W, interact, player, notebook, UI, save, A, modelRefs, modelRoot, waterY });
+landfall.bind({ W, interact, player, notebook, UI, save, modelRoot });
+
 // Enter a rung from the offline mirror immediately, then reconcile a shared pull
 // without freezing the crossing. The effective tide includes any already-spent L2
 // Upstream Hand, so a late stranger can add draft without erasing the spectacle's
@@ -1204,17 +1214,17 @@ function landAscent() {
   // the snap: the shrunk world becomes the model above; you stand at its chart table
   diveGroup.scale.setScalar(1);
   diveGroup.position.set(0, 0, 0);
-  W.level = Math.max(W.level - 1, 1); // one recursion shallower — clamp at the surface
-  if (W.level <= 1) {
-    W.flags.climbing = false; // back at the surface — a new descent is possible
-    // THE RETURN LEAVES A MARK (#12, Panel #4 #2): you climbed all the way out. The world is
-    // as you left it; only you are different — and the chart-table tally stays full (the
-    // fingerprint, driven in puzzles _apply by W.flags.returned). Fork-neutral; not an ending.
-    if (!W.flags.returned) {
-      W.flags.returned = true;
-      UI.whisper('The surface room receives the weight of the lower ones. The plate remains warm.');
-      notebook.record('return.surface');
-    }
+  const landing = ascentLanding(W);
+  W.level = landing.level;
+  if (W.level === 1) W.flags.climbing = false;
+  if (landing.route === 'receiver') {
+    W.flags.receiverReturned = true;
+    UI.whisper('The lamp is still lit. There is time to sit before going back.');
+    notebook.record('return.receiver');
+  } else if (landing.route === 'home') {
+    W.flags.returned = true;
+    UI.whisper('Back in the study. Through the open door, the kettle and the blue blanket.');
+    notebook.record('return.surface');
   }
   // SEA-STRATA: arriving a level shallower, the sea recedes to that level's tide (surface = 1)
   pullStackAt(W.level, { snap: true });
@@ -1270,37 +1280,18 @@ function tickAscent(dt) {
   }
 }
 
-// ---------------- the climb (hub Phase B) ----------------
-// The lamp-room stair as a committed fade-crossing up to the gallery and back. The tower is too
-// narrow to wind a free-walked multi-turn floor through, so the climb lands you on the walkable
-// balcony (W.atTop drives the gallery floor + rail in terrain.js and the foreshadow ring in
-// applyAtmosphere). You arrive looking seaward, the whole island open below — and out past the
-// shallows, the line the next tide means to rise to. Gated on W.lampLit (you earn it by lighting
-// the lamp). Set atTop BEFORE spawn so syncCamera snaps to the gallery height, not the study floor.
+// The stair is a continuous, reversible walking route. A touch only sets a foot
+// on its first/last tread; it never advances height or hides the climb in a fade.
 function startClimb(up) {
-  if (MODE !== 'play') return;
-  if (climbTimer !== null) clearTimeout(climbTimer);
-  player.locked = true;
-  interact.enabled = false;
-  UI.fadeOut(false, false);
-  A.duckAmbient(true);
-  climbTimer = setTimeout(() => {
-    climbTimer = null;
-    if (up) {
-      W.atTop = true;
-      player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 1.6, 0, SPOTS.lighthouse.y - 1.9), 5.59, -0.10);
-    } else {
-      W.atTop = false;
-      player.spawn(new THREE.Vector3(SPOTS.lighthouse.x - 0.8, 0, SPOTS.lighthouse.y - 2.0), 3.49, 0);
-    }
-    UI.fadeIn(true);
-    player.locked = false;
-    interact.enabled = true;
-    A.duckAmbient(false);
-    UI.whisper(up
-      ? 'You climb the long stair to the lamp. From up here the whole island lies open — and out past the shallows, the sea shows you the line it means to rise to.'
-      : 'Down the stair, back to the working room.');
-  }, 850);
+  if (MODE !== 'play' || !W.lensPlaced) return;
+  const p = stairPose(up ? .001 : .999);
+  syncGates(W);
+  player.pos.set(p.x, p.y, p.z);
+  player.vel.set(0, 0, 0);
+  player.yaw = p.yaw + (up ? 0 : Math.PI);
+  player.pitch = up ? .06 : -.22;
+  player.syncCamera();
+  UI.whisper(up ? 'The handrail is smooth where people have held it.' : 'The warm room is below.');
 }
 
 
@@ -1433,7 +1424,7 @@ function startDispositionFinale(kind, result = null) {
   const line1 = document.querySelector('#finale .fin-line1');
   const line2 = document.querySelector('#finale .fin-line2');
   if (line1) line1.textContent = tableau.line;
-  if (line2) line2.textContent = 'the island remains';
+  if (line2) line2.textContent = 'The east room is still there.';
   const coda = prepareFinaleCoda(kind, result);
   coda?.classList.remove('show');
   A.bellToll(true);
@@ -1714,7 +1705,7 @@ function applyAtmosphere(elapsed, dt) {
   // caught in this pass). It is only ever legitimately seen through the cellar's east window
   // — render it only while the player is actually down in the cellar. (The model clone prunes
   // vaultVista, so this drives the real island only.)
-  const inCellar = Math.abs(player.pos.x - SPOTS.hatch.x) < 6.5 &&
+  const inCellar = player.pos.x > 79 && player.pos.x < 104 &&
     player.pos.z > SPOTS.hatch.y - 18.5 && player.pos.z < SPOTS.hatch.y + 1.5 &&
     player.pos.y < 23.2;
   if (refs.vaultVista) refs.vaultVista.visible = inCellar;
@@ -1807,6 +1798,7 @@ function applyAtmosphere(elapsed, dt) {
   // plus the waterline pass (#47/#38): tide line + caustics ride the live tide
   if (terrainMat?.userData.shader) {
     const tu = terrainMat.userData.shader.uniforms;
+    tu.uBuriedView.value = player.pos.y < 23.2 && player.pos.y > 16 && player.pos.x > 79 && player.pos.x < 104 && player.pos.z > 12 && player.pos.z < 34 ? 1 : player.pos.y < 8.2 && player.pos.x > 127 && player.pos.x < 143 && player.pos.z > -155 && player.pos.z < -145 ? 2 : 0;
     tu.uHaze.value.copy(scene.fog.color);
     tu.uWaterY.value = waterY();
     tu.uTime.value = elapsed;
@@ -2191,6 +2183,17 @@ function makeReportThumbnail() {
       save(player);
       beginVista(n);   // #135: instant jumps get the held first-sighting too (once)
       return { level: n, id: L.id, region: L.region, tide: L.tide, encounter: L.encounter };
+    },
+    // Causal capture seam: validates the same plate gate and skips ONLY travel.
+    // Legacy dive/goLevel remain explicit fixtures for isolated renderer tests.
+    cross: () => {
+      const action = nextPlateAction({ world: W, notebook, armed: true });
+      if (!['descend', 'ascend'].includes(action.kind)) return { crossed: false, ...action };
+      game._brink = false; A.duckAmbient(false);
+      game.resolveUpstreamHand({ reveal: false });
+      if (action.kind === 'descend') { completeDescent(); beginVista(W.level); }
+      else { if (action.route !== 'receiver-return') W.flags.climbing = true; landAscent(); }
+      return { crossed: true, level: W.level, kind: action.kind, route: action.route };
     },
     dive: (instant = false) => {                       // the missing counterpart to ascend()
       if (W.level >= MAX_DEPTH) { UI.whisper(T.already_at_the_bottom); return false; }
@@ -2689,6 +2692,8 @@ renderer.setAnimationLoop((tMs) => {
 
   if (!W.reading && !W.notesOpen && !W.writing) player.update(dt); // reading surfaces hold the player's hand still
   game.tick(dt, elapsed);
+  harbor.tick(W, dt, elapsed);
+  landfall.tick();
   runDrives(W, dt, elapsed);   // #73: the self-gating per-entity drives
   // Finale state is deliberately last: the gameplay tick keeps the returned world
   // alive, then the chosen tableau owns its waterline, threshold, and camera.

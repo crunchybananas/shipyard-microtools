@@ -1,3 +1,8 @@
+> Current narrative and route: see [SPINE.md](SPINE.md) and [HANDOFF.md](HANDOFF.md).
+> The September 2026 revision establishes quiet, humane wonder, an early refuge
+> and return, and the unfinished-boat homecoming. Older iteration notes below
+> describe the development process, not a competing story contract.
+
 # ABYME Quality Loop — Mission
 
 You are one iteration of an ongoing quality loop for **THE ISLAND: ABYME**

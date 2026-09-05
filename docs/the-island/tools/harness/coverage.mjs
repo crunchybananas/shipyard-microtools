@@ -102,7 +102,7 @@ ok('HINTS.unique-thread-ids', new Set(hintIds).size === hintIds.length);
 ok('HINTS.evidence-backed', badHints.length === 0, badHints.map((thread) => thread.id).join(', '));
 ok('HINTS.separate-from-notes', hintIds.every((id) => !idSet.has(id)));
 
-const runtimeFiles = ['main.js', 'notebook.js', 'puzzles.js', 'ui.js', 'world.js', 'save-schema.js'];
+const runtimeFiles = ['main.js', 'harbor.js', 'landfall.js', 'notebook.js', 'puzzles.js', 'ui.js', 'world.js', 'save-schema.js'];
 const runtime = runtimeFiles.map((file) => readFileSync(new URL(file, JS), 'utf8')).join('\n');
 const referenced = new Set(Object.values(progression.NOTE_IDS));
 

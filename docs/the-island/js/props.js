@@ -725,7 +725,7 @@ export function buildWorld() {
       });
       floorTop.dispose();
     }
-    const ceil = new THREE.RingGeometry(1.25, baseR + 0.1, 28);
+    const ceil = new THREE.RingGeometry(3.06, baseR + 0.1, 48);
     ceil.rotateX(Math.PI / 2);
     stone.add(ceil, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH, LH.z), grad(C.boneDark, C.boneDark));
     ceil.dispose();
@@ -749,23 +749,6 @@ export function buildWorld() {
     // masonry looks like: you can still see the stone through it.
     const cPaint = new THREE.Color(0xe7e1d2).multiplyScalar(1.62);   // limewash, warm and chalky
     const cCollar = new THREE.Color(0x39423e);         // the dark collar under the gallery
-    const tower = new THREE.CylinderGeometry(2.45, 4.05, 15.9, 28, 32, true);
-    stone.add(tower, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH + 7.95, LH.z), (t, wp) => {
-      const ang = Math.atan2(wp.z - LH.z, wp.x - LH.x);
-      const granite = C.bone.clone().lerp(C.boneDark, 1 - t);
-      // the paint line WANDERS and is worn thin — a ruler-straight edge at one height is
-      // the thing that would make this read as a decal rather than as paint on stone
-      const wob = (vnoise(ang * 2.3, 11.4) - 0.5) * 0.055;
-      const c = granite.lerp(cPaint, smoothstep(0.40 + wob, 0.46 + wob, t));
-      // salt and rainwater streak DOWN from the gallery. Vertical, per-azimuth, strongest
-      // just under the deck and fading out before the string course — the single thing
-      // that stops a painted tower reading as a plastic tube.
-      const streak = (vnoise(ang * 6.1, 3.3) - 0.42) * 1.5;
-      c.multiplyScalar(1 - Math.max(0, streak) * 0.16 * smoothstep(0.46, 0.95, t));
-      // and the collar
-      return c.lerp(cCollar, smoothstep(0.878, 0.898, t) * (1 - smoothstep(0.966, 0.982, t)));
-    });
-    tower.dispose();
     // STRING COURSE + PLINTH. A masonry tower is not a smooth taper: it has projecting
     // courses, and they are what give a silhouette its joints. One at the paint line, one
     // where the shaft meets the drum. Cheap rings, and they catch a hard shadow.
@@ -775,31 +758,6 @@ export function buildWorld() {
       const band = new THREE.CylinderGeometry(r + over * 0.8, r + over, hh, 28, 1, true);
       stone.add(band, new THREE.Matrix4().makeTranslation(LH.x, LH.y + yy + hh / 2, LH.z), grad(cc.clone().multiplyScalar(0.82), cc));
       band.dispose();
-    }
-    // THE STAIR LIGHTS. A lighthouse shaft is not blind — a spiral stair climbs it and
-    // every turn or so there is a small window to see the steps by. Six of them, winding
-    // round as the stair does, and they do two jobs at once: they say a person walks up
-    // there, and they give the tower a SCALE. A featureless taper could be six metres or
-    // sixty; put a human-sized opening on it and the eye knows instantly.
-    for (let i = 0; i < 6; i++) {
-      const ty = 0.085 + i * 0.148;
-      const yy = baseH + ty * 15.9;
-      const rr = 4.05 + (2.45 - 4.05) * ty;
-      const aa = deg(34) + i * 1.24;                    // each light is one turn of the stair on
-      const painted = ty > 0.44;
-      const dressing = painted ? cPaint.clone() : C.bone.clone();
-      // the opening, recessed into the shell so it reads as a hole and not a sticker
-      const op = new THREE.BoxGeometry(0.46, 0.80, 0.16);
-      stone.add(op, place(LH.x + Math.sin(aa) * (rr - 0.10), LH.y + yy, LH.z + Math.cos(aa) * (rr - 0.10), aa),
-        () => new THREE.Color(0x15171b));
-      op.dispose();
-      // sill and head, proud of the wall — dressed stone around a rubble shaft
-      for (const [dy, hh, ww, dd] of [[-0.47, 0.15, 0.74, 0.26], [0.46, 0.12, 0.64, 0.22]]) {
-        const b = new THREE.BoxGeometry(ww, hh, dd);
-        stone.add(b, place(LH.x + Math.sin(aa) * (rr + 0.02), LH.y + yy + dy, LH.z + Math.cos(aa) * (rr + 0.02), aa),
-          grad(dressing.clone().multiplyScalar(0.60), dressing.clone().multiplyScalar(0.88)));
-        b.dispose();
-      }
     }
     // CORBELS. The gallery deck was a brass disc floating off the stone with nothing
     // holding it up. Every real one is carried on a ring of stone brackets, and their
@@ -822,7 +780,8 @@ export function buildWorld() {
     // The dawn gull is 2.64 m across. The old 3.1 m rail left only 0.98 m
     // outside the lantern cage, so its wing envelope entered the copper even at
     // rest. Widen deck and rail together: the perch stays physically supported.
-    const gallery = new THREE.CylinderGeometry(GALLERY_RADIUS, GALLERY_RADIUS, 0.35, 24);
+    const gallery = new THREE.RingGeometry(2.3, GALLERY_RADIUS, 48);
+    gallery.rotateX(-Math.PI / 2);
     brass.add(gallery, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 20.6, LH.z), grad(C.brassDark, C.brass));
     gallery.dispose();
     for (let i = 0; i < 10; i++) {
@@ -842,7 +801,7 @@ export function buildWorld() {
     // the murette: the low solid band the glazing stands on. Without it the glass runs
     // straight into the deck and the room has no foot.
     {
-      const mur = new THREE.CylinderGeometry(2.12, 2.16, 0.46, 24, 1, true);
+      const mur = new THREE.CylinderGeometry(2.12, 2.16, 0.46, 24, 1, true, Math.PI / 3, Math.PI * 5 / 3);
       stone.add(mur, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 21.05, LH.z),
         grad(cPaint.clone().multiplyScalar(0.55), cPaint.clone().multiplyScalar(0.78)));
       mur.dispose();
@@ -850,13 +809,14 @@ export function buildWorld() {
     // astragals: 12, not 6 — at six you count them and it reads as scaffolding
     for (let i = 0; i < 12; i++) {
       const a = (i / 12) * TAU;
+      if (i === 1) continue;
       const post = new THREE.BoxGeometry(0.085, 1.95, 0.11);
       brass.add(post, place(LH.x + Math.sin(a) * 2.06, LH.y + 22.26, LH.z + Math.cos(a) * 2.06, a), grad(C.brassDark, C.brass));
       post.dispose();
     }
     // and the horizontal bars that make it a cage rather than a comb
     for (const gy of [21.55, 22.30, 23.02]) {
-      const ring = new THREE.TorusGeometry(2.06, 0.045, 6, 36);
+      const ring = new THREE.TorusGeometry(2.06, 0.045, 6, 36, Math.PI * 5 / 3);
       ring.rotateX(Math.PI / 2);
       brass.add(ring, new THREE.Matrix4().makeTranslation(LH.x, LH.y + gy, LH.z), grad(C.brassDark, C.brass));
       ring.dispose();
@@ -900,7 +860,7 @@ export function buildWorld() {
   }
   // glass for lamp room + window
   {
-    const lampGlass = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.05, 2.4, 24, 1, true), matGlass);
+    const lampGlass = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.05, 2.4, 24, 1, true, Math.PI / 3, Math.PI * 5 / 3), matGlass);
     lampGlass.position.set(0, 22.05, 0);
     lhGroup.add(lampGlass);
     // the study window, right-sized (owner fix): the old 2.6m flat sheet chorded the whole
@@ -1046,73 +1006,9 @@ export function buildWorld() {
     lhGroup.add(shaft);
   }
 
-  // =================== THE CLIMB (hub Phase B) ==============================
-  // A wooden spiral stair winds up the tower interior, around the light shaft, from just above
-  // the study oculus to the lamp-room gallery. You earn the climb by lighting the lamp; until
-  // then a rope hangs across its foot. Reaching the top opens the whole island — and a foreshadow
-  // of where the next tide means to rise (the vista). The ascent itself is a committed crossing
-  // (puzzles.js), not free-walked: the tower is too narrow to wind a multi-turn floor through.
-  {
-    const startAng = deg(200);
-    const N = 34, yB = LH.y + baseH, yTop = LH.y + 19.4;   // study-ceiling level -> just under the gallery (LH.y+20.6)
-    for (let i = 0; i < N; i++) {
-      const t = i / (N - 1);
-      const ang = startAng + i * (2.5 * TAU / N);          // ~2.5 turns
-      const rad = 2.5 - t * 0.5;                            // spiral inward as it rises (2.5 -> 2.0)
-      const yy = yB + 0.6 + t * (yTop - yB - 0.6);
-      const step = new THREE.BoxGeometry(0.82, 0.13, 0.56);
-      stone.add(step, place(LH.x + Math.sin(ang) * rad, yy, LH.z + Math.cos(ang) * rad, ang), grad(C.woodDark, C.wood));
-      step.dispose();
-    }
-    // the FOOT — a bottom step + a brass newel in the study, under the oculus, where you step on.
-    // lhGroup is ALREADY positioned at LH, so these three anchors use lhGroup-LOCAL coords —
-    // they were built LH-absolute and rendered at DOUBLE the offset (~-170,27,-81): the whole
-    // hub-Phase-B trio (climb foot, rope gate, descend ring) floated unreachable off-shore.
-    const footAng = startAng, footR = 1.95;
-    const flx = Math.sin(footAng) * footR, flz = Math.cos(footAng) * footR;
-    const foot = new THREE.Group(); foot.name = 'stairFoot'; foot.position.set(flx, 0.02, flz);
-    const fstep = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.16, 0.7), matWood); fstep.position.y = 0.08; foot.add(fstep);
-    const newel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 1.15, 8), matBrassSolid); newel.position.set(0.42, 0.6, 0.28); foot.add(newel);
-    lhGroup.add(foot);
-    // the rope across the foot — the gate; hangs until the lamp is lit (puzzles _apply).
-    // It WAS a half-torus: a rigid semicircular hoop, hexagonal in section, standing up
-    // off the step like a croquet wicket. Owner: "the rope thing seems weird". A rope
-    // does one thing that reads instantly as rope, and a torus cannot do it — it HANGS.
-    // So: a catenary strung between two eyes, sagging under its own weight, swept as a
-    // tube along the curve. Cheap (one mesh, ~200 tris) and it finally reads as a line
-    // slung across a stair rather than a piece of hardware bolted to it.
-    {
-      const HALF = 0.45, TOPY = 1.02, SAG = 0.19, RZ = 0.28;   // to the newel's z
-      const pts = [];
-      for (let i = 0; i <= 8; i++) {
-        const t = i / 8, x = -HALF + t * (HALF * 2);
-        // a real catenary, normalised so the ends sit exactly on the eyes
-        const a = 1.9, k = (Math.cosh(a * (t * 2 - 1)) - 1) / (Math.cosh(a) - 1);
-        pts.push(new THREE.Vector3(x, TOPY - SAG * (1 - k), RZ));
-      }
-      const curve = new THREE.CatmullRomCurve3(pts);
-      const rope = new THREE.Mesh(
-        new THREE.TubeGeometry(curve, 20, 0.019, 5, false),
-        new THREE.MeshStandardMaterial({ color: 0x8a7a52, roughness: 1 }),   // hemp, not bitumen
-      );
-      rope.name = 'stairRope';
-      rope.position.set(flx, 0.02, flz);
-      lhGroup.add(rope);
-      // the two eyes it is made off to, so the ends terminate on something
-      for (const ex of [-HALF, HALF]) {
-        const eye = new THREE.Mesh(new THREE.TorusGeometry(0.028, 0.008, 5, 10), matBrassSolid);
-        eye.position.set(flx + ex, 0.02 + TOPY, flz + RZ);
-        eye.rotation.y = Math.PI / 2;
-        lhGroup.add(eye);
-      }
-    }
-    // the DESCEND point — a brass trap-ring on the gallery, where the stair tops out
-    const topAng = startAng + (N - 1) * (2.5 * TAU / N);
-    const hatch = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 6, 16), matBrassSolid);
-    hatch.rotation.x = Math.PI / 2;
-    hatch.position.set(Math.sin(topAng) * 2.0, 20.55, Math.cos(topAng) * 2.0);
-    hatch.name = 'galleryHatch';
-    lhGroup.add(hatch);
+  // Named interaction anchors are aligned to the Blender stair by landfall.js.
+  for (const name of ['stairFoot', 'stairRope', 'galleryHatch']) {
+    const anchor = new THREE.Group(); anchor.name = name; lhGroup.add(anchor);
   }
 
   // =================== THE STUDY ============================================
@@ -1878,7 +1774,7 @@ export function buildWorld() {
     const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 0.56),
       new THREE.MeshStandardMaterial({ color: 0x756b5c, flatShading: true, roughness: 1 }));
     pillow.position.set(-0.62, 0.51, 0); cot.add(pillow);
-    q.add(cot);
+    cot.name = 'legacyCot'; q.add(cot);
 
     // the cold stove — fire long dead, its mouth a black hole; the contrast the
     // warm lamp needs
@@ -1887,7 +1783,7 @@ export function buildWorld() {
     const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.08, 10), ironMat); lid.position.y = 0.85; stove.add(lid);
     const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.095, 2.5, 8), ironMat); pipe.position.y = 2.05; stove.add(pipe);
     const mouth = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.26), new THREE.MeshBasicMaterial({ color: 0x070504 })); mouth.position.set(0, 0.41, 0.401); stove.add(mouth);
-    q.add(stove);
+    stove.name = 'legacyStove'; q.add(stove);
 
     // the wound: the recursion drawn by his own hand — nested islands receding
     // to a single warm dot, pinned to the far wall (echoes the nestedGlint)
@@ -1906,7 +1802,7 @@ export function buildWorld() {
     const dot = new THREE.Mesh(new THREE.CircleGeometry(0.02, 10), new THREE.MeshBasicMaterial({ color: 0xffd98a }));
     dot.position.set(-0.022 * 6, -0.022 * 6, 0.02);
     sketch.add(dot);
-    q.add(sketch);
+    sketch.name = 'legacyRoomSketch'; q.add(sketch);
 
     // the warm lamp source, hung over the room (the point-light is in main.js)
     const lamp = new THREE.Group(); lamp.position.set(0.05, 0, 0.55);
@@ -2881,8 +2777,20 @@ export function buildWorld() {
     // the contradiction deepening are the follow-up.)
     const dgx = hx - 4.7 - 6;        // study centre, west of the framed window
     const dgMat = new THREE.MeshStandardMaterial({ color: 0x6a6456, flatShading: true, roughness: 0.95, side: THREE.BackSide });
-    const study2 = new THREE.Mesh(new THREE.BoxGeometry(12, 5, 11), dgMat);
-    study2.position.set(dgx, 20.0, cz); cellar.add(study2);                       // east face flush with the window
+    // The western study is a room you can enter. Its east opening stays open
+    // from either side; a BackSide box would turn into a solid wall on returning.
+    const study2 = new THREE.Group(); study2.name = 'westernStudy';
+    const westPanel = (w, h, x, y, z, rx = 0, ry = 0) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), roomMat);
+      m.position.set(x, y, z); m.rotation.set(rx, ry, 0); study2.add(m);
+    };
+    westPanel(12, 11, dgx, 17.5, cz, -Math.PI / 2);
+    westPanel(12, 11, dgx, 22.5, cz, Math.PI / 2);
+    westPanel(12, 5, dgx, 20, cz - 5.5);
+    westPanel(12, 5, dgx, 20, cz + 5.5);
+    westPanel(11, 5, dgx - 6, 20, cz, 0, Math.PI / 2);
+    for (const side of [-1, 1]) westPanel(3.2, 5, dgx + 6, 20, cz + side * 3.9, 0, Math.PI / 2);
+    cellar.add(study2);                       // east face flush with the window
     const dgWin = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.7),              // a window onto contradicting weather (static)
       new THREE.MeshStandardMaterial({ color: 0xaebfd2, emissive: 0x718aa6, emissiveIntensity: 0.8, flatShading: true, side: THREE.DoubleSide }));
     dgWin.rotation.y = Math.PI / 2; dgWin.position.set(dgx - 5.92, 20.5, cz); cellar.add(dgWin);
@@ -3879,7 +3787,7 @@ function buildVegetation(core, r) {
     sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs → object-space sample)
     sh.uniforms.uFolAmt = { value: 0.25 };   // was 0.5 — the asset is a painterly STARBURST motif and at half strength it read as fireworks up close; the procedural needle grain below carries the fine detail now
     sh.uniforms.uFolScale = { value: 1.0 };
-    sh.uniforms.uFringe = { value: 0.48 };   // ragged silhouette without erasing the leader and every outer hand
+    sh.uniforms.uFringe = { value: 0.26 };   // ragged silhouette without erasing the leader and every outer hand
     canopyMat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
@@ -3985,6 +3893,16 @@ function buildVegetation(core, r) {
       `);
   };
 
+  const leanValues = new Float32Array(spots.length);
+  trunkGeo.setAttribute('aTrunkLean', new THREE.InstancedBufferAttribute(leanValues, 1));
+  const trunkRelief = trunkMat.onBeforeCompile;
+  trunkMat.onBeforeCompile = shader => {
+    trunkRelief?.(shader);
+    shader.vertexShader = 'attribute float aTrunkLean;\n' + shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+      transformed.x += pow(clamp(position.y / 2.6, 0.0, 1.0), 1.15) * aTrunkLean;`);
+  };
+  trunkMat.customProgramCacheKey = () => 'bark-with-crown-bend-v1';
   const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, spots.length);
   // per-spot canopy SHAPE variant (loop #139). A SEPARATE rng picks the silhouette so the shared
   // r() stream — and thus every tree's POSITION, scale, lean and tone — is byte-unchanged; only
@@ -4043,6 +3961,7 @@ function buildVegetation(core, r) {
       sy * crown / 2.6,
       trunkScale * (1.04 - (squash - 1) * 0.18),
     ));
+    leanValues[i] = cp.lean * (cp.n - 1) * sy / trunkScale;
     trunks.setMatrixAt(i, tm4);
     // per-trunk bark tone (loop #141): warm browns, light↔dark, so the trunks aren't 131 identical
     // poles; multiplies the shared bark albedo. Uses the separate br() rng (canopy tone unchanged).
@@ -4553,7 +4472,9 @@ function buildVegetation(core, r) {
     // catching light; the colour is a quiet flat base; texels enlarged (repeat 0.6) so
     // features read as geology up close, not texture grid. (The Bender house rule made
     // material: normal maps yes, tiled colour never.)
-    applyRelief(mat, 'rock_height', { normalScale: 0.8, strength: 2.6, colorMap: false, repeat: [0.6, 0.6] });   // #138: strata bedding relief (Bender heightmap; 0.8 keeps it geology, not zebra, at grazing light)
+    // At eye height the older 0.8 / 2.6 relief covered whole boulders in black
+    // parallel stripes. Let the displaced silhouette carry the rock's structure.
+    applyRelief(mat, 'rock_height', { normalScale: 0.22, strength: 1.4, colorMap: false, repeat: [0.6, 0.6] });
     const im = new THREE.InstancedMesh(rockVariants[idx], mat, 70);
     im.castShadow = true; im.name = 'rocks';
     return im;
@@ -4679,7 +4600,7 @@ function buildVegetation(core, r) {
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
 // 'handMarks' is pruned from the 1:240 clone: a ground scuff is ~4 mm there, sub-pixel
 // at every angle, and the clone would double its instance cost for nothing.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs', 'handMarks']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs', 'handMarks', 'towerShaft', 'towerStair', 'towerRails', 'vaultRibs', 'archiveFurniture', 'towerLanding', 'towerLog', 'coastalPines', 'archiveTin']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);

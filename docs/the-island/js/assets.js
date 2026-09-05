@@ -11,6 +11,7 @@
 // lives here as the first manifest row. Style guide + budgets: ASSETS.md.
 
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const BASE = 'assets/';
 
@@ -21,6 +22,16 @@ const BASE = 'assets/';
 //            generation prompt — see ASSETS.md).
 //   texture rows carry their sampler settings (wrap/repeat/colorSpace/anisotropy).
 export const MANIFEST = {
+  landfall: {
+    kind: 'model', file: 'landfall.glb', bytes: 2081688,
+    license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/landfall.py',
+    prompt: 'Authored lighthouse with open windows and 83 treads, stone vault ribs, drying table, coastal basalt arch and wind pines.',
+  },
+  harbor_rooms: {
+    kind: 'model', file: 'harbor-rooms.glb', bytes: 1716348,
+    license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/harbor_rooms.py',
+    prompt: 'Original coastal furniture, repaired chair, cloth, carved boat and mobile; procedural mesh authorship.',
+  },
   // #138 (AAA-B4): TRUE relief heightmaps — grayscale height, not albedo. The Sobel
   // in buildNormalFromImage reads luminance, so feeding it real height yields real
   // geometric normals (ripples/strata/furrows) instead of color-edge guesses.
@@ -298,4 +309,14 @@ export function getDerivedNormal(id, strength, cb) {
     if (!nt) { nt = buildNormalFromImage(t.image, strength); _normCache.set(id, nt); }
     cb(nt);
   });
+}
+
+// Preload before the world/model clone boundary. Clones share immutable geometry.
+const modelLoads = new Map();
+export function loadModel(id) {
+  const row = MANIFEST[id];
+  if (!row || row.kind !== 'model') throw new Error(`Unknown model asset: ${id}`);
+  if (!modelLoads.has(id)) modelLoads.set(id,
+    new GLTFLoader().loadAsync(new URL(BASE + row.file, document.baseURI).href).then((gltf) => gltf.scene));
+  return modelLoads.get(id);
 }

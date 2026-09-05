@@ -6,7 +6,7 @@ import {
   NOTE_IDS, PROGRESSION, SURFACE_REQUIREMENTS, advanceDecimalDial,
   advanceLowerHandRegard, canAttemptStoneSong, canOpenChest, canRevealShimmer,
   challengeState, hatchCodeMatches, missingRequirements,
-  nextPlateAction,
+  nextPlateAction, ascentLanding,
 } from '../js/progression.js';
 
 const notebook = (...ids) => {
@@ -203,4 +203,13 @@ test('puzzle runtime contains no legacy journal or identity-ending authority', a
   ]) {
     assert.equal(source.includes(retired), false, `retired runtime path remains: ${retired}`);
   }
+});
+
+
+test('first return, final homecoming and reload land on distinct boundaries', () => {
+  assert.deepEqual(ascentLanding(world(2)), { level: 1, route: 'receiver' });
+  assert.deepEqual(ascentLanding(world(3, { receiverReturned: true, climbing: true })), { level: 2, route: 'intermediate' });
+  assert.deepEqual(ascentLanding(world(2, { receiverReturned: true })), { level: 1, route: 'surface' });
+  assert.deepEqual(ascentLanding(world(2, { receiverReturned: true, dispositionChosen: true, climbing: true })), { level: 1, route: 'home' });
+  assert.deepEqual(ascentLanding(world(2, { receiverReturned: true, dispositionChosen: true, returned: true })), { level: 1, route: 'surface' });
 });

@@ -37,6 +37,8 @@ const folio = (id, title, noteIds) => Object.freeze({
 export const FIELD_FOLIOS = Object.freeze([
   folio('room', 'THE ROOM', [
     'evidence.model-marker',
+    'place.lamp-gallery',
+    'artifact.watch-book',
     'artifact.signal-shelf.surface',
     'evidence.hatch-numerals',
     'evidence.tide-gauge',
@@ -51,6 +53,8 @@ export const FIELD_FOLIOS = Object.freeze([
   ]),
   folio('changed', 'WHAT I CHANGED', [
     'event.refuge-lit',
+    'event.place-made',
+    'event.archive-opened',
     'evidence.valve',
     'evidence.music-box',
     'evidence.ruler',
@@ -80,6 +84,8 @@ export const FIELD_FOLIOS = Object.freeze([
   ]),
   folio('hands', 'OTHER HANDS', [
     'evidence.register',
+    'artifact.drying-papers',
+    'evidence.spare-place',
     'collection.climber.cmTallies',
     'collection.climber.cmFormal',
     'collection.climber.cmPlain',
@@ -134,6 +140,8 @@ export const FIELD_FOLIOS = Object.freeze([
   ]),
   folio('return', 'RETURN', [
     'return.receiver',
+    'event.boat-launched',
+    'evidence.boat-return',
     'return.surface',
     'event.returned-shore',
     'record.filed',

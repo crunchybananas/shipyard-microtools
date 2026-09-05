@@ -1051,3 +1051,11 @@ body.finale-reduced-motion #finale .title-btn {
   .sand-write-row { justify-content: space-between; }
 }
 #import-text { font-size: 0.72rem; }
+
+/* The hands differ through sentence and material, with readable, unforced type. */
+.reader-hand { font: 0.8rem/1.4 Georgia, serif; color: #52625e; margin-bottom: 0.65rem; }
+.reader-title { text-transform: none; letter-spacing: 0; font-size: 1.35rem; }
+.reader-body { font-style: normal; line-height: 1.8; max-width: 56ch; }
+.reader-body.keeper-deep { font-style: normal; transform: none; color: #34453e; }
+#reader[data-hand="inspector"] .reader-body { font-family: 'Courier New', monospace; font-size: 0.94rem; line-height: 1.7; }
+#whisper { font-style: normal; line-height: 1.55; }

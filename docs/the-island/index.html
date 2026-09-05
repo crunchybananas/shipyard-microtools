@@ -40,13 +40,13 @@
       </div>
       <!-- Begin pressed while a save exists (#56): the destructive step gets its own beat -->
       <div id="begin-confirm" class="hidden">
-        <div class="confirm-line">Begin anew &mdash; the tide takes everything.</div>
+        <div class="confirm-line">Begin again? Your current journey will be replaced.</div>
         <div class="title-actions">
           <button id="btn-begin-confirm" class="title-btn">Begin anew</button>
           <button id="btn-begin-back" class="title-btn">Back</button>
         </div>
       </div>
-      <div class="title-foot">headphones recommended &middot; every answer leaves a tide below</div>
+      <div class="title-foot">A small island. A long way home. &nbsp; Headphones recommended.</div>
       <!-- THE SHARED TIDE (STACK.md §8). Hidden until world.js confirms the shared
            stack is actually configured, so a local-only build never claims to send
            anything. Revealed on the TITLE screen rather than mid-game: the first
@@ -216,7 +216,8 @@
   <!-- the reading surface: open a book / letter / inscription and read it in fragments -->
   <div id="reader" class="hidden" role="dialog" aria-modal="true" aria-labelledby="reader-title">
     <div class="reader-page">
-      <div class="reader-title" id="reader-title"></div>
+      <div class="reader-hand" id="reader-hand"></div>
+    <div class="reader-title" id="reader-title"></div>
       <div class="reader-body" id="reader-body"></div>
       <div class="reader-foot">
         <button id="reader-prev" class="reader-arrow" aria-label="previous page">‹</button>
@@ -231,7 +232,7 @@
   <div id="finale" class="hidden">
     <div class="finale-inner">
       <div class="fin-line1">the tide brought you back</div>
-      <h1>A B Y M E</h1>
+      <h1>The Island</h1>
       <div class="fin-line2">an island within an island</div>
       <div class="fin-coda"></div>
       <button id="btn-again" class="title-btn">begin again</button>
