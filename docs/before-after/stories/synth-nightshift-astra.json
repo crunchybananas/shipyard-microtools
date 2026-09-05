@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 2,
+  "slug": "synth-nightshift-astra",
+  "title": "Synth Studio becomes Nightshift",
+  "appSlug": "synth-studio",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "in-revision",
+  "publishedAt": null,
+  "updatedAt": "2026-09-05T00:33:27Z",
+  "thesis": "An instrument should invite a performance. Start with a piece of music, let every gesture leave a musical consequence, and let the player take that composition away.",
+  "summary": "From a sound rack to a playable electronic record: three original sessions, four scenes, six voices, captured motion, editable arrangements, and a real stereo WAV to take away.",
+  "versions": {
+    "before": {
+      "label": "Original",
+      "commit": "fe30da1dd4652c92fe4d761f23213ab587b44dde"
+    },
+    "after": {
+      "label": "Nightshift",
+      "commit": "b05dc8d5680206e9cafaa27f4f52982b02b80dd1"
+    }
+  },
+  "lineage": [
+    {
+      "id": "original",
+      "label": "Original",
+      "commit": "fe30da1dd4652c92fe4d761f23213ab587b44dde",
+      "summary": "The original release assembled a polyphonic synthesizer, effects, drums, a step sequencer, and recording controls. Its creating commit does not record a model.",
+      "provenance": {
+        "model": null,
+        "note": "No model credit is recorded in the creating commit.",
+        "evidence": {
+          "kind": "unrecorded"
+        }
+      }
+    },
+    {
+      "id": "fable",
+      "label": "Export & memory",
+      "commit": "8022d20be5ac0319d9987474947a3fc1f29a1d79",
+      "summary": "The July revision made WAV timing and length follow the sequence and added localStorage persistence. Its commit explicitly credits Claude Fable 5. Those ideas remain essential to Nightshift.",
+      "provenance": {
+        "model": "Claude Fable 5",
+        "note": "The exact repository credit is preserved here; it is not an independent verification of the model run.",
+        "evidence": {
+          "kind": "commit-trailer",
+          "commit": "8022d20be5ac0319d9987474947a3fc1f29a1d79",
+          "quote": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+        }
+      }
+    },
+    {
+      "id": "baseline",
+      "label": "Deployed baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "summary": "The suite refresh gave the instrument a pale physical-rack design. This snapshot combines earlier work with an unattributed suite overhaul, so its model remains unassigned.",
+      "provenance": {
+        "model": null,
+        "note": "The material suite overhaul at 13f4a628 contains no model credit.",
+        "evidence": {
+          "kind": "unrecorded"
+        }
+      }
+    },
+    {
+      "id": "astra",
+      "label": "Nightshift",
+      "commit": "b05dc8d5680206e9cafaa27f4f52982b02b80dd1",
+      "summary": "An authored electronic record becomes a playable instrument: six independent voices, four harmonic scenes, a score orbit, quantized scene launches, captured pad motion, note editing, an arrangement, and shared live/offline synthesis. The complete previous rack remains available.",
+      "provenance": {
+        "model": "GPT-6 Astra",
+        "note": "The exact repository credit is preserved here; it is not an independent verification of the model run.",
+        "evidence": {
+          "kind": "commit-trailer",
+          "commit": "b05dc8d5680206e9cafaa27f4f52982b02b80dd1",
+          "quote": "Co-Authored-By: GPT-6 Astra <noreply@openai.com>"
+        }
+      }
+    }
+  ],
+  "captureProtocol": "scripts/capture-nightshift-lineage.mjs extracts isolated Git archives. Every revision opens in a fresh Chromium page with empty local storage, audio stopped, device scale 1, reduced motion, and 100% zoom. Desktop is 1440×900 and mobile is 390×844; both start at scroll position zero. No controls are altered and no UI is reconstructed or retouched. These default states intentionally show the change from the old rack to the authored opening score. The receipt records source commits, browser version, dimensions, scroll position, and SHA-256 hashes.",
+  "captureReceipt": "assets/synth-nightshift-astra/capture-receipt.json",
+  "comparisons": [
+    {
+      "id": "desktop",
+      "title": "Desktop · 1440 × 900",
+      "caption": "Each pinned revision is freshly opened with empty local storage and audio stopped, at the same viewport and scroll position. Earlier versions open their synth rack; Nightshift opens an authored six-voice score. These are default starting states, not the same musical arrangement.",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "before": {
+        "src": "assets/synth-nightshift-astra/original-desktop.jpg",
+        "alt": "Synth Studio, Original, freshly opened on desktop with audio stopped."
+      },
+      "after": {
+        "src": "assets/synth-nightshift-astra/astra-desktop.jpg",
+        "alt": "Synth Studio, Nightshift, freshly opened on desktop with audio stopped."
+      },
+      "frames": {
+        "original": {
+          "src": "assets/synth-nightshift-astra/original-desktop.jpg",
+          "alt": "Synth Studio, Original, freshly opened on desktop with audio stopped."
+        },
+        "fable": {
+          "src": "assets/synth-nightshift-astra/fable-desktop.jpg",
+          "alt": "Synth Studio, Export & memory, freshly opened on desktop with audio stopped."
+        },
+        "baseline": {
+          "src": "assets/synth-nightshift-astra/baseline-desktop.jpg",
+          "alt": "Synth Studio, Deployed baseline, freshly opened on desktop with audio stopped."
+        },
+        "astra": {
+          "src": "assets/synth-nightshift-astra/astra-desktop.jpg",
+          "alt": "Synth Studio, Nightshift, freshly opened on desktop with audio stopped."
+        }
+      }
+    },
+    {
+      "id": "mobile",
+      "title": "Mobile · 390 × 844",
+      "caption": "Each pinned revision is freshly opened with empty local storage and audio stopped, at the same viewport and scroll position. Earlier versions open their synth rack; Nightshift opens an authored six-voice score. These are default starting states, not the same musical arrangement.",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "before": {
+        "src": "assets/synth-nightshift-astra/original-mobile.jpg",
+        "alt": "Synth Studio, Original, freshly opened on mobile with audio stopped."
+      },
+      "after": {
+        "src": "assets/synth-nightshift-astra/astra-mobile.jpg",
+        "alt": "Synth Studio, Nightshift, freshly opened on mobile with audio stopped."
+      },
+      "frames": {
+        "original": {
+          "src": "assets/synth-nightshift-astra/original-mobile.jpg",
+          "alt": "Synth Studio, Original, freshly opened on mobile with audio stopped."
+        },
+        "fable": {
+          "src": "assets/synth-nightshift-astra/fable-mobile.jpg",
+          "alt": "Synth Studio, Export & memory, freshly opened on mobile with audio stopped."
+        },
+        "baseline": {
+          "src": "assets/synth-nightshift-astra/baseline-mobile.jpg",
+          "alt": "Synth Studio, Deployed baseline, freshly opened on mobile with audio stopped."
+        },
+        "astra": {
+          "src": "assets/synth-nightshift-astra/astra-mobile.jpg",
+          "alt": "Synth Studio, Nightshift, freshly opened on mobile with audio stopped."
+        }
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "The opening is a piece of music",
+      "body": "Night drive, Glasshouse, and Daybreak each contain four scenes and a 32-bar arrangement. Six separate synthesized voices carry changing harmony, rhythm, and density. Press Play and the song travels through those scenes; launch one manually and it arrives on the next bar, then loops."
+    },
+    {
+      "title": "A gesture becomes part of the composition",
+      "body": "The pad opens synth filters horizontally and expands reverb and delay vertically. Capture motion remembers sixteen steps of movement in the selected scene. Replay applies it every bar, including in the WAV export. The six orbits show actual note positions and respond to measured audio."
+    },
+    {
+      "title": "Go inside the music",
+      "body": "Edit the step patterns and accents, select a voice for its scale-relative notes and tone, mute or solo a part, and change the scene order and section lengths. Notes follow the selected key and four-bar harmony. The live keys offer in-key improvisation."
+    },
+    {
+      "title": "The work leaves the browser intact",
+      "body": "Projects autosave locally and round-trip through validated JSON. WAV export renders a snapshot of the score, mix, effects, and captured motion using the same sound graph as playback. A six-second tail preserves the last echoes. Live keyboard improvisation is not recorded into that score; add those notes to the grid to export them."
+    },
+    {
+      "title": "The original instrument remains playable",
+      "body": "The Classic rack retains the previous synth controls, effects, MIDI, recording, sequencer, and its original saved-project storage. Nightshift uses a separate save key. The new Project dialog provides Undo on both desktop and mobile."
+    }
+  ],
+  "builderNote": null,
+  "proof": [
+    {
+      "label": "Musical structure",
+      "value": "Six score tests cover the three sessions, swing and bar timing, harmony, mix behavior, captured motion, malformed imports, and the 64-bar bound."
+    },
+    {
+      "label": "Actual playback",
+      "value": "78 browser and DSP checks pass at 1440×900 and 390×844, including scene quantization, motion capture, note edits, reload, project round trips, WAV download, song completion, and source retirement."
+    },
+    {
+      "label": "Rendered audio",
+      "value": "All three authored sessions produce finite, audible samples and silent final tails. Muting all voices produces silence. Motion changes the rendered signal. A dense maximum-volume score peaks at 0.954, below clipping."
+    },
+    {
+      "label": "Review state",
+      "value": "Source and real captures are ready for review. The live deployment is unchanged; this record contains no owner endorsement."
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/synth-studio/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/b05dc8d5680206e9cafaa27f4f52982b02b80dd1/docs/synth-studio/",
+    "download": "assets/synth-nightshift-astra/montage.png"
+  },
+  "share": {
+    "summary": "From a sound rack to a playable electronic record: three original sessions, four scenes, six voices, captured motion, editable arrangements, and a real stereo WAV to take away.",
+    "image": "assets/synth-nightshift-astra/social.jpg",
+    "captureLabel": "1440 × 900 captures · fresh starting states · pinned source commits"
+  }
+}

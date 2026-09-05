@@ -1,0 +1,142 @@
+{
+  "capturedAt": "2026-09-05T00:34:26.257Z",
+  "fixture": "scripts/capture-nightshift-lineage.mjs; fresh page, empty local storage, audio stopped",
+  "captures": [
+    {
+      "version": "original",
+      "commit": "fe30da1dd4652c92fe4d761f23213ab587b44dde",
+      "scene": "desktop",
+      "filename": "original-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "0e9b9eeb3aa31ec277ece98991b249ced001494ebe119aca97b514fa997b5457",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Synth Studio",
+      "audioState": "not activated"
+    },
+    {
+      "version": "original",
+      "commit": "fe30da1dd4652c92fe4d761f23213ab587b44dde",
+      "scene": "mobile",
+      "filename": "original-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "a0abc42ffac9b3fd5ae842ce1cef0f7af315b86b379116aaa161c3c6739a83ba",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Synth Studio",
+      "audioState": "not activated"
+    },
+    {
+      "version": "fable",
+      "commit": "8022d20be5ac0319d9987474947a3fc1f29a1d79",
+      "scene": "desktop",
+      "filename": "fable-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "8e58a129f8e7581c5230a3de19c64985837403c531c237f213c15df2914ff8c5",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Synth Studio",
+      "audioState": "not activated"
+    },
+    {
+      "version": "fable",
+      "commit": "8022d20be5ac0319d9987474947a3fc1f29a1d79",
+      "scene": "mobile",
+      "filename": "fable-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "4235eafeee3e5a3add16ee051a25f04d16a31adcfe0747721d325e58cb33f1aa",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Synth Studio",
+      "audioState": "not activated"
+    },
+    {
+      "version": "baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "scene": "desktop",
+      "filename": "baseline-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "4194416c5aa67f422d10bc2621be02f3cac5b38617ac3812a20c0afedd52caea",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Synth Studio — SS-4 Sound Workshop",
+      "audioState": "not activated"
+    },
+    {
+      "version": "baseline",
+      "commit": "d88602aa9ebdd614b961cc773ff4ad7f2430e10c",
+      "scene": "mobile",
+      "filename": "baseline-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "c0612efac4380f5a728af0064d2a2bd29a27c3305b5e412cf9f7e7ef5f36b3c1",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Synth Studio — SS-4 Sound Workshop",
+      "audioState": "not activated"
+    },
+    {
+      "version": "astra",
+      "commit": "b05dc8d5680206e9cafaa27f4f52982b02b80dd1",
+      "scene": "desktop",
+      "filename": "astra-desktop.jpg",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "fbfc6f6687162cbb3a4cb8db67640ec04426e387d06e0882482c219b793edaf1",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Nightshift · Synth Studio",
+      "audioState": "uninitialized"
+    },
+    {
+      "version": "astra",
+      "commit": "b05dc8d5680206e9cafaa27f4f52982b02b80dd1",
+      "scene": "mobile",
+      "filename": "astra-mobile.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "deviceScaleFactor": 1,
+      "browser": "147.0.7727.15",
+      "sha256": "1fc46019c559c092b1e7e0a9ff17d778db0ce823f1f57cdf0103976275166595",
+      "scrollX": 0,
+      "scrollY": 0,
+      "title": "Nightshift · Synth Studio",
+      "audioState": "uninitialized"
+    }
+  ]
+}

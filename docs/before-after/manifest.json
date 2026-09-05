@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-04T23:39:00Z",
+  "updatedAt": "2026-09-05T00:33:27Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,19 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "synth-nightshift-astra",
+      "title": "Synth Studio becomes Nightshift",
+      "appSlug": "synth-studio",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "in-revision",
+      "publishedAt": null,
+      "updatedAt": "2026-09-05T00:33:27Z",
+      "data": "stories/synth-nightshift-astra.json",
+      "href": "./synth-nightshift-astra/",
+      "cover": "assets/synth-nightshift-astra/social.jpg"
+    },
     {
       "slug": "json-workbench-astra",
       "title": "JSON Workbench, from formatter to inspector",
@@ -303,8 +316,8 @@
       "slug": "synth-studio",
       "title": "Synth Studio",
       "category": "Creative",
-      "status": "queued",
-      "story": null
+      "status": "in-revision",
+      "story": "synth-nightshift-astra"
     },
     {
       "slug": "text-diff",

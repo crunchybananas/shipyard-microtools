@@ -68,7 +68,7 @@ try {
       check(await page.locator('.story-title').textContent() === record.title, `${record.slug} stable route resolves`);
       check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), `${record.slug} fits ${viewport.width}px`);
       if (story.schemaVersion === 2) {
-        check(await page.locator('.revision-button').count() === 4, 'All recorded revisions are selectable');
+        check(await page.locator('.revision-button').count() === story.lineage.length, 'All recorded revisions are selectable');
         await page.locator('.revision-button').first().click();
         await page.locator('.revision-button').first().press('End');
         check(await page.locator('.revision-button').last().getAttribute('aria-pressed') === 'true', 'Keyboard navigation selects Astra');
@@ -104,7 +104,7 @@ try {
       check(await page.locator('.error-block').count() === 0, 'Story has no loading error');
     }
     await page.goto(`${base}/before-after/`); await page.locator('.feature-title').waitFor();
-    check((await page.locator('.feature-title').textContent()).includes('JSON Workbench'), 'Latest review is visible on the archive landing page');
+    check((await page.locator('.feature-title').textContent()) === manifest.stories.slice().sort((a,b) => String(b.updatedAt || b.publishedAt || '').localeCompare(String(a.updatedAt || a.publishedAt || '')))[0].title, 'Latest review is visible on the archive landing page');
     check(await page.locator('.story-row').count() === manifest.stories.length, 'Every historical story remains indexed');
     await page.goto(base); await page.locator('.demo-card').first().waitFor();
     check(await page.locator('.demo-card').count() === 32, 'Hub retains all 32 existing apps');

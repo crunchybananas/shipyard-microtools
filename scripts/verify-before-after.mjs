@@ -113,7 +113,7 @@ function discoverTrackedApps() {
       encoding: 'utf8',
     })
       .split(/\r?\n/)
-      .filter(Boolean)
+      .filter(path => /^docs\/[^/]+\/index\.html$/.test(path))
       .map(path => path.split('/')[1])
       .filter(slug => slug && !EXCLUDED_DEMO_DIRECTORIES.has(slug))
       .sort();

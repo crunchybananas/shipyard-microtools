@@ -72,7 +72,7 @@ function discoverDemoNames() {
     { cwd: repoRoot, encoding: 'utf8' },
   )
     .split(/\r?\n/)
-    .filter(Boolean);
+    .filter(path => /^docs\/[^/]+\/index\.html$/.test(path));
 
   const names = trackedIndexes
     .map(path => path.split('/')[1])
