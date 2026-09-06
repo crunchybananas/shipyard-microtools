@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // walk.mjs — full future-facing route: observation → manipulation → crossing → account.
 //
 // This uses the shipped hotspot callbacks for every puzzle action and the pure
@@ -27,11 +28,8 @@ export default async function walk(h) {
     await ready();
     await h.evaluate(`window.__walkErrors = [];
       addEventListener('error', (event) => window.__walkErrors.push(event.message));
-      addEventListener('unhandledrejection', (event) => window.__walkErrors.push(String(event.reason)));
-      document.getElementById('btn-begin').click(); 1`);
-    await h.wait(1.5);
-    await h.evaluate(`ABYME.setIntroT(99); 1`);
-    await h.wait(2.2);
+      addEventListener('unhandledrejection', (event) => window.__walkErrors.push(String(event.reason)));1`);
+    await beginPlay(h);
   };
 
   await h.send('Emulation.setDeviceMetricsOverride', {

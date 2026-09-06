@@ -58,6 +58,11 @@ export default async function (h) {
   const ok = (n, c, x) => (c ? R.pass : R.fail).push(n + (c ? '' : ' :: ' + JSON.stringify(x)));
   const URL = 'http://127.0.0.1:' + (process.env.SERVE_PORT || 8642) + '/the-island/?debug&mute&localstack';
 
+  // The narrow door-frame crop was calibrated at the release suite's viewport.
+  // A standalone Chrome outer-window size is not its content viewport on macOS.
+  await h.send('Emulation.setDeviceMetricsOverride', {
+    width:1280, height:720, deviceScaleFactor:1, mobile:false,
+  });
   await h.navigate(URL);
   for (let i = 0; i < 40; i++) {
     if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) break;
