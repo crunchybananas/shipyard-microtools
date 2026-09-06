@@ -10,8 +10,9 @@ jobs:
   walk:
     runs-on: ubuntu-latest
     # The full renderer suite includes the tower, buried rooms and working coast.
-    # Software GL takes minutes per rendered group; keep the complete gate intact.
-    timeout-minutes: 45
+    # The complete software-GL gate passed in 44m25s on the working-coast release.
+    # Allow runner variance without changing any gameplay or renderer assertion.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
