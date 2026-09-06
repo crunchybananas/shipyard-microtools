@@ -77,7 +77,9 @@ export default async function (h) {
     ok('words add exactly zero draft', committed.draft2 === 0, committed);
     ok('the line persists in the ledger immediately', /Hold fast/.test(committed.stored || ''), committed.stored);
 
-    await h.wait(0.5);
+    // Submission clears the cached texture key; the gameplay frame draws the
+    // actual ink. Half a wall second can contain no gameplay frame in software GL.
+    await h.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))');
     const fresh = await h.evaluate(`(() => {
       const s = ABYME.refs.sandWriting.userData.writingState || {};
       const before = ABYME.ledger().marks.filter(m => m.k === 'writing').length;
@@ -101,6 +103,7 @@ export default async function (h) {
 
     await h.evaluate(`ABYME.goLevel(2); ABYME.player.locked = false; 1`);
     await h.wait(1.2);
+    await h.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))');
     const below = await h.evaluate(`(() => {
       const s = ABYME.refs.sandWriting.userData.writingState || {};
       const p = ABYME.refs.sandWriting.userData.anchor || {};
