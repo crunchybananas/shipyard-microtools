@@ -12,6 +12,41 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 47 — 2026-09-05 — Working coast: the room and the trees
+
+**Revision:** The main study now has fitted floorboards, painted joinery, limewashed
+walls and a copper stilling tube. Turning the wheel moves the float with the actual
+sea level. Four Blender crown forms replace the old generated foliage; the model
+uses tiny crowns from the same placement data. Lichen sits on the rock surface.
+
+**Evidence:** Pure contracts **115/115**, syntax and the complete native browser
+gate passed, including Working coast **9/9**, Landfall **21/21**, and the causal
+walk **69/69**. The Upstream Hand peak is **511 calls / 934,535 triangles** with
+nine point lights, below the unchanged ceilings. Real phone input passes the tide
+gauge **4/4** and tower movement **2/2**. Viewer checks **12/12** cover image loading,
+folding, deep links and phone taps.
+
+The final instrument also passes **10/10** in native and software rendering,
+including containment at the maximum shared tide. Its glass, pipe and backboard
+were extended for that range, and the half-step marks now meet the float.
+
+The review in `playthrough/2026-09-05/working-coast/` preserves **165 stages**, all
+four endings and the complete manuscript. **106 illustrated moments** remain after
+folding repeated views and grouping continuation pages. Six matching before/after
+camera views show the room, forest and shore at noon and night; timing samples are
+observations, not a controlled speed claim. The capture records zero browser errors.
+
+**Test timing:** The upstream budget now waits for the miniature's rendered
+visibility before its baseline; Linux software GL exposed the old wall-time race.
+The buried-view assertion also waits for actual frames. The working-coast CI pass
+steps production tide easing in 50 ms increments, then renders the float; the
+native pass uses its ordinary thirteen-second travel. No ceiling or gameplay gate
+was relaxed. CI results are attached to the release commits.
+
+**Next:** Author the larger terrain and boulder forms from player-height views,
+then revisit character animation and the arrival. The present visual standard is
+still below the user's AAA ambition; this revision is a coherent next layer.
+
 ## 46 — 2026-09-05 — Landfall: the tower and rooms below
 
 **Implemented locally:** Rebuilt the lighthouse shaft in Blender around a continuous

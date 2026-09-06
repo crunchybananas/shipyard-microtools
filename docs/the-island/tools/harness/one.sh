@@ -26,15 +26,20 @@ fi
 [ -z "${CHROME_BIN:-}" ] && { echo "no chrome found; set CHROME_BIN"; exit 2; }
 
 WORK="$(mktemp -d)"
+EXTRA_FLAGS=""
+[ "${CI:-}" = "true" ] && EXTRA_FLAGS="--no-sandbox --disable-dev-shm-usage --use-angle=swiftshader"
 cleanup() { kill "${SRV_PID:-}" "${CHROME_PID:-}" 2>/dev/null; wait 2>/dev/null; rm -rf "$WORK" 2>/dev/null; }
 trap cleanup EXIT
 
 SERVE_PORT="$SERVE_PORT" python3 "$HERE/serve.py" > "$WORK/serve.log" 2>&1 & SRV_PID=$!
 # no --disable-gpu: new headless kills WebGL under it
+# These are fixed flags, intentionally split as in run.sh; an empty array under
+# set -u is an error on the Bash 3.2 shipped with macOS.
+# shellcheck disable=SC2086
 "$CHROME_BIN" --headless=new --remote-debugging-port="$CDP_PORT" \
   --autoplay-policy=no-user-gesture-required --mute-audio \
   --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows \
-  --window-size=1280,800 --user-data-dir="$WORK/profile" about:blank \
+  --window-size=1280,800 --user-data-dir="$WORK/profile" $EXTRA_FLAGS about:blank \
   > "$WORK/chrome.log" 2>&1 & CHROME_PID=$!
 
 for i in $(seq 1 30); do curl -sf "http://127.0.0.1:$CDP_PORT/json/version" >/dev/null && break; sleep 1; done

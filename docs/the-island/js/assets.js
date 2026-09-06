@@ -22,6 +22,11 @@ const BASE = 'assets/';
 //            generation prompt — see ASSETS.md).
 //   texture rows carry their sampler settings (wrap/repeat/colorSpace/anisotropy).
 export const MANIFEST = {
+  working_coast: {
+    kind: 'model', file: 'working-coast.glb', bytes: 1718784,
+    license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/working_coast.py',
+    prompt: 'Four closed-volume conifer crowns with paired LODs, fitted study floorboards, painted joinery, limewash and a tide wheel pipe run.',
+  },
   landfall: {
     kind: 'model', file: 'landfall.glb', bytes: 2081688,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/landfall.py',

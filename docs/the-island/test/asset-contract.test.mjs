@@ -42,7 +42,7 @@ const cssAssets = [...styleSource.matchAll(/url\(\s*['"]?assets\/([^'"\)]+)['"]?
   .map((match) => match[1]);
 
 test('every WebGL manifest row is consumed and matches its file', () => {
-  assert.equal(manifestRows.length, 14, 'update the documented WebGL asset count with deliberate additions');
+  assert.equal(manifestRows.length, 15, 'update the documented WebGL asset count with deliberate additions');
   for (const { id, file, bytes } of manifestRows) {
     assert.match(runtimeJs, new RegExp(`['"]${id}['"]`), `${id} has no JavaScript consumer`);
     assert.equal(statSync(join(ASSET_DIR, file)).size, bytes, `${file} byte count is stale`);

@@ -1,3 +1,4 @@
+import { attachWorkingStudy } from './working-coast.js';
 import { attachLandfall } from './landfall.js';
 import { TOWER, TOWER_TOP, stairPose } from './tower-course.js';
 // main.js — boot, light, loop. ABYME: an island within an island.
@@ -247,10 +248,11 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
-const [harborKit, landfallKit] = await Promise.all([loadModel('harbor_rooms'), loadModel('landfall')]);
-const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, l3motes, vaultDrips } = buildWorld();
+const [harborKit, landfallKit, coastKit] = await Promise.all([loadModel('harbor_rooms'), loadModel('landfall'), loadModel('working_coast')]);
+const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, l3motes, vaultDrips } = buildWorld(coastKit);
 const harbor = attachHarborRooms(core, harborKit);
 const landfall = attachLandfall(core, landfallKit);
+const workingStudy = attachWorkingStudy(core, coastKit);
 const modelRoot = instantiateModel(core, modelAnchor);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
@@ -2694,6 +2696,7 @@ renderer.setAnimationLoop((tMs) => {
   game.tick(dt, elapsed);
   harbor.tick(W, dt, elapsed);
   landfall.tick();
+  workingStudy.tick(W.tide);
   runDrives(W, dt, elapsed);   // #73: the self-gating per-entity drives
   // Finale state is deliberately last: the gameplay tick keeps the returned world
   // alive, then the chosen tableau owns its waterline, threshold, and camera.

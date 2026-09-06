@@ -103,6 +103,7 @@ The stack ledger is intentionally separate and outlives Begin again.
 | Physical signal, instrument, and dial assets | `js/props.js` |
 | Blender tower, vaults, coast, pines and drying-room tin | `js/landfall.js` |
 | Shared Blender stair layout and player tread surface | `js/tower-course.js` |
+| Blender forest profiles, study finish and tide sight glass | `js/forest-profile.js`, `js/working-coast.js` |
 | Hotspots and world application | `js/puzzles.js` |
 | Crossings, finale, reports, debug tools | `js/main.js` |
 | Notebook presentation and readers | `js/ui.js`, `style.css` |
@@ -201,3 +202,20 @@ animation. Its ground is flattened below the new floor. `harbor.mjs` checks real
 keyboard entrance and pointer selection, then boat restoration and water contact.
 `ABYME.cross()` validates the production gate while skipping only the camera trip;
 use it for causal captures. Legacy level fixtures do not prove progression.
+
+## Working coast
+
+`working-coast.glb` preloads with the two other kits. `forest-profile.js` owns
+crown proportions for the Blender generator and trunk placement. The full stand
+retains its deterministic positions, colliders and litter mask; a separate
+232–296-triangle version of each crown serves the 1:240 model. Both scales use
+the same placement list. The study kit is pruned from the miniature.
+
+The sight-glass float follows `W.tide`, never the target or a separate state.
+This preserves gradual drainage and the inherited rise on the lower island.
+The new ledge has physical colliders. Rock lichen is now a material on the
+actual stone surface; the old floating lichen instances were removed.
+
+`working-coast.mjs` verifies authored LODs, wind weights, open room apertures,
+a real pointer on the wheel and the float throughout its travel.
+`coast-power.mjs` captures identical poses at noon and night in either revision.

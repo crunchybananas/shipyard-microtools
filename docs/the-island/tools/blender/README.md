@@ -31,3 +31,16 @@ that authority before regenerating stairs; hand-editing only the mesh would brea
 the player floor. The GLB includes separate distant shaft and pine meshes. Runtime
 assembly and LOD live in `../../js/landfall.js`. Review geometry totals in
 `landfall-geometry.json` and run `tools/harness/landfall.mjs` through `one.sh`.
+
+## Working coast
+
+`working_coast.py` produces `working-coast.glb`, `working-coast.blend`,
+`working-coast-geometry.json` and the matching PNG inspection render. It reads
+the four tree proportions from `js/forest-profile.js`. Every crown has near, far
+and miniature geometry. UV.x transports its wind weight into the runtime.
+The original object transforms are exported before the source inspection layout
+is arranged, so the GLB stays centred in game coordinates.
+
+The kit also contains the main study's plaster, fitted boards, panelling, shelf
+joinery, working ledge and pipe run. The glass, water and float are runtime
+geometry because their level follows the live tide.

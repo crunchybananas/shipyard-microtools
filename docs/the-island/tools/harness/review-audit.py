@@ -4,7 +4,7 @@ import json, sys
 from PIL import Image, ImageChops, ImageStat
 root=Path(sys.argv[1]);path=root/'stages.json';data=json.loads(path.read_text());stages=data['stages']
 previous=[];seen_text={};groups={};first_scene=set()
-protected=('first window','bay from halfway','high window','above the whole island','light shaft below','drain chamber','inverted lighthouse','western doorway','drying table','lid loose','cellar stair','drowned hall','water in the room','across the bay','changed shore','afterward')
+protected=('boughs above','working ledge','water in the glass','float has fallen','first window','bay from halfway','high window','above the whole island','light shaft below','drain chamber','inverted lighthouse','western doorway','drying table','lid loose','cellar stair','drowned hall','water in the room','across the bay','changed shore','afterward')
 for s in stages:
  s['presentation']='moment';s.pop('repeatOf',None);s.pop('additionalPages',None)
  im=Image.open(root/s['image']).convert('RGB').resize((32,20))

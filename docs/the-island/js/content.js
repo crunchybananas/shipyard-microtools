@@ -738,7 +738,7 @@ export const T = {
   "the_top_ring_stands": "The top ring stands {gap} m clear of the water. Fresh-cut. Nothing has ever reached it.",
   "the_water_is_at": "The water is at the fifth ring.",
   "it_has_to_go_somewhere": "The lower gauge rises as the upper basin falls.",
-  "below_the_window_the": "Below the window, the sea obeys.",
+  "below_the_window_the": "The float moves in its glass. Beyond the window, the water follows.",
   "the_crank_resists_as": "The crank is stiff. The sky moves a little after your hand stops.",
   "the_little_lamp_drags": "The little lamp drags the real sun with it.",
   "the_fourth_note_does": "The fourth tooth catches. The note falls silent.",

@@ -41,7 +41,9 @@ export default async function(h){
  ok('the drain can be entered and exited on its ramp',underground.drain===4&&underground.drainExit>8.7,underground);
  ok('the cellar stair leads into the western room',underground.cellar===18.3&&underground.west===17.5&&underground.failures.length===0,underground);
  await h.wait(.3);
- ok('the underground view cuts obstructing terrain',await h.evaluate('ABYME.core.getObjectByName("terrain").material.userData.shader.uniforms.uBuriedView.value===1'));
+ await h.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))');
+ const buried=await h.evaluate('({value:ABYME.core.getObjectByName("terrain").material.userData.shader.uniforms.uBuriedView.value,pos:ABYME.player.pos.toArray(),camera:ABYME.camera.position.toArray()})');
+ ok('the underground view cuts obstructing terrain',buried.value===1,buried);
  const reread=await h.evaluate(`(()=>{const {W,game,UI,notebook}=ABYME;const ledger=game.interact.hotspots.find(s=>s.id==='drainLedger');W.level=1;ledger.onClick();UI._readerPage(1);UI.closeReader();W.level=3;ledger.onClick();const reopened=UI._reader?.id==='drain_ledger'&&!W.recDisp.drain_ledger;while(UI._reader&&UI._reader.page<UI._reader.pages.length-1)UI._readerPage(1);UI.closeReader();const deep=notebook.hasReadLore('drain_ledger','deep');ledger.onClick();const carried=W.recDisp.drain_ledger==='carried';W.level=1;return {reopened,deep,carried};})()`);
  ok('returning to a read record reveals newly available pages',reread.reopened&&reread.deep,reread);
  ok('the record can be carried after its new pages are read',reread.carried,reread);

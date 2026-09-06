@@ -1,3 +1,4 @@
+import { forestCrowns, applyRockCrust } from './working-coast.js';
 // props.js — every structure on the island, generated from primitives.
 // Static pieces are baked into merged meshes (a few draw calls); anything
 // that moves or glows is a named object so world.js state can drive it —
@@ -503,7 +504,7 @@ function phialProp(name) {
 // =============================================================================
 // build the whole world. Returns { core, refs, modelRefs, hotspots, ... }
 // =============================================================================
-export function buildWorld() {
+export function buildWorld(coastKit) {
   const r = mulberry32(SEED ^ 0xbeef);
   const core = new THREE.Group();
   core.name = 'islandCore';
@@ -697,34 +698,8 @@ export function buildWorld() {
     const floor = new THREE.CylinderGeometry(baseR + 0.2, baseR + 0.2, 0.3, 28);
     stone.add(floor, new THREE.Matrix4().makeTranslation(LH.x, LH.y - 0.07, LH.z), grad(C.stoneOld, C.boneDark));
     floor.dispose();
-    // CONTACT AO (#43): the room players study longest had a gradient floor under
-    // shadowless point lights — table legs and shelves visibly floated. The cylinder cap
-    // is a vertex FAN (centre + rim only), so pools can't bake into it; lay a finely
-    // tessellated ring 5mm proud as the walk surface and darken it by proximity to the
-    // known furniture footprints. CPU-only, +0 draws (same stone bake), clone inherits.
-    {
-      const FEET = [
-        [0, 0, 1.9, 0.14],                                              // chart table's soft under-shadow
-        [-1.0, -1.0, 0.4, 0.42], [1.0, -1.0, 0.4, 0.42],                // its four legs
-        [-1.0, 1.0, 0.4, 0.42], [1.0, 1.0, 0.4, 0.42],                  // (these two were left at 1.25)
-        [2.3, 1.1, 0.36, 0.4],                                          // valve pedestal
-        [2.2, -1.4, 0.78, 0.2],                                         // brass plate, seated
-        [Math.sin(deg(285)) * 4.4, Math.cos(deg(285)) * 4.4, 1.2, 0.26],  // bookshelf bays
-        [Math.sin(deg(323)) * 4.4, Math.cos(deg(323)) * 4.4, 1.2, 0.26],
-        [-3.6, -2.6, 0.8, 0.2],                                         // music-box shelf
-      ];
-      const floorTop = new THREE.RingGeometry(0.02, baseR + 0.2, 56, 24);
-      floorTop.rotateX(-Math.PI / 2);
-      stone.add(floorTop, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 0.085, LH.z), (t, wv) => {
-        let ao = 0;
-        for (const [fx, fz, fr, fs] of FEET) {
-          const d = Math.hypot(wv.x - (LH.x + fx), wv.z - (LH.z + fz));
-          ao += fs * (1 - smoothstep(fr * 0.4, fr, d));
-        }
-        return C.boneDark.clone().multiplyScalar(1 - Math.min(0.52, ao));
-      });
-      floorTop.dispose();
-    }
+    // The fitted Blender floor is now the walking finish. Its material owns the
+    // contact shadow; the old stone overlay would bury all the board joints.
     const ceil = new THREE.RingGeometry(3.06, baseR + 0.1, 48);
     ceil.rotateX(Math.PI / 2);
     stone.add(ceil, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH, LH.z), grad(C.boneDark, C.boneDark));
@@ -2921,7 +2896,7 @@ export function buildWorld() {
   }
 
   // =================== VEGETATION ===========================================
-  buildVegetation(core, r);
+  buildVegetation(core, r, coastKit);
 
   // =================== LOWER HAND (on the model) ============================
   // A figure one stratum down, standing on the model's beach. The group sits at
@@ -3487,7 +3462,7 @@ export function buildWorld() {
 }
 
 // ---------------------------------------------------------------------------
-function buildVegetation(core, r) {
+function buildVegetation(core, r, coastKit) {
   // keep-outs: floors the scatter must respect. Discs match the structures
   // built in buildWorld — lighthouse base (r 5.2 + wall + apron) and the
   // annex (attached at azimuth 15°, baseR + 2.2 from the tower, r 2.8).
@@ -3537,220 +3512,8 @@ function buildVegetation(core, r) {
     }
     trunkGeo.computeVertexNormals();
   }
-  // A conifer is not a tiered surface and it is not a pinwheel of triangular cards.
-  // Build each bough from overlapping, asymmetric THREE-DIMENSIONAL needle sprays.
-  // The sprays share a bowed centreline but fork near the hand, so a nearby tree reads
-  // shoulder → bough → branchlet → fresh tip. At distance those same clumps merge
-  // into a soft, broken crown rather than a stack of stamped triangles. `aRim` records
-  // progress along the bough for edge fray, new growth and tip-weighted wind.
-  const makeCanopy = ({ n, baseY, baseR, taperK, tierH, spacing, lean, jag, droop,
-    fullness = 1, broken = 0, seedXor, seg = 16 }) => {
-    const jr = mulberry32(SEED ^ seedXor);
-    const pos = [], shade = [], rim = [], index = [];
-    const near = seg >= 12;
-
-    const colour = (u, tone = 1) => {
-      // Full foliage colour lives in the geometry now. Instance colour is only a pale
-      // botanical tint, which lets woody branch vertices remain brown in this one batch.
-      const s = tone * (0.57 + u * 0.43);
-      return [s * (0.49 + u * 0.09), s * (0.77 + u * 0.08), s * (0.36 - u * 0.025)];
-    };
-    const vertex = (p0, u, tone) => {
-      const c = colour(clamp(u, 0, 1), tone);
-      pos.push(p0.x, p0.y, p0.z);
-      shade.push(c[0], c[1], c[2]);
-      rim.push(clamp(u, 0, 1));
-    };
-    const woodVertex = (p0, tone = 1, u = 0) => {
-      pos.push(p0.x, p0.y, p0.z);
-      shade.push(0.50 * tone, 0.29 * tone, 0.12 * tone);
-      // Wood sways gently with its bough, but never enters the foliage-only fray band.
-      rim.push(Math.min(0.52, u * 0.48));
-    };
-    const basis = (direction, twist = 0) => {
-      const D = direction.clone().normalize();
-      let L = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), D);
-      if (L.lengthSq() < 1e-4) L.set(Math.cos(twist), 0, Math.sin(twist));
-      else L.normalize();
-      let V = new THREE.Vector3().crossVectors(D, L).normalize();
-      if (twist && Math.abs(D.y) < 0.98) {
-        const l0 = L.clone(), v0 = V.clone(), cs = Math.cos(twist), sn = Math.sin(twist);
-        L = l0.clone().multiplyScalar(cs).add(v0.clone().multiplyScalar(sn));
-        V = v0.clone().multiplyScalar(cs).add(l0.multiplyScalar(-sn));
-      }
-      return { D, L, V };
-    };
-    // One needle spray is two crossed, six-lobed fans. Each fan is small enough to
-    // read as a spray of needles, not a whole branch made from one triangle; crossing
-    // them gives the bough volume from every camera angle without crystal-like solids.
-    const spray = (centre, direction, length, width, height, u, twist = 0, tone = 1) => {
-      const { D, L, V } = basis(direction, twist);
-      const fan = (side, breadth, planeTone, skew, silhouette) => {
-        const outline = near && silhouette ? [
-          [-0.58, 0.00], [-0.41, 0.34], [-0.13, 0.82], [0.24, 0.57],
-          [ 0.63, 0.00], [ 0.20,-0.51], [-0.09,-0.76], [-0.40,-0.29],
-        ] : [
-          [-0.57, 0.00], [-0.08, 0.82], [0.62, 0.00], [-0.05,-0.68],
-        ];
-        const b = pos.length / 3;
-        // The far outline is a convex diamond. A centre-fan draws that same quadrilateral
-        // with four triangles; two triangles are identical on screen and half the cost.
-        if (!near) {
-          for (let k = 0; k < outline.length; k++) {
-            const [d0, w0] = outline[k];
-            const p0 = centre.clone().addScaledVector(D, d0 * length)
-              .addScaledVector(side, w0 * breadth * (1 + skew * (k % 2 ? 1 : -1)));
-            vertex(p0, u + d0 * 0.30, tone * planeTone * (1 + Math.max(0, d0) * 0.12));
-          }
-          index.push(b, b + 1, b + 2, b, b + 2, b + 3);
-          return;
-        }
-        vertex(centre.clone().addScaledVector(D, -length * 0.015), u, tone * planeTone * 0.90);
-        for (let k = 0; k < outline.length; k++) {
-          const [d0, w0] = outline[k];
-          const p0 = centre.clone().addScaledVector(D, d0 * length)
-            .addScaledVector(side, w0 * breadth * (1 + skew * (k % 2 ? 1 : -1)));
-          const endLight = 1 + Math.max(0, d0) * 0.12;
-          vertex(p0, u + d0 * 0.30, tone * planeTone * endLight);
-        }
-        for (let k = 0; k < outline.length; k++)
-          index.push(b, b + 1 + k, b + 1 + (k + 1) % outline.length);
-      };
-      // The horizontal fan owns the branch outline; the perpendicular fan only stops
-      // it going edge-on, so four points provide the same volume at half its old cost.
-      fan(L, width, 0.92, (jr() - 0.5) * 0.16, true);
-      fan(V, height, 1.05, (jr() - 0.5) * 0.14, false);
-    };
-    const stem = (a, b0, r0, r1, tone, u) => {
-      const { L, V } = basis(b0.clone().sub(a));
-      const base = pos.length / 3;
-      for (const [p0, rad] of [[a, r0], [b0, r1]]) {
-        woodVertex(p0.clone().addScaledVector(L, rad), tone, u);
-        woodVertex(p0.clone().addScaledVector(V, rad), tone, u);
-        woodVertex(p0.clone().addScaledVector(L, -rad), tone, u);
-        woodVertex(p0.clone().addScaledVector(V, -rad), tone, u);
-      }
-      for (let k = 0; k < 4; k++) {
-        const q = (k + 1) % 4;
-        index.push(base + k, base + 4 + k, base + q, base + q, base + 4 + k, base + 4 + q);
-      }
-    };
-
-    for (let i = 0; i < n; i++) {
-      const t = i / Math.max(1, n - 1);
-      // Keep enough breadth in the top third for a living crown. A purely linear taper
-      // drives the last whorl almost to zero and leaves the leader looking amputated.
-      const radius = baseR * (0.10 + 0.90 * (1 - t * taperK));
-      const tierY = baseY + i * spacing;
-      // Successive whorls turn by an irrational-looking interval; a vertical view no
-      // longer resolves into five identical spokes stacked directly above one another.
-      const phase = jr() * TAU + i * 2.37;
-      const armCount = Math.max(4,
-        (near ? Math.round(6 * fullness) : 5) - (t > 0.70 ? 1 : 0));
-      for (let j = 0; j < armCount; j++) {
-        const a0 = phase + j * TAU / armCount + (jr() - 0.5) * 0.20;
-        const armY = tierY + (jr() - 0.5) * spacing * 0.34;
-        // Only the storm elder loses whole boughs. Its gaps tell a different history;
-        // random holes in every silhouette merely make the whole forest look unfinished.
-        if (broken && jr() < broken * (0.55 + t * 0.45)) continue;
-        // The local +x side is downwind: longer, lower hands there; short, tucked
-        // boughs face the weather. Instance yaw aligns this habit across the island.
-        const windSide = 0.5 + 0.5 * Math.cos(a0);
-        const reach = radius * (0.82 + jr() * 0.22) * (0.88 + windSide * 0.18);
-        const bend = (jr() - 0.5) * (0.26 + jag * 0.12);
-        const sag = droop * (0.74 + jr() * 0.52) * (0.88 + windSide * 0.20);
-        const point = (u) => {
-          const au = a0 + bend * u * u;
-          const d = reach * (0.045 + 0.955 * u);
-          const tipLift = tierH * (0.04 + 0.05 * t) * smoothstep(0.70, 1, u);
-          return new THREE.Vector3(
-            lean * i + Math.cos(au) * d,
-            armY + tierH * 0.10 * (1 - u) - sag * Math.pow(u, 1.38) + tipLift,
-            Math.sin(au) * d,
-          );
-        };
-        if (near) {
-          // The dark structure is visible only in small gaps between sprays. Two bowed
-          // prisms are enough to make the branch anatomically legible without spending
-          // cylinders on geometry the needles mostly cover.
-          stem(point(0.035), point(0.51), 0.032 + reach * 0.013, 0.019,
-            0.82 + jr() * 0.16, 0.22);
-          stem(point(0.49), point(0.98), 0.020, 0.007,
-            0.84 + jr() * 0.16, 0.62);
-        }
-        const stops = near ? [0.16, 0.39, 0.63, 0.84] : [0.25, 0.53, 0.82];
-        for (let k = 0; k < stops.length; k++) {
-          const u = stops[k], p = point(u);
-          const p0 = point(Math.max(0, u - 0.055)), p1 = point(Math.min(1, u + 0.055));
-          const length = reach * (near ? 0.33 : 0.43) * (1 - u * 0.07) * (0.92 + jr() * 0.14);
-          const width = reach * (near ? 0.115 : 0.145) * (1 - u * 0.18) * (0.90 + jr() * 0.20);
-          const height = tierH * (near ? 0.105 - u * 0.010 : 0.14 - u * 0.016) * (0.88 + jr() * 0.20);
-          spray(p, p1.sub(p0), length, width, height, u,
-            (jr() - 0.5) * 0.50, 0.92 + jr() * 0.16);
-        }
-        const forkEvery = fullness > 1.1 ? 1 : fullness < 0.9 ? 3 : 2;
-        if (near && t < 0.92 && (i + j) % forkEvery === 0) {
-          // A side branchlet splits each bough's outline. Alternating the fork side is
-          // visible in silhouette; randomising it alone tends to leave accidental rows.
-          const u = 0.53 + (jr() - 0.5) * 0.10, p = point(u);
-          const main = point(u + 0.05).sub(point(u - 0.05)).normalize();
-          const side = new THREE.Vector3(-main.z, -0.10 - sag * 0.08, main.x)
-            .multiplyScalar(j % 2 ? -1 : 1).normalize();
-          const fork = main.multiplyScalar(0.58).add(side.multiplyScalar(0.82)).normalize();
-          p.addScaledVector(side, reach * 0.050);
-          spray(p, fork, reach * (0.25 + jr() * 0.05), reach * 0.078,
-            tierH * 0.085, Math.min(0.84, u + 0.11), (jr() - 0.5) * 0.6, 0.95);
-        }
-      }
-    }
-
-    // A chain of overlapping candle sprays forms the leader. It leans with the old
-    // growth, narrows unevenly, and ends in one fresh point instead of a geometric cap.
-    const crownY = baseY + (n - 1) * spacing;
-    const candles = near ? 7 : 5;
-    for (let k = 0; k < candles; k++) {
-      const u = k / Math.max(1, candles - 1);
-      const centre = new THREE.Vector3(
-        lean * (n - 1) + lean * 0.34 * u,
-        crownY + tierH * (0.02 + u * 0.64),
-        (jr() - 0.5) * baseR * 0.045,
-      );
-      const dir = new THREE.Vector3(lean * 0.12, 1, (jr() - 0.5) * 0.05);
-      const width = baseR * (0.18 * (1 - u) + 0.052);
-      spray(centre, dir, tierH * (0.43 - u * 0.11), width, width * 0.78,
-        0.58 + u * 0.26, k * 0.71, 0.98 + u * 0.08);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(shade, 3));
-    g.setAttribute('aRim', new THREE.Float32BufferAttribute(rim, 1));
-    g.setIndex(index); g.computeVertexNormals(); g.computeBoundingSphere();
-    return g;
-  };
-  // FOUR silhouettes. A stand of two shapes plus a scale multiplier still reads
-  // as a grove of clones, because the eye reads OUTLINE first and there were only two
-  // outlines in the entire forest. The two new ones are not more of the same: a young
-  // tree is a different PROPORTION (dense, tight tiers, no bare trunk), and an old
-  // storm-worked one is a different HABIT (leaning hard downwind, tiers spaced apart so
-  // the sky shows between them the way a thinning crown does).
-  //
-  // `weight` is how much of the stand wears it, and `scale` is baked into the instance
-  // matrix so a sapling is genuinely a sapling and not a full-grown tree drawn small.
-  const CANOPY = [
-    { name: 'broad fir',  weight: 0.30, scale: 1.00, p: { n: 8, baseY: 1.02, baseR: 1.88, taperK: 0.86, tierH: 1.18, spacing: 0.52, lean: 0.09, jag: 0.50, droop: 0.42, fullness: 1.18, seedXor: 0x7a3c } },
-    { name: 'slim spruce', weight: 0.28, scale: 1.00, p: { n: 9, baseY: 1.22, baseR: 1.38, taperK: 0.91, tierH: 1.10, spacing: 0.54, lean: 0.065, jag: 0.42, droop: 0.35, fullness: 1.00, seedXor: 0x3b71 } },
-    { name: 'sapling',    weight: 0.24, scale: 0.64, p: { n: 7, baseY: 0.54, baseR: 1.08, taperK: 0.70, tierH: 0.84, spacing: 0.36, lean: 0.04, jag: 0.58, droop: 0.24, fullness: 1.08, seedXor: 0x21c9 } },
-    // lean is applied per whorl; the elder bends coherently without looking uprooted.
-    { name: 'storm elder', weight: 0.18, scale: 1.12, p: { n: 7, baseY: 1.34, baseR: 1.84, taperK: 0.90, tierH: 1.34, spacing: 0.72, lean: 0.19, jag: 0.64, droop: 0.58, fullness: 0.82, broken: 0.18, seedXor: 0x6f04 } },
-  ];
-  for (const c of CANOPY) {
-    c.geo = makeCanopy(c.p);
-    // Same branch grammar at distance, fewer arms and no secondary branchlets.
-    c.farGeo = makeCanopy({ ...c.p, seg: 6 });
-  }
-  // Fine stems, forked branchlets and eight-lobed fans matter only in the local stand.
-  // The far geometry keeps the same broken bough silhouette, so it can take over in the
-  // 65–78m middle distance before sub-pixel anatomy consumes the frame.
+  // The four authored Blender crowns share the trunk profile and deterministic scatter.
+  const CANOPY = forestCrowns(coastKit);
 
   const spots = [];
   for (let i = 0; i < 600 && spots.length < 130; i++) {
@@ -3972,20 +3735,20 @@ function buildVegetation(core, r) {
     // saturated greens made the first volumetric-clump pass neon and turned its wood green.
     const tv = r();
     col.setHSL(
-      0.18 + r() * 0.12,                          // a warm-sun ↔ cool-shade cast
-      0.08 + r() * 0.12,
-      0.64 + tv * tv * 0.15
+      0.23 + r() * 0.08,                          // a warm-sun ↔ cool-shade cast
+      0.025 + r() * 0.04,
+      0.86 + tv * tv * 0.08
     );
     TREES.push({ x, z, v: variant[i], m: m4.clone(), c: col.clone(), far: false });
   }
-  // The repartition: enter near under 65m, leave over 78m. The two geometries keep the
+  // The repartition: enter near under 48m, leave over 56m. The two geometries keep the
   // same outline grammar, and hysteresis prevents a branch hand flickering at the seam.
   const _nearN = new Array(CANOPY.length).fill(0), _farN = new Array(CANOPY.length).fill(0);
   const treePartition = (px, pz) => {
     _nearN.fill(0); _farN.fill(0);
     for (const t of TREES) {
       const d2 = (t.x - px) * (t.x - px) + (t.z - pz) * (t.z - pz);
-      t.far = t.far ? d2 > 4225 : d2 > 6084;
+      t.far = t.far ? d2 > 2304 : d2 > 3136;
       const mesh = t.far ? farMesh[t.v] : nearMesh[t.v];
       const idx = t.far ? _farN[t.v]++ : _nearN[t.v]++;
       mesh.setMatrixAt(idx, t.m);
@@ -4107,6 +3870,20 @@ function buildVegetation(core, r) {
     ltex.wrapS = ltex.wrapT = THREE.ClampToEdgeWrapping;
     LITTER.tex = ltex; LITTER.cx = cx0; LITTER.cz = cz0; LITTER.size = WIN;
   }
+  core.userData.miniForest = () => {
+    const group = new THREE.Group(); group.name = 'canopies';
+    const meshes = CANOPY.map((c, i) => new THREE.InstancedMesh(c.modelGeo, canopyMat, vCount[i]));
+    const counts = CANOPY.map(() => 0);
+    for (const t of TREES) {
+      const mesh = meshes[t.v], i = counts[t.v]++;
+      mesh.setMatrixAt(i, t.m); mesh.setColorAt(i, t.c);
+    }
+    for (const mesh of meshes) {
+      mesh.instanceMatrix.needsUpdate = true; mesh.instanceColor.needsUpdate = true;
+      mesh.computeBoundingSphere(); group.add(mesh);
+    }
+    return group;
+  };
   core.userData.treeLod = treePartition;
   core.userData.canopyVariants = CANOPY.length;   // so tools/harness/trees.mjs cannot drift from the table
   trunks.castShadow = true;
@@ -4475,12 +4252,12 @@ function buildVegetation(core, r) {
     // At eye height the older 0.8 / 2.6 relief covered whole boulders in black
     // parallel stripes. Let the displaced silhouette carry the rock's structure.
     applyRelief(mat, 'rock_height', { normalScale: 0.22, strength: 1.4, colorMap: false, repeat: [0.6, 0.6] });
+    applyRockCrust(mat);
     const im = new THREE.InstancedMesh(rockVariants[idx], mat, 70);
     im.castShadow = true; im.name = 'rocks';
     return im;
   });
   const riCount = [0, 0, 0];
-  const boulders = [];   // substantial rocks captured for the lichen pass below
   let ri = 0;
   for (let i = 0; i < 400 && ri < 70; i++) {
     const a = r() * TAU, d = 120 + r() * 90;
@@ -4500,7 +4277,7 @@ function buildVegetation(core, r) {
     rockMeshes[bucket].setMatrixAt(riCount[bucket]++, m4);
     // make the substantial boulders SOLID (you walked through them) — register a collider
     // footprint; small pebbles (s<0.9) stay passable so you don't bump invisible nubs
-    if (s >= 0.9) { addCollider(x, z, s * 0.82); boulders.push([x, h, z, s]); }
+    if (s >= 0.9) addCollider(x, z, s * 0.82);
     ri++;
   }
   rockMeshes.forEach((im, b) => { im.count = riCount[b]; core.add(im); });   // trim each to its filled count
@@ -4550,44 +4327,13 @@ function buildVegetation(core, r) {
           eq.setFromEuler(ee.set(er() * TAU, er() * TAU, er() * TAU)),
           new THREE.Vector3(sc, sc * (0.55 + er() * 0.5), sc));
         errMesh[b].setMatrixAt(en[b]++, em);
-        if (sc >= 1.0) { addCollider(x, z, sc * 0.78); boulders.push([x, hh, z, sc]); }
+        if (sc >= 1.0) addCollider(x, z, sc * 0.78);
       }
     }
     errMesh.forEach((im, b) => { im.count = en[b]; if (en[b]) core.add(im); });
   }
 
-  // LICHEN on the shore boulders — sage-grey and rust crusty patches weathering the bare granite (the
-  // rocks rang plain grey; this gives them coastal character + a touch of colour). One InstancedMesh
-  // (+1 draw); own rng so the world scatter stays byte-identical; placed on the upper boulder surfaces.
-  // Canon: weathering on stone no one has cleaned.
-  {
-    const lichMat = new THREE.MeshStandardMaterial({ color: 0x8a9476, roughness: 1.0, flatShading: true });
-    const lichInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.3, 0), lichMat, boulders.length * 2 + 1);
-    const lr = mulberry32(SEED ^ 0x71c4);
-    const lm = new THREE.Matrix4(), lq = new THREE.Quaternion(), le = new THREE.Euler(), lc = new THREE.Color();
-    let ln = 0;
-    for (const [bx, bh, bz, bs] of boulders) {
-      const npatch = 1 + (lr() < 0.55 ? 1 : 0);
-      for (let p = 0; p < npatch; p++) {
-        const ang = lr() * TAU, rad = bs * (0.25 + lr() * 0.45);
-        const px = bx + Math.cos(ang) * rad, pz = bz + Math.sin(ang) * rad;
-        const py = bh + bs * (0.35 + lr() * 0.6);                        // crusting the upper boulder
-        const psc = bs * (0.16 + lr() * 0.2);
-        le.set((lr() - 0.5) * 0.7, lr() * TAU, (lr() - 0.5) * 0.7); lq.setFromEuler(le);
-        lm.compose(new THREE.Vector3(px, py, pz), lq, new THREE.Vector3(psc, psc * 0.32, psc));   // flat crust
-        lichInst.setMatrixAt(ln, lm);
-        const rust = lr() < 0.4;                                          // ~40% rust/ochre for colour pops on grey
-        lc.setHSL(rust ? 0.07 + lr() * 0.05 : 0.21 + lr() * 0.12, rust ? 0.42 + lr() * 0.18 : 0.16 + lr() * 0.16, 0.42 + lr() * 0.16);
-        lichInst.setColorAt(ln, lc);
-        ln++;
-      }
-    }
-    lichInst.count = ln;
-    lichInst.computeBoundingSphere();
-    lichInst.name = 'lichen';
-    lichInst.receiveShadow = true;
-    core.add(lichInst);
-  }
+
 }
 
 // =============================================================================
@@ -4600,7 +4346,7 @@ function buildVegetation(core, r) {
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
 // 'handMarks' is pruned from the 1:240 clone: a ground scuff is ~4 mm there, sub-pixel
 // at every angle, and the clone would double its instance cost for nothing.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs', 'handMarks', 'towerShaft', 'towerStair', 'towerRails', 'vaultRibs', 'archiveFurniture', 'towerLanding', 'towerLog', 'coastalPines', 'archiveTin']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs', 'handMarks', 'towerShaft', 'towerStair', 'towerRails', 'vaultRibs', 'archiveFurniture', 'towerLanding', 'towerLog', 'coastalPines', 'archiveTin', 'workingStudy']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -4619,6 +4365,8 @@ export function instantiateModel(core, modelAnchor) {
     if (o.isPoints || MODEL_PRUNE.has(o.name)) prune.push(o);
   });
   for (const o of prune) o.removeFromParent();
+  modelRoot.getObjectByName('canopies').removeFromParent();
+  modelRoot.add(core.userData.miniForest());
   // ---- CROP THE MODEL, do not shrink it --------------------------------------
   // Owner: "when the table is shrinked we could also show less water. It is a lot of
   // the space." They are right — the model spanned 2.58 m and the island itself is

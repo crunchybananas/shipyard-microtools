@@ -1,10 +1,11 @@
-import {readFileSync, mkdirSync} from 'node:fs';
-import {resolve, join} from 'node:path';
+import {readFileSync, mkdirSync, existsSync} from 'node:fs';
+import {resolve, join, relative} from 'node:path';
 export default async function(h){
- const dir=resolve(process.env.PLAYTHROUGH_DIR||'loop/playthrough/2026-09-05/landfall');
+ const dir=resolve(process.env.PLAYTHROUGH_DIR||'loop/playthrough/2026-09-05/working-coast');
  const data=JSON.parse(readFileSync(join(dir,'stages.json')));
  const shots=join(dir,'viewer');mkdirSync(shots,{recursive:true});
- const url=`http://127.0.0.1:${process.env.SERVE_PORT}/the-island/loop/playthrough/2026-09-05/landfall/index.html`;
+ const folder=relative(process.cwd(),dir).split('\\').join('/');
+ const url=`http://127.0.0.1:${process.env.SERVE_PORT}/the-island/${folder}/index.html`;
  const failures=[];let passed=0;const ok=(label,value)=>value?passed++:failures.push(label);
  await h.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
  await h.navigate(url);
@@ -34,6 +35,25 @@ export default async function(h){
  for(const [title,file] of [['Above the whole island','mobile-tower.png'],['The inverted lighthouse','mobile-cellar.png']]){
   const s=data.stages.find(s=>s.title===title);
   await h.evaluate(`document.getElementById('stage-${s.number}').scrollIntoView({behavior:'instant',block:'start'});1`);await h.wait(.3);await h.screenshot(join(shots,file));
+ }
+ if(existsSync(join(dir,'comparison/index.html'))){
+  await h.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+  await h.send('Emulation.setTouchEmulationEnabled',{enabled:false});
+  await h.navigate(url.replace('/index.html','/comparison/index.html'));
+  const comparison=await h.evaluate(`(async()=>{const sources=[...document.querySelectorAll('option')].flatMap(o=>[o.value+'-before.jpg',o.value+'-after.jpg']);const loaded=await Promise.all(sources.map(src=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image.naturalWidth===1440&&image.naturalHeight===900);image.onerror=()=>resolve(false);image.src=src;})));return loaded.length===12&&loaded.every(Boolean);})()`);
+  ok('all six before and after pairs load at their captured size',comparison);
+  await h.evaluate('document.getElementById("split").focus();1');
+  await h.send('Input.dispatchKeyEvent',{type:'keyDown',code:'ArrowRight',key:'ArrowRight',windowsVirtualKeyCode:39});
+  await h.send('Input.dispatchKeyEvent',{type:'keyUp',code:'ArrowRight',key:'ArrowRight',windowsVirtualKeyCode:39});
+  ok('the comparison divider responds to the keyboard',await h.evaluate('document.getElementById("images").style.getPropertyValue("--split")==="51%"'));
+  await h.screenshot(join(shots,'comparison-desktop.png'));
+  await h.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await h.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+  const slider=await h.evaluate('(()=>{const s=document.getElementById("split");s.scrollIntoView({block:"center",behavior:"instant"});const r=s.getBoundingClientRect();return {x:r.x+r.width*.8,y:r.y+r.height*.5};})()');
+  await h.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...slider,id:1}]});
+  await h.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  ok('the comparison works by phone touch without horizontal overflow',await h.evaluate('Number(document.getElementById("split").value)>70&&document.documentElement.scrollWidth<=innerWidth'));
+  await h.screenshot(join(shots,'comparison-mobile.png'));
  }
  console.log(`REVIEW-VIEWER ${passed} / ${passed+failures.length}`);
  if(failures.length){console.log(JSON.stringify({failures,state}));process.exitCode=1;}

@@ -42,9 +42,13 @@ in the game or its review folder.
 
 ## The next visual work
 
-The original canopy silhouettes, generic study walls and some broad rock relief
-still need more authored variation. The new assets are a step toward a coherent
-environment, not evidence that the whole game has reached a AAA production standard.
+The working-coast revision replaces the original canopy cards and the main study
+finish. Trees now carry dense closed needle volumes, with smaller meshes for the
+distance and miniature. Floorboards, painted panelling and a stilling tube give
+the study a material scale and a visible connection to the water. Lichen follows
+the actual rock surface. The broader terrain, boulder silhouettes and character
+animation still need further authored work. This is not yet a AAA production
+standard.
 Judge further changes from player height in daylight, dusk, rain and the deeper
 strata, then through a full route. Keep the existing render budget measurable.
 

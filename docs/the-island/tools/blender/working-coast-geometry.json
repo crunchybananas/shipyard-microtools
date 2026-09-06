@@ -1,0 +1,66 @@
+{
+  "parts": {
+    "forest0Model": {
+      "triangles": 264,
+      "vertices": 198
+    },
+    "forest0Near": {
+      "triangles": 5792,
+      "vertices": 3576
+    },
+    "forest0Far": {
+      "triangles": 1376,
+      "vertices": 1032
+    },
+    "forest1Model": {
+      "triangles": 296,
+      "vertices": 222
+    },
+    "forest1Near": {
+      "triangles": 5588,
+      "vertices": 3450
+    },
+    "forest1Far": {
+      "triangles": 1328,
+      "vertices": 996
+    },
+    "forest2Model": {
+      "triangles": 232,
+      "vertices": 174
+    },
+    "forest2Near": {
+      "triangles": 4364,
+      "vertices": 2694
+    },
+    "forest2Far": {
+      "triangles": 1040,
+      "vertices": 780
+    },
+    "forest3Model": {
+      "triangles": 232,
+      "vertices": 174
+    },
+    "forest3Near": {
+      "triangles": 3752,
+      "vertices": 2316
+    },
+    "forest3Far": {
+      "triangles": 896,
+      "vertices": 672
+    },
+    "studyPlaster": {
+      "triangles": 1352,
+      "vertices": 2704
+    },
+    "studyTimber": {
+      "triangles": 6108,
+      "vertices": 4072
+    },
+    "studyFittings": {
+      "triangles": 1364,
+      "vertices": 866
+    }
+  },
+  "bytes": 1718784,
+  "totalTriangles": 33984
+}

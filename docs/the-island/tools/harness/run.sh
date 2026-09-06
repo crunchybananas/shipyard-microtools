@@ -166,6 +166,10 @@ echo "== the tower and underground rooms =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/landfall.mjs" | tee "$WORK/landfall.out"
 grep -q 'LANDFALL 21 / 21' "$WORK/landfall.out" || exit 1
 
+echo "== the working coast =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/working-coast.mjs" | tee "$WORK/working-coast.out"
+grep -q 'WORKING COAST 10 / 10' "$WORK/working-coast.out" || exit 1
+
 echo "== the walk =="
 # Every puzzle action goes through its shipped hotspot. Crossing travel uses the public
 # instant transition so local and software-GL runs enforce the same 69 assertions: the

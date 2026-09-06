@@ -148,6 +148,25 @@ export default async function (h) {
     window.__upstreamHarnessElapsed = 0; 1`);
   await h.wait(0.5);
 
+  // The model's distance gate advances on simulated time. Software GL may have
+  // rendered only one frame during that half-second, leaving the chart model
+  // hidden from the previous outside pose. Measuring then attributes the entire
+  // island miniature to the Hand's incremental cost. Wait for the actual visible
+  // baseline through rendered frames; keep every performance ceiling unchanged.
+  const modelReady = await h.evaluate(`new Promise(resolve => {
+    let frames = 0;
+    const next = () => {
+      const model = ABYME.core.getObjectByName('modelAnchor').getObjectByName('modelIsland');
+      if (model?.visible && !ABYME.player.locked) {
+        requestAnimationFrame(() => resolve(true)); return;
+      }
+      if (++frames >= 30) { resolve(false); return; }
+      requestAnimationFrame(next);
+    };
+    requestAnimationFrame(next);
+  })`);
+  if (!modelReady) throw new Error('The model did not become visible at the fixed study pose');
+
   const fixture = await status();
   const baselineBudget = await budget();
   ok('L2 inherits exactly one valve mark from another hand',

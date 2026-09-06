@@ -8,7 +8,7 @@ import { LORE, T, KEEPER, FIELD_NOTES, CLIMBERS, CONGREGATION, LAMPBLACK } from 
 import { renderPlaythrough } from './playthrough-html.mjs';
 
 export default async function(h) {
- const dir=resolve(process.env.PLAYTHROUGH_DIR || 'loop/playthrough/2026-09-05/landfall');
+ const dir=resolve(process.env.PLAYTHROUGH_DIR || 'loop/playthrough/2026-09-05/working-coast');
  mkdirSync(dir,{recursive:true});
  const url=`http://127.0.0.1:${process.env.SERVE_PORT||8642}/the-island/?debug&mute&localstack`;
  const stages=[]; let chapter='01-arrival';
@@ -20,6 +20,7 @@ export default async function(h) {
   addEventListener('unhandledrejection',e=>window.__captureErrors.push(String(e.reason)));
   document.getElementById('debug-panel').style.display='none';W.timeDrift=0;`);
  const check=async(expr,label)=>{if(!await h.evaluate(expr))throw Error('Stage failed: '+label);};
+ await h.send('Emulation.setTouchEmulationEnabled',{enabled:false});
  await h.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
  await h.navigate(url);await ready();await h.evaluate(`localStorage.clear();localStorage.setItem('abyme-muted','1');1`);
  await h.navigate(url);await ready();await setup();
@@ -41,7 +42,7 @@ export default async function(h) {
    finale:ABYME.getFinale(),finaleText:document.getElementById('finale').classList.contains('hidden')?'':document.getElementById('finale').innerText,errors:window.__captureErrors||[]};})()`);
   if(state.errors.length)throw Error(state.errors.join('\n'));
   stages.push({number:stages.length+1,chapter,title,action,image:file,kind,...state});
-  writeFileSync(join(dir,'stages.json'),JSON.stringify({method:METHOD,stages},null,2));
+  writeFileSync(join(dir,'stages.json'),JSON.stringify({edition:'Working coast',method:METHOD,stages},null,2));
   console.log(`${num} L${state.level} ${chapter} — ${title}`);
  }
  const look=async(x,z,tx,tz,pitch=-.12)=>ev(`UI.clearWhispers();ABYME.tp(${x},${z},Math.atan2(${x-tx},${z-tz}),${pitch})`);
@@ -75,17 +76,24 @@ export default async function(h) {
  await reader('stone_inscription','inscription');
  await look(-63,-64,-85,-40,.18);await capture('The western lighthouse','Follow the headland path toward the chalked tower.');
  await look(-102,-75,-105,-86,-.05);await capture('An opening in the headland','The coastal arch opens toward the sea.');
+ await look(-58,-58,-70,-58,.12);await capture('Boughs above the path','Follow the worn path beneath the wind-shaped crowns.');
  chapter='02-east-room';await look(-82,-37,-88,-43);
  await capture('A model of this room','Enter the lighthouse study.',`W.time=11`);
+ await look(-85,-42,-87.9,-43.2,-.22);await capture('The working ledge','Rolled charts and dividers lie beside the fitted shelves.');
+ await look(-82,-37,-88,-43);
  await reader('keeper_logbook','logbook');
  await room();await capture('The east room','Walk through the open inner door.');
  await reader('quarters_journal','quartersJournal');
  await capture('A lamp to return to','Light the small lamp beside the bed.',`hs('refugeLamp').onClick()`,'ABYME.W.flags.refugeLit');
  await reader('spare_place','spareChair');
  await capture('A place beside the table','The pulled-out chair remains where you left it.','','ABYME.W.flags.placeMade');
- chapter='03-the-working-model';await look(-82,-37,-85,-40,-.45);
+ chapter='03-the-working-model';await look(-81.9,-38.6,-80.99,-40.65,-.24);
+ await capture('The water in the glass','The stilling tube beside the window shows the bay at its high mark.');
+ await look(-82,-37,-85,-40,-.45);
  await capture('The sea leaves the road','Turn the model valve. Allow the tide to fall.',`hs('valve').onClick()`,'ABYME.W.flags.valveTurned',4);
- await ev('W.tide=W.tideTarget');await look(121,-173,118,-176,-.2);
+ await ev('W.tide=W.tideTarget');await look(-81.9,-38.6,-80.99,-40.65,-.24);
+ await capture('The float has fallen','The same water level drives the bay, miniature and stilling tube.','','ABYME.W.tide===0');
+ await look(121,-173,118,-176,-.2);
  await capture('The exposed chest','Open the chest uncovered by the lower water.',`hs('chest').onClick()`,'ABYME.W.flags.chestOpen');
  await capture('The survey rule','Lift the brass ruler from the chest.',`hs('chest').onClick()`,'ABYME.W.flags.rulerTaken');
  await look(-82,-37,-85,-40,-.5);

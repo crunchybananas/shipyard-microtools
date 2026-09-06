@@ -89,12 +89,13 @@ live output into `assets/`; the runtime repository is not a candidate archive.
 |---|---:|---|---|
 | `harbor-rooms.glb` | 1,716,348 | 8 consolidated parts; 16,244 triangles | Original procedural Blender geometry, created for this project |
 | `landfall.glb` | 2,081,688 | 12 parts; 23,340 triangles including alternative LODs | Original procedural Blender geometry, created for this project |
+| `working-coast.glb` | 1,718,784 | 15 parts; 33,984 triangles including near, far and miniature crowns | Original Blender geometry for this project |
 
 The kit contains the east-room floor, daybed, creased blanket, kettle, cups,
 spare chair, carved bird mobile, stitched boat, tide bench and source cradle.
 It adds no texture images, external models or external asset licenses. The existing
 12 WebGL textures and two CSS-native textures retain their original ownership.
-The manifest owns 14 WebGL assets: 12 textures and two models.
+The manifest owns 15 WebGL assets: 12 textures and three models.
 
 Source: `tools/blender/harbor-rooms.blend`. Generator:
 `tools/blender/harbor_rooms.py`, Blender 5.2.1 LTS. `geometry.json` records per-part
@@ -112,3 +113,15 @@ uses a 672-triangle shaft; pines swap to a 284-triangle silhouette at distance.
 the visible treads and player floor agree. `landfall-geometry.json` records every
 part and `landfall.blend` preserves the editable source. The assembly reuses the
 owned rock relief texture and adds no point lights.
+
+The working-coast kit replaces the procedural canopy cards with closed needle
+volumes. Its four profiles share heights and bend with runtime trunks through
+`js/forest-profile.js`. Every tree keeps the same deterministic position, collider
+and terrain litter. Near/far hysteresis runs at 48/56 metres; the 1:240 model uses
+232–296-triangle crowns with the same layout. No trees are removed for this saving.
+
+The main study has fitted boards, limewashed walls, painted panelling, shelf
+joinery and a pipe run from the tide wheel to a stilling tube. The tube's water and
+float read `W.tide` each frame, including the delayed rise from the Upstream Hand.
+The room adds no point light. `tools/blender/working-coast.blend` is the editable
+scene; `working_coast.py` regenerates the runtime asset and inspection render.
