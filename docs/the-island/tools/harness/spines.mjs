@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // spines.mjs — the study's physical glyph-to-instrument decoder.
 //
 // Eight index volumes route the figure alphabet to instruments already handled in
@@ -25,10 +26,7 @@ export default async function (h) {
     localStorage.setItem('abyme-muted', '1'); return 1;
   })`);
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
-  await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`);
-  await h.wait(2.5);
+  await beginPlay(h);
 
   const scene = await h.evaluate(`Promise.all([import('./js/props.js'), import('./js/content.js')]).then(([P, C]) => {
     const realNamed = (name) => {

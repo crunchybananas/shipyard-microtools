@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // tabletop.mjs — everything that lies on the chart table has to lie ON the chart table.
 //
 // The table came down from 3.1 m to 2.5 m and nothing standing on it moved. The keeper's
@@ -38,8 +39,7 @@ export default async function (h) {
   await h.navigate(PAGE); await ready();
   await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(2.5);
+  await beginPlay(h);
 
   const m = await h.evaluate(`(() => {
     const T = ABYME.THREE, LHX = -85, LHZ = -40;

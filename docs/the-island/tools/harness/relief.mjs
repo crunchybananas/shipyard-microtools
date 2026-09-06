@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // relief.mjs — every surface that asked for relief has to actually get it.
 //
 // The owner stood on the beach and said "This lost texture ... it 100% used to have a
@@ -32,8 +33,7 @@ export default async function (h) {
   await h.navigate(PAGE); await ready();
   await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(4);   // decodes + Sobel passes finish
+  await beginPlay(h); await h.wait(4);   // decodes + Sobel passes finish
 
   const led = await h.evaluate(`JSON.stringify(ABYME.RELIEF ? { asked: ABYME.RELIEF.asked, applied: ABYME.RELIEF.applied } : null)`).then(JSON.parse);
   ok('the relief ledger is reachable', !!led, led);

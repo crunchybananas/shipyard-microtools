@@ -1,3 +1,4 @@
+import {beginPlay,renderedFrames} from './play-ready.mjs';
 // glare.mjs — nothing in the study may clip to white under the window sun.
 //
 // "The study props wash out under window sun" has now been reported three times (#147,
@@ -65,8 +66,7 @@ export default async function (h) {
   await h.navigate(PAGE); await ready();
   await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(2.5);
+  await beginPlay(h);
 
   const measure = `(() => {
     const r = ABYME.renderer, cvs = r.domElement;
@@ -93,7 +93,7 @@ export default async function (h) {
   for (const f of FRAMES) {
     await h.evaluate(`ABYME.W.time = ${f.time}; ABYME.W.sunFrozen = true; 1`);
     await h.evaluate(`ABYME.tp(${f.at[0]}, ${f.at[1]}, ${f.yaw}, ${f.pitch}); 1`);
-    await h.wait(1.2);
+    await renderedFrames(h);
     const m = await h.evaluate(measure).then(JSON.parse);
     seen.push({ ...f, ...m });
     ok(`${f.name}: not washed out`, m.hotPct <= f.maxHot, { hotPct: m.hotPct, max: f.maxHot });

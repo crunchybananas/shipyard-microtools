@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // doors.mjs — every door leaf stays inside the building it is hung in.
 //
 // The owner's bug: the study door's closed angle was derived from the doorway's
@@ -37,10 +38,7 @@ export default async function (h) {
 
   await h.navigate(URL); await ready();
   await h.evaluate(`localStorage.setItem('abyme-muted','1'); 1`);
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
-  await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`);
-  await h.wait(2.5);
+  await beginPlay(h);
 
   // Sweep each leaf through its full range and record the worst radius it reaches.
   // THE MODEL-CLONE GOTCHA: the chart table carries a 1:240 copy of the whole island

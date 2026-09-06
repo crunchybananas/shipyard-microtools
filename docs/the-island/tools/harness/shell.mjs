@@ -1,3 +1,4 @@
+import {beginPlay,renderedFrames} from './play-ready.mjs';
 // shell.mjs — the lighthouse is a BUILDING. You should not see sky through its walls.
 //
 // Two holes have shipped in the study's shell and nothing in the gate could catch
@@ -63,17 +64,14 @@ export default async function (h) {
     await h.wait(1);
   }
   await h.evaluate(`localStorage.setItem('abyme-muted','1'); 1`);
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
-  await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`);
-  await h.wait(2.5);
+  await beginPlay(h);
   await h.evaluate(`ABYME.W.time = 8.03; ABYME.W.sunFrozen = true; 1`);
-  await h.wait(0.8);
+  await renderedFrames(h);
 
   const results = [];
   for (const p of POSES) {
     await h.evaluate(`ABYME.tp(${p.at[0]}, ${p.at[1]}, ${p.yaw}, ${p.pitch}); 1`);
-    await h.wait(1.0);
+    await renderedFrames(h);
     const r = await h.evaluate(`(() => {
       const T = ABYME.THREE, cam = ABYME.camera, rc = new T.Raycaster();
       rc.far = 400;

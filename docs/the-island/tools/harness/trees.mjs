@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // trees.mjs — the canopy's detail is carried by things that fail SILENTLY.
 //
 // The trees are the owner's standing example of the quality bar. Their first defence is
@@ -32,8 +33,7 @@ export default async function (h) {
   await h.navigate(PAGE); await ready();
   await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(3);
+  await beginPlay(h);
 
   const m = await h.evaluate(`(() => {
     const geos = [], mats = new Set();

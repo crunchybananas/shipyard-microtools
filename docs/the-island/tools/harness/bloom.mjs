@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // bloom.mjs — the bloom threshold must sit BELOW every intended emissive.
 //
 // Bloom is supposed to mark light SOURCES. The threshold runs on the linear
@@ -33,10 +34,7 @@ export default async function (h) {
     if (up) break;
     if (i === 2) throw new Error('app never booted');
   }
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
-  await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`);
-  await h.wait(2.5);
+  await beginPlay(h);
 
   const m = await h.evaluate(`(() => {
     const seen = new Map();

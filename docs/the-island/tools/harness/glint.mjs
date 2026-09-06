@@ -78,7 +78,7 @@ export default async function (h) {
     if (camR > 4.6) camR = 4.6;                                 // do not stand in the masonry
     const cx = CX + ux * camR, cz = CZ + uz * camR;
     const yaw = Math.atan2(cx - q.x, cz - q.z);
-    await h.evaluate(`ABYME.tp(${cx}, ${cz}, ${yaw}, 0); 1`); await h.wait(0.6);
+    await h.evaluate(`ABYME.tp(${cx}, ${cz}, ${yaw}, 0); 1`); await renderedFrames(h);
     const eyeY = await h.evaluate(`ABYME.camera.position.y`);
     const pitch = -Math.atan2(eyeY - q.y, Math.hypot(cx - q.x, cz - q.z));
     await h.evaluate(`ABYME.tp(${cx}, ${cz}, ${yaw}, ${pitch}); 1`); await renderedFrames(h);

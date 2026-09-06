@@ -1,6 +1,7 @@
 import {tmpdir} from 'node:os';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {resolve,join} from 'node:path';
+import {beginPlay,renderedFrames,waitForFrame} from './play-ready.mjs';
 
 export default async function(h) {
   const out=resolve(process.env.SHOT_DIR||join(tmpdir(),'island-working-coast-review'));
@@ -21,13 +22,11 @@ export default async function(h) {
   };
   await h.send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
   await h.navigate(url);await ready();await h.evaluate('localStorage.clear();1');await h.navigate(url);await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click();if(!document.getElementById('begin-confirm').classList.contains('hidden'))document.getElementById('btn-begin-confirm').click();1`);
-  await h.wait(1.5);await h.evaluate('ABYME.setIntroT(99);1');await frame();
-  if(!await h.evaluate('!ABYME.player.locked&&ABYME.interact.enabled'))throw new Error('Intro did not release player control');
+  await beginPlay(h);
   await h.evaluate(`document.getElementById('debug-panel').style.display='none';ABYME.W.timeDrift=0;ABYME.UI.clearWhispers();1`);
   const shots=[];
   async function shot(name,pose,hour) {
-    await h.evaluate(`ABYME.W.time=${hour};ABYME.UI.clearWhispers();ABYME.tp(${pose.join(',')});1`);await h.wait(.8);
+    await h.evaluate(`ABYME.W.time=${hour};ABYME.UI.clearWhispers();ABYME.tp(${pose.join(',')});1`);await renderedFrames(h);
     await h.screenshot(join(out,name+'.png'));
     const state=await h.evaluate(`(()=>{ABYME.renderer.info.reset();ABYME.composer.render();return {position:ABYME.player.pos.toArray(),tide:ABYME.W.tide,render:{...ABYME.renderer.info.render}};})()`);
     shots.push({name,hour,...state});
@@ -56,6 +55,7 @@ export default async function(h) {
   await h.send('Input.dispatchMouseEvent',{type:'mouseMoved',...point});await h.wait(.2);
   await frame();
   const pointerState=await h.evaluate('({hover:ABYME.interact.hovered?.id,enabled:ABYME.interact.enabled,locked:ABYME.player.locked,mouse:ABYME.interact.mouse.toArray()})');
+  await waitForFrame(h,'ABYME.interact.hovered?.id==="valve"','the pointer on the tide wheel');
   await h.send('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...point});
   await h.send('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...point});
   await advance(3.2);
@@ -63,7 +63,7 @@ export default async function(h) {
   ok('a pointer on the wheel moves both the sea and float',during.turned&&during.tide<before.tide&&during.y<before.y,{before,during,pointerState,point});
   ok('the float follows the actual water during travel',Math.abs(during.y-(.445+during.tide*.64))<.003,during);
   await advance(10.5);
-  await h.evaluate('ABYME.tp(-81.9,-38.6,Math.atan2(-.91,2.05),-.24);ABYME.UI.clearWhispers();1');await h.wait(.5);
+  await h.evaluate('ABYME.tp(-81.9,-38.6,Math.atan2(-.91,2.05),-.24);ABYME.UI.clearWhispers();1');await renderedFrames(h);
   await h.screenshot(join(out,'09-tide-low.png'));
   const low=await h.evaluate(`({tide:ABYME.W.tide,y:ABYME.core.getObjectByName('tideGaugeFloat').position.y})`);
   ok('the falling tide reaches the bottom of the tube',low.tide<.005&&Math.abs(low.y-.445)<.005,low);
