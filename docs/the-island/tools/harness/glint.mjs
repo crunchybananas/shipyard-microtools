@@ -1,3 +1,4 @@
+import {beginPlay,renderedFrames,waitForFrame} from './play-ready.mjs';
 // glint.mjs — the hover highlight must mark a prop, not replace it.
 //
 // The glint used to be a binary step to a full-body amber wash, and it failed in two
@@ -43,8 +44,7 @@ export default async function (h) {
   // compile would otherwise show up only as a prop that quietly stops being drawn
   await h.evaluate(`window.__err = []; const ce = console.error.bind(console);
     console.error = (...a) => { window.__err.push(a.map(String).join(' ').slice(0, 300)); ce(...a); }; 1`);
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(2.5);
+  await beginPlay(h);
   await h.evaluate(`ABYME.W.time = 11; ABYME.W.sunFrozen = true; 1`);   // DAYLIGHT is the hard case
   await h.wait(1.2);
 
@@ -81,7 +81,7 @@ export default async function (h) {
     await h.evaluate(`ABYME.tp(${cx}, ${cz}, ${yaw}, 0); 1`); await h.wait(0.6);
     const eyeY = await h.evaluate(`ABYME.camera.position.y`);
     const pitch = -Math.atan2(eyeY - q.y, Math.hypot(cx - q.x, cz - q.z));
-    await h.evaluate(`ABYME.tp(${cx}, ${cz}, ${yaw}, ${pitch}); 1`); await h.wait(0.8);
+    await h.evaluate(`ABYME.tp(${cx}, ${cz}, ${yaw}, ${pitch}); 1`); await renderedFrames(h);
     return q;
   };
 
@@ -103,7 +103,8 @@ export default async function (h) {
   for (const name of PROBES) {
     const q = await aim(name);
     if (!q) { ok(`probe ${name} exists`, false, 'not in scene'); continue; }
-    await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9); 1`); await h.wait(0.8);
+    await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9);ABYME.interact.update();1`);
+    await waitForFrame(h,'ABYME.interact._fading.length===0','the unhovered material baseline');
 
     // THE BASELINE MUST NOT COME FROM THE CODE UNDER TEST. Checking each material
     // against its own userData._glintBase is circular: the bug being hunted is
@@ -149,7 +150,7 @@ export default async function (h) {
       };
       requestAnimationFrame(step);
     }))()`).then(JSON.parse);
-    await h.wait(1.3);
+    await waitForFrame(h,'ABYME.interact._live?.t===1','the settled highlight');
     const settled = await h.evaluate(readLive).then(JSON.parse);
     if (!settled.live) { ok(`${name}: crosshair finds a hotspot`, false, settled); continue; }
     ok(`${name}: the glint RAMPS (intermediate values exist; a step has none)`, ramp.mid >= 1, ramp);
@@ -166,9 +167,12 @@ export default async function (h) {
     // (3) IT RESTORES — including from mid-fade. Leaving and re-entering before the
     // decay finishes is the one way an eased highlight can capture its own half-lit
     // value as "normal" and strand the prop permanently bright.
-    await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9); 1`); await h.wait(0.08);
-    await h.evaluate(`ABYME.interact.mouse.set(0, 0); 1`); await h.wait(0.9);
-    await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9); 1`); await h.wait(1.4);
+    await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9);ABYME.interact.update();1`);
+    await waitForFrame(h,'ABYME.interact._fading.some(g=>g.t>0&&g.t<1)','a real intermediate fade');
+    await h.evaluate(`ABYME.interact.mouse.set(0, 0);ABYME.interact.update();1`);
+    await waitForFrame(h,'ABYME.interact._live?.t===1','the re-hovered highlight');
+    await h.evaluate(`ABYME.interact.mouse.set(0.9, -0.9);ABYME.interact.update();1`);
+    await waitForFrame(h,'ABYME.interact._fading.length===0','the restored material');
     const after = await h.evaluate(snap).then(JSON.parse);
     const drift = before.map((b, i) => [b, after[i]])
       .filter(([b, a]) => !a || a.hex !== b.hex || Math.abs(a.i - b.i) > 1e-6 || a.rim !== b.rim)

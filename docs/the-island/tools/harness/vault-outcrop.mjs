@@ -1,3 +1,4 @@
+import {beginPlay,advanceGameplay} from './play-ready.mjs';
 // vault-outcrop.mjs — the lens vault is a sealed outcrop, not a walk-through room.
 //
 // A field report arrived from the centre of the rock at (124,-150): the rendered
@@ -22,8 +23,7 @@ export default async function (h) {
   await h.navigate(URL); await ready();
   await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(URL); await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(2.5);
+  await beginPlay(h);
 
   const sealed = await h.evaluate(`(() => {
     const T=ABYME.terrain,V=T.VAULT_OUTCROP,P=ABYME.player;
@@ -63,7 +63,7 @@ export default async function (h) {
   ok('the sealed niche neither shows nor offers the lens', !sealed.lensVisible&&!sealed.lensEligible, sealed);
 
   await h.evaluate(`ABYME.game.flag('birdSolved'); 1`);
-  await h.wait(4.2); // vault ease reaches the slab's authored hidden threshold
+  await advanceGameplay(h,4.2); // vault ease reaches the slab's authored hidden threshold
 
   const opened = await h.evaluate(`(() => {
     const T=ABYME.terrain,V=T.VAULT_OUTCROP,P=ABYME.player;

@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // experience.mjs — player-facing checks for the evidence notebook.
 //
 // The full walk proves progression. This pass proves the interface does not invent
@@ -25,10 +26,10 @@ export default async function experience(h) {
   await h.evaluate(`localStorage.clear(); localStorage.setItem('abyme-muted', '1'); 1`);
   await h.navigate(url);
   await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`);
-  await h.wait(1.8);
-  await h.evaluate(`ABYME.setIntroT(99); 1`);
-  await h.wait(2.4);
+  await beginPlay(h);
+  // Judge the controls after their ordinary CSS reveal has finished, rather than
+  // spending most of a fixed wall-time wait on software rendering the arrival.
+  await h.evaluate(`Promise.all(document.getElementById('controls-hint').getAnimations().map(a=>a.finished))`);
 
   const chrome = await h.evaluate(`(() => {
     const hint = document.getElementById('controls-hint');
@@ -206,7 +207,7 @@ export default async function experience(h) {
 
   console.log(`EXPERIENCE PASS ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   if (R.fail.length) {
-    console.log('FAILURES:', JSON.stringify(R.fail));
+    console.log('FAILURES:', JSON.stringify({fail:R.fail,chrome}));
     process.exitCode = 1;
   }
 }

@@ -1,3 +1,4 @@
+import {beginPlay,renderedFrames} from './play-ready.mjs';
 // terrain-finish.mjs — pin what the final pixels depend on, not merely whether an
 // image decoded. The former sand heightmap repeated its complete authored shape every
 // 6.25 m; the coarse terrain grid stair-stepped every tide cut; the composer's non-MSAA
@@ -12,8 +13,9 @@ export default async function (h) {
     if (await h.evaluate(`typeof ABYME !== 'undefined' && !!document.getElementById('btn-begin')`).catch(() => false)) break;
     await h.wait(.4);
   }
-  await h.evaluate(`localStorage.setItem('abyme-muted','1'); localStorage.removeItem('abyme-save'); document.getElementById('btn-begin').click(); 1`);
-  await h.wait(1.3); await h.evaluate(`ABYME.setIntroT(99); ABYME.W.timeDrift=0; 1`); await h.wait(3);
+  await h.evaluate(`localStorage.setItem('abyme-muted','1'); localStorage.removeItem('abyme-save');1`);
+  await beginPlay(h);
+  await h.evaluate('ABYME.W.timeDrift=0;1');
 
   const s = await h.evaluate(`(() => {
     const terrain = ABYME.core.getObjectByName('terrain');
@@ -70,17 +72,30 @@ export default async function (h) {
     { coast: s.coast, triangles: s.terrainTriangles, children: s.terrainChildren });
 
   const at = async (time) => {
-    await h.evaluate(`ABYME.W.time=${time}; ABYME.W.timeDrift=0; 1`); await h.wait(1.2);
-    return h.evaluate(`({strength:ABYME.bloomPass.strength,base:ABYME.bloomPass.userData.baseStrength,draws:ABYME.renderer.info.render.calls})`);
+    await h.evaluate(`ABYME.W.time=${time}; ABYME.W.timeDrift=0; 1`); await renderedFrames(h);
+    // Total draw counts change with sun shadows and visible wildlife, so they do
+    // not prove which render path ran. Observe the real calls without replacing
+    // their work, then restore both methods before the next pose.
+    return h.evaluate(`(async()=>{
+      const {renderer,composer,scene}=ABYME;const draw=renderer.render,compose=composer.render;
+      let worldDraws=0,composed=0;
+      renderer.render=function(...args){if(args[0]===scene)worldDraws++;return draw.apply(this,args);};
+      composer.render=function(...args){composed++;return compose.apply(this,args);};
+      try{
+        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+        return {strength:ABYME.bloomPass.strength,base:ABYME.bloomPass.userData.baseStrength,
+          draws:renderer.info.render.calls,worldDraws,composed,antialias:renderer.getContext().getContextAttributes().antialias};
+      }finally{renderer.render=draw;composer.render=compose;}
+    })()`);
   };
   const noon = await at(12), golden = await at(17.7), night = await at(23);
   ok('high daylight fades bloom fully out and regains direct-render MSAA',
-    noon.strength <= 0.001 && noon.draws < golden.draws,
+    noon.strength <= 0.001 && noon.composed===0 && noon.worldDraws>0 && noon.antialias,
     { noon, golden });
   ok('golden hour keeps the authored bloom',
-    golden.base === s.bloomBase && golden.strength >= golden.base * 0.98, { golden, bloomBase: s.bloomBase });
+    golden.base === s.bloomBase && golden.strength >= golden.base * 0.98 && golden.composed>0, { golden, bloomBase: s.bloomBase });
   ok('night keeps the authored bloom',
-    night.base === s.bloomBase && night.strength >= night.base * 0.98, { night, bloomBase: s.bloomBase });
+    night.base === s.bloomBase && night.strength >= night.base * 0.98 && night.composed>0, { night, bloomBase: s.bloomBase });
 
   console.log(`TERRAIN-FINISH ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }

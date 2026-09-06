@@ -1,3 +1,4 @@
+import {beginPlay} from './play-ready.mjs';
 // gulls.mjs — the dawn percher must not fly through the lighthouse.
 //
 // At dawn gulls[0] leaves the wheeling gyre and settles on the gallery rail. It used to
@@ -24,9 +25,19 @@ export default async function (h) {
   await h.navigate(PAGE); await ready();
   await h.evaluate(`localStorage.removeItem('abyme-save'); localStorage.setItem('abyme-muted','1'); 1`);
   await h.navigate(PAGE); await ready();
-  await h.evaluate(`document.getElementById('btn-begin').click(); 1`); await h.wait(2);
-  await h.evaluate(`ABYME.setIntroT(99); 1`); await h.wait(2.5);
+  await beginPlay(h);
+  // This gate reads motion, soles and geometry; it never judges pixels. Keep the
+  // production animation loop running at its normal rate on software-GL runners
+  // by suspending draw submission for these samples. The rendered visual gates
+  // and power budget run separately with the complete renderer intact.
+  if(process.env.CI==='true')await h.evaluate(`(()=>{
+    const {renderer,composer,scene}=ABYME;
+    window.__gullRestoreDraws=()=>{renderer.render=draw;composer.render=compose;};
+    const draw=renderer.render,compose=composer.render;
+    renderer.render=composer.render=()=>scene.updateMatrixWorld(true);return true;
+  })()`);
 
+  try {
   // THE TRANSITION IS THE TEST, and by the time a probe gets here it is already over —
   // the settle ramp takes 4.5 s and the harness spends longer than that booting. So drive
   // the bird back OUT to the gyre first (out of dawn, the ramp falls in 3 s), then put
@@ -126,9 +137,11 @@ export default async function (h) {
     const bird=ABYME.perched.find((b)=>b.userData.species==='gull'),u=bird.userData;
     u.flush=0; u.cool=0; bird.position.set(u.px,u.py,u.pz); bird.rotation.set(0,u.yaw,0); bird.visible=true;
     ABYME.tp(u.px+2,u.pz,0,0);
-    let startedAt=null,lastFlush=0,lastPos=[u.px,u.py,u.pz],maxSpeed=0,finite=true,frames=0;
+    let startedAt=null,samplingAt=null,lastFlush=0,lastPos=[u.px,u.py,u.pz],maxSpeed=0,finite=true,frames=0;
     const checks=[1.2,3.2,5.2].map((at)=>({at,visible:null}));
     const step=(now)=>{
+      if(samplingAt===null)samplingAt=now;
+      if(startedAt===null&&now-samplingAt>5000)return res(JSON.stringify({firstHidden:null,displacement:0,rise:0,checks,maxSpeed,finite,frames,timeout:'flush never started'}));
       if(startedAt===null&&u.flush>0){ startedAt=now; lastFlush=u.flush; lastPos=[bird.position.x,bird.position.y,bird.position.z]; }
       if(startedAt!==null){
         const t=(now-startedAt)/1000;
@@ -155,4 +168,7 @@ export default async function (h) {
   console.log(`  sole error ${idle.soleError.toFixed(4)} m · root drift ${idle.rootDrift.toFixed(4)} m · wing breath ${idle.wingRange.toFixed(3)} rad`);
   console.log(`  exit ${flight.firstHidden?.toFixed(2)} s · ${flight.displacement?.toFixed(1)} m out · ${flight.rise?.toFixed(1)} m up · max ${flight.maxSpeed?.toFixed(1)} m/s`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
+  } finally {
+    if(process.env.CI==='true')await h.evaluate('window.__gullRestoreDraws?.();delete window.__gullRestoreDraws;true').catch(()=>{});
+  }
 }

@@ -1,4 +1,4 @@
-# The Island's complete release gate: state contracts, the 63-assertion causal
+# The Island's complete release gate: state contracts, the 69-assertion causal
 # walk, rendered regressions, and the executable Upstream Hand power budget.
 name: island-walk
 on:
@@ -9,7 +9,9 @@ on:
 jobs:
   walk:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # The full renderer suite includes the tower, buried rooms and working coast.
+    # Software GL takes minutes per rendered group; keep the complete gate intact.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

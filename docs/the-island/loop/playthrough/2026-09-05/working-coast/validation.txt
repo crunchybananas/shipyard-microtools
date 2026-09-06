@@ -55,3 +55,16 @@ place and consequence views remain illustrated, with unique paths for 165 images
 The earlier complete native gate preceded the final instrument size/label fitting
 and harness timing corrections. The final instrument passes the focused checks
 above; Linux CI results are attached to the source and release commits.
+
+RELEASE-GATE FOLLOW-UP
+The final software checks pass terrain 10/10, experience 22/22, gulls 7/7,
+vault 8/8, glint 25/25, harbor 11/11 and Landfall 21/21. The software-rendered
+complete story walk also passes 69/69. Pointer checks wait for the rendered
+camera and actual hovered target. The boat export is measured in its ordinary
+reduced-motion pose; the original waterline bounds remain unchanged.
+The gull geometry/motion check keeps the production animation loop but suspends
+pixel submission on software GL. Visual and power checks retain the renderer.
+Daylight calibration: restoring the old composer route in memory causes exactly
+the intended MSAA assertion to fail (9/10); the normal renderer passes 10/10.
+No game source changed during these harness corrections. All 54 captured runtime
+fingerprints were verified again afterward.

@@ -43,11 +43,22 @@ steps production tide easing in 50 ms increments, then renders the float; the
 native pass uses its ordinary thirteen-second travel. No ceiling or gameplay gate
 was relaxed. CI results are attached to the release commits.
 
+The final software checks also pass terrain **10/10**, experience **22/22**,
+gulls **7/7**, vault **8/8**, glint **25/25**, harbor **11/11** and Landfall
+**21/21**, with the full walk **69/69**. Real pointer probes wait for camera
+matrices and hovered targets; the hull is measured at a stable rendered pose.
+The daylight test rejects an in-memory restoration of the former composer bug.
+The motion-only gull gate suspends software draw submission while retaining the
+production animation loop. Visual gates and performance limits remain intact.
+
 **Next:** Author the larger terrain and boulder forms from player-height views,
 then revisit character animation and the arrival. The present visual standard is
 still below the user's AAA ambition; this revision is a coherent next layer.
 
 ## 46 — 2026-09-05 — Landfall: the tower and rooms below
+
+**Publication:** Released to the public Island in commit `3cc94c0a`; the Pages
+deployment passed after the gallery inventory correction in `bae5b494`.
 
 **Implemented locally:** Rebuilt the lighthouse shaft in Blender around a continuous
 83-tread spiral, with real windows, handrails, an open lantern landing and a watch
@@ -82,7 +93,7 @@ now precedes carrying at the current depth. The terrain check now enforces the
 original grid's geometry budget instead of pinning the old coast's exact count.
 The original canopy shapes, simple study geometry and broad environmental forms
 still need authored refinement. This revision is not a claim of AAA completion.
-No private narration or identifying biography is included. Not publicly deployed.
+No private narration or identifying biography is included.
 
 **Next tick suggestion:** Author the main study and surrounding forest as a coherent
 approach, then judge their scale and story pacing in a full walk at ordinary speed.

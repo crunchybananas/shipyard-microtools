@@ -7,7 +7,7 @@ gate that has guarded every fire since the walk was born:
   contracts + runtime reset + Upstream Hand + sand writing + player-facing experience
   + the visual gates + the full walk. Exit 0 = ship.
   `SERVE_PORT` / `CDP_PORT` / `CHROME_BIN` env-overridable.
-- **`walk.mjs`** — the 64-assertion future-facing route: physical evidence →
+- **`walk.mjs`** — the 69-assertion future-facing route: physical evidence →
   instrument-routed signal → every gated descent → held-regard encounters → atomic
   ascent saves → returned-surface commitment for all four dispositions. It uses
   shipped hotspots and asserts zero window errors. Power is not asserted here.
@@ -43,7 +43,7 @@ gate that has guarded every fire since the walk was born:
   first-use copy; unobstructed L2/L3/L4 arrivals; the L3 hall actually breaching in the
   frame named by its prose; story whispers waiting until a reader closes; a stateful,
   diegetic journal bearing; and opt-in acceleration that lands both the descent and
-  ascent through their real state/save boundaries. 18 assertions.
+  ascent through their real state/save boundaries. 22 assertions.
 - **`doors.mjs`** — where props END UP. The owner watched a door swing through the
   tower wall; the walk proved you can get THROUGH a doorway, never that the door hung
   in it is inside the building. Pure geometry. 6 assertions.
@@ -128,19 +128,44 @@ CI: `.github/workflows/island-walk.yml` runs the same `run.sh` gate on every pus
 pull request touching `docs/the-island/**`, then uploads current golden images for
 human inspection. Local and CI runs use the same assertion counts and failure rules.
 
+`play-ready.mjs` handles the real Begin confirmation and waits for the arrival to
+release control. A removed save can be recreated by autosave before navigation;
+never assume one button click has entered play. Rendered-state checks wait for
+frames, and interface checks wait for the ordinary CSS transition to finish.
+Gameplay-only animation fixtures may advance `game.tick` in 50 ms increments on
+software GL; they still render and inspect the resulting state.
+
+The gull motion gate samples the production animation loop while suspending pixel
+submission on CI, then restores both draw methods in `finally`. Its assertions
+measure trajectories, geometry, soles and timing. This keeps the simulation clock
+from being stretched by the software GPU. Native motion checks, shader checks,
+image checks and the Upstream Hand power gate retain the complete renderer.
+
+The daylight gate observes actual composer/world draw calls and checks the
+antialiased WebGL context. Total scene draw counts are not a render-route oracle:
+sun shadows and visible wildlife can change them between noon and golden hour.
+
 
 ## Inhabited room and complete playthrough
 
 `harbor.mjs` checks initial room access with keyboard movement, selects the new
 Blender chair with real pointer input, checks floor clearance, and verifies boat
 geometry, water contact, two-scale ownership, Continue and reduced motion.
+The export waterline uses the rendered reduced-motion pose so the existing bounds
+do not depend on which point of the boat's pitch-and-roll cycle was sampled.
 
 `capture-playthrough.mjs` exports a complete causal route and all four endings to
-`loop/playthrough/2026-09-05/revised` (override with `PLAYTHROUGH_DIR`). It writes
-133 JPEG screenshots, an offline HTML viewer, exact stage text and state, the
+`loop/playthrough/2026-09-05/working-coast` (override with `PLAYTHROUGH_DIR`). It writes
+165 JPEG screenshots, an offline HTML viewer, exact stage text and state, the
 full manuscript, and earned source/homecoming saves. `playthrough-html.mjs` renders
 the static viewer. It uses no fetch, external fonts, or server-side dependencies,
 so the viewer also opens directly from a folder.
+
+The current readable edition has 107 illustrated moments; 18 continuation pages
+are grouped and 40 repeated frames folded. Every image remains accessible by its
+stage anchor. `build-review.mjs` refreshes navigation and runtime fingerprints;
+`build-coast-comparison.mjs` preserves six matching camera/hour comparisons. The
+viewer gate also exercises the divider with keyboard and phone input.
 
 ```sh
 SERVE_PORT=8734 CDP_PORT=9494 bash tools/harness/one.sh capture-playthrough.mjs
