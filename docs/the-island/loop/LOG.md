@@ -31,7 +31,7 @@ including containment at the maximum shared tide. Its glass, pipe and backboard
 were extended for that range, and the half-step marks now meet the float.
 
 The review in `playthrough/2026-09-05/working-coast/` preserves **165 stages**, all
-four endings and the complete manuscript. **106 illustrated moments** remain after
+four endings and the complete manuscript. **107 illustrated moments** remain after
 folding repeated views and grouping continuation pages. Six matching before/after
 camera views show the room, forest and shore at noon and night; timing samples are
 observations, not a controlled speed claim. The capture records zero browser errors.

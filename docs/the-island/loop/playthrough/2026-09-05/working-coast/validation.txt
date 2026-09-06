@@ -1,0 +1,57 @@
+The Island — Working coast revision
+2026-09-05
+
+LOCAL RUNTIME VERIFICATION
+Syntax: pass (tools/harness/syntax.sh).
+Pure contracts: 115 / 115.
+Complete native Chromium release gate: green (tools/harness/run.sh).
+Saves 24/24; coverage 21/21; runtime reset 6/6; Upstream Hand 32/32;
+writing 19/19; terrain 10/10; experience 22/22; doors 6/6; bloom 3/3;
+shell 5/5; relief 8/8; gulls 7/7; vault outcrop 8/8; trees 13/13;
+tabletop OK; glare 8/8; spines 20/20; glint 25/25; harbor 11/11;
+Landfall 21/21; Working coast 9/9; full causal walk 69/69.
+Upstream Hand baseline: 497 calls, 932905 triangles, 9 point lights.
+Peak: 511 calls, 934535 triangles, 9 point lights.
+Ceilings remain 525 calls, 1000000 triangles, 9 point lights.
+
+PHONE AND REVIEW
+Real phone tide-wheel taps and gauge response: 4/4 at 390x844.
+Real phone tower movement and release: 2/2.
+Desktop/mobile review viewer and comparison: 12/12 (all images, unique anchors, folding,
+deep-link expansion, overflow and a real phone tap).
+Full capture: 165 stages, all four endings, zero browser errors.
+Readable edition: 107 illustrated moments, 18 grouped continuation pages,
+40 repeated frames folded. Every source capture is retained.
+Manuscript: 23 artifacts, 56 pages, including optional/deep pages.
+
+METHODOLOGY
+The scripted route operates real hotspot callbacks and crossing gates.
+Long travel and camera sequences are accelerated; encounters use declared
+placement fixtures. Tower treads and underground connectors use actual player
+collision in both directions. This is not an uninterrupted manual play session.
+The actual wheel is operated by pointer and phone input in separate checks.
+No private narrative source or identifying biography is included.
+
+BUILD AND COMPARISON
+build.json: SHA256 fingerprints for 54 runtime files and all three Blender kits.
+working-coast.glb: 1718784 bytes, 33984 triangles across 15 authored parts.
+Original Blender source, generator and inspection render live in tools/blender.
+comparison/: six exact camera/hour pairs at 1440x900, before and after images,
+and raw geometry/timing records. Host GPU load was not controlled, so the timings
+do not establish a speed improvement. Both records contain zero browser errors.
+Gallery/archive verifier: 1438 checks, 33 apps, 6 stories.
+
+FINAL FOCUSED VERIFICATION
+Working coast: 10/10 in native and software rendering, including the full shared
+water-level range. The tube, backboard and pipe were lengthened to contain 2.65;
+the half-step marks were aligned and numerals moved clear of the lines.
+Upstream Hand in software rendering: 32/32. Baseline 499 calls / 933083 triangles;
+peak 514 calls / 934723 triangles. Existing ceilings unchanged.
+The final label spacing passed another real phone-input check, 4/4.
+The complete 165-stage route and six comparisons were captured again afterward.
+All 54 runtime fingerprints match the final captured source. All nine new/required
+place and consequence views remain illustrated, with unique paths for 165 images.
+
+The earlier complete native gate preceded the final instrument size/label fitting
+and harness timing corrections. The final instrument passes the focused checks
+above; Linux CI results are attached to the source and release commits.

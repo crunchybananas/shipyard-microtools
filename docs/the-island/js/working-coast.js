@@ -123,7 +123,7 @@ export function attachWorkingStudy(core, library) {
   for(let i=0;i<=2;i++)ctx.fillText(String(i),100,466-i*192);
   const face=new THREE.Mesh(new THREE.PlaneGeometry(.19,1.62),
     new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
-  face.position.set(3.81,1.12,-.689);group.add(face);
+  face.position.set(3.81,1.21,-.689);group.add(face);
   return {
     tick(tide) {
       const level=Math.max(0,Math.min(MAX_TIDE,tide));

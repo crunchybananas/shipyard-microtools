@@ -1,0 +1,231 @@
+{
+  "source": "local Working coast revision",
+  "runtimeSha256": {
+    "assets/bark.jpg": "a0b19d8fb42c8b6574cd1c25a8407028cab671b71ff7919635dc49a3545e52cd",
+    "assets/bark_height.png": "0d8000683a1756218a6dd68e0f08dc4c0332de478fd0e4f873fb9e78bd8f5f63",
+    "assets/chart_vellum.jpg": "6e4071b8ed94458de897744d6455393f7de2366b88971f797e89510e45078504",
+    "assets/cloth.jpg": "92a872f836d0d9a6a91989b0f6fb87631e843ba531d31c67075c5f0136cf3a46",
+    "assets/driftwood.jpg": "9527b8e586f8cd65938c98f27d46fc3c7dada0b007c5e4e76c90d25f0105462f",
+    "assets/foam.jpg": "ffcab88a99db0e6474b8972997a41035d2288d4a4dcebbcb5bbbb9514dffa1a2",
+    "assets/foliage.jpg": "647be28adab327ff6b24d7639adadbed297aec94455807088ac239d1943ce90a",
+    "assets/harbor-rooms.glb": "19e071f65c3350a5b0aba472b7636a2e4bcb2afa52e48d7c7f206cca14adfc9d",
+    "assets/landfall.glb": "b30c512e61edcd4f4d5dab4e2df7ab6d7fea4611213a6a90e43e55088f730906",
+    "assets/note_paper.jpg": "745a5310d4e530355f37b56b847e37c9940d556ffe69210ec25437d821a86b5f",
+    "assets/pebble.jpg": "904f1b89c035bdc6a581e6009f6adc1e7b5c7e87b3f22f5353a4645d2b128ac4",
+    "assets/rock_height.png": "738e0b504c16255d98e729cdff780785bcfb08dc3d22625ea77f72e70eee2ab0",
+    "assets/sand.jpg": "10be98e8e570a5d0f4e399bb015ac8b6309994adf46a52bc338e8fa2d56af0c3",
+    "assets/study_stone.jpg": "d31c50b499309600f397581811bbff812c83bd88e6ddff237c27853d685c9263",
+    "assets/water_ripple.jpg": "c7a6d23a0ae3f83897503ec5a69920e57045f7530593c26b92610fa2f3b818a2",
+    "assets/wood.jpg": "55dcebefafcca800f32836dd471778fd77fd0f3d03d49c0bf04c7e4a264c71d0",
+    "assets/working-coast.glb": "27ecd0195d86ad1ecb1d136faf56e400af67446cb309d8a5d4ed4179f974ae7d",
+    "index.html": "04589fe9c1516630291cfbb9b53fe04c03ad5b5015e612b5f10368be9df47c13",
+    "js/assets.js": "8d5489efc16c93433555f6aedf7472cb8252c0670d3babd70873566d48ca486a",
+    "js/audio.js": "8e6bcd31707e97fedc379ae1f182d0c58f778369f1852da6d3ec12ba50eff5e0",
+    "js/content.js": "0037a3ef4c9e6d7b2f6d1cffc8a2b2e353a14b88f57d3cc301af6c0b6a28b125",
+    "js/dispositions.js": "a6d71ab48ca5f4d00960b9762ba0c82db53a1bcff323042ad31ba67b12954b76",
+    "js/finale-tableaux.js": "05735cc420533c109d58561f2ea14315d1e34c11fc4d29f08f8a1bc677092dba",
+    "js/forest-profile.js": "d85c69dea04eff6ee4ccf355e6e3543614833c2efa911e6400d54c65be128d9e",
+    "js/harbor.js": "b9797380d05d44c5c8ca14e53674405cd55e98658d989255c806c4cce40fd985",
+    "js/interact.js": "2cf68a03bce691ce274bdff0c7d977d8df7e347a0018c2ddcbca27e13831df09",
+    "js/landfall.js": "101c3dce95d891717aa9a3b2f44c24e20266b9d00e2defc99921c5ff621fc325",
+    "js/ledger-firebase.js": "e7d9a45694492edc6447da32ea9ca5917b60c3cec71cb65813bbd2929929b244",
+    "js/ledger.js": "13d1cbf0c74f8ce0c699130ba9168d63ae37e59ea0dca3938f3b9169b5bd6570",
+    "js/main.js": "c4c499aa70745448fbb8bc9c08f8cf64bd204719ea0240f991186d45a2de07b7",
+    "js/notebook-schema.js": "c70deacedd858b857127d31d093e1562da682b5fe353013cadbaee9e44260176",
+    "js/notebook.js": "986d981650fb27b84b8be3072724f39bbecd54b9d527ff254a6588dca4bf0851",
+    "js/player.js": "ba12776fbef1c114e6ee316df302f654e7fb783ec4808f85c8a1ec3adcb50bb0",
+    "js/progression.js": "df679f33a68bbb558c35b8bcc6b22b1b46968522bd1d964474a2280db6a9d80b",
+    "js/props.js": "48b20830eac9d287d642c255403339fd3db5177a694bab2672d33f26cf7d837f",
+    "js/puzzle-runtime.js": "6b068c170053830856cadc2a23b57cd437a74a6554df91e2ae46506c1e6520d6",
+    "js/puzzles.js": "79d670d165824b20ed2f5ea963409ab6b423d62d6f1f492dbf8804b5963e4c9e",
+    "js/refuge.js": "97c8dcbb79d22e1446c423d036532a2b1085555298b80d7b08cfd990673d8825",
+    "js/regions/index.js": "87fd7b7ff0bb4982813716458a02150ff3458febf68c0dfed51417c972564082",
+    "js/regions/l2_shallows.js": "d3caa2846887b80920db876375a24028a78f9bd668a7e44055d261d9adedc849",
+    "js/regions/l3_gallery.js": "51761c0a0236ac8f4a2b2f3055f8051ba775f3c63d5984d2d475721e69fe62ff",
+    "js/regions/l4_seabed.js": "344ab7611e8e31abf8d2d0be87858582c23b2896c5970fb82a4c7e4906434ff9",
+    "js/report-schema.js": "4978309f3c633e81333f6a9fca2fd76ce077c9ec644f3717260e406cd5256374",
+    "js/save-schema.js": "7f8493054a104ff883d77205d44c85f94aa4a93c58c1374de1cc3f7ec8af4694",
+    "js/shaders.js": "55dbb55438930fb0efcb606ea51a95f04decb775965e42c6d857e15a2a8876f2",
+    "js/stack-config.js": "4d2a6e931e33a5bb1bcdb4a3fefad483467022d4d5cf2227ab2425bbbf140b40",
+    "js/terrain.js": "bbe4fb730015d1d1826b325a524a44b47604c31bfe6ae6e647f8c426fd1dde8a",
+    "js/tower-course.js": "1fe21d2dcd80795857569f898a3a7679ccffa625bda8b710ad9f625216733df7",
+    "js/ui.js": "330214cf5f2ddcfcbe690a5f0469036b8c4b15932403bea824bf218b0a2170ad",
+    "js/upstream-hand.js": "0bfe05fdfb20840741dd693628a7d051109e8f4c6fb35955f388ec026c46028f",
+    "js/util.js": "740fa45675d2a6cf5ff5188ee3af62d455f52f033d7a01f2f67d15dce21903ea",
+    "js/working-coast.js": "b88fa02bf581dcb7014a8b66ba33e52ae0b23f78710f34f9644ec9667667d77d",
+    "js/world.js": "96322fb7cf03b38d8f7d18c0e053de46a8099d768390dd8a2125d5008f04e5f8",
+    "style.css": "d91f93c6908993587426f746ba34f4d9f76c2f9312a656224686bd40e895e643"
+  },
+  "blender": {
+    "geometry": {
+      "generator": "Blender 5.2.1 LTS",
+      "parts": {
+        "roomStructure": {
+          "triangles": 6460,
+          "vertices": 3378
+        },
+        "roomCloth": {
+          "triangles": 3360,
+          "vertices": 1785
+        },
+        "roomCeramics": {
+          "triangles": 1038,
+          "vertices": 596
+        },
+        "spareChair": {
+          "triangles": 608,
+          "vertices": 336
+        },
+        "keepsakeBoat": {
+          "triangles": 604,
+          "vertices": 352
+        },
+        "listeningMobile": {
+          "triangles": 484,
+          "vertices": 274
+        },
+        "tideBench": {
+          "triangles": 1498,
+          "vertices": 844
+        },
+        "sourceCradle": {
+          "triangles": 2192,
+          "vertices": 1211
+        }
+      },
+      "totalTriangles": 16244,
+      "glbBytes": 1716348
+    },
+    "landfall-geometry": {
+      "parts": {
+        "towerShaft": {
+          "triangles": 11224,
+          "vertices": 44416
+        },
+        "towerShaftFar": {
+          "triangles": 672,
+          "vertices": 1344
+        },
+        "towerStair": {
+          "triangles": 1992,
+          "vertices": 1328
+        },
+        "towerRails": {
+          "triangles": 3688,
+          "vertices": 2016
+        },
+        "vaultRib": {
+          "triangles": 204,
+          "vertices": 136
+        },
+        "archiveFurniture": {
+          "triangles": 288,
+          "vertices": 192
+        },
+        "basaltA": {
+          "triangles": 152,
+          "vertices": 5226
+        },
+        "basaltB": {
+          "triangles": 152,
+          "vertices": 5226
+        },
+        "headlandArch": {
+          "triangles": 204,
+          "vertices": 104
+        },
+        "windPineWood": {
+          "triangles": 952,
+          "vertices": 522
+        },
+        "windPineNeedles": {
+          "triangles": 3528,
+          "vertices": 8820
+        },
+        "windPineFar": {
+          "triangles": 284,
+          "vertices": 180
+        }
+      },
+      "totalTriangles": 23340,
+      "bytes": 2081688
+    },
+    "working-coast-geometry": {
+      "parts": {
+        "forest0Model": {
+          "triangles": 264,
+          "vertices": 198
+        },
+        "forest0Near": {
+          "triangles": 5792,
+          "vertices": 3576
+        },
+        "forest0Far": {
+          "triangles": 1376,
+          "vertices": 1032
+        },
+        "forest1Model": {
+          "triangles": 296,
+          "vertices": 222
+        },
+        "forest1Near": {
+          "triangles": 5588,
+          "vertices": 3450
+        },
+        "forest1Far": {
+          "triangles": 1328,
+          "vertices": 996
+        },
+        "forest2Model": {
+          "triangles": 232,
+          "vertices": 174
+        },
+        "forest2Near": {
+          "triangles": 4364,
+          "vertices": 2694
+        },
+        "forest2Far": {
+          "triangles": 1040,
+          "vertices": 780
+        },
+        "forest3Model": {
+          "triangles": 232,
+          "vertices": 174
+        },
+        "forest3Near": {
+          "triangles": 3752,
+          "vertices": 2316
+        },
+        "forest3Far": {
+          "triangles": 896,
+          "vertices": 672
+        },
+        "studyPlaster": {
+          "triangles": 1352,
+          "vertices": 2704
+        },
+        "studyTimber": {
+          "triangles": 6108,
+          "vertices": 4072
+        },
+        "studyFittings": {
+          "triangles": 1364,
+          "vertices": 866
+        }
+      },
+      "bytes": 1718784,
+      "totalTriangles": 33984
+    }
+  },
+  "captures": 165,
+  "review": {
+    "moments": 107,
+    "sourceCaptures": 165,
+    "groupedPages": 18,
+    "repeatedFrames": 40,
+    "method": "Consecutive artifact pages are grouped. Revisited text and perceptually similar frames at the same depth are folded into the action record. All original captures remain available."
+  },
+  "artifacts": 23,
+  "pages": 56,
+  "endings": 4
+}
