@@ -165,7 +165,11 @@ assert.equal(Object.isFrozen(waitingSnapshot), true);
 resetCitizenRenderCache();
 assert.equal(actorAnimationFrame(snapshot, snapshot.variant, 'walk', { isMoving: true }), 0);
 G.gameTick += 7;
-assert.equal(actorAnimationFrame(snapshot, snapshot.variant, 'walk', { isMoving: true }), 1);
+assert.equal(actorAnimationFrame(snapshot, snapshot.variant, 'walk', { isMoving: true }), 0,
+  'an unchanged position must not cycle a walking row');
+G.gameTick += 7;
+const movedSnapshot = Object.freeze({ ...snapshot, x: snapshot.x + .14, previousX: snapshot.x, previousY: snapshot.y });
+assert.equal(actorAnimationFrame(movedSnapshot, snapshot.variant, 'walk', { isMoving: true }), 1);
 assert.deepEqual(citizen, before, 'render animation must not mutate the simulation citizen');
 assert.equal(Object.hasOwn(citizen, '_actorAnimationKey'), false);
 assert.equal(citizenRenderCacheSize(), 1);

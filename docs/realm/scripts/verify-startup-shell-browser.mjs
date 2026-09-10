@@ -33,6 +33,12 @@ async function queuedClickScenario() {
 
   let releaseMain;
   const mainGate = new Promise(resolve => { releaseMain = resolve; });
+  let releaseFounder;
+  const founderGate = new Promise(resolve => { releaseFounder = resolve; });
+  await page.route(url => url.pathname.includes('/assets/sprites/founder/') && url.pathname.endsWith('.png'), async route => {
+    await founderGate;
+    await route.continue();
+  });
   await page.route(`**/js/main.js?realm=${contract.moduleRevision}`, async route => {
     await mainGate;
     await route.continue();
@@ -48,9 +54,11 @@ async function queuedClickScenario() {
 
     releaseMain();
     await assertRealmStarted(page, 'queued click');
+    await page.evaluate(() => forceRender());
     assert.deepEqual(errors, [], errors.join(' | '));
   } finally {
     releaseMain();
+    releaseFounder();
     await context.close();
   }
 }

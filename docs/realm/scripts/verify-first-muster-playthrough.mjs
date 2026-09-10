@@ -26,9 +26,15 @@ try {
     window.setScenario('military_rise');
   });
   await page.locator('#kingdom-name-input').fill('Muster Playthrough');
+  // This is a core-tick playthrough. Pause in the same click event as startup;
+  // an extra browser round trip previously allowed an arbitrary opening tick
+  // count, changing the deterministic construction/scouting fixture with load.
+  await page.locator('#title-screen .title-btn.primary').evaluate(button => {
+    button.addEventListener('click', () => window.setSpeed(0), { once: true });
+  });
   await page.locator('#title-screen .title-btn.primary').click();
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
-  await page.evaluate(() => window.setSpeed(0));
+  assert.equal(await page.evaluate(() => G.gameTick), 0, 'mechanical playthrough must start at tick zero');
 
   const report = await page.evaluate(async () => {
     const state = await import('./js/state.js?realm=198');
@@ -189,7 +195,9 @@ try {
       stepUntil(
         `recruit ${company} drill`,
         () => g.soldiers.length >= company && !barracks.recruitType,
-        military.RECRUITMENT.barracks.duration + 60,
+        // Training advances only while the yard is staffed and operating. A
+        // late-day order can span the crew's physical meal/sleep schedule.
+        g.dayLength + military.RECRUITMENT.barracks.duration + 60,
       );
       mark(`soldier-${company}`);
     }
@@ -241,7 +249,11 @@ try {
     requireCondition(g.avatar.scoutingFinds > scoutingStart, 'Founder never converted physical exploration into intelligence');
     requireCondition(
       g.soldiers.every(soldier => Math.hypot(soldier.tx - g.avatar.x, soldier.ty - g.avatar.y) <= 3),
-      'Explore order did not keep company targets around the Founder',
+      `Explore order did not keep company targets around the Founder: ${JSON.stringify({
+        tick: g.gameTick,
+        founder: { x: g.avatar.x, y: g.avatar.y },
+        soldiers: g.soldiers.map(soldier => ({ name: soldier.name, x: soldier.x, y: soldier.y, tx: soldier.tx, ty: soldier.ty, timer: soldier.stateTimer })),
+      })}`,
     );
     stepUntil(
       'scouting chapter transition',

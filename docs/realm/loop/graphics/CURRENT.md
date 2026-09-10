@@ -1,5 +1,273 @@
 # Current Graphics Handoff
 
+## Paused at the owner's request — 2026-09-10
+
+Checkpoint branch: `codex/graphics-checkpoint-round-213`. The checkpoint covers
+completed graphics work through Round 213, including editable Blender sources,
+generated runtime assets, the walk studio, integration and verification scripts.
+Earlier round entries below describe their status at the time of each review.
+
+The owner asked to commit, push and pause. Stop after that checkpoint; do not
+start another feature, bake, test campaign or polish pass until the owner resumes.
+The wider graphics goal is unfinished. Two unused, unverified Round 214 files
+remain local and are deliberately outside the commit. See [PAUSED.md](PAUSED.md)
+for the exact resume point and retained evidence.
+
+## Active quality bar — 2026-09-05
+
+The owner expanded the goal to refining every pixel toward AAA quality across
+the whole game. Treat that as a continuing standard for terrain, architecture,
+characters, materials, lighting, effects, motion, depth, and interface clarity.
+The direction is less cartoonish, with a continuous landscape instead of
+repeated ground stamps. Existing assets and rendering choices are open to
+replacement. Judge improvements in a growing, playable settlement on current
+Safari and Chrome, including citizens passing each other around new buildings.
+A completed character or terrain pass does not complete this broader goal.
+
+Round 213 adds saved Blender houses to the actual settlement: three material
+variants across four tiers, sixteen installed construction stages, recessed
+lit windows, roof snow and chimney smoke registered to the source. All 394
+generated outputs reproduce exactly from the saved scene. Chrome 152.0.7977.83
+and WebKit 26.4 pass source, production draw, loading, roof click/hover, empty
+plot, light, depth and bounded-cache checks. The 7,200-tick growing settlement
+completes all 21 buildings with a byte-identical before/after save and zero
+unwanted gait changes in 4,787 stationary observations. All 68 canonical CORE
+and shell checks pass, and all 24 shell checks pass again after late input
+fixes. Both engines also pass the adult-builder motion, real construction and
+390px touch gate after its delayed-image startup wait was corrected. Native
+Safari construction, lit-window, Save/Continue and roof selection
+were reviewed in a private town left paused and muted. All work is local and
+uncommitted. Next address oversized citizen hit circles stealing site clicks,
+the premature “House built!” message, tutorial persistence, and the remaining
+older building/profession families. Close captures also expose scale mismatch,
+generic ambient marks and hard winter lake edges. The wider AAA goal remains
+active. See
+[`rounds/213-carpentered-homes-and-visible-construction.md`](rounds/213-carpentered-homes-and-visible-construction.md).
+
+Round 212 adds the first adult Blender craftsperson to ordinary settlers and
+builders: complete eight-direction walk, rest, hammer and carry, with fitted
+clothing, stable grips and grounded feet. All 1,536 baked cells and 32 exact
+detail strips pass Chrome 152.0.7977.83 and WebKit 26.4; a clean saved-scene
+rebuild reproduces all 52 generated files. The bounded crowd cache makes no
+additional warm row requests. A 7,200-tick settlement completes 21 buildings
+with zero unwanted gait changes across 4,787 stationary observations, and its
+saved simulation remains byte-identical to the before run. Native Safari is
+available again as of September 10: actual house construction/resident sleep,
+resource visibility and citizen/building selection were reviewed in an
+isolated private window. That playtest caught and fixed a Retina coordinate
+conversion that made off-center actors and buildings unclickable; 16 actual
+draw targets now pass in each automated browser engine. The phone citizen
+panel clears the dock, and the navigation link no longer covers resources.
+All work is local and uncommitted. Next substantial targets are authored
+construction phases, building variety, the older profession families and
+action handoffs; these and the wider AAA goal remain unfinished. See
+[`rounds/212-adult-citizens-and-authored-work.md`](rounds/212-adult-citizens-and-authored-work.md).
+
+Round 211 replaces generic window rectangles and overlapping house/church/forge
+halos with light traced to actual painted apertures. Window and furnace light
+shares the building crop and tier transform; ground spill stays beneath actors.
+Unfinished and hidden buildings add no light. The window fade is continuous at
+dusk and midnight, with restrained clock-driven flame variation. Chrome 152
+and WebKit 26.4 pass all 36 direct source registrations, semantic landmarks,
+construction/fog cases, pause and citizen/Founder depth. The 46-structure run
+again has zero unwanted gait changes in 5,540 stationary observations; its
+saved simulation is byte-identical to Round 210. Ground contacts, winter
+surfaces, dense traffic and WebKit Founder/phone checks pass. Native Safari
+remains unavailable: a fresh native check on September 6 still reports a
+locked Mac. The older citizen families now deserve the next substantial art
+pass; building repetition, construction scaffolding and the overall night
+lighting curve also remain below the goal. All changes are local and
+uncommitted. See
+[`rounds/211-source-aligned-windows-and-furnace-light.md`](rounds/211-source-aligned-windows-and-furnace-light.md).
+
+Round 210 replaces the floating winter caps with snow on the actual painted
+roof planes and fixes source crops that clipped roofs or included neighboring
+sprites. All 16 support regions and all production building crops pass exact
+source-ownership checks. Winter preserves source alpha, windows, chimneys and
+livestock, with two cached material atlases and zero warm readbacks. All 46
+structures in the expanded construction fixture complete, with zero unwanted
+gait changes across 5,540 stationary observations. The winter presentation
+fixture uses the ordinary simulation season; it is not a winter economy test.
+Chrome 152 and temporary Playwright WebKit 26.4 pass the building gate. WebKit
+also passes landscape, all 12 road configurations, both depth paths, Founder
+gameplay and actual phone touch. Native Safari review remains pending while
+the Mac is locked. All changes remain local and uncommitted. Next targets are
+source-aligned window lighting and construction, repeated house art, material
+coherence, and the older citizen/animal families. See
+[`rounds/210-complete-building-sources-and-conforming-snow.md`](rounds/210-complete-building-sources-and-conforming-snow.md).
+
+Round 209 replaces the brown road diamonds with continuous worn gravel,
+curved corners, soft verges and construction-aware surfaces. Dry ground reuses
+its GPU frame while the view and lighting remain unchanged; visible water
+still animates. Repeated winter snow ovals are removed. All 12 road shapes
+pass actual pixel checks, both rendering paths preserve actor depth, and the
+41-structure construction run has zero unwanted gait changes in 5,830
+stationary observations. Its saved state exactly matches the pre-change run.
+The 24-person dense traffic test, Founder, phone, scenery/contact and locomotion
+checks also pass. These are local, uncommitted changes; native Safari review
+remains pending. The next visible defects are the roof snow caps inherited
+from old procedural buildings, repeated house art, construction presentation
+and the older citizen families. See
+[`rounds/209-continuous-roads-and-seasonal-verges.md`](rounds/209-continuous-roads-and-seasonal-verges.md).
+
+Round 208 removes detached building/tree shadow patches and registers soft
+contact beneath the actual painted bases. Contact draws before every actor;
+building body caches now reuse one copy per type and house tier across daylight
+changes. All 77 rendered contact cases and 25 affected release checks pass,
+along with Founder, scenery/phone and locomotion checks. Tutorial buttons also
+retain focus and clicks through routine updates. Native Safari review remains
+pending; all changes are local and uncommitted. The next visual targets are
+road materials, construction phases, architectural variation and the older
+citizen families. See
+[`rounds/208-painted-ground-contact-and-stable-controls.md`](rounds/208-painted-ground-contact-and-stable-controls.md).
+
+Round 207 ties citizen walking and carrying to actual world displacement.
+Waiting citizens hold their feet even if a route remains active, and draw at
+the position accepted by traffic rather than an extra cosmetic lane offset.
+An eight-day growing town completes all 21 buildings with zero unwanted gait
+changes in 40,361 continuously stationary observations. All 69 affected release
+checks pass, including a delayed-image Founder startup regression. This is a
+presentation fix; the existing 124-tick maximum construction-run traffic wait
+is unchanged. Architecture grounding and variation are the next visual target.
+See [`rounds/207-citizen-displacement-and-ground-contact.md`](rounds/207-citizen-displacement-and-ground-contact.md).
+
+Round 206 reshapes the Founder toward adult proportions in the saved Blender
+source. New continuous sleeves, a fitted survey strap, a bronze clasp and linen
+wraps replace the toy-like shoulder details. All four actions are retargeted;
+the original ankle paths and level soles are preserved. The game receives the
+new geometry and muted material palette through freshly baked sprites, with
+his runtime cell recalibrated to 44px.
+
+Chrome passes all 4,032 action cells, 80 rendered scale comparisons, the walking
+and gameplay gates, live lighting/context recovery, road depth and all eight
+scenery crossings. Native Safari review is pending because the Mac is locked;
+an unlock request was sent. These remain local changes, not a published release.
+See [`rounds/206-founder-adult-anatomy-and-fitted-clothing.md`](rounds/206-founder-adult-anatomy-and-fitted-clothing.md).
+
+Round 205 added a continuous WebGL2 ground/water surface, soft discovery edges,
+varied scenery sharing actor/building depth, cleaner lighting and effects, and
+a minimap that clears the build controls. The citizen fix releases stale arrival
+targets into job decisions. A controlled eight-day construction run reduces the
+longest measured stall from 449 to 124 ticks. All 68 affected core/gameplay checks
+pass, with a dedicated graphics/phone/fallback gate and a native Safari visual
+review. These are local changes, not a published release.
+
+Simulation is now **11**, save shape **7**, module revision **198**. The existing
+strict save policy rejects simulation-10 development saves. The in-app original
+game was not reloaded. The next pass is architecture grounding and authored
+building/vegetation variation; displacement-driven citizen gait is complete in
+Round 207. See
+[`rounds/205-continuous-landscape-and-arrival-traffic.md`](rounds/205-continuous-landscape-and-arrival-traffic.md)
+for evidence, limits, and the full remaining goal.
+
+## Founder scale and surface polish — 2026-09-05
+
+The first integration was oversized. The Founder now has a 36px runtime cell
+instead of 58px, with his visible height calibrated against settlers in all
+eight headings. A corrected ground anchor, softer contact shadow, small crest,
+and selection-only name keep him legible without overwhelming his neighbors.
+
+The shared character material profile now reaches the game: muted cloth greens,
+warm skin, leather and metal response, normal/roughness detail and self-shadows
+are baked into every frame. Close zoom uses exact 128px/192px direction strips
+with two enlarged rows retained. Saved Blender motion is unchanged in this pass.
+
+Chrome passes 80 rendered scale comparisons, eight gameplay checks, all 4,032
+action cells, exact decoded pixel agreement for 64 runtime strips, the walking
+gate, and the live-detail gate. The in-app game was refreshed using Save/Continue
+and visually reviewed. This is a local Founder polish checkpoint; the existing
+citizen families still need a cohesive art pass. See
+[`rounds/204-founder-scale-and-surface-polish.md`](rounds/204-founder-scale-and-surface-polish.md).
+
+## Founder in the actual settlement — 2026-09-05
+
+The existing Founder now uses the new eight-view character in the game's
+Canvas2D depth pass. **Founder / F** selects him; WASD or ground taps move him.
+Accepted placement, assignment and upgrade orders point toward work; rally
+orders beckon. Walking interrupts gestures, pause freezes them, and Save/Continue
+retains the same character without persisting animation state.
+
+The pointing shoulder now uses a relaxed reach and an aligned elbow bend
+plane. Only its right arm curves were changed in the saved Blender source;
+all maps and preview GLBs were rebuilt. Chrome gameplay, all 4,032 action cells,
+workshop detail, deterministic replay and runtime identity pass. The game uses
+baked lighting; the live material study remains in the workshop. See
+[`rounds/203-founder-in-the-settlement.md`](rounds/203-founder-in-the-settlement.md)
+for behavior, evidence and the map-scale cadence limitation.
+
+## Founder live material and lighting study — 2026-09-05
+
+`walk-studio.html` now starts in **Living scene**, a Three.js/WebGL2 courtyard
+with cloth/leather/metal detail, relighting, a survey table, lantern and banner.
+The same saved animation GLB drives all four actions. A separate surface UV
+set follows skinning. The limestone albedo is a verified completed Bender/Peel
+asset; normal/roughness maps come from deterministic browser surface recipes.
+These additions are live-only, documented in the Founder README; existing
+Blender motion, sprite outputs and production families remain intact.
+
+Native Safari 26.3.1 renders and relights the scene; installed Chrome
+152.0.7977.76 passes the detail, action and walking gates. The new gate checks
+real rendered pixel changes, all named poses in all eight views, graphics
+context loss/recovery, atlas eviction, quality levels and mobile touch controls.
+The live scene reports 10,211 triangles / 106 draws at the reviewed pose.
+See [`rounds/202-founder-live-materials.md`](rounds/202-founder-live-materials.md).
+
+## Founder standing gestures and toe correction — 2026-09-04
+
+The owner approved the walking foundation and asked for standing key poses.
+The workshop now has **Walk**, **Take stock**, **Work over there**, and
+**Come with me**, each with eight views, its own timing and named key beats.
+The toe defect is corrected using neutral sole references and neutral toe
+rotation. Owner review also caught a folded pointing wrist; its glove now
+follows the forearm through an outward reach, with a dedicated regression check. Standing feet stay planted, and the three standing actions share a
+ready pose. The editing file is now **assets/sprites/founder/founder-actions.blend**;
+the original walking scene is preserved.
+
+Use the saved-scene rebuild and both focused gates in
+[`assets/sprites/founder/README.md`](../../assets/sprites/founder/README.md).
+The new action witness checks protect Blender slot selection, source-to-sprite
+agreement, level toes, gesture motion and closed loops. The ordinary game and
+production citizen families remain unchanged. See
+[`rounds/201-founder-standing-gestures.md`](rounds/201-founder-standing-gestures.md)
+for this checkpoint. Gameplay triggers and transitions are the next decision.
+
+
+## Eight-direction Founder walking study — 2026-09-04
+
+The owner reopened the art direction and explicitly authorized an eight-view
+walking pilot, including a 3D asset workflow. The review entry is now
+`walk-studio.html`, reachable through **Character Workshop** on the ordinary
+Realm title screen. This pilot does not replace the production citizen families.
+
+One KayKit Rogue character now owns 24 synchronized walking poses in eight
+independent directions. The source is an editable Blender scene, with a saved
+Blender → GLB → transparent sprite-map rebuild path. A single skeleton fixes
+anatomy; planted-foot IK, explicit pose assignment, and distance-driven movement
+address sliding, deformation history, and direction-reset glitches. The
+workshop includes frame scrubbing, neighboring poses, foot contacts, a movable
+character, the exported 3D model, four-view settler comparison, and phone layout.
+
+The complete checkpoint, source attribution, and editing commands are in
+[`assets/sprites/founder/README.md`](../../assets/sprites/founder/README.md).
+The scene is `assets/sprites/founder/founder-walk.blend`; Space plays the loop.
+Only walking and its double-support rest are in scope. Other actions and any
+production conversion should follow review of this motion and art direction.
+
+Validation: all 576 tier frames are distinct, nonblank and unclipped; supporting
+foot error is below `3.5e-7` model units; limb lengths remain fixed; Blender
+agrees with sampled joints within `1.4e-7` model units; all three sprite maps
+and the exported GLB match a separate clean bake byte for byte. All scrub
+positions, direction changes, keyboard movement, planted stopping, 3D dragging,
+390px layout, reduced motion and the title-screen entry pass. Existing source
+locks, the runtime URL graph, and `verify.mjs --game --logic` also pass.
+
+Blender 5.2.1's glTF import/export timing required explicit normalization. The
+saved action occupies frames 1–25, playback excludes duplicate endpoint 25,
+and the exporter normalizes its time origin and duration before baking.
+Do not remove this adapter or re-run the bootstrap over edited Blender work.
+
+See [the walking-pilot handoff](rounds/200-founder-eight-direction-walk.md).
+
 ## Realm 191 A16 trader production family — 2026-08-08
 
 The complete trader family is now atomically promoted as A16. The retired

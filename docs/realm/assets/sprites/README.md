@@ -1,12 +1,23 @@
 # Sprite Asset Notes
 
-The current art direction uses painted PNG assets as the source of truth:
+The current art direction combines painted PNG sources with editable Blender
+characters and architecture baked to PNG for the live game:
 
 - `buildings-atlas-painted.png` for core settlement buildings.
+- `architecture/homes/source/homes.blend` for three house variants across four
+  tiers, with sixteen construction stages, roof snow, contact, aperture light
+  and source-measured chimney positions. The game loads PNG layers and a
+  bounded detail cache. The original painted house is the atomic loading
+  fallback. See [the house source and rebuild contract](architecture/homes/README.md).
 - `support-atlas.png` for farms, production sites, walls, roads, and small support structures.
 - `terrain-atlas.png` for tile overlays.
 - `nature-atlas.png` for trees, rocks, ore, mountains, and ground details.
 - `ui-icons.png` for HUD resource symbols.
+- `founder/founder-actions.blend` as the Founder's editable scene and actions,
+  with generated maps under `founder/`.
+- `citizens/builder/source/builder.blend` as the adult settler/builder source,
+  with four complete eight-direction action families under `citizens/builder/`.
+  See [the character's source and rebuild contract](citizens/builder/README.md).
 - `actors/*.png` as editable per-role citizen source sheets.
 - `actor-rows/` as canonical reviewed row overrides plus their SHA-256
   manifest.
@@ -34,7 +45,8 @@ The current art direction uses painted PNG assets as the source of truth:
   renderer derives those visual states only from existing enemy fields.
 
 Hard rule for motion sprites: do not edit a compiled role sheet or atlas as
-source art. Review one `512x84` action/direction row at a time; promote a
+source art. For the painted family pipeline, review one `512x84`
+action/direction row at a time; promote a
 complete replacement family only through the atomic family transaction.
 Complete modular families compile those rows from separate identity, garment,
 equipment, pose, and attachment authorities. Ambient motion source art remains
@@ -44,9 +56,51 @@ Painted enemies follow the same source/compiled separation: never edit an
 `python3 scripts/build-enemy-sprites.py --verify` so all 48 raider rows pass
 before the four runtime atlases and their hash manifest promote together.
 
+## Building source regions and winter surfaces
+
+The authored home family has its own saved-scene materials and PNG contract.
+The painted-source checks below cover the other building types and retained
+house fallback. `verify-house-source.mjs` and `verify-house-game.mjs` cover all
+twelve new homes through construction, winter, lighting, depth and input.
+
+The painted building atlases remain unchanged source PNGs. The support sheet
+does **not** obey a uniform 128px cell grid: some roofs cross those boundaries,
+and a grid crop can borrow pixels from the next building. Reviewed complete
+regions live in `js/building-surfaces.js`, with two-pixel transparent margins.
+The main sheet also has explicit barracks/town-hall edge corrections. Keep
+these regions aligned with the source if the artwork changes.
+
+The same module traces winter roof planes and protects windows, chimneys,
+banners, entrances and livestock. It derives two cached 512×512 material
+canvases at runtime, preserving every source alpha byte. Runtime crops, scale
+and anchors are identical in bare and snow materials; snow is not a separate
+geometric roof overlay. The extra retained pixel payload is 2 MiB and steady
+rendering performs no material readbacks. Roads use the continuous landscape
+material; the road image in this atlas is retained source art.
+
+`node scripts/verify-building-surfaces-browser.mjs` checks source ownership,
+protected landmarks, material coverage and actual production draws in Chrome.
+Set `REALM_BROWSER=webkit` to run the same gate with an installed Playwright
+WebKit runtime. That engine check is separate from native Safari review.
+
+`js/building-lighting.js` traces the actual apertures in 13 source building
+designs, including glass, furnace openings and the trading-post lantern. It
+derives two sparse emission atlases from the unchanged PNGs; source shading
+and glass pigment remain visible through the light. Facade emission shares
+the exact body crop and transform, including housing tiers and winter material.
+Ground spill is a separate layer beneath all buildings and actors. Daylight,
+construction and discovery control visibility; paused flame variation is
+exactly still. No light is saved as simulation state. Run
+`node scripts/verify-building-lighting-browser.mjs` for the same source-landmark,
+registration, clock, visibility, cache and actor-depth checks in Chrome or,
+with `REALM_BROWSER=webkit`, Playwright WebKit.
+
 ## Runtime Actor Resolution
 
-The `512x84` row remains the editable and reviewable unit. Runtime presentation
+For the painted families, the `512x84` row remains the editable and reviewable
+unit. The saved Blender characters have their own complete action contracts
+and exact direction strips; the settler/builder family uses 24-frame rows at
+64×84 and 128×168 with a bounded shared detail cache. Runtime presentation
 does not repeatedly shrink that row from `64x84` to the actor's on-screen
 footprint. `build-motion-atlases.mjs` resizes every action/direction row in
 isolation. It normalizes hidden RGB beneath fully transparent pixels, uses a

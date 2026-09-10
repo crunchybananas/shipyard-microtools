@@ -264,12 +264,13 @@ try {
     const allClearText = compactText(allClearPanel);
     requireCondition(g.selectedCitizenId === resident.actorId, 'All-clear resident did not become canvas-selectable again');
     requireCondition(
-      allClearText.includes('Looking for work') || allClearText.includes('Idle'),
+      allClearText.includes(afterClear.activity.kind === 'idle' ? 'Idle' : 'Looking for work'),
       `All-clear citizen panel lacked a readable state: ${allClearText}`,
     );
     requireCondition(
-      allClearText.includes(afterClear.activity.reason),
-      'All-clear citizen panel did not expose its current activity reason',
+      allClearPanel?.dataset.citizenActorId === String(afterClear.actorId)
+        && !allClearText.includes(afterClear.activity.reason),
+      'All-clear citizen panel must show this resident without exposing an internal activity reason',
     );
 
     return {

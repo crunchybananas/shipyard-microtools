@@ -1,0 +1,2115 @@
+{
+  "version": 1,
+  "profile": "carpentered-homes-v1",
+  "sourceMode": "saved-blender-scene",
+  "authoring": "Original Realm carpentered architecture",
+  "steps": [
+    "Setting out",
+    "Footings",
+    "Stone plinth",
+    "Floor joists",
+    "Uprights",
+    "Wall frames",
+    "Lower infill",
+    "Upper infill",
+    "Gables",
+    "Roof trusses",
+    "Roof battens",
+    "Eaves",
+    "Roof covering",
+    "Ridge and chimney",
+    "Joinery",
+    "Complete"
+  ],
+  "variants": [
+    "Reed",
+    "Slate",
+    "Clay"
+  ],
+  "tiers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "anchor": {
+    "x": 0.5,
+    "y": 0.78
+  },
+  "camera": {
+    "width": 512,
+    "height": 640,
+    "viewHeight": 11.1,
+    "elevation": 30
+  },
+  "cell": {
+    "width": 128,
+    "height": 160,
+    "worldWidth": 112,
+    "worldHeight": 140
+  },
+  "maps": {
+    "complete": {
+      "width": 128,
+      "height": 160,
+      "columns": 3,
+      "rows": 4
+    },
+    "construction": {
+      "width": 64,
+      "height": 80,
+      "columns": 15,
+      "rows": 12
+    },
+    "ground": {
+      "width": 64,
+      "height": 80,
+      "columns": 16,
+      "rows": 12
+    },
+    "emission": {
+      "width": 256,
+      "height": 320,
+      "columns": 3,
+      "rows": 4
+    },
+    "spill": {
+      "width": 128,
+      "height": 160,
+      "columns": 3,
+      "rows": 4
+    }
+  },
+  "runtime": {
+    "maxDetailFrames": 12,
+    "maxConcurrentDetailLoads": 2,
+    "liveWebGL": false
+  },
+  "render": {
+    "normalMaps": true,
+    "roughnessMaps": true,
+    "selfShadows": true,
+    "parts": 9339,
+    "triangles": 920652,
+    "batches": 1799,
+    "normalMappedParts": 8466
+  },
+  "sources": [
+    {
+      "file": "assets/sprites/architecture/homes/source/homes.glb",
+      "sha256": "76ad66bd4bfcc790981e33927833048b5b150c9000501b70c149cc22286998dc"
+    },
+    {
+      "file": "assets/sprites/architecture/homes/source/homes.blend",
+      "sha256": "74a7ca4f314b0cec71769bd8fa952191d008ab0266804dc1c0c41c82601b176a"
+    },
+    {
+      "file": "assets/sprites/architecture/homes/source/source.json",
+      "sha256": "189687053ff26e35fd64708e6124f2ae58ac8dee6e7963efef8d02b993f305a7"
+    },
+    {
+      "file": "scripts/house-sprites/export_blender.py",
+      "sha256": "dca61d38a3b2835bdb6d1f379f9fbc25c438d0ed5e06b71b112e8083d7ca7fa9"
+    },
+    {
+      "file": "scripts/house-sprites/studio.js",
+      "sha256": "b4df324284263fc4e2e5c9e9c7192bf1237060354672413e8703bad94826b16c"
+    },
+    {
+      "file": "scripts/house-sprites/contract.js",
+      "sha256": "e7c17e46c91feeb9672444eccb7951725d21b27138b447101a21e375778497f3"
+    },
+    {
+      "file": "scripts/house-sprites/bake.mjs",
+      "sha256": "313c7e934c389b9ca6dbaa321f06fbf1b727b02a3f942e482327ab675b328ab7"
+    },
+    {
+      "file": "vendor/three/three.module.js",
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "file": "vendor/three/three.core.js",
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "file": "vendor/three/GLTFLoader.js",
+      "sha256": "adbbafe8ce40416525b6be0ee5cac0d3782482bcf0122c8ca8ec1ffa77d3440b"
+    },
+    {
+      "file": "vendor/three/BufferGeometryUtils.js",
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751"
+    }
+  ],
+  "outputs": [
+    {
+      "file": "detail/summer-0-0.png",
+      "bytes": 18405,
+      "sha256": "926d23f3380a7951d8f49fef55331fed380b8e239060f4515dc441248dc3cc44"
+    },
+    {
+      "file": "detail/winter-0-0.png",
+      "bytes": 18405,
+      "sha256": "926d23f3380a7951d8f49fef55331fed380b8e239060f4515dc441248dc3cc44"
+    },
+    {
+      "file": "detail/summer-0-1.png",
+      "bytes": 38390,
+      "sha256": "dab803146f62765110375be9e345630ec9027667457526cd87d9da484fa8c7d0"
+    },
+    {
+      "file": "detail/winter-0-1.png",
+      "bytes": 38390,
+      "sha256": "dab803146f62765110375be9e345630ec9027667457526cd87d9da484fa8c7d0"
+    },
+    {
+      "file": "detail/summer-0-2.png",
+      "bytes": 34699,
+      "sha256": "5bd08aab6710ca1ba374c13a65ea4d4b0056507a0ca588d69d072b67dc5efac0"
+    },
+    {
+      "file": "detail/winter-0-2.png",
+      "bytes": 34699,
+      "sha256": "5bd08aab6710ca1ba374c13a65ea4d4b0056507a0ca588d69d072b67dc5efac0"
+    },
+    {
+      "file": "detail/summer-0-3.png",
+      "bytes": 54339,
+      "sha256": "5613a13340eccdb1c3462ba60daa7d41b2c9ecb5714247dad530d80a11375d27"
+    },
+    {
+      "file": "detail/winter-0-3.png",
+      "bytes": 54339,
+      "sha256": "5613a13340eccdb1c3462ba60daa7d41b2c9ecb5714247dad530d80a11375d27"
+    },
+    {
+      "file": "detail/summer-0-4.png",
+      "bytes": 59188,
+      "sha256": "4170c012e2b45ffc810993c73dbf87defb2e86340a9e674e60993933c4551650"
+    },
+    {
+      "file": "detail/winter-0-4.png",
+      "bytes": 59188,
+      "sha256": "4170c012e2b45ffc810993c73dbf87defb2e86340a9e674e60993933c4551650"
+    },
+    {
+      "file": "detail/summer-0-5.png",
+      "bytes": 81257,
+      "sha256": "f1b89b6743d3fb034ed6ae02190552f6181383afc661bb00d6d7f6ce7d900d7c"
+    },
+    {
+      "file": "detail/winter-0-5.png",
+      "bytes": 81257,
+      "sha256": "f1b89b6743d3fb034ed6ae02190552f6181383afc661bb00d6d7f6ce7d900d7c"
+    },
+    {
+      "file": "detail/summer-0-6.png",
+      "bytes": 85990,
+      "sha256": "982040a9875d91490577820834afbfb99e0c17cf59e296db01247a9c8085b880"
+    },
+    {
+      "file": "detail/winter-0-6.png",
+      "bytes": 85990,
+      "sha256": "982040a9875d91490577820834afbfb99e0c17cf59e296db01247a9c8085b880"
+    },
+    {
+      "file": "detail/summer-0-7.png",
+      "bytes": 87915,
+      "sha256": "cd582d83e5ce68b84521f2f81b261a796afc2c33998d5e5ff314fbd79bd3c75a"
+    },
+    {
+      "file": "detail/winter-0-7.png",
+      "bytes": 87915,
+      "sha256": "cd582d83e5ce68b84521f2f81b261a796afc2c33998d5e5ff314fbd79bd3c75a"
+    },
+    {
+      "file": "detail/summer-0-8.png",
+      "bytes": 103052,
+      "sha256": "e1d26719bae94f7f99a296af9cb8f7b06371255dc3dbc916b97df5d11796746d"
+    },
+    {
+      "file": "detail/winter-0-8.png",
+      "bytes": 103052,
+      "sha256": "e1d26719bae94f7f99a296af9cb8f7b06371255dc3dbc916b97df5d11796746d"
+    },
+    {
+      "file": "detail/summer-0-9.png",
+      "bytes": 110663,
+      "sha256": "66e2595a6c6faff70abd46857b276caa5f3464ea5e46d5efee8ed1ddddcf0956"
+    },
+    {
+      "file": "detail/winter-0-9.png",
+      "bytes": 110663,
+      "sha256": "66e2595a6c6faff70abd46857b276caa5f3464ea5e46d5efee8ed1ddddcf0956"
+    },
+    {
+      "file": "detail/summer-0-10.png",
+      "bytes": 115582,
+      "sha256": "45a7f6b3b9deb9b88b283f932ebb3b5d736cae933221ae8096e4705e23b887dd"
+    },
+    {
+      "file": "detail/winter-0-10.png",
+      "bytes": 115582,
+      "sha256": "45a7f6b3b9deb9b88b283f932ebb3b5d736cae933221ae8096e4705e23b887dd"
+    },
+    {
+      "file": "detail/summer-0-11.png",
+      "bytes": 118428,
+      "sha256": "762872fe3ce919e021785c15737c7ee60cbc1c5220a5cfceb1999ae76594757d"
+    },
+    {
+      "file": "detail/winter-0-11.png",
+      "bytes": 115919,
+      "sha256": "477ee746731c185090d46bf598af23d1be80c731532fcd039476dda67061505b"
+    },
+    {
+      "file": "detail/summer-0-12.png",
+      "bytes": 120101,
+      "sha256": "f9d54104a29be95eb05f88c67124fd1003d149f67f9ad8d3e71bfd2a73c31371"
+    },
+    {
+      "file": "detail/winter-0-12.png",
+      "bytes": 114986,
+      "sha256": "1fb5524a08561e966bc334c8545ea5d2b8b5418b71ea0f98af3e24b984414f66"
+    },
+    {
+      "file": "detail/summer-0-13.png",
+      "bytes": 124442,
+      "sha256": "c75e4794384aff94abd6e9db528cc990cfe975848013bd7eecf34800f94bb4b1"
+    },
+    {
+      "file": "detail/winter-0-13.png",
+      "bytes": 117081,
+      "sha256": "8806ca7cf320f293822c93f5e68e8f306601c6a64c1f9ced4591d908051dcb8b"
+    },
+    {
+      "file": "detail/summer-0-14.png",
+      "bytes": 123545,
+      "sha256": "4008b9bb84b453d6e617e841f6d9ffb8e36f85c8fbf433ceffefc65375892a4b"
+    },
+    {
+      "file": "detail/winter-0-14.png",
+      "bytes": 116302,
+      "sha256": "5921d747f4d58da0e6a4d7afa9c9853c2f96fe70f6ac85a2a59cdb6fcacbd548"
+    },
+    {
+      "file": "detail/summer-0-15.png",
+      "bytes": 116074,
+      "sha256": "373de2c139bbfebe05c0602ca1978726d5cd68b8e3b4a8c174c9e11ae7d6dd2b"
+    },
+    {
+      "file": "detail/winter-0-15.png",
+      "bytes": 108659,
+      "sha256": "7f5e63cbaf1f825feb2a6b998329bd2ebfe305968828bbc19f675cdd126b7144"
+    },
+    {
+      "file": "icon.png",
+      "bytes": 22168,
+      "sha256": "5f3a2513e695eb8f571f7e0cb5cdac5d83817e500de4c59ee1a79e7c0499e5ca"
+    },
+    {
+      "file": "detail/summer-1-0.png",
+      "bytes": 18974,
+      "sha256": "de01d3c0d105a4f06895d5ce7365571eef284c5fb1afb269fc0772549817d7d5"
+    },
+    {
+      "file": "detail/winter-1-0.png",
+      "bytes": 18974,
+      "sha256": "de01d3c0d105a4f06895d5ce7365571eef284c5fb1afb269fc0772549817d7d5"
+    },
+    {
+      "file": "detail/summer-1-1.png",
+      "bytes": 39110,
+      "sha256": "7a8420fafae5615dec73d57aaee004667422414faaa6420b6e5d1dc8e62f365f"
+    },
+    {
+      "file": "detail/winter-1-1.png",
+      "bytes": 39110,
+      "sha256": "7a8420fafae5615dec73d57aaee004667422414faaa6420b6e5d1dc8e62f365f"
+    },
+    {
+      "file": "detail/summer-1-2.png",
+      "bytes": 35405,
+      "sha256": "94446a0120998a3f76890ea08dfd0288ec22b0407438a230bad123dcd1b1165d"
+    },
+    {
+      "file": "detail/winter-1-2.png",
+      "bytes": 35405,
+      "sha256": "94446a0120998a3f76890ea08dfd0288ec22b0407438a230bad123dcd1b1165d"
+    },
+    {
+      "file": "detail/summer-1-3.png",
+      "bytes": 55492,
+      "sha256": "ae804a2813a0c9901887f3d43d677fbbf7bcc94c2577a0d015b02db52c5f64b8"
+    },
+    {
+      "file": "detail/winter-1-3.png",
+      "bytes": 55492,
+      "sha256": "ae804a2813a0c9901887f3d43d677fbbf7bcc94c2577a0d015b02db52c5f64b8"
+    },
+    {
+      "file": "detail/summer-1-4.png",
+      "bytes": 61415,
+      "sha256": "2833e586dfd7ede69ade057023ee83306f43ddb89f71a1afd0be800a97c57ca5"
+    },
+    {
+      "file": "detail/winter-1-4.png",
+      "bytes": 61415,
+      "sha256": "2833e586dfd7ede69ade057023ee83306f43ddb89f71a1afd0be800a97c57ca5"
+    },
+    {
+      "file": "detail/summer-1-5.png",
+      "bytes": 83457,
+      "sha256": "ff1ba8060cc7b5170d47bb463a736a34ed380f25550dd7457df11874b32b4a13"
+    },
+    {
+      "file": "detail/winter-1-5.png",
+      "bytes": 83457,
+      "sha256": "ff1ba8060cc7b5170d47bb463a736a34ed380f25550dd7457df11874b32b4a13"
+    },
+    {
+      "file": "detail/summer-1-6.png",
+      "bytes": 87996,
+      "sha256": "fa49de9407d2bd54289d2d64038f1db5ab581136105ef5c924f612993295138c"
+    },
+    {
+      "file": "detail/winter-1-6.png",
+      "bytes": 87996,
+      "sha256": "fa49de9407d2bd54289d2d64038f1db5ab581136105ef5c924f612993295138c"
+    },
+    {
+      "file": "detail/summer-1-7.png",
+      "bytes": 89408,
+      "sha256": "71f7a2c2b458146d0d363d19a6d505c9b7193aecc2612d9029abea0f668231c8"
+    },
+    {
+      "file": "detail/winter-1-7.png",
+      "bytes": 89408,
+      "sha256": "71f7a2c2b458146d0d363d19a6d505c9b7193aecc2612d9029abea0f668231c8"
+    },
+    {
+      "file": "detail/summer-1-8.png",
+      "bytes": 106044,
+      "sha256": "807515252f56999e430c4a7295b26a6334619379e529e69ec028665e7d65435c"
+    },
+    {
+      "file": "detail/winter-1-8.png",
+      "bytes": 106044,
+      "sha256": "807515252f56999e430c4a7295b26a6334619379e529e69ec028665e7d65435c"
+    },
+    {
+      "file": "detail/summer-1-9.png",
+      "bytes": 114922,
+      "sha256": "fbde4aa549dce11d38f40cca3b8c6d9d4cda02f0f9fed2b7fb320394362fdb15"
+    },
+    {
+      "file": "detail/winter-1-9.png",
+      "bytes": 114922,
+      "sha256": "fbde4aa549dce11d38f40cca3b8c6d9d4cda02f0f9fed2b7fb320394362fdb15"
+    },
+    {
+      "file": "detail/summer-1-10.png",
+      "bytes": 121177,
+      "sha256": "8d469f9f04893e7dbae470fd1f86556bdf7f0ba0909432cb4958f99ac96bb48d"
+    },
+    {
+      "file": "detail/winter-1-10.png",
+      "bytes": 121177,
+      "sha256": "8d469f9f04893e7dbae470fd1f86556bdf7f0ba0909432cb4958f99ac96bb48d"
+    },
+    {
+      "file": "detail/summer-1-11.png",
+      "bytes": 120940,
+      "sha256": "7a9f1a69adae94b5fdd88368b6160c536343cdc66471b65de6e75a6b380ad73f"
+    },
+    {
+      "file": "detail/winter-1-11.png",
+      "bytes": 114711,
+      "sha256": "23542ced402f9c9e51d3703911a4817f44b62e1aac28d89335895d1cdf542bfe"
+    },
+    {
+      "file": "detail/summer-1-12.png",
+      "bytes": 118988,
+      "sha256": "9255bb1eb3c56cdb0e892ffc4942111a22cadd7c153308ee89455df4c543f682"
+    },
+    {
+      "file": "detail/winter-1-12.png",
+      "bytes": 102759,
+      "sha256": "605ac10d3dbcfe5974591919c3e6d6341f1b660998f9e1a99a9cd27c669c2534"
+    },
+    {
+      "file": "detail/summer-1-13.png",
+      "bytes": 122685,
+      "sha256": "78d797e8d0c32aa237cce0bf97c3247317d5a0bf64ba5bb9a913be68ad37d64e"
+    },
+    {
+      "file": "detail/winter-1-13.png",
+      "bytes": 102013,
+      "sha256": "a4516fbdf850a248de570c4a95f415db4c42be1cd68154075ee8025043ff3582"
+    },
+    {
+      "file": "detail/summer-1-14.png",
+      "bytes": 122525,
+      "sha256": "92da408b919414fe98c7bd1a35cc4a5692607b27bf9bd19a6017dffdc097b146"
+    },
+    {
+      "file": "detail/winter-1-14.png",
+      "bytes": 101412,
+      "sha256": "ef0a0dae6a1938df845da371022f8e604a4891727bd350261d96d70ea53586c0"
+    },
+    {
+      "file": "detail/summer-1-15.png",
+      "bytes": 115007,
+      "sha256": "9ba6871cceb0af4f5441d538524c13637da7a511731e1e224d42347b64ce4bfc"
+    },
+    {
+      "file": "detail/winter-1-15.png",
+      "bytes": 93343,
+      "sha256": "9680d6e24e54134fb64d22cf6c1818a18676b780c99fd9b0224873ee099d18cf"
+    },
+    {
+      "file": "detail/summer-2-0.png",
+      "bytes": 19234,
+      "sha256": "214d84318136449b79a57f7ab47d254f07abb3c544fd56bad8f85a219b783b44"
+    },
+    {
+      "file": "detail/winter-2-0.png",
+      "bytes": 19234,
+      "sha256": "214d84318136449b79a57f7ab47d254f07abb3c544fd56bad8f85a219b783b44"
+    },
+    {
+      "file": "detail/summer-2-1.png",
+      "bytes": 39295,
+      "sha256": "e527ee42ad29595f6b484aeb7994f61df8c4b056a28aff7d92ce123d43cd1607"
+    },
+    {
+      "file": "detail/winter-2-1.png",
+      "bytes": 39295,
+      "sha256": "e527ee42ad29595f6b484aeb7994f61df8c4b056a28aff7d92ce123d43cd1607"
+    },
+    {
+      "file": "detail/summer-2-2.png",
+      "bytes": 35200,
+      "sha256": "6de04e364188d944dff1a1f1411776ebd16e07c95b7795422d85fd3df1d2292d"
+    },
+    {
+      "file": "detail/winter-2-2.png",
+      "bytes": 35200,
+      "sha256": "6de04e364188d944dff1a1f1411776ebd16e07c95b7795422d85fd3df1d2292d"
+    },
+    {
+      "file": "detail/summer-2-3.png",
+      "bytes": 56383,
+      "sha256": "ff3bbaee59bf637378ac147f9bbc7b320cf73f66b6ed5f2302aa1370fc44d36a"
+    },
+    {
+      "file": "detail/winter-2-3.png",
+      "bytes": 56383,
+      "sha256": "ff3bbaee59bf637378ac147f9bbc7b320cf73f66b6ed5f2302aa1370fc44d36a"
+    },
+    {
+      "file": "detail/summer-2-4.png",
+      "bytes": 60699,
+      "sha256": "04fde2f64728b9719da9614ff48214a26a0838e67716c2c4d15965a7e9f809d6"
+    },
+    {
+      "file": "detail/winter-2-4.png",
+      "bytes": 60699,
+      "sha256": "04fde2f64728b9719da9614ff48214a26a0838e67716c2c4d15965a7e9f809d6"
+    },
+    {
+      "file": "detail/summer-2-5.png",
+      "bytes": 83066,
+      "sha256": "55c9b07d9836043c261ea24443f06a53fca2d87a87f3ebbce7ebf959a5edc570"
+    },
+    {
+      "file": "detail/winter-2-5.png",
+      "bytes": 83066,
+      "sha256": "55c9b07d9836043c261ea24443f06a53fca2d87a87f3ebbce7ebf959a5edc570"
+    },
+    {
+      "file": "detail/summer-2-6.png",
+      "bytes": 87768,
+      "sha256": "ce553f3ecb89bc8ccc6b2fef81c8bde9bbbc57c3f3e1e3d765b1eea17942acb3"
+    },
+    {
+      "file": "detail/winter-2-6.png",
+      "bytes": 87768,
+      "sha256": "ce553f3ecb89bc8ccc6b2fef81c8bde9bbbc57c3f3e1e3d765b1eea17942acb3"
+    },
+    {
+      "file": "detail/summer-2-7.png",
+      "bytes": 89937,
+      "sha256": "8b1cc35df19bf005b75659bfd4381f6fbb78e6ec21291998f071a419c416690f"
+    },
+    {
+      "file": "detail/winter-2-7.png",
+      "bytes": 89937,
+      "sha256": "8b1cc35df19bf005b75659bfd4381f6fbb78e6ec21291998f071a419c416690f"
+    },
+    {
+      "file": "detail/summer-2-8.png",
+      "bytes": 104478,
+      "sha256": "b79c85ec3e0c44c7e5d292b54d33863ac49d276bddd8209124b91fa9194171ba"
+    },
+    {
+      "file": "detail/winter-2-8.png",
+      "bytes": 104478,
+      "sha256": "b79c85ec3e0c44c7e5d292b54d33863ac49d276bddd8209124b91fa9194171ba"
+    },
+    {
+      "file": "detail/summer-2-9.png",
+      "bytes": 110954,
+      "sha256": "5999e0a68ad20eeb512ec33cd2a2fca4a9c8c40e210b26878f203bc573d7d509"
+    },
+    {
+      "file": "detail/winter-2-9.png",
+      "bytes": 110954,
+      "sha256": "5999e0a68ad20eeb512ec33cd2a2fca4a9c8c40e210b26878f203bc573d7d509"
+    },
+    {
+      "file": "detail/summer-2-10.png",
+      "bytes": 116156,
+      "sha256": "b59ebdb364d8caf9cc7e609e13ef50772de917f183d966d66a12c88b058af928"
+    },
+    {
+      "file": "detail/winter-2-10.png",
+      "bytes": 116156,
+      "sha256": "b59ebdb364d8caf9cc7e609e13ef50772de917f183d966d66a12c88b058af928"
+    },
+    {
+      "file": "detail/summer-2-11.png",
+      "bytes": 116663,
+      "sha256": "57a06aa1dda112d09d6adf1578838c2b3e019bc157979820fe9484b95f6f05b2"
+    },
+    {
+      "file": "detail/winter-2-11.png",
+      "bytes": 111982,
+      "sha256": "b8051633f27f26f76422f54f49ec91f7f7f232f88251c296545f31ea12afc176"
+    },
+    {
+      "file": "detail/summer-2-12.png",
+      "bytes": 113804,
+      "sha256": "522d4adc4521ef7ed887e1911f699b58a2da4c8fd04b99490cfaf924d02ca32d"
+    },
+    {
+      "file": "detail/winter-2-12.png",
+      "bytes": 101262,
+      "sha256": "6abc01d855981a05e51f3ff976d845df247c4b257b56b55204aa3e5dafaf0eae"
+    },
+    {
+      "file": "detail/summer-2-13.png",
+      "bytes": 117767,
+      "sha256": "3a0be7cefe30f4e76d9f11ec58836a14943472904008cd8870bee4130d03afed"
+    },
+    {
+      "file": "detail/winter-2-13.png",
+      "bytes": 101411,
+      "sha256": "0abb170da8295eb0e5e85cb02d59c1b3e4c6a61c6bc1c158a0289ba7c1fc1838"
+    },
+    {
+      "file": "detail/summer-2-14.png",
+      "bytes": 116602,
+      "sha256": "4ba908e09b0c1146de40e510410046b886b9febd6de2ddecdac901406988a00b"
+    },
+    {
+      "file": "detail/winter-2-14.png",
+      "bytes": 100292,
+      "sha256": "4b5ba8c2f38c19c981f340daee2ab62d0f9fd2005781063be0d1866d5847be4b"
+    },
+    {
+      "file": "detail/summer-2-15.png",
+      "bytes": 109371,
+      "sha256": "d6cb047eb8ef22f128761747e70061f4840c623aa2865a5e0d3aa5a0cb0272b4"
+    },
+    {
+      "file": "detail/winter-2-15.png",
+      "bytes": 92575,
+      "sha256": "4ef8a7aeec01db8c3118692f751fe824a848ac6cd1f8b3863b76f0a3ca0abcf2"
+    },
+    {
+      "file": "detail/summer-3-0.png",
+      "bytes": 18012,
+      "sha256": "1bf1abff911a8d95053297ad403eee5aac84719f363ff00ebc8ce5d61b40b181"
+    },
+    {
+      "file": "detail/winter-3-0.png",
+      "bytes": 18012,
+      "sha256": "1bf1abff911a8d95053297ad403eee5aac84719f363ff00ebc8ce5d61b40b181"
+    },
+    {
+      "file": "detail/summer-3-1.png",
+      "bytes": 39496,
+      "sha256": "32c9f5126e7a3febdc80071c5383b33ce6ef1a8c87773ebc40f3b4f42757023b"
+    },
+    {
+      "file": "detail/winter-3-1.png",
+      "bytes": 39496,
+      "sha256": "32c9f5126e7a3febdc80071c5383b33ce6ef1a8c87773ebc40f3b4f42757023b"
+    },
+    {
+      "file": "detail/summer-3-2.png",
+      "bytes": 35863,
+      "sha256": "92b78787d9de947ddbd8bfcd95160b8c91406fbaf0414196de0de9449bd5a665"
+    },
+    {
+      "file": "detail/winter-3-2.png",
+      "bytes": 35863,
+      "sha256": "92b78787d9de947ddbd8bfcd95160b8c91406fbaf0414196de0de9449bd5a665"
+    },
+    {
+      "file": "detail/summer-3-3.png",
+      "bytes": 57100,
+      "sha256": "e2024b76fca18d22e1dd6d6fdc9dbe75cd18335da65aa872c317fc225f33e5ab"
+    },
+    {
+      "file": "detail/winter-3-3.png",
+      "bytes": 57100,
+      "sha256": "e2024b76fca18d22e1dd6d6fdc9dbe75cd18335da65aa872c317fc225f33e5ab"
+    },
+    {
+      "file": "detail/summer-3-4.png",
+      "bytes": 62319,
+      "sha256": "7eae693d0fe25dd076dc5465f6f71813d018d379664383abd6df796fee7ceed3"
+    },
+    {
+      "file": "detail/winter-3-4.png",
+      "bytes": 62319,
+      "sha256": "7eae693d0fe25dd076dc5465f6f71813d018d379664383abd6df796fee7ceed3"
+    },
+    {
+      "file": "detail/summer-3-5.png",
+      "bytes": 86360,
+      "sha256": "a13a6720f5dc63f6e6af63a198eab247e48a4a420c6a358bd49d48ac6e8bc607"
+    },
+    {
+      "file": "detail/winter-3-5.png",
+      "bytes": 86360,
+      "sha256": "a13a6720f5dc63f6e6af63a198eab247e48a4a420c6a358bd49d48ac6e8bc607"
+    },
+    {
+      "file": "detail/summer-3-6.png",
+      "bytes": 91757,
+      "sha256": "e72a17d3b5b310c89348b0214deaf27ddd55b7fd82c87adb92f908c139580c3d"
+    },
+    {
+      "file": "detail/winter-3-6.png",
+      "bytes": 91757,
+      "sha256": "e72a17d3b5b310c89348b0214deaf27ddd55b7fd82c87adb92f908c139580c3d"
+    },
+    {
+      "file": "detail/summer-3-7.png",
+      "bytes": 94568,
+      "sha256": "a572faf94ad8cd938e8925cad5ae8ff2a391299b53a4e3bdaebddfdc8079115c"
+    },
+    {
+      "file": "detail/winter-3-7.png",
+      "bytes": 94568,
+      "sha256": "a572faf94ad8cd938e8925cad5ae8ff2a391299b53a4e3bdaebddfdc8079115c"
+    },
+    {
+      "file": "detail/summer-3-8.png",
+      "bytes": 110358,
+      "sha256": "6b4bd32f91c63958a5c176c1e178c466f75d7b4e6e117fbc73607e47bd5f45c5"
+    },
+    {
+      "file": "detail/winter-3-8.png",
+      "bytes": 110358,
+      "sha256": "6b4bd32f91c63958a5c176c1e178c466f75d7b4e6e117fbc73607e47bd5f45c5"
+    },
+    {
+      "file": "detail/summer-3-9.png",
+      "bytes": 118188,
+      "sha256": "e35a0bc3439d266bf0b3b3091fbd86f0f7604207a6d1020c30d2b3b4dc9c91c6"
+    },
+    {
+      "file": "detail/winter-3-9.png",
+      "bytes": 118188,
+      "sha256": "e35a0bc3439d266bf0b3b3091fbd86f0f7604207a6d1020c30d2b3b4dc9c91c6"
+    },
+    {
+      "file": "detail/summer-3-10.png",
+      "bytes": 123347,
+      "sha256": "39636eccef5d5056e0206515a1485fffee4e97076bfd8a614672357c4805017d"
+    },
+    {
+      "file": "detail/winter-3-10.png",
+      "bytes": 123347,
+      "sha256": "39636eccef5d5056e0206515a1485fffee4e97076bfd8a614672357c4805017d"
+    },
+    {
+      "file": "detail/summer-3-11.png",
+      "bytes": 126059,
+      "sha256": "4be93efeb7a627988d92796c1965f1ac187d1a8a9af2fd75df5047ec056659ac"
+    },
+    {
+      "file": "detail/winter-3-11.png",
+      "bytes": 123935,
+      "sha256": "a4c47a8362c943e2bc597d71d847e14e792be48014f496154cbb9786c9692df1"
+    },
+    {
+      "file": "detail/summer-3-12.png",
+      "bytes": 128136,
+      "sha256": "0a2a0af74b3ee2d9e65e0ab0bbaebdd96284f2951d4a691907548db6529e1943"
+    },
+    {
+      "file": "detail/winter-3-12.png",
+      "bytes": 123033,
+      "sha256": "1d148172b4f6f58a567f68e508c018af81bbd526083fbe2f8f656674f825ba63"
+    },
+    {
+      "file": "detail/summer-3-13.png",
+      "bytes": 132622,
+      "sha256": "1ec0096697b0414f6872ba379a33c4d4bda391f3a0eff1fa03ae8d9214bd9cb3"
+    },
+    {
+      "file": "detail/winter-3-13.png",
+      "bytes": 125051,
+      "sha256": "bd0378c7a3068c471d3a74eb8c80950c7b01d4b6157f3f179ccc6d5f04944d97"
+    },
+    {
+      "file": "detail/summer-3-14.png",
+      "bytes": 132132,
+      "sha256": "d884c3d27e02a45abd3e8eb2839b8b33de2c695fa27148e949de3789781d3a15"
+    },
+    {
+      "file": "detail/winter-3-14.png",
+      "bytes": 124651,
+      "sha256": "4f590412b6671e580d4fa0552d7a74dcfd22a542a1f691443d6fd1e7b77a2a42"
+    },
+    {
+      "file": "detail/summer-3-15.png",
+      "bytes": 126151,
+      "sha256": "cf1e5fe3e56cbc44caa6a24c05dba70b6dfc77180a6ef6f3158b006704c6ac0d"
+    },
+    {
+      "file": "detail/winter-3-15.png",
+      "bytes": 118668,
+      "sha256": "dc740d24baef9b04b98acd0f7b1cedb3a987f6378e435d3330dde157b4c73418"
+    },
+    {
+      "file": "detail/summer-4-0.png",
+      "bytes": 18789,
+      "sha256": "b335b07cf554547da9e417cbde806f0932c80320404aa574a3da8d37cfeb6289"
+    },
+    {
+      "file": "detail/winter-4-0.png",
+      "bytes": 18789,
+      "sha256": "b335b07cf554547da9e417cbde806f0932c80320404aa574a3da8d37cfeb6289"
+    },
+    {
+      "file": "detail/summer-4-1.png",
+      "bytes": 40493,
+      "sha256": "d01af8e0c0f6d7e10692443da59bcbda032d7f9abb415e132f9099a1da8756ba"
+    },
+    {
+      "file": "detail/winter-4-1.png",
+      "bytes": 40493,
+      "sha256": "d01af8e0c0f6d7e10692443da59bcbda032d7f9abb415e132f9099a1da8756ba"
+    },
+    {
+      "file": "detail/summer-4-2.png",
+      "bytes": 36188,
+      "sha256": "0d11861b4283b786d29ce287e9ddc0627f7ae3759ddb5f8db014e99318cb3a9c"
+    },
+    {
+      "file": "detail/winter-4-2.png",
+      "bytes": 36188,
+      "sha256": "0d11861b4283b786d29ce287e9ddc0627f7ae3759ddb5f8db014e99318cb3a9c"
+    },
+    {
+      "file": "detail/summer-4-3.png",
+      "bytes": 58032,
+      "sha256": "0a6352e225169f546cdc1bc7fcc35f9c30501444a5f5ede53aff0ab5a39d7432"
+    },
+    {
+      "file": "detail/winter-4-3.png",
+      "bytes": 58032,
+      "sha256": "0a6352e225169f546cdc1bc7fcc35f9c30501444a5f5ede53aff0ab5a39d7432"
+    },
+    {
+      "file": "detail/summer-4-4.png",
+      "bytes": 64402,
+      "sha256": "c014176e3489224d731bae1a4cef806ce9177f9f9c0175e05b1c71a74c805214"
+    },
+    {
+      "file": "detail/winter-4-4.png",
+      "bytes": 64402,
+      "sha256": "c014176e3489224d731bae1a4cef806ce9177f9f9c0175e05b1c71a74c805214"
+    },
+    {
+      "file": "detail/summer-4-5.png",
+      "bytes": 87737,
+      "sha256": "0633a8478b2525ca44be1dc60d77f0e3e31b9cc42e6341c0d64991b681461121"
+    },
+    {
+      "file": "detail/winter-4-5.png",
+      "bytes": 87737,
+      "sha256": "0633a8478b2525ca44be1dc60d77f0e3e31b9cc42e6341c0d64991b681461121"
+    },
+    {
+      "file": "detail/summer-4-6.png",
+      "bytes": 92867,
+      "sha256": "001598bedaf0ec1762b03b8680f0504d952464fcfedfe2955f19d25953223866"
+    },
+    {
+      "file": "detail/winter-4-6.png",
+      "bytes": 92867,
+      "sha256": "001598bedaf0ec1762b03b8680f0504d952464fcfedfe2955f19d25953223866"
+    },
+    {
+      "file": "detail/summer-4-7.png",
+      "bytes": 95014,
+      "sha256": "d625500fecc72eff55873fefafd7666881fae255b1a37fccc4d7b1ecc47fe292"
+    },
+    {
+      "file": "detail/winter-4-7.png",
+      "bytes": 95014,
+      "sha256": "d625500fecc72eff55873fefafd7666881fae255b1a37fccc4d7b1ecc47fe292"
+    },
+    {
+      "file": "detail/summer-4-8.png",
+      "bytes": 112366,
+      "sha256": "d121f5975b659708b720733b90bed2e9ee121a38d53405644fcb9bba56106aa3"
+    },
+    {
+      "file": "detail/winter-4-8.png",
+      "bytes": 112366,
+      "sha256": "d121f5975b659708b720733b90bed2e9ee121a38d53405644fcb9bba56106aa3"
+    },
+    {
+      "file": "detail/summer-4-9.png",
+      "bytes": 121845,
+      "sha256": "67869cb6c4144c5d53eccde474cabf074a0e8b35a3043a143fbc7b1b61b908fe"
+    },
+    {
+      "file": "detail/winter-4-9.png",
+      "bytes": 121845,
+      "sha256": "67869cb6c4144c5d53eccde474cabf074a0e8b35a3043a143fbc7b1b61b908fe"
+    },
+    {
+      "file": "detail/summer-4-10.png",
+      "bytes": 128104,
+      "sha256": "3940ad5b621a4d8e40d8048b93c86726fa8ece83c9bb39b2b5fbf53c4a906c53"
+    },
+    {
+      "file": "detail/winter-4-10.png",
+      "bytes": 128104,
+      "sha256": "3940ad5b621a4d8e40d8048b93c86726fa8ece83c9bb39b2b5fbf53c4a906c53"
+    },
+    {
+      "file": "detail/summer-4-11.png",
+      "bytes": 127963,
+      "sha256": "f6ef39c86b20dc75b3c4d53436e37462228f13572269ae9c94f519b9d1cd16df"
+    },
+    {
+      "file": "detail/winter-4-11.png",
+      "bytes": 122874,
+      "sha256": "7290b53fd6f2018126ac83b774c5ff64f0708bba936291d852c725040e157fc4"
+    },
+    {
+      "file": "detail/summer-4-12.png",
+      "bytes": 126452,
+      "sha256": "73a4287f1e6e902182f37ad034d57c8afd2a6a38c324ee05fb87c6b2d2b54254"
+    },
+    {
+      "file": "detail/winter-4-12.png",
+      "bytes": 111241,
+      "sha256": "59d10e36a72835d39e9cf448cd0c54403e7f2341a5abae7be03b09e442456ae0"
+    },
+    {
+      "file": "detail/summer-4-13.png",
+      "bytes": 130524,
+      "sha256": "9ef760c0a95e0dc0660df28a817092a6ed6bf8f786019beedee1d2999d56ec5e"
+    },
+    {
+      "file": "detail/winter-4-13.png",
+      "bytes": 110389,
+      "sha256": "282436c003c649e38d37b902394ab520987bed8983f49eb38987d74d38959d54"
+    },
+    {
+      "file": "detail/summer-4-14.png",
+      "bytes": 130336,
+      "sha256": "50a9de05606c139cbc688771f840c3dd92e7dbe06dcc3e6108e8d0df596ff237"
+    },
+    {
+      "file": "detail/winter-4-14.png",
+      "bytes": 110299,
+      "sha256": "97399806a50383d8568123122024e4c2e2a52db8c09aa77c9c1cefea12fb8ee4"
+    },
+    {
+      "file": "detail/summer-4-15.png",
+      "bytes": 123854,
+      "sha256": "afe8e9be96c798371a8aa97a8418c46a1d147091d9f7102baa2335626ad2b993"
+    },
+    {
+      "file": "detail/winter-4-15.png",
+      "bytes": 103555,
+      "sha256": "09e7de9036ab859b35193be1d996bba56c9adee413098243714887aa0d2c496e"
+    },
+    {
+      "file": "detail/summer-5-0.png",
+      "bytes": 18067,
+      "sha256": "567c83343667a6ed1b895ce75ab29bc04688081cc5841d497dc5f9a8b7d5b9c9"
+    },
+    {
+      "file": "detail/winter-5-0.png",
+      "bytes": 18067,
+      "sha256": "567c83343667a6ed1b895ce75ab29bc04688081cc5841d497dc5f9a8b7d5b9c9"
+    },
+    {
+      "file": "detail/summer-5-1.png",
+      "bytes": 40230,
+      "sha256": "c4d71f4671879b5ded85095b5375c9324b46544a7a54bb72d2ff83351aeae84a"
+    },
+    {
+      "file": "detail/winter-5-1.png",
+      "bytes": 40230,
+      "sha256": "c4d71f4671879b5ded85095b5375c9324b46544a7a54bb72d2ff83351aeae84a"
+    },
+    {
+      "file": "detail/summer-5-2.png",
+      "bytes": 36559,
+      "sha256": "878a9004ca564c333ddaa28d14135038b715a5db1fa7b32b4b8469fde02f0500"
+    },
+    {
+      "file": "detail/winter-5-2.png",
+      "bytes": 36559,
+      "sha256": "878a9004ca564c333ddaa28d14135038b715a5db1fa7b32b4b8469fde02f0500"
+    },
+    {
+      "file": "detail/summer-5-3.png",
+      "bytes": 58747,
+      "sha256": "6fb339a1eea4793b10f00f9c39d31ef8db7da8ded8ddb14d57c6407cdeb36277"
+    },
+    {
+      "file": "detail/winter-5-3.png",
+      "bytes": 58747,
+      "sha256": "6fb339a1eea4793b10f00f9c39d31ef8db7da8ded8ddb14d57c6407cdeb36277"
+    },
+    {
+      "file": "detail/summer-5-4.png",
+      "bytes": 63916,
+      "sha256": "5d2860854d51f470f5b57d02a5a1f78ade3d41e768872aaef796ad8e96a86d3f"
+    },
+    {
+      "file": "detail/winter-5-4.png",
+      "bytes": 63916,
+      "sha256": "5d2860854d51f470f5b57d02a5a1f78ade3d41e768872aaef796ad8e96a86d3f"
+    },
+    {
+      "file": "detail/summer-5-5.png",
+      "bytes": 88042,
+      "sha256": "72ce6c9a9d68101ea80fdd7d9379e45ff349a9aa3d6e01a456a10d8e93c09318"
+    },
+    {
+      "file": "detail/winter-5-5.png",
+      "bytes": 88042,
+      "sha256": "72ce6c9a9d68101ea80fdd7d9379e45ff349a9aa3d6e01a456a10d8e93c09318"
+    },
+    {
+      "file": "detail/summer-5-6.png",
+      "bytes": 93140,
+      "sha256": "5a3addc220b6b24aebc60a18c0b2a2ef1b56f2448a8e21c878eda5ac9c513244"
+    },
+    {
+      "file": "detail/winter-5-6.png",
+      "bytes": 93140,
+      "sha256": "5a3addc220b6b24aebc60a18c0b2a2ef1b56f2448a8e21c878eda5ac9c513244"
+    },
+    {
+      "file": "detail/summer-5-7.png",
+      "bytes": 95656,
+      "sha256": "b97eb26841da804af8e3fcc709c979bcacef24810f46e7486974778b71ef986f"
+    },
+    {
+      "file": "detail/winter-5-7.png",
+      "bytes": 95656,
+      "sha256": "b97eb26841da804af8e3fcc709c979bcacef24810f46e7486974778b71ef986f"
+    },
+    {
+      "file": "detail/summer-5-8.png",
+      "bytes": 111413,
+      "sha256": "7d159eb2b3e3c22d9fa10fb22f7ca2ca81d291b703077dfc3a2eec2f8bb7d850"
+    },
+    {
+      "file": "detail/winter-5-8.png",
+      "bytes": 111413,
+      "sha256": "7d159eb2b3e3c22d9fa10fb22f7ca2ca81d291b703077dfc3a2eec2f8bb7d850"
+    },
+    {
+      "file": "detail/summer-5-9.png",
+      "bytes": 118357,
+      "sha256": "e92cd3b503f606b55e1508da6a34decbc9ad0e20fe32125be3d509c1b4500004"
+    },
+    {
+      "file": "detail/winter-5-9.png",
+      "bytes": 118357,
+      "sha256": "e92cd3b503f606b55e1508da6a34decbc9ad0e20fe32125be3d509c1b4500004"
+    },
+    {
+      "file": "detail/summer-5-10.png",
+      "bytes": 123823,
+      "sha256": "c2a4283f27f6b066f0759b9df127905b279eb2249699a056986a84c17699bf01"
+    },
+    {
+      "file": "detail/winter-5-10.png",
+      "bytes": 123823,
+      "sha256": "c2a4283f27f6b066f0759b9df127905b279eb2249699a056986a84c17699bf01"
+    },
+    {
+      "file": "detail/summer-5-11.png",
+      "bytes": 124071,
+      "sha256": "3add349c19f670c3881d0621ec7e3f0444169a81c0f34dd64bda9e7f0b4de077"
+    },
+    {
+      "file": "detail/winter-5-11.png",
+      "bytes": 119557,
+      "sha256": "d35f2266f41651b67590330f3a5f00464a88ad0e2017ae5406fd1502af4e1cc1"
+    },
+    {
+      "file": "detail/summer-5-12.png",
+      "bytes": 121184,
+      "sha256": "8c976232b08aff571bf11f99b3904a180697aa647ded4d315fc592ab7ad0cd0a"
+    },
+    {
+      "file": "detail/winter-5-12.png",
+      "bytes": 109150,
+      "sha256": "f83f51ebc17f818a0efc902efec96977173c734d6cf407367f4e2beeffab9818"
+    },
+    {
+      "file": "detail/summer-5-13.png",
+      "bytes": 124711,
+      "sha256": "ded710081c7c4ea47d95854b2c801e841a875dd66bbe47b8d3fa0ea6db2ca336"
+    },
+    {
+      "file": "detail/winter-5-13.png",
+      "bytes": 110050,
+      "sha256": "4dc846baff9b5bbb2803d7ce939960d227bc64a8fa84e232ddf3762d1e71eac7"
+    },
+    {
+      "file": "detail/summer-5-14.png",
+      "bytes": 124234,
+      "sha256": "c83e59a1d814a8e614488bd3652f4b3a38336ba119f6a6a1dbbf81bc55fe8407"
+    },
+    {
+      "file": "detail/winter-5-14.png",
+      "bytes": 109714,
+      "sha256": "b9b22c8529a60b7a927635ff475eb6ca0bc70119a219ad20b35ba08c6f45d86a"
+    },
+    {
+      "file": "detail/summer-5-15.png",
+      "bytes": 119067,
+      "sha256": "e837a7eb7b28ce99d896c5692f2b0933b8e95a05c8078177787fd71cad231d2d"
+    },
+    {
+      "file": "detail/winter-5-15.png",
+      "bytes": 103686,
+      "sha256": "db478bef31ab30ddf9243db7711d299ffce5f1de1cfa1f571a56070892686876"
+    },
+    {
+      "file": "detail/summer-6-0.png",
+      "bytes": 19019,
+      "sha256": "3ce4bf93005e2682aa9e7018d95e1ab2030319061d8c8cf78c1d8d239775cdb9"
+    },
+    {
+      "file": "detail/winter-6-0.png",
+      "bytes": 19019,
+      "sha256": "3ce4bf93005e2682aa9e7018d95e1ab2030319061d8c8cf78c1d8d239775cdb9"
+    },
+    {
+      "file": "detail/summer-6-1.png",
+      "bytes": 40379,
+      "sha256": "edb42dc31eb2653ab42c97fb436964804e619b79ac4dd634d0510081f3ff9c5b"
+    },
+    {
+      "file": "detail/winter-6-1.png",
+      "bytes": 40379,
+      "sha256": "edb42dc31eb2653ab42c97fb436964804e619b79ac4dd634d0510081f3ff9c5b"
+    },
+    {
+      "file": "detail/summer-6-2.png",
+      "bytes": 36216,
+      "sha256": "a472efbcd2f31cfb8e2354a6e0769bb972f9a066c21afaab5fd556d6287a8b3e"
+    },
+    {
+      "file": "detail/winter-6-2.png",
+      "bytes": 36216,
+      "sha256": "a472efbcd2f31cfb8e2354a6e0769bb972f9a066c21afaab5fd556d6287a8b3e"
+    },
+    {
+      "file": "detail/summer-6-3.png",
+      "bytes": 59224,
+      "sha256": "1050b67ef2b004a46e29188518a85eed5c17685973f0480ed7ac08a3d34f5177"
+    },
+    {
+      "file": "detail/winter-6-3.png",
+      "bytes": 59224,
+      "sha256": "1050b67ef2b004a46e29188518a85eed5c17685973f0480ed7ac08a3d34f5177"
+    },
+    {
+      "file": "detail/summer-6-4.png",
+      "bytes": 68472,
+      "sha256": "40f3ec438b0777e04ef033b3ff59c9f9d42ab86d5f9e86f4c7a198a9019a79c1"
+    },
+    {
+      "file": "detail/winter-6-4.png",
+      "bytes": 68472,
+      "sha256": "40f3ec438b0777e04ef033b3ff59c9f9d42ab86d5f9e86f4c7a198a9019a79c1"
+    },
+    {
+      "file": "detail/summer-6-5.png",
+      "bytes": 131046,
+      "sha256": "b1164ff850d0aae484fe97ab81d772c750312ddd9c3293f0ef471ef857e65993"
+    },
+    {
+      "file": "detail/winter-6-5.png",
+      "bytes": 131046,
+      "sha256": "b1164ff850d0aae484fe97ab81d772c750312ddd9c3293f0ef471ef857e65993"
+    },
+    {
+      "file": "detail/summer-6-6.png",
+      "bytes": 139018,
+      "sha256": "3912bf55152ae85756dd358d5dde492831fd5e0a2728d8fea0136f61bd73add7"
+    },
+    {
+      "file": "detail/winter-6-6.png",
+      "bytes": 139018,
+      "sha256": "3912bf55152ae85756dd358d5dde492831fd5e0a2728d8fea0136f61bd73add7"
+    },
+    {
+      "file": "detail/summer-6-7.png",
+      "bytes": 139724,
+      "sha256": "01cf990039ea716dfdf7d682107c03096c8d752e9b17fac92759656753cb9da5"
+    },
+    {
+      "file": "detail/winter-6-7.png",
+      "bytes": 139724,
+      "sha256": "01cf990039ea716dfdf7d682107c03096c8d752e9b17fac92759656753cb9da5"
+    },
+    {
+      "file": "detail/summer-6-8.png",
+      "bytes": 157369,
+      "sha256": "34f1379aef2df412df602454434881c1d6669c32559efea8ac7287c8d5e172e9"
+    },
+    {
+      "file": "detail/winter-6-8.png",
+      "bytes": 157369,
+      "sha256": "34f1379aef2df412df602454434881c1d6669c32559efea8ac7287c8d5e172e9"
+    },
+    {
+      "file": "detail/summer-6-9.png",
+      "bytes": 166019,
+      "sha256": "805e4adbb9d7119c3a2dd87c66e171b32098a130d2f85d299225c4b4dc3b0314"
+    },
+    {
+      "file": "detail/winter-6-9.png",
+      "bytes": 166019,
+      "sha256": "805e4adbb9d7119c3a2dd87c66e171b32098a130d2f85d299225c4b4dc3b0314"
+    },
+    {
+      "file": "detail/summer-6-10.png",
+      "bytes": 171987,
+      "sha256": "33303b13f90e3937f934b15ad92319aad2aac01455ab293df120df76c66c51fd"
+    },
+    {
+      "file": "detail/winter-6-10.png",
+      "bytes": 171987,
+      "sha256": "33303b13f90e3937f934b15ad92319aad2aac01455ab293df120df76c66c51fd"
+    },
+    {
+      "file": "detail/summer-6-11.png",
+      "bytes": 175110,
+      "sha256": "fc4b61015c32fff3347217a663ab35b754540937b6c987f2b7cb433d8d3c3eaf"
+    },
+    {
+      "file": "detail/winter-6-11.png",
+      "bytes": 171569,
+      "sha256": "daf502845986620737e9f139a3ed774f23cb57b8500d54b06a6d6d0b9feee271"
+    },
+    {
+      "file": "detail/summer-6-12.png",
+      "bytes": 176879,
+      "sha256": "a05bae1f37d87886a7a00d37c811c50371f1ff6a7a7369100aa2fdf344246647"
+    },
+    {
+      "file": "detail/winter-6-12.png",
+      "bytes": 170115,
+      "sha256": "53f9b0b98ad80b9bef8538ac414efcb8e958bc0342c2b94090f94404b350e6d8"
+    },
+    {
+      "file": "detail/summer-6-13.png",
+      "bytes": 181131,
+      "sha256": "439afb5b5675635cadbf272c719281daae5dd33e79c27b24c95eec1313c908ba"
+    },
+    {
+      "file": "detail/winter-6-13.png",
+      "bytes": 171815,
+      "sha256": "c7bd47fc7b83dbeed9cc677ae8e43e3091ed42b63024d8fa5ba668519e0efe68"
+    },
+    {
+      "file": "detail/summer-6-14.png",
+      "bytes": 179088,
+      "sha256": "3375ac4497308f47ab7b49241fccff1b78d937ab38ff2ce307704689d2491234"
+    },
+    {
+      "file": "detail/winter-6-14.png",
+      "bytes": 169738,
+      "sha256": "cff5ae3c6ebe5400f1212c51b761c653a680f56273cf51a92cf9219680c0083d"
+    },
+    {
+      "file": "detail/summer-6-15.png",
+      "bytes": 172013,
+      "sha256": "89825974b98614496b7a53ecedd28ad061fbd77e646c9a18bc38f09f3b45a2b7"
+    },
+    {
+      "file": "detail/winter-6-15.png",
+      "bytes": 162571,
+      "sha256": "664ffb9dbb2bf9f6cb4d586f7aebfb7124d9828ef1c7734791b09f158963677b"
+    },
+    {
+      "file": "detail/summer-7-0.png",
+      "bytes": 18806,
+      "sha256": "c42e8203a9c3573036f007b7c4833439208b7b7d88c0bd68b21fe8e6e621a786"
+    },
+    {
+      "file": "detail/winter-7-0.png",
+      "bytes": 18806,
+      "sha256": "c42e8203a9c3573036f007b7c4833439208b7b7d88c0bd68b21fe8e6e621a786"
+    },
+    {
+      "file": "detail/summer-7-1.png",
+      "bytes": 41670,
+      "sha256": "7271a601ff97cb1518154aff36c3de881566e671bc660b4731e482bad0c2f949"
+    },
+    {
+      "file": "detail/winter-7-1.png",
+      "bytes": 41670,
+      "sha256": "7271a601ff97cb1518154aff36c3de881566e671bc660b4731e482bad0c2f949"
+    },
+    {
+      "file": "detail/summer-7-2.png",
+      "bytes": 37240,
+      "sha256": "0a79320b0898600d356cc84cab0972d503d60be5edd2d13ccd29389382a12d0a"
+    },
+    {
+      "file": "detail/winter-7-2.png",
+      "bytes": 37240,
+      "sha256": "0a79320b0898600d356cc84cab0972d503d60be5edd2d13ccd29389382a12d0a"
+    },
+    {
+      "file": "detail/summer-7-3.png",
+      "bytes": 60278,
+      "sha256": "e40c14dbbb272f2de8e3a17ee0bafe9f42d14fc00f1bcbaa9ae93d7f278c27d7"
+    },
+    {
+      "file": "detail/winter-7-3.png",
+      "bytes": 60278,
+      "sha256": "e40c14dbbb272f2de8e3a17ee0bafe9f42d14fc00f1bcbaa9ae93d7f278c27d7"
+    },
+    {
+      "file": "detail/summer-7-4.png",
+      "bytes": 71297,
+      "sha256": "b38a9cdb3717dd16816c08027c45b382c56a2a30655810953ab57ad959c4b28e"
+    },
+    {
+      "file": "detail/winter-7-4.png",
+      "bytes": 71297,
+      "sha256": "b38a9cdb3717dd16816c08027c45b382c56a2a30655810953ab57ad959c4b28e"
+    },
+    {
+      "file": "detail/summer-7-5.png",
+      "bytes": 134140,
+      "sha256": "771458e423ecba2164cfe2717571df2db887fd24e957f4ebf9f67cd4a4323e46"
+    },
+    {
+      "file": "detail/winter-7-5.png",
+      "bytes": 134140,
+      "sha256": "771458e423ecba2164cfe2717571df2db887fd24e957f4ebf9f67cd4a4323e46"
+    },
+    {
+      "file": "detail/summer-7-6.png",
+      "bytes": 141653,
+      "sha256": "c7f828eec41d7d88eafc51a0a0accba7216476164124d4fd01f5de4bbe5fc34e"
+    },
+    {
+      "file": "detail/winter-7-6.png",
+      "bytes": 141653,
+      "sha256": "c7f828eec41d7d88eafc51a0a0accba7216476164124d4fd01f5de4bbe5fc34e"
+    },
+    {
+      "file": "detail/summer-7-7.png",
+      "bytes": 140760,
+      "sha256": "2cdab8a9c12fca6174cd858f89ee42ca60468553b8e0176f048543bcd0cd69f0"
+    },
+    {
+      "file": "detail/winter-7-7.png",
+      "bytes": 140760,
+      "sha256": "2cdab8a9c12fca6174cd858f89ee42ca60468553b8e0176f048543bcd0cd69f0"
+    },
+    {
+      "file": "detail/summer-7-8.png",
+      "bytes": 159651,
+      "sha256": "94b4cc808f9e7b53f7f6680733a00f3252323b742d5aa2cd841e3563d8bf78a9"
+    },
+    {
+      "file": "detail/winter-7-8.png",
+      "bytes": 159651,
+      "sha256": "94b4cc808f9e7b53f7f6680733a00f3252323b742d5aa2cd841e3563d8bf78a9"
+    },
+    {
+      "file": "detail/summer-7-9.png",
+      "bytes": 169681,
+      "sha256": "3207ebb39abcebd42ba4a6012d07694219ab132d447d623ffbedaea4165b80de"
+    },
+    {
+      "file": "detail/winter-7-9.png",
+      "bytes": 169681,
+      "sha256": "3207ebb39abcebd42ba4a6012d07694219ab132d447d623ffbedaea4165b80de"
+    },
+    {
+      "file": "detail/summer-7-10.png",
+      "bytes": 177160,
+      "sha256": "e72e687f1c323799c12c9364af7e066298a5580fd31f1b8c1ee49175e9b635dc"
+    },
+    {
+      "file": "detail/winter-7-10.png",
+      "bytes": 177160,
+      "sha256": "e72e687f1c323799c12c9364af7e066298a5580fd31f1b8c1ee49175e9b635dc"
+    },
+    {
+      "file": "detail/summer-7-11.png",
+      "bytes": 176586,
+      "sha256": "adca73bc46158e9f4ae1bdb24276f56abbab59226cfb863b29c0bb75f35d86fb"
+    },
+    {
+      "file": "detail/winter-7-11.png",
+      "bytes": 171313,
+      "sha256": "15256f899da499ac8e98813698eff66bcbe641f17c1a73e0292bfa219e411926"
+    },
+    {
+      "file": "detail/summer-7-12.png",
+      "bytes": 174086,
+      "sha256": "84dfa371525ffbe33e75737c0536711ed3d73cd777dcb1cd2e7fc5e2cb4d0c35"
+    },
+    {
+      "file": "detail/winter-7-12.png",
+      "bytes": 159412,
+      "sha256": "e390b022751fc60e7cb8c4e3b64c3ca24d93edc53030d66d8bdd8a09adf730d2"
+    },
+    {
+      "file": "detail/summer-7-13.png",
+      "bytes": 178394,
+      "sha256": "1079b275c23f05c105db94a1c8453d427ed70b22ca35761998100850617a8ac4"
+    },
+    {
+      "file": "detail/winter-7-13.png",
+      "bytes": 159143,
+      "sha256": "d5cf49505a643655773dac5132ad71ec8ffce7aca31f1cd6730e047ff7562bf3"
+    },
+    {
+      "file": "detail/summer-7-14.png",
+      "bytes": 176617,
+      "sha256": "3d9176f167804aebb992f23ac06df6b949d198ee3be2a4652fb4f87ea8fbf8e6"
+    },
+    {
+      "file": "detail/winter-7-14.png",
+      "bytes": 157956,
+      "sha256": "8a56978d75f759b1ff3ed4a8c98f6822528ee5928ca4e09c82f3b41ebc93eaa4"
+    },
+    {
+      "file": "detail/summer-7-15.png",
+      "bytes": 168881,
+      "sha256": "47b49f3d65a3363d92a39b2277b7546f62adde48e343bc82a0ceea8cbf1ff3c1"
+    },
+    {
+      "file": "detail/winter-7-15.png",
+      "bytes": 149706,
+      "sha256": "d17e0a4a2ac0289a84622fd367e9c580408e85e8593375458b352df38e745ec9"
+    },
+    {
+      "file": "detail/summer-8-0.png",
+      "bytes": 18182,
+      "sha256": "a42fc90457d8fa77e02acc2d45a4f71aeeab33bad6468a156495dbe67aa0c216"
+    },
+    {
+      "file": "detail/winter-8-0.png",
+      "bytes": 18182,
+      "sha256": "a42fc90457d8fa77e02acc2d45a4f71aeeab33bad6468a156495dbe67aa0c216"
+    },
+    {
+      "file": "detail/summer-8-1.png",
+      "bytes": 40700,
+      "sha256": "593f275e38bc5c5ebf79f139c167f2ffa941d1bace5eb1713e295064fff101f9"
+    },
+    {
+      "file": "detail/winter-8-1.png",
+      "bytes": 40700,
+      "sha256": "593f275e38bc5c5ebf79f139c167f2ffa941d1bace5eb1713e295064fff101f9"
+    },
+    {
+      "file": "detail/summer-8-2.png",
+      "bytes": 37068,
+      "sha256": "e71445e13a725ceb0afe265ba8d1b7d75aef7dc7f41d5e620a4af038f0205015"
+    },
+    {
+      "file": "detail/winter-8-2.png",
+      "bytes": 37068,
+      "sha256": "e71445e13a725ceb0afe265ba8d1b7d75aef7dc7f41d5e620a4af038f0205015"
+    },
+    {
+      "file": "detail/summer-8-3.png",
+      "bytes": 61079,
+      "sha256": "d5cd696fafd4e7c7b6caeb8b2e968cac6239d74bc49afc948faf23c92d7e5241"
+    },
+    {
+      "file": "detail/winter-8-3.png",
+      "bytes": 61079,
+      "sha256": "d5cd696fafd4e7c7b6caeb8b2e968cac6239d74bc49afc948faf23c92d7e5241"
+    },
+    {
+      "file": "detail/summer-8-4.png",
+      "bytes": 70546,
+      "sha256": "234fbe538aac9c281aefea587e510c6308c125a73d3530db41ffed8a66c50987"
+    },
+    {
+      "file": "detail/winter-8-4.png",
+      "bytes": 70546,
+      "sha256": "234fbe538aac9c281aefea587e510c6308c125a73d3530db41ffed8a66c50987"
+    },
+    {
+      "file": "detail/summer-8-5.png",
+      "bytes": 135716,
+      "sha256": "13243f4eedd50d3cf92be005e430649d0d41b2a9eb816ee9e331a3860e52f3c5"
+    },
+    {
+      "file": "detail/winter-8-5.png",
+      "bytes": 135716,
+      "sha256": "13243f4eedd50d3cf92be005e430649d0d41b2a9eb816ee9e331a3860e52f3c5"
+    },
+    {
+      "file": "detail/summer-8-6.png",
+      "bytes": 142799,
+      "sha256": "561de38359203b5bea2428b8c96e6a9f9fe331dd4b419e3eb38d226ebdfa48f6"
+    },
+    {
+      "file": "detail/winter-8-6.png",
+      "bytes": 142799,
+      "sha256": "561de38359203b5bea2428b8c96e6a9f9fe331dd4b419e3eb38d226ebdfa48f6"
+    },
+    {
+      "file": "detail/summer-8-7.png",
+      "bytes": 142192,
+      "sha256": "b1bb6e2e061099122b4209141062060017ebd96dd2ac902c029ac1d10305cc00"
+    },
+    {
+      "file": "detail/winter-8-7.png",
+      "bytes": 142192,
+      "sha256": "b1bb6e2e061099122b4209141062060017ebd96dd2ac902c029ac1d10305cc00"
+    },
+    {
+      "file": "detail/summer-8-8.png",
+      "bytes": 159254,
+      "sha256": "bd257554f926fea9a8e9284a42dfcffc717847047eb0e3066cda260560c94ee3"
+    },
+    {
+      "file": "detail/winter-8-8.png",
+      "bytes": 159254,
+      "sha256": "bd257554f926fea9a8e9284a42dfcffc717847047eb0e3066cda260560c94ee3"
+    },
+    {
+      "file": "detail/summer-8-9.png",
+      "bytes": 166516,
+      "sha256": "afd374dabbc792e571c2b8695c3b7f9cad9a687b8210847d44cadc090e6698f2"
+    },
+    {
+      "file": "detail/winter-8-9.png",
+      "bytes": 166516,
+      "sha256": "afd374dabbc792e571c2b8695c3b7f9cad9a687b8210847d44cadc090e6698f2"
+    },
+    {
+      "file": "detail/summer-8-10.png",
+      "bytes": 172879,
+      "sha256": "8aab045450b69f9e1096afdca0648ecefe62eb05c530c726e0bd8b39eeeef98d"
+    },
+    {
+      "file": "detail/winter-8-10.png",
+      "bytes": 172879,
+      "sha256": "8aab045450b69f9e1096afdca0648ecefe62eb05c530c726e0bd8b39eeeef98d"
+    },
+    {
+      "file": "detail/summer-8-11.png",
+      "bytes": 173258,
+      "sha256": "595a10258957a4f487c127511cbbff2abe879592c7a0942a6fb010b5c551d618"
+    },
+    {
+      "file": "detail/winter-8-11.png",
+      "bytes": 168054,
+      "sha256": "11662121d9fafa6548efd5f6f15d322b46b40800293a55b432f7e143e67aaa9d"
+    },
+    {
+      "file": "detail/summer-8-12.png",
+      "bytes": 170254,
+      "sha256": "2ff6d10a52627fe25641283ee13ca8a0f147ac975d44876a36188bd08c3495f9"
+    },
+    {
+      "file": "detail/winter-8-12.png",
+      "bytes": 157601,
+      "sha256": "83c9bcfea22cb87f873b78f83279ea3e93959cee2d15bafe62c0da63c1956d70"
+    },
+    {
+      "file": "detail/summer-8-13.png",
+      "bytes": 173522,
+      "sha256": "8266f1b43491e237551acf7504c0a31ff999658cba72d396ebec7f27313189e8"
+    },
+    {
+      "file": "detail/winter-8-13.png",
+      "bytes": 157868,
+      "sha256": "49900d018a25243b7feff2e8f166824168ffbe9dbc3e8097b79bd697ed58c6c4"
+    },
+    {
+      "file": "detail/summer-8-14.png",
+      "bytes": 172072,
+      "sha256": "0e9ae0de50be13a32252db68390383cf030a7bf669e7a3505531201bde52c793"
+    },
+    {
+      "file": "detail/winter-8-14.png",
+      "bytes": 156862,
+      "sha256": "5f87d3714acb8b6c392d8ba573b6cc235b5be20a211a2fd1eb1a4bb2c9ff9c49"
+    },
+    {
+      "file": "detail/summer-8-15.png",
+      "bytes": 164892,
+      "sha256": "e60925c81bb6e304020a1a7ef1dc755c07cbe33f470f89ac99dc763407f2d573"
+    },
+    {
+      "file": "detail/winter-8-15.png",
+      "bytes": 149365,
+      "sha256": "b0a530ebfed620664a8d57a81d39a39bfa22870b488109c4fb2889cdfdd9a57a"
+    },
+    {
+      "file": "detail/summer-9-0.png",
+      "bytes": 19036,
+      "sha256": "e00089bc8a92b50d0a51299749738154e6683c30432fccf8054db693682c55f1"
+    },
+    {
+      "file": "detail/winter-9-0.png",
+      "bytes": 19036,
+      "sha256": "e00089bc8a92b50d0a51299749738154e6683c30432fccf8054db693682c55f1"
+    },
+    {
+      "file": "detail/summer-9-1.png",
+      "bytes": 41364,
+      "sha256": "9f43cca85a14cf2e21bc85239da367a54120ed8ed487a04462614c1779580536"
+    },
+    {
+      "file": "detail/winter-9-1.png",
+      "bytes": 41364,
+      "sha256": "9f43cca85a14cf2e21bc85239da367a54120ed8ed487a04462614c1779580536"
+    },
+    {
+      "file": "detail/summer-9-2.png",
+      "bytes": 37256,
+      "sha256": "b39db4ae630776aa7641b29d7cef78895911998d34b2f5e55b1cd5424ec18b76"
+    },
+    {
+      "file": "detail/winter-9-2.png",
+      "bytes": 37256,
+      "sha256": "b39db4ae630776aa7641b29d7cef78895911998d34b2f5e55b1cd5424ec18b76"
+    },
+    {
+      "file": "detail/summer-9-3.png",
+      "bytes": 61301,
+      "sha256": "296919d723cc96ca4a5bd157a437a57a53938e98d58f7352d2f3b9dbfed6cea5"
+    },
+    {
+      "file": "detail/winter-9-3.png",
+      "bytes": 61301,
+      "sha256": "296919d723cc96ca4a5bd157a437a57a53938e98d58f7352d2f3b9dbfed6cea5"
+    },
+    {
+      "file": "detail/summer-9-4.png",
+      "bytes": 71295,
+      "sha256": "82ccb977628c52d6f614744688995ad4a5e3d3adb3442dd01a0c96c93e7ba4c1"
+    },
+    {
+      "file": "detail/winter-9-4.png",
+      "bytes": 71295,
+      "sha256": "82ccb977628c52d6f614744688995ad4a5e3d3adb3442dd01a0c96c93e7ba4c1"
+    },
+    {
+      "file": "detail/summer-9-5.png",
+      "bytes": 136789,
+      "sha256": "d9cd6cbd4c9b6d6f18c449bf3f58e230330caa5117f8a25d9b00923a2ffad3f9"
+    },
+    {
+      "file": "detail/winter-9-5.png",
+      "bytes": 136789,
+      "sha256": "d9cd6cbd4c9b6d6f18c449bf3f58e230330caa5117f8a25d9b00923a2ffad3f9"
+    },
+    {
+      "file": "detail/summer-9-6.png",
+      "bytes": 144655,
+      "sha256": "3e1df0c12c223b2e3febdb50fab2605515dfb1d06c8fedc8a951167b7eaa5981"
+    },
+    {
+      "file": "detail/winter-9-6.png",
+      "bytes": 144655,
+      "sha256": "3e1df0c12c223b2e3febdb50fab2605515dfb1d06c8fedc8a951167b7eaa5981"
+    },
+    {
+      "file": "detail/summer-9-7.png",
+      "bytes": 144913,
+      "sha256": "30adc3105079f585a484174f3ebed9b97884a492cce855a1f67c08627aad3c12"
+    },
+    {
+      "file": "detail/winter-9-7.png",
+      "bytes": 144913,
+      "sha256": "30adc3105079f585a484174f3ebed9b97884a492cce855a1f67c08627aad3c12"
+    },
+    {
+      "file": "detail/summer-9-8.png",
+      "bytes": 163630,
+      "sha256": "72b8438e685b2c154b45b11be2125d1fd184124c47bc5e00740d343399a4c16d"
+    },
+    {
+      "file": "detail/winter-9-8.png",
+      "bytes": 163630,
+      "sha256": "72b8438e685b2c154b45b11be2125d1fd184124c47bc5e00740d343399a4c16d"
+    },
+    {
+      "file": "detail/summer-9-9.png",
+      "bytes": 172689,
+      "sha256": "69ae86223fc90319b5d009c5656a6d20ad89629ea9e3e6b394905a074459df0b"
+    },
+    {
+      "file": "detail/winter-9-9.png",
+      "bytes": 172689,
+      "sha256": "69ae86223fc90319b5d009c5656a6d20ad89629ea9e3e6b394905a074459df0b"
+    },
+    {
+      "file": "detail/summer-9-10.png",
+      "bytes": 179311,
+      "sha256": "f5369cdc75e2a1691a687df7ac66c5b57a6f280df1f2582beb860bcd9d1dc62f"
+    },
+    {
+      "file": "detail/winter-9-10.png",
+      "bytes": 179311,
+      "sha256": "f5369cdc75e2a1691a687df7ac66c5b57a6f280df1f2582beb860bcd9d1dc62f"
+    },
+    {
+      "file": "detail/summer-9-11.png",
+      "bytes": 182327,
+      "sha256": "15fd158066de5cff02b3c4db163d7c947115578a87333967682d9b3e0cee5877"
+    },
+    {
+      "file": "detail/winter-9-11.png",
+      "bytes": 178632,
+      "sha256": "2ce6d9f1e6e3673bb1aac2cb4bc120187119e1de16efbe2c879eafe4353ae505"
+    },
+    {
+      "file": "detail/summer-9-12.png",
+      "bytes": 184232,
+      "sha256": "05ff317192828c7f7205852483c21ab23ea0c64b1372fc29e9d23e1f1c054ce3"
+    },
+    {
+      "file": "detail/winter-9-12.png",
+      "bytes": 176888,
+      "sha256": "f8a3225138236029b0fe1f9b39bd797b6eab29fc9deacb7b48836f6a82e64037"
+    },
+    {
+      "file": "detail/summer-9-13.png",
+      "bytes": 188678,
+      "sha256": "b8b86694808aed5eaa88fffb726dd0b4517ac167815653ef474e832a8d0a99f0"
+    },
+    {
+      "file": "detail/winter-9-13.png",
+      "bytes": 178711,
+      "sha256": "60befcd1d837a9904308d6e5011f8834b7cac41993ce024cdd047e9119341d4f"
+    },
+    {
+      "file": "detail/summer-9-14.png",
+      "bytes": 186298,
+      "sha256": "007cc8a0f8758cbf82b6cdab366750b37eed5fabed989a054f274b4b4208feea"
+    },
+    {
+      "file": "detail/winter-9-14.png",
+      "bytes": 176250,
+      "sha256": "4764e05530d4c027caa783805158b4260bd5f1d8b4cd536dcf60d87cdce29118"
+    },
+    {
+      "file": "detail/summer-9-15.png",
+      "bytes": 178728,
+      "sha256": "0a989369adaf061d6eb999606785f3fef0f5aa4e5b908f3316c3f7ed25f0b10a"
+    },
+    {
+      "file": "detail/winter-9-15.png",
+      "bytes": 168632,
+      "sha256": "9daea8c2c1e6ae33c359f2ff09fc36baf80055c79f2afa86075a27f00b2c89f1"
+    },
+    {
+      "file": "detail/summer-10-0.png",
+      "bytes": 19117,
+      "sha256": "67c5ce2c09bbf05689a564efd3e9f439a70a0f956f3436e00b9fd104d86737f0"
+    },
+    {
+      "file": "detail/winter-10-0.png",
+      "bytes": 19117,
+      "sha256": "67c5ce2c09bbf05689a564efd3e9f439a70a0f956f3436e00b9fd104d86737f0"
+    },
+    {
+      "file": "detail/summer-10-1.png",
+      "bytes": 42078,
+      "sha256": "74c21cdb4dfea32c5a4caa27eb63ff9ced26dcd76180ee39d6a841c054f1c3eb"
+    },
+    {
+      "file": "detail/winter-10-1.png",
+      "bytes": 42078,
+      "sha256": "74c21cdb4dfea32c5a4caa27eb63ff9ced26dcd76180ee39d6a841c054f1c3eb"
+    },
+    {
+      "file": "detail/summer-10-2.png",
+      "bytes": 38013,
+      "sha256": "297beee04ff84bef47868f752f02a9d141d47d250f102a652f09f52d9da6d505"
+    },
+    {
+      "file": "detail/winter-10-2.png",
+      "bytes": 38013,
+      "sha256": "297beee04ff84bef47868f752f02a9d141d47d250f102a652f09f52d9da6d505"
+    },
+    {
+      "file": "detail/summer-10-3.png",
+      "bytes": 63405,
+      "sha256": "de2476420e36e4925bf9afd59b9ee8f86d098f76b17d29118c99c7ef1926c879"
+    },
+    {
+      "file": "detail/winter-10-3.png",
+      "bytes": 63405,
+      "sha256": "de2476420e36e4925bf9afd59b9ee8f86d098f76b17d29118c99c7ef1926c879"
+    },
+    {
+      "file": "detail/summer-10-4.png",
+      "bytes": 73870,
+      "sha256": "5bd7125bbf0c7f61048274e2c982d834f8d94b5a9a0398357f79f40a6cda96ff"
+    },
+    {
+      "file": "detail/winter-10-4.png",
+      "bytes": 73870,
+      "sha256": "5bd7125bbf0c7f61048274e2c982d834f8d94b5a9a0398357f79f40a6cda96ff"
+    },
+    {
+      "file": "detail/summer-10-5.png",
+      "bytes": 138609,
+      "sha256": "caf4ab4d53412981326938fd2b3b7a63b90a8e12ba277a10bfc5409fe8b2d4b2"
+    },
+    {
+      "file": "detail/winter-10-5.png",
+      "bytes": 138609,
+      "sha256": "caf4ab4d53412981326938fd2b3b7a63b90a8e12ba277a10bfc5409fe8b2d4b2"
+    },
+    {
+      "file": "detail/summer-10-6.png",
+      "bytes": 146682,
+      "sha256": "31422af42ff5b77e3adb6b50ffcac4329f1f86dd680a4511b80dd4ac0433ce47"
+    },
+    {
+      "file": "detail/winter-10-6.png",
+      "bytes": 146682,
+      "sha256": "31422af42ff5b77e3adb6b50ffcac4329f1f86dd680a4511b80dd4ac0433ce47"
+    },
+    {
+      "file": "detail/summer-10-7.png",
+      "bytes": 144943,
+      "sha256": "d772472e41d8b33e038ecf749e6ceb83934c4dc74d1fe0f591991ea391dc9fc0"
+    },
+    {
+      "file": "detail/winter-10-7.png",
+      "bytes": 144943,
+      "sha256": "d772472e41d8b33e038ecf749e6ceb83934c4dc74d1fe0f591991ea391dc9fc0"
+    },
+    {
+      "file": "detail/summer-10-8.png",
+      "bytes": 165583,
+      "sha256": "1274978366ceba4a15270e83de9ffe3131de21b30529fcdcc8ca7804761dea43"
+    },
+    {
+      "file": "detail/winter-10-8.png",
+      "bytes": 165583,
+      "sha256": "1274978366ceba4a15270e83de9ffe3131de21b30529fcdcc8ca7804761dea43"
+    },
+    {
+      "file": "detail/summer-10-9.png",
+      "bytes": 176399,
+      "sha256": "c4fffaf4d9da3be5e59e83cb39b76fa13473a0bb3bc6fc3041a469530dc77589"
+    },
+    {
+      "file": "detail/winter-10-9.png",
+      "bytes": 176399,
+      "sha256": "c4fffaf4d9da3be5e59e83cb39b76fa13473a0bb3bc6fc3041a469530dc77589"
+    },
+    {
+      "file": "detail/summer-10-10.png",
+      "bytes": 184412,
+      "sha256": "9c0dccbfe32a20d9915675f195571effda5474a3ce821024f511edf2087b1487"
+    },
+    {
+      "file": "detail/winter-10-10.png",
+      "bytes": 184412,
+      "sha256": "9c0dccbfe32a20d9915675f195571effda5474a3ce821024f511edf2087b1487"
+    },
+    {
+      "file": "detail/summer-10-11.png",
+      "bytes": 184129,
+      "sha256": "06e60c7dd148cbcc7b26384a716ffe86d13cca849ee958168b7fe24e2a274422"
+    },
+    {
+      "file": "detail/winter-10-11.png",
+      "bytes": 178305,
+      "sha256": "d9583eca951568b5c9b6200445d57011df8e7b0d306045c9b37517dd77b692d3"
+    },
+    {
+      "file": "detail/summer-10-12.png",
+      "bytes": 181535,
+      "sha256": "273379dd2073db7e37ad2857f66a643cb85bfeb82f73585b83026f98b56c716c"
+    },
+    {
+      "file": "detail/winter-10-12.png",
+      "bytes": 165891,
+      "sha256": "a775cd4e20bc8bc38f1563ba137145e64347407ba694ed0df951e082ea4e3b78"
+    },
+    {
+      "file": "detail/summer-10-13.png",
+      "bytes": 185548,
+      "sha256": "452880f9d776351b5022fb092a50081ed7c9355cd9a9755463ae697faba2774a"
+    },
+    {
+      "file": "detail/winter-10-13.png",
+      "bytes": 164524,
+      "sha256": "9806c11b95b19d4517142c6d342198e65265031d3652ce93f5016d2ec383c980"
+    },
+    {
+      "file": "detail/summer-10-14.png",
+      "bytes": 184105,
+      "sha256": "4b625e4e4696ed559083a9347024320ad6b1dc473af6a7d300f0ec9d06b9d374"
+    },
+    {
+      "file": "detail/winter-10-14.png",
+      "bytes": 163245,
+      "sha256": "ce43cd7af98aba163dc693ca1f1ad7facdae7ae3e3922cafa1bec2696474564b"
+    },
+    {
+      "file": "detail/summer-10-15.png",
+      "bytes": 175445,
+      "sha256": "394b8394bd3f0e89a195f665a0572280a513f03df52c13e7514e56e49cca6f93"
+    },
+    {
+      "file": "detail/winter-10-15.png",
+      "bytes": 154865,
+      "sha256": "d3fb14268c41ca30ffc02e417c61e88b6e4af718ddb0acb9fdc51e56082a0ccd"
+    },
+    {
+      "file": "detail/summer-11-0.png",
+      "bytes": 19378,
+      "sha256": "0502f9ab6c503ab04d8000c8f789cd27fa2ac7629ec43c413f38bd6b4c993053"
+    },
+    {
+      "file": "detail/winter-11-0.png",
+      "bytes": 19378,
+      "sha256": "0502f9ab6c503ab04d8000c8f789cd27fa2ac7629ec43c413f38bd6b4c993053"
+    },
+    {
+      "file": "detail/summer-11-1.png",
+      "bytes": 42083,
+      "sha256": "6dabb0f2c93113e626a9db98255230d157464128fb51533d5a933baf98a6d27a"
+    },
+    {
+      "file": "detail/winter-11-1.png",
+      "bytes": 42083,
+      "sha256": "6dabb0f2c93113e626a9db98255230d157464128fb51533d5a933baf98a6d27a"
+    },
+    {
+      "file": "detail/summer-11-2.png",
+      "bytes": 37756,
+      "sha256": "42ae82c98a469bccc7de275349dc6c3d2e21e65185f252a3cec621b941b732a5"
+    },
+    {
+      "file": "detail/winter-11-2.png",
+      "bytes": 37756,
+      "sha256": "42ae82c98a469bccc7de275349dc6c3d2e21e65185f252a3cec621b941b732a5"
+    },
+    {
+      "file": "detail/summer-11-3.png",
+      "bytes": 63433,
+      "sha256": "96e54e49af1a118298d231bcaa773666fc39efc181fd3d74756143bc29eb0c69"
+    },
+    {
+      "file": "detail/winter-11-3.png",
+      "bytes": 63433,
+      "sha256": "96e54e49af1a118298d231bcaa773666fc39efc181fd3d74756143bc29eb0c69"
+    },
+    {
+      "file": "detail/summer-11-4.png",
+      "bytes": 72692,
+      "sha256": "04c1b57140abc86424f9aaacd90883cb799b9ac00fceb2c50847a0ff08260ec7"
+    },
+    {
+      "file": "detail/winter-11-4.png",
+      "bytes": 72692,
+      "sha256": "04c1b57140abc86424f9aaacd90883cb799b9ac00fceb2c50847a0ff08260ec7"
+    },
+    {
+      "file": "detail/summer-11-5.png",
+      "bytes": 140264,
+      "sha256": "75649ed8fa5a68c053d743dbc10396004c4aa8905ea11b0b10e8fcb7d47696f4"
+    },
+    {
+      "file": "detail/winter-11-5.png",
+      "bytes": 140264,
+      "sha256": "75649ed8fa5a68c053d743dbc10396004c4aa8905ea11b0b10e8fcb7d47696f4"
+    },
+    {
+      "file": "detail/summer-11-6.png",
+      "bytes": 147975,
+      "sha256": "236811f37f19c0cefacf5b9e27e2aa0721bfd1019cad6c72a878d83d24ad1d58"
+    },
+    {
+      "file": "detail/winter-11-6.png",
+      "bytes": 147975,
+      "sha256": "236811f37f19c0cefacf5b9e27e2aa0721bfd1019cad6c72a878d83d24ad1d58"
+    },
+    {
+      "file": "detail/summer-11-7.png",
+      "bytes": 147086,
+      "sha256": "930f7d71824dde0445402b9c0e10cf4822e25b31b7a13465e51a45ceca0490d2"
+    },
+    {
+      "file": "detail/winter-11-7.png",
+      "bytes": 147086,
+      "sha256": "930f7d71824dde0445402b9c0e10cf4822e25b31b7a13465e51a45ceca0490d2"
+    },
+    {
+      "file": "detail/summer-11-8.png",
+      "bytes": 165473,
+      "sha256": "6e2e2eace78fcc6fe18b80ccc6a9962000ef8dc3d64b81d9d4b8ad633569fae5"
+    },
+    {
+      "file": "detail/winter-11-8.png",
+      "bytes": 165473,
+      "sha256": "6e2e2eace78fcc6fe18b80ccc6a9962000ef8dc3d64b81d9d4b8ad633569fae5"
+    },
+    {
+      "file": "detail/summer-11-9.png",
+      "bytes": 173489,
+      "sha256": "b032836eca89ffcc76d2fe78255932c6fc9678207a7fa9a22327728453b4ca78"
+    },
+    {
+      "file": "detail/winter-11-9.png",
+      "bytes": 173489,
+      "sha256": "b032836eca89ffcc76d2fe78255932c6fc9678207a7fa9a22327728453b4ca78"
+    },
+    {
+      "file": "detail/summer-11-10.png",
+      "bytes": 180583,
+      "sha256": "14225ed1e5f2b49e6cc537a9f17bacac8d0e6bd305ee8ef86e00b028523a88e7"
+    },
+    {
+      "file": "detail/winter-11-10.png",
+      "bytes": 180583,
+      "sha256": "14225ed1e5f2b49e6cc537a9f17bacac8d0e6bd305ee8ef86e00b028523a88e7"
+    },
+    {
+      "file": "detail/summer-11-11.png",
+      "bytes": 180763,
+      "sha256": "b61b92113e8f2c3321ee68e776ab1e604989fb253085bc234088c31dff395c03"
+    },
+    {
+      "file": "detail/winter-11-11.png",
+      "bytes": 175825,
+      "sha256": "d995efa37a99e4397f2e4e1b9644593ff742045da113a78960efbbaa0b649fd0"
+    },
+    {
+      "file": "detail/summer-11-12.png",
+      "bytes": 177438,
+      "sha256": "1167b89a5e2c1e0dcd79f179babad564377144f513528b93b16a991e0dde9434"
+    },
+    {
+      "file": "detail/winter-11-12.png",
+      "bytes": 165377,
+      "sha256": "8a82f74393f696b2e42f2dacf2888940d98ae1d26e8932bc4dbe52112b14cf6c"
+    },
+    {
+      "file": "detail/summer-11-13.png",
+      "bytes": 180742,
+      "sha256": "e105b7983d17d597ef505ccb4df8aa593f060c978c72946ce4e754f3579d5e87"
+    },
+    {
+      "file": "detail/winter-11-13.png",
+      "bytes": 165077,
+      "sha256": "5c032eabcaab9e38506422660a44332a4abebced6976a30c40b4317d75d3ea12"
+    },
+    {
+      "file": "detail/summer-11-14.png",
+      "bytes": 178943,
+      "sha256": "c84f0025391ffbacc3c62f317a685e3017df383d44451b62ae321244af248b9b"
+    },
+    {
+      "file": "detail/winter-11-14.png",
+      "bytes": 163274,
+      "sha256": "f6b17bdc76a23df0c5906f40c2668199d9ba0910194206edacb098d9c98c6e86"
+    },
+    {
+      "file": "detail/summer-11-15.png",
+      "bytes": 171203,
+      "sha256": "2ccbe3bb9f50dbaeeeadb9aed695b1491f34f572129c15d8c95bdc03e9070be3"
+    },
+    {
+      "file": "detail/winter-11-15.png",
+      "bytes": 155782,
+      "sha256": "c77315b907506573833ce9028817f879754979facbbc3d62dac33c2b1c4b22d2"
+    },
+    {
+      "file": "complete-summer.png",
+      "bytes": 158504,
+      "sha256": "d1a4524fd4eb1406121becb762c4b886310ec8770467e0caed4abca87eb0d740"
+    },
+    {
+      "file": "complete-winter.png",
+      "bytes": 155098,
+      "sha256": "4c7d2e1cc150e796c27fbefb673ba00b3b3b997086d768b41983cdafadf96c26"
+    },
+    {
+      "file": "construction-summer.png",
+      "bytes": 285789,
+      "sha256": "4116d240fbde4eff9a0162278e7f6202c424a87b5df96c5879d3279b84d62c39"
+    },
+    {
+      "file": "construction-winter.png",
+      "bytes": 286829,
+      "sha256": "2b9d1b63d4bb5d56002416fabd64ddf94461a3041e3168e482f0285ab56a708f"
+    },
+    {
+      "file": "ground.png",
+      "bytes": 100866,
+      "sha256": "f1dfce16380a7dec22b549c02970fc8ef47ced8af7e56f318fb7143c47b070c1"
+    },
+    {
+      "file": "emission.png",
+      "bytes": 38688,
+      "sha256": "6581d08c1451be8c9b888d9ee3009e9506dad4f307196d2bd18c3a845c835074"
+    },
+    {
+      "file": "spill.png",
+      "bytes": 25601,
+      "sha256": "28ab7a8da0a24201ffbd6dc282bbefbca12d41da93ccdc6b5c656965d0215ce6"
+    },
+    {
+      "file": "quality.json",
+      "bytes": 608011,
+      "sha256": "ccb1eb64681fb058ce367a5a807eef073b9b48324482892b956295e061920635"
+    },
+    {
+      "file": "anchors.json",
+      "bytes": 1596,
+      "sha256": "35dbab597e16b2b31c1c86fc661ccf401be42edd1c5df957dc744387f97ac947"
+    }
+  ]
+}

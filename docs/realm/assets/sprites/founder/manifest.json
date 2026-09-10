@@ -1,0 +1,719 @@
+{
+  "version": 2,
+  "character": "The Founder",
+  "authoring": "Kay Lousberg / KayKit Rogue; Realm grounded walk and standing gestures",
+  "license": "CC0-1.0",
+  "sourceRevision": "672074b73ba276876a19e8816ecdc5241817ab47",
+  "sourceURL": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+  "frames": 24,
+  "directions": [
+    "s",
+    "se",
+    "e",
+    "ne",
+    "n",
+    "nw",
+    "w",
+    "sw"
+  ],
+  "anchor": {
+    "x": 0.5,
+    "y": 0.86
+  },
+  "stride": 0.64,
+  "duration": 1.0666667222976685,
+  "viewHeight": 2.6,
+  "tiers": [
+    {
+      "key": "game",
+      "file": "walk-64.png",
+      "frameW": 64,
+      "frameH": 84
+    },
+    {
+      "key": "retina",
+      "file": "walk-128.png",
+      "frameW": 128,
+      "frameH": 168
+    },
+    {
+      "key": "studio",
+      "file": "walk-192.png",
+      "frameW": 192,
+      "frameH": 252
+    }
+  ],
+  "actions": {
+    "walk": {
+      "label": "Walk",
+      "clip": "Realm_Grounded_Walk",
+      "source": "Walking_B",
+      "frames": 24,
+      "duration": 1.0666667222976685,
+      "description": "A continuous stride with level boots and a clean swing.",
+      "beats": [
+        [
+          0,
+          "Left contact"
+        ],
+        [
+          8,
+          "Right passing"
+        ],
+        [
+          12,
+          "Right contact"
+        ],
+        [
+          20,
+          "Left passing"
+        ]
+      ],
+      "tiers": [
+        {
+          "key": "game",
+          "file": "walk-64.png",
+          "frameW": 64,
+          "frameH": 84
+        },
+        {
+          "key": "retina",
+          "file": "walk-128.png",
+          "frameW": 128,
+          "frameH": 168
+        },
+        {
+          "key": "studio",
+          "file": "walk-192.png",
+          "frameW": 192,
+          "frameH": 252
+        }
+      ],
+      "repeatExact": true
+    },
+    "idle": {
+      "label": "Take stock",
+      "clip": "Realm_Take_Stock",
+      "source": "Founder_Idle",
+      "frames": 48,
+      "duration": 4,
+      "description": "Breathe, shift the shoulders, and quietly survey the settlement.",
+      "beats": [
+        [
+          0,
+          "Settle"
+        ],
+        [
+          12,
+          "Breathe in"
+        ],
+        [
+          24,
+          "Look across"
+        ],
+        [
+          36,
+          "Exhale"
+        ]
+      ],
+      "tiers": [
+        {
+          "key": "game",
+          "file": "idle-64.png",
+          "frameW": 64,
+          "frameH": 84
+        },
+        {
+          "key": "retina",
+          "file": "idle-128.png",
+          "frameW": 128,
+          "frameH": 168
+        },
+        {
+          "key": "studio",
+          "file": "idle-192.png",
+          "frameW": 192,
+          "frameH": 252
+        }
+      ],
+      "repeatExact": true
+    },
+    "point": {
+      "label": "Work over there",
+      "clip": "Realm_Direct_Work",
+      "source": "Founder_Point",
+      "frames": 48,
+      "duration": 3.2,
+      "description": "Look first. Gather the hand. Indicate the work. Let the arm settle.",
+      "beats": [
+        [
+          0,
+          "Ready"
+        ],
+        [
+          7,
+          "Look & gather"
+        ],
+        [
+          17,
+          "Indicate"
+        ],
+        [
+          28,
+          "Hold the direction"
+        ],
+        [
+          39,
+          "Recover"
+        ]
+      ],
+      "tiers": [
+        {
+          "key": "game",
+          "file": "point-64.png",
+          "frameW": 64,
+          "frameH": 84
+        },
+        {
+          "key": "retina",
+          "file": "point-128.png",
+          "frameW": 128,
+          "frameH": 168
+        },
+        {
+          "key": "studio",
+          "file": "point-192.png",
+          "frameW": 192,
+          "frameH": 252
+        }
+      ],
+      "repeatExact": true
+    },
+    "beckon": {
+      "label": "Come with me",
+      "clip": "Realm_Beckon",
+      "source": "Founder_Beckon",
+      "frames": 48,
+      "duration": 3.2,
+      "description": "Catch someone’s eye, then invite them over with two easy sweeps.",
+      "beats": [
+        [
+          0,
+          "Ready"
+        ],
+        [
+          10,
+          "Catch the eye"
+        ],
+        [
+          20,
+          "First invitation"
+        ],
+        [
+          30,
+          "Again"
+        ],
+        [
+          40,
+          "Settle"
+        ]
+      ],
+      "tiers": [
+        {
+          "key": "game",
+          "file": "beckon-64.png",
+          "frameW": 64,
+          "frameH": 84
+        },
+        {
+          "key": "retina",
+          "file": "beckon-128.png",
+          "frameW": 128,
+          "frameH": 168
+        },
+        {
+          "key": "studio",
+          "file": "beckon-192.png",
+          "frameW": 192,
+          "frameH": 252
+        }
+      ],
+      "repeatExact": true
+    }
+  },
+  "sources": [
+    {
+      "file": "assets/sprites/founder/source/blender-actions.glb",
+      "sha256": "de9b1d9696c048ea5d626a718d61a4d42182ef8c612eea9c882d3c0eca428560"
+    },
+    {
+      "file": "scripts/founder-sprites/rig.js",
+      "sha256": "6cb5bf9b16e91fd75571bfd4186cf9e903d12f1514c5291e95c92c40cf3ed834"
+    },
+    {
+      "file": "scripts/founder-sprites/actions.js",
+      "sha256": "174cc702984ac038f03c8b73631ceb1d4fbdce64a65d94437ad96db8cb5a55da"
+    },
+    {
+      "file": "scripts/founder-sprites/bake.mjs",
+      "sha256": "577f1c58c4c4ed1efc2cf0b5004211dfc5010cffef0e0427d00890dc21a6a3d3"
+    },
+    {
+      "file": "scripts/founder-sprites/materials.js",
+      "sha256": "7caf7d69725a6d0b6322faa62398c6d9d398f34698c1f5ed9f8adfd27cf1cc4e"
+    },
+    {
+      "file": "scripts/founder-sprites/settlement-materials.js",
+      "sha256": "da18972b3327af91a523c5eaedcbfa73727e7d878084308e60e60e32e9eb3961"
+    },
+    {
+      "file": "scripts/founder-sprites/export-glb.mjs",
+      "sha256": "427c78c0d7528212c1dd20dda8bc890ef215a0ff55c9d4ccdf30b327514c976c"
+    },
+    {
+      "file": "scripts/founder-sprites/contract.js",
+      "sha256": "0c8a1c9829a04dd6cc43a306de9eeb5386f30395316485e90736e837f2570bc8"
+    },
+    {
+      "file": "vendor/three/three.module.js",
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "file": "vendor/three/three.core.js",
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "file": "vendor/three/GLTFLoader.js",
+      "sha256": "adbbafe8ce40416525b6be0ee5cac0d3782482bcf0122c8ca8ec1ffa77d3440b"
+    },
+    {
+      "file": "vendor/three/BufferGeometryUtils.js",
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751"
+    },
+    {
+      "file": "assets/sprites/founder/founder-actions.blend",
+      "sha256": "ddaf79905a47e72b051cb4aad49cdbd715b56b081b6e8c3a340f05e3c97d7dc6"
+    },
+    {
+      "file": "scripts/founder-sprites/export_blender.py",
+      "sha256": "c0beb1be154c1c4ce940b7cd99fdeb1f5fe99b36feb07580025b6f876b5aa38f"
+    },
+    {
+      "file": "scripts/founder-sprites/rebuild-from-blender.mjs",
+      "sha256": "860f542cc3e977b2ed1cbe17f1e1d52c47043b23ed2e958a090c8a6a4c8a986c"
+    }
+  ],
+  "outputs": [
+    {
+      "file": "walk-64.png",
+      "sha256": "3348e4bd6d60be0b5804d9b8aba2cd4f32e70a1725babbb25adad38e11a646c7",
+      "bytes": 332157
+    },
+    {
+      "file": "walk-128.png",
+      "sha256": "48b076d987cd97a011c1e18439945430974ed73c9bba45981f81a9dfa3642eb9",
+      "bytes": 1089221
+    },
+    {
+      "file": "walk-192.png",
+      "sha256": "62bbfd2255826b9b573aa7e9d089aabc5e822b926db1dae1ee08b1f028f1f8f1",
+      "bytes": 2253065
+    },
+    {
+      "file": "runtime/walk-128-s.png",
+      "sha256": "e3660f51329d5a0e85b9d1286bdceb1757067cf092054d1e2569e8ee99aae20d",
+      "bytes": 152561
+    },
+    {
+      "file": "runtime/walk-128-se.png",
+      "sha256": "d8cc5b949e588353ebce308b14ef23f599879ea59e88c60bff681f3e5b17b37a",
+      "bytes": 153124
+    },
+    {
+      "file": "runtime/walk-128-e.png",
+      "sha256": "a057bf409588651c37880ed1717a52aa8ca633bb2aed30ffc336f56ad7bc2dec",
+      "bytes": 121869
+    },
+    {
+      "file": "runtime/walk-128-ne.png",
+      "sha256": "6d95a5183fbd9396179b591c7e93c77e9c3f89bdab1a98e2868358288a9eb25a",
+      "bytes": 134033
+    },
+    {
+      "file": "runtime/walk-128-n.png",
+      "sha256": "cd47515c0706e73954334df3db18970f9662a1fcbbff40547f60f4506ae12d30",
+      "bytes": 121458
+    },
+    {
+      "file": "runtime/walk-128-nw.png",
+      "sha256": "7821262aad0607ff345ee84ae765f7e72ea1e9f4bc22ab191aa8a0ecbad9b6ec",
+      "bytes": 135872
+    },
+    {
+      "file": "runtime/walk-128-w.png",
+      "sha256": "a581ecf5920d5b370b061d8643bd93a57e56e9b73b6169ba8601a34b420712a8",
+      "bytes": 121023
+    },
+    {
+      "file": "runtime/walk-128-sw.png",
+      "sha256": "dbb2d05007a23dddca96b3ed7f1d4affdf1ea3c908db32bb9d4274e677fea7de",
+      "bytes": 149869
+    },
+    {
+      "file": "runtime/walk-192-s.png",
+      "sha256": "614437050e4bc3dccbcb504cb71fd8f93535718c3437d79eee1f3ef5cd549807",
+      "bytes": 321927
+    },
+    {
+      "file": "runtime/walk-192-se.png",
+      "sha256": "7a4fc9d4a6fed657bef44206f97bb68c96dbcfe76bd311d51f2f4f196d60021a",
+      "bytes": 317499
+    },
+    {
+      "file": "runtime/walk-192-e.png",
+      "sha256": "6ceecca220a61e07427084b4758b6772d1dee38a6f1ae1c7e2760cc0a26f1efb",
+      "bytes": 256469
+    },
+    {
+      "file": "runtime/walk-192-ne.png",
+      "sha256": "3e92bbcf9e9a91a7993e04cc5e8fa92be168aa86e631ab0580fb6ef583d12a21",
+      "bytes": 263765
+    },
+    {
+      "file": "runtime/walk-192-n.png",
+      "sha256": "bd279ab9bce99d3a69b9457ecc6ce014de9147891096176bd125ae5a91d7709c",
+      "bytes": 251991
+    },
+    {
+      "file": "runtime/walk-192-nw.png",
+      "sha256": "2b6029d3b5aca910f9544562bdf3efc56c9e2bd0ea4e4128a0d4263d7b3ee4c3",
+      "bytes": 271096
+    },
+    {
+      "file": "runtime/walk-192-w.png",
+      "sha256": "0e6bdd4603704c8ffe8c855add0eba8109e600c91f21b9a8ae689baf7b9e073b",
+      "bytes": 258224
+    },
+    {
+      "file": "runtime/walk-192-sw.png",
+      "sha256": "a793a06042fd64dfe9042723c0e0cd1917d464d890c25853c6f7170f071e0b35",
+      "bytes": 316438
+    },
+    {
+      "file": "idle-64.png",
+      "sha256": "e10ce3bffdba27e765710781fab77ce43420c9f5ddd41011cfbb46aedf3fe1a5",
+      "bytes": 642358
+    },
+    {
+      "file": "idle-128.png",
+      "sha256": "8dbdffdca6fa5463add063a000c9cd774fa066a2b8522ef6943c1731f8529a7e",
+      "bytes": 2263964
+    },
+    {
+      "file": "idle-192.png",
+      "sha256": "c243430beb99b91feb20d96c4f0296924550a6d648bf8bc8349782fd705fcd8e",
+      "bytes": 4962477
+    },
+    {
+      "file": "runtime/idle-128-s.png",
+      "sha256": "a8b083e4d1780debc45d01f7a2209735fd2c9758867154aab5189d89135cccb5",
+      "bytes": 334124
+    },
+    {
+      "file": "runtime/idle-128-se.png",
+      "sha256": "54d766c20da6dfb7111297639a89631f4eb2fbdebc8114254140c51977432ebe",
+      "bytes": 304608
+    },
+    {
+      "file": "runtime/idle-128-e.png",
+      "sha256": "3f2d9bd4d6832d0df4dae6db6d1f172221b0d0fe45e673506630adfa19713647",
+      "bytes": 208813
+    },
+    {
+      "file": "runtime/idle-128-ne.png",
+      "sha256": "47b2c1900363edd2cfaff2a69ed572ce501c85d61e2d393091853b93ed0506ba",
+      "bytes": 283041
+    },
+    {
+      "file": "runtime/idle-128-n.png",
+      "sha256": "bc19a17c48894aee1570a6f7224eb9c6a8974967e00f34b7c53654716ae9f85e",
+      "bytes": 303974
+    },
+    {
+      "file": "runtime/idle-128-nw.png",
+      "sha256": "bc93edda4c60b596812a8a4821f7cfe08b667b219b2c95fd398403128748845a",
+      "bytes": 319165
+    },
+    {
+      "file": "runtime/idle-128-w.png",
+      "sha256": "a39b97c6a2be07fa3d23240a3a7eda1af2687ea87259862f2927cbf565a8dcd0",
+      "bytes": 207115
+    },
+    {
+      "file": "runtime/idle-128-sw.png",
+      "sha256": "ac3e9ca63a4f0714d0a744e9b38b3e141e135dd58b7871fea6533e7338929ec9",
+      "bytes": 304847
+    },
+    {
+      "file": "runtime/idle-192-s.png",
+      "sha256": "b83ddb945ef5ff52b02b01b66113ce340af0cd96b6e789c6211fc233b5bf66fa",
+      "bytes": 733194
+    },
+    {
+      "file": "runtime/idle-192-se.png",
+      "sha256": "815e1ec33f030edde587545e1e82a46646bd5f8eb778d61e7decd51f9941d41b",
+      "bytes": 688367
+    },
+    {
+      "file": "runtime/idle-192-e.png",
+      "sha256": "adf9d93097e0868d2d19dcf5bd66e4a1bcd0b88f0243c223a5bde55a76008b4a",
+      "bytes": 482558
+    },
+    {
+      "file": "runtime/idle-192-ne.png",
+      "sha256": "5a5cf9716fec1433bb12ce9f44fffdce6286c6803e080af4180167ac55bbdb76",
+      "bytes": 590461
+    },
+    {
+      "file": "runtime/idle-192-n.png",
+      "sha256": "c1db71a2edc1c26ea609bd49332c62e29f0dce9a0dcf0f4a1a4f717d3ade8e1a",
+      "bytes": 652199
+    },
+    {
+      "file": "runtime/idle-192-nw.png",
+      "sha256": "7b4fb614a0ba0196e1459e0218073952196eff971a39dcd6afa6b79c1bc514f9",
+      "bytes": 664492
+    },
+    {
+      "file": "runtime/idle-192-w.png",
+      "sha256": "9787cb18036376df9149a84980fd02bcaac8ba3955dc7498d29e7b7d3f3e4c7b",
+      "bytes": 468202
+    },
+    {
+      "file": "runtime/idle-192-sw.png",
+      "sha256": "453543e48fec801bbeb06fa7fdb3b39058f71992decd741da9be53d90d641442",
+      "bytes": 686261
+    },
+    {
+      "file": "point-64.png",
+      "sha256": "0d207f3f70229c3d9b2f7d566fabdcac688cb09a705bfe526726a623c581662a",
+      "bytes": 675436
+    },
+    {
+      "file": "point-128.png",
+      "sha256": "6689c615460178b05646dd759f2557c96963f970e0f3fbe45a4a242a3bf90345",
+      "bytes": 2348427
+    },
+    {
+      "file": "point-192.png",
+      "sha256": "502a44db3dbbfad30b012c815d1cb26c8536981b039dbab8cccae29fc49b4d7f",
+      "bytes": 5133001
+    },
+    {
+      "file": "runtime/point-128-s.png",
+      "sha256": "fbf1e4295634c99732fac1d60680694c91027128e4baa5550e22c059b5432485",
+      "bytes": 339476
+    },
+    {
+      "file": "runtime/point-128-se.png",
+      "sha256": "c022a9c6fef89f71de4fe4c6ce616231f1390041f505bb8af23cb6a44193b983",
+      "bytes": 315866
+    },
+    {
+      "file": "runtime/point-128-e.png",
+      "sha256": "086e39acdd2de5b71b999aa4277121f74a5d1d66832f7055f7aa9579dec2c8de",
+      "bytes": 221952
+    },
+    {
+      "file": "runtime/point-128-ne.png",
+      "sha256": "530d691085ae6bf8c9e374351eaa77678c2b91fd27f150f3f3df398a03a4dcad",
+      "bytes": 298258
+    },
+    {
+      "file": "runtime/point-128-n.png",
+      "sha256": "827992b1265b127f1e250589ecd4259018b03496d42985e90c5feee37419d5dc",
+      "bytes": 310813
+    },
+    {
+      "file": "runtime/point-128-nw.png",
+      "sha256": "3524b7807f83b5b300cd5d6b68d4fb897218a90d7ee972cae2373306aae064b3",
+      "bytes": 325479
+    },
+    {
+      "file": "runtime/point-128-w.png",
+      "sha256": "681e690e1f707966700b0772cc77bc7758204ffd40c9ecaa018264d2f71bbe33",
+      "bytes": 218346
+    },
+    {
+      "file": "runtime/point-128-sw.png",
+      "sha256": "6a7318d95ee6f2db0eb8197dae2c11752e5fdffe0bc067d7575ab7ed345cf320",
+      "bytes": 321442
+    },
+    {
+      "file": "runtime/point-192-s.png",
+      "sha256": "d2667303f9f88287d14726b78ad08c956b7bbec261964d2fcd9c2785b695cba6",
+      "bytes": 742154
+    },
+    {
+      "file": "runtime/point-192-se.png",
+      "sha256": "b1d9d0bdac39d39bc474c6c1f9ec1dfc6c3ac8d448d6e078e38187e231bb2c97",
+      "bytes": 703004
+    },
+    {
+      "file": "runtime/point-192-e.png",
+      "sha256": "a6ac07e59bac4b98e12b16b68a9f11486ee9342f3e2fbb068dba0b1328c21b36",
+      "bytes": 507113
+    },
+    {
+      "file": "runtime/point-192-ne.png",
+      "sha256": "77386d3aa5832b797e08aec442e3ab114fa0e8d5f29dfcee44902c30b4f19ee1",
+      "bytes": 628035
+    },
+    {
+      "file": "runtime/point-192-n.png",
+      "sha256": "a518245aed5d30f0f00bbd626bdaaf691d1e9d831b29a1858cd79bad93ab461f",
+      "bytes": 659068
+    },
+    {
+      "file": "runtime/point-192-nw.png",
+      "sha256": "2b73ab684bf13b42f0eb7ae6e9384312926b825f502490001fb03a7a31c63eb3",
+      "bytes": 686786
+    },
+    {
+      "file": "runtime/point-192-w.png",
+      "sha256": "e0362096005c7f91f08413078f8adc3d03d7142dd35551b0dd696a14dea7fa23",
+      "bytes": 494174
+    },
+    {
+      "file": "runtime/point-192-sw.png",
+      "sha256": "e6b5106b1c919d52fd7eb98330329cc08e0846786b371090b378565498691408",
+      "bytes": 719492
+    },
+    {
+      "file": "beckon-64.png",
+      "sha256": "c6c3470791e02c07c27b61e144ea0bd139e715199b133625a1de1bc31f568e5b",
+      "bytes": 682386
+    },
+    {
+      "file": "beckon-128.png",
+      "sha256": "fb81a13b142dbfc8e86533b40cef84a0beb20e0b0ea3d0927ecd2753dac4e8f3",
+      "bytes": 2367487
+    },
+    {
+      "file": "beckon-192.png",
+      "sha256": "ee9184a9caede94e3feb127168a671c7a7f2fe4fb99418877ddfa254a1b52083",
+      "bytes": 5167221
+    },
+    {
+      "file": "runtime/beckon-128-s.png",
+      "sha256": "576a735768ce1ba1752169d93a84cb98eeda453b47f28bb3382307eb0c15e2cc",
+      "bytes": 339962
+    },
+    {
+      "file": "runtime/beckon-128-se.png",
+      "sha256": "e2330b100fab26ea0d2ca1682fdd102f63d94c3b0fc6615389b3bdf6384bf5e0",
+      "bytes": 321310
+    },
+    {
+      "file": "runtime/beckon-128-e.png",
+      "sha256": "8429816c26906a192c86e49c4504d5ffabdccd8795fb6c2c554976042e75c32a",
+      "bytes": 219965
+    },
+    {
+      "file": "runtime/beckon-128-ne.png",
+      "sha256": "65a9817e262b2a4029ef01b363ebd6782389b03863d412d401fea80ac9f5b045",
+      "bytes": 299322
+    },
+    {
+      "file": "runtime/beckon-128-n.png",
+      "sha256": "28cb9d13b8cb5ec8a323420b3dbeafb53dc8b5e2d303812bc35e160ecc908a41",
+      "bytes": 316930
+    },
+    {
+      "file": "runtime/beckon-128-nw.png",
+      "sha256": "c62f701d1bbe0d99f74f334233c36efd666b598aa9cc0fe04e073abf1e1a4e77",
+      "bytes": 340093
+    },
+    {
+      "file": "runtime/beckon-128-w.png",
+      "sha256": "d4b95a19e6ed9d66e8396da59c948b485f2465883d79cb6c25564ea682acafe9",
+      "bytes": 215868
+    },
+    {
+      "file": "runtime/beckon-128-sw.png",
+      "sha256": "10416ab8e8a2a0dc0e91a536cfbab216d8391324e805addfa15e6876d02088ee",
+      "bytes": 318327
+    },
+    {
+      "file": "runtime/beckon-192-s.png",
+      "sha256": "76afbeae6119c5b442c91ced54d5c662a02fbee110119d88f408f46733468107",
+      "bytes": 742793
+    },
+    {
+      "file": "runtime/beckon-192-se.png",
+      "sha256": "21ec0f877821ea6fea4c4bd739b70e6ace98af9a8c9aef7f932382c8c1db65ab",
+      "bytes": 713318
+    },
+    {
+      "file": "runtime/beckon-192-e.png",
+      "sha256": "df8f533f54b9a57ca5d0e3aff7fe2d03a195eb824645620e2eccb85fe38e3983",
+      "bytes": 499447
+    },
+    {
+      "file": "runtime/beckon-192-ne.png",
+      "sha256": "b554f38064c9805c38f85aee2ce24853a19aca434898f7c495a4ef832e7c2326",
+      "bytes": 627239
+    },
+    {
+      "file": "runtime/beckon-192-n.png",
+      "sha256": "03b0ad9ae99506c5d4481d7bec107ce57600b9e6167cd4eba8a3626c299fbbe9",
+      "bytes": 674098
+    },
+    {
+      "file": "runtime/beckon-192-nw.png",
+      "sha256": "142b5a9e13a9abba26c17e212df1a411fcf90b2ad9691120f005f5467e71a092",
+      "bytes": 715353
+    },
+    {
+      "file": "runtime/beckon-192-w.png",
+      "sha256": "dc900d97c3cce9a6a2ccf5524551d33657b87b58671feb079f798d6ebed78d9f",
+      "bytes": 486809
+    },
+    {
+      "file": "runtime/beckon-192-sw.png",
+      "sha256": "92c128e5ec3edac1057aaa97b26c80c31c39adb403c597e8d2477cd9c584dc55",
+      "bytes": 712047
+    },
+    {
+      "file": "founder-actions.glb",
+      "sha256": "5c89054e6d3a0b04572993a61afc12cad8d0c6438872e384fc8ad330a7cf4e6b",
+      "bytes": 902428
+    },
+    {
+      "file": "founder-walk.glb",
+      "sha256": "481046ab05bed843d3b16bcbccf96121499dce8d9718eed88a7c55b7249efbf9",
+      "bytes": 452568
+    }
+  ],
+  "repeatExact": true,
+  "sourceMode": "blender-scene",
+  "renderStyle": {
+    "profile": "settlement-v2",
+    "physicalMaterials": true,
+    "normalMaps": true,
+    "selfShadows": true,
+    "samples": [
+      384,
+      504
+    ]
+  },
+  "anatomy": "adult-traveler-v1",
+  "runtimeRows": {
+    "sizes": [
+      128,
+      192
+    ],
+    "views": 8,
+    "pattern": "runtime/{action}-{size}-{direction}.png"
+  }
+}

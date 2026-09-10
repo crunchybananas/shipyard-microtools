@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Founder in the world — Realm</title>
+  <link rel="stylesheet" href="walk-studio.css">
+  <link rel="icon" href="data:,">
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js"}}</script>
+</head>
+<body>
+  <header class="masthead"><a class="brand" href="index.html">Realm</a><span>Character workshop</span><a href="index.html" title="Play Realm, then select Founder or press F">Play with the Founder →</a></header>
+  <main>
+    <div class="introduction"><div><h1>The Founder, in the world.</h1><p>Worn leather. Woven cloth. The light before the work begins.</p></div><span class="ready" id="load-status" role="status">Preparing the actions…</span></div>
+    <section class="workshop" aria-label="Interactive Founder animation study">
+      <aside class="controls">
+        <div><h2 id="action-title">Work over there</h2><p id="action-description">Look first, then give the work a clear direction.</p></div>
+        <div class="mode-list" role="group" aria-label="Preview mode">
+          <button data-mode="detail" aria-pressed="true"><span>Living scene</span><small>Materials, light, and a place to begin</small></button>
+          <button data-mode="cycle" aria-pressed="false"><span>Action study</span><small>Watch a gesture unfold</small></button>
+          <button data-mode="roam" aria-pressed="false"><span>Walk around</span><small>Click the ground or use WASD</small></button>
+          <button data-mode="source" aria-pressed="false"><span>3D source</span><small>Drag to turn the actual rig</small></button>
+          <button data-mode="compare" aria-pressed="false"><span>Compare</span><small>The current settler alongside</small></button>
+        </div>
+        <div id="material-controls" class="material-controls">
+          <div class="light-presets" role="group" aria-label="Scene lighting">
+            <button data-light="day" aria-pressed="true">Morning</button><button data-light="overcast" aria-pressed="false">Cloud</button><button data-light="dusk" aria-pressed="false">Lanterns</button>
+          </div>
+          <label class="detail-field" for="light-angle">Move the light <input id="light-angle" type="range" min="-180" max="180" value="-35"></label>
+          <label class="detail-field" for="detail-zoom">Come closer <input id="detail-zoom" type="range" min="1" max="1.85" step="0.01" value="1"></label>
+          <label><input id="surface-detail" type="checkbox" checked> Surface detail</label>
+          <label><input id="wireframe" type="checkbox"> See the mesh</label>
+          <details class="render-settings"><summary>Rendering</summary><label for="render-quality">Quality</label><select id="render-quality"><option value="auto">Automatic</option><option value="high">High</option><option value="low">Light</option></select><p id="render-stats" role="status">Preparing the live scene…</p><p>WebGL2 · live light and shadows. Detail maps follow the animated mesh.</p></details>
+        </div>
+        <div class="options">
+          <label class="field">Playback <select id="rate"><option value="0.25">Quarter speed</option><option value="0.5">Half speed</option><option value="1" selected>Normal speed</option><option value="1.5">Brisk</option></select></label>
+          <label><input id="contacts" type="checkbox"> Show foot contacts</label>
+          <label><input id="onion" type="checkbox"> Show neighboring poses</label>
+          <label><input id="turns" type="checkbox"> Turn through eight views</label>
+        </div>
+        <div class="scale-study"><span>At settlement scale</span><canvas id="small" width="220" height="82" aria-label="Founder at normal and twice normal gameplay scale"></canvas></div>
+        <p class="control-note" id="control-note">Pause or scrub to inspect a key pose. Changing direction keeps the same gesture.</p>
+      </aside>
+      <div class="stage-column">
+        <div class="action-tabs" role="group" aria-label="Founder action">
+          <button data-action="walk" aria-pressed="false">Walk</button>
+          <button data-action="idle" aria-pressed="false">Take stock</button>
+          <button data-action="point" aria-pressed="true">Work over there</button>
+          <button data-action="beckon" aria-pressed="false">Come with me</button>
+        </div>
+        <div id="stage" tabindex="0" aria-label="Character preview. In Walk around mode use arrow keys or WASD to move; Shift walks faster.">
+          <canvas id="scene" aria-label="Animated Founder"></canvas>
+          <div class="stage-label"><span id="view-label">Southeast</span><span id="pose-label">Pose 1 / 48</span></div>
+          <span class="stage-hint" id="stage-hint">Look first. Gather the hand. Indicate the work. Let the arm settle.</span>
+          <div class="contact-readout" id="contact-readout" hidden><span id="left-foot">Left foot</span><span id="right-foot">Right foot</span></div>
+        </div>
+        <div class="transport">
+          <button id="play" class="play" aria-label="Pause animation">Pause</button>
+          <button id="previous" aria-label="Previous pose">‹</button>
+          <input id="phase" type="range" min="0" max="47" step="1" value="0" aria-label="Animation pose">
+          <button id="next" aria-label="Next pose">›</button>
+        </div>
+        <div id="beats" class="beats" role="group" aria-label="Named key poses"></div>
+      </div>
+    </section>
+    <section class="angles" aria-label="Eight animation directions"><div class="angle-heading"><h2>Every side of the same character</h2><span>Select a direction to hold it</span></div><div id="directions" class="direction-grid"></div></section>
+    <footer>
+      <p>Based on the character and original motion by <a href="https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0">Kay Lousberg / KayKit</a> (CC0). Realm adds adult proportions, fitted sleeves and clothing details, grounded motion, standing gestures, and material surfaces. Limestone was generated on Bender through Peel with FLUX.1-schnell. The sprite maps share this character’s material palette.</p>
+      <div><a id="download-map" href="assets/sprites/founder/point-128.png" download="founder-point.png">Download this action</a><a href="assets/sprites/founder/founder-actions.blend" download>Animation in Blender</a><a href="assets/sprites/founder/README.md">Source notes</a></div>
+    </footer>
+  </main>
+  <script type="module" src="scripts/founder-sprites/studio.js"></script>
+</body>
+</html>

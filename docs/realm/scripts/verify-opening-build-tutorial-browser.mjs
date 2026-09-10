@@ -122,6 +122,15 @@ desktop.on('console', message => {
 try {
   await mkdir(proofDir, { recursive: true });
   await startFresh(desktop, 'Opening Truth Gate');
+  const welcomeContinuity = await desktop.evaluate(async () => {
+    const { updateTutorialTip } = await import('./js/ui.js?realm=198');
+    const button = document.querySelector('.tut-next');
+    button.focus();
+    for (let i = 0; i < 60; i++) updateTutorialTip();
+    return { sameButton: button === document.querySelector('.tut-next'), focused: document.activeElement === button };
+  });
+  assert.equal(welcomeContinuity.sameButton, true, 'ordinary updates replace a tutorial button during interaction');
+  assert.equal(welcomeContinuity.focused, true, 'ordinary updates lose tutorial keyboard focus');
   const guided = await acknowledgeWelcome(desktop);
   assert.equal(guided.selectedBuild, null);
   assert.equal(guided.farmActive, false);

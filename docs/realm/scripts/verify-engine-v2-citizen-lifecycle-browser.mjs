@@ -470,11 +470,19 @@ try {
         'Citizen info panel was not tagged by stable actor ID',
       );
       requireCondition(g.selectedCitizenId === target.actorId, 'Canvas selection did not select by actor ID');
+      const citizenPanelRows = Object.fromEntries([...citizenPanel.querySelectorAll('.ip-row')].map(row => [
+        compactText(row.querySelector('.ip-label')), compactText(row.querySelector('.ip-val')),
+      ]));
       requireCondition(
         citizenPanelText.includes(selectedSnapshot.identity.name)
-          && citizenPanelText.includes(selectedSnapshot.profession.kind)
-          && citizenPanelText.includes(selectedSnapshot.activity.reason),
+          && citizenPanelRows.Vocation?.toLowerCase() === selectedSnapshot.profession.kind
+          && selectedSnapshot.activity.kind === 'idle'
+          && compactText(citizenPanel.querySelector('.ip-desc')) === 'Idle',
         'Citizen info panel disagrees with its presentation snapshot',
+      );
+      requireCondition(
+        !citizenPanelText.includes(selectedSnapshot.activity.reason),
+        'Citizen panel exposes an internal activity reason instead of its player-facing state',
       );
       requireCondition(
         Object.isFrozen(selectedSnapshot)

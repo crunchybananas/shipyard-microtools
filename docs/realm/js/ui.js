@@ -6,6 +6,7 @@ import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } f
 import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=198';
 import { getWonderReport } from './wonder.js?realm=198';
 import { panCameraTo } from './render.js?realm=198';
+import { houseConstructionStage, houseFamilyReady } from './house-presentation.js?realm=198';
 import { dispatch } from './commands.js?realm=198';
 import { missions } from './missions.js?realm=198';
 import { getActiveScenario } from './scenarios.js?realm=198';
@@ -157,6 +158,7 @@ const SUPPORT_ATLAS_TYPES = [
 ];
 
 function buildAtlasIcon(type) {
+  if (type === 'house') return '<span class="build-sprite house-sprite" style="--atlas:url(\'assets/sprites/architecture/homes/icon.png\')" aria-hidden="true"></span>';
   const supportIdx = SUPPORT_ATLAS_TYPES.indexOf(type);
   const coreIdx = BUILDING_ATLAS_TYPES.indexOf(type);
   const idx = supportIdx >= 0 ? supportIdx : coreIdx;
@@ -1055,6 +1057,7 @@ export function showInfoPanel(b) {
     const crewNames = crew.map(worker => escapeHtml(worker.identity.name)).join(', ');
     html += `
       <div class="ip-desc">🔨 Under construction</div>
+      ${b.type === 'house' && houseFamilyReady() ? `<div class="ip-row"><span class="ip-label">Stage</span><span class="ip-val">${houseConstructionStage(b)}</span></div>` : ''}
       <div class="ip-row"><span class="ip-label">Progress</span><span class="ip-val">${Math.round(buildProgress * 100)}%</span></div>
       ${capacity > 0
         ? `<div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">${crew.length}/${capacity}${crewNames ? ' — ' + crewNames : ''}</span></div>`
@@ -1656,6 +1659,7 @@ const TUTORIAL_STEPS = [
 let tutorialStep = 0;
 let tutorialDismissed = false;
 let tutorialWelcomeAcknowledged = false;
+let tutorialMarkup = null;
 
 function reconcileOpeningTutorial() {
   const hasFarm = G.buildings.some(building => building.type === 'farm');
@@ -1711,31 +1715,39 @@ export function updateTutorialTip() {
   const tutorialText = current.id === 'done'
     ? `${current.text} The first raid is expected on Day ${getActiveScenario().raidStart}. Open the 📖 Chronicle to read your story!`
     : current.text;
-  tipEl.innerHTML = `
+  const markup = `
     <div class="tut-text">${tutorialText}</div>
     ${current.action ? `<div class="tut-action">${current.action}</div>` : ''}
     ${current.continueLabel ? `<button class="tut-next" type="button">${current.continueLabel}</button>` : ''}
     <div class="tut-progress">Step ${tutorialStep + 1} of ${TUTORIAL_STEPS.length}</div>
     <button class="tut-skip" onclick="dismissTutorial()">Skip tutorial</button>
   `;
+  // Keep focused/pressed controls alive during ordinary HUD refreshes. Replacing
+  // an unchanged button between pointerdown and pointerup can swallow a click.
+  if (tutorialMarkup !== markup) {
+    tipEl.innerHTML = markup;
+    tutorialMarkup = markup;
+    tipEl.querySelector('.tut-next')?.addEventListener('click', () => {
+      tutorialWelcomeAcknowledged = true;
+      updateTutorialTip();
+    });
+  }
   tipEl.style.display = 'block';
 
-  tipEl.querySelector('.tut-next')?.addEventListener('click', () => {
-    tutorialWelcomeAcknowledged = true;
-    updateTutorialTip();
-  });
-
-  // Highlight relevant UI element
+  // Build-bar nodes can change with unlocks, but a stable target should retain
+  // its animation rather than restarting the pulse on every update.
+  const highlighted = current.highlight && (!current.highlightWhen || current.highlightWhen())
+    ? document.querySelector(current.highlight) : null;
   document.querySelectorAll('.tut-highlight').forEach(e => {
-    e.classList.remove('tut-highlight');
-    e.removeAttribute('data-tutorial-hint');
-  });
-  if (current.highlight && (!current.highlightWhen || current.highlightWhen())) {
-    const el = document.querySelector(current.highlight);
-    if (el) {
-      el.classList.add('tut-highlight');
-      el.dataset.tutorialHint = current.hint || 'Next';
+    if (e !== highlighted) {
+      e.classList.remove('tut-highlight');
+      e.removeAttribute('data-tutorial-hint');
     }
+  });
+  if (highlighted) {
+    highlighted.classList.add('tut-highlight');
+    const hint = current.hint || 'Next';
+    if (highlighted.dataset.tutorialHint !== hint) highlighted.dataset.tutorialHint = hint;
   }
 }
 
@@ -1743,6 +1755,7 @@ export function resetTutorial() {
   tutorialStep = 0;
   tutorialDismissed = false;
   tutorialWelcomeAcknowledged = false;
+  tutorialMarkup = null;
   document.querySelectorAll('.tut-highlight').forEach(element => {
     element.classList.remove('tut-highlight');
     element.removeAttribute('data-tutorial-hint');

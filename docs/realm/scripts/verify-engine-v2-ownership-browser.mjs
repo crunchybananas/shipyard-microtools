@@ -416,7 +416,7 @@ try {
     window.forceRender();
     const victimRecord = renderCache.citizenRenderRecord(victimActorId);
     victimRecord.animationKey = 'death-spawn-lifecycle-sentinel';
-    victimRecord.laneX = 0.375;
+    victimRecord.motion = { phase: 0.375, sentinel: 'dead-actor-motion' };
 
     // updateEnemies() owns the canonical combat-death cleanup path. It releases
     // assignment state, removes the citizen, advances death accounting, and
@@ -465,7 +465,7 @@ try {
     requireCondition(spawnedRecord, 'Full render did not create the spawned actor render record');
     requireCondition(
       spawnedRecord.animationKey !== 'death-spawn-lifecycle-sentinel'
-        && spawnedRecord.laneX !== 0.375,
+        && spawnedRecord.motion?.sentinel !== 'dead-actor-motion',
       'Spawned actor inherited renderer continuity from the dead actor',
     );
     requireCondition(

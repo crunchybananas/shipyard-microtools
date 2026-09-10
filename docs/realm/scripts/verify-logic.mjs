@@ -816,18 +816,26 @@ rec(
 // Test: 261 — render desaturation CSS filter applies when G.realmEnded toggles
 const realmEndFilter = await page.evaluate(async () => {
   window.G.debug.pauseRendering = false;
+  const waitForFilter = async expected => {
+    const deadline = performance.now() + 1500;
+    // Painting is capped independently of display refresh. Two rAF callbacks
+    // can both occur before the next real paint on a high-refresh display.
+    while (performance.now() < deadline) {
+      const filter = document.getElementById('game').style.filter || '';
+      if (expected(filter)) return filter;
+      await new Promise(requestAnimationFrame);
+    }
+    return document.getElementById('game').style.filter || '';
+  };
   // Reset
   window.G.realmEnded = false;
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  const preFilter = document.getElementById('game').style.filter || '';
+  const preFilter = await waitForFilter(filter => filter === '');
   // Trigger
   window.G.realmEnded = true;
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  const postFilter = document.getElementById('game').style.filter || '';
+  const postFilter = await waitForFilter(filter => filter.includes('grayscale'));
   // Restore
   window.G.realmEnded = false;
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  const restoreFilter = document.getElementById('game').style.filter || '';
+  const restoreFilter = await waitForFilter(filter => filter === '');
   window.G.debug.pauseRendering = true;
   return { preFilter, postFilter, restoreFilter };
 });

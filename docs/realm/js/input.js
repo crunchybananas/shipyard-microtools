@@ -10,6 +10,7 @@ import { notify } from './notifications.js?realm=198';
 import { initAudio } from './audio.js?realm=198';
 import { cancelBuildMode, renderBuildBar, updateUI, updateTutorialTip, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=198';
 import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=198';
+import { hitHouse } from './house-presentation.js?realm=198';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -26,19 +27,25 @@ function pickTile(clientX, clientY) {
   return screenToWorld(clientX, clientY);
 }
 
+function pointerToIso(clientX, clientY) {
+  const rect = document.getElementById('game').getBoundingClientRect();
+  // Camera coordinates are logical CSS pixels. The renderer scales its
+  // backing canvas for Retina separately; multiplying a pointer by that DPR
+  // displaces the selection target away from the visible character/building.
+  return {
+    x: (clientX - rect.left - rect.width / 2) / G.camera.zoom + G.camera.x,
+    y: (clientY - rect.top - rect.height / 2) / G.camera.zoom + G.camera.y,
+  };
+}
+
 // Standard isometric hit test: screen-space bounding box, depth-sorted (front wins)
 function findBuildingAtClick(clientX, clientY) {
-  const C = document.getElementById('game');
-  const rect = C.getBoundingClientRect();
-  // Convert click to canvas pixels, then to world iso-screen coords
-  const cpx = (clientX - rect.left) * (C.width / rect.width);
-  const cpy = (clientY - rect.top) * (C.height / rect.height);
-  const wx = (cpx - C.width/2) / G.camera.zoom + G.camera.x;
-  const wy = (cpy - C.height/2) / G.camera.zoom + G.camera.y;
+  const { x: wx, y: wy } = pointerToIso(clientX, clientY);
 
   // Test all buildings, keep the frontmost (highest screen Y = closest to camera) hit
   let best = null, bestY = -Infinity;
   for (const b of G.buildings) {
+    if (G.fog[b.y]?.[b.x] === false) continue;
     const bs = toScreen(b.x, b.y);
     // Screen-space bounding box of the building sprite. Buildings render with
     // a 1.3x scale around (bs.x, bs.y); box widened to cover the visible sprite
@@ -48,7 +55,8 @@ function findBuildingAtClick(clientX, clientY) {
     const hitTop    = bs.y - 56;
     const hitBottom = bs.y + 16;
 
-    if (wx >= hitLeft && wx <= hitRight && wy >= hitTop && wy <= hitBottom) {
+    const authoredHit = hitHouse(b, bs, wx, wy);
+    if (authoredHit ?? (wx >= hitLeft && wx <= hitRight && wy >= hitTop && wy <= hitBottom)) {
       // Depth sort: higher bs.y = rendered later = in front
       if (bs.y > bestY) {
         bestY = bs.y;
@@ -61,12 +69,7 @@ function findBuildingAtClick(clientX, clientY) {
 
 // Find citizen at screen position — small radius around citizen sprite
 function findCitizenAtClick(clientX, clientY) {
-  const C = document.getElementById('game');
-  const rect = C.getBoundingClientRect();
-  const cpx = (clientX - rect.left) * (C.width / rect.width);
-  const cpy = (clientY - rect.top) * (C.height / rect.height);
-  const wx = (cpx - C.width/2) / G.camera.zoom + G.camera.x;
-  const wy = (cpy - C.height/2) / G.camera.zoom + G.camera.y;
+  const { x: wx, y: wy } = pointerToIso(clientX, clientY);
 
   let best = null, bestDist = Infinity;
   for (const c of buildCurrentCitizenPresentations()) {
@@ -97,7 +100,7 @@ function showCitizenPanel(c) {
   if (!panel) return;
   const stateLabels = {
     idle:'Idle', find_job:'Looking for work', walk_to_work:'Walking to work',
-    working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
+    working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering', needs_delivery:'Waiting for storage',
     foraging:'Foraging', walk_to_eat:'Going to eat',
     waiting_for_food:'Waiting for food', eating:'Eating',
     go_home:'Heading home', sleep:'Sleeping', leisure:'Off to unwind',
@@ -111,20 +114,17 @@ function showCitizenPanel(c) {
     : 'Unassigned';
   const management = assigned?.reason === 'player-command'
     ? '👑 Crown order'
-    : assigned ? 'AI assigned' : 'AI available';
+    : assigned ? 'Settlement work' : 'Available for work';
   const carrying = c.carrying ? `${c.carryAmount} ${c.carrying}` : 'Nothing';
   const home = c.home ? `House at ${c.home.x}, ${c.home.y}` : 'No home';
-  const whereabouts = c.indoors ? 'Inside at home' : state;
   const safe = {
     name: escapeHtml(c.identity.name),
     state: escapeHtml(state),
-    profession: escapeHtml(c.profession.kind),
+    profession: escapeHtml(c.profession.kind.charAt(0).toUpperCase() + c.profession.kind.slice(1)),
     job: escapeHtml(job),
     management: escapeHtml(management),
-    reason: escapeHtml(c.activity.reason),
     carrying: escapeHtml(carrying),
     home: escapeHtml(home),
-    whereabouts: escapeHtml(whereabouts),
   };
 
   panel.innerHTML = `
@@ -132,19 +132,17 @@ function showCitizenPanel(c) {
       <span class="ip-title">👤 ${safe.name}</span>
       <button class="ip-close" onclick="hideInfoPanel()">✕</button>
     </div>
-    <div class="ip-desc">${safe.state}</div>
+    <div class="ip-desc">${c.indoors ? 'At home · ' : ''}${safe.state}</div>
     <div class="ip-row"><span class="ip-label">Vocation</span><span class="ip-val">${safe.profession}</span></div>
     <div class="ip-row"><span class="ip-label">Assignment</span><span class="ip-val">${safe.job}</span></div>
     <div class="ip-row"><span class="ip-label">Work order</span><span class="ip-val">${safe.management}</span></div>
-    <div class="ip-row"><span class="ip-label">Activity</span><span class="ip-val">${safe.state} · ${safe.reason}</span></div>
     <div class="ip-row"><span class="ip-label">Home</span><span class="ip-val">${safe.home}</span></div>
-    <div class="ip-row"><span class="ip-label">Whereabouts</span><span class="ip-val">${safe.whereabouts}</span></div>
     <div class="ip-row"><span class="ip-label">Carrying</span><span class="ip-val">${safe.carrying}</span></div>
     <div class="ip-row"><span class="ip-label">Hunger</span><span class="ip-val">${Math.round(c.hunger)}%</span></div>
     <div class="ip-row"><span class="ip-label">Energy</span><span class="ip-val">${Math.round(c.rest ?? 100)}%</span></div>
     <div class="ip-row"><span class="ip-label">Joy</span><span class="ip-val">${Math.round(c.needs.joy)}%</span></div>
     <div class="ip-row"><span class="ip-label">Faith</span><span class="ip-val">${Math.round(c.needs.faith)}%</span></div>
-    <div class="ip-hint">Open Population to issue a work order or return this citizen to the AI.</div>
+    <div class="ip-hint">Open Population to assign work or let this citizen choose a job.</div>
   `;
   panel.dataset.citizenActorId = String(c.actorId);
   panel.style.display = 'block';
@@ -360,6 +358,10 @@ export function setupInput(canvas) {
       G.camera.y = G.camStart.y - (e.clientY - G.dragStart.y) / G.camera.zoom;
     }
     G.hoveredTile = pickTile(e.clientX, e.clientY);
+    if (!G.selectedBuild && !G._placingRally && !G.dragging && !document.body.classList.contains('company-objective-placement')) {
+      const building = findBuildingAtClick(e.clientX, e.clientY);
+      if (building) G.hoveredTile = {x: building.x, y: building.y};
+    }
     G.mouseX = e.clientX; G.mouseY = e.clientY;
   }
   C.addEventListener('mousemove', onMouseMove);

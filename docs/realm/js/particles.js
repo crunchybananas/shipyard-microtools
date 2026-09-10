@@ -4,6 +4,7 @@
 
 import { G } from './state.js?realm=198';
 import { workersForBuilding } from './citizen-ownership.js?realm=198';
+import { houseChimney } from './house-presentation.js?realm=198';
 
 export function updateParticles() {
   for (let i = G.particles.length - 1; i >= 0; i--) {
@@ -48,17 +49,19 @@ export function updateParticles() {
   }
 }
 
-export function spawnSmoke(tx, ty) {
+export function spawnSmoke(tx, ty, mouth = null) {
+  const jitter = mouth ? .02 : .1;
   G.particles.push({
-    tx: tx + (Math.random() - 0.5) * 0.1,
-    ty: ty + (Math.random() - 0.5) * 0.1,
-    offsetY: -30 - Math.random() * 5,
+    tx: tx + (Math.random() - 0.5) * jitter,
+    ty: ty + (Math.random() - 0.5) * jitter,
+    offsetX: mouth?.x || 0,
+    offsetY: (mouth?.y ?? -50) - Math.random() * (mouth ? 1 : 5),
     text: null,
-    alpha: 0.45 + Math.random() * 0.15,
+    alpha: mouth ? .30 + Math.random() * .06 : 0.45 + Math.random() * 0.15,
     vy: -0.2 - Math.random() * 0.1,  // faster rise
     decay: 0.002 + Math.random() * 0.002, // longer lifetime
     type: 'smoke',
-    size: 2 + Math.random() * 1.5,  // bigger
+    size: mouth ? .7 + Math.random() * .35 : 2 + Math.random() * 1.5,
   });
 }
 
@@ -67,8 +70,9 @@ export function updateSmokeEmitters() {
   if (G.particles.length > 400) return;
   if (G.gameTick % 8 !== 0) return;
   for (const b of G.buildings) {
+    if (b.buildProgress < 1 || !G.fog[b.y]?.[b.x]) continue;
     if (b.type === 'house' || b.type === 'tavern' || b.type === 'lumber') {
-      if (G.particles.length < 200) spawnSmoke(b.x, b.y);
+      if (G.particles.length < 200) spawnSmoke(b.x, b.y, houseChimney(b));
     }
     if (b.type === 'blacksmith' && workersForBuilding(b).length > 0) {
       if (G.particles.length < 250) {

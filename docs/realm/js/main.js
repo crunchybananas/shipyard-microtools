@@ -127,6 +127,14 @@ resizeCanvas();
 initPostFX(canvas);
 window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); });
 
+// Research and phone layouts change the build bar's height. Keep the map
+// above its actual bounds so it never covers a building or Cancel target.
+const buildBarLayout = new ResizeObserver(entries => {
+  const height = Math.ceil(entries[0].target.getBoundingClientRect().height);
+  document.documentElement.style.setProperty('--realm-build-bar-height', `${height}px`);
+});
+buildBarLayout.observe(document.getElementById('build-bar'));
+
 // Query-gated visual verification hook for the sprite production pipeline.
 // The in-app browser can inspect DOM attributes reliably even when its generic
 // tab screenshot path times out on Realm's two high-resolution canvases.

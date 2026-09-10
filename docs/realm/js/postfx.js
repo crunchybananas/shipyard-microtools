@@ -124,12 +124,13 @@ void main() {
   color.r = mix(color.r, r, 0.4);
   color.b = mix(color.b, b, 0.4);
 
-  // ── Contrast S-curve ──
-  color.rgb = smoothstep(vec3(0.0), vec3(1.0), color.rgb * 1.02 - 0.006);
+  // Preserve diffuse midtones. A full smoothstep curve crushed soil and
+  // cloth into black while turning roof highlights into saturated yellow.
+  color.rgb = (color.rgb - 0.5) * 1.035 + 0.5;
 
   // ── Film Grain (subtle) ──
   float grain = fract(sin(dot(uv * u_resolution + u_time * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
-  float grainIntensity = mix(0.02, 0.05, 1.0 - u_daylight);
+  float grainIntensity = mix(0.004, 0.008, 1.0 - u_daylight);
   color.rgb += (grain - 0.5) * grainIntensity;
 
   // ── Edge darkening (pseudo-AO) ──

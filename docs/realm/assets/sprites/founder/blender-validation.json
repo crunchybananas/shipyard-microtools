@@ -1,0 +1,12 @@
+{
+  "frames": 24,
+  "jointsPerFrame": 4,
+  "maxWorldError": 1.3868891052146469e-07,
+  "cycleSeconds": 1.0666667222976685,
+  "actionFrames": [
+    [
+      1.0,
+      25.0
+    ]
+  ]
+}

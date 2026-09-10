@@ -21,6 +21,7 @@ import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.
 import { startResearch } from './tech.js?realm=198';
 import { executeTrade } from './trade.js?realm=198';
 import { avatarMove, avatarGoto } from './avatar.js?realm=198';
+import { emit } from './bus.js?realm=198';
 import { queueRecruit } from './military.js?realm=198';
 import { setBuildingWorkforcePriority } from './workforce-policy.js?realm=198';
 import { choosePostRaidDoctrine } from './post-raid-recovery.js?realm=198';
@@ -344,6 +345,7 @@ export function dispatch(cmd) {
     G._commandLog = G._commandLog || [];
     G._commandLog.push(Object.freeze({ ...command, tick: G.gameTick }));
     if (G._commandLog.length > LOG_CAP) G._commandLog.splice(0, G._commandLog.length - LOG_CAP);
+    emit('command-applied', Object.freeze({ ...command, tick: G.gameTick }));
   }
   return res;
 }

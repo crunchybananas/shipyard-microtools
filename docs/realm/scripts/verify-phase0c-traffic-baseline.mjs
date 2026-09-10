@@ -28,7 +28,7 @@ import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=19
 
 const RECORDED_REVISION = 198;
 const RECORDED_SAVE_VERSION = 7;
-const RECORDED_SIMULATION_VERSION = 10;
+const RECORDED_SIMULATION_VERSION = 11;
 const MINIMUM_ACTOR_SEPARATION = 0.295;
 
 function rounded(value, digits = 12) {

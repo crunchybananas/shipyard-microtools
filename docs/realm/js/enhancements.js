@@ -5,12 +5,13 @@
 // deleted rather than left as registered no-ops.
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=198';
+import { G, TILE, TW, TH, MAP_W, MAP_H, BUILDINGS, getDaylight } from './state.js?realm=198';
 import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=198';
 import { makeAtlasLoader } from './atlas-loader.js?realm=198';
 import { citizenStaffingCapacity, staffingCount } from './citizen-ownership.js?realm=198';
 import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=198';
 import { citizenRenderRecord } from './citizen-render-cache.js?realm=198';
+import { houseConstructionStage, houseFamilyReady } from './house-presentation.js?realm=198';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
@@ -139,49 +140,6 @@ export function renderSnowmen(ctx) {
     ctx.moveTo(s.x + 2.3, s.y - 4); ctx.lineTo(s.x + 5, s.y - 6);
     ctx.stroke();
   }
-}
-
-// ── Loop 20: Sun lens flare (animates with day phase) ──────
-export function renderLensFlare(ctx, logicalW, logicalH) {
-  const dayl = getDaylight();
-  if (dayl < 0.6) return;
-  const t = G.dayPhase / G.dayLength;
-  // Sun horizontally moves across upper area — left at dawn, right at dusk
-  const sunFrac = Math.min(1, Math.max(0, (t - 0.05) / 0.7));
-  const sx = sunFrac * logicalW * 0.85 + logicalW * 0.075;
-  const sy = logicalH * 0.18;
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  // Main sun glow
-  const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, 90);
-  grad.addColorStop(0, `rgba(255,250,210,${dayl * 0.55})`);
-  grad.addColorStop(0.4, `rgba(255,210,140,${dayl * 0.18})`);
-  grad.addColorStop(1, 'rgba(255,210,140,0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(sx, sy, 90, 0, Math.PI * 2);
-  ctx.fill();
-  // Lens flare ghosts along axis from sun through screen center
-  const cx = logicalW / 2, cy = logicalH / 2;
-  const dx = cx - sx, dy = cy - sy;
-  const flareSpots = [
-    { t: 0.5, r: 28, color: `rgba(255,170,80,${dayl * 0.15})` },
-    { t: 0.85, r: 18, color: `rgba(160,200,255,${dayl * 0.12})` },
-    { t: 1.2,  r: 38, color: `rgba(255,100,160,${dayl * 0.10})` },
-    { t: 1.55, r: 12, color: `rgba(180,255,180,${dayl * 0.13})` },
-  ];
-  for (const f of flareSpots) {
-    const fx = sx + dx * f.t;
-    const fy = sy + dy * f.t;
-    const fg = ctx.createRadialGradient(fx, fy, 0, fx, fy, f.r);
-    fg.addColorStop(0, f.color);
-    fg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = fg;
-    ctx.beginPath();
-    ctx.arc(fx, fy, f.r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
 }
 
 // ── Loop 19: Footprints in snow (winter only) ──────────────
@@ -606,80 +564,6 @@ export function renderCarts(ctx) {
     drawAmbientSprite(ctx, 'cart', s.x, s.y + 8 + bob, 48, 38, 1, mdx < 0);
   }
   ctx.globalAlpha = 1;
-}
-
-// ── Loop 12: Festival lanterns strung between adjacent houses
-// When two houses are close (≤ 3 tiles), draw a string of glowing
-// lanterns between them. Active any time, brighter at night.
-function lanternColor(idx) {
-  return ['#ff8c4a','#ffd166','#ffb0c8','#a4f0ff','#c0ffae'][idx % 5];
-}
-export function renderLanterns(ctx) {
-  if (G.camera.zoom < 0.7) return;
-  const houses = G.buildings.filter(b => b.type === 'house' || b.type === 'tavern');
-  if (houses.length < 2) return;
-  const dayl = getDaylight();
-  const nightStrength = Math.max(0, Math.min(1, (0.85 - dayl) / 0.4));
-  ctx.save();
-  // Find pairs of close houses (each pair drawn once, dedupe by sorted id)
-  const seen = new Set();
-  for (let i = 0; i < houses.length; i++) {
-    for (let j = i + 1; j < houses.length; j++) {
-      const a = houses[i], b = houses[j];
-      const dx = a.x - b.x, dy = a.y - b.y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 > 9) continue; // > 3 tiles
-      const key = i + ':' + j;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      const sa = toScreen(a.x, a.y);
-      const sb = toScreen(b.x, b.y);
-      const ax = sa.x, ay = sa.y - 22;
-      const bx = sb.x, by = sb.y - 22;
-      // Sag the string
-      const cx = (ax + bx) / 2;
-      const cy = (ay + by) / 2 + 8;
-      // Draw rope
-      ctx.strokeStyle = 'rgba(40,28,16,0.7)';
-      ctx.lineWidth = 0.6;
-      ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      ctx.quadraticCurveTo(cx, cy, bx, by);
-      ctx.stroke();
-      // Lanterns at parameter steps
-      const N = 5;
-      for (let k = 1; k < N; k++) {
-        const t = k / N;
-        const lx = (1 - t) * (1 - t) * ax + 2 * (1 - t) * t * cx + t * t * bx;
-        const ly = (1 - t) * (1 - t) * ay + 2 * (1 - t) * t * cy + t * t * by;
-        const col = lanternColor((i + j + k));
-        // Glow halo (additive at night)
-        if (nightStrength > 0.05) {
-          ctx.globalCompositeOperation = 'screen';
-          ctx.globalAlpha = nightStrength * 0.7;
-          const grad = ctx.createRadialGradient(lx, ly, 0, lx, ly, 8);
-          grad.addColorStop(0, col);
-          grad.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.arc(lx, ly, 8, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalCompositeOperation = 'source-over';
-          ctx.globalAlpha = 1;
-        }
-        // Lantern body
-        ctx.fillStyle = col;
-        ctx.beginPath();
-        ctx.ellipse(lx, ly, 1.6, 2.2, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Cap & base
-        ctx.fillStyle = '#3a2410';
-        ctx.fillRect(lx - 1.2, ly - 2.6, 2.4, 0.6);
-        ctx.fillRect(lx - 1, ly + 2, 2, 0.5);
-      }
-    }
-  }
-  ctx.restore();
 }
 
 // ── Loop 11: Dawn ground mist drifting over land ───────────
@@ -2115,29 +1999,6 @@ function renderCitizenTrails(ctx) {
 registerUpdater(updateCitizenTrails);
 registerWorldRenderer(renderCitizenTrails);
 
-// ── Loop 44: Glowing windows on houses at night ────────────
-function renderHouseWindows(ctx) {
-  const dayl = getDaylight();
-  const ns = Math.max(0, Math.min(1, (0.7 - dayl) / 0.3));
-  if (ns < 0.05 || G.camera.zoom < 0.7) return;
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  for (const b of G.buildings) {
-    if (b.type !== 'house' && b.type !== 'tavern') continue;
-    const s = toScreen(b.x, b.y);
-    const flick = 0.85 + 0.15 * Math.sin(G.gameTick * 0.07 + b.x + b.y);
-    const grad = ctx.createRadialGradient(s.x, s.y - 8, 1, s.x, s.y - 8, 14);
-    grad.addColorStop(0, `rgba(255,210,140,${0.55 * ns * flick})`);
-    grad.addColorStop(1, 'rgba(255,210,140,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y - 8, 14, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-registerWorldRenderer(renderHouseWindows);
-
 // ── Loop 45: Rotating windmill blade overlay ────────────────
 function renderWindmillSpin(ctx) {
   if (G.camera.zoom < 0.7) return;
@@ -2209,56 +2070,6 @@ function renderAcorns(ctx) {
 }
 registerUpdater(updateAcorns);
 registerWorldRenderer(renderAcorns);
-
-// ── Loop 47: Coastal tide foam shifts with day phase ───────
-function renderTideFoam(ctx) {
-  if (G.camera.zoom < 0.5) return;
-  const tt = G.gameTick * 0.01;
-  const tideOffset = Math.sin(tt * 0.05) * 0.4; // slow tidal cycle
-  const cx = G.camera.x, cy = G.camera.y;
-  const range = 24 / G.camera.zoom;
-  const tcx = (cx / 32 + cy / 16) / 2;
-  const tcy = (cy / 16 - cx / 32) / 2;
-  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
-  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
-  ctx.save();
-  ctx.fillStyle = 'rgba(240,250,255,0.55)';
-  for (let ty = ty0; ty <= ty1; ty++) {
-    for (let tx = tx0; tx <= tx1; tx++) {
-      if (G.map[ty][tx] !== TILE.SAND) continue;
-      // adjacent water?
-      let nearWater = false;
-      for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
-        if (G.map[ty+dy] && G.map[ty+dy][tx+dx] === TILE.WATER) { nearWater = true; break; }
-      }
-      if (!nearWater) continue;
-      const s = toScreen(tx, ty);
-      const wPhase = ((tx + ty) * 0.6 + tt) % (Math.PI * 2);
-      const len = 8 + Math.sin(wPhase) * 3 + tideOffset * 4;
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 4, len, 1.2, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  ctx.restore();
-}
-registerWorldRenderer(renderTideFoam);
-
-// ── Loop 48: Snow drift mounds on east side of buildings ───
-function renderSnowDrifts(ctx) {
-  if (G.season !== 'winter' || G.camera.zoom < 0.7) return;
-  ctx.fillStyle = 'rgba(245,250,255,0.85)';
-  for (const b of G.buildings) {
-    const s = toScreen(b.x, b.y);
-    ctx.beginPath();
-    ctx.ellipse(s.x + 12, s.y + 4, 7, 2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(s.x + 8, s.y + 5, 4, 1.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-registerWorldRenderer(renderSnowDrifts);
 
 // ── Loop 49: Dust devils swirl on sand in summer ───────────
 function updateDustDevils() {
@@ -2751,67 +2562,6 @@ function renderBunnies(ctx) {
 }
 registerUpdater(updateBunnies);
 registerWorldRenderer(renderBunnies);
-
-// ── Loop 65: Citizen sleeps Z bubbles when at home at night
-function renderSleepBubbles(ctx) {
-  const t = G.dayPhase / G.dayLength;
-  if (t < 0.78 && t > 0.05) return;
-  if (G.camera.zoom < 0.9) return;
-  const houses = G.buildings.filter(b => b.type === 'house');
-  ctx.fillStyle = 'rgba(220,235,255,0.7)';
-  ctx.font = 'bold 6px monospace';
-  ctx.textAlign = 'center';
-  for (const h of houses) {
-    const s = toScreen(h.x, h.y);
-    const phase = (G.gameTick * 0.04 + h.x + h.y) % 6;
-    const yOff = -phase * 2;
-    const a = (1 - phase / 6) * 0.85;
-    ctx.globalAlpha = a;
-    ctx.fillText('z', s.x + 4, s.y - 18 + yOff);
-  }
-  ctx.globalAlpha = 1;
-}
-registerWorldRenderer(renderSleepBubbles);
-
-// ── Loop 66: Glowing forge embers around blacksmiths ───────
-function renderForgeEmbers(ctx) {
-  if (G.camera.zoom < 0.7) return;
-  const dayl = getDaylight();
-  const tt = G.gameTick * 0.15;
-  for (const b of G.buildings) {
-    if (b.type !== 'blacksmith') continue;
-    const s = toScreen(b.x, b.y);
-    // Floating embers
-    for (let i = 0; i < 5; i++) {
-      const phase = i + (b.x + b.y) * 0.5;
-      const ex = s.x + Math.sin(tt * 0.7 + phase) * 6;
-      const ey = s.y - 6 + (((G.gameTick * 0.3 + i * 7) % 30) - 15);
-      const a = 1 - Math.abs(((G.gameTick * 0.3 + i * 7) % 30) - 15) / 15;
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      ctx.fillStyle = `rgba(255,140,40,${a * 0.85})`;
-      ctx.beginPath();
-      ctx.arc(ex, ey, 0.7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-    // Forge glow
-    if (dayl < 0.7) {
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      const a = (0.7 - dayl) * 0.8;
-      const grad = ctx.createRadialGradient(s.x + 4, s.y - 2, 1, s.x + 4, s.y - 2, 14);
-      grad.addColorStop(0, `rgba(255,150,40,${a})`);
-      grad.addColorStop(1, 'rgba(255,80,0,0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(s.x + 4, s.y - 2, 14, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-}
-registerWorldRenderer(renderForgeEmbers);
 
 // ── Loop 67: Decorative weather vane on church spire ───────
 function renderChurchVane(ctx) {
@@ -3414,31 +3164,6 @@ function renderBeggar(ctx) {
 }
 registerWorldRenderer(renderBeggar);
 
-// ── Loop 86: Stained glass glow from churches at any time ──
-function renderChurchGlow(ctx) {
-  if (G.camera.zoom < 0.7) return;
-  for (const b of G.buildings) {
-    if (b.type !== 'church') continue;
-    const s = toScreen(b.x, b.y);
-    const tt = G.gameTick * 0.05;
-    const colors = ['#c83030','#3060c8','#30c860','#c8c030'];
-    for (let i = 0; i < colors.length; i++) {
-      const x = s.x - 6 + i * 4;
-      const y = s.y - 18;
-      const a = 0.55 + 0.25 * Math.sin(tt + i);
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      ctx.fillStyle = colors[i];
-      ctx.globalAlpha = a;
-      ctx.beginPath();
-      ctx.ellipse(x, y, 1.5, 2, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-}
-registerWorldRenderer(renderChurchGlow);
-
 // ── Loop 87: Long shadows of soldiers extending at sunset ──
 function renderSoldierShadows(ctx) {
   if (!G.soldiers || G.camera.zoom < 0.7) return;
@@ -3682,7 +3407,8 @@ registerUpdater(updateResourceWarnings);
 
 // ── Loop 123: Hover tooltip showing tile type ──────────────
 function renderTileTooltip(ctx, logicalW, logicalH) {
-  if (!G.hoveredTile || G.selectedBuild) return;
+  if (!G.hoveredTile || G.selectedBuild || G.photoMode) return;
+  if (G.fog[G.hoveredTile.y]?.[G.hoveredTile.x] === false) return;
   const names = ['Water','Sand','Grass','Forest','Stone','Iron Ore','Mountain'];
   // Per-terrain hint about what builds there
   const hints = [
@@ -3696,8 +3422,11 @@ function renderTileTooltip(ctx, logicalW, logicalH) {
   ];
   const tile = G.map[G.hoveredTile.y]?.[G.hoveredTile.x];
   if (tile === undefined) return;
-  const label = names[tile] || '?';
-  const hint = hints[tile] || '';
+  const building = G.buildingGrid[G.hoveredTile.y]?.[G.hoveredTile.x];
+  const label = building ? BUILDINGS[building.type]?.name || 'Building' : names[tile] || '?';
+  const hint = building ? building.buildProgress < 1
+    ? building.type === 'house' && houseFamilyReady() ? houseConstructionStage(building) : 'Under construction'
+    : 'Click to inspect' : hints[tile] || '';
   // Position near cursor (use mouse pos if available)
   const mx = (G.mouseX || logicalW / 2) + 14;
   const my = (G.mouseY || logicalH / 2) + 14;
@@ -3754,45 +3483,6 @@ function updateRaidBanner() {
   }
 }
 registerUpdater(updateRaidBanner);
-
-// ── Loop 125 + S4 L72: Production efficiency arc ──────────
-// Flat fill bar under building was fine but read like a UI element.
-// Replaced with a subtle arc ring drawn around the building base —
-// fills clockwise as the building gets closer to producing. Reads
-// as a cooldown meter (RPG / RTS convention) and doesn't fight the
-// building silhouette.
-function renderEfficiencyBars(ctx) {
-  if (G.camera.zoom < 0.8) return;
-  for (const b of G.buildings) {
-    if (!b.prodTimer) continue;
-    const s = toScreen(b.x, b.y);
-    const pct = Math.min(1, (b.prodTimer || 0) / 120);
-    if (pct <= 0) continue;
-    // Base arc — dark gutter
-    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.lineWidth = 1.6;
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 4, 11, 4.2, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    // Filled arc — green, starts at 12 o'clock, sweeps clockwise
-    ctx.strokeStyle = '#4ade80';
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 4, 11, 4.2, 0,
-                -Math.PI / 2,
-                -Math.PI / 2 + pct * Math.PI * 2);
-    ctx.stroke();
-    // Tiny tip dot at the current progress position for clarity
-    const ang = -Math.PI / 2 + pct * Math.PI * 2;
-    const tx = s.x + Math.cos(ang) * 11;
-    const ty = s.y + 4 + Math.sin(ang) * 4.2;
-    ctx.fillStyle = '#86efac';
-    ctx.beginPath();
-    ctx.arc(tx, ty, 1.2, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-registerWorldRenderer(renderEfficiencyBars);
 
 // ── Loop 126: Ambient wind audio shifts with biome under cursor ─
 // (Stub — actual audio manipulation done in audio tick via G.hoveredBiome)
@@ -4206,23 +3896,14 @@ function renderSpeedIndicator(ctx, w, h) {
 registerScreenRenderer(renderSpeedIndicator);
 
 // ── Loop 162: Pause overlay ─────────────────────────────────
-function renderPauseOverlay(ctx, w, h) {
+function renderPauseOverlay(ctx, w, _h) {
   if (G.speed !== 0) return;
   // Loop 035 (the-fixer): photo-mode hides the PAUSED label so you can
   // compose a screenshot while paused without the dim overlay or label.
   if (G.photoMode) return;
   ctx.save();
-  // Gentle scene-dim — paused should read as "held breath," not a modal
-  // wall. The pill below carries the label's contrast on its own.
-  ctx.fillStyle = 'rgba(0,0,0,0.18)';
-  ctx.fillRect(0, 0, w, h);
-  // Label lives at top-center below the HUD instead of dead-center. On Day 1
-  // the starting citizens spawn mid-map and the old h/2 label landed right on
-  // top of them, obscuring the exact area a new player is looking at. y=56
-  // originally sat inside the HUD band and got clipped by the opaque HTML
-  // panel layered above the canvas — moved to y=92 so the label sits cleanly
-  // in the empty strip between the HUD and the play area, clear of the
-  // Save/Load/New buttons which hug the left edge.
+  // The top-center pill provides contrast while preserving the scene's light
+  // and keeping the starting citizens clear of the pause label.
   ctx.font = 'bold 13px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -4517,26 +4198,3 @@ function updateVictoryFanfare() {
   });
 }
 registerUpdater(updateVictoryFanfare);
-
-// ── Map vignette mask — hides void clutter and softens hard tile edge ──
-// Renders a radial gradient that fades the outer screen to the body
-// background color (#0a0e1a), masking the black void beyond the isometric
-// map edge and any screen-space particles (clouds, scissors) that stray
-// into that region.  Registered as a SCREEN renderer so it sits above
-// world renderers but below HUD elements.
-function renderMapVignette(ctx, w, h) {
-  const cx = w * 0.45;              // slightly left of center — map is offset
-  const cy = h * 0.5;
-  const innerR = Math.min(w, h) * 0.38;   // bright zone
-  const outerR = Math.max(w, h) * 0.62;   // opaque sooner to hide edge-tile artifacts
-  const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
-  grad.addColorStop(0,    'rgba(10,14,26,0)');
-  grad.addColorStop(0.45, 'rgba(10,14,26,0.55)');
-  grad.addColorStop(0.75, 'rgba(10,14,26,0.95)');
-  grad.addColorStop(1,    'rgba(10,14,26,1)');
-  ctx.save();
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-  ctx.restore();
-}
-registerScreenRenderer(renderMapVignette);

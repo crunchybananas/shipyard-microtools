@@ -594,33 +594,29 @@ try {
     const renderEvidence = {
       actorAtlasDraws: 0,
       buildingCompositeBlits: 0,
-      roadSurfaceFills: 0,
+      landscapeBlits: 0,
     };
     const proto = CanvasRenderingContext2D.prototype;
     const originalDrawImage = proto.drawImage;
-    const originalFill = proto.fill;
     proto.drawImage = function (image, ...args) {
       if (this.canvas.id === 'game') {
         const source = image?.currentSrc || image?.src || '';
-        if (source.includes('/actors-atlas-')) renderEvidence.actorAtlasDraws++;
-        if (image instanceof HTMLCanvasElement && image !== this.canvas) {
+        if (source.includes('/actors-atlas-') || source.includes('/citizens/builder/')) renderEvidence.actorAtlasDraws++;
+        if (image instanceof HTMLCanvasElement && image.dataset.realmBuildingComposite) {
           renderEvidence.buildingCompositeBlits++;
+        }
+        if (image instanceof HTMLCanvasElement && image.dataset.realmLandscape) {
+          renderEvidence.landscapeBlits++;
         }
       }
       return originalDrawImage.call(this, image, ...args);
-    };
-    proto.fill = function (...args) {
-      if (this.canvas.id === 'game' && this.fillStyle === '#9f7548') {
-        renderEvidence.roadSurfaceFills++;
-      }
-      return originalFill.apply(this, args);
     };
     try {
       window.forceRender();
     } finally {
       proto.drawImage = originalDrawImage;
-      proto.fill = originalFill;
     }
+    renderEvidence.landscape = window.__realm.landscape();
     return {
       first,
       second,
@@ -699,9 +695,11 @@ try {
       `peak render drew only ${result.renderEvidence.actorAtlasDraws} actor-atlas frames`,
     );
   }
-  if (result.renderEvidence.roadSurfaceFills < 60) {
+  if (result.renderEvidence.landscapeBlits !== 1
+    || result.renderEvidence.landscape.state !== 'ready'
+    || result.renderEvidence.landscape.knownRoadTiles !== summary.fixture.roads) {
     failures.push(
-      `peak render drew only ${result.renderEvidence.roadSurfaceFills} visible road surfaces`,
+      `peak render did not composite the landscape with every known fixture road: ${JSON.stringify(result.renderEvidence)}`,
     );
   }
   if (browserErrors.length) failures.push(...browserErrors);

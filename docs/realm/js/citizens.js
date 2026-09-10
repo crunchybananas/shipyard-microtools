@@ -740,19 +740,18 @@ export function updateCitizens() {
     // on the same tick the AI authored it.
     if (!c._pathRequest && c.path && c.pathIdx >= c.path.length) {
       clearPath(c);
+      // Arrival belongs to this actor's accepted position, including a lane
+      // offset or the personal-space correction. Chasing the old exact goal
+      // without a path made several arrivals fight over one tile center;
+      // that branch also skipped their activity timer and job decisions.
+      c.tx = c.x;
+      c.ty = c.y;
     }
 
-    // No path or path complete — fallback straight-line for non-pathfound movement
-    if (
-      !c.path
-      && c.activity.kind !== 'walk_to_work'
-      && c.activity.kind !== 'walk_to_deliver'
-      && c.activity.kind !== 'walk_to_eat'
-      && c.activity.kind !== 'foraging'
-      && c.activity.kind !== 'go_home'
-      && c.activity.kind !== 'sleep'
-      && c.activity.kind !== 'leisure'
-    ) {
+    // Open raid flight is the only pathless movement intent. Other activities
+    // must reach their state machine after a route is completed/cancelled;
+    // a stale tx/ty is not permission to march back into an occupied center.
+    if (!c.path && c.activity.kind === 'flee') {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.1) {

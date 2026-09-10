@@ -1,0 +1,26 @@
+{
+  "status": "completed",
+  "deviceName": "Bender Bending Rodriguez",
+  "error": null,
+  "node": "tree",
+  "outputs": [
+    {
+      "format": "png",
+      "model": "FLUX.1-schnell",
+      "params": {
+        "seed": 0,
+        "h": 1024,
+        "prompt": "seamless tileable pale weathered limestone boulder, soft rounded eroded stone, warm cream-grey, moss and lichen patches, no seams no blocks no grid, soft daylight, top-down orthographic, tileable seamless texture",
+        "w": 1024
+      },
+      "path": "limestone-albedo.png",
+      "bytes": 1931901,
+      "license": "Apache-2.0",
+      "sha256": "054941a15dc2ac76059eaa65e5457d16281e5e4d2cdbbab53ebc297417045310"
+    }
+  ],
+  "jobId": "946C3E6C-DB78-404B-86AA-EF11239A4443",
+  "tool": "asset.texture.generate",
+  "startedAt": 1782073439.204249,
+  "completedAt": 1782073461.526778
+}

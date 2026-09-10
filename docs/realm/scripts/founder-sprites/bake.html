@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Founder sprite bake</title>
+<script type="importmap">{"imports":{"three":"../../vendor/three/three.module.js"}}</script>
+<style>html,body{margin:0;background:#293c40}canvas{display:block}</style>
+<script type="module">
+import { createFounderRig } from './rig.js';
+window.rig = await createFounderRig({width:512,height:672});
+document.body.append(rig.renderer.domElement);
+rig.pose('Walking_A',0,Math.PI/4);
+rig.render();
+window.ready=true;
+</script></html>

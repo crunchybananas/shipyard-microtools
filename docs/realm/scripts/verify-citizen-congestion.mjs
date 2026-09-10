@@ -22,6 +22,7 @@ import {
 import { resetPathfindingService } from '../js/pathfinding-service.js?realm=198';
 import { updateCitizens } from '../js/citizens.js?realm=198';
 import { pathCitizenTo } from '../js/citizen-navigation.js?realm=198';
+import { beginCitizenOpenRaidFlight } from '../js/citizen-shelter.js?realm=198';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -572,6 +573,50 @@ function selectiveEpochFinding() {
   };
 }
 
+function releasedArrivalFinding() {
+  // Reproduce the observed cluster: multiple actors have accepted positions
+  // around the same entrance, but an old tile-center target remains behind.
+  // A completed or cancelled route must let their next decision run.
+  const results = [];
+  for (const completed of [true, false]) {
+    resetWorld(205);
+    const farm = completedBuilding('farm', 24, 20);
+    const workers = [spawnCitizen(20.31, 20, 'East arrival'), spawnCitizen(19.69, 20, 'West arrival')];
+    for (const citizen of workers) {
+      citizen._hb = 5;
+      citizen.tx = 20; citizen.ty = 20;
+      citizen.activityTimer = 2;
+      citizen.path = completed ? [{ x: 20, y: 20 }] : null;
+      citizen.pathIdx = completed ? 1 : 0;
+      citizen._pathEpoch = G.obstacleEpoch;
+    }
+    G.gameTick = 1;
+    updateCitizens();
+    for (const citizen of workers) {
+      assert.equal(citizen.activityTimer, 1, 'arrival must advance its decision timer instead of chasing the occupied tile center');
+      assert.equal(citizen._movedAt, undefined, 'an old target must not author a new movement step');
+    }
+    assert.equal(workers[0].x, 20.31);
+    assert.equal(workers[1].x, 19.69);
+    let claimedAt = null;
+    for (let tick = 2; tick <= 180; tick++) {
+      G.gameTick = tick; updateCitizens();
+      if (workers.some(c => c.assignment?.building === farm)) { claimedAt = tick; break; }
+    }
+    assert.ok(claimedAt !== null, 'arrivals must become available for the new farm');
+    results.push({ route: completed ? 'completed' : 'cancelled', claimedAt });
+  }
+  resetWorld(205);
+  const refugee = spawnCitizen(20, 20, 'Open flight');
+  refugee._hb = 5;
+  G.enemies = [{ x: 19, y: 20, hp: 100 }];
+  beginCitizenOpenRaidFlight(refugee);
+  G.gameTick = 1; updateCitizens();
+  assert.ok(refugee.x > 20, 'explicit pathless raid flight must still move away from danger');
+  assert.equal(refugee.activity.kind, 'flee');
+  return { arrivals: results, openFlightDistance: round(refugee.x - 20) };
+}
+
 function runSuite() {
   const firstDiners = runDiners().result;
   const secondDiners = runDiners().result;
@@ -609,6 +654,7 @@ function runSuite() {
       maximumSoftOverlapTicks: MAX_SOFT_OVERLAP_TICKS,
     },
     crownReassignment: staleCrownReassignmentFinding(),
+    releasedArrivals: releasedArrivalFinding(),
     noGoPruning: noGoPruningFinding(),
     diners: firstDiners,
     bidirectional: firstRoutes,

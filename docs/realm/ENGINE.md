@@ -47,7 +47,7 @@ different birds; they must never see different granaries.
 | Tier | Modules |
 |---|---|
 | CORE | state, world, pathfinding-kernel, pathfinding-service, pathfinding, ground-traffic, citizens, citizen-activity, citizen-needs, citizen-work, citizen-food, citizen-shelter, citizen-navigation, citizen-traffic, citizen-route-state, soldiers, combat, military, walkers, economy, building-inventory, logistics, events, tech, trade, wonder, scenarios, first-muster, post-raid-recovery, missions, story, raid-summary, raid-planner, raid-intelligence, sim, commands, bus, log, fx, avatar, building-lifecycle, building-operation, workforce-policy, citizen-ownership, residences, death-markers |
-| SHELL | main (loop/init), pathfinding-client, pathfinding-worker, render, minimap, postfx, ui, input, audio, notifications (DOM half), story-ui (chronicle DOM + optional wall-clock preview), achievements, advisor, save (localStorage wrapper), save-state/save-schema (pure boundary), citizen-inspector, citizen-presentation, citizen-render-cache, presentation-cues, enhancements, particles (update), animals, sprite-lab, sprite-muster, sprite-source-contract, actor-registration, enemy-sprite-contract, atlas-loader |
+| SHELL | main (loop/init), pathfinding-client, pathfinding-worker, render, landscape, building-surfaces, building-lighting, house-presentation, minimap, postfx, ui, input, audio, notifications (DOM half), story-ui (chronicle DOM + optional wall-clock preview), achievements, advisor, save (localStorage wrapper), save-state/save-schema (pure boundary), citizen-inspector, citizen-presentation, citizen-render-cache, founder-presentation, builder-presentation, presentation-cues, enhancements, particles (update), animals, sprite-lab, sprite-muster, sprite-source-contract, actor-registration, enemy-sprite-contract, atlas-loader |
 
 ## Core contract rules
 
@@ -191,15 +191,19 @@ the core neither knows nor cares.
 
 - Realm is in development and uses one strict Engine v2 save epoch. Round 008 is
   promoted atomically at module revision `198`, schema `realm.engine-v2`, key
-  `realm-engine-v2-save`, save version `7`, and simulation version `10`. These
+  `realm-engine-v2-save`, save version `7`. The current arrival correction uses
+  simulation version `11`. These
   values are not permission for mixed-version loads. The authoritative live
   values and core order identifier come only from `runtime-contract.json`; the
   order identifier is the content address of the executable order.
 - Save `7` is the clean cut for authoritative food/wheat/flour inventories, the
   required `physicalSupplyWeb` marker, physical-cargo delivery references, and
-  bounded raid path/intent/breach state. Simulation `10` identifies the new
-  delivery, local conversion, and warband decision behavior for golden-master
-  review.
+  bounded raid path/intent/breach state. Simulation `10` introduced delivery,
+  local conversion, and warband decisions. Simulation `11` releases completed
+  and cancelled citizen routes into their activity decisions instead of
+  following stale tile-center targets. Explicit open raid flight still moves
+  without a path. The changed worker timing has a separately reviewed golden;
+  simulation-10 development saves are outside the current strict epoch.
 - Superseded save keys and shapes are outside the runtime contract. There is no
   migration, fallback, backup, compatibility classifier, or preservation
   guarantee for development-era data. Source control is the rollback mechanism.
@@ -213,9 +217,43 @@ the core neither knows nor cares.
   command log are omitted and reset on load; durable non-authoritative state is
   persisted deliberately. Actor animation caches are presentation fields, not
   save state.
+- Citizen walk/carry phase follows accepted, interpolated world displacement
+  in the renderer-owned motion cache. Route intent and `_movedAt` are not
+  evidence that the actor moved: crowd separation can cancel the step. Brief
+  waits hold the feet; longer waits settle once onto a contact pose. The
+  renderer adds neither a second road-lane offset nor a timed vertical bob.
+  The Founder's loading fallback uses a WeakMap record, outside citizen IDs.
+- `builder-presentation` draws the saved Blender craftsperson for settlers and
+  builders, including opening construction workers whose profession remains
+  settler. It reads the existing motion cache and activity/cargo projection;
+  it does not assign a profession or edit the simulation. All four small action
+  maps must be ready before the family replaces its legacy counterpart.
+  Twelve detailed direction rows and two concurrent loads bound the shared
+  cache; visible rows are retained to prevent repeated crowd decoding. The
+  retained decoded image references are at most 39.375 MiB, not a total browser
+  memory estimate. Both Blender characters register the physical ground at
+  normalized cell `(0.5, 0.86)`. Sprite Lab's explicit older-family previews
+  remain independent. Other professions still use their original families.
 
 ## Clean-cut browser and asset surface
 
+- `house-presentation` draws the saved Blender home family: three material
+  variants, four housing tiers and sixteen installed construction stages.
+  Variant, tier and stage derive only from the existing coordinates, level and
+  progress. Seven PNG maps plus measured chimney anchors load atomically;
+  the entire painted house family remains available if any are unavailable.
+  The runtime never downloads the source GLB or opens a 3D house renderer.
+  Twelve 512×640 detail cells and two concurrent loads bound the shared cache
+  at 32.34375 MiB of retained decoded image references, plus at most 1,167,360
+  alpha-mask bytes for input. Visible cells stay resident. Contact and ground
+  light precede actors; aperture emission shares the body depth and transform.
+  Snow changes roof materials without changing geometry or registration.
+  The fixed 112×140 destination registers its ground at `(0.5, 0.78)`.
+  Picking and hover use source alpha, including tall roofs and scaffolds;
+  unfinished projects also own their whole ground cell. Smoke uses the saved
+  chimney position. None of these presentation choices changes routes,
+  construction, occupancy or saves. See the architecture source README and
+  `verify-house-source.mjs` / `verify-house-game.mjs`.
 - Modern browsers are the only target. Post-processing requests WebGL2 and
   disables itself if WebGL2 is unavailable; the WebGL1 shader, buffer, and
   branching path were deleted.
@@ -228,6 +266,39 @@ the core neither knows nor cares.
   prebuilds a complete raster sprite contract for every catalog type. Unknown
   types, missing shape fields, or incomplete sprite metadata fail loudly; there
   is no procedural-building fallback.
+- Painted ground contact uses the visible alpha edge of each decoded crop,
+  measured once and retained only in SHELL memory. Building and scenery contact
+  shading draws in the ground pass before every actor. Building composites
+  contain only the painted body and are keyed by type, housing tier and winter
+  material; daylight changes do not create duplicate copies. The cache retains
+  at most 64 entries. Warm rendering performs no contact pixel readbacks.
+- `building-surfaces` owns the reviewed static-building source rectangles and
+  winter material masks. The support art is irregular, not a uniform 128px
+  grid; every runtime crop must retain its complete painted body and exclude
+  neighboring sprites. Winter changes RGB only inside reviewed source surfaces,
+  preserving the source alpha, crop, scale and ground registration. Two cached
+  512px seasonal atlases retain 2 MiB of pixel data in total; there are no warm
+  material readbacks and no source-PNG rewrite or CORE/save field. Winter roof
+  geometry inherited from the removed procedural buildings is not rendered.
+- `building-lighting` traces actual painted windows, glass, lanterns and furnace
+  openings. Facade light uses the exact body crop/transform inside the building's
+  depth entry; its soft ground spill draws before all bodies and actors. Hidden
+  and unfinished buildings produce no added light. Two cached emission atlases
+  and one shared ground-light stamp retain 2,113,536 pixel bytes, with no warm
+  readbacks. The cyclic window fade and restrained flame variation read the
+  existing clock without changing it. Lighting is not part of body-cache keys
+  or saves. Generic window rectangles and house/church/forge light overlays
+  after the world depth pass are removed.
+- The continuous WebGL2 landscape owns roads before the actor/building depth
+  pass. Adjacent arms form curved junctions with world-space gravel, soft
+  verges and restrained wheel wear. The existing RGBA8 map stores terrain,
+  discovery, traffic wear and footprints: alpha 0 is open ground, 64–127
+  encodes road construction progress, and 255 is another building. Hidden
+  neighbors cannot expose road connections or foundations. Dry surfaces reuse
+  their GPU frame until the view, lighting, season or map changes; known water
+  overlapping the viewport keeps its animation. Canvas recovery draws connected
+  curves clipped to their owning cells, before actors. No CORE/save field or
+  additional texture asset is introduced.
 - `js/sprite-source-contract.js` is the one runtime and tooling sprite contract.
   Accepted row overrides must pass the painted-era and stable-body gates. The
   `WAIVED` state, mixed-era bypass, legacy role-sheet query alias, and runtime
