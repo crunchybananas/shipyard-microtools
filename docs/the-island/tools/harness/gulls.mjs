@@ -85,21 +85,14 @@ export default async function (h) {
   const HALF_SPAN = 1.32;
   ok('no part of the dawn percher enters the tower', m.worstClearance > HALF_SPAN, { ...m, HALF_SPAN });
   const anatomy = await h.evaluate(`(() => {
-    const gull=ABYME.perched.find(b=>b.userData.species==='gull');
-    const body=gull.children.find(o=>o.isMesh), p=body.geometry.attributes.position, c=body.geometry.attributes.color;
-    let eyes=0,feet=0,beak=0;
-    for(let i=0;i<p.count;i++){
-      const r=c.getX(i),g=c.getY(i),b=c.getZ(i),y=p.getY(i),z=p.getZ(i),lum=r*.299+g*.587+b*.114;
-      if(lum<.08&&y>.42&&z>.23)eyes++;
-      const ochre=r>.3&&r>g*1.25&&b<g*.45;
-      if(ochre&&y<.16)feet++; if(ochre&&y>.34&&z>.28)beak++;
-    }
-    const wing=gull.lw.children[0].geometry, wc=wing.attributes.color;
-    return JSON.stringify({bodyVerts:p.count,eyes,feet,beak,wingVerts:wing.attributes.position.count,
-      wingColour:!!wc,tip:wc?Math.min(...Array.from(wc.array)):null,minY:body.geometry.boundingBox?.min.y??null});
-  })()`).then(JSON.parse);
-  ok('a grounded gull has eyes, beak, legs and feet in its one body draw', anatomy.eyes>0&&anatomy.feet>0&&anatomy.beak>0, anatomy);
-  ok('flush wings have an elbow, swept hand and dark primaries', anatomy.wingVerts>=10&&anatomy.wingColour&&anatomy.tip<.5, anatomy);
+    const gull=ABYME.perched.find(b=>b.userData.species==='gull'),u=gull.userData,m=u.mesh;
+    const p=m.geometry.attributes.position,c=m.geometry.attributes.color,j=m.geometry.attributes.skinIndex;
+    const wings=new Set(['wingL','wingR','handL','handR'].map(n=>m.skeleton.bones.findIndex(b=>b.name===n)));
+    let wingVerts=0,dark=0;for(let i=0;i<p.count;i++){if(wings.has(j.getX(i)))wingVerts++;if(c.getX(i)<.05)dark++;}
+    return {bodyVerts:p.count,skinned:m.isSkinnedMesh,bones:Object.keys(u.bones),singleMaterial:!Array.isArray(m.material),wingVerts,dark};
+  })()`);
+  ok('Blender anatomy renders as one skin with all twelve anatomical joints', anatomy.skinned&&anatomy.singleMaterial&&anatomy.bones.length===12, anatomy);
+  ok('feathered wings have weighted shoulders, hands and dark primaries',anatomy.wingVerts>250&&anatomy.dark>30,anatomy);
 
   // Two field reports named what a still screenshot cannot: the grounded birds
   // hovered/wobbled, then vanished less than a second into takeoff. First hold every
@@ -107,14 +100,17 @@ export default async function (h) {
   const idle = await h.evaluate(`(() => new Promise((res) => {
     ABYME.W.time=7.5; ABYME.W.sunFrozen=true; ABYME.tp(-82.8,-41.4,0,0);
     const birds=ABYME.perched.filter((b)=>b.userData.species==='gull');
-    const base=birds.map((b)=>{ const u=b.userData; u.flush=0; u.cool=0;
+    const base=birds.map((b)=>{ const u=b.userData; u.flush=0; u.cool=0;u.returning=false;
       b.position.set(u.px,u.py,u.pz); b.rotation.set(0,u.yaw,0);
-      const body=b.children.find((o)=>o.isMesh); body.geometry.computeBoundingBox();
-      return {x:u.px,y:u.py,z:u.pz,yaw:u.yaw,minY:body.geometry.boundingBox.min.y,ground:u.groundY}; });
+      const body=b.userData.mesh;body.computeBoundingBox();
+      const p=body.geometry.attributes.position,feet=[];for(let i=0;i<p.count;i++)if(p.getY(i)<.009)feet.push(i);
+      return {x:u.px,y:u.py,z:u.pz,yaw:u.yaw,feet,ground:u.groundY}; });
     let frames=0,soleError=0,rootDrift=0,yawDrift=0,wingMin=Infinity,wingMax=-Infinity;
     const step=()=>{
       birds.forEach((b,i)=>{ const q=base[i];
-        soleError=Math.max(soleError,Math.abs(b.position.y+q.minY-q.ground));
+        b.updateMatrixWorld(true);b.userData.mesh.skeleton.update();let sole=Infinity;
+        for(const i of q.feet){const v=b.userData.mesh.getVertexPosition(i,new ABYME.THREE.Vector3());b.userData.mesh.localToWorld(v);sole=Math.min(sole,v.y);}
+        soleError=Math.max(soleError,Math.abs(sole-q.ground));
         rootDrift=Math.max(rootDrift,Math.hypot(b.position.x-q.x,b.position.y-q.y,b.position.z-q.z));
         const dy=Math.atan2(Math.sin(b.rotation.y-q.yaw),Math.cos(b.rotation.y-q.yaw));
         yawDrift=Math.max(yawDrift,Math.abs(dy));
@@ -135,7 +131,7 @@ export default async function (h) {
   // departure must remain continuous and visible long enough to reach far-water scale.
   const flight = await h.evaluate(`(() => new Promise((res) => {
     const bird=ABYME.perched.find((b)=>b.userData.species==='gull'),u=bird.userData;
-    u.flush=0; u.cool=0; bird.position.set(u.px,u.py,u.pz); bird.rotation.set(0,u.yaw,0); bird.visible=true;
+    u.flush=0; u.cool=0;u.returning=false; bird.position.set(u.px,u.py,u.pz); bird.rotation.set(0,u.yaw,0); bird.visible=true;
     ABYME.tp(u.px+2,u.pz,0,0);
     let startedAt=null,samplingAt=null,lastFlush=0,lastPos=[u.px,u.py,u.pz],maxSpeed=0,finite=true,frames=0;
     const checks=[1.2,3.2,5.2].map((at)=>({at,visible:null}));
@@ -162,9 +158,38 @@ export default async function (h) {
     flight.firstHidden>=6.15&&flight.displacement>=78&&flight.rise>=24
       &&flight.checks.every((c)=>c.visible===true)&&flight.maxSpeed<=35&&flight.finite,
     flight);
+  // Observe the actual cooldown -> returning -> landing state machine. Only shorten
+  // the hidden cooldown; the visible flight still takes its real six seconds.
+  const returned=await h.evaluate(`new Promise(resolve=>{
+    const b=ABYME.perched.find(b=>b.userData.species==='gull'),u=b.userData;
+    ABYME.tp(-82.8,-41.4,0,0);u.cool=.01;
+    let seen=false,visible=true,last=null,lastT=0,maxSpeed=0,frames=0,landing=false;
+    function step(){
+      if(u.returning){seen=true;visible=visible&&b.visible;landing=landing||u.pose.landing>.2;
+        if(last&&u.returnT>lastT)maxSpeed=Math.max(maxSpeed,b.position.distanceTo(last)/(u.returnT-lastT));
+        last=b.position.clone();lastT=u.returnT;
+      }
+      if(seen&&!u.returning)return resolve({seen,visible,landing,maxSpeed,home:b.position.distanceTo(new ABYME.THREE.Vector3(u.px,u.py,u.pz)),frames});
+      if(++frames>900)return resolve({seen,visible,landing,maxSpeed,timeout:true});requestAnimationFrame(step);
+    }requestAnimationFrame(step);
+  })`);
+  ok('return is a visible continuous flight with a braking landing at home',returned.seen&&returned.visible&&returned.landing&&returned.home<.002&&returned.maxSpeed<32,returned);
+  const gestures=await h.evaluate(`(async()=>{
+    const {poseBird}=await import('/the-island/js/island-life.js');
+    const b=ABYME.perched.find(b=>b.userData.species==='gull'),u=b.userData,base=b.position.clone();
+    const rows=[];for(const [name,t,opts] of [['watch',1,{}],['forage',8.5/.62,{}],['preen',13.6/.62,{}],['blink',0,{}],['call',1,{calling:true}],['glide',2,{flight:1}],['land',2,{flight:1,landing:1}]]){
+      poseBird(b,t,{phase:0,...opts});b.updateMatrixWorld(true);u.mesh.skeleton.update();
+      rows.push({name,behavior:u.behavior,head:u.bones.head.node.rotation.toArray().slice(0,3),jaw:u.bones.jaw.node.rotation.x,eye:u.bones.eyes.node.scale.y,foot:u.bones.footL.node.rotation.x,root:b.position.distanceTo(base),pose:{...u.pose}});
+    }return rows;
+  })()`);
+  const row=n=>gestures.find(r=>r.name===n);
+  ok('foraging and preening use different head gestures with the root planted',row('forage').behavior==='forage'&&row('preen').behavior==='preen'&&Math.abs(row('forage').head[0]-row('watch').head[0])>.9&&Math.abs(row('preen').head[1])>.7&&gestures.every(r=>r.root===0),gestures);
+  ok('blinks and calls articulate the face',row('blink').eye<.2&&row('call').jaw>.03&&row('watch').jaw===0,gestures);
+  ok('landing extends the feet independently of flight',Math.abs(row('glide').foot-row('land').foot)>.6,gestures);
+  console.log('  return '+JSON.stringify(returned));
   console.log(`GULLS ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   console.log(`  closest approach ${m.worstClearance} m clear, at radius ${m.worstAt && m.worstAt[0]} / y ${m.worstAt && m.worstAt[1]}`);
-  console.log(`  grounded anatomy ${anatomy.bodyVerts} verts · eyes ${anatomy.eyes} · feet ${anatomy.feet} · wing ${anatomy.wingVerts} verts`);
+  console.log(`  grounded skin ${anatomy.bodyVerts} verts · ${anatomy.bones.length} joints · ${anatomy.wingVerts} wing verts`);
   console.log(`  sole error ${idle.soleError.toFixed(4)} m · root drift ${idle.rootDrift.toFixed(4)} m · wing breath ${idle.wingRange.toFixed(3)} rad`);
   console.log(`  exit ${flight.firstHidden?.toFixed(2)} s · ${flight.displacement?.toFixed(1)} m out · ${flight.rise?.toFixed(1)} m up · max ${flight.maxSpeed?.toFixed(1)} m/s`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }

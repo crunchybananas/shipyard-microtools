@@ -119,7 +119,7 @@ export default async function walk(h) {
     out.firstReady = progression.nextPlateAction({ world:W, notebook:ABYME.notebook }).route === 'surfaceFirst';
     ABYME.cross();
     hs('valve').onClick(); game.resolveUpstreamHand({ reveal:true });
-    ABYME.tideFigure();
+    ABYME.tp(4,-104,Math.atan2(-8,-4),-.08);ABYME.tideFigure();
     for (let i=0;i<30;i++) game.tick(.1, 8+i*.1);
     out.firstReturnReady = progression.nextPlateAction({ world:W, notebook:ABYME.notebook }).route === 'receiver-return';
     ABYME.cross();
@@ -247,7 +247,7 @@ export default async function walk(h) {
     game.resolveUpstreamHand({ reveal:true });
     const upstream = W.flags.upstreamHandWitnessed && ABYME.notebook.has('event.upstream-hand');
 
-    ABYME.tideFigure();
+    ABYME.tp(4,-104,Math.atan2(-8,-4),-.08);ABYME.tideFigure();
     for (let i = 0; i < 30; i++) game.tick(0.1, 10 + i * 0.1);
     const tideFigure = W.flags.tideFigureSeen && ABYME.notebook.has('encounter.tide-figure');
     const missing = progression.missingRequirements('level2', W, ABYME.notebook);
@@ -275,7 +275,7 @@ export default async function walk(h) {
     for (let i = 0; i < 20; i++) game.tick(0.1, 20 + i * 0.1);
     const register = W.flags.registerRead && ABYME.notebook.has('evidence.register');
 
-    ABYME.watcher('spawn');
+    ABYME.tp(-23,-84,0,-.18);ABYME.watcher('spawn');
     for (let i = 0; i < 30; i++) game.tick(0.1, 24 + i * 0.1);
     const watcher = W.flags.watcherSeen && ABYME.notebook.has('encounter.watcher');
     const missing = progression.missingRequirements('level3', W, ABYME.notebook);

@@ -24,7 +24,7 @@ writeFileSync(join(dir,'build.json'),JSON.stringify({source:`local ${edition} re
 const places=[
  ['A model of this room','Fitted boards, painted joinery and the working island model.'],
  ['Boughs above the path','Four wind-shaped crowns with geometry for the forest and its miniature.'],
- ['Above the whole island','Eighty-three physical treads lead to the lantern gallery.'],
+ ['Above the whole island','115 physical treads lead to the lantern gallery.'],
  ['The drain chamber','A stone ramp leads under the standing stones.'],
  ['The inverted lighthouse','The cellar opens onto the hanging lighthouse.'],
  ['Through the western doorway','Two steps lead from the cellar into the western study.'],

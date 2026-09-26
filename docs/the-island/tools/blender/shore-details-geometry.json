@@ -1,0 +1,31 @@
+{
+  "blender": "5.2.1 LTS",
+  "parts": {
+    "shoreTimber": {
+      "vertices": 633,
+      "triangles": 1102
+    },
+    "shoreGear": {
+      "vertices": 3485,
+      "triangles": 6582
+    },
+    "shoreRock": {
+      "vertices": 181,
+      "triangles": 284
+    },
+    "shoreLife": {
+      "vertices": 1260,
+      "triangles": 1752
+    },
+    "shorePool": {
+      "vertices": 29,
+      "triangles": 28
+    },
+    "shoreMini": {
+      "vertices": 68,
+      "triangles": 98
+    }
+  },
+  "bytes": 918788,
+  "totalTriangles": 9846
+}

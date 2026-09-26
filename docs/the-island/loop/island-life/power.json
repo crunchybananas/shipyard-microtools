@@ -1,0 +1,204 @@
+{
+  "fail": [],
+  "samples": [
+    {
+      "name": "study",
+      "hour": 12,
+      "pose": [
+        -82,
+        -37,
+        0.7853981633974483,
+        -0.12
+      ],
+      "image": "study-12.png",
+      "frame": 1916,
+      "calls": 474,
+      "triangles": 935821,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": -1,
+      "deltaTriangles": 4022,
+      "gpuMedianMs": 9.2,
+      "gpuSamplesMs": [
+        9.17,
+        9.19,
+        9.19,
+        9.2,
+        9.22,
+        9.24,
+        9.32
+      ]
+    },
+    {
+      "name": "study",
+      "hour": 22,
+      "pose": [
+        -82,
+        -37,
+        0.7853981633974483,
+        -0.12
+      ],
+      "image": "study-22.png",
+      "frame": 4742,
+      "calls": 474,
+      "triangles": 935821,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": -1,
+      "deltaTriangles": 4022,
+      "gpuMedianMs": 6.78,
+      "gpuSamplesMs": [
+        5.77,
+        6.43,
+        6.44,
+        6.78,
+        13.5,
+        14.2,
+        15.06
+      ]
+    },
+    {
+      "name": "forest",
+      "hour": 12,
+      "pose": [
+        -58,
+        -58,
+        1.5,
+        0.12
+      ],
+      "image": "forest-12.png",
+      "frame": 5257,
+      "calls": 242,
+      "triangles": 633003,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": -9,
+      "deltaTriangles": 1089,
+      "gpuMedianMs": 11.71,
+      "gpuSamplesMs": [
+        5.01,
+        11.69,
+        11.7,
+        11.71,
+        11.92,
+        12.04,
+        12.48
+      ]
+    },
+    {
+      "name": "forest",
+      "hour": 22,
+      "pose": [
+        -58,
+        -58,
+        1.5,
+        0.12
+      ],
+      "image": "forest-22.png",
+      "frame": 8084,
+      "calls": 239,
+      "triangles": 630576,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 0,
+      "deltaTriangles": 0,
+      "gpuMedianMs": 11.48,
+      "gpuSamplesMs": [
+        8.26,
+        8.28,
+        9.04,
+        11.48,
+        11.94,
+        17.2,
+        20.97
+      ]
+    },
+    {
+      "name": "beach",
+      "hour": 12,
+      "pose": [
+        4,
+        -104,
+        2.19,
+        -0.06
+      ],
+      "image": "beach-12.png",
+      "frame": 8599,
+      "calls": 321,
+      "triangles": 680933,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": -25,
+      "deltaTriangles": 19453,
+      "gpuMedianMs": 12.34,
+      "gpuSamplesMs": [
+        5.04,
+        10.16,
+        11.42,
+        12.34,
+        13.31,
+        13.48,
+        14.37
+      ]
+    },
+    {
+      "name": "beach",
+      "hour": 22,
+      "pose": [
+        4,
+        -104,
+        2.19,
+        -0.06
+      ],
+      "image": "beach-22.png",
+      "frame": 11425,
+      "calls": 310,
+      "triangles": 668636,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 3,
+      "deltaTriangles": 13672,
+      "gpuMedianMs": 22.26,
+      "gpuSamplesMs": [
+        21.52,
+        22.17,
+        22.17,
+        22.26,
+        23.08,
+        23.11,
+        23.57
+      ]
+    }
+  ],
+  "kit": {
+    "near": true,
+    "far": false,
+    "texture": [
+      512,
+      512
+    ],
+    "miniTriangles": 98,
+    "miniChildren": 0,
+    "authored": "Blender shore_details.py",
+    "parts": [
+      "shoreRack",
+      "shoreRock",
+      "shoreLife",
+      "shorePool"
+    ],
+    "lights": 9
+  },
+  "collision": {
+    "solid": true,
+    "clear": true,
+    "rocks": [
+      true
+    ]
+  }
+}

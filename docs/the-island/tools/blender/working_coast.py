@@ -58,14 +58,16 @@ def cushion(p, direction, length, width, depth, near, tone, rim):
     d=Vector(direction).normalized(); u=d.cross(Vector((0,1,0)))
     if u.length<.01: u=d.cross(Vector((1,0,0)))
     u.normalize(); w=d.cross(u).normalized(); p=Vector(p)
-    n=10 if near else 4
-    rings=[(0,1)]
+    n=5 if near else 4
+    # Two small rings round the bough without adding vertices or triangles.
+    # The former single ring tapered every branch into a diamond spike.
+    rings=[(-.24,.76),(.20,.94)] if near else [(0,1)]
     v=[tuple(p-d*length*.64)]
     for along,rad in rings:
         for j in range(n):
             a=j*math.tau/n
-            lobed=(.72 if near and j%2 else 1.12)*(1+.09*math.sin(j*4.3+rim*12))
-            v.append(tuple(p+d*((along+(.11 if j%2 else -.11))*length)+u*(math.cos(a)*width*rad*lobed)+w*(math.sin(a)*depth*rad)))
+            lobed=(.88 if near and j%2 else 1.02)*(1+.09*math.sin(j*4.3+rim*12))
+            v.append(tuple(p+d*((along+(.055 if j%2 else -.055))*length)+u*(math.cos(a)*width*rad*lobed)+w*(math.sin(a)*depth*rad)))
     v.append(tuple(p+d*length*.61+w*depth*.12)); tip=len(v)-1
     f=[]
     for j in range(n):
@@ -167,7 +169,7 @@ for i in range(32):
     a=(i+.5)*math.tau/32
     box((math.sin(a)*4.57,4.40,math.cos(a)*4.57),(.91,.20,.21),'wood',a)
     if i%4==0:
-        box((math.sin(a)*3.90,4.40,math.cos(a)*3.90),(.16,.23,1.34),'wood',a)
+        box((math.sin(a)*4.22,4.40,math.cos(a)*4.22),(.16,.23,.66),'wood',a)
 
 ACTIVE='studyFittings'
 # The working library is fitted into actual bays, with side uprights and backs.
@@ -176,17 +178,23 @@ for degrees in [285,323]:
     for side in [-1,1]:
         x=math.sin(a)*4.43+math.cos(a)*side*1.07
         z=math.cos(a)*4.43-math.sin(a)*side*1.07
-        box((x,1.34,z),(.10,1.68,.48),'paint',a)
-    box((math.sin(a)*4.43,2.20,math.cos(a)*4.43),(2.25,.11,.52),'end',a)
-    box((math.sin(a)*4.63,1.37,math.cos(a)*4.63),(2.20,1.56,.035),'wood',a)
+        box((x,1.30,z),(.10,1.62,.48),'paint',a)
+    box((math.sin(a)*4.43,2.14,math.cos(a)*4.43),(2.25,.09,.52),'end',a)
+    box((math.sin(a)*4.63,1.30,math.cos(a)*4.63),(2.20,1.62,.035),'wood',a)
 # The valve now belongs to a pipe run and a visible stilling tube by the window.
-tube([(2.3,.83,1.1),(2.3,.19,1.1),(3.76,.19,.22),(3.99,.24,-.72),(4.15,.35,-1.40),(4.36,.35,-1.61)],.066,'copper',10)
+ga=math.radians(100)
+def gp(p):
+ x,y,z=p;return (x*math.cos(ga)+z*math.sin(ga),y,-x*math.sin(ga)+z*math.cos(ga))
+tube([(2.05,.83,.65),(2.05,.055,.65),gp((3.99,.055,-.72)),gp((3.99,.24,-.72))],.046,'copper',10)
+gauge_start=len(PARTS[ACTIVE]['v'])
 tube([(3.99,.24,-.72),(3.99,2.33,-.72)],.035,'copper',8)
 box((3.99,1.29,-.76),(.43,2.16,.10),'paint')
 for y in [.31,2.28]:
     tube([(3.94,y,-.65),(4.09,y,-.65)],.077,'copper',10)
 for y in [.445,.765,1.085,1.405,1.725,2.045]:
     box((3.83,y,-.69),(.10,.017,.02),'paper')
+for i in range(gauge_start,len(PARTS[ACTIVE]['v'])):
+    x,z,y=PARTS[ACTIVE]['v'][i];xx,yy,zz=gp((x,y,-z));PARTS[ACTIVE]['v'][i]=(xx,-zz,yy)
 # A shallow working ledge on the blank southern wall: rolled charts, dividers, twine.
 a=math.radians(221)
 def desk(p):

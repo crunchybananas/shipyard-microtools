@@ -1,0 +1,5 @@
+Use case: stylized-concept
+Asset type: seamless square grayscale HEIGHT MAP for weathered North Atlantic granite in a first-person game, not an albedo photograph.
+Primary request: isotropic fine-grained granite, shallow irregular mineral pits and tiny chipped facets, with a few short disconnected hairline fractures. Equal grain scale in all directions. Mostly smooth stone, broad restrained soft elevation variation. Middle gray is the average surface; slightly lighter gray for low rounded relief; darker gray only in shallow pores. Narrow tonal range, no white highlights or black shadows. No large cobblestones, no layered bedding, no parallel lines, no wood grain, no directional streaks, no masonry mortar, no obvious repeating blobs.
+Composition: 1024x1024, flat orthographic edge-to-edge height data, seamlessly tileable on all four edges.
+Constraints: grayscale only, uniform field, no lighting or shading baked in, no perspective, no border, no objects, no text, no watermark.

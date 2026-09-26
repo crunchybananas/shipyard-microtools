@@ -1,0 +1,28 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "width": 1440,
+      "overflow": false,
+      "images": 33,
+      "broken": [],
+      "links": [],
+      "anchors": []
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "images": 33,
+      "broken": [],
+      "links": [],
+      "anchors": []
+    }
+  ],
+  "video": {
+    "duration": 27.416667,
+    "currentTime": 1.502737,
+    "error": null,
+    "width": 960,
+    "height": 600
+  }
+}

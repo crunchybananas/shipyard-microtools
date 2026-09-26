@@ -17,7 +17,7 @@ A player entering the study should understand the room in this order:
 5. **Floor plate:** the threshold is physically under the model beach. It stays
    visually secondary until the refuge, valve, ruler and crank make the first crossing possible.
 6. **Tower stair:** fitting the lens opens the physical stair to the gallery in daylight
-   or darkness. Eighty-three treads pass three real windows; height follows walking.
+   or darkness. 115 treads pass three real windows; height follows walking.
 7. **Quarters and records:** these deepen the place without competing with the
    surface circuit.
 
@@ -139,3 +139,13 @@ imperfect world, not as a trophy or a punishment screen.
 Do not reintroduce special-case progress checks in UI copy, obsolete save-field
 aliases, or alternate terminals. A changed contract belongs in these authorities and
 their tests.
+
+
+## Physical scale — September 26, 2026
+
+The stair rises in 115 increments of 17.9 cm, over three turns. Its 1.16 m width,
+95 cm aisle beside the chart table, two-metre headroom and ordinary keyboard
+ascent/descent are checked by `tools/harness/cohesion.mjs`. The fitted shelf cap
+clears both rows of books. Ordinary reference spines carry names again; the signal
+manuals retain their instrument labels and deduction contract. The tide tube and
+its pipe are kept out of the stair and doorway, with the wheel reachable below.

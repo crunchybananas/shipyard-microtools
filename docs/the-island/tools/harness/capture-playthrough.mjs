@@ -42,7 +42,7 @@ export default async function(h) {
    finale:ABYME.getFinale(),finaleText:document.getElementById('finale').classList.contains('hidden')?'':document.getElementById('finale').innerText,errors:window.__captureErrors||[]};})()`);
   if(state.errors.length)throw Error(state.errors.join('\n'));
   stages.push({number:stages.length+1,chapter,title,action,image:file,kind,...state});
-  writeFileSync(join(dir,'stages.json'),JSON.stringify({edition:'Working coast',method:METHOD,stages},null,2));
+  writeFileSync(join(dir,'stages.json'),JSON.stringify({edition:process.env.REVIEW_EDITION||'Working coast',method:METHOD,stages},null,2));
   console.log(`${num} L${state.level} ${chapter} — ${title}`);
  }
  const look=async(x,z,tx,tz,pitch=-.12)=>ev(`UI.clearWhispers();ABYME.tp(${x},${z},Math.atan2(${x-tx},${z-tz}),${pitch})`);
@@ -87,11 +87,11 @@ export default async function(h) {
  await capture('A lamp to return to','Light the small lamp beside the bed.',`hs('refugeLamp').onClick()`,'ABYME.W.flags.refugeLit');
  await reader('spare_place','spareChair');
  await capture('A place beside the table','The pulled-out chair remains where you left it.','','ABYME.W.flags.placeMade');
- chapter='03-the-working-model';await look(-81.9,-38.6,-80.99,-40.65,-.24);
+ chapter='03-the-working-model';await look(-85.5,-41.7,-85.66,-43.84,-.14);
  await capture('The water in the glass','The stilling tube beside the window shows the bay at its high mark.');
  await look(-82,-37,-85,-40,-.45);
  await capture('The sea leaves the road','Turn the model valve. Allow the tide to fall.',`hs('valve').onClick()`,'ABYME.W.flags.valveTurned',4);
- await ev('W.tide=W.tideTarget');await look(-81.9,-38.6,-80.99,-40.65,-.24);
+ await ev('W.tide=W.tideTarget');await look(-85.5,-41.7,-85.66,-43.84,-.14);
  await capture('The float has fallen','The same water level drives the bay, miniature and stilling tube.','','ABYME.W.tide===0');
  await look(121,-173,118,-176,-.2);
  await capture('The exposed chest','Open the chest uncovered by the lower water.',`hs('chest').onClick()`,'ABYME.W.flags.chestOpen');
@@ -108,7 +108,7 @@ export default async function(h) {
  await capture('A hand above the room','Remain by the wheel. The other hand becomes visible.','','',3.2);
  await capture('The water arrives','Watch the displaced water enter this level.','','',5.4);
  await capture('After the hand','The wheel holds the mark of the encounter.','','ABYME.W.flags.upstreamHandWitnessed',5.0);
- await ev('ABYME.tideFigure()');await capture('Someone in the kelp','Stop approaching and let the figure remain.','','',.25);
+ await ev('ABYME.tp(4,-104,Math.atan2(-8,-4),-.08);ABYME.tideFigure()');await capture('Someone in the kelp','Stop approaching and let the figure remain.','','',.25);
  await capture('An answer across the water','Wait without moving. The low note is earned here.','','ABYME.W.flags.tideFigureSeen',3.4);
  await crossing('Back to the lit room');
  await check('ABYME.W.flags.receiverReturned && !ABYME.W.flags.returned && !ABYME.W.flags.plumbHung','First return remains distinct from the final homecoming');
@@ -174,7 +174,7 @@ export default async function(h) {
  await enterDrain();await capture('Water in the room','Return to the drain chamber after descending. The rising water has reached the shelves.');await reader('drain_ledger','drainLedger');await leaveDrain();await look(-82,-37,-85,-40,-.3);
  await reader('commendation_copy','lore_commendation_copy');
  await room();await reader('quarters_journal','quartersJournal');
- await ev('ABYME.tp(24,-88,0,0);ABYME.watcher("spawn")');
+ await ev('ABYME.tp(-23,-84,0,-.18);ABYME.watcher("spawn")');
  await capture('The shore visitor','Look toward the figure instead of chasing it.');
  await capture('The visitor looks up','Hold the view until the encounter resolves.','','ABYME.W.flags.watcherSeen',3.2);
  chapter='08-the-unfinished-boat';await crossing('The lowest room');

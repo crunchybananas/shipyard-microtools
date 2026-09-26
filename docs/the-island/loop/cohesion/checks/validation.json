@@ -1,0 +1,232 @@
+{
+  "pass": [
+    {
+      "name": "ordinary books have distinct authored titles"
+    },
+    {
+      "name": "every title vertex retains its atlas coordinates"
+    },
+    {
+      "name": "spine lettering is not duplicated inside the miniature"
+    },
+    {
+      "name": "risers and the central aisle are human-scale"
+    },
+    {
+      "name": "the stair has two metres of clear headroom along its walking width"
+    },
+    {
+      "name": "held keyboard input climbs the entire stair"
+    },
+    {
+      "name": "held keyboard input walks all the way down"
+    },
+    {
+      "name": "walking does not snap the camera through a full riser"
+    },
+    {
+      "name": "no runtime exceptions in the audit walk"
+    }
+  ],
+  "fail": [],
+  "books": {
+    "count": 25,
+    "titles": 16,
+    "uv": 150,
+    "vertices": 150,
+    "mini": false,
+    "books": [
+      {
+        "title": "Coast Pilot",
+        "height": 0.36103901695460083,
+        "width": 0.11444300727336668,
+        "depth": 0.31051465064287187
+      },
+      {
+        "title": "Soundings",
+        "height": 0.32148359740385785,
+        "width": 0.12068762369803154,
+        "depth": 0.27300236471230166
+      },
+      {
+        "title": "Weather Journal",
+        "height": 0.2526913207024336,
+        "width": 0.11499290329637007,
+        "depth": 0.25255480360239746
+      },
+      {
+        "title": "The Working Sea",
+        "height": 0.38442805282538756,
+        "width": 0.1235101849550847,
+        "depth": 0.26016820817487313
+      },
+      {
+        "title": "Lamp Keeping",
+        "height": 0.3036746586440131,
+        "width": 0.08690957733662799,
+        "depth": 0.30464379958808424
+      },
+      {
+        "title": "Tides and Harbours",
+        "height": 0.2712823424371891,
+        "width": 0.12295385868754238,
+        "depth": 0.30327490746509284
+      },
+      {
+        "title": "Knots and Splices",
+        "height": 0.28693915830226613,
+        "width": 0.10366458391537892,
+        "depth": 0.2986862383433618
+      },
+      {
+        "title": "Birds of the Coast",
+        "height": 0.26759157596388833,
+        "width": 0.14330535994959065,
+        "depth": 0.31386688962578774
+      },
+      {
+        "title": "Small Boat Repair",
+        "height": 0.3805786528275348,
+        "width": 0.1478759658499621,
+        "depth": 0.28666752161690967
+      },
+      {
+        "title": "Clouds and Weather",
+        "height": 0.27637116237310694,
+        "width": 0.14846317933406683,
+        "depth": 0.2862455185386352
+      },
+      {
+        "title": "Island Flora",
+        "height": 0.28181118845241143,
+        "width": 0.080842349762097,
+        "depth": 0.261252704039216
+      },
+      {
+        "title": "The Night Watch",
+        "height": 0.3430419197306037,
+        "width": 0.0895958453102503,
+        "depth": 0.2696432900102809
+      },
+      {
+        "title": "Masonry Repairs",
+        "height": 0.3007831148104742,
+        "width": 0.1218292934948113,
+        "depth": 0.30110843404429033
+      },
+      {
+        "title": "Charts and Bearings",
+        "height": 0.32095976774580776,
+        "width": 0.11381909824791366,
+        "depth": 0.3159339964995161
+      },
+      {
+        "title": "The Winter Log",
+        "height": 0.2719407933182083,
+        "width": 0.1391635863913689,
+        "depth": 0.25999959830660374
+      },
+      {
+        "title": "Shore Notes",
+        "height": 0.30930810132995246,
+        "width": 0.07693056262331084,
+        "depth": 0.2960412312555127
+      },
+      {
+        "title": "Coast Pilot",
+        "height": 0.3137648426461965,
+        "width": 0.13476829839288257,
+        "depth": 0.30642658393597233
+      },
+      {
+        "title": "Soundings",
+        "height": 0.3735383962630294,
+        "width": 0.07287219933932648,
+        "depth": 0.30276567867025733
+      },
+      {
+        "title": "Weather Journal",
+        "height": 0.36447809705277906,
+        "width": 0.11169587760930882,
+        "depth": 0.2831216748827137
+      },
+      {
+        "title": "The Working Sea",
+        "height": 0.27659046268090604,
+        "width": 0.12961686678230763,
+        "depth": 0.26511148596415296
+      },
+      {
+        "title": "Lamp Keeping",
+        "height": 0.38759801198029886,
+        "width": 0.14976812304463238,
+        "depth": 0.259799183846917
+      },
+      {
+        "title": "Tides and Harbours",
+        "height": 0.3170444393297657,
+        "width": 0.14036438040202484,
+        "depth": 0.2954161056014709
+      },
+      {
+        "title": "Knots and Splices",
+        "height": 0.3789962557493709,
+        "width": 0.14334670996409843,
+        "depth": 0.2995816034590826
+      },
+      {
+        "title": "Birds of the Coast",
+        "height": 0.3092191628064029,
+        "width": 0.10104278609273025,
+        "depth": 0.2689946660818532
+      },
+      {
+        "title": "Small Boat Repair",
+        "height": 0.33468135468428956,
+        "width": 0.07005323670688086,
+        "depth": 0.25509328339016063
+      }
+    ]
+  },
+  "physical": {
+    "hits": [],
+    "riser": 0.1791304347826087,
+    "clear": 0.9522330470336309,
+    "steps": 115
+  },
+  "climbs": [
+    {
+      "done": true,
+      "start": 7007.400000095367,
+      "frames": 689,
+      "maxEyeJump": 0.070967735298062,
+      "minY": 13.679130434782609,
+      "maxY": 34.1,
+      "lastEye": 35.57239810014979,
+      "success": true,
+      "elapsed": 11.483299999952317,
+      "end": [
+        -84.64776563872549,
+        34.1,
+        -38.371568640121325
+      ]
+    },
+    {
+      "done": true,
+      "start": 18777.800000071526,
+      "frames": 694,
+      "maxEyeJump": 0.07119855521288088,
+      "minY": 13.5,
+      "maxY": 34.1,
+      "lastEye": 15.320899855232742,
+      "success": true,
+      "elapsed": 11.867899999976158,
+      "end": [
+        -83.92039110275768,
+        13.5,
+        -36.870139706003485
+      ]
+    }
+  ],
+  "errors": []
+}

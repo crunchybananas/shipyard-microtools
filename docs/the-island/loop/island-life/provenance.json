@@ -1,0 +1,288 @@
+{
+  "capturedAt": "2026-09-19T01:40:45.857464+00:00",
+  "status": "local implementation; not deployed",
+  "geometry": "Original project-authored Blender 5.2.1 LTS geometry",
+  "texture": "shore-timber.jpg: built-in OpenAI imagegen; original and prompt retained in tools/blender",
+  "video": "Final source, 560 actual CDP browser frames over 27.95 seconds; ordinary production time; 960x600, zoom 5 at 10 metres, muted; timestamps encoded to 24fps H.264 without motion interpolation",
+  "captureLimits": "Era/prerequisite/encounter screenshots are explicit fixtures, not proof of earned progression. Pose stills select production poses. Tide-Figure appearance not established by its water shot.",
+  "sourceFiles": {
+    "assets/island-life.glb": {
+      "bytes": 583244,
+      "sha256": "6053d587717112a73d030b25c27ec848ec36e2035b8f774cd9f38583ecfcc65c"
+    },
+    "assets/shore-details.glb": {
+      "bytes": 918788,
+      "sha256": "170e64fdc49a0b6eba5625b99c193000ef5ce5859a7b2831a382a3741c876985"
+    },
+    "assets/shore-timber.jpg": {
+      "bytes": 116076,
+      "sha256": "73ded0ab0734aaf6aff280594f8120e2d0defc3add589e3d13a86391077e6c90"
+    },
+    "assets/working-coast.glb": {
+      "bytes": 1718784,
+      "sha256": "1f67f59367d5ec214db4fe33979b43e2e94e428117f58625c0327a9683a626c0"
+    },
+    "js/island-life.js": {
+      "bytes": 7169,
+      "sha256": "d59de6916e8ba8d87c737877950a1c4340926dde493dc3cd58eb88ed49fa1260"
+    },
+    "js/main.js": {
+      "bytes": 137343,
+      "sha256": "055d3689d11c756cdd808bbbadd5e4b53bbb55b956aa26d30954e2caad788041"
+    },
+    "js/props.js": {
+      "bytes": 257843,
+      "sha256": "495ba45842437663ff8ab98bbdb95fd4a4148de4c0b14685ffb8115f07755139"
+    },
+    "js/puzzles.js": {
+      "bytes": 100741,
+      "sha256": "6ff36400440b846185537390bae72531924dd67813524405653adf770153f863"
+    },
+    "js/shore-details.js": {
+      "bytes": 3679,
+      "sha256": "666b2479afaca39463f2c882043190243297935c173620a64176069f72153674"
+    },
+    "js/working-coast.js": {
+      "bytes": 8562,
+      "sha256": "f09524ffeb6a4f6e2704780aebfb4d7d4420880d16c8621934a85422df8388a1"
+    },
+    "js/regions/l4_seabed.js": {
+      "bytes": 2994,
+      "sha256": "11bf725263518f8b2fa841061fb0c38d86225ac58b259c7b229b583ab65e5c98"
+    },
+    "tools/blender/island_life.py": {
+      "bytes": 15958,
+      "sha256": "f4c0299f3879d253d0855aa079169c89245017fcc729849d2cb1fd4a44c40d8c"
+    },
+    "tools/blender/island-life.blend": {
+      "bytes": 313415,
+      "sha256": "c173eaa9604c8208fa324bec58e81aa5a7ce6fd7cda132058bc2518798ea54bf"
+    },
+    "tools/blender/working_coast.py": {
+      "bytes": 14048,
+      "sha256": "a13d743181387b9914b406faa57837197bb54f37d10fe69a00133a756ca349fa"
+    },
+    "tools/blender/shore_details.py": {
+      "bytes": 13878,
+      "sha256": "d8c1ce8c4ac99a5660ed70367aa8285e0c9aa5be881cf37f7da04c80f56d1704"
+    },
+    "tools/harness/island-life.mjs": {
+      "bytes": 12803,
+      "sha256": "b2150684caec5f7719d551225d3e31b82f484e62b9b41f01f38c1959312e9c4e"
+    },
+    "tools/harness/gulls.mjs": {
+      "bytes": 14017,
+      "sha256": "b5043f5c05367d9b31d2ebda8e10eb04b8ffbe842164e3626453c740d06c2777"
+    },
+    "tools/harness/capture-wildlife.mjs": {
+      "bytes": 2019,
+      "sha256": "88821957a90ad729ee9effe38163c3f86dfbef023a3b25cd8b6ac9d58a068656"
+    }
+  },
+  "reviewFiles": {
+    "01-arrival.jpg": {
+      "bytes": 158965,
+      "sha256": "f34a23cb3e766d1b152a92d4230006bf922b4173371d5cd1f655c226b3d72467"
+    },
+    "02-worked-shore.jpg": {
+      "bytes": 179562,
+      "sha256": "1c1af3bab90bf6d98a50b5f81ced2be7bb7e0999b9d3f0455d65ba8263bbda1e"
+    },
+    "03-open-dory.jpg": {
+      "bytes": 173010,
+      "sha256": "7c67e8855129052b74c36e4dcee8f809d3cc02f40ea2b6ca019f922c0a9f8134"
+    },
+    "04-gull-gameplay.jpg": {
+      "bytes": 158566,
+      "sha256": "4bc234e2e1b8b297771f34256e078fd9283e9f1c841d09d71db51cb968bf7172"
+    },
+    "05-gull-detail.jpg": {
+      "bytes": 198693,
+      "sha256": "2f4095e53837f7b561c4bb46ca3afdd8fd23d44fabde9eba5c3ec9a9dce2289c"
+    },
+    "06-forest.jpg": {
+      "bytes": 168612,
+      "sha256": "8511872880023e4bc81f0a348519888bed0994a539eac28b3b402a4faa3169a7"
+    },
+    "07-study.jpg": {
+      "bytes": 104670,
+      "sha256": "987c4dc8b3a48f07fd17e043ddf32b75d5f135bea22d16bee492445e8300fc4f"
+    },
+    "08-instruments.jpg": {
+      "bytes": 64122,
+      "sha256": "7946a8073fc9030fccc7e977d4ebbec70291ae4bc07e2162270734e3e51c625d"
+    },
+    "09-music-box.jpg": {
+      "bytes": 88059,
+      "sha256": "d006e11f1460a54970aff77b837b3e7f35db8e1afe3e435a038433909efc7a23"
+    },
+    "10-refuge-room.jpg": {
+      "bytes": 147134,
+      "sha256": "ffd96960574b22273ad77c6781e01458968e34ad182ac54a7323b3200c7e9564"
+    },
+    "11-stone-circle.jpg": {
+      "bytes": 75169,
+      "sha256": "7065eece6ac93c2a5608a0c595890e5f527039a1ee4a2d3fbac3cf55529e5431"
+    },
+    "12-songbird.jpg": {
+      "bytes": 47364,
+      "sha256": "98bfab13283e700443007f6c54f437d3067f6dcc8d21bef904f97549a53b99aa"
+    },
+    "13-drain.jpg": {
+      "bytes": 77175,
+      "sha256": "504b3559cce4ef0534c7fddee7a06e326565e530fb7a6f33226c4c001ea59650"
+    },
+    "14-archive.jpg": {
+      "bytes": 84360,
+      "sha256": "f48736ab77972d573b7f372cc1f9e149eaee233202935dc893c2488d74e444ef"
+    },
+    "15-lighthouse.jpg": {
+      "bytes": 107767,
+      "sha256": "e220852d0db23d08ec5c6f9753cd6d4a79dbf7600cf19de282d081abd5bc4020"
+    },
+    "16-shallows.jpg": {
+      "bytes": 63326,
+      "sha256": "ecc35f23ffad1a3f3731b578011cb727be788b88a7858d9f7d22feb84aba997c"
+    },
+    "17-gallery-bluff.jpg": {
+      "bytes": 57801,
+      "sha256": "ae47edebb1886a463902cc9f0e3fe727683c55ef6851cb1651cbb3e9d684b891"
+    },
+    "18-source.jpg": {
+      "bytes": 78366,
+      "sha256": "b529a1057467c746e9e3664c19d59ecc79edf789e57e5b0e398d95808d713290"
+    },
+    "19-tide-figure.jpg": {
+      "bytes": 69709,
+      "sha256": "1292958af4b8b1e6e0d7dc636a5675c2dbf51fe57a1dde94b20e4b0a20b3f60b"
+    },
+    "20-watcher.jpg": {
+      "bytes": 48994,
+      "sha256": "6625e00134d4e710988dcb3ddb072cb62a4ad24f6bea1d6a1abb5f5bb3eb77d7"
+    },
+    "21-readable.jpg": {
+      "bytes": 65102,
+      "sha256": "8746ae93b6c2294721842e846805a7247eeee01a7051c9ad9adadba4714d654c"
+    },
+    "ASSET_REVIEW.md": {
+      "bytes": 7520,
+      "sha256": "6e3311c3ea828d42a45a58169c8b016c3f05ad581cde2bceaa12cd06957e85ce"
+    },
+    "REPORT.md": {
+      "bytes": 6202,
+      "sha256": "b74ca0c6c123845fc27abc0e3c16488023e0a2349c7d76adb8a7d3283bf1bd40"
+    },
+    "crow-0.jpg": {
+      "bytes": 106956,
+      "sha256": "c875dc240042c01139477a961d3cfa78e188d45b7ba77a98d1c659f400c12955"
+    },
+    "crow-1.jpg": {
+      "bytes": 106085,
+      "sha256": "948a9f5346c3214d6c7a00e309288f891d58217b85d14c9519ebf0239aa2cb1e"
+    },
+    "crow-2.jpg": {
+      "bytes": 64870,
+      "sha256": "52f34dc84af255cd3d3338b239da8a3bf27f8d85bb569e4af4b8c393b25e58cc"
+    },
+    "crow-3.jpg": {
+      "bytes": 73654,
+      "sha256": "fdd0d47838ba1e31604296988fa1f0ea3f168897d904bf7ccb94544830816b11"
+    },
+    "era-1-12.jpg": {
+      "bytes": 105689,
+      "sha256": "73018d327fc27410f1b0f03d438124ea63a00ec44cab150c83fcef9b935d5a13"
+    },
+    "era-1-22.jpg": {
+      "bytes": 113614,
+      "sha256": "a610f22f5858fa6c0470de315e8e25c206c0b9b2b74f3b10fc882cd89abac068"
+    },
+    "era-2-12.jpg": {
+      "bytes": 100571,
+      "sha256": "5850f76712f3c03833b1dbc2267c9140b0bb96da613356ad667683ba704650f1"
+    },
+    "era-2-22.jpg": {
+      "bytes": 115287,
+      "sha256": "bc660442d666278945e0759e1f22844365716cba34729200ccce14fc2cf3fc04"
+    },
+    "era-3-12.jpg": {
+      "bytes": 99503,
+      "sha256": "9911d2529391b6a5519c0a4555157772de54089af490f19616fc063be1db479e"
+    },
+    "era-3-22.jpg": {
+      "bytes": 95316,
+      "sha256": "1e34d86eab90deb925f7d46b6741eefde6344aa2aa484293e2a065cb2d4e245e"
+    },
+    "era-4-12.jpg": {
+      "bytes": 98627,
+      "sha256": "2f6d17bf16affce90a454fa88ac5403c46a61315466357213b6bdd6c2cfd651c"
+    },
+    "era-4-22.jpg": {
+      "bytes": 79240,
+      "sha256": "5afafc77ad5f624c91ead3484768eb6c9f968d1c8c35e78745ef4424bc64db0f"
+    },
+    "final-asset-gates.log": {
+      "bytes": 1695,
+      "sha256": "a92bcd1c6bc3555daca2851b50d31d0914cb823f437ff8fce8f1b11beedc137d"
+    },
+    "full-regression.log": {
+      "bytes": 13335,
+      "sha256": "cd8a5994ac76dc5675d4e36d6f1632e3988f32c59b0618c6ca03e0e2d09ccd97"
+    },
+    "gull-life.mp4": {
+      "bytes": 2133132,
+      "sha256": "8eafa383e5424dab067ee2a911d73ee392b5d37dfa721993cd5963395543cd38"
+    },
+    "index.html": {
+      "bytes": 14461,
+      "sha256": "7238c90ccd234bb15871608834497baa643c7d9b50ea342a1ca50eec81d84486"
+    },
+    "pose-forage.jpg": {
+      "bytes": 220823,
+      "sha256": "6ac0e84a9bd19493d6ecef7586607d935edf2b945e279f8d2d49af254e657b87"
+    },
+    "pose-glide.jpg": {
+      "bytes": 221716,
+      "sha256": "113b1d5e6e5835b819dde543b322de16ec2973984e652836f1c4030435f4cfe1"
+    },
+    "pose-preen.jpg": {
+      "bytes": 220429,
+      "sha256": "0be2e91aec2c6ceaafd91c6d19f519bb96ea553d15da0ec14b9992b7d7270420"
+    },
+    "power.json": {
+      "bytes": 3509,
+      "sha256": "18745ac1a22139ed0a7d1033ba1269cdbdd7a6fe003411c4d145727276c5af5f"
+    },
+    "review-check.log": {
+      "bytes": 182,
+      "sha256": "8c50ddb02b9a412caab925572a07ba2ffee203ea62e4d4736989ccea9cbbfaca"
+    },
+    "review-validation.json": {
+      "bytes": 4743,
+      "sha256": "86563fb5a306e21ef8a4466b0bee77c46c9f6e79379d13d37c7a19095392576e"
+    },
+    "supplement.json": {
+      "bytes": 787,
+      "sha256": "fc33ac30efd0c88be62c292dca4a8de944a6db7968570ed97ecb48d98d9ab335"
+    },
+    "syntax.log": {
+      "bytes": 1047,
+      "sha256": "b551c28d1d177e8b5ac259906251e762d244cfc5d4d1977dbe1ade938aab4d53"
+    },
+    "unit-tests.log": {
+      "bytes": 14292,
+      "sha256": "e9b8da34faa16bc6fcaab4493f11bd44432455b18144624469b9b9706893931d"
+    },
+    "validation.json": {
+      "bytes": 8516,
+      "sha256": "ffc56cd8ed86a84aa15b38d63ceba1abdd4ce2276c3251f57940ac19605c7a6f"
+    },
+    "video-capture.log": {
+      "bytes": 93,
+      "sha256": "2541f580505e5d47288413c36922113acbec4c958e990627e580f25f3cc07312"
+    },
+    "video-timing.json": {
+      "bytes": 37471,
+      "sha256": "c2a5d5631004a595f85a89d028eab4aa1f8ee7ef281fe762c55e9da2dd934888"
+    }
+  }
+}

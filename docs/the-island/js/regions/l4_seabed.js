@@ -38,7 +38,7 @@ export function build({ region4 }) {
     note.name = 'sourceNote';
     const paperMat = new THREE.MeshStandardMaterial({ color: 0xd8cca8, roughness: 0.9, side: THREE.DoubleSide, emissive: 0x1a1408, emissiveIntensity: 0.15 });
     const paper = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.46), paperMat);
-    paper.rotation.set(-Math.PI / 2 + 0.16, 0.3, 0); paper.position.y = 0.012;
+    paper.rotation.set(-Math.PI / 2, 0, 0); paper.position.y = 0.012;
     const curl = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.16), paperMat);   // a half-curled top edge
     curl.rotation.set(-Math.PI / 2 - 0.5, 0.3, 0); curl.position.set(0.0, 0.06, -0.2);
     const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(0.08, 0),

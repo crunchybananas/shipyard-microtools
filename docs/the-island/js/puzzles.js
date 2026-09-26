@@ -3,6 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
+import { makeEncounterSightline } from './encounter-sightline.js';
 import {
   W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL,
   MAX_DEPTH, waterY, LEVELS, actForFlag, recordAct, recordWriting, writings,
@@ -68,6 +69,7 @@ export class Game {
     this.refs = refs;
     this.modelRefs = modelRefs;
     this.player = player;
+    this._encounterInView = makeEncounterSightline(refs.watcher.parent);
     this.interact = interact;
     this.notebook = notebook;
     this.progression = PROGRESSION;
@@ -147,6 +149,7 @@ export class Game {
     if (this.modelRefs?.lampLens?.material) this.modelRefs.lampLens.material.emissiveIntensity = 0.25;
     if (this.refs.handMarks) this.refs.handMarks.count = 0;
 
+    for(const r of [this.refs,this.modelRefs])if(r?.songBird)r.songBird.userData.callUntilMs=0;
     resetPuzzleRuntimeState(this);
   }
 
@@ -1114,6 +1117,7 @@ export class Game {
     if (d > 38) return;
     BIRD_MELODY.forEach((stoneIdx, n) => {
       this._scheduleRuntime(() => {
+        for(const r of [this.refs,this.modelRefs])if(r?.songBird)r.songBird.userData.callUntilMs=performance.now()+310;
         A.chirp(STONE_NOTES[stoneIdx], 0, 0.35, { x: stonesPos.x, z: stonesPos.z, ref: 24 });   // #63: from the arc
         this.anim.stoneGlow[stoneIdx] = Math.max(this.anim.stoneGlow[stoneIdx], 0.5);
       }, n * 650);
@@ -1593,7 +1597,7 @@ export class Game {
       const dist = Math.hypot(dx, dz) || 1e-3;
       fig.lookAt(p.x, fig.position.y, p.z);
       const fx = -Math.sin(this.player.yaw), fz = -Math.cos(this.player.yaw);
-      const looked = (fx * dx + fz * dz) / dist > spec.lookDot && dist < spec.lookMax;
+      const looked = (fx * dx + fz * dz) / dist > spec.lookDot && dist < spec.lookMax && this._encounterInView(this.player,fig);
       if (spec.stance === 'approach-unwatched') {
         if (looked) {
           this[spec.regardKey] = Math.min((this[spec.regardKey] || 0) + dt, 3);

@@ -2,7 +2,7 @@
 // The generator reads the JSON object between these markers.
 export const TOWER = Object.freeze(
 // layout:start
-{"x":-85,"z":-40,"base":13.5,"rise":20.6,"steps":83,"turns":3.5,"startDegrees":200,"radiusBottom":2.42,"radiusTop":1.64,"halfWidth":0.58}
+{"x":-85,"z":-40,"base":13.5,"rise":20.6,"steps":115,"turns":3,"startDegrees":20,"radiusBottom":3.30,"radiusTop":1.64,"halfWidth":0.58}
 // layout:end
 );
 const TAU = Math.PI * 2;

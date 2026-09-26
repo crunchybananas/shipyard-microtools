@@ -114,16 +114,21 @@ export class Player {
     this.syncCamera();
   }
 
-  syncCamera() {
+  syncCamera(smoothDt = 0) {
     // `this.pos.y` is the floor we were on last frame — it keeps us on it where a
     // buried room shares our (x,z) with the ground above (spawn() clears it first,
     // so an arrival always resolves to the surface).
     const groundY = walkableY(this.pos.x, this.pos.z, this.pos.y);
     this.pos.y = groundY;
     if (Math.hypot(this.pos.x - TOWER.x, this.pos.z - TOWER.z) < 4) W.atTop = groundY >= TOWER_TOP - .3;
+    // Keep collision on the actual tread while easing the eye over a short riser.
+    // Teleports and explicit camera staging snap; ordinary walking stays continuous.
+    if (smoothDt > 0 && Number.isFinite(this._viewFloor) && Math.abs(groundY - this._viewFloor) < .7)
+      this._viewFloor = lerp(this._viewFloor, groundY, 1 - Math.exp(-18 * smoothDt));
+    else this._viewFloor = groundY;
     this.camera.position.set(
       this.pos.x,
-      groundY + this.eye + Math.sin(this.bobPhase) * 0.045 * this.bobAmp * (W.reduceMotion ? 0 : 1),
+      this._viewFloor + this.eye + Math.sin(this.bobPhase) * 0.045 * this.bobAmp * (W.reduceMotion ? 0 : 1),
       this.pos.z);
     this.camera.rotation.set(0, 0, 0);
     this.camera.rotateY(this.yaw);
@@ -189,7 +194,7 @@ export class Player {
       this.onFootstep?.(kind, this.pos);
     }
 
-    this.syncCamera();
+    this.syncCamera(dt);
   }
 
   // one walk-collision probe from the current position toward (nx,nz) — moved out of update()

@@ -1,0 +1,309 @@
+{
+  "date": "2026-09-26",
+  "status": "local, not deployed",
+  "runtimeSha256": {
+    "index.html": "04589fe9c1516630291cfbb9b53fe04c03ad5b5015e612b5f10368be9df47c13",
+    "style.css": "d91f93c6908993587426f746ba34f4d9f76c2f9312a656224686bd40e895e643",
+    "js/assets.js": "a06b7a868891dce7f8eab8e9716edeef7c02c7d469940ad5d4f2f2e6062790cf",
+    "js/audio.js": "8e6bcd31707e97fedc379ae1f182d0c58f778369f1852da6d3ec12ba50eff5e0",
+    "js/content.js": "1b054d094df2d1917a063611726ad7bc6fefce592486cc66d22a72dcbdc03fbf",
+    "js/dispositions.js": "a6d71ab48ca5f4d00960b9762ba0c82db53a1bcff323042ad31ba67b12954b76",
+    "js/encounter-sightline.js": "01d36536b47adbca87823e463aea86bf60e6ca96d67bf061d8f679a4f43c6359",
+    "js/finale-tableaux.js": "05735cc420533c109d58561f2ea14315d1e34c11fc4d29f08f8a1bc677092dba",
+    "js/forest-profile.js": "d85c69dea04eff6ee4ccf355e6e3543614833c2efa911e6400d54c65be128d9e",
+    "js/harbor.js": "b9797380d05d44c5c8ca14e53674405cd55e98658d989255c806c4cce40fd985",
+    "js/interact.js": "2cf68a03bce691ce274bdff0c7d977d8df7e347a0018c2ddcbca27e13831df09",
+    "js/island-life.js": "7b50e004d85f01f4f569ec69d53c15713940dd3a2b462f28935aad69376d3f2c",
+    "js/landfall.js": "101c3dce95d891717aa9a3b2f44c24e20266b9d00e2defc99921c5ff621fc325",
+    "js/ledger-firebase.js": "e7d9a45694492edc6447da32ea9ca5917b60c3cec71cb65813bbd2929929b244",
+    "js/ledger.js": "13d1cbf0c74f8ce0c699130ba9168d63ae37e59ea0dca3938f3b9169b5bd6570",
+    "js/library-detail.js": "290eac4f2ed0b8a47c30d32f6f954332204384db86b8288db0c5478f4b5de2b7",
+    "js/main.js": "a7be89fbaaf5ec7b87446b22b95c4e67d35cf8a348853d61ae8d429332c90ecd",
+    "js/notebook-schema.js": "c70deacedd858b857127d31d093e1562da682b5fe353013cadbaee9e44260176",
+    "js/notebook.js": "986d981650fb27b84b8be3072724f39bbecd54b9d527ff254a6588dca4bf0851",
+    "js/player.js": "50ff425841cfabc42ebe26e7e4994509b2c1db79249b97365c4f8663bb267dcb",
+    "js/progression.js": "df679f33a68bbb558c35b8bcc6b22b1b46968522bd1d964474a2280db6a9d80b",
+    "js/props.js": "7edbb27949d9151f3611536bfec6512885fb1351de85102ca06227a9d211e7bf",
+    "js/puzzle-runtime.js": "6b068c170053830856cadc2a23b57cd437a74a6554df91e2ae46506c1e6520d6",
+    "js/puzzles.js": "4ab30ff6b8c3418d3fdf09ceff7040223103b996401b1e93dfc30a071b76daa5",
+    "js/refuge.js": "97c8dcbb79d22e1446c423d036532a2b1085555298b80d7b08cfd990673d8825",
+    "js/regions/index.js": "87fd7b7ff0bb4982813716458a02150ff3458febf68c0dfed51417c972564082",
+    "js/regions/l2_shallows.js": "de32fdfcb4db1570eb0aa5b289e822b8940b0b6a72da5cedd4c5deb36f0db5bd",
+    "js/regions/l3_gallery.js": "51761c0a0236ac8f4a2b2f3055f8051ba775f3c63d5984d2d475721e69fe62ff",
+    "js/regions/l4_seabed.js": "11bf725263518f8b2fa841061fb0c38d86225ac58b259c7b229b583ab65e5c98",
+    "js/report-schema.js": "4978309f3c633e81333f6a9fca2fd76ce077c9ec644f3717260e406cd5256374",
+    "js/save-schema.js": "7f8493054a104ff883d77205d44c85f94aa4a93c58c1374de1cc3f7ec8af4694",
+    "js/shaders.js": "55dbb55438930fb0efcb606ea51a95f04decb775965e42c6d857e15a2a8876f2",
+    "js/shore-details.js": "666b2479afaca39463f2c882043190243297935c173620a64176069f72153674",
+    "js/stack-config.js": "4d2a6e931e33a5bb1bcdb4a3fefad483467022d4d5cf2227ab2425bbbf140b40",
+    "js/terrain.js": "bbe4fb730015d1d1826b325a524a44b47604c31bfe6ae6e647f8c426fd1dde8a",
+    "js/tower-course.js": "4d679f5904e5c451be27361cdf6c7de90e0586121d46414628097529d3fe78dc",
+    "js/ui.js": "330214cf5f2ddcfcbe690a5f0469036b8c4b15932403bea824bf218b0a2170ad",
+    "js/upstream-hand.js": "0bfe05fdfb20840741dd693628a7d051109e8f4c6fb35955f388ec026c46028f",
+    "js/util.js": "740fa45675d2a6cf5ff5188ee3af62d455f52f033d7a01f2f67d15dce21903ea",
+    "js/working-coast.js": "d590819954baca77dee76271af12a1617b3068b79db653b0cc32d33f9e67cd1a",
+    "js/world.js": "96322fb7cf03b38d8f7d18c0e053de46a8099d768390dd8a2125d5008f04e5f8",
+    "assets/bark.jpg": "a0b19d8fb42c8b6574cd1c25a8407028cab671b71ff7919635dc49a3545e52cd",
+    "assets/bark_height.png": "0d8000683a1756218a6dd68e0f08dc4c0332de478fd0e4f873fb9e78bd8f5f63",
+    "assets/chart_vellum.jpg": "6e4071b8ed94458de897744d6455393f7de2366b88971f797e89510e45078504",
+    "assets/cloth.jpg": "92a872f836d0d9a6a91989b0f6fb87631e843ba531d31c67075c5f0136cf3a46",
+    "assets/driftwood.jpg": "9527b8e586f8cd65938c98f27d46fc3c7dada0b007c5e4e76c90d25f0105462f",
+    "assets/foam.jpg": "ffcab88a99db0e6474b8972997a41035d2288d4a4dcebbcb5bbbb9514dffa1a2",
+    "assets/foliage.jpg": "647be28adab327ff6b24d7639adadbed297aec94455807088ac239d1943ce90a",
+    "assets/harbor-rooms.glb": "19e071f65c3350a5b0aba472b7636a2e4bcb2afa52e48d7c7f206cca14adfc9d",
+    "assets/island-life.glb": "94f8bdd8e8d8b4179425e361b24d809d645a2e5d9d118bfeb9b4485616842c86",
+    "assets/landfall.glb": "1321edc07ccfa6df663166d9164ec080caaab6cbad7a5d04d64ab3d17fc8df85",
+    "assets/note_paper.jpg": "745a5310d4e530355f37b56b847e37c9940d556ffe69210ec25437d821a86b5f",
+    "assets/pebble.jpg": "904f1b89c035bdc6a581e6009f6adc1e7b5c7e87b3f22f5353a4645d2b128ac4",
+    "assets/rock-height.jpg": "9540a99ee6923a49322ef8c7b5800692b8782f3f3c77d367352f549300e89862",
+    "assets/sand.jpg": "10be98e8e570a5d0f4e399bb015ac8b6309994adf46a52bc338e8fa2d56af0c3",
+    "assets/shore-details.glb": "170e64fdc49a0b6eba5625b99c193000ef5ce5859a7b2831a382a3741c876985",
+    "assets/shore-timber.jpg": "73ded0ab0734aaf6aff280594f8120e2d0defc3add589e3d13a86391077e6c90",
+    "assets/study_stone.jpg": "d31c50b499309600f397581811bbff812c83bd88e6ddff237c27853d685c9263",
+    "assets/water_ripple.jpg": "c7a6d23a0ae3f83897503ec5a69920e57045f7530593c26b92610fa2f3b818a2",
+    "assets/wood.jpg": "55dcebefafcca800f32836dd471778fd77fd0f3d03d49c0bf04c7e4a264c71d0",
+    "assets/working-coast.glb": "faee4142cf6f063a84b8a17b679457e6b59b193d8a363a2bfa1f67431dfb7885"
+  },
+  "blender": {
+    "landfall": {
+      "parts": {
+        "towerShaft": {
+          "triangles": 11220,
+          "vertices": 44400
+        },
+        "towerShaftFar": {
+          "triangles": 672,
+          "vertices": 1344
+        },
+        "towerStair": {
+          "triangles": 2760,
+          "vertices": 1840
+        },
+        "towerRails": {
+          "triangles": 6944,
+          "vertices": 3712
+        },
+        "vaultRib": {
+          "triangles": 204,
+          "vertices": 136
+        },
+        "archiveFurniture": {
+          "triangles": 1584,
+          "vertices": 976
+        },
+        "basaltA": {
+          "triangles": 152,
+          "vertices": 5226
+        },
+        "basaltB": {
+          "triangles": 152,
+          "vertices": 5226
+        },
+        "headlandArch": {
+          "triangles": 204,
+          "vertices": 104
+        },
+        "windPineWood": {
+          "triangles": 952,
+          "vertices": 522
+        },
+        "windPineNeedles": {
+          "triangles": 3528,
+          "vertices": 8820
+        },
+        "windPineFar": {
+          "triangles": 284,
+          "vertices": 180
+        }
+      },
+      "totalTriangles": 28656,
+      "bytes": 2604048
+    },
+    "working-coast": {
+      "parts": {
+        "forest0Model": {
+          "triangles": 264,
+          "vertices": 198
+        },
+        "forest0Near": {
+          "triangles": 5792,
+          "vertices": 3576
+        },
+        "forest0Far": {
+          "triangles": 1376,
+          "vertices": 1032
+        },
+        "forest1Model": {
+          "triangles": 296,
+          "vertices": 222
+        },
+        "forest1Near": {
+          "triangles": 5588,
+          "vertices": 3450
+        },
+        "forest1Far": {
+          "triangles": 1328,
+          "vertices": 996
+        },
+        "forest2Model": {
+          "triangles": 232,
+          "vertices": 174
+        },
+        "forest2Near": {
+          "triangles": 4364,
+          "vertices": 2694
+        },
+        "forest2Far": {
+          "triangles": 1040,
+          "vertices": 780
+        },
+        "forest3Model": {
+          "triangles": 232,
+          "vertices": 174
+        },
+        "forest3Near": {
+          "triangles": 3752,
+          "vertices": 2316
+        },
+        "forest3Far": {
+          "triangles": 896,
+          "vertices": 672
+        },
+        "studyPlaster": {
+          "triangles": 1352,
+          "vertices": 2704
+        },
+        "studyTimber": {
+          "triangles": 6108,
+          "vertices": 4072
+        },
+        "studyFittings": {
+          "triangles": 1324,
+          "vertices": 846
+        }
+      },
+      "bytes": 1715112,
+      "totalTriangles": 33944
+    },
+    "island-life": {
+      "blender": "5.2.1 LTS",
+      "bones": [
+        "root",
+        "body",
+        "head",
+        "jaw",
+        "eyes",
+        "tail",
+        "wingL",
+        "wingR",
+        "handL",
+        "handR",
+        "footL",
+        "footR"
+      ],
+      "parts": {
+        "gull": {
+          "triangles": 2806,
+          "vertices": 1633,
+          "skinned": true
+        },
+        "crow": {
+          "triangles": 2522,
+          "vertices": 1441,
+          "skinned": true
+        },
+        "songbird": {
+          "triangles": 2522,
+          "vertices": 1441,
+          "skinned": true
+        },
+        "doryCraft": {
+          "triangles": 4836,
+          "vertices": 2480,
+          "skinned": false
+        },
+        "doryOarCraft": {
+          "triangles": 44,
+          "vertices": 26,
+          "skinned": false
+        },
+        "watcherCraft": {
+          "triangles": 2564,
+          "vertices": 1400,
+          "skinned": false
+        },
+        "tideFigureCraft": {
+          "triangles": 2004,
+          "vertices": 1114,
+          "skinned": false
+        },
+        "gullFar": {
+          "triangles": 859,
+          "vertices": 651,
+          "skinned": true
+        },
+        "crowFar": {
+          "triangles": 563,
+          "vertices": 455,
+          "skinned": true
+        },
+        "songbirdFar": {
+          "triangles": 563,
+          "vertices": 455,
+          "skinned": true
+        }
+      },
+      "bytes": 723320
+    },
+    "shore-details": {
+      "blender": "5.2.1 LTS",
+      "parts": {
+        "shoreTimber": {
+          "vertices": 633,
+          "triangles": 1102
+        },
+        "shoreGear": {
+          "vertices": 3485,
+          "triangles": 6582
+        },
+        "shoreRock": {
+          "vertices": 181,
+          "triangles": 284
+        },
+        "shoreLife": {
+          "vertices": 1260,
+          "triangles": 1752
+        },
+        "shorePool": {
+          "vertices": 29,
+          "triangles": 28
+        },
+        "shoreMini": {
+          "vertices": 68,
+          "triangles": 98
+        }
+      },
+      "bytes": 918788,
+      "totalTriangles": 9846
+    }
+  },
+  "imagegen": {
+    "tool": "OpenAI built-in imagegen",
+    "source": "tools/blender/granite-height-source.png",
+    "prompt": "tools/blender/granite-height-prompt.txt",
+    "runtime": "assets/rock-height.jpg"
+  },
+  "methods": {
+    "coastWalk": "held keyboard movement, no teleports during recording",
+    "stairWalk": "held keyboard movement; lens prerequisite fixture",
+    "journey": "earned progression with disclosed accelerated travel and actor fixtures"
+  },
+  "verification": {
+    "unitTests": 116,
+    "fullGate": "green",
+    "causalRouteChecks": 69,
+    "landfallChecks": 21,
+    "cohesionChecks": 9,
+    "encounterChecks": 8
+  }
+}

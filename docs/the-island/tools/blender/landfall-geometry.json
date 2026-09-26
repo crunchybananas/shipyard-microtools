@@ -1,28 +1,28 @@
 {
   "parts": {
     "towerShaft": {
-      "triangles": 11224,
-      "vertices": 44416
+      "triangles": 11220,
+      "vertices": 44400
     },
     "towerShaftFar": {
       "triangles": 672,
       "vertices": 1344
     },
     "towerStair": {
-      "triangles": 1992,
-      "vertices": 1328
+      "triangles": 2760,
+      "vertices": 1840
     },
     "towerRails": {
-      "triangles": 3688,
-      "vertices": 2016
+      "triangles": 6944,
+      "vertices": 3712
     },
     "vaultRib": {
       "triangles": 204,
       "vertices": 136
     },
     "archiveFurniture": {
-      "triangles": 288,
-      "vertices": 192
+      "triangles": 1584,
+      "vertices": 976
     },
     "basaltA": {
       "triangles": 152,
@@ -49,6 +49,6 @@
       "vertices": 180
     }
   },
-  "totalTriangles": 23340,
-  "bytes": 2081688
+  "totalTriangles": 28656,
+  "bytes": 2604048
 }

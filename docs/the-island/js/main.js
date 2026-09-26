@@ -1,3 +1,5 @@
+import { birdFactory, poseBird, attachLivingBoat, attachSongbirds, attachCoastalFigures } from './island-life.js';
+import { attachShoreDetails } from './shore-details.js';
 import { attachWorkingStudy } from './working-coast.js';
 import { attachLandfall } from './landfall.js';
 import { TOWER, TOWER_TOP, stairPose } from './tower-course.js';
@@ -39,7 +41,7 @@ import {
   FINALE_KINDS, finaleTableau, sampleFinaleTableau,
 } from './finale-tableaux.js';
 import A from './audio.js';
-import { Baker, mergeGeometries, clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED, addDrive, runDrives } from './util.js';
+import { clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED, addDrive, runDrives } from './util.js';
 
 const canvas = document.getElementById('scene');
 const DEBUG = new URLSearchParams(location.search).has('debug');
@@ -248,12 +250,15 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
-const [harborKit, landfallKit, coastKit] = await Promise.all([loadModel('harbor_rooms'), loadModel('landfall'), loadModel('working_coast')]);
+const [harborKit, landfallKit, coastKit, shoreKit, lifeKit] = await Promise.all([loadModel('harbor_rooms'), loadModel('landfall'), loadModel('working_coast'), loadModel('shore_details'), loadModel('island_life')]);
 const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, l3motes, vaultDrips } = buildWorld(coastKit);
 const harbor = attachHarborRooms(core, harborKit);
 const landfall = attachLandfall(core, landfallKit);
 const workingStudy = attachWorkingStudy(core, coastKit);
 const modelRoot = instantiateModel(core, modelAnchor);
+attachShoreDetails(core, modelRoot, shoreKit);
+attachLivingBoat(core, modelRoot, lifeKit);
+const tickFigures=attachCoastalFigures(core,lifeKit);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
 const youMarker = modelRoot.getObjectByName('youMarker');
@@ -436,97 +441,11 @@ renderer.compile(scene, camera);         // #27: warm the full 9-light program (
 renderer.shadowMap.autoUpdate = false;   // #28: the shadow pass redraws only when applyAtmosphere marks it dirty
 renderer.shadowMap.needsUpdate = true;   // …starting with one honest first draw
 
-// ---------------- gulls ----------------
+// ---------------- authored coastal birds ----------------
+const makeBird = birdFactory(lifeKit,camera);
+const tickSongbirds=attachSongbirds(refs,modelRefs,makeBird);
 const gulls = [];
 {
-  // A gull is not a white shape — it is a WHITE BIRD WITH A GREY MANTLE AND BLACK
-  // WINGTIPS, and that contrast is the entire silhouette at any distance. The flock
-  // was one flat off-white on every surface, which is why it read as ovoids drifting
-  // over the island rather than as birds. Vertex colours fix it for zero extra draws
-  // and zero extra material state (the flock is still 3 meshes each).
-  const wingMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: false, side: THREE.DoubleSide });
-  const C_BODY = new THREE.Color(0xf2efe6);   // white, faintly warm
-  const C_MANTLE = new THREE.Color(0x9aa6ae); // the grey back
-  const C_TIP = new THREE.Color(0x2b2f36);    // the black primaries
-
-  // paint a wing root→tip. The two wings sit at x = ∓0.7 from one centred plane, so
-  // the tip is at local −x on the left and +x on the right — mirrored, which is why
-  // this needs a geometry per side. Still one mesh per wing, so draws are unchanged.
-  // A GULL'S WING IS NOT A RECTANGLE, and it is not vertical. This was a flat 1.4 x 0.4
-  // plane left in the XY plane — standing on edge, facing the direction of travel — so
-  // rotating it about Z to "flap" spun it in its own plane like a propeller blade, and
-  // the whole bird read as a paper dart. Owner: "the birds need more detail."
-  //
-  // Now it lies HORIZONTAL (span across, chord fore-and-aft, so the flap rotation about
-  // Z actually raises and lowers it), and it is shaped: the chord tapers to the tip, the
-  // leading edge sweeps AFT, the wing is cambered, and the tip lifts. Those four things
-  // are the whole difference between a card and a bird at any distance.
-  const mkWing = (tipAtNegX) => {
-    const g = new THREE.PlaneGeometry(1.32, 0.44, 10, 2);
-    const p = g.attributes.position, col = new Float32Array(p.count * 3), c = new THREE.Color();
-    for (let i = 0; i < p.count; i++) {
-      const x = p.getX(i), y = p.getY(i);
-      const t = tipAtNegX ? (0.66 - x) / 1.32 : (x + 0.66) / 1.32;   // 0 root → 1 tip
-      const taper = 1 - t * t * 0.74;                 // narrow to a point
-      // The rear edge resolves into individual primaries instead of one ruler-straight
-      // line. At flock distance the notches are only a few pixels, but those pixels are
-      // the difference between a glider and a gull.
-      const primary = y > 0.08 && t > 0.48 ? (0.025 + 0.035 * (Math.floor(t * 10) % 2)) * t : 0;
-      p.setY(i, y * taper - t * t * 0.30 - primary);   // taper + aft sweep + feather slots
-      p.setZ(i, Math.sin(t * Math.PI) * 0.065 + t * t * 0.13);  // camber, elbow, lifted tip
-      c.copy(C_BODY).lerp(C_MANTLE, Math.min(1, t * 1.5)).lerp(C_TIP, Math.max(0, (t - 0.70) / 0.30));
-      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
-    }
-    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    g.computeVertexNormals();
-    g.rotateX(-Math.PI / 2);                          // lie flat: span in x, chord in z
-    // ROOT AT THE ORIGIN. The wing was centred on its own middle and the mesh was then
-    // placed at x = ∓0.7, so rotating it about z pivoted it about the MIDDLE of the span:
-    // the tip went down while the root went up, straight through the body. Owner: "bird
-    // wings seem to almost flap backwards. rather than hinge at the body, they flap at
-    // the body." A wing hinges at the shoulder — put the shoulder on the axis and the
-    // rotation is a shoulder joint.
-    g.translate(tipAtNegX ? -0.66 : 0.66, 0, 0);
-    return g;
-  };
-  const wingGeoL = mkWing(true), wingGeoR = mkWing(false);
-
-  const bodyCone = new THREE.ConeGeometry(0.115, 0.62, 8);
-  bodyCone.rotateX(Math.PI / 2.15);                       // nose forward, tail riding up
-  const headBall = new THREE.SphereGeometry(0.085, 8, 6);
-  headBall.translate(0, 0.075, 0.32);
-  // a beak, and a TAIL — a gull in the air is a cross, and without the tail the rear
-  // just stops. Both are a handful of triangles on a geometry eight birds share.
-  const beak = new THREE.ConeGeometry(0.022, 0.11, 5);
-  beak.rotateX(Math.PI / 2);
-  beak.translate(0, 0.065, 0.40);
-  const tail = new THREE.PlaneGeometry(0.30, 0.26, 2, 1);
-  {
-    const tp = tail.attributes.position;
-    for (let i = 0; i < tp.count; i++) {                  // a notched delta, not a paddle
-      const tx = tp.getX(i);
-      tp.setY(i, tp.getY(i) * (0.35 + 0.65 * Math.abs(tx) / 0.15));
-    }
-    tail.computeVertexNormals();
-    tail.rotateX(-Math.PI / 2 + 0.16);
-    tail.translate(0, 0.03, -0.36);
-  }
-  const gullBodyGeo = mergeGeometries([bodyCone, headBall, beak, tail]);
-  bodyCone.dispose(); headBall.dispose(); beak.dispose(); tail.dispose();
-  {
-    // the body is white underneath and grey along the back — the same read as the
-    // wings, so a gull seen from below is pale and from above is a grey shape on the sea
-    const p = gullBodyGeo.attributes.position, col = new Float32Array(p.count * 3), c = new THREE.Color();
-    for (let i = 0; i < p.count; i++) {
-      c.copy(C_BODY).lerp(C_MANTLE, Math.max(0, Math.min(1, (p.getY(i) + 0.02) / 0.14)) * 0.85);
-      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
-    }
-    gullBodyGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  }
-  // a WHEELING FLOCK over the island (loop: life). Varied radius/height/speed (some negative =
-  // counter-wheeling) so it reads as a living gyre, not identical circles — and several fly LOW + CLOSE
-  // so you actually see gulls pass overhead, not two specks at 50 m. gulls[0] still leaves the gyre to
-  // perch on the gallery rail at dawn (the keeper's-view beat). +0 model-clone cost (added to scene, not core).
   const FLOCK = [
     { radius: 24, h: 32, speed:  0.14, phase: 0.0 },   // [0] the dawn percher — keep first
     { radius: 33, h: 38, speed:  0.17, phase: 2.4 },
@@ -538,133 +457,12 @@ const gulls = [];
     { radius: 39, h: 44, speed: -0.13, phase: 2.0 },   // high counter
   ];
   for (const f of FLOCK) {
-    const g = new THREE.Group();
-    const l = new THREE.Mesh(wingGeoL, wingMat);
-    l.position.x = -0.055;                            // the shoulder, at the body's edge
-    const r = new THREE.Mesh(wingGeoR, wingMat);
-    r.position.x = 0.055;
-    // a body between the wings — songbird recipe, gull proportions —
-    // so the dawn percher reads as a bird up close, not two cards
-    g.add(l, r, new THREE.Mesh(gullBodyGeo, wingMat));
-    g.userData = { phase: f.phase, radius: f.radius, h: f.h, speed: f.speed, l, r };
+    const g = makeBird('gull');g.scale.setScalar(1.25);g.userData.mesh.castShadow=false;
+    Object.assign(g.userData, { phase: f.phase, radius: f.radius, h: f.h, speed: f.speed });
     scene.add(g);
     gulls.push(g);
   }
 }
-
-// ---------------- bird wings (perched gulls + crows) ----------------
-// A resting bird shows FOLDED wings (the grey/dark mantle); when it FLUSHES it needs real ones. One
-// pivoted wing per side: swept back along the body at rest, spread + flapping on takeoff (driven by
-// u.flush in tickPerched). Shared geometry + material across all birds — cheap, scene-only (no clone).
-const _wingGeo = (side) => {
-  // Five chord stations make a shoulder, elbow and tapered hand. The old four-vertex
-  // rectangle could only ever open like a hinged card; this has a swept leading edge,
-  // a scalloped primary edge and a pointed tip, while staying one tiny shared mesh.
-  const U = [0, 0.24, 0.52, 0.78, 1];
-  const pos = [], col = [], idx = [];
-  for (let i = 0; i < U.length; i++) {
-    const u = U[i], x = side * 0.62 * u;
-    const centre = -0.025 - 0.13 * u * u;
-    const half = (0.095 + 0.07 * Math.sin(u * Math.PI)) * (1 - 0.82 * u) + 0.012;
-    const notch = i >= 2 && i % 2 ? 0.035 : 0;
-    const lift = Math.sin(u * Math.PI) * 0.025 + u * u * 0.018;
-    pos.push(x, lift, centre + half, x, lift, centre - half + notch);
-    const shade = 1 - 0.72 * Math.max(0, (u - 0.62) / 0.38);
-    col.push(shade, shade, shade, shade, shade, shade);
-    if (i < U.length - 1) {
-      const a = i * 2, b = a + 1, c = a + 2, d = a + 3;
-      idx.push(a, b, c, b, d, c);
-    }
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-  geo.setIndex(idx); geo.computeVertexNormals();
-  return geo;
-};
-const WING_GEO_L = _wingGeo(-1), WING_GEO_R = _wingGeo(1);
-// wing grey matched to the baked mantle so a folded wing reads as the bird's grey back,
-// not a stuck-on pale board (#46)
-const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xa9a69b, vertexColors: true, flatShading: false, roughness: 0.82, side: THREE.DoubleSide });
-const crowWingMat = new THREE.MeshStandardMaterial({ color: 0x34373d, vertexColors: true, flatShading: false, roughness: 0.7, metalness: 0.1, side: THREE.DoubleSide });
-// the FOLDED pose (#46): swept back AND rolled down the flank with the chord tucked
-// short, so the wing hugs the body like real folded primaries — the old pose left both
-// wings sticking out horizontally at shoulder height, the last blob-tell on the shore
-// gulls. tickPerched lerps from these exact constants on takeoff.
-const FOLD_Y = 1.42, FOLD_Z = 0.45, FOLD_CHORD = 0.72;
-const addWings = (g, mat) => {
-  const lw = new THREE.Group(), rw = new THREE.Group();
-  lw.position.set(-0.05, 0.25, 0.03); rw.position.set(0.05, 0.25, 0.03);
-  lw.rotation.set(0, -FOLD_Y, FOLD_Z); rw.rotation.set(0, FOLD_Y, -FOLD_Z);
-  lw.scale.z = rw.scale.z = FOLD_CHORD;
-  lw.add(new THREE.Mesh(WING_GEO_L, mat)); rw.add(new THREE.Mesh(WING_GEO_R, mat));
-  g.add(lw, rw); g.lw = lw; g.rw = rw;
-};
-
-// ---------------- perched-bird bodies ----------------
-// One merged, vertex-coloured geometry per species (via the Baker): the resting body was five
-// meshes across three materials PER BIRD — 45 draw calls of tiny 7×6-segment spheres that read
-// visibly faceted at flush distance. Now each bird is 1 smooth body draw (+2 wings), and both
-// species share one material. Their bodies now carry the profile-defining anatomy too:
-// split tails, eyes, legs, toes and the gull's black primaries, still in that one draw.
-const birdBodyMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0.06 });
-const bakeBirdGeo = (parts) => {
-  const b = new Baker();
-  const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3(), S = new THREE.Vector3();
-  for (const [geo, col, x, y, z, rx = 0, sx = 1, sy = 1, sz = 1] of parts) {
-    b.add(geo, M.compose(V.set(x, y, z), Q.setFromEuler(E.set(rx, 0, 0)), S.set(sx, sy, sz)), col);
-    geo.dispose();
-  }
-  return b.build();
-};
-const gullGeo = (() => {
-  // A perched gull is read from the ground up: feet, breast, folded dark primaries,
-  // upright neck, eye, then beak. Two ellipsoids alone made a snowman. Keep every part
-  // in this one baked draw, but give the silhouette the anatomy the eye expects.
-  const white = new THREE.Color(0xeeeae0), grey = new THREE.Color(0x8e969b);
-  const black = new THREE.Color(0x24282d), ochre = new THREE.Color(0xd19a2d);
-  const toe = () => { const g = new THREE.CylinderGeometry(0.008, 0.009, 0.13, 5); g.rotateX(Math.PI / 2); return g; };
-  return bakeBirdGeo([
-    [new THREE.SphereGeometry(0.17, 12, 9), white, 0, 0.25, -0.01, -0.08, 1, 0.9, 1.62],  // pear-shaped breast
-    [new THREE.SphereGeometry(0.145, 10, 8), grey, 0, 0.31, -0.09, -0.08, 0.96, 0.40, 1.62], // mantle
-    [new THREE.ConeGeometry(0.052, 0.29, 6), black, -0.055, 0.23, -0.39, -1.82],           // split black tail
-    [new THREE.ConeGeometry(0.052, 0.29, 6), black,  0.055, 0.23, -0.39, -1.82],
-    [new THREE.SphereGeometry(0.105, 12, 9), white, 0, 0.45, 0.22],                        // head above the breast
-    [new THREE.SphereGeometry(0.014, 7, 5), black, -0.087, 0.472, 0.285],                 // eyes survive profile views
-    [new THREE.SphereGeometry(0.014, 7, 5), black,  0.087, 0.472, 0.285],
-    [new THREE.ConeGeometry(0.03, 0.14, 6), ochre, 0, 0.43, 0.39, Math.PI / 2],            // beak
-    [new THREE.CylinderGeometry(0.011, 0.013, 0.17, 5), ochre, -0.06, 0.075, 0.02],       // legs
-    [new THREE.CylinderGeometry(0.011, 0.013, 0.17, 5), ochre,  0.06, 0.075, 0.02],
-    [toe(), ochre, -0.06, -0.008, 0.065], [toe(), ochre, 0.06, -0.008, 0.065],             // forward toes
-  ]);
-})();
-const crowGeo = (() => {
-  const blk = new THREE.Color(0x30343a), blkD = new THREE.Color(0x171a1f), eye = new THREE.Color(0x8896a4);
-  const toe = () => { const g = new THREE.CylinderGeometry(0.008, 0.009, 0.15, 5); g.rotateX(Math.PI / 2); return g; };
-  return bakeBirdGeo([
-    [new THREE.SphereGeometry(0.16, 12, 9), blk, 0, 0.24, -0.02, -0.10, 0.94, 0.84, 1.9],
-    [new THREE.SphereGeometry(0.145, 10, 8), blkD, 0, 0.31, -0.10, -0.08, 0.90, 0.38, 1.65],
-    [new THREE.ConeGeometry(0.06, 0.43, 6), blkD, -0.045, 0.22, -0.49, -1.72],
-    [new THREE.ConeGeometry(0.06, 0.43, 6), blkD,  0.045, 0.22, -0.49, -1.72],
-    [new THREE.SphereGeometry(0.1, 12, 9), blk, 0, 0.43, 0.27],
-    [new THREE.SphereGeometry(0.012, 7, 5), eye, -0.082, 0.455, 0.335],
-    [new THREE.SphereGeometry(0.012, 7, 5), eye,  0.082, 0.455, 0.335],
-    [new THREE.ConeGeometry(0.034, 0.19, 6), blkD, 0, 0.41, 0.48, Math.PI / 2],
-    [new THREE.CylinderGeometry(0.01, 0.012, 0.18, 5), blkD, -0.055, 0.07, 0.02],
-    [new THREE.CylinderGeometry(0.01, 0.012, 0.18, 5), blkD,  0.055, 0.07, 0.02],
-    [toe(), blkD, -0.055, -0.015, 0.075], [toe(), blkD, 0.055, -0.015, 0.075],
-  ]);
-})();
-
-// The merged body includes the feet, so its actual bounding box is the only honest
-// ground-contact datum. Root each species by its sole instead of burying the toes at
-// y=terrain and then disguising the error with a whole-body hover.
-gullGeo.computeBoundingBox();
-crowGeo.computeBoundingBox();
-const BIRD_SOLE = {
-  gull: -gullGeo.boundingBox.min.y,
-  crow: -crowGeo.boundingBox.min.y,
-};
 
 // ---------------- perched shore gulls ----------------
 // gulls resting on the south shingle — the first life you meet at the wake-up beach. They startle and
@@ -672,23 +470,20 @@ const BIRD_SOLE = {
 // added to `scene` (not core) → no 1:240 model clone. Surface + day only.
 const perched = [];
 {
-  const mk = () => {
-    const g = new THREE.Group();
-    g.add(new THREE.Mesh(gullGeo, birdBodyMat));
-    addWings(g, gullWingMat);
-    return g;
-  };
+  const mk = () => makeBird('gull');
   const rngP = mulberry32(SEED ^ 0x9c0f);   // own rng — world scatter byte-unchanged
   let placed = 0;
-  for (let i = 0; i < 80 && placed < 5; i++) {
+  for (let i = 0; i < 80 && placed < 3; i++) {
     const x = -22 + rngP() * 52;            // south shingle span
     const z = -98 - rngP() * 22;
     const h = heightAt(x, z);
     if (h < 0.25 || h > 2.2) continue;       // dry shingle above the waterline only
-    const g = mk(), py = h + BIRD_SOLE.gull;
+    const g = mk();
+    const groundY=h+(x>-32&&x<16&&z>-106.5&&z< -98.5?.04:0);
+    const py=groundY+g.userData.sole;
     g.position.set(x, py, z);
-    g.rotation.y = (rngP() - 0.5) * 1.7;     // facing roughly seaward (yaw 0 = −z), spread
-    g.userData = { px: x, py, pz: z, groundY: h, yaw: g.rotation.y, ph: rngP() * TAU, flush: 0, cool: 0, species: 'gull' };
+    g.rotation.y = (rngP() - 0.5) * 1.7;     // mixed watching directions (bird forward is +z)
+    Object.assign(g.userData, { px: x, py, pz: z, groundY, yaw: g.rotation.y, ph: rngP() * TAU, flush: 0, cool: 0, species: 'gull' });
     scene.add(g);
     perched.push(g);
     placed++;
@@ -700,24 +495,21 @@ const perched = [];
 // quiet (life persisting in the keeper's absence). Reuses the perched-bird model with dark plumage +
 // a sleeker body / longer tail + beak, and the same `perched` idle+flush logic. scene-only (no clone).
 {
-  const mkCrow = () => {
-    const g = new THREE.Group();
-    g.add(new THREE.Mesh(crowGeo, birdBodyMat));
-    addWings(g, crowWingMat);
-    return g;
-  };
+  const mkCrow = () => makeBird('crow');
   const rngC = mulberry32(SEED ^ 0x4c0a);
   let pc = 0;
   for (let i = 0; i < 100 && pc < 4; i++) {
     const a = rngC() * TAU, d = 24 + rngC() * 110;
     const x = SPOTS.mainCenter.x + Math.sin(a) * d, z = SPOTS.mainCenter.y + Math.cos(a) * d;
     const h = heightAt(x, z);
+    if(colliders().some(c=>Math.hypot(x-c.x,z-c.z)<c.r+2.2))continue;
+    if(Math.abs(heightAt(x+.35,z)-heightAt(x-.35,z))>.18||Math.abs(heightAt(x,z+.35)-heightAt(x,z-.35))>.18)continue;
     if (h < 2.0 || h > 12) continue;                                          // inland dune / tree line, dry
     if (Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 14) continue;
-    const g = mkCrow(), py = h + BIRD_SOLE.crow;
+    const g = mkCrow(), py = h + g.userData.sole;
     g.position.set(x, py, z);
     g.rotation.y = rngC() * TAU;
-    g.userData = { px: x, py, pz: z, groundY: h, yaw: g.rotation.y, ph: rngC() * TAU, flush: 0, cool: 0, species: 'crow' };
+    Object.assign(g.userData, { px: x, py, pz: z, groundY: h, yaw: g.rotation.y, ph: rngC() * TAU, flush: 0, cool: 0, species: 'crow' });
     scene.add(g);
     perched.push(g);
     pc++;
@@ -1835,10 +1627,11 @@ function tickGulls(elapsed, dt) {
   if (day > 0.5 && MODE === 'play' && W.level === 1 && Math.random() < dt * 0.033) {
     const g = gulls[(Math.random() * gulls.length) | 0];
     const d = Math.hypot(g.position.x - player.pos.x, g.position.z - player.pos.z);
+    g.userData.callUntil=elapsed+.65;
     A.gullCry(clamp(0.26 * (1 - d / 220), 0.03, 0.26), { x: g.position.x, z: g.position.z, ref: 40 });   // #63: from the bird itself
   }
   // #64: the dawn percher announces the rail (the keeper's-view beat gets its sound)
-  if (settle > 0.6 && !perchCried && MODE === 'play') { perchCried = true; A.gullCry(0.18, { x: GULL_PERCH.x, z: GULL_PERCH.z, ref: 40 }); }
+  if (settle > 0.6 && !perchCried && MODE === 'play') { perchCried = true; gulls[0].userData.callUntil=elapsed+.65; A.gullCry(0.18, { x: GULL_PERCH.x, z: GULL_PERCH.z, ref: 40 }); }
   if (settle < 0.2) perchCried = false;
   for (const g of gulls) {
     g.visible = day > 0.3 && MODE !== 'dive';
@@ -1847,7 +1640,7 @@ function tickGulls(elapsed, dt) {
     const a = elapsed * u.speed + u.phase;
     g.position.set(LH.x + Math.cos(a) * u.radius, LH.y + u.h + Math.sin(a * 2.3) * 2, LH.z + Math.sin(a) * u.radius);
     g.rotation.y = -a + (u.speed < 0 ? Math.PI : 0); // nose along the flight tangent (flip for counter-wheelers)
-    let flapAmp = 0.5;
+
     if (g === gulls[0] && settle > 0) {
       // SPIRAL IN — do not lerp through the building. A straight line from the gyre
       // (radius 24, 32 m up) to the rail (radius 3.55, 21.95 m up) passes THROUGH the
@@ -1864,14 +1657,12 @@ function tickGulls(elapsed, dt) {
       da = Math.atan2(Math.sin(da), Math.cos(da));    // take the short way round
       const ra = a + da * settle;
       g.position.set(LH.x + Math.cos(ra) * rr, lerp(gy, LH.y + 21.95, settle), LH.z + Math.sin(ra) * rr);
-      g.position.y += Math.sin(elapsed * 2.2) * 0.02 * settle;   // breathing
+      // The feet stay on the rail; the articulated neck and wings carry life.
       g.rotation.y = lerp(g.rotation.y, Math.PI / 2, settle);    // face the dawn (east)
-      flapAmp = 0.5 * (1 - settle);                              // fold
-      u.l.rotation.x = u.r.rotation.x = -0.12 * settle;          // wings tucked
     }
-    const flap = Math.sin(elapsed * 6 + u.phase) * flapAmp;
-    u.l.rotation.z = flap + 0.16 * (g === gulls[0] ? settle : 0);
-    u.r.rotation.z = -flap - 0.16 * (g === gulls[0] ? settle : 0);
+    const landed=g===gulls[0]?settle:0;
+    g.rotation.z=Math.sin(a*1.7+u.phase)*.12*(1-landed);
+    poseBird(g,elapsed,{phase:u.phase,flight:1-landed,calling:elapsed<u.callUntil});
   }
 }
 
@@ -1893,15 +1684,28 @@ function tickPerched(elapsed, dt) {
     const u = g.userData;
     if (!active) { g.visible = false; continue; }
     const d = Math.hypot(pp.x - u.px, pp.z - u.pz);
+    if(u.returning){
+      u.returnT=Math.min(6,u.returnT+dt);const t=u.returnT/6;
+      const remain=(1-t)*(1-t),distance=BIRD_EXIT_DISTANCE*remain;
+      g.visible=true;g.position.set(u.px+u.exitX*distance,u.py+BIRD_EXIT_RISE*remain,u.pz+u.exitZ*distance);
+      const yaw=Math.atan2(-u.exitX,-u.exitZ);
+      const align=Math.atan2(Math.sin(u.yaw-yaw),Math.cos(u.yaw-yaw))*smoothstep(.84,1,t);
+      g.rotation.set(-.12*(1-t),yaw+align,0);
+      const land=smoothstep(.65,1,t);
+      poseBird(g,elapsed,{phase:u.ph,flight:1-smoothstep(.94,1,t),landing:land});
+      u.behavior='returning';
+      if(t===1){u.returning=false;u.flush=0;g.position.set(u.px,u.py,u.pz);g.rotation.set(0,u.yaw,0);}
+      continue;
+    }
     if (u.flush === 0) {
-      // Perched means PERCHED. The baked feet and body share one geometry, so moving
-      // or yawing the root makes the toes hover and skate. Hold the sole exactly on
-      // terrain; the folded wings carry the tiny breath below.
+      // Keep the root and both foot joints planted. The articulated head, neck,
+      // tail and folded wings carry the idle gestures.
       g.visible = true; g.rotation.x = 0;
       g.position.set(u.px, u.py, u.pz);
       g.rotation.y = u.yaw;
       // #64: the lone caw of an island gone quiet — rare, and only within earshot
       if (u.species === 'crow' && d < 60 && Math.random() < dt * 0.008) {
+        u.callUntil=elapsed+.65;
         A.crowCaw(clamp(0.22 * (1 - d / 70), 0.04, 0.22), undefined, { x: u.px, z: u.pz, ref: 30 });   // #63
       }
       if (d < 3.6) {
@@ -1919,6 +1723,7 @@ function tickPerched(elapsed, dt) {
         u.sideX = -ez * side; u.sideZ = ex * side;
         u.flush = 0.001;                                   // startle → continuous flight clock
         // #64: the burst-up finally makes a sound — a close startled cry
+        u.callUntil=elapsed+.65;
         if (u.species === 'crow') A.crowCaw(0.3, true, { x: u.px, z: u.pz, ref: 20 }); else A.gullCry(0.3, { x: u.px, z: u.pz, ref: 20 });   // #63
       }
     } else if (u.flush < BIRD_VISIBLE_FLIGHT_S) {
@@ -1958,26 +1763,11 @@ function tickPerched(elapsed, dt) {
       // has left this patch of shore; by then its removal was below visual scale.
       g.visible = false;
       u.cool -= dt;
-      if (u.cool <= 0 && d > 22) u.flush = 0;
+      if (u.cool <= 0 && d > 22) {u.returning=true;u.returnT=0;g.visible=true;}
     }
-    // wings: swept-back/folded at rest, snap open + flap fast on takeoff (spread leads the
-    // climb). Rest pose = the FOLD_* constants from addWings; chord stretches back out as
-    // the wing opens.
-    if (g.lw) {
-      if (u.flush === 0) {
-        const breath = Math.sin(elapsed * 0.9 + u.ph) * 0.012;
-        g.rw.rotation.y = FOLD_Y; g.rw.rotation.z = -FOLD_Z - breath;
-        g.lw.rotation.y = -FOLD_Y; g.lw.rotation.z = FOLD_Z + breath;
-        g.lw.scale.z = g.rw.scale.z = FOLD_CHORD;
-      } else {
-        const spread = clamp(u.flush / 0.18, 0, 1);
-        const glide = smoothstep(0.7, BIRD_VISIBLE_FLIGHT_S, u.flush);
-        const flap = 0.12 + Math.sin(elapsed * 20 + u.ph) * lerp(0.72, 0.24, glide);
-        g.rw.rotation.y = lerp(FOLD_Y, 0, spread); g.rw.rotation.z = lerp(-FOLD_Z, flap, spread);
-        g.lw.rotation.y = lerp(-FOLD_Y, 0, spread); g.lw.rotation.z = lerp(FOLD_Z, -flap, spread);
-        g.lw.scale.z = g.rw.scale.z = lerp(FOLD_CHORD, 1, spread);
-      }
-    }
+    const look=Math.atan2(pp.x-u.px,pp.z-u.pz)-u.yaw;
+    poseBird(g,elapsed,{phase:u.ph,flight:u.flush>0?clamp(u.flush/.22,0,1):0,
+      alert:u.flush===0?1-smoothstep(4,9,d):0,look:Math.atan2(Math.sin(look),Math.cos(look)),calling:elapsed<u.callUntil});
   }
 }
 
@@ -2215,7 +2005,7 @@ function makeReportThumbnail() {
       if (cmd === 'resolve') return game.resolveEncounter('watcher') ? 'resolved' : 'already resolved';
       if (cmd === 'reset') {
         W.flags.watcherSeen = false; w.visible = false; w.scale.setScalar(1);
-        w.position.set(24, heightAt(24, -88) || 0, -88); game._watcherRegard = 0; return 'reset';
+        w.position.set(8, heightAt(8, -84) || 0, -84); game._watcherRegard = 0; return 'reset';
       }
       if (W.level < 3) window.ABYME.goLevel(3);           // apply the canonical rung transition
       W.flags.watcherSeen = false;
@@ -2713,6 +2503,8 @@ renderer.setAnimationLoop((tMs) => {
   applyAtmosphere(elapsed, dt);
   tickGulls(elapsed, dt);
   tickPerched(elapsed, dt);
+  tickSongbirds(elapsed);
+  tickFigures(W.reduceMotion?0:elapsed);
 
   A.update(dt, {
     wavePhase: clamp(wavePhase(elapsed), 0, 1),

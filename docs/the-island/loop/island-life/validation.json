@@ -1,0 +1,448 @@
+{
+  "pass": [
+    {
+      "name": "shore scatter is deliberately sparse"
+    },
+    {
+      "name": "driftwood stays west of the open arrival"
+    },
+    {
+      "name": "one tide-rock cluster belongs beside the working shore"
+    },
+    {
+      "name": "the arrival-to-working-shore walking line remains clear"
+    },
+    {
+      "name": "distance selects one lighter skin on the same animated joints"
+    },
+    {
+      "name": "the full-size dory uses the authored hull"
+    },
+    {
+      "name": "open hull contains a floor below its gunwale"
+    },
+    {
+      "name": "the dory keeps its human scale and replaces the old seats"
+    },
+    {
+      "name": "the miniature shares the same authored boat geometry"
+    },
+    {
+      "name": "a real pointer still operates the rebuilt dory"
+    },
+    {
+      "name": "the stone clue has its own rig at both scales"
+    },
+    {
+      "name": "the actual musical clue opens the bird beak with its note"
+    },
+    {
+      "name": "a fresh runtime cancels pending beak gestures with the notes"
+    },
+    {
+      "name": "the shingle transition blends continuously over the terrain"
+    },
+    {
+      "name": "era 1 preserves the clue and the surface wildlife rule"
+    },
+    {
+      "name": "era 2 preserves the clue and the surface wildlife rule"
+    },
+    {
+      "name": "era 3 preserves the clue and the surface wildlife rule"
+    },
+    {
+      "name": "era 4 preserves the clue and the surface wildlife rule"
+    },
+    {
+      "name": "all six stone crowns have closed corners rather than split faces"
+    },
+    {
+      "name": "the final note and kept-record slab sit above the fitted boards"
+    },
+    {
+      "name": "asset assembly, all era grades and wildlife produce no runtime errors"
+    }
+  ],
+  "fail": [],
+  "beach": {
+    "logs": 6,
+    "wrack": 9,
+    "gulls": 3,
+    "eastern": -17.333871841430664,
+    "rocks": [
+      {
+        "x": -32.5,
+        "z": -101,
+        "scale": 1.15,
+        "yaw": 0.3
+      }
+    ],
+    "blocked": []
+  },
+  "boat": {
+    "source": "Blender island_life.py",
+    "triangles": 4836,
+    "floor": -0.23776091635227292,
+    "width": 1.3849339485168457,
+    "length": 3.155845880508423,
+    "same": true,
+    "oldSeats": 0
+  },
+  "clue": {
+    "perchError": 3.552713678800501e-15,
+    "species": "songbird",
+    "independent": true,
+    "joints": 12
+  },
+  "singing": {
+    "live": true,
+    "jaw": 0.0799534236276795
+  },
+  "paper": {
+    "paper": 0.014000000000001123,
+    "rest": 0.001999999850989198
+  },
+  "shots": [
+    {
+      "name": "01-arrival",
+      "image": "01-arrival.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        4,
+        0.05809980853914054,
+        -104
+      ]
+    },
+    {
+      "name": "02-worked-shore",
+      "image": "02-worked-shore.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -22,
+        0.8200403320045757,
+        -104.5
+      ]
+    },
+    {
+      "name": "03-open-dory",
+      "image": "03-open-dory.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -26,
+        1.3406127715723248,
+        -99.2
+      ]
+    },
+    {
+      "name": "04-gull-gameplay",
+      "image": "04-gull-gameplay.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -2.791438336484134,
+        1.1300741089799136,
+        -101.60035330587998
+      ]
+    },
+    {
+      "name": "05-gull-detail",
+      "image": "05-gull-detail.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 5,
+      "position": [
+        2.208561663515866,
+        1.1077211924028822,
+        -101.60035330587998
+      ]
+    },
+    {
+      "name": "06-forest",
+      "image": "06-forest.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -58,
+        12.249216292040664,
+        -58
+      ]
+    },
+    {
+      "name": "07-study",
+      "image": "07-study.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "08-instruments",
+      "image": "08-instruments.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -81.9,
+        13.5,
+        -38.6
+      ]
+    },
+    {
+      "name": "09-music-box",
+      "image": "09-music-box.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -85,
+        13.5,
+        -40
+      ]
+    },
+    {
+      "name": "10-refuge-room",
+      "image": "10-refuge-room.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -82.6630133966664,
+        13.5,
+        -33.016913747071484
+      ]
+    },
+    {
+      "name": "11-stone-circle",
+      "image": "11-stone-circle.jpg",
+      "era": 1,
+      "hour": 7.2,
+      "tide": 0,
+      "zoom": 1,
+      "position": [
+        135,
+        8.8,
+        -146
+      ]
+    },
+    {
+      "name": "12-songbird",
+      "image": "12-songbird.jpg",
+      "era": 1,
+      "hour": 7.2,
+      "tide": 0,
+      "zoom": 3,
+      "position": [
+        138.99999999999997,
+        8.866848448950847,
+        -137.5
+      ]
+    },
+    {
+      "name": "13-drain",
+      "image": "13-drain.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 0,
+      "zoom": 1,
+      "position": [
+        131,
+        4,
+        -150
+      ]
+    },
+    {
+      "name": "14-archive",
+      "image": "14-archive.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        89.8,
+        17.5,
+        18.6
+      ]
+    },
+    {
+      "name": "15-lighthouse",
+      "image": "15-lighthouse.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -68,
+        11.162053251406734,
+        -57
+      ]
+    },
+    {
+      "name": "era-1-12",
+      "image": "era-1-12.jpg",
+      "era": 1,
+      "hour": 12,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "era-1-22",
+      "image": "era-1-22.jpg",
+      "era": 1,
+      "hour": 22,
+      "tide": 1,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "era-2-12",
+      "image": "era-2-12.jpg",
+      "era": 2,
+      "hour": 12,
+      "tide": 1.35,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "era-2-22",
+      "image": "era-2-22.jpg",
+      "era": 2,
+      "hour": 22,
+      "tide": 1.35,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "era-3-12",
+      "image": "era-3-12.jpg",
+      "era": 3,
+      "hour": 12,
+      "tide": 1.7,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "era-3-22",
+      "image": "era-3-22.jpg",
+      "era": 3,
+      "hour": 22,
+      "tide": 1.7,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "era-4-12",
+      "image": "era-4-12.jpg",
+      "era": 4,
+      "hour": 12,
+      "tide": 2.05,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "era-4-22",
+      "image": "era-4-22.jpg",
+      "era": 4,
+      "hour": 22,
+      "tide": 2.05,
+      "zoom": 1,
+      "position": [
+        -82,
+        13.5,
+        -37
+      ]
+    },
+    {
+      "name": "16-shallows",
+      "image": "16-shallows.jpg",
+      "era": 2,
+      "hour": 12,
+      "tide": 1.35,
+      "zoom": 1,
+      "position": [
+        43,
+        1.2018742410546288,
+        -76
+      ]
+    },
+    {
+      "name": "17-gallery-bluff",
+      "image": "17-gallery-bluff.jpg",
+      "era": 3,
+      "hour": 12,
+      "tide": 1.7,
+      "zoom": 1,
+      "position": [
+        91.5,
+        23.559991536890266,
+        34.5
+      ]
+    },
+    {
+      "name": "18-source",
+      "image": "18-source.jpg",
+      "era": 4,
+      "hour": 12,
+      "tide": 2.05,
+      "zoom": 1,
+      "position": [
+        -82.8,
+        13.5,
+        -41
+      ]
+    }
+  ],
+  "errors": [],
+  "method": "Real rendered frames. Era and prerequisite fixtures are explicit debug staging, not earned progression. Detail cameras use labelled zoom; the wildlife video runs ordinary production time."
+}

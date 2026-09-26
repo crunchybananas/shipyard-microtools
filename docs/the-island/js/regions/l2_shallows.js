@@ -72,8 +72,17 @@ export function build({ region2 }) {
   // world scatter.
   {
     const kr = mulberry32(SEED ^ 0x4e19);
-    const frond = new THREE.PlaneGeometry(0.55, 4.2, 1, 5);
+    const frond = new THREE.PlaneGeometry(0.27, 4.2, 2, 8);
     frond.translate(0, 2.1, 0);                       // base at y=0, rises up
+    // Tapered, folded ribbons: an anchored stipe, broad blade and a pointed tip.
+    const fp=frond.attributes.position;
+    for(let i=0;i<fp.count;i++){
+      const t=fp.getY(i)/4.2,edge=fp.getX(i)/.135;
+      const blade=.06+.94*Math.pow(Math.sin(Math.PI*t),.72);
+      fp.setX(i,fp.getX(i)*blade+Math.sin(t*5.2)*.15*t);
+      fp.setZ(i,Math.sin(t*8.5)*.07*t+(1-Math.abs(edge))*.032*blade);
+    }
+    frond.computeVertexNormals();
     const kelpMat = new THREE.MeshStandardMaterial({ color: 0x3c5a3e, roughness: 0.8, side: THREE.DoubleSide });
     kelpMat.onBeforeCompile = (sh) => {
       sh.uniforms.uTime = { value: 0 };
@@ -178,13 +187,7 @@ export function build({ region2 }) {
   {
     const tf = new THREE.Group();
     tf.name = 'tideFigure'; tf.visible = false;
-    const tmat = new THREE.MeshStandardMaterial({ color: 0x182a2c, emissive: 0x081416, emissiveIntensity: 0.45,
-      transparent: true, opacity: 0.8, roughness: 1, flatShading: true });
-    tf.userData.mats = [tmat];
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.62, 1.7, 7), tmat);
-    body.position.y = 0.85; tf.add(body);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), tmat);
-    head.position.y = 1.78; head.scale.set(1, 1.12, 1); tf.add(head);
+    // The authored Blender figure is attached after the model clone boundary.
     const tfx = 12, tfz = -100;
     tf.position.set(tfx, Number.isFinite(heightAt(tfx, tfz)) ? heightAt(tfx, tfz) : 0, tfz);
     tf.castShadow = false; tf.receiveShadow = false;

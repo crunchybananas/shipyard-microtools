@@ -27,7 +27,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(('127.0.0.1', PORT), Handler) as srv:
+    # Concurrent ES module requests must not overflow the default five-slot queue.
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+    socketserver.ThreadingTCPServer.request_queue_size = 128
+    with socketserver.ThreadingTCPServer(('127.0.0.1', PORT), Handler) as srv:
         print(f'serving {DOCROOT} on http://127.0.0.1:{PORT}', flush=True)
         srv.serve_forever()

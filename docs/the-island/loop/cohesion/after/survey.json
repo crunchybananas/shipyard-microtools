@@ -1,0 +1,112 @@
+[
+  {
+    "name": "arrival",
+    "position": [
+      4,
+      0.05809980853914054,
+      -104
+    ],
+    "calls": 312,
+    "triangles": 640147
+  },
+  {
+    "name": "study-entry",
+    "position": [
+      -82.2,
+      13.5,
+      -32.4
+    ],
+    "calls": 493,
+    "triangles": 936736
+  },
+  {
+    "name": "study-overview",
+    "position": [
+      -82,
+      13.5,
+      -37
+    ],
+    "calls": 467,
+    "triangles": 925468
+  },
+  {
+    "name": "signal-shelf",
+    "position": [
+      -87.35,
+      13.5,
+      -39.4
+    ],
+    "calls": 124,
+    "triangles": 600085
+  },
+  {
+    "name": "reference-books",
+    "position": [
+      -86.4,
+      13.5,
+      -37
+    ],
+    "calls": 46,
+    "triangles": 594753
+  },
+  {
+    "name": "music-box",
+    "position": [
+      -87.8,
+      13.5,
+      -41
+    ],
+    "calls": 64,
+    "triangles": 578600
+  },
+  {
+    "name": "stairs-foot",
+    "position": [
+      -83.9,
+      13.5,
+      -42.5
+    ],
+    "calls": 158,
+    "triangles": 775478
+  },
+  {
+    "name": "forest",
+    "position": [
+      -58,
+      12.249216292040664,
+      -58
+    ],
+    "calls": 47,
+    "triangles": 586992
+  },
+  {
+    "name": "rocks",
+    "position": [
+      -28,
+      1.3475349032655048,
+      -99
+    ],
+    "calls": 274,
+    "triangles": 705484
+  },
+  {
+    "name": "archive",
+    "position": [
+      89.8,
+      17.5,
+      18.6
+    ],
+    "calls": 61,
+    "triangles": 528315
+  },
+  {
+    "name": "refuge",
+    "position": [
+      -82,
+      13.5,
+      -32
+    ],
+    "calls": 70,
+    "triangles": 639363
+  }
+]

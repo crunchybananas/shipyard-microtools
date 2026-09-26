@@ -22,15 +22,31 @@ const BASE = 'assets/';
 //            generation prompt — see ASSETS.md).
 //   texture rows carry their sampler settings (wrap/repeat/colorSpace/anisotropy).
 export const MANIFEST = {
+  island_life: {
+    kind: 'model', file: 'island-life.glb', bytes: 723320,
+    license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/island_life.py',
+    prompt: 'Original skinned gull, crow and songbird anatomy, twelve-joint rig, closed feather wings, articulated head and webbed feet, an open lapstrake dory and oar, and human-scale coastal figures with folded coats, sleeves, hands and boots.',
+  },
+  shore_details: {
+    kind: 'model', file: 'shore-details.glb', bytes: 918788,
+    license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/shore_details.py',
+    prompt: 'Original drying rack, open slatted creel, net, rope, floats, tide rock, hollow barnacles and mussels; 98-triangle miniature.',
+  },
+  shore_timber: {
+    kind: 'texture', file: 'shore-timber.jpg', bytes: 116076,
+    license: 'project-generated', source: 'OpenAI built-in imagegen; 2026-09-19; full prompt in tools/blender/shore-texture-prompt.txt',
+    prompt: "Use case: stylized-concept\nAsset type: seamless physically based game material, color/albedo texture for the weathered fishing equipment on a quiet North Atlantic lighthouse island.\nPrimary request: A perfectly flat orthographic close-up of a single continuous surface of salt-bleached old pine timber. Silvery warm gray wood with fine long parallel fibers running vertically, occasional narrow dark checks and a few subtle small worn knots. Decades of seawater and handling have exposed the grain. Matte, restrained low-chroma grey-beige, medium-light value, readable broad grain at 512px. No boards, no plank edges, no gaps, no frame, no separate objects.\nLighting: uniform diffuse neutral illumination, absolutely no cast shadows, directional shading, highlights or ambient occlusion; this is a material albedo to receive real game lighting.\nComposition: square 1024 by 1024, edge-to-edge continuous wood grain, seamlessly tileable on all four sides.\nConstraints: no text, no logos, no watermark, no perspective, no surrounding scene, no vignette.",
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
+  },
   working_coast: {
-    kind: 'model', file: 'working-coast.glb', bytes: 1718784,
+    kind: 'model', file: 'working-coast.glb', bytes: 1715112,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/working_coast.py',
     prompt: 'Four closed-volume conifer crowns with paired LODs, fitted study floorboards, painted joinery, limewash and a tide wheel pipe run.',
   },
   landfall: {
-    kind: 'model', file: 'landfall.glb', bytes: 2081688,
+    kind: 'model', file: 'landfall.glb', bytes: 2604048,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/landfall.py',
-    prompt: 'Authored lighthouse with open windows and 83 treads, stone vault ribs, drying table, coastal basalt arch and wind pines.',
+    prompt: 'Authored lighthouse with open windows and 115 closed risers and supported treads, stone vault ribs, hinged archive tins and drying table, coastal basalt arch and wind pines.',
   },
   harbor_rooms: {
     kind: 'model', file: 'harbor-rooms.glb', bytes: 1716348,
@@ -41,9 +57,9 @@ export const MANIFEST = {
   // in buildNormalFromImage reads luminance, so feeding it real height yields real
   // geometric normals (ripples/strata/furrows) instead of color-edge guesses.
   rock_height: {
-    kind: 'texture', file: 'rock_height.png', bytes: 213084,
-    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell (asset.texture.generate, seed 11)',
-    prompt: 'seamless tileable grayscale height map of weathered layered rock, strata bedding, cracks',
+    kind: 'texture', file: 'rock-height.jpg', bytes: 161465,
+    license: 'project-generated', source: 'OpenAI built-in imagegen; 2026-09-26; tools/blender/granite-height-prompt.txt',
+    prompt: 'Isotropic grayscale granite height field: shallow mineral pits, tiny chipped facets, short fractures; restrained relief without layered bedding or directional streaks. Full prompt and original in tools/blender.',
     wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
   },
   bark_height: {

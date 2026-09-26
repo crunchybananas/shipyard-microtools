@@ -73,8 +73,9 @@ export default async function runtimeReset(h) {
       && armed.timers > 0 && armed.box,
     armed);
 
-  await h.evaluate(`ABYME.resetFlags(); 1`);
-  const reset = await h.evaluate(`(() => ({
+  // Read in the same browser task as the reset; a rendered frame between CDP
+  // calls legitimately ticks birdTimer below its exact initial value of eight.
+  const reset = await h.evaluate(`(() => { ABYME.resetFlags(); return ({
     score:ABYME.audioScore(), timers:ABYME.game._runtimeTimers.size,
     seq:[ABYME.game.stoneSeq.length,ABYME.game.songSeq.length],
     box:ABYME.game.boxPlaying, bird:ABYME.game.birdTimer,
@@ -82,7 +83,7 @@ export default async function runtimeReset(h) {
     echo:[ABYME.game.watcherEchoT,ABYME.game.tideFigureEchoT],
     era:[ABYME.game._pendHour,ABYME.game._breachT,ABYME.game._farewellT],
     brink:ABYME.game._brink, spray:!!ABYME.scene.getObjectByName('introSpray'),
-  }))()`);
+  }); })()`);
   ok('Game reset clears pending callbacks, sequences, clocks, and encounter regard',
     reset.timers === 0 && reset.seq.every((n) => n === 0) && !reset.box && reset.bird === 8
       && reset.regard.every((n) => n === 0) && reset.echo.every((n) => n === null)

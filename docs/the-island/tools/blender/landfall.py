@@ -64,17 +64,24 @@ for a,y in windows:
  for yy in [y-.94,y+.94]:box((math.sin(a)*r,yy,math.cos(a)*r),(.96,.14,.44),'chalk',a)
  for side in [-1,1]:
   aa=a+side*.186;box((math.sin(aa)*r,y,math.cos(aa)*r),(.13,1.87,.44),'chalk',aa)
-# All 83 treads have real thickness and a radial wedge. Same course as collision.
+# Human-scale closed risers and radial treads share the exact collision course.
 ACTIVE='towerStair'
 for i in range(T['steps']):
  t0=i/T['steps'];t1=(i+1)/T['steps'];a0,r0,_=course(t0);a1,r1,y=course(t1)
  v=[]
- for yy in [y-.12,y]:
-  for a,r in [(a0,r0-.58),(a0,r0+.58),(a1,r1+.58),(a1,r1-.58)]:v.append((math.sin(a)*r,yy,math.cos(a)*r))
+ for yy in [y-T['rise']/T['steps']-.025,y]:
+  for a,r in [(a0,r0-T['halfWidth']),(a0,r0+T['halfWidth']),(a1,r1+T['halfWidth']),(a1,r1-T['halfWidth'])]:v.append((math.sin(a)*r,yy,math.cos(a)*r))
  add(v,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],'cut' if i%9==0 else 'oak')
  # A pale worn leading edge catches each tread in the window spill.
- a,r,y=course(t0);tube([(math.sin(a)*(r-.56),y+.251,math.cos(a)*(r-.56)),(math.sin(a)*(r+.56),y+.251,math.cos(a)*(r+.56))],.012,'cut',4)
+ a,r,_=course(t0);a+=.014/r;tube([(math.sin(a)*(r-.56),y+.003,math.cos(a)*(r-.56)),(math.sin(a)*(r+.56),y+.003,math.cos(a)*(r+.56))],.006,'cut',4)
 ACTIVE='towerRails'
+# Continuous stringers carry the treads; the stair no longer floats between posts.
+for side in [-1,1]:
+ points=[]
+ for i in range(T['steps']+1):
+  a,r,y=course(i/T['steps']);r+=side*(T['halfWidth']-.08)
+  points.append((math.sin(a)*r,y-.16,math.cos(a)*r))
+ tube(points,.052,'iron',4)
 for side in [-1,1]:
  points=[]
  for i in range(T['steps']+1):
@@ -99,8 +106,22 @@ for x in [-2.1,-1.1,.1,1.2,2.1]:
  box((x,1.025,0),(.68,.07,.72),'paper',random.uniform(-.15,.15))
  box((x,1.06,.25),(.08,.035,.15),'stone')
 for i in range(5):
- x=-2.2+i*1.08;box((x,1.21,-.42),(.65,.30,.34),'iron')
- if i<4:box((x,1.37,-.42),(.60,.035,.30),'copper')
+ x=-2.2+i*1.08
+ # Folded sheet-metal tins, with open interiors, rolled lips and hinged lids.
+ box((x,1.075,-.42),(.65,.025,.34),'iron')
+ for side in [-1,1]:
+  box((x+side*.316,1.22,-.42),(.018,.30,.34),'iron')
+  box((x,1.22,-.42+side*.161),(.65,.30,.018),'blue')
+  tube([(x-.323,1.371,-.42+side*.161),(x+.323,1.371,-.42+side*.161)],.011,'copper',6)
+  tube([(x+side*.316,1.371,-.58),(x+side*.316,1.371,-.26)],.011,'copper',6)
+ box((x,1.275,-.239),(.34,.085,.005),'paper')
+ tube([(x-.09,1.18,-.226),(x-.09,1.15,-.20),(x+.09,1.15,-.20),(x+.09,1.18,-.226)],.007,'copper',6)
+ for xx in [-.19,.19]:tube([(x+xx-.03,1.37,-.586),(x+xx+.03,1.37,-.586)],.016,'copper',8)
+ if i<4:
+  box((x,1.385,-.42),(.668,.023,.355),'copper')
+  box((x,1.398,-.42),(.59,.006,.285),'blue')
+ else:
+  for j in range(4):box((x+(j%2)*.014,1.10+j*.009,-.405),(.51,.007,.25),'paper',-.04+j*.019)
 # Hand-cut basalt with broad bedding planes, missing corners, and moss only on upward faces.
 def rock(name,seed):
  global ACTIVE;ACTIVE=name;rng=random.Random(seed);v=[];f=[];N=13;R=6

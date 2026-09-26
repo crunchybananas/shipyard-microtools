@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { TOWER, TOWER_TOP, stairPose, stairSurface } from '../js/tower-course.js';
 
-test('83 physical treads form a connected course in both directions', () => {
+test('115 physical treads form a connected course in both directions', () => {
   for (const reverse of [false, true]) {
     let y = reverse ? TOWER_TOP : TOWER.base;
     for (let i = 0; i <= 1660; i++) {
@@ -26,4 +26,10 @@ test('overlapping flights never pull a player through the floor above', () => {
 test('an approach outside the stair and the gallery does not invent a floor', () => {
   assert.equal(stairSurface(TOWER.x + 5, TOWER.z, 25), null);
   assert.equal(stairSurface(TOWER.x, TOWER.z + 2, undefined), null);
+});
+
+test('stair proportions leave a human aisle beside the chart table', () => {
+  assert.ok(TOWER.rise/TOWER.steps < .19, 'risers are below 19 cm');
+  assert.ok(TOWER.radiusBottom-TOWER.halfWidth-Math.SQRT2*1.25 > .9, 'clear central circulation');
+  assert.ok(TOWER.halfWidth*2 >= 1.1, 'usable tread width');
 });

@@ -1,0 +1,70 @@
+{
+  "blender": "5.2.1 LTS",
+  "bones": [
+    "root",
+    "body",
+    "head",
+    "jaw",
+    "eyes",
+    "tail",
+    "wingL",
+    "wingR",
+    "handL",
+    "handR",
+    "footL",
+    "footR"
+  ],
+  "parts": {
+    "gull": {
+      "triangles": 2806,
+      "vertices": 1633,
+      "skinned": true
+    },
+    "crow": {
+      "triangles": 2522,
+      "vertices": 1441,
+      "skinned": true
+    },
+    "songbird": {
+      "triangles": 2522,
+      "vertices": 1441,
+      "skinned": true
+    },
+    "doryCraft": {
+      "triangles": 4836,
+      "vertices": 2480,
+      "skinned": false
+    },
+    "doryOarCraft": {
+      "triangles": 44,
+      "vertices": 26,
+      "skinned": false
+    },
+    "watcherCraft": {
+      "triangles": 2564,
+      "vertices": 1400,
+      "skinned": false
+    },
+    "tideFigureCraft": {
+      "triangles": 2004,
+      "vertices": 1114,
+      "skinned": false
+    },
+    "gullFar": {
+      "triangles": 859,
+      "vertices": 651,
+      "skinned": true
+    },
+    "crowFar": {
+      "triangles": 563,
+      "vertices": 455,
+      "skinned": true
+    },
+    "songbirdFar": {
+      "triangles": 563,
+      "vertices": 455,
+      "skinned": true
+    }
+  },
+  "bytes": 723320
+}

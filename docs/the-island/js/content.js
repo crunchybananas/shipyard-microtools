@@ -42,7 +42,7 @@ export const LORE = {
     era: 'spanning', kind: 'book', hand: 'keeper', title: 'The watch book',
     pages: [
       'Three boats through before dark. The last had no running light. I kept the beam on the channel until she was clear. Then I came down for the soup.',
-      'A page in a smaller hand:\n\nI counted the stairs. You were right: eighty-three. I still think you could have come down when I called.\n\nThere is a small circle of dried soup beside the reply: Fair.'
+      'A page in a smaller hand:\n\nI counted the stairs. You were right: one hundred and fifteen. I still think you could have come down when I called.\n\nThere is a small circle of dried soup beside the reply: Fair.'
     ], notes: { surface: 'artifact.watch-book' }
   },
   drying_papers: {
@@ -361,7 +361,7 @@ export const LORE = {
     ],
     "deepFrom": 3,
     "deep": [
-      "Reverse: tower, twenty-one metres; stair, eighty-three treads. Under RELIEF, the keeper has written:\n\nSomeone who will stay for supper."
+      "Reverse: tower, twenty-one metres; stair, one hundred and fifteen treads. Under RELIEF, the keeper has written:\n\nSomeone who will stay for supper."
     ],
     "notes": {
       "surface": "evidence.field-slip.surface",
@@ -467,7 +467,7 @@ const dispositionCount = (world, disposition) => Object.values(world.recDisp)
   .filter((value) => value === disposition).length;
 
 export const FIELD_NOTES = Object.freeze({
-  'place.lamp-gallery': { text: 'I climbed the eighty-three treads. Both ends of the causeway are visible from the gallery.', sketchId: 'model-marker' },
+  'place.lamp-gallery': { text: 'I climbed the one hundred and fifteen treads. Both ends of the causeway are visible from the gallery.', sketchId: 'model-marker' },
   'artifact.watch-book': { text: 'The keeper watched the last unlit boat clear the channel. Another hand counted the stairs.', sketchId: 'model-marker' },
   'artifact.drying-papers': { text: 'Three people carried papers into the western room in bread tins. They saved the names first.', sketchId: 'register' },
   'event.archive-opened': { text: 'I opened a tin on the drying table in the western study.', sketchId: 'register' },
@@ -531,7 +531,7 @@ export const FIELD_NOTES = Object.freeze({
   'collection.lampblack.lmChest': { text: 'Seal held through three spring tides.' },
   'collection.lampblack.lmDory': { text: 'Hull sound. One oar missing before inventory.' },
   'collection.lampblack.lmJetty': { text: 'West current reversed after 02:10.' },
-  'collection.lampblack.lmStair': { text: 'Eighty-three treads. Third wet at neap.' },
+  'collection.lampblack.lmStair': { text: 'One hundred and fifteen treads. Third wet at neap.' },
   'collection.lampblack.lmBell': { text: 'Toll carries farther below the water line.' },
   'collection.lampblack.lmBuoy': { text: 'Mooring datum no longer marks the channel.' },
   'collection.lampblack.lmDrain': { text: 'Return flow delayed eleven seconds.' },
@@ -686,7 +686,7 @@ export const LAMPBLACK = [
   { id: 'lmChest', noteId: 'collection.lampblack.lmChest', place: 'the half-buried chest',                 line: 'Seal held through three spring tides.' },
   { id: 'lmDory',  noteId: 'collection.lampblack.lmDory', place: 'the dory’s hull',                       line: 'Hull sound. One oar missing before inventory.' },
   { id: 'lmJetty', noteId: 'collection.lampblack.lmJetty', place: 'the jetty lantern post',                line: 'West current reversed after 02:10.' },
-  { id: 'lmStair', noteId: 'collection.lampblack.lmStair', place: 'the stair to the lamp',                 line: 'Eighty-three treads. Third wet at neap.' },
+  { id: 'lmStair', noteId: 'collection.lampblack.lmStair', place: 'the stair to the lamp',                 line: 'One hundred and fifteen treads. Third wet at neap.' },
   { id: 'lmBell',  noteId: 'collection.lampblack.lmBell', place: 'the small bright bell',                 line: 'Toll carries farther below the water line.' },
   { id: 'lmBuoy',  noteId: 'collection.lampblack.lmBuoy', place: 'the listing bell-buoy',                 line: 'Mooring datum no longer marks the channel.' },
   { id: 'lmDrain', noteId: 'collection.lampblack.lmDrain', place: 'the drain wall, beside the carved line', line: 'Return flow delayed eleven seconds.' },
@@ -832,3 +832,11 @@ export function finaleCoda(kind, s = {}) {
   if (s.kept > 0) lines.push('The papers you left below are weighted above the water.');
   return lines;
 }
+
+// The ordinary working library carries useful titles, separate from the signal index.
+export const REFERENCE_LIBRARY = Object.freeze([
+  'Coast Pilot', 'Soundings', 'Weather Journal', 'The Working Sea',
+  'Lamp Keeping', 'Tides and Harbours', 'Knots and Splices', 'Birds of the Coast',
+  'Small Boat Repair', 'Clouds and Weather', 'Island Flora', 'The Night Watch',
+  'Masonry Repairs', 'Charts and Bearings', 'The Winter Log', 'Shore Notes',
+]);

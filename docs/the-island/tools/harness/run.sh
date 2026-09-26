@@ -80,6 +80,10 @@ echo "== the finished terrain =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/terrain-finish.mjs" | tee "$WORK/terrain-finish.out"
 grep -q "TERRAIN-FINISH 10 / 10" "$WORK/terrain-finish.out" || { echo "TERRAIN FINISH FAILED"; exit 1; }
 
+echo "== the living coastal assets =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/island-life.mjs" | tee "$WORK/island-life.out"
+grep -q "ISLAND LIFE 21 / 21" "$WORK/island-life.out" || { echo "ISLAND LIFE FAILED"; exit 1; }
+
 echo "== the player-facing journey =="
 # The ChallengeGraph walk proves flags can be earned; this proves the notebook contains
 # only observed evidence, renders its physical spread at both breakpoints, waits until a
@@ -118,7 +122,7 @@ echo "== the gulls =="
 # straight line THROUGH the lantern and the dome, and the owner photographed it mid-flight
 # with a wing out through the copper.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/gulls.mjs" | tee "$WORK/gulls.out"
-grep -q "GULLS 7 / 7" "$WORK/gulls.out" || { echo "GULLS FAILED"; exit 1; }
+grep -q "GULLS 11 / 11" "$WORK/gulls.out" || { echo "GULLS FAILED"; exit 1; }
 
 echo "== the lens-vault outcrop =="
 # The slab reveals a shallow niche, not a room. The irregular boulder must stay
@@ -169,6 +173,18 @@ grep -q 'LANDFALL 21 / 21' "$WORK/landfall.out" || exit 1
 echo "== the working coast =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/working-coast.mjs" | tee "$WORK/working-coast.out"
 grep -q 'WORKING COAST 10 / 10' "$WORK/working-coast.out" || exit 1
+
+echo "== the landing-beach details =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/shore-details.mjs" | tee "$WORK/shore-details.out"
+grep -q 'SHORE DETAILS 18 / 18' "$WORK/shore-details.out" || exit 1
+
+echo "== human scale and keyboard circulation =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/cohesion.mjs" | tee "$WORK/cohesion.out"
+grep -q 'COHESION 9 / 9' "$WORK/cohesion.out" || { echo "COHESION FAILED"; exit 1; }
+
+echo "== visible coastal encounters =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/encounters.mjs" | tee "$WORK/encounters.out"
+grep -q 'ENCOUNTERS 8 / 8' "$WORK/encounters.out" || { echo "ENCOUNTERS FAILED"; exit 1; }
 
 echo "== the walk =="
 # Every puzzle action goes through its shipped hotspot. Crossing travel uses the public

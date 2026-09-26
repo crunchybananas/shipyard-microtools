@@ -1,0 +1,41 @@
+{
+  "birds": [
+    {
+      "p": [
+        -111.44151525881671,
+        11.403475354999506,
+        101.48374835371611
+      ],
+      "species": "crow",
+      "detail": "far"
+    },
+    {
+      "p": [
+        -131.64357354923095,
+        11.79679268940299,
+        41.59599073739859
+      ],
+      "species": "crow",
+      "detail": "far"
+    },
+    {
+      "p": [
+        66.6953977800014,
+        11.634054213275075,
+        73.27639088726247
+      ],
+      "species": "crow",
+      "detail": "far"
+    },
+    {
+      "p": [
+        35.45104252695798,
+        3.6982116823910864,
+        145.30309952646132
+      ],
+      "species": "crow",
+      "detail": "far"
+    }
+  ],
+  "method": "Crow detail cameras; explicit debug encounter spawns and reader fixture, not earned progression."
+}

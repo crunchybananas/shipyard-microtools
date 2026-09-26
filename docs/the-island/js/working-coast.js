@@ -103,19 +103,31 @@ export function attachWorkingStudy(core, library) {
     mesh.name=name;mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);
   }
 
+  // Later story objects were positioned against terrain before the fitted floor
+  // existed. Seat them on its actual boards so notes and kept records remain visible.
+  const floor=group.getObjectByName('studyTimber');floor.updateWorldMatrix(true,false);
+  for(const name of ['sourceNote','sourceRest','sourceCradle']){
+    const object=core.getObjectByName(name);if(!object)continue;
+    const p=object.getWorldPosition(new THREE.Vector3());
+    const ray=new THREE.Raycaster(new THREE.Vector3(p.x,group.position.y+.75,p.z),new THREE.Vector3(0,-1,0),0,1.5);
+    const hit=ray.intersectObject(floor,false)[0];
+    if(hit){p.y=hit.point.y+.002;object.position.copy(object.parent.worldToLocal(p));}
+  }
+
   // A stilling tube makes the wheel's water level visible at the player's hand.
   // The float and sea both follow W.tide, including its thirteen-second travel.
   // The instrument must contain even the deepest shared-water draft (2.65),
   // not only the 0–1 range of the surface wheel.
+  const gauge = new THREE.Group();gauge.name='studyTideGauge';gauge.rotation.y=100*Math.PI/180;group.add(gauge);
   const glass = new THREE.Mesh(new THREE.CylinderGeometry(.061,.061,1.89,14,1,true),
     new THREE.MeshStandardMaterial({color:0xa0c2b7,roughness:.24,metalness:.12,transparent:true,opacity:.22,depthWrite:false}));
-  glass.position.set(4.01,1.315,-.65);glass.name='tideGaugeGlass';group.add(glass);
+  glass.position.set(4.01,1.315,-.65);glass.name='tideGaugeGlass';gauge.add(glass);
   const water = new THREE.Mesh(new THREE.CylinderGeometry(.049,.049,1,12),
     new THREE.MeshStandardMaterial({color:0x367e7b,roughness:.31,metalness:.2}));
-  water.position.set(4.01,.40,-.65);water.name='tideGaugeWater';group.add(water);
+  water.position.set(4.01,.40,-.65);water.name='tideGaugeWater';gauge.add(water);
   const float = new THREE.Mesh(new THREE.CylinderGeometry(.053,.053,.049,12),
     new THREE.MeshStandardMaterial({color:0xb48c45,roughness:.5,metalness:.65}));
-  float.name='tideGaugeFloat';float.position.set(4.01,.40,-.65);group.add(float);
+  float.name='tideGaugeFloat';float.position.set(4.01,.40,-.65);gauge.add(float);
   // Readable marks are part of the instrument, with zero new asset requests.
   const cv=document.createElement('canvas');cv.width=128;cv.height=512;
   const ctx=cv.getContext('2d');ctx.fillStyle='#cad1ba';ctx.font='24px Georgia';
@@ -123,7 +135,7 @@ export function attachWorkingStudy(core, library) {
   for(let i=0;i<=2;i++)ctx.fillText(String(i),100,466-i*192);
   const face=new THREE.Mesh(new THREE.PlaneGeometry(.19,1.62),
     new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
-  face.position.set(3.81,1.21,-.689);group.add(face);
+  face.position.set(3.81,1.21,-.689);gauge.add(face);
   return {
     tick(tide) {
       const level=Math.max(0,Math.min(MAX_TIDE,tide));

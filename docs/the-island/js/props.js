@@ -1,3 +1,4 @@
+import { createLibraryLettering } from './library-detail.js';
 import { forestCrowns, applyRockCrust } from './working-coast.js';
 // props.js — every structure on the island, generated from primitives.
 // Static pieces are baked into merged meshes (a few draw calls); anything
@@ -65,7 +66,7 @@ applyRelief(matStone, 'stone', { normalScale: 0.85, strength: 2.4 });   // grani
 export const matJoinery = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: false, roughness: 0.94, metalness: 0.0,
 });
-applyRelief(matJoinery, 'cloth', { normalScale: 0.35, strength: 1.2, colorMap: false, repeat: [1.6, 1.6] });
+applyRelief(matJoinery, 'cloth', { normalScale: 0.14, strength: 1.2, colorMap: false, repeat: [8, 8] });
 
 // THE GENEROUS MARK — a small terrain-conforming canvas at the live shoreline.
 //
@@ -269,7 +270,7 @@ export const matMegalith = new THREE.MeshStandardMaterial({
 // while its siblings went charcoal — from the same quarry, in the same light. Relief
 // should describe the surface, not repaint it.
 applyRelief(matMegalith, 'rock_height', {
-  normalScale: 0.5, strength: 1.8, colorMap: false, repeat: [0.32, 0.32],
+  normalScale: 0.28, strength: 1.2, colorMap: false, repeat: [0.32, 0.32],
 });
 
 // THE BAKED BRASS — the gallery ring and its posts and rails, the finial, the lamp
@@ -402,11 +403,12 @@ export function makeInstrumentAtlas(bindings = SIGNAL_BINDINGS) {
   for (let i = 0; i < bindings.length; i++) {
     const binding = bindings[i];
     const x = cell * (i + 0.5);
-    g.font = `500 ${Math.round(cell * 0.40)}px "Avenir Next", sans-serif`;
-    g.fillText(binding.symbol, x, cell * 0.36, cell * 0.72);
-    g.fillRect(x - cell * 0.30, cell * 0.64, cell * 0.60, cell * 0.018);
-    g.font = `700 ${Math.round(cell * 0.105)}px "Avenir Next Condensed", "Arial Narrow", sans-serif`;
-    g.fillText(binding.label, x, cell * 0.80, cell * 0.86);
+    g.font = `500 ${Math.round(cell * 0.29)}px "Avenir Next", sans-serif`;
+    g.fillText(binding.symbol, x, cell * 0.24, cell * 0.72);
+    g.fillRect(x - cell * 0.30, cell * 0.45, cell * 0.60, cell * 0.018);
+    g.font = `700 ${Math.round(cell * 0.13)}px "Avenir Next Condensed", "Arial Narrow", sans-serif`;
+    const words=binding.label.split(" ");
+    words.forEach((word,j)=>g.fillText(word,x,cell*(words.length===1?.72:.62+j*.19),cell*.94));
   }
   const tex = new THREE.CanvasTexture(cv);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -700,7 +702,7 @@ export function buildWorld(coastKit) {
     floor.dispose();
     // The fitted Blender floor is now the walking finish. Its material owns the
     // contact shadow; the old stone overlay would bury all the board joints.
-    const ceil = new THREE.RingGeometry(3.06, baseR + 0.1, 48);
+    const ceil = new THREE.RingGeometry(3.68, baseR + 0.1, 48);
     ceil.rotateX(Math.PI / 2);
     stone.add(ceil, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH, LH.z), grad(C.boneDark, C.boneDark));
     ceil.dispose();
@@ -1246,10 +1248,10 @@ export function buildWorld(coastKit) {
   // valve pedestal + wheel (tide)
   {
     const ped = new THREE.CylinderGeometry(0.14, 0.2, 1.0, 8);
-    brass.add(ped, place(LH.x + 2.3, LH.y + 0.5, LH.z + 1.1), grad(C.brassDark, C.brass));
+    brass.add(ped, place(LH.x + 2.05, LH.y + 0.5, LH.z + .65), grad(C.brassDark, C.brass));
     ped.dispose();
     const wheel = new THREE.Group();
-    wheel.position.set(LH.x + 2.3, LH.y + 1.1, LH.z + 1.1);
+    wheel.position.set(LH.x + 2.05, LH.y + 1.1, LH.z + .65);
     wheel.rotation.x = -0.5;
     wheel.name = 'valveWheel';
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.05, 6, 18), matBrassSolid);
@@ -1387,6 +1389,7 @@ export function buildWorld(coastKit) {
   {
     const SPINES = [0x263b43, 0x355560, 0x3e665f, 0x5c3935, 0x6c5939, 0x343641, 0x59445e];
     SHELF_BINDING_MARKS.length = 0;
+    const lettering=createLibraryLettering();let referenceIndex=0;
 
     // Both bays share one timber footprint. The near bay is measured and sparse;
     // the far bay carries the irregular working library, so the room still feels lived in.
@@ -1399,26 +1402,28 @@ export function buildWorld(coastKit) {
       ];
       for (let sh = 0; sh < 3; sh++) {
         const shelf = new THREE.BoxGeometry(2.0, 0.07, 0.45);
-        joinery.add(shelf, place(LH.x + nx * 4.4, LH.y + 0.6 + sh * 0.62, LH.z + nz * 4.4, a0), grad(C.woodDark, C.wood));
+        joinery.add(shelf, place(LH.x + nx * 4.4, LH.y + 0.50 + sh * 0.56, LH.z + nz * 4.4, a0), grad(C.woodDark, C.wood));
         shelf.dispose();
 
         if (s === 0 || sh === 0) continue;
         // Ordinary reference books in the far bay: irregular enough to read as a
-        // working library, deliberately unmarked so they cannot impersonate the key.
+        // working library, with titles distinct from the eight figure-bearing manuals.
         let bx = -0.86;
         while (bx < 0.82) {
           if (r() < 0.10) { bx += 0.05 + r() * 0.05; continue; }
           const bw = 0.07 + r() * 0.085;
-          const bh = 0.29 + r() * 0.19;
+          const bh = 0.25 + r() * 0.15;
           const d = 0.25 + r() * 0.07;
           const lean = r() < 0.16 ? (r() - 0.5) * 0.34 : 0;
           const depth = -0.025 + r() * 0.055;
           const drop = lean ? (bh / 2) * (1 - Math.cos(lean)) + (bw / 2) * Math.abs(Math.sin(lean)) : 0;
-          const book = new THREE.BoxGeometry(bw, bh, d);
           const col = vary(new THREE.Color(SPINES[Math.floor(r() * SPINES.length)]), r, 0.04, 0.16, 0.13);
-          joinery.add(book, place(...at(bx + bw / 2, LH.y + 0.64 + sh * 0.62 + bh / 2 - drop, depth),
-            a0, 1, 1, 1, 0, lean), () => col);
-          book.dispose();
+          const matrix=place(...at(bx+bw/2,LH.y+.54+sh*.56+bh/2-drop,depth),a0,1,1,1,0,lean);
+          const part=(w,h,dep,x,z,color)=>{const g=new THREE.BoxGeometry(w,h,dep);g.translate(x,0,z);joinery.add(g,matrix,()=>color);g.dispose();};
+          part(bw-.012,bh-.016,d-.024,0,.007,new THREE.Color(0xbdb398));
+          for(const side of [-1,1])part(.006,bh,d,side*(bw/2-.003),0,col);
+          part(bw,bh,.014,0,-d/2+.007,col);
+          lettering.add(matrix,bw,bh,d,referenceIndex++);
           bx += bw * Math.cos(lean) + 0.014;
         }
       }
@@ -1435,7 +1440,7 @@ export function buildWorld(coastKit) {
     defineProp('signalShelf', { prune: true });
     signalShelf.position.set(LH.x + Math.sin(a0) * 4.4, LH.y, LH.z + Math.cos(a0) * 4.4);
     signalShelf.rotation.y = a0;
-    const bookW = 0.32, bookH = 0.49, bookD = 0.29;
+    const bookW = 0.30, bookH = 0.40, bookD = 0.24;
     for (let glyph = 0; glyph < GLYPHS; glyph++) {
       const signal = SIGNAL_BINDINGS.find((entry) => entry.glyph === glyph);
       if (!signal) throw new Error(`Missing signal binding for glyph ${glyph}`);
@@ -1446,7 +1451,7 @@ export function buildWorld(coastKit) {
       const localX = 0.60 - col * 0.40;
       const volume = new THREE.Group();
       volume.name = `signalVolume${glyph}`;
-      volume.position.set(localX, 0.64 + shelf * 0.62 + bookH / 2, -0.015 + (glyph % 2) * 0.008);
+      volume.position.set(localX, .54 + shelf * .56 + bookH / 2, -0.015 + (glyph % 2) * 0.008);
       volume.userData.glyph = glyph;
       volume.userData.instrument = signal.instrument;
       volume.userData.label = signal.label;
@@ -1470,12 +1475,12 @@ export function buildWorld(coastKit) {
       }
       const figure = glyphSprite(atlas, glyph, 0xe6c279, 0.145);
       figure.rotation.y = Math.PI;
-      figure.position.set(0, bookH * 0.205, -bookD / 2 - 0.014);
+      figure.position.set(0, bookH * 0.225, -bookD / 2 - 0.014);
       figure.name = `signalGlyph${glyph}`;
       volume.add(figure);
-      const instrument = instrumentSprite(instrumentAtlas, glyph, 0xf0d59a, 0.17);
+      const instrument = instrumentSprite(instrumentAtlas, glyph, 0xe2cc9e, 0.198);
       instrument.rotation.y = Math.PI;
-      instrument.position.set(0, -bookH * 0.205, -bookD / 2 - 0.014);
+      instrument.position.set(0, -bookH * 0.18, -bookD / 2 - 0.014);
       instrument.name = `signalInstrument${glyph}`;
       volume.add(instrument);
       signalShelf.add(volume);
@@ -1484,13 +1489,14 @@ export function buildWorld(coastKit) {
       }));
     }
     core.add(signalShelf);
+    const libraryInk=lettering.finish();defineProp(libraryInk.name,{prune:true});core.add(libraryInk);
 
     // A single reader spans exactly the index volumes. Content owns the label and
     // observations; geometry owns the name and placement.
     const rr = 4.15;
-    const box = new THREE.Mesh(new THREE.BoxGeometry(1.92, 1.30, 0.34),
+    const box = new THREE.Mesh(new THREE.BoxGeometry(1.92, 1.05, 0.34),
       new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
-    box.position.set(LH.x + Math.sin(a0) * rr, LH.y + 1.86, LH.z + Math.cos(a0) * rr);
+    box.position.set(LH.x + Math.sin(a0) * rr, LH.y + 1.58, LH.z + Math.cos(a0) * rr);
     box.rotation.y = a0;
     box.name = 'lore_signal_shelf';
     defineProp('lore_signal_shelf', { prune: true });
@@ -2096,12 +2102,12 @@ export function buildWorld(coastKit) {
     // Density against the empty beach (the world rang flat). One InstancedMesh (+1 draw); own rng so the
     // world scatter stays byte-identical; reuses the jetty/dory driftwood material + relief.
     {
-      const driftInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.1, 0.15, 1.5, 6), weather, 12);
+      const driftInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.08, 0.14, 1.35, 6), weather, 6);
       const rngW = mulberry32(SEED ^ 0xd71f);
       const dm = new THREE.Matrix4(), dq = new THREE.Quaternion(), de = new THREE.Euler(), dv = new THREE.Vector3();
       let dn = 0;
-      for (let i = 0; i < 140 && dn < 12; i++) {
-        const x = -46 + rngW() * 78, z = -90 - rngW() * 34;        // south wake-up shore span
+      for (let i = 0; i < 140 && dn < 6; i++) {
+        const x = -48 + rngW() * 33, z = -94 - rngW() * 25;        // south wake-up shore span
         const h = heightAt(x, z);
         if (h < -0.4 || h > 2.6) continue;                          // the shore band (shingle → low sand)
         if (Math.hypot(x + 18, z + 110) < 3.5) continue;            // clear of the jetty footprint
@@ -2127,11 +2133,11 @@ export function buildWorld(coastKit) {
       // #48: the clumps were flat dark polygons — a subdivided dome + WET specular (the
       // tide just left them) makes them read as heaped weed, not spilled paint
       const wrackMat = new THREE.MeshStandardMaterial({ color: 0x3a4a2e, roughness: 0.32, metalness: 0.0, flatShading: true });
-      const wrackInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.34, 1), wrackMat, 18);
+      const wrackInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.34, 1), wrackMat, 9);
       const rngK = mulberry32(SEED ^ 0x5eac);
       const km = new THREE.Matrix4(), kq = new THREE.Quaternion(), ke = new THREE.Euler(), kc = new THREE.Color();
       let kn = 0;
-      for (let i = 0; i < 220 && kn < 18; i++) {
+      for (let i = 0; i < 220 && kn < 9; i++) {
         const x = -40 + rngK() * 66, z = -98 - rngK() * 22;        // south waterline band
         const h = heightAt(x, z);
         if (h < -0.7 || h > 0.9) continue;                          // the WET tideline (low shingle → waterline)
@@ -2165,7 +2171,7 @@ export function buildWorld(coastKit) {
         ap.setY(v, heightAt(wx, wz) + 0.04);                      // drape on the shore
       }
       ag.computeVertexNormals();
-      const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: true });
+      const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: false, transparent: true, depthWrite: false });
       applyRelief(apronMat, 'pebble', { normalScale: 0.5, strength: 2.0 });
       // DE-TILE the pebbles + GRADIENT-BLEND the shingle into the sand (no hard line anywhere).
       //  - de-tile: warp the albedo sample coord with low-freq value-noise so the [53,12] column
@@ -2173,7 +2179,8 @@ export function buildWorld(coastKit) {
       //  - blend: pebble DENSITY is full at the waterline and thins to nothing up the beach over a
       //    ~6.5m band, gated by a per-pebble value-noise threshold so the thinning SCATTERS (stray
       //    pebbles strand out on the de-tiled sand beneath) rather than ending on a boundary. The
-      //    seaward lip + x-ends are softened too. Early discard, +0 texture fetches (pure ALU noise).
+      //    seaward lip + x-ends are softened too. Alpha fades continuously at centimetre scale;
+      //    the old metre-scale discard cut the apron into obvious pasted-on islands.
       apronMat.onBeforeCompile = (sh) => {
         // carry world XZ to the fragment stage (geometry positions are baked world coords)
         sh.vertexShader = sh.vertexShader
@@ -2191,13 +2198,14 @@ export function buildWorld(coastKit) {
             '#include <clipping_planes_fragment>\n' +
             '  float apDens = 1.0 - smoothstep(-104.5, -99.0, vApW.y);            // full at the water, ->0 up the beach\n' +
             '  apDens *= smoothstep(-106.5, -105.3, vApW.y);                      // soften the seaward lip into the water\n' +
-            '  apDens *= smoothstep(-32.0, -29.5, vApW.x) * smoothstep(16.0, 13.5, vApW.x);  // soften the two ends\n' +
-            '  if (apDens < apVN(vApW * 1.3)) discard;                            // noisy threshold -> scattered thinning\n')
+            '  apDens *= smoothstep(-32.0, -29.5, vApW.x) * (1.0-smoothstep(13.5, 16.0, vApW.x));  // soften the two ends\n' +
+            '  float apCoverage = smoothstep(.015, .68, apDens) * smoothstep(.08, .37, apDens + apVN(vApW * 24.0) * .28);                            // centimetre grain, with a continuous sand transition\n')
           .replace('#include <map_fragment>',
             '#ifdef USE_MAP\n' +
             '  vec2 apWarp = (vec2(apVN(vMapUv * 0.4), apVN(vMapUv * 0.4 + 19.7)) - 0.5) * 0.7;\n' +
             '  vec4 sampledDiffuseColor = texture2D( map, vMapUv + apWarp );\n' +
             '  diffuseColor *= sampledDiffuseColor;\n' +
+            '  diffuseColor.a *= apCoverage;\n' +
             '#endif');
       };
       apronMat.needsUpdate = true;
@@ -2226,7 +2234,10 @@ export function buildWorld(coastKit) {
         if (pa.getY(v) > 0) {
           pa.setX(v, pa.getX(v) * 0.6);
           pa.setZ(v, pa.getZ(v) * 0.7);
-          pa.setY(v, pa.getY(v) + (r() - 0.5) * 0.2);
+          // Box corners are duplicated per face. Shape by position so adjacent
+          // faces meet; preserve the old RNG draws for every later world object.
+          r();
+          pa.setY(v, pa.getY(v) + (vnoise(pa.getX(v)*5.7+2.1,pa.getZ(v)*7.3-.8)-.5)*.2);
         }
       }
       g.computeVertexNormals();
@@ -2304,7 +2315,10 @@ export function buildWorld(coastKit) {
         if (pa.getY(v) > 0) {
           pa.setX(v, pa.getX(v) * 0.6);
           pa.setZ(v, pa.getZ(v) * 0.7);
-          pa.setY(v, pa.getY(v) + (r() - 0.5) * 0.2);
+          // Box corners are duplicated per face. Shape by position so adjacent
+          // faces meet; preserve the old RNG draws for every later world object.
+          r();
+          pa.setY(v, pa.getY(v) + (vnoise(pa.getX(v)*5.7+2.1,pa.getZ(v)*7.3-.8)-.5)*.2);
         }
       }
       g.computeVertexNormals();
@@ -2340,39 +2354,9 @@ export function buildWorld(coastKit) {
       m.add(gl);
     }
 
-    // the song bird, visible at dawn, perched on stone 2 — the dawn-clue ACTOR deserves
-    // better than a cone and a sphere (#44): the same merged vertex-coloured recipe as
-    // the shore gulls, songbird proportions — slate-blue mantle, warm breast, real tail
-    // and beak. One draw, clones to the model like the rest of the stones.
-    const bird = new THREE.Group();
-    bird.name = 'songBird';
-    {
-      const bb = new Baker();
-      const M4 = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), E4 = new THREE.Euler(), V4 = new THREE.Vector3(), S4 = new THREE.Vector3();
-      const part = (geo, col, x, y, z, rx = 0, sx = 1, sy = 1, sz = 1) => {
-        bb.add(geo, M4.compose(V4.set(x, y, z), Q4.setFromEuler(E4.set(rx, 0, 0)), S4.set(sx, sy, sz)), col);
-        geo.dispose();
-      };
-      const slate = new THREE.Color(0x3a4e63), breast = new THREE.Color(0xb98a58),
-        dark = new THREE.Color(0x27364a), beakC = new THREE.Color(0x3c444e), legC = new THREE.Color(0x8c6040);
-      part(new THREE.SphereGeometry(0.10, 12, 9), breast, 0, 0.15, 0.02, -0.08, 1, 0.88, 1.44); // breast
-      // two folded wings instead of one cap over the whole back: the warm breast remains
-      // visible between them and the outline narrows into the tail like a real passerine.
-      part(new THREE.SphereGeometry(0.075, 10, 7), slate, -0.057, 0.18, -0.035, -0.08, 0.62, 0.38, 1.55);
-      part(new THREE.SphereGeometry(0.075, 10, 7), slate,  0.057, 0.18, -0.035, -0.08, 0.62, 0.38, 1.55);
-      part(new THREE.ConeGeometry(0.04, 0.21, 6), dark, -0.025, 0.13, -0.23, -1.8);            // split tail
-      part(new THREE.ConeGeometry(0.04, 0.21, 6), dark,  0.025, 0.13, -0.23, -1.8);
-      part(new THREE.SphereGeometry(0.065, 12, 9), slate, 0, 0.27, 0.12);                      // head
-      part(new THREE.SphereGeometry(0.009, 7, 5), dark, -0.052, 0.286, 0.163);                // eyes
-      part(new THREE.SphereGeometry(0.009, 7, 5), dark,  0.052, 0.286, 0.163);
-      part(new THREE.ConeGeometry(0.017, 0.075, 6), beakC, 0, 0.265, 0.195, Math.PI / 2);      // beak
-      part(new THREE.CylinderGeometry(0.006, 0.007, 0.11, 5), legC, -0.035, 0.055, 0.02);     // legs
-      part(new THREE.CylinderGeometry(0.006, 0.007, 0.11, 5), legC,  0.035, 0.055, 0.02);
-      const toeL = new THREE.CylinderGeometry(0.004, 0.005, 0.08, 5); toeL.rotateX(Math.PI / 2);
-      const toeR = new THREE.CylinderGeometry(0.004, 0.005, 0.08, 5); toeR.rotateX(Math.PI / 2);
-      part(toeL, legC, -0.035, 0.005, 0.055); part(toeR, legC, 0.035, 0.005, 0.055);
-      bird.add(new THREE.Mesh(bb.build(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0.05 })));
-    }
+    // The clue's anchor survives at both scales. main.js attaches an independent
+    // Blender skin after cloning, so the real notes can articulate its beak.
+    const bird = new THREE.Group();bird.name='songBird';
     const s2 = stonesGroup.getObjectByName('stone2');
     bird.position.copy(s2.position).add(new THREE.Vector3(0, 2.6, 0));
     bird.rotation.y = 0.6;   // quartering toward the arc's centre, where the listener stands
@@ -2937,17 +2921,8 @@ export function buildWorld(coastKit) {
     const wfig = new THREE.Group();
     wfig.name = 'watcher';
     wfig.visible = false;
-    const wmat = new THREE.MeshStandardMaterial({ color: 0x28323a, emissive: 0x13212a, emissiveIntensity: 0.6, flatShading: true, roughness: 1 });
-    const wbody = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.52, 1.5, 7), wmat);
-    wbody.position.y = 0.75; wfig.add(wbody);
-    const whood = new THREE.Mesh(new THREE.SphereGeometry(0.32, 8, 6, 0, Math.PI * 2, 0, Math.PI * 0.62), wmat);
-    whood.position.y = 1.5; whood.scale.set(1, 1.3, 1); wfig.add(whood);
-    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x9fe8e0 });   // two cold pinpoints, barely there
-    for (const ex of [-0.09, 0.09]) {
-      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.026, 5, 4), eyeMat);
-      eye.position.set(ex, 1.46, 0.26); wfig.add(eye);   // local +z = the figure's FRONT (lookAt aims +z at you)
-    }
-    const wx = 24, wz = -88;
+    // The authored Blender figure is attached after the model clone boundary.
+    const wx = 8, wz = -84;
     wfig.position.set(wx, heightAt(wx, wz), wz);
     core.add(wfig);
   }
@@ -3972,10 +3947,17 @@ function buildVegetation(core, r, coastKit) {
       for (let i = 0; i < p.count; i++) {
         const y = p.getY(i);
         const t = Math.max(0, Math.min(1, y / h));    // 0 root → 1 tip
-        p.setX(i, p.getX(i) * (1 - t * 0.82));        // taper toward the tip
+        p.setX(i, p.getX(i) * (1 - t * 0.98));        // taper toward the tip
         p.setZ(i, p.getZ(i) + bend * t * t * h);      // arc forward, accelerating to the tip
         p.setY(i, y - bend * 0.4 * t * t * h);        // droop the arcing tip down
       }
+      const colors=[];
+      for(let i=0;i<p.count;i++){
+        const t=Math.max(0,Math.min(1,p.getY(i)/h));
+        const c=new THREE.Color(0x5a6650).lerp(new THREE.Color(0xd0c6a0),t*.8);
+        colors.push(c.r,c.g,c.b);
+      }
+      g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
       g.computeVertexNormals();
       return g.toNonIndexed();
     };
@@ -3985,7 +3967,7 @@ function buildVegetation(core, r, coastKit) {
     for (let i = 0; i < N; i++) {
       const yaw = (i / N) * TAU + i * 1.3;
       const h = 0.4 + (i % 3) * 0.08;                 // 0.40 .. 0.56
-      const w = 0.055 + (i % 2) * 0.02;
+      const w = 0.022 + (i % 2) * 0.009;
       const bend = 0.45 + (i % 4) * 0.14;             // varied droop so it isn't a uniform spray
       const b = makeBlade(h, w, bend);
       b.rotateY(yaw);
@@ -3997,7 +3979,7 @@ function buildVegetation(core, r, coastKit) {
     return g;
   })();
   const grassMat = new THREE.MeshStandardMaterial({
-    color: 0xc2a75f, flatShading: true, roughness: 0.9, side: THREE.DoubleSide,
+    color: 0xd3d2b8, vertexColors: true, flatShading: false, roughness: 0.9, side: THREE.DoubleSide,
   });
   // The meadow's shading recipe, shared: a two-axis sway weighted to the tips, and the
   // up-normal relight. Factored out because the heath below needs exactly the same
@@ -4022,7 +4004,7 @@ function buildVegetation(core, r, coastKit) {
     // the terrain they grow from, from every side, and still dim correctly at night.
     sh.fragmentShader = sh.fragmentShader
       .replace('void main() {', 'varying vec3 vGUp;\nvoid main() {')
-      .replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\n  normal = normalize(vGUp);');
+      .replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\n  normal = normalize(normal*.35 + normalize(vGUp)*.65);');
     // A SPRIG IS NOT A CARD. Scaled up big enough to read across the meadow, the heath's
     // flat tapered planes showed exactly what they are — hard straight edges against the
     // sky, the same folded-paper tell the canopy had. Fray the tips with the same
@@ -4045,7 +4027,7 @@ function buildVegetation(core, r, coastKit) {
         `);
     }
   };
-  grassMat.onBeforeCompile = meadowSway(grassMat, 1);
+  grassMat.onBeforeCompile = meadowSway(grassMat, .45);
 
   const G_MAIN = 3800, G_ISLET = 650;   // fewer instances — each is now a full 5-blade tuft, not one blade
   // #30: one island-spanning InstancedMesh could never frustum-cull — every view paid all
@@ -4065,7 +4047,7 @@ function buildVegetation(core, r, coastKit) {
     // plus more value range — a living coastal meadow, not uniform dead brush. (× the 0xc2a75f base;
     // lifted with the up-normal relight so the meadow reads sunlit, not scorched.)
     const gv = r();
-    gcol.setHSL(0.13 + gv * gv * 0.18, 0.36 + r() * 0.26, 0.33 + r() * 0.22);
+    gcol.setHSL(0.17 + gv * gv * 0.12, 0.18 + r() * 0.17, 0.35 + r() * 0.16);
     gPlaced.push({ m: m4.clone(), c: gcol.clone(), x, z });
     gi++;
   };
@@ -4124,18 +4106,18 @@ function buildVegetation(core, r, coastKit) {
     const hr = mulberry32(SEED ^ 0x4e17);
     const heathGeo = (() => {
       const sprigs = [];
-      const N = 14;                                   // denser: a bush, not a starburst
+      const N = 7;                                    // folded sprigs; same 56-triangle budget
       for (let i = 0; i < N; i++) {
         const yaw = (i / N) * TAU + hr() * 0.8;
         const lean = 0.55 + hr() * 0.5;                 // out and up: a dome, not a fan
         const len = 0.32 + hr() * 0.30;
-        const g = new THREE.PlaneGeometry(0.085, len, 1, 2);
+        const g = new THREE.PlaneGeometry(0.052, len, 2, 2);
         g.translate(0, len / 2, 0);
         const pp = g.attributes.position;
         for (let v = 0; v < pp.count; v++) {
           const t = Math.max(0, Math.min(1, pp.getY(v) / len));
-          pp.setX(v, pp.getX(v) * (1 - t * 0.72));      // taper
-          pp.setZ(v, pp.getZ(v) + t * t * len * 0.5);   // curl outward
+          pp.setX(v, pp.getX(v) * (1 - t * 0.97));      // taper
+          pp.setZ(v, pp.getZ(v) + t * t * len * 0.5 + (Math.abs(pp.getX(v))<.001?.018*(1-t):0));   // curl outward
         }
         g.computeVertexNormals();
         const rim = new Float32Array(pp.count);
@@ -4154,7 +4136,7 @@ function buildVegetation(core, r, coastKit) {
     const heathMat = new THREE.MeshStandardMaterial({
       color: 0x8a8770, flatShading: true, roughness: 0.95, side: THREE.DoubleSide,
     });
-    heathMat.onBeforeCompile = meadowSway(heathMat, 0.45, 0.80);   // a woody clump barely moves; its tips fray
+    heathMat.onBeforeCompile = meadowSway(heathMat, 0.28, 0);   // a woody clump barely moves; its tips fray
     const placed = [];
     const hcol = new THREE.Color();
     const hm = new THREE.Matrix4(), hq = new THREE.Quaternion(), he = new THREE.Euler();

@@ -44,7 +44,7 @@ export default async function(h) {
   ok('far crowns are substantially lighter',crowns.slice(4).every((g,i)=>g.triangles<crowns[i].triangles*.25),crowns);
   const model=await h.evaluate(`({full:!!ABYME.core.getObjectByName('workingStudy'),mini:!!ABYME.core.getObjectByName('modelAnchor').getObjectByName('workingStudy')})`);
   ok('the fitted study is loaded without duplicating it in the miniature',model.full&&!model.mini,model);
-  await shot('08-tide-high',[-81.9,-38.6,Math.atan2(-.91,2.05),-.24],11);
+  await shot('08-tide-high',[-85.5,-41.7,Math.atan2(-.16,2.14),-.14],11);
   const before=await h.evaluate(`({tide:ABYME.W.tide,y:ABYME.core.getObjectByName('tideGaugeFloat').position.y})`);
   // Project the real wheel and operate it with a pointer, not a granted flag.
   await h.evaluate(`(()=>{const {player,refs,THREE}=ABYME;const p=refs.valveWheel.getWorldPosition(new THREE.Vector3());player.yaw=Math.atan2(player.pos.x-p.x,player.pos.z-p.z);player.pitch=Math.atan2(p.y-player.pos.y-player.eye,Math.hypot(player.pos.x-p.x,player.pos.z-p.z));player.syncCamera();return true;})()`);await h.wait(.3);
@@ -63,7 +63,7 @@ export default async function(h) {
   ok('a pointer on the wheel moves both the sea and float',during.turned&&during.tide<before.tide&&during.y<before.y,{before,during,pointerState,point});
   ok('the float follows the actual water during travel',Math.abs(during.y-(.445+during.tide*.64))<.003,during);
   await advance(10.5);
-  await h.evaluate('ABYME.tp(-81.9,-38.6,Math.atan2(-.91,2.05),-.24);ABYME.UI.clearWhispers();1');await renderedFrames(h);
+  await h.evaluate('ABYME.tp(-85.5,-41.7,Math.atan2(-.16,2.14),-.14);ABYME.UI.clearWhispers();1');await renderedFrames(h);
   await h.screenshot(join(out,'09-tide-low.png'));
   const low=await h.evaluate(`({tide:ABYME.W.tide,y:ABYME.core.getObjectByName('tideGaugeFloat').position.y})`);
   ok('the falling tide reaches the bottom of the tube',low.tide<.005&&Math.abs(low.y-.445)<.005,low);

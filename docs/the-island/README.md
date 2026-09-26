@@ -7,7 +7,11 @@ to an unfinished boat.
 
 It is a static Three.js application with no build step. Original furniture, cloth,
 boats, lighthouse masonry, spiral stairs, vault ribs, wind pines and coastal rock
-are authored in Blender and loaded as two GLBs.
+are authored in Blender and loaded as five GLBs.
+The landing beach includes a net-drying rack, coiled line, painted floats, an open
+creel and one western cluster of barnacled tide rocks; the timber grain is an imagegen material.
+The open shore now has articulated gulls, crows and a musical clue bird, while the
+dory has an authored lapstrake hull. [Review the living-coast pass](loop/island-life/index.html).
 
 ## Run it
 
@@ -56,7 +60,7 @@ A final two-touch commitment at the **small refuge lamp** applies **tend**,
 **carry**, **open**, or **close**. The plate, bell and oar remain nonterminal.
 Each ending has a distinct water result and a quiet continuation afterward.
 
-The lighthouse also has a physical climb: eighty-three treads around an open shaft,
+The lighthouse also has a physical climb: 115 treads around an open shaft,
 three windows onto the coast, and a lantern gallery above the whole island. Fitting
 the lens opens the stair in daylight as well as at night. A watch book waits above.
 Under the bluff, the cellar opens east onto an inverted lighthouse and west into
@@ -102,6 +106,9 @@ complete mark, tombstone, outbox, and rules contract.
 | `js/content.js` | field-note copy, hint threads, readable artifacts, sketches |
 | `js/harbor.js` | Blender room assembly, spare chair and two-scale boat homecoming |
 | `js/landfall.js` | Blender tower, vaults, coast, pines and persistent drying-room tin |
+| `js/working-coast.js` | Blender conifers, fitted study and live tide instrument |
+| `js/shore-details.js` | sparse working-shore kit, collision and distance detail |
+| `js/island-life.js` | Blender bird rigs, distance skins, expressive poses and open dory |
 | `js/tower-course.js` | Shared staircase layout, tread heights and movement course |
 | `js/props.js` | structures, glyph/instrument/dial atlases, model clone |
 | `js/puzzles.js` | physical interactions and state-to-scene application |
@@ -119,3 +126,12 @@ route, four endings, before/after views and every readable page. The exporter is
 encounter fixtures explicitly. The Blender source is
 [tools/blender/harbor-rooms.blend](tools/blender/harbor-rooms.blend), reproducible
 with the Python generator beside it.
+
+
+## Current visual and walking review
+
+[The cohesion pass](loop/cohesion/index.html) restores named library books, rebuilds
+the lighthouse circulation and stair, and replaces weak rock, vegetation, archive
+and human-figure assets. It includes a recorded keyboard walk from the landing to
+the study and a separate complete causal route through the game. Blender sources
+and the imagegen granite prompt remain editable under `tools/blender/`.

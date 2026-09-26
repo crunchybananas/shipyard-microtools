@@ -1,0 +1,184 @@
+{
+  "viewport": [
+    1440,
+    900
+  ],
+  "method": "Same camera and hour, isolated Chromium sessions, seven live timing samples per pose. Host GPU load is not controlled; geometry counts are the deterministic comparison.",
+  "samples": [
+    {
+      "name": "study",
+      "hour": 12,
+      "pose": [
+        -82,
+        -37,
+        0.7853981633974483,
+        -0.12
+      ],
+      "image": "study-12.jpg",
+      "calls": 475,
+      "triangles": 931799,
+      "gpuMode": "gpu",
+      "position": [
+        -82,
+        13.5,
+        -37
+      ],
+      "gpuMedianMs": 5.13,
+      "gpuSamplesMs": [
+        2.68,
+        3.04,
+        3.58,
+        5.13,
+        8.48,
+        10.57,
+        16.13
+      ]
+    },
+    {
+      "name": "study",
+      "hour": 22,
+      "pose": [
+        -82,
+        -37,
+        0.7853981633974483,
+        -0.12
+      ],
+      "image": "study-22.jpg",
+      "calls": 475,
+      "triangles": 931799,
+      "gpuMode": "gpu",
+      "position": [
+        -82,
+        13.5,
+        -37
+      ],
+      "gpuMedianMs": 8.54,
+      "gpuSamplesMs": [
+        5.33,
+        5.86,
+        6.97,
+        8.54,
+        8.54,
+        11.79,
+        13.2
+      ]
+    },
+    {
+      "name": "forest",
+      "hour": 12,
+      "pose": [
+        -58,
+        -58,
+        1.5,
+        0.12
+      ],
+      "image": "forest-12.jpg",
+      "calls": 251,
+      "triangles": 631914,
+      "gpuMode": "gpu",
+      "position": [
+        -58,
+        12.249216292040664,
+        -58
+      ],
+      "gpuMedianMs": 7.4,
+      "gpuSamplesMs": [
+        6.57,
+        7.18,
+        7.24,
+        7.4,
+        7.57,
+        9.08,
+        9.82
+      ]
+    },
+    {
+      "name": "forest",
+      "hour": 22,
+      "pose": [
+        -58,
+        -58,
+        1.5,
+        0.12
+      ],
+      "image": "forest-22.jpg",
+      "calls": 239,
+      "triangles": 630576,
+      "gpuMode": "gpu",
+      "position": [
+        -58,
+        12.249216292040664,
+        -58
+      ],
+      "gpuMedianMs": 11.22,
+      "gpuSamplesMs": [
+        7.45,
+        7.62,
+        8.73,
+        11.22,
+        12.11,
+        12.27,
+        17.54
+      ]
+    },
+    {
+      "name": "beach",
+      "hour": 12,
+      "pose": [
+        4,
+        -104,
+        2.19,
+        -0.06
+      ],
+      "image": "beach-12.jpg",
+      "calls": 346,
+      "triangles": 661480,
+      "gpuMode": "gpu",
+      "position": [
+        4,
+        0.05809980853914054,
+        -104
+      ],
+      "gpuMedianMs": 6.91,
+      "gpuSamplesMs": [
+        5.73,
+        5.74,
+        6.49,
+        6.91,
+        7.18,
+        8.09,
+        9.23
+      ]
+    },
+    {
+      "name": "beach",
+      "hour": 22,
+      "pose": [
+        4,
+        -104,
+        2.19,
+        -0.06
+      ],
+      "image": "beach-22.jpg",
+      "calls": 307,
+      "triangles": 654964,
+      "gpuMode": "gpu",
+      "position": [
+        4,
+        0.05809980853914054,
+        -104
+      ],
+      "gpuMedianMs": 12.07,
+      "gpuSamplesMs": [
+        10.19,
+        10.9,
+        11.99,
+        12.07,
+        12.15,
+        13.16,
+        14.45
+      ]
+    }
+  ],
+  "errors": []
+}

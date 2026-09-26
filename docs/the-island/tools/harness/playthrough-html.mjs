@@ -2,7 +2,7 @@ const esc = (s='') => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','
 const TITLES={
  '01-arrival':'Ashore','02-east-room':'A room kept ready','03-the-working-model':'The working model',
  '04-the-first-crossing':'The first crossing','05-listening':'Learning to listen','05b-the-drain':'Under the standing stones',
- '06a-the-tower':'Eighty-three treads','06b-the-signal':'The light on the cliff','06c-beneath-the-bluff':'The rooms under the bluff','06d-the-line':'The hanging line',
+ '06a-the-tower':'The long stair','06b-the-signal':'The light on the cliff','06c-beneath-the-bluff':'The rooms under the bluff','06d-the-line':'The hanging line',
  '06-the-signal':'The signal and the line','07-the-other-hands':'Other hands','08-the-unfinished-boat':'The unfinished boat','09-homecoming':'Homecoming',
  'ending-tend':'Take the watch','ending-carry':'Bring the water home','ending-open':'Join the rooms','ending-close':'Enough for tonight',
 };

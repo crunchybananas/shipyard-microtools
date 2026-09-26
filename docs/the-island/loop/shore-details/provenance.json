@@ -1,0 +1,27 @@
+{
+  "generator": "Blender 5.2.1 LTS; separate background process",
+  "imageGenerator": "OpenAI built-in imagegen",
+  "generatedImageTreatment": "sips 512x512 JPEG quality 85; original preserved",
+  "files": {
+    "assets/shore-details.glb": {
+      "bytes": 918788,
+      "sha256": "170e64fdc49a0b6eba5625b99c193000ef5ce5859a7b2831a382a3741c876985"
+    },
+    "assets/shore-timber.jpg": {
+      "bytes": 116076,
+      "sha256": "73ded0ab0734aaf6aff280594f8120e2d0defc3add589e3d13a86391077e6c90"
+    },
+    "tools/blender/shore_details.py": {
+      "bytes": 13878,
+      "sha256": "d8c1ce8c4ac99a5660ed70367aa8285e0c9aa5be881cf37f7da04c80f56d1704"
+    },
+    "tools/blender/shore-timber-source.png": {
+      "bytes": 2886203,
+      "sha256": "45135121c5df284f776e6161447774d76617485663d83789740a10519f779193"
+    },
+    "tools/blender/shore-texture-prompt.txt": {
+      "bytes": 1051,
+      "sha256": "17c3d8a36914f1d078ebac1f9e898de1c01cd610b96d189f0df6578de5393344"
+    }
+  }
+}

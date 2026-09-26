@@ -1,0 +1,264 @@
+{
+  "pass": [
+    {
+      "name": "study at 12: addition stays within 14 calls / 30,000 triangles"
+    },
+    {
+      "name": "study at 12: existing total ceiling holds"
+    },
+    {
+      "name": "study at 22: addition stays within 14 calls / 30,000 triangles"
+    },
+    {
+      "name": "study at 22: existing total ceiling holds"
+    },
+    {
+      "name": "forest at 12: addition stays within 14 calls / 30,000 triangles"
+    },
+    {
+      "name": "forest at 12: existing total ceiling holds"
+    },
+    {
+      "name": "forest at 22: addition stays within 14 calls / 30,000 triangles"
+    },
+    {
+      "name": "forest at 22: existing total ceiling holds"
+    },
+    {
+      "name": "beach at 12: addition stays within 14 calls / 30,000 triangles"
+    },
+    {
+      "name": "beach at 12: existing total ceiling holds"
+    },
+    {
+      "name": "beach at 22: addition stays within 14 calls / 30,000 triangles"
+    },
+    {
+      "name": "beach at 22: existing total ceiling holds"
+    },
+    {
+      "name": "the near rack uses its authored net and imagegen timber"
+    },
+    {
+      "name": "miniature uses the 98-triangle silhouette"
+    },
+    {
+      "name": "shells and pools are merged into three shore batches"
+    },
+    {
+      "name": "rack and rocks block walking while the approach stays open"
+    },
+    {
+      "name": "distant rack selects its small silhouette"
+    },
+    {
+      "name": "no shader, asset or runtime errors"
+    }
+  ],
+  "fail": [],
+  "samples": [
+    {
+      "name": "study",
+      "hour": 12,
+      "pose": [
+        -82,
+        -37,
+        0.7853981633974483,
+        -0.12
+      ],
+      "image": "study-12.png",
+      "frame": 1977,
+      "calls": 476,
+      "triangles": 931897,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 1,
+      "deltaTriangles": 98,
+      "gpuMedianMs": 9.18,
+      "gpuSamplesMs": [
+        3.72,
+        5,
+        8.03,
+        9.18,
+        9.19,
+        9.24,
+        9.53
+      ]
+    },
+    {
+      "name": "study",
+      "hour": 22,
+      "pose": [
+        -82,
+        -37,
+        0.7853981633974483,
+        -0.12
+      ],
+      "image": "study-22.png",
+      "frame": 4788,
+      "calls": 476,
+      "triangles": 931897,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 1,
+      "deltaTriangles": 98,
+      "gpuMedianMs": 14.54,
+      "gpuSamplesMs": [
+        5.66,
+        6.62,
+        7.1,
+        14.54,
+        15.04,
+        15.72,
+        16.21
+      ]
+    },
+    {
+      "name": "forest",
+      "hour": 12,
+      "pose": [
+        -58,
+        -58,
+        1.5,
+        0.12
+      ],
+      "image": "forest-12.png",
+      "frame": 5318,
+      "calls": 251,
+      "triangles": 631914,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 0,
+      "deltaTriangles": 0,
+      "gpuMedianMs": 8.02,
+      "gpuSamplesMs": [
+        6.25,
+        7.49,
+        8,
+        8.02,
+        9.34,
+        9.87,
+        12.07
+      ]
+    },
+    {
+      "name": "forest",
+      "hour": 22,
+      "pose": [
+        -58,
+        -58,
+        1.5,
+        0.12
+      ],
+      "image": "forest-22.png",
+      "frame": 8129,
+      "calls": 239,
+      "triangles": 630576,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 0,
+      "deltaTriangles": 0,
+      "gpuMedianMs": 16.92,
+      "gpuSamplesMs": [
+        11.63,
+        13.31,
+        15.49,
+        16.92,
+        19.15,
+        19.63,
+        19.68
+      ]
+    },
+    {
+      "name": "beach",
+      "hour": 12,
+      "pose": [
+        4,
+        -104,
+        2.19,
+        -0.06
+      ],
+      "image": "beach-12.png",
+      "frame": 8644,
+      "calls": 351,
+      "triangles": 675356,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 5,
+      "deltaTriangles": 13876,
+      "gpuMedianMs": 11.36,
+      "gpuSamplesMs": [
+        4.71,
+        9.17,
+        11.21,
+        11.36,
+        11.44,
+        11.49,
+        12.5
+      ]
+    },
+    {
+      "name": "beach",
+      "hour": 22,
+      "pose": [
+        4,
+        -104,
+        2.19,
+        -0.06
+      ],
+      "image": "beach-22.png",
+      "frame": 11454,
+      "calls": 312,
+      "triangles": 668840,
+      "points": 981,
+      "lines": 0,
+      "gpuMode": "gpu",
+      "deltaCalls": 5,
+      "deltaTriangles": 13876,
+      "gpuMedianMs": 10.79,
+      "gpuSamplesMs": [
+        6.89,
+        7.24,
+        8.43,
+        10.79,
+        11.45,
+        15.14,
+        17.61
+      ]
+    }
+  ],
+  "kit": {
+    "near": true,
+    "far": false,
+    "texture": [
+      512,
+      512
+    ],
+    "miniTriangles": 98,
+    "miniChildren": 0,
+    "authored": "Blender shore_details.py",
+    "parts": [
+      "shoreRack",
+      "shoreRock",
+      "shoreLife",
+      "shorePool"
+    ],
+    "lights": 9
+  },
+  "collision": {
+    "solid": true,
+    "clear": true,
+    "rocks": [
+      true,
+      true,
+      true
+    ]
+  },
+  "errors": [],
+  "method": "Fixed baseline cameras at 1440x900; live GPU samples are host observations. Era images use explicit debug fixtures, not earned progression."
+}
