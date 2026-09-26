@@ -1,0 +1,116 @@
+{
+  "pass": [
+    {
+      "name": "the lower keeper is absent at the surface"
+    },
+    {
+      "name": "all four paper corners sit above the blanket"
+    },
+    {
+      "name": "the visible copy opens its actual text"
+    },
+    {
+      "name": "proximity without regard does not start the encounter"
+    },
+    {
+      "name": "the authored gesture preserves the stillness threshold"
+    },
+    {
+      "name": "held regard reaches the authored hands-resting pose"
+    },
+    {
+      "name": "both palms meet the actual table top"
+    },
+    {
+      "name": "hands rise independently while the feet stay planted"
+    },
+    {
+      "name": "only the nested figure appears in the source era"
+    },
+    {
+      "name": "the keeper remains on dry ground at the maximum supported tide"
+    },
+    {
+      "name": "no runtime exceptions during the handwork checks"
+    }
+  ],
+  "fail": [],
+  "paper": {
+    "gaps": [
+      0.0012044247128439878,
+      0.002561795663476474,
+      0.002181638162102928,
+      0.0015136639819015585
+    ],
+    "point": {
+      "x": 720,
+      "y": 450.0000000000007
+    }
+  },
+  "idle": {
+    "palms": [
+      {
+        "name": "keeperPalmL",
+        "low": 14.548247919648006,
+        "gap": -0.003285795690514348
+      },
+      {
+        "name": "keeperPalmR",
+        "low": 14.548247919648006,
+        "gap": -0.003285795690514348
+      }
+    ],
+    "foot": [
+      -85.08333333333333,
+      14.541817048724504,
+      -40.30833333333333
+    ],
+    "pitch": 0,
+    "full": false,
+    "mini": true,
+    "gesture": "working",
+    "head": [
+      0,
+      0,
+      0.008303948814932025,
+      0.9999655216226603
+    ],
+    "regarded": false
+  },
+  "resting": {
+    "palms": [
+      {
+        "name": "keeperPalmL",
+        "low": 14.551555799045637,
+        "gap": 0.0000220837071172042
+      },
+      {
+        "name": "keeperPalmR",
+        "low": 14.551555799045637,
+        "gap": 0.0000220837071172042
+      }
+    ],
+    "foot": [
+      -85.08333333333333,
+      14.541817048724504,
+      -40.30833333333333
+    ],
+    "pitch": 0,
+    "full": false,
+    "mini": true,
+    "gesture": "hands-resting",
+    "head": [
+      -0.14869874349496642,
+      0.3543934236412302,
+      0.05719171433953368,
+      0.9214244910863673
+    ],
+    "regarded": true
+  },
+  "ground": {
+    "height": 7.636091693880736,
+    "terrain": 7.636091693880736,
+    "maxSea": 6.93
+  },
+  "errors": []
+}

@@ -1,6 +1,6 @@
 """Editable Blender source for the working study and four coastal conifers.
 
-Closed needle cushions replace the old crossed cards. Near and far crowns use the
+Closed, slender needle sprays replace the old crossed cards. Near and far crowns use the
 same bough centres, wind habit and height; UV.x transports each tip's wind weight.
 Coordinates below are game Y-up and convert once on entry to Blender Z-up.
 """
@@ -84,6 +84,27 @@ def cushion(p, direction, length, width, depth, near, tone, rim):
         part['c'][-len(v)+k]=tuple(c*gain for c in base[:3])+(1,)
         if k==len(v)-1:part['rim'][-len(v)+k]=min(1,rim+.25)
 
+def needle_spray(p, direction, length, width, depth, tone, rim):
+    """Six-sided closed branchlet, with an arched spine and a dipped growing tip.
+    Narrow overlapping sprays leave daylight between twigs at walking distance.
+    """
+    d=Vector(direction).normalized();u=d.cross(Vector((0,1,0))).normalized();w=u.cross(d).normalized();p=Vector(p)
+    v=[tuple(p-d*length*.52-w*depth*.2)]
+    for along,spread,lift in [(-.22,.92,.65),(.23,.68,.20)]:
+        centre=p+d*length*along+w*depth*lift
+        for j in range(3):
+            a=j*math.tau/3+math.pi/2
+            v.append(tuple(centre+u*math.cos(a)*width*spread+w*math.sin(a)*depth))
+    v.append(tuple(p+d*length*.58-w*depth*.8))
+    f=[]
+    for j in range(3):
+        a=1+j;b=1+(j+1)%3;f.extend([(0,b,a),(a,b,b+3,a+3),(7,a+3,b+3)])
+    base=(.09*tone,.185*tone,.12*tone,1);add(v,f,base,rim);part=PARTS[ACTIVE]
+    for k,vertex in enumerate(v):
+        gain=.82+.17*max(-.5,min(1,(vertex[1]-p.y)/max(.015,depth)))+.10*rim
+        part['c'][-len(v)+k]=tuple(c*gain for c in base[:3])+(1,)
+        part['rim'][-len(v)+k]=min(1,rim+(.24 if k==7 else -.1 if k==0 else 0))
+
 for variant,profile in enumerate(profiles):
     p=profile['p']
     # Generate the branch skeleton once. LOD cannot reroll missing boughs.
@@ -117,21 +138,33 @@ for variant,profile in enumerate(profiles):
     for near in [True,False]:
         ACTIVE=f'forest{variant}{"Near" if near else "Far"}'
         for root,middle,end,reach,a,tone,t in branches:
-            if near:tube([root,middle,end],[.048,.022,.005],(.16,.09,.037,1),5,.24)
+            if near:tube([root,middle,end],[.033,.017,.003],(.16,.09,.037,1),5,.24)
             direction=end-middle
-            # Broad cushions overlap along each branch. Forks break their silhouette.
-            for k,u0 in enumerate([.26,.56,.84]):
-                centre=root.lerp(end,u0);centre.y+=.03+math.sin(u0*math.pi)*.08
-                cushion(centre,direction,reach*.72,reach*(.245-u0*.045),p['tierH']*(.15-u0*.025),near,tone,u0)
+            def branch_point(u):return root.lerp(middle,u/.52) if u<.52 else middle.lerp(end,(u-.52)/.48)
             if near:
-                for side in [-1,1]:
-                    centre=root.lerp(end,.61)+Vector((-math.sin(a),.10,math.cos(a)))*reach*.20*side
-                    branch=direction.normalized()+Vector((-math.sin(a),.24,math.cos(a)))*side*.72
-                    cushion(centre,branch,reach*.51,reach*.17,p['tierH']*.18,False,tone*1.04,.77)
+                # Two leaders and two paired forks: fine, feathered fans supported
+                # by the same branch skeleton used by the far silhouette.
+                for u0 in [.37,.80]:
+                    centre=branch_point(u0);centre.y+=.02
+                    needle_spray(centre,direction,reach*.62,reach*.125,p['tierH']*.041,tone,u0)
+                for k,u0 in enumerate([.39,.69]):
+                    for side in [-1,1]:
+                        off=Vector((-math.sin(a),0,math.cos(a)))*side
+                        centre=branch_point(u0)+off*reach*(.17 if k==0 else .13)
+                        centre.y+=.012+.012*side
+                        branch=direction.normalized()+off*(.78 if k==0 else .60)
+                        needle_spray(centre,branch,reach*(.53 if k==0 else .45),reach*.105,p['tierH']*.036,tone*(1+.04*side),u0+.14)
+            else:
+                for u0 in [.26,.56,.84]:
+                    centre=branch_point(u0);centre.y+=.02
+                    cushion(centre,direction,reach*.70,reach*(.22-u0*.04),p['tierH']*.062,False,tone,u0)
         top=p['baseY']+(p['n']-1)*p['spacing']
-        for k in range(4):
-            t=k/3
-            cushion((p['lean']*(p['n']-1)+.05*t,top+t*p['tierH']*.55,0),(.06,1,.02),p['tierH']*.63,p['baseR']*(.18-.105*t),p['baseR']*(.15-.09*t),near,1.13,.78+t*.15)
+        for k in range(4 if near else 3):
+            t=k/(3 if near else 2)
+            if near:
+                needle_spray((p['lean']*(p['n']-1)+.05*t,top+t*p['tierH']*.55,0),(.06,1,.02),p['tierH']*.63,p['baseR']*(.13-.085*t),p['baseR']*.027,1.13,.78+t*.15)
+            else:
+                cushion((p['lean']*(p['n']-1)+.05*t,top+t*p['tierH']*.55,0),(.06,1,.02),p['tierH']*.63,p['baseR']*(.13-.085*t),p['baseR']*.04,False,1.13,.78+t*.15)
 
 # The room's masonry shell stays structural. These are its inner finish and timber.
 # Real openings preserve the beach door, study window, annex and tower course.

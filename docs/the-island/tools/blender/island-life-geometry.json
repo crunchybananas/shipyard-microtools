@@ -14,6 +14,16 @@
     "footL",
     "footR"
   ],
+  "keeperBones": [
+    "keeperRoot",
+    "keeperHead",
+    "keeperUpperL",
+    "keeperForeL",
+    "keeperPalmL",
+    "keeperUpperR",
+    "keeperForeR",
+    "keeperPalmR"
+  ],
   "parts": {
     "gull": {
       "triangles": 2806,
@@ -50,6 +60,16 @@
       "vertices": 1114,
       "skinned": false
     },
+    "keeperCraft": {
+      "triangles": 2188,
+      "vertices": 1256,
+      "skinned": true
+    },
+    "keeperBenchCraft": {
+      "triangles": 108,
+      "vertices": 72,
+      "skinned": false
+    },
     "gullFar": {
       "triangles": 859,
       "vertices": 651,
@@ -66,5 +86,5 @@
       "skinned": true
     }
   },
-  "bytes": 723320
+  "bytes": 830804
 }

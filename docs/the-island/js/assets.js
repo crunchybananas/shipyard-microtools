@@ -23,9 +23,9 @@ const BASE = 'assets/';
 //   texture rows carry their sampler settings (wrap/repeat/colorSpace/anisotropy).
 export const MANIFEST = {
   island_life: {
-    kind: 'model', file: 'island-life.glb', bytes: 723320,
+    kind: 'model', file: 'island-life.glb', bytes: 830804,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/island_life.py',
-    prompt: 'Original skinned gull, crow and songbird anatomy, twelve-joint rig, closed feather wings, articulated head and webbed feet, an open lapstrake dory and oar, and human-scale coastal figures with folded coats, sleeves, hands and boots.',
+    prompt: 'Original skinned gull, crow and songbird anatomy, twelve-joint rig, closed feather wings, articulated head and webbed feet, an open lapstrake dory and oar, human-scale coastal figures with folded coats, sleeves, hands and boots, and an eight-joint miniature keeper with a fitted worktable.',
   },
   shore_details: {
     kind: 'model', file: 'shore-details.glb', bytes: 918788,
@@ -39,9 +39,9 @@ export const MANIFEST = {
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
   },
   working_coast: {
-    kind: 'model', file: 'working-coast.glb', bytes: 1715112,
+    kind: 'model', file: 'working-coast.glb', bytes: 1705768,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/working_coast.py',
-    prompt: 'Four closed-volume conifer crowns with paired LODs, fitted study floorboards, painted joinery, limewash and a tide wheel pipe run.',
+    prompt: 'Four conifer crowns with slender closed branch sprays and paired LODs, fitted study floorboards, painted joinery, limewash and a tide wheel pipe run.',
   },
   landfall: {
     kind: 'model', file: 'landfall.glb', bytes: 2604048,
@@ -49,9 +49,9 @@ export const MANIFEST = {
     prompt: 'Authored lighthouse with open windows and 115 closed risers and supported treads, stone vault ribs, hinged archive tins and drying table, coastal basalt arch and wind pines.',
   },
   harbor_rooms: {
-    kind: 'model', file: 'harbor-rooms.glb', bytes: 1716348,
+    kind: 'model', file: 'harbor-rooms.glb', bytes: 1714344,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/harbor_rooms.py',
-    prompt: 'Original coastal furniture, repaired chair, cloth, carved boat and mobile; procedural mesh authorship.',
+    prompt: 'Original coastal furniture, repaired chair, sewn blanket and pillow, connected rug, carved boat and mobile; procedural mesh authorship.',
   },
   // #138 (AAA-B4): TRUE relief heightmaps — grayscale height, not albedo. The Sobel
   // in buildNormalFromImage reads luminance, so feeding it real height yields real

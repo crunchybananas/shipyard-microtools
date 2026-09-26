@@ -1,0 +1,35 @@
+{
+  "pass": [
+    {
+      "name": "all review images load"
+    },
+    {
+      "name": "all evidence and source links resolve"
+    },
+    {
+      "name": "desktop layout fits without placeholders"
+    },
+    {
+      "name": "the actual walk video has valid duration and dimensions"
+    },
+    {
+      "name": "phone layout has no horizontal overflow"
+    },
+    {
+      "name": "source details open by phone touch"
+    }
+  ],
+  "fail": [],
+  "state": {
+    "images": 17,
+    "broken": [],
+    "missing": [],
+    "overflow": false,
+    "placeholders": false
+  },
+  "video": {
+    "duration": 27.466016,
+    "width": 960,
+    "height": 600
+  }
+}

@@ -27,7 +27,7 @@ def finish(obj,color,bevel=0):
  attr=obj.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='CORNER')
  base=COLORS.get(color,color)
  for poly in obj.data.polygons:
-  shade=random.uniform(.96,1.04)
+  shade=1 if ACTIVE=='roomCloth' else random.uniform(.96,1.04)
   for li in poly.loop_indices:attr.data[li].color=tuple(min(1,v*shade) for v in base[:3])+(1,)
  PARTS.setdefault(ACTIVE,[]).append(obj)
  return obj
@@ -113,15 +113,73 @@ for x in [-1.91,.01]:
  for z in [1.11,1.35,1.59]:rod((x,.40,z),(x,.91,z),.022,'edge')
 box((-.95,.43,1.35),(1.85,.17,.76),'linen',.07)
 ACTIVE='roomCloth'
-cloth(-.84,.558,1.35,1.64,.91,'blue',.18)
-# Blue cloth remains visibly creased; repair is carried by the sewn line below.
-for i in range(9):
- x=-.45+i*.036;rod((x,.574,1.251),(x+.011,.574,1.265),.0027,'linen')
-ball((-1.6,.568,1.35),(.25,.095,.32),'linen')
-# A small woven oval rug that never covers the threshold.
+# The blanket follows the mattress, with a heavier hanging side and a turned
+# head hem. Dimensions describe cloth, not an inflated rectangular slab.
+def bed_point(u,v,lift=0):
+ x=-1.48+u*1.46;z=1.35+(v-.5)*1.04
+ edge=max(0,(abs(v-.5)*1.04-.352)/.168)
+ fold=.018*math.exp(-((u-.055)/.033)**2)
+ wrinkles=(.004*math.sin(u*23+v*5)+.004*math.sin(u*9-v*21))*(.25+.75*edge)
+ return (x,.535+fold+wrinkles-.165*edge**.72+lift,z)
+def seam(points,color,r=.003):
+ verts=[];faces=[];n=4
+ for i,p in enumerate(points):
+  d=(Vector(points[min(i+1,len(points)-1)])-Vector(points[max(0,i-1)])).normalized()
+  side=d.cross(Vector((0,1,0)))
+  if side.length<.01:side=d.cross(Vector((1,0,0)))
+  side.normalize();up=side.cross(d).normalized()
+  for j in range(n):
+   t=j*math.tau/n;verts.append(tuple(Vector(p)+r*(math.cos(t)*side+math.sin(t)*up)))
+ for i in range(len(points)-1):
+  for j in range(n):a=i*n+j;b=i*n+(j+1)%n;faces.append((a,b,b+n,a+n))
+ o=mesh(verts,faces,color)
+ for f in o.data.polygons:f.use_smooth=True
+nx=32;nz=16;vs=[bed_point(i/nx,j/nz) for j in range(nz+1) for i in range(nx+1)]
+fs=[]
+for j in range(nz):
+ for i in range(nx):a=j*(nx+1)+i;fs.append((a,a+nx+1,a+nx+2,a+1))
+o=mesh(vs,fs,'blue')
+for f in o.data.polygons:f.use_smooth=True
+# Backing makes the tucked edge solid from either side of the bed.
+bpy.context.view_layer.objects.active=o
+mod=o.modifiers.new('Wool thickness','SOLIDIFY');mod.thickness=.004;bpy.ops.object.modifier_apply(modifier=mod.name)
+for v in [.008,.992]:seam([bed_point(i/32,v,.002) for i in range(33)],'blue',.004)
+for u in [.012,.092,.985]:seam([bed_point(u,j/24,.003) for j in range(25)],'blue',.003)
+# One small darn. The cloth and stitches share exactly the same folded surface.
+u0,u1,v0,v1=.64,.82,.27,.42
+vs=[bed_point(u0+(u1-u0)*i/8,v0+(v1-v0)*j/5,.004) for j in range(6) for i in range(9)]
+fs=[]
+for j in range(5):
+ for i in range(8):a=j*9+i;fs.append((a,a+9,a+10,a+1))
+o=mesh(vs,fs,'patch')
+for f in o.data.polygons:f.use_smooth=True
+for j in range(8):
+ u=u0+(u1-u0)*(j+.3)/8
+ for v in [v0,v1]:seam([bed_point(u,v-.009,.007),bed_point(u+.006,v+.008,.007)],'linen',.0018)
+# Sewn rectangular pillow: flattened seam, full centre, compressed corners.
+vs=[];fs=[];nx=12;nz=16
+for side in [-1,1]:
+ for j in range(nz+1):
+  v=j/nz*2-1
+  for i in range(nx+1):
+   u=i/nx*2-1;bulge=max(0,(1-u*u)*(1-v*v))**.42
+   yy=.565+side*(.003+.074*bulge)+.0025*math.sin(u*26+v*12)*(1-bulge)
+   vs.append((-1.64+u*.23*(1-.085*abs(v)**8),yy,1.35+v*.30*(1-.085*abs(u)**8)))
+layer=(nx+1)*(nz+1)
+for side in range(2):
+ for j in range(nz):
+  for i in range(nx):
+   a=side*layer+j*(nx+1)+i;f=(a,a+nx+1,a+nx+2,a+1);fs.append(f if side else f[::-1])
+edge=list(range(nx+1))+[j*(nx+1)+nx for j in range(1,nz+1)]+[nz*(nx+1)+i for i in range(nx-1,-1,-1)]+[j*(nx+1) for j in range(nz-1,0,-1)]
+for i,a in enumerate(edge):b=edge[(i+1)%len(edge)];fs.append((a,b,b+layer,a+layer))
+o=mesh(vs,fs,'linen')
+for f in o.data.polygons:f.use_smooth=True
+seam([(vs[i][0],.565,vs[i][2]) for i in edge+[edge[0]]],'linen',.003)
+# A connected oval rug. Its braided coloured bands meet, without floor showing
+# between them like the slats of a second piece of furniture.
 for j in range(-8,9):
  z=-.34+j*.067;w=math.sqrt(max(0,1-(j/9)**2))*.92
- box((-.02,.135,z),(w*2,.012,.052),'blue' if j%3 else 'patch',.004)
+ box((-.02,.136,z),(w*2,.010,.069),'blue' if j%3 else 'patch',.004)
 ACTIVE='roomStructure'
 # The stove is detailed but compact; no invisible collision is added.
 cyl((1.4,.43,1.2),.36,.74,'dark',20,r2=.32)

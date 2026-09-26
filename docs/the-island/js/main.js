@@ -1,4 +1,4 @@
-import { birdFactory, poseBird, attachLivingBoat, attachSongbirds, attachCoastalFigures } from './island-life.js';
+import { birdFactory, poseBird, attachLivingBoat, attachSongbirds, attachCoastalFigures, attachLowerKeeper } from './island-life.js';
 import { attachShoreDetails } from './shore-details.js';
 import { attachWorkingStudy } from './working-coast.js';
 import { attachLandfall } from './landfall.js';
@@ -258,6 +258,7 @@ const workingStudy = attachWorkingStudy(core, coastKit);
 const modelRoot = instantiateModel(core, modelAnchor);
 attachShoreDetails(core, modelRoot, shoreKit);
 attachLivingBoat(core, modelRoot, lifeKit);
+attachLowerKeeper(modelRoot,lifeKit);
 const tickFigures=attachCoastalFigures(core,lifeKit);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();

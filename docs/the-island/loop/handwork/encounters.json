@@ -1,0 +1,424 @@
+{
+  "pass": [
+    {
+      "name": "both coastal figures use the authored human-scale mesh"
+    },
+    {
+      "name": "a figure hidden by shore rock cannot accrue regard"
+    },
+    {
+      "name": "a figure hidden by a canopy cannot earn regard"
+    },
+    {
+      "name": "looking at the sky does not count as seeing the figure"
+    },
+    {
+      "name": "visible watcher resolves through ordinary held regard"
+    },
+    {
+      "name": "visible tideFigure resolves through ordinary held regard"
+    },
+    {
+      "name": "reset restores figure opacity, scale and the authored starting site"
+    },
+    {
+      "name": "the encounter review has no runtime exceptions"
+    }
+  ],
+  "fail": [],
+  "anatomy": [
+    {
+      "name": "watcher",
+      "source": "Blender island_life.py",
+      "height": 1.7949999524280433,
+      "meshes": 1,
+      "triangles": 2564
+    },
+    {
+      "name": "tideFigure",
+      "source": "Blender island_life.py",
+      "height": 1.7380000306293368,
+      "meshes": 1,
+      "triangles": 2004
+    }
+  ],
+  "canopy": {
+    "site": {
+      "x": 14,
+      "z": -81
+    },
+    "samples": [
+      {
+        "hidden": true,
+        "before": 0.03289999997615814,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": true,
+        "before": 0,
+        "after": 0,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0,
+        "after": 0.05,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.05,
+        "after": 0.1,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.1,
+        "after": 0.15000000000000002,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.15000000000000002,
+        "after": 0.2,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.2,
+        "after": 0.25,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.25,
+        "after": 0.3,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.3,
+        "after": 0.35,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.35,
+        "after": 0.39999999999999997,
+        "resolved": false
+      },
+      {
+        "hidden": false,
+        "before": 0.39999999999999997,
+        "after": 0.44999999999999996,
+        "resolved": false
+      }
+    ]
+  },
+  "reset": {
+    "opacity": 0.8,
+    "scale": 1,
+    "watcher": [
+      8,
+      2.6591235154205495,
+      -84
+    ]
+  },
+  "errors": [],
+  "method": "Explicit era and position fixtures; visual regard and dissolution run ordinary game time, except the canopy drift probe uses explicit 50 ms production ticks. Tests deliberately inspect blocked and clear sightlines."
+}

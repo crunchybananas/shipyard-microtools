@@ -202,6 +202,61 @@ def coastalFigure(name,hooded):
 coastalFigure('watcherCraft',True)
 coastalFigure('tideFigureCraft',False)
 
+# The lower hand: a small work-worn person, independently articulated. Authored
+# at human scale; runtime exaggerates it only inside the 1:240 model for legibility.
+ACTIVE='keeperCraft'
+PAL.update({'keeperCoat':(.21,.31,.29,1),'keeperFold':(.13,.21,.20,1),'keeperSkin':(.55,.46,.32,1),'keeperHair':(.14,.15,.12,1)})
+v=[];f=[];N=16
+for j,(y,rx,rz) in enumerate([(.48,.21,.135),(.75,.19,.135),(1.02,.18,.125),(1.26,.22,.13),(1.39,.19,.105),(1.44,.08,.065)]):
+    for i in range(N):
+        a=i*math.tau/N;fold=1+.04*math.sin(a*7+j*.31)
+        v.append((math.cos(a)*rx*fold,y,math.sin(a)*rz*fold))
+for j in range(5):
+    for i in range(N):a=j*N+i;b=j*N+(i+1)%N;f.append((a,b,b+N,a+N))
+f.extend([tuple(range(N-1,-1,-1)),tuple(5*N+i for i in range(N))]);add(v,f,'keeperCoat','keeperRoot')
+for side in [-1,1]:
+    x=.105*side;tube([(x,.07,0),(x,.48,0),(x,.66,0)],[.062,.071,.074],'keeperFold','keeperRoot',8)
+    ell((x,.052,.045),(.069,.052,.13),'boot','keeperRoot',12,6)
+# Collar and a cap shade the face without assigning a particular identity.
+ell((0,1.435,0),(.090,.037,.084),'keeperFold','keeperRoot',12,6)
+ell((0,1.545,.012),(.092,.124,.096),'keeperSkin','keeperHead',16,8)
+ell((0,1.606,-.005),(.10,.076,.103),'keeperHair','keeperHead',16,6)
+ell((0,1.637,.06),(.12,.022,.12),'keeperCoat','keeperHead',12,5)
+ell((0,1.54,.108),(.021,.036,.026),'keeperSkin','keeperHead',8,5)
+for side in [-1,1]:
+    suffix='L' if side<0 else 'R';upper='keeperUpper'+suffix;lower='keeperFore'+suffix;hand='keeperPalm'+suffix
+    shoulder=(side*.20,1.33,0);elbow=(side*.255,1.065,.085);wrist=(side*.205,.93,.38)
+    tube([shoulder,elbow],[.080,.066],'keeperCoat',upper,10)
+    ell(elbow,(.068,.071,.068),'keeperFold',lower,10,6)
+    tube([elbow,wrist],[.064,.046],'keeperCoat',lower,10)
+    ell((side*.205,.901,.45),(.048,.019,.080),'keeperSkin',hand,12,6)
+    # Thumb separated from palm so even the source silhouette is a hand.
+    ell((side*.162,.903,.422),(.022,.018,.038),'keeperSkin',hand,8,5)
+# A worktable with a worn board top and a shallow empty work surface.
+ACTIVE='keeperBenchCraft'
+def keeperBox(p,size,color):
+    x,y,z=p;w,h,d=[v/2 for v in size]
+    v=[(x+a,y+b,z+c) for a,b,c in [(-w,-h,-d),(w,-h,-d),(w,h,-d),(-w,h,-d),(-w,-h,d),(w,-h,d),(w,h,d),(-w,h,d)]]
+    add(v,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(3,7,6,2),(0,4,7,3),(1,2,6,5)],color,None,False)
+for z in [.29,.45,.61]:keeperBox((0,.859,z),(.85,.042,.154),'wood')
+for x in [-.34,.34]:
+    for z in [.31,.59]:keeperBox((x,.421,z),(.043,.842,.045),'edge')
+keeperBox((0,.25,.45),(.72,.035,.035),'wood')
+keeperBox((0,.783,.45),(.80,.08,.30),'wood')
+# Named pivots and bind-pose palms are useful in source inspection and contact tests.
+keeperJoints={'keeperRoot':((0,0,0),None),'keeperHead':((0,1.435,0),'keeperRoot')}
+for side in [-1,1]:
+    suffix='L' if side<0 else 'R'
+    keeperJoints['keeperUpper'+suffix]=((side*.20,1.33,0),'keeperRoot')
+    keeperJoints['keeperFore'+suffix]=((side*.255,1.065,.085),'keeperUpper'+suffix)
+    keeperJoints['keeperPalm'+suffix]=((side*.205,.93,.38),'keeperFore'+suffix)
+ka=bpy.data.armatures.new('Lower keeper skeleton');keeperRig=bpy.data.objects.new('KeeperRig',ka);scene.collection.objects.link(keeperRig)
+bpy.ops.object.select_all(action='DESELECT');keeperRig.select_set(True);bpy.context.view_layer.objects.active=keeperRig;bpy.ops.object.mode_set(mode='EDIT')
+for name,(p,parent) in keeperJoints.items():
+    b=ka.edit_bones.new(name);b.head=coord(p);b.tail=coord((p[0],p[1]+.075,p[2]))
+    if parent:b.parent=ka.edit_bones[parent]
+bpy.ops.object.mode_set(mode='OBJECT')
+
 mat=bpy.data.materials.new('Coastal life vertex palette');mat.use_nodes=True
 bs=next(n for n in mat.node_tree.nodes if n.type=='BSDF_PRINCIPLED');bs.inputs['Roughness'].default_value=.8
 vc=mat.node_tree.nodes.new('ShaderNodeVertexColor');vc.layer_name='Color';mat.node_tree.links.new(vc.outputs['Color'],bs.inputs['Base Color'])
@@ -215,15 +270,16 @@ for name,d in DATA.items():
     for p in me.polygons:
         for li in p.loop_indices:
             pt=me.vertices[me.loops[li].vertex_index].co;uv.data[li].uv=(pt.x*.7,pt.y*.7+pt.z*.1)
-    if name in ['gull','crow','songbird']:
-        o.parent=rig
-        for bone in joints:o.vertex_groups.new(name=bone)
+    if name in ['gull','crow','songbird','keeperCraft']:
+        skinRig,skinJoints=(keeperRig,keeperJoints) if name=='keeperCraft' else (rig,joints)
+        o.parent=skinRig
+        for bone in skinJoints:o.vertex_groups.new(name=bone)
         for i,weights in enumerate(d['b']):
             weights={weights:1} if isinstance(weights,str) else weights
             for bone,w in weights.items():
                 if w>0:o.vertex_groups[bone].add([i],w,'REPLACE')
-        mod=o.modifiers.new('Anatomical rig','ARMATURE');mod.object=rig
-    o['authoring']='Blender island_life.py';me.calc_loop_triangles();stats[name]={'triangles':len(me.loop_triangles),'vertices':len(me.vertices),'skinned':name in ['gull','crow','songbird']};objects.append(o)
+        mod=o.modifiers.new('Anatomical rig','ARMATURE');mod.object=skinRig
+    o['authoring']='Blender island_life.py';me.calc_loop_triangles();stats[name]={'triangles':len(me.loop_triangles),'vertices':len(me.vertices),'skinned':name in ['gull','crow','songbird','keeperCraft']};objects.append(o)
 # Keep close anatomy, but do not spend it on a bird only a few pixels wide.
 for name in ['gull','crow','songbird']:
     original=bpy.data.objects[name];low=original.copy();low.data=original.data.copy();low.name=name+'Far';scene.collection.objects.link(low)
@@ -234,7 +290,7 @@ for name in ['gull','crow','songbird']:
     skin=low.modifiers.new('Anatomical rig','ARMATURE');skin.object=rig
     low.data.calc_loop_triangles();stats[low.name]={'triangles':len(low.data.loop_triangles),'vertices':len(low.data.vertices),'skinned':True}
     objects.append(low)
-bpy.ops.object.select_all(action='DESELECT');rig.select_set(True)
+bpy.ops.object.select_all(action='DESELECT');rig.select_set(True);keeperRig.select_set(True)
 for o in objects:o.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(ROOT/'assets/island-life.glb'),export_format='GLB',use_selection=True,use_active_scene=True,export_yup=True,export_skins=True,export_animations=False,export_extras=True)
 # Reusable authored poses remain editable in the source file.
@@ -249,7 +305,7 @@ for name in ['wingL','wingR']:rig.pose.bones[name].scale=(.68,1,.63)
 # Render the gull alone at a real, useful profile angle.
 for name in ['gullFar','crowFar','songbirdFar']:bpy.data.objects[name].hide_render=True
 bpy.data.objects['crow'].hide_render=True;bpy.data.objects['songbird'].hide_render=True
-for name in ['doryCraft','doryOarCraft','watcherCraft','tideFigureCraft']:bpy.data.objects[name].hide_render=True
+for name in ['doryCraft','doryOarCraft','watcherCraft','tideFigureCraft','keeperCraft','keeperBenchCraft']:bpy.data.objects[name].hide_render=True
 world=bpy.data.worlds.new('Bird inspection');scene.world=world;world.use_nodes=True
 bg=next(n for n in world.node_tree.nodes if n.type=='BACKGROUND');bg.inputs[0].default_value=(.16,.21,.24,1);bg.inputs[1].default_value=.6
 for i,(p,power,size) in enumerate([((-2,-3,4),280,3),((3,2,3),240,2)]):
@@ -257,7 +313,7 @@ for i,(p,power,size) in enumerate([((-2,-3,4),280,3),((3,2,3),240,2)]):
 camd=bpy.data.cameras.new('Inspection');cam=bpy.data.objects.new('Inspection',camd);scene.collection.objects.link(cam);cam.location=(1.35,-1.25,.82);cam.rotation_euler=(Vector((0,0,.28))-cam.location).to_track_quat('-Z','Y').to_euler();camd.type='ORTHO';camd.ortho_scale=1.2;scene.camera=cam
 scene.render.engine='CYCLES';scene.cycles.samples=32;scene.render.resolution_x=1200;scene.render.resolution_y=1000;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG';scene.render.filepath=str(SRC/'gull-inspection.png')
-stat={'blender':bpy.app.version_string,'bones':list(joints),'parts':stats,'bytes':(ROOT/'assets/island-life.glb').stat().st_size}
+stat={'blender':bpy.app.version_string,'bones':list(joints),'keeperBones':list(keeperJoints),'parts':stats,'bytes':(ROOT/'assets/island-life.glb').stat().st_size}
 (SRC/'island-life-geometry.json').write_text(json.dumps(stat,indent=2)+'\n')
 bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'island-life.blend'));bpy.ops.render.render(write_still=True);print(json.dumps(stat))
 # Inspect the open hull from above, with the game-oriented oar beside it.
@@ -271,3 +327,8 @@ for name,x in [('watcherCraft',-.55),('tideFigureCraft',.55)]:
     bpy.data.objects[name].hide_render=False;bpy.data.objects[name].location.x=x
 cam.location=(2.8,-5,2.4);cam.rotation_euler=(Vector((0,0,.90))-cam.location).to_track_quat('-Z','Y').to_euler();camd.ortho_scale=2.8
 scene.render.filepath=str(SRC/'coastal-figures.png');bpy.ops.render.render(write_still=True)
+
+for name in ['watcherCraft','tideFigureCraft']:bpy.data.objects[name].hide_render=True
+for name in ['keeperCraft','keeperBenchCraft']:bpy.data.objects[name].hide_render=False
+cam.location=(2.3,-3.2,2.1);cam.rotation_euler=(Vector((0,-.2,.85))-cam.location).to_track_quat('-Z','Y').to_euler();camd.ortho_scale=2.1
+scene.render.filepath=str(SRC/'lower-keeper.png');bpy.ops.render.render(write_still=True)

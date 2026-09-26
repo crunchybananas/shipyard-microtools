@@ -1,6 +1,7 @@
 // Blender-authored anatomy and deliberate, asynchronous wildlife gestures.
 import * as THREE from 'three';
 import {clone as cloneSkeleton} from 'three/addons/utils/SkeletonUtils.js';
+import {heightAt} from './terrain.js';
 import {clamp, smoothstep, lerp} from './util.js';
 const q=new THREE.Quaternion(), e=new THREE.Euler();
 const cameras=new WeakMap(), birdPosition=new THREE.Vector3(), birdScale=new THREE.Vector3();
@@ -131,4 +132,50 @@ export function attachCoastalFigures(core,library){
     anchor.userData.mats=[material];anchor.userData.authoring='Blender island_life.py';materials.push(material);
   }
   return time=>{for(const m of materials)if(m.userData.shader)m.userData.shader.uniforms.uFigureTime.value=time;};
+}
+
+// A planted miniature, with a real head turn and palms that settle on its table.
+// Kept outside userData because Three clones userData through JSON.
+const lowerKeepers=new WeakMap();
+export function attachLowerKeeper(modelRoot,library){
+  const anchor=modelRoot.getObjectByName('tinyFigure'),source=library.getObjectByName('KeeperRig');
+  if(!anchor||!source)throw Error('Missing authored lower keeper');
+  anchor.clear();
+  const scale=2.65,rig=cloneSkeleton(source),bones={};let skin;
+  const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.97,emissive:0x668f80,emissiveIntensity:.14});
+  rig.traverse(o=>{
+    if(o.isBone)bones[o.name]={node:o,rotation:o.quaternion.clone(),position:o.position.clone(),scale:o.scale.clone()};
+    if(o.isSkinnedMesh){skin=o;o.material=material;o.frustumCulled=false;}
+  });
+  if(!skin)throw Error('Lower keeper has no articulated mesh');
+  const benchSource=library.getObjectByName('keeperBenchCraft');benchSource.updateWorldMatrix(true,false);
+  const bench=new THREE.Mesh(benchSource.geometry.clone().applyMatrix4(benchSource.matrixWorld),
+    new THREE.MeshStandardMaterial({vertexColors:true,roughness:.94,emissive:0x4c4635,emissiveIntensity:.06}));
+  bench.name='keeperBenchCraft';bench.scale.setScalar(scale);rig.scale.setScalar(scale);
+  // Fit the four feet to this actual slope; leave the level top and hand contact
+  // in authored coordinates. Only vertices at the bottoms of the legs move.
+  const feet=bench.geometry.attributes.position;
+  for(let i=0;i<feet.count;i++)if(feet.getY(i)<.001){
+    feet.setY(i,(heightAt(anchor.position.x+feet.getX(i)*scale,anchor.position.z+feet.getZ(i)*scale)-anchor.position.y)/scale);
+  }
+  feet.needsUpdate=true;bench.geometry.computeVertexNormals();bench.geometry.computeBoundingSphere();
+  anchor.add(rig,bench);lowerKeepers.set(anchor,{bones,material,skin});
+  anchor.userData.authoring='Blender island_life.py';anchor.userData.figureScale=scale;
+  poseLowerKeeper(anchor,0,0,0,0);
+}
+export function poseLowerKeeper(anchor,time,look,rest,yaw){
+  const keeper=lowerKeepers.get(anchor);if(!keeper)return;
+  const {bones:b,material}=keeper;
+  const turnTo=clamp(Math.atan2(Math.sin(yaw),Math.cos(yaw)),-1.15,1.15);
+  turn(b.keeperHead,-.32*look,turnTo*look,Math.sin(time*.8)*.018*(1-look));
+  // The rest pose was authored with both palms exactly 2 mm above the boards.
+  // Relaxing rotates the elbows down; returning to bind space restores contact.
+  const settle=smoothstep(0,1,rest);
+  for(const side of ['L','R']){
+    turn(b['keeperUpper'+side],.20*(1-settle),0,0);
+    turn(b['keeperFore'+side],.90*(1-settle),0,0);
+    turn(b['keeperPalm'+side],0,0,0);
+  }
+  material.emissiveIntensity=.14+.10*look;
+  anchor.userData.gesture=settle>.98?'hands-resting':settle>.01?'settling-hands':'working';
 }

@@ -3,6 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
+import { poseLowerKeeper } from './island-life.js';
 import { makeEncounterSightline } from './encounter-sightline.js';
 import {
   W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL,
@@ -17,7 +18,7 @@ import {
 import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
-import { clamp, lerp, lerpAngle, TAU } from './util.js';
+import { clamp, lerp, lerpAngle, smoothstep, TAU } from './util.js';
 import { UpstreamHand } from './upstream-hand.js';
 import {
   NOTE_IDS, PROGRESSION, advanceDecimalDial, advanceLowerHandRegard, canAttemptStoneSong,
@@ -2069,14 +2070,12 @@ export class Game {
         const look = this._lowerLook;
         fig.getWorldPosition(_kv);
         const wantYaw = Math.atan2(this.player.pos.x - _kv.x, this.player.pos.z - _kv.z);
-        fig.rotation.y = lerpAngle(fig.rotation.y, wantYaw, look);
-        fig.rotation.x = -0.6 * look;
+        fig.rotation.set(0,0,0);
         fig.position.y = fig.userData.baseY ?? fig.position.y;
         fig.scale.setScalar(1);
-        const body = fig.children[0];
-        if (body?.material) body.material.emissiveIntensity = 1.8 * (1 + 0.12 * Math.sin(elapsed * 1.5)) + 1.7 * look;
-        const head = fig.children[1];
-        if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look;
+        const rest=W.flags.lowerHandRegarded?look:smoothstep(.65,2.6,this._lowerRegard);
+        poseLowerKeeper(fig,W.reduceMotion?0:elapsed,look,rest,wantYaw);
+
       }
     }
 

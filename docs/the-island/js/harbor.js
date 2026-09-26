@@ -20,6 +20,21 @@ export function attachHarborRooms(core, library) {
   };
   for (const name of ['legacyCot', 'legacyStove', 'legacyRoomSketch']) q.getObjectByName(name)?.removeFromParent();
   for (const name of ['roomStructure', 'roomCloth', 'roomCeramics']) q.add(part(name));
+  // Fine woven yarn belongs to cloth alone, and fades before it aliases at model
+  // scale. Geometry owns the folds and seams; this only breaks flat surface colour.
+  const cloth=q.getObjectByName('roomCloth');cloth.material=cloth.material.clone();
+  cloth.material.roughness=1;
+  cloth.material.onBeforeCompile=shader=>{
+    shader.vertexShader='varying vec3 vWool;\n'+shader.vertexShader;
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvWool=position;');
+    shader.fragmentShader='varying vec3 vWool;\n'+shader.fragmentShader;
+    shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
+      vec2 yarn=vWool.xy*920.0;
+      float fade=1.0-smoothstep(.7,2.8,length(fwidth(yarn)));
+      float weave=sin(yarn.x+sin(yarn.y)*.3)*sin(yarn.y);
+      diffuseColor.rgb*=1.0+.045*weave*fade;`);
+  };
+  cloth.material.customProgramCacheKey=()=> 'refuge-woven-cloth-v1';
   const chair = part('spareChair'); q.add(chair);
   const mobile = part('listeningMobile'); mobile.position.set(-.7, 0, .15); q.add(mobile);
   const boat = part('keepsakeBoat'); boat.position.z = -.22; q.add(boat);

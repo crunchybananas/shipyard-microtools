@@ -282,11 +282,11 @@ export const LORE = {
     "place": {
       "parent": "quarters",
       "pos": [
-        -0.35,
-        0.44,
-        1.05
+        -0.62,
+        0.537,
+        1.47
       ],
-      "rx": -1.5107963267948965,
+      "rx": -1.5707963267948966,
       "rz": 0.3,
       "prop": "sheet",
       "label": "a carbon copy, kept",

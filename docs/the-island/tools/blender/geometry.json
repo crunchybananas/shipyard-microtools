@@ -6,8 +6,8 @@
       "vertices": 3378
     },
     "roomCloth": {
-      "triangles": 3360,
-      "vertices": 1785
+      "triangles": 6700,
+      "vertices": 3490
     },
     "roomCeramics": {
       "triangles": 1038,
@@ -34,6 +34,6 @@
       "vertices": 1211
     }
   },
-  "totalTriangles": 16244,
-  "glbBytes": 1716348
+  "totalTriangles": 19584,
+  "glbBytes": 1714344
 }

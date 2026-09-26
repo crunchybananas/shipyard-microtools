@@ -1798,12 +1798,27 @@ export function buildWorld(coastKit) {
     // the chart-table logbook (the reading surface). Found only here, behind the inner door, one
     // level down; its deep page turns toward the descent. A worn dark book; click to read it.
     const jbook = new THREE.Group(); jbook.name = 'quartersJournal';
-    const jcover = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.36), woodMat);
-    jbook.add(jcover);
-    const jleaves = new THREE.Mesh(new THREE.BoxGeometry(0.235, 0.045, 0.335),
-      new THREE.MeshStandardMaterial({ color: 0xded3ba, roughness: 0.95, flatShading: true }));
-    jleaves.position.y = 0.005; jbook.add(jleaves);
-    jbook.position.set(-1.2, 0.57, 1.32);     // on the cot blanket, near the pillow
+    const jcoverMat = new THREE.MeshStandardMaterial({color:0x3f4c48,roughness:.96});
+    for(const y of [-.025,.025]){
+      const cover=new THREE.Mesh(new THREE.BoxGeometry(.26,.009,.36),jcoverMat);
+      cover.position.y=y;jbook.add(cover);
+    }
+    const spine=new THREE.Mesh(new THREE.BoxGeometry(.014,.05,.36),jcoverMat);
+    spine.position.x=-.123;jbook.add(spine);
+    const jleaves = new THREE.Mesh(new THREE.BoxGeometry(.239,.038,.335),
+      new THREE.MeshLambertMaterial({color:0xc9bda0}));
+    jleaves.position.x=.002;jbook.add(jleaves);
+    // A cloth bookmark projects only a little beyond the page block.
+    const ribbon=new THREE.Mesh(new THREE.BoxGeometry(.018,.002,.045),jcoverMat);
+    ribbon.position.set(.04,-.006,.178);jbook.add(ribbon);
+    // Covers, spine and cloth marker are one static binding, not four draws.
+    const bindingParts=[];
+    for(const part of [...jbook.children])if(part.material===jcoverMat){
+      part.updateMatrix();bindingParts.push(part.geometry.clone().applyMatrix4(part.matrix));part.removeFromParent();part.geometry.dispose();
+    }
+    const binding=new THREE.Mesh(mergeGeometries(bindingParts),jcoverMat);binding.name='journalBinding';jbook.add(binding);
+    for(const geometry of bindingParts)geometry.dispose();
+    jbook.position.set(-1.2,.566,1.32);
     jbook.rotation.y = -0.5;
     q.add(jbook);
   }
@@ -2883,29 +2898,19 @@ export function buildWorld(coastKit) {
   buildVegetation(core, r, coastKit);
 
   // =================== LOWER HAND (on the model) ============================
-  // A figure one stratum down, standing on the model's beach. The group sits at
+  // A figure one stratum down, standing on the model's dry shore terrace. The group sits at
   // its feet so the body can turn in place when the player holds it in regard.
   // Exaggerated about 3x so the gesture reads at 1:240 without assigning identity.
   {
     const fig = new THREE.Group();
     fig.name = 'tinyFigure';
     fig.visible = false;
-    const fy = heightAt(SPOTS.beach.x, SPOTS.beach.y);
-    fig.position.set(SPOTS.beach.x, fy, SPOTS.beach.y);
+    // The old low-beach site drowned at the final era's tide. This shoulder
+    // remains above even the capped shared draft, with the same 1:240 scale.
+    const fy = heightAt(-20,-74);
+    fig.position.set(-20,fy,-74);
     fig.userData.baseY = fy;
-    const fb = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 3.4, 6),
-      new THREE.MeshStandardMaterial({ color: 0x355560, emissive: 0x58f2c2, emissiveIntensity: 1.8, flatShading: true }));
-    fb.position.y = 1.7;
-    fig.add(fb);
-    const fh = new THREE.Mesh(new THREE.SphereGeometry(0.55, 6, 5),
-      new THREE.MeshStandardMaterial({ color: 0xd9c9a8, emissive: 0xffe2a8, emissiveIntensity: 1.0, flatShading: true }));
-    fh.position.y = 3.9;
-    fig.add(fh);
-    // A small brow gives the figure a front (+z) so the turn is legible.
-    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.26, 0.34),
-      new THREE.MeshStandardMaterial({ color: 0x1a2730, emissive: 0x0a1a24, emissiveIntensity: 0.5, flatShading: true }));
-    brow.position.set(0, 3.98, 0.5);
-    fig.add(brow);
+    // Authored anatomy is attached independently after the model clone boundary.
     core.add(fig);
   }
 
@@ -3411,7 +3416,7 @@ export function buildWorld(coastKit) {
   {
     const STOCK = {
       sheet: () => new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.32),
-        new THREE.MeshStandardMaterial({ color: 0xd9d2bc, roughness: 0.95, side: THREE.DoubleSide })),
+        new THREE.MeshLambertMaterial({ color: 0xc6bea5, side: THREE.DoubleSide })),
       fold: () => new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.14),
         new THREE.MeshStandardMaterial({ color: 0xcfc7ae, roughness: 0.95 })),
     };
@@ -3427,6 +3432,17 @@ export function buildWorld(coastKit) {
       if (pl.rx) mesh.rotation.x = pl.rx;
       if (pl.ry) mesh.rotation.y = pl.ry;
       if (pl.rz) mesh.rotation.z = pl.rz;
+      if(id==='commendation_copy'){
+        const paper=document.createElement('canvas');paper.width=256;paper.height=342;
+        const ink=paper.getContext('2d');ink.fillStyle='#c6bea5';ink.fillRect(0,0,256,342);
+        ink.fillStyle='#555d59';ink.font='12px serif';ink.fillText('LIGHTHOUSE SERVICE',26,36);
+        ink.font='9px monospace';ink.fillText('CARBON COPY',26,56);
+        ink.fillStyle='#73766b';
+        for(let line=0;line<15;line++)ink.fillRect(26,87+line*12,line%5===4?122:197,1.2);
+        ink.fillRect(26,296,68,1.4);
+        const map=new THREE.CanvasTexture(paper);map.colorSpace=THREE.SRGBColorSpace;
+        mesh.material.map=map;mesh.material.color.set(0xffffff);
+      }
       mesh.name = 'lore_' + id;
       defineProp('lore_' + id);
       ((pl.parent && core.getObjectByName(pl.parent)) || core).add(mesh);

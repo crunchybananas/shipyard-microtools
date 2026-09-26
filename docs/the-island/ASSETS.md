@@ -155,7 +155,7 @@ for the current combined pass; GPU samples are observations on the local host.
 
 ## Living coastal birds and dory — September 19, 2026
 
-`island-life.glb` (723,320 bytes) contains original Blender gull, crow and songbird
+`island-life.glb` (830,804 bytes) contains original Blender gull, crow and songbird
 skins (2,806 / 2,522 / 2,522 triangles), a twelve-joint skeleton, a 4,836-triangle
 open lapstrake dory, a 44-triangle oar, and two coastal figures (2,564 / 2,004 triangles). `tools/blender/island_life.py` regenerates
 the kit; `island-life.blend` retains editable geometry and authored pose actions.
@@ -220,3 +220,34 @@ and a clear sightline through terrain, architecture, rocks and tree crowns.
 [The cohesion review](loop/cohesion/index.html) contains matched views, the actual
 beach-to-study keyboard walk, the complete causal journey and current validation.
 Earlier review folders are retained as dated evidence, not current source hashes.
+
+
+## Handwork and grounded lower keeper — September 26, 2026
+
+The working-coast crowns now use six slender, closed sprays per bough, fitted to
+its bowed wooden support. Near profiles have 5,536 / 5,340 / 4,164 / 3,576 triangles;
+far profiles have 1,368 / 1,320 / 1,032 / 888. Placements, colliders, wind weights,
+LOD thresholds, and the miniature silhouettes are retained. The working-coast kit
+is 1,705,768 bytes. Foliage remains deliberately faceted at close range.
+
+The refuge blanket has a turned head hem, a fitted hanging side, sewn repair, and
+solid edges. The rectangular pillow has a compressed seam. Rug bands meet rather
+than leaving floor gaps. Cloth uses a small derivative-filtered weave in its own
+material. `roomCloth` uses 6,700 triangles; the full harbor kit uses 19,584 triangles
+and 1,714,344 bytes. The journal's binding batches into one draw plus its page block.
+The carbon copy now lies above the blanket and carries a restrained printed face;
+its reader and lore are unchanged.
+
+The life kit adds `keeperCraft` (2,188 triangles), an eight-joint `KeeperRig`, and a
+108-triangle worktable. The miniature keeps the existing exaggerated reading scale
+(2.65 times a human figure inside the 1:240 model). Head and arms move independently;
+resting palms meet the boards with 2 mm source clearance. The anchor stays upright
+and the table feet fit the actual terrain. Its dry shore terrace is 7.636 m above
+sea datum, above the highest supported sea of 6.93 m. It exists only on the nested
+model from era two onward and preserves the final-era stillness requirement.
+No point light, save field, prop scatter, or new downloaded texture is added.
+
+`tools/harness/handwork.mjs` checks the letter by pointer, all four paper corners,
+regard timing, palm contact, planted feet, nested visibility, and flood clearance.
+It is included in the full regression gate. `loop/handwork/` holds matched images,
+local walk evidence, render comparisons and source hashes for this refinement.

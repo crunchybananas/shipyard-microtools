@@ -182,6 +182,10 @@ echo "== human scale and keyboard circulation =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/cohesion.mjs" | tee "$WORK/cohesion.out"
 grep -q 'COHESION 9 / 9' "$WORK/cohesion.out" || { echo "COHESION FAILED"; exit 1; }
 
+echo "== grounded keeper and refuge handwork =="
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/handwork.mjs" | tee "$WORK/handwork.out"
+grep -q 'HANDWORK 11 / 11' "$WORK/handwork.out" || { echo "HANDWORK FAILED"; exit 1; }
+
 echo "== visible coastal encounters =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/encounters.mjs" | tee "$WORK/encounters.out"
 grep -q 'ENCOUNTERS 8 / 8' "$WORK/encounters.out" || { echo "ENCOUNTERS FAILED"; exit 1; }
