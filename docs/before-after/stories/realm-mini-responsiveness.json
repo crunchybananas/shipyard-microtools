@@ -50,7 +50,7 @@
   ],
   "builderNote": {
     "quote": "The opening needs clear, responsive controls before more visual experiments.",
-    "context": "Implementation note from this recovery pass, not an owner endorsement. Working branch; not merged or deployed."
+    "context": "Implementation note from this recovery pass, not an owner endorsement. Captures were recorded on the working branch before release; the in-revision label reflects remaining gameplay and art work."
   },
   "proof": [
     {
@@ -63,7 +63,7 @@
     },
     {
       "label": "Limits",
-      "value": "Isolated headless Chrome used file-origin loading. Deployed HTTP behavior and the full release suite remain unverified. Measurements are not a timing benchmark."
+      "value": "Matched captures used isolated headless Chrome with file-origin loading. The subsequent release run passed all 68 affected gates, lint and archive validation. Measurements are not a timing benchmark."
     }
   ],
   "links": {
@@ -72,7 +72,7 @@
     "download": "assets/realm-mini-responsiveness/social.png"
   },
   "share": {
-    "summary": "Phone controls now clear the minimap and touch tooltips. Closed Sprite Lab work waits until it is opened. Real opening delivery and Save \u2192 reload \u2192 Continue checks pass. Working branch; not deployed.",
+    "summary": "Phone controls now clear the minimap and touch tooltips. Closed Sprite Lab work waits until it is opened. Real opening delivery and Save \u2192 reload \u2192 Continue checks pass. Matched captures from the pre-release working branch.",
     "image": "assets/realm-mini-responsiveness/social.png"
   }
 }
