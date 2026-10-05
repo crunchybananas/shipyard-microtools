@@ -130,25 +130,39 @@ try {
   assert.equal(await page.evaluate(()=>founderView.founderPresentationDiagnostics().pose.action),'idle');
   check('Save/Continue preserves the existing Founder and never persists animation or stale orders');
 
+  // Houses draw their body from the saved Blender home maps, never from the
+  // painted atlas; that atlas now belongs to other buildings (the Founder
+  // Stockpile is deeper in this fixture and always draws after the Founder).
+  // Occlusion is proven against the authored production family only.
+  await page.evaluate(async()=>{window.houseView=await import('./js/house-presentation.js?realm=198');});
+  await page.waitForFunction(()=>houseView.inspectHouseSprites().ready);
   for(const [label,offset] of [['behind',-.55],['in-front',.55]]) {
     const order=await page.evaluate(async offset=>{
-      const {render}=await import('./js/render.js?realm=198');
+      const {render,toScreen}=await import('./js/render.js?realm=198');
       const a=G.avatar,b=G.buildingGrid[28][31];
       b.buildProgress=1;b.completeTick=G.gameTick;
       G._followAvatar=false;G.camera.zoom=2.2;G.camera.x=96;G.camera.y=944;
       Object.assign(a,{x:31+offset,y:28+offset,_px:31+offset,_py:28+offset,path:null,vx:0,vy:0});
       G._renderAlpha=1;
+      // The target's body: a home body map (not its ground, glow or spill
+      // pass) whose destination contains this building's own ground anchor.
+      const anchor=toScreen(b.x,b.y);
       const ctx=document.getElementById('game').getContext('2d'),original=ctx.drawImage,calls=[];
       ctx.drawImage=function(img,...args){
         if(img.src?.includes('/founder/'))calls.push('founder');
-        if(img.src?.includes('buildings-atlas-painted'))calls.push('house');
+        if(/\/architecture\/homes\/(complete-|construction-|detail\/)/.test(img.src||'')){
+          const [x,y,w,h]=args.length>=8?args.slice(4,8):args.slice(0,4);
+          if(anchor.x>=x&&anchor.x<=x+w&&anchor.y>=y&&anchor.y<=y+h)calls.push('house');
+        }
         return original.call(this,img,...args);
       };
       try{render();}finally{ctx.drawImage=original;}
-      return calls;
+      return {calls,target:b.type};
     },offset);
-    assert.ok(order.includes('house') && order.includes('founder'),`Missing actual canvas draws: ${order}`);
-    assert.equal(order.indexOf('founder')<order.indexOf('house'),offset<0,'Founder bypassed world occlusion');
+    assert.equal(order.target,'house','Occlusion fixture lost its house');
+    assert.ok(order.calls.includes('founder'),`Missing Founder canvas draw: ${order.calls}`);
+    assert.equal(order.calls.filter(c=>c==='house').length,1,`Target house body not drawn exactly once: ${order.calls}`);
+    assert.equal(order.calls.indexOf('founder')<order.calls.indexOf('house'),offset<0,'Founder bypassed world occlusion');
     await page.screenshot({path:new URL(`founder-${label}-house.png`,output).pathname});
   }
   check('Actual canvas draw order puts the Founder behind or in front of a house at the correct ground depth');

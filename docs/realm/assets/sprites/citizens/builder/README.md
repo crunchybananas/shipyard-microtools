@@ -37,11 +37,47 @@ image-generated asset.
 | Carry | `Builder_Carry` | 1.066667 s | 24 |
 
 Every action has eight views: south, southeast, east, northeast, north,
-northwest, west and southwest. Hammering includes ready, backswing, contact,
-rebound and recovery. Carrying preserves the walk's ankle trajectories while
-both hands grip the crate. Standing actions keep the feet planted. The saved
-joint witnesses independently verify exported poses and reviewed wrist/toe
-limits.
+northwest, west and southwest. Standing actions keep the feet planted. The
+saved joint witnesses independently verify exported poses and reviewed
+wrist/toe limits.
+
+### Motion v2
+
+`scripts/citizen-sprites/animate_builder.py` re-authored all four actions
+from animator key poses (the saved keys, not the script, are now the source).
+It replaced a mannequin pass whose arms were held 45° out from the body, whose
+walk shuffled 0.64 m per cycle with bent knees, a backward lean and the body
+at its highest on heel contact, and whose mallet only stirred at chest height.
+
+- **Walk:** 0.95 m stride with flat 60% stances (the gate contract), the
+  weight lowest just after each heel contact and highest over the planted
+  foot, pelvis yaw/list/sway, chest counter-rotation, a 4° forward lean, a
+  stabilised head, and arms that counter-swing the legs with the forearm and
+  hand trailing by a few frames.
+- **Rest:** contrapposto on the right leg with a soft left knee, a breath per
+  loop, a slow weight drift and one glance; the arms hang beside the torso.
+- **Hammer:** ready (frame 0, the action's entry pose) · lift 1–6 · a
+  one-frame anticipation hold at the apex 7–8 · overhead whip 9–10 · contact
+  11–12 with the knees dropping into the blow · rebound 13 · settle and
+  recover 14–23. The off hand steadies in front, then braces the thigh.
+- **Carry:** the walk's exact ankle paths under a lower, heavier pelvis, a
+  backward counter-lean against the load, and a crate that rides the chest
+  one frame late with both wrists solved onto its sides.
+
+The pass solves every frame analytically (pelvis and spine rotations, two-bone
+IK with pole-derived bone twist for each ankle and wrist) and asserts the gate
+contracts before saving: level planted soles, unmoving standing feet, carry
+feet identical to walk, leg reach below 99.85%, and wrist bends under 45°. It
+writes only to `tmp/` for review:
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender --background \
+  assets/sprites/citizens/builder/source/builder.blend \
+  --python scripts/citizen-sprites/animate_builder.py -- --table
+```
+
+After review, copy the staged `.blend` over `source/builder.blend` and run the
+rebuild below. Do not rerun the pass over later hand edits to the keys.
 
 ## Rebuild and review
 
@@ -62,8 +98,9 @@ REALM_PORT=8942 node scripts/citizen-sprites/rebuild-from-blender.mjs --out tmp/
 ```
 
 `author_builder.py` is a bootstrap for creating a staged character under
-`tmp/`. It is deliberately absent from the rebuild command: rerunning it
-would discard subsequent artistic edits. Keep reviewing the saved source.
+`tmp/`, and `animate_builder.py` is the staged motion pass above. Both are
+deliberately absent from the rebuild command: rerunning either would discard
+subsequent artistic edits. Keep reviewing the saved source.
 Review the direction contact sheets and live construction, cargo, pause,
 near/far depth and phone selection after changes. Set `REALM_BROWSER=webkit`
 to run the same source/game gates in an installed Playwright WebKit browser.

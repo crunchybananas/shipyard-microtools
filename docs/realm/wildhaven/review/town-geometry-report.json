@@ -1,0 +1,120 @@
+{
+  "scope": "Isolated real-GLB geometry and renderer motion fixtures. No browser or user save is used. Rendered visual review is a separate check.",
+  "checkedAt": "2026-10-02T05:26:32.208Z",
+  "sourceHashesAtStart": {
+    "js/world.js": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/village-kit.json": "01660a0a2362764f71b574c299902438a7943be92a715d842238147f9e105f1d",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/town-kit.json": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794",
+    "tools/town-geometry.mjs": "7013e4f3832faf4aba618bd2633d149a41d8883c56e6edb5c3069e6b0f1f0a6c",
+    "tools/worksite-fixture.mjs": "f78fb44ccf2077f05253fcf1a06b1a615706663cf80e36faa6d38b1fff2b8532"
+  },
+  "sourceHashesAtEnd": {
+    "js/world.js": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/village-kit.json": "01660a0a2362764f71b574c299902438a7943be92a715d842238147f9e105f1d",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/town-kit.json": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794",
+    "tools/town-geometry.mjs": "7013e4f3832faf4aba618bd2633d149a41d8883c56e6edb5c3069e6b0f1f0a6c",
+    "tools/worksite-fixture.mjs": "f78fb44ccf2077f05253fcf1a06b1a615706663cf80e36faa6d38b1fff2b8532"
+  },
+  "sourcesStable": true,
+  "checks": {
+    "stations": 84,
+    "blockedEntrance": "real anvil side access; enclosed site waits",
+    "midRouteReassignment": "cardinal first waypoint",
+    "productionGate": "blocked inputs stop work motion",
+    "coverage": "Euclidean boundaries and upgraded radius exact",
+    "pressure": {
+      "poses": 31,
+      "verticesChecked": 335699,
+      "readOnly": true
+    },
+    "population": 76,
+    "mixedTown": {
+      "actors": 36,
+      "seconds": 120,
+      "positionSamples": 86400,
+      "workingSamples": 57313,
+      "walkingSamples": 10926,
+      "productiveSites": 10,
+      "naturalObstacleTiles": 72
+    },
+    "crowd": [
+      {
+        "fixture": "earned 76-citizen town",
+        "seconds": 180,
+        "pairSamples": 427500,
+        "minimumSeparation": 0.4456,
+        "hardOverlaps": 0,
+        "closePairs": 0,
+        "illegal": 0,
+        "settledCells": 45
+      },
+      {
+        "fixture": "76 idle citizens",
+        "seconds": 180,
+        "pairSamples": 427500,
+        "minimumSeparation": 0.4727,
+        "hardOverlaps": 0,
+        "closePairs": 0,
+        "illegal": 0,
+        "settledCells": 48
+      }
+    ],
+    "openWorksites": {
+      "sites": 16,
+      "actors": 32,
+      "seconds": 180,
+      "productiveSites": 16,
+      "workersWhoWorked": 32,
+      "firstWork": {
+        "fixture-smith": 3.15,
+        "fixture-lumber": 3.95,
+        "fixture-sawmill": 4.05,
+        "fixture-bakery": 4.1,
+        "fixture-farm": 4.65,
+        "fixture-quarry": 5,
+        "fixture-market": 5.2,
+        "fixture-barracks": 5.65,
+        "fixture-mine": 5.95,
+        "fixture-garden": 6.7,
+        "fixture-school": 7.05,
+        "fixture-windmill": 7.35,
+        "fixture-orchard": 7.7,
+        "fixture-manor": 7.7,
+        "fixture-clinic": 8.05,
+        "fixture-chapel": 8.2
+      },
+      "walkingSamples": 18057,
+      "atEnd": {
+        "walking": 4,
+        "working": 23,
+        "unloading": 2,
+        "waiting": 2,
+        "watching": 1
+      }
+    },
+    "earnedLaneTown": {
+      "actors": 76,
+      "buildings": 59,
+      "staffedSites": 36,
+      "reachableStations": 36,
+      "productiveSites": 35,
+      "workSamples": 69836,
+      "seconds": 120,
+      "finalStates": {
+        "walking": 17,
+        "working": 57,
+        "unloading": 1,
+        "waiting": 1
+      }
+    },
+    "entrancePreview": "four rotated arrows follow terrain and clear with preview"
+  }
+}

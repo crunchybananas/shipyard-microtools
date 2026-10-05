@@ -1,0 +1,311 @@
+{
+  "startedAt": "2026-10-02T05:01:07.769Z",
+  "scope": "Isolated Chromium UI review, not a browser-played campaign. Fresh school prepared with public build/tick/workforce APIs; late fixture imported from the separately recorded earned simulation campaign. UI buttons perform the reviewed actions. Clock skips are explicit.",
+  "section": "all",
+  "sourceHashesAtStart": {
+    "index.html": "c42337a0d81a79451935b68a9132c055cd8e727d093c26965fa66d67b3d2e232",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+    "js/world.js": "9e543e45045516f89642b319ec5fa744e86fa1fb19b528b495ee8913bdb27b02",
+    "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "checks": [
+    {
+      "name": "Council exposes research and charter prerequisites before spending",
+      "passed": true
+    },
+    {
+      "name": "Visible research action charges knowledge and displays staffed progress",
+      "passed": true
+    },
+    {
+      "name": "Research progress survives reload and the UI changes to Learned",
+      "passed": true
+    },
+    {
+      "name": "Stores shows every resource, physical capacity, services and production chains",
+      "passed": true
+    },
+    {
+      "name": "Trade UI accepts then delivers a real order, with dates, costs and named trust",
+      "passed": true
+    },
+    {
+      "name": "Earned checkpoint restores the late town and an explicit priced charter choice",
+      "passed": true
+    },
+    {
+      "name": "Harbor counter imports and exports spend exact quotes, with visible quotas preserved on reload",
+      "passed": true
+    },
+    {
+      "name": "An earned town can queue and complete an upgrade through the inspector",
+      "passed": true
+    },
+    {
+      "name": "Trade UI dispatches earned cargo and reports its actual return date",
+      "passed": true
+    },
+    {
+      "name": "Watch shows a real warning, patrol progress, exact shelter/payment costs and a quiet record",
+      "passed": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-action-id=\"pressure-shelter\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled title=\"\" class=\"small-button\" data-action-id=\"pressure-shelter\">Shelter the stores</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    8 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n"
+    },
+    {
+      "name": "No browser or application errors in prepared UI review",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "town-progression-01-prepared-council.png",
+    "town-progression-02-prepared-research.png",
+    "town-progression-03-prepared-stores.png",
+    "town-progression-04-prepared-trade.png",
+    "town-progression-05-earned-charter.png",
+    "town-progression-13-earned-import-quota.png",
+    "town-progression-14-earned-export.png",
+    "town-progression-06-earned-upgrade.png",
+    "town-progression-07-earned-voyage.png",
+    "town-progression-08-earned-return.png",
+    "town-progression-10-prepared-warning.png",
+    "town-progression-earned-failure.png"
+  ],
+  "fixtures": {
+    "fresh": {
+      "label": "Prepared school fixture, public simulation APIs only; no injected resources, citizens or research.",
+      "schoolId": "b1",
+      "day": 3,
+      "population": 6,
+      "knowledge": 18.632977,
+      "setupSeconds": 260
+    },
+    "campaign": {
+      "label": "Imported earned simulation-campaign checkpoint. This UI test did not play that campaign.",
+      "file": "campaign-services-lanes-save.json",
+      "sha256": "bbe9106df94ec942d7ec99f5eaf0e7e0d31bca4dbb9bf52d57dd0e5fcf8ac38c",
+      "day": 61,
+      "population": 76,
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "charter": "breadbasket",
+      "contracts": 108,
+      "voyages": 10
+    },
+    "route": {
+      "label": "Prepared earned checkpoint: food/timber jobs staffed and wood-consuming craft jobs rested through public setWorkers for independent clock skips. No resources or unlocks injected.",
+      "assignments": [
+        {
+          "id": "b2",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b3",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b12",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b13",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b16",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b17",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b19",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b23",
+          "type": "windmill",
+          "workers": 2
+        },
+        {
+          "id": "b25",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b26",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b28",
+          "type": "bakery",
+          "workers": 2
+        },
+        {
+          "id": "b30",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b40",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b41",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b50",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b52",
+          "type": "orchard",
+          "workers": 2
+        }
+      ],
+      "foodPerDay": 185.479098,
+      "timberPerDay": 34.804556
+    },
+    "watch": {
+      "label": "Prepared earned checkpoint: food/timber jobs staffed and wood-consuming craft jobs rested through public setWorkers for independent clock skips. No resources or unlocks injected.",
+      "assignments": [
+        {
+          "id": "b2",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b3",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b12",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b13",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b16",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b17",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b19",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b23",
+          "type": "windmill",
+          "workers": 2
+        },
+        {
+          "id": "b25",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b26",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b28",
+          "type": "bakery",
+          "workers": 2
+        },
+        {
+          "id": "b30",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b40",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b41",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b50",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b52",
+          "type": "orchard",
+          "workers": 2
+        }
+      ],
+      "foodPerDay": 185.479098,
+      "timberPerDay": 34.804556
+    }
+  },
+  "browser": "147.0.7727.15",
+  "campaignFailure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-action-id=\"pressure-shelter\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled title=\"\" class=\"small-button\" data-action-id=\"pressure-shelter\">Shelter the stores</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    8 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n",
+  "finishedAt": "2026-10-02T05:07:17.784Z",
+  "sourceHashesAtFinish": {
+    "index.html": "c42337a0d81a79451935b68a9132c055cd8e727d093c26965fa66d67b3d2e232",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+    "js/world.js": "979bfe964fe9d779905344eb42667293ad4d9f7f6cb02c616c70cf7fc5b60b1b",
+    "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "sourcesChangedDuringRun": [
+    "js/world.js"
+  ],
+  "passed": false
+}

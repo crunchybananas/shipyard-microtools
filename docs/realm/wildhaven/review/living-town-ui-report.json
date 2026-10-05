@@ -1,0 +1,890 @@
+{
+  "startedAt": "2026-10-03T03:43:35.846Z",
+  "scope": "Fresh opening and mobile use real controls, with review clock to skip waits. Migration uses a labeled legacy fixture. No opening resources or population are injected.",
+  "checks": [
+    {
+      "name": "Two actual placements reserve materials and enter one finite builder queue",
+      "passed": true
+    },
+    {
+      "name": "Construction preview protects the neighboring front entrance",
+      "passed": true
+    },
+    {
+      "name": "Queue controls reorder and pause actual building work",
+      "passed": true
+    },
+    {
+      "name": "Mid-construction local save restores escrow, progress and named jobs",
+      "passed": true
+    },
+    {
+      "name": "Staffing and rest controls change production and release real people",
+      "passed": true
+    },
+    {
+      "name": "Partial cancellation returns unused escrow without duplicating materials",
+      "passed": true
+    },
+    {
+      "name": "More workplaces compete for scarce staff; construction finishes before growth",
+      "passed": true,
+      "details": {
+        "day": 3,
+        "population": 10,
+        "resources": {
+          "wood": 76.860527,
+          "stone": 66.358239,
+          "food": 95.288579,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 30,
+          "knowledge": 0
+        }
+      }
+    },
+    {
+      "name": "Person finder identifies a named citizen and their real workplace",
+      "passed": true
+    },
+    {
+      "name": "Locked buildings explain their research path and open Council",
+      "passed": true
+    },
+    {
+      "name": "All town panels render, scroll, and stay within the desktop viewport",
+      "passed": true
+    },
+    {
+      "name": "Touch placement and queue management work on a narrow phone",
+      "passed": true
+    },
+    {
+      "name": "Phone management tabs and scrolling have no page overflow",
+      "passed": true
+    },
+    {
+      "name": "Legacy browser save migrates to separate v3 key without rewriting original",
+      "passed": true
+    },
+    {
+      "name": "No browser application errors in desktop, phone or migration sessions",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "living-town-03-construction-queue.png",
+    "living-town-04-working-village.png",
+    "living-town-05-mobile-projects.png",
+    "living-town-06-mobile-trade.png"
+  ],
+  "sourceHashesAtStart": {
+    "js/discovery.js": "c7978a9f46544467e3ea18e12939e9c4997ea9c69cb517c7d005014172029358",
+    "js/fieldbook-ui.js": "53ac4f6c9bb3372e22060784b41387a76adedbf30e77b8337362d5f8f95ef1e6",
+    "living.css": "5cc81b6b8921efba0ff8a62c7a038b1b5010d8237fb4415dc389f01529ebc404",
+    "assets/living-kit.glb": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c",
+    "index.html": "c080585cdbdc434281ce3de76268de85821a94e7ff1966bcfbf7cc5a25e639fd",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "js/main.js": "ec3865bb87b0bf8374bd8c5f9cc5301d96a96629fcd2d00e8db7e87b05eda22b",
+    "js/world.js": "dd8e8ac8873c29178c8de0247aa224c91577748d6ef71913ec23b7b833083b5d",
+    "js/town-ui.js": "f6444cb865eaf3b6a60a887b3e97287d0383e657deb9ca8df5f8e00d2dc6dda8",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/frontier.js": "0546fc344d6e45d7e0a1c9a4361455888aea181c009e7cae93bd36683ffa0fe6",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218"
+  },
+  "desktop": {
+    "snapshot": {
+      "version": 4,
+      "resources": {
+        "wood": 76.860527,
+        "stone": 66.358239,
+        "food": 95.288579,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 0
+      },
+      "population": 10,
+      "citizens": [
+        {
+          "id": "c1",
+          "name": "Ada",
+          "arrivalDay": 1,
+          "experience": {
+            "forager": 3,
+            "builder": 68.873752,
+            "lumberjack": 15,
+            "quarryworker": 102
+          },
+          "job": "quarryworker",
+          "workplace": "b5"
+        },
+        {
+          "id": "c2",
+          "name": "Bram",
+          "arrivalDay": 1,
+          "experience": {
+            "forager": 3,
+            "builder": 68.873752,
+            "lumberjack": 15,
+            "quarryworker": 102
+          },
+          "job": "quarryworker",
+          "workplace": "b5"
+        },
+        {
+          "id": "c3",
+          "name": "Cora",
+          "arrivalDay": 1,
+          "experience": {
+            "forager": 25,
+            "farmer": 203
+          },
+          "job": "farmer",
+          "workplace": "b2"
+        },
+        {
+          "id": "c4",
+          "name": "Dev",
+          "arrivalDay": 1,
+          "experience": {
+            "forager": 25,
+            "farmer": 203
+          },
+          "job": "farmer",
+          "workplace": "b2"
+        },
+        {
+          "id": "c5",
+          "name": "Elin",
+          "arrivalDay": 1,
+          "experience": {
+            "forager": 83,
+            "lumberjack": 120
+          },
+          "job": "lumberjack",
+          "workplace": "b4"
+        },
+        {
+          "id": "c6",
+          "name": "Finn",
+          "arrivalDay": 1,
+          "experience": {
+            "forager": 83,
+            "lumberjack": 120
+          },
+          "job": "lumberjack",
+          "workplace": "b4"
+        },
+        {
+          "id": "c7",
+          "name": "Greta",
+          "arrivalDay": 2,
+          "experience": {
+            "forager": 120
+          },
+          "job": "forager",
+          "workplace": "hearth"
+        },
+        {
+          "id": "c8",
+          "name": "Hollis",
+          "arrivalDay": 2,
+          "experience": {
+            "forager": 120
+          },
+          "job": "forager",
+          "workplace": "hearth"
+        },
+        {
+          "id": "c9",
+          "name": "Ida",
+          "arrivalDay": 3,
+          "experience": {},
+          "job": "idle",
+          "workplace": null
+        },
+        {
+          "id": "c10",
+          "name": "Jory",
+          "arrivalDay": 3,
+          "experience": {},
+          "job": "idle",
+          "workplace": null
+        }
+      ],
+      "nextCitizenId": 11,
+      "day": 3,
+      "time": 51,
+      "subsecond": 0.9134,
+      "elapsed": 231.9134,
+      "nextId": 6,
+      "nextEventId": 15,
+      "nextQueueOrder": 6,
+      "won": false,
+      "undo": null,
+      "lastTradeDay": 0,
+      "builderTarget": 2,
+      "morale": 76.2675,
+      "buildings": [
+        {
+          "id": "hearth",
+          "type": "hearth",
+          "x": 0,
+          "z": 2,
+          "rotation": 0,
+          "builtDay": 1,
+          "level": 1,
+          "status": "ready",
+          "constructionKind": null,
+          "targetLevel": 1,
+          "progress": 0,
+          "workRequired": 0,
+          "escrow": {},
+          "investment": {
+            "wood": 0,
+            "stone": 0,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 0,
+          "desiredWorkers": 2,
+          "paused": false,
+          "priority": 100
+        },
+        {
+          "id": "bell",
+          "type": "bell",
+          "x": 0,
+          "z": -5,
+          "rotation": 0,
+          "builtDay": 1,
+          "level": 1,
+          "status": "ready",
+          "constructionKind": null,
+          "targetLevel": 1,
+          "progress": 0,
+          "workRequired": 0,
+          "escrow": {},
+          "investment": {
+            "wood": 0,
+            "stone": 0,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 0,
+          "desiredWorkers": 0,
+          "paused": false,
+          "priority": 10,
+          "restored": false
+        },
+        {
+          "id": "b1",
+          "type": "cottage",
+          "x": -2,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 1,
+          "level": 1,
+          "status": "ready",
+          "constructionKind": null,
+          "targetLevel": 1,
+          "progress": 36,
+          "workRequired": 36,
+          "escrow": {},
+          "investment": {
+            "wood": 16,
+            "stone": 8,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 2,
+          "desiredWorkers": 0,
+          "paused": false,
+          "priority": 10
+        },
+        {
+          "id": "b2",
+          "type": "orchard",
+          "x": -3,
+          "z": -2,
+          "rotation": 0,
+          "builtDay": 1,
+          "level": 1,
+          "status": "ready",
+          "constructionKind": null,
+          "targetLevel": 1,
+          "progress": 28,
+          "workRequired": 28,
+          "escrow": {},
+          "investment": {
+            "wood": 12,
+            "stone": 3,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 1,
+          "desiredWorkers": 2,
+          "paused": false,
+          "priority": 0
+        },
+        {
+          "id": "b4",
+          "type": "lumber",
+          "x": -4,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 1,
+          "level": 1,
+          "status": "ready",
+          "constructionKind": null,
+          "targetLevel": 1,
+          "progress": 32,
+          "workRequired": 32,
+          "escrow": {},
+          "investment": {
+            "wood": 14,
+            "stone": 5,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 4,
+          "desiredWorkers": 2,
+          "paused": false,
+          "priority": 10
+        },
+        {
+          "id": "b5",
+          "type": "quarry",
+          "x": 4,
+          "z": -2,
+          "rotation": 0,
+          "builtDay": 2,
+          "level": 1,
+          "status": "ready",
+          "constructionKind": null,
+          "targetLevel": 1,
+          "progress": 38,
+          "workRequired": 38,
+          "escrow": {},
+          "investment": {
+            "wood": 12,
+            "stone": 8,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 5,
+          "desiredWorkers": 2,
+          "paused": false,
+          "priority": 10
+        }
+      ],
+      "events": [
+        {
+          "id": 14,
+          "day": 3,
+          "text": "The work of a village: an ambition fulfilled.",
+          "type": "milestone"
+        },
+        {
+          "id": 13,
+          "day": 3,
+          "text": "2 new citizens have arrived. Assign their skills to the town’s next task.",
+          "type": "arrival"
+        },
+        {
+          "id": 12,
+          "day": 2,
+          "text": "Stoneworks is complete. Its workplace is ready for citizens.",
+          "type": "complete"
+        },
+        {
+          "id": 11,
+          "day": 2,
+          "text": "Stoneworks is planned. Materials reserved; builders will work in queue order.",
+          "type": "construction"
+        },
+        {
+          "id": 10,
+          "day": 2,
+          "text": "Woodcutter is complete. Its workplace is ready for citizens.",
+          "type": "complete"
+        },
+        {
+          "id": 9,
+          "day": 2,
+          "text": "A working supper: an ambition fulfilled.",
+          "type": "milestone"
+        },
+        {
+          "id": 8,
+          "day": 2,
+          "text": "A home, built by hand: an ambition fulfilled.",
+          "type": "milestone"
+        },
+        {
+          "id": 7,
+          "day": 2,
+          "text": "2 new citizens have arrived. Assign their skills to the town’s next task.",
+          "type": "arrival"
+        },
+        {
+          "id": 6,
+          "day": 1,
+          "text": "Woodcutter is planned. Materials reserved; builders will work in queue order.",
+          "type": "construction"
+        },
+        {
+          "id": 5,
+          "day": 1,
+          "text": "Kitchen garden construction cancelled. Unused materials were recovered.",
+          "type": "cancel"
+        },
+        {
+          "id": 4,
+          "day": 1,
+          "text": "Kitchen garden is planned. Materials reserved; builders will work in queue order.",
+          "type": "construction"
+        },
+        {
+          "id": 3,
+          "day": 1,
+          "text": "Cottage is complete. The neighborhood has grown.",
+          "type": "complete"
+        },
+        {
+          "id": 2,
+          "day": 1,
+          "text": "Orchard is complete. Its workplace is ready for citizens.",
+          "type": "complete"
+        },
+        {
+          "id": 1,
+          "day": 1,
+          "text": "Welcome back. Day 1, 6 citizens, and work waiting for willing hands.",
+          "type": "welcome"
+        }
+      ],
+      "stats": {
+        "built": 4,
+        "arrivals": 4,
+        "harvests": 2,
+        "upgrades": 0
+      },
+      "research": {
+        "completed": [],
+        "active": null
+      },
+      "policies": {
+        "charter": null,
+        "changedDay": null
+      },
+      "contracts": {
+        "offers": [
+          {
+            "id": "order-3-pantry",
+            "definitionId": "pantry",
+            "offeredDay": 3,
+            "status": "offered"
+          },
+          {
+            "id": "order-3-repairs",
+            "definitionId": "repairs",
+            "offeredDay": 3,
+            "status": "offered"
+          },
+          {
+            "id": "order-3-provisions",
+            "definitionId": "provisions",
+            "offeredDay": 3,
+            "status": "offered"
+          }
+        ],
+        "active": [],
+        "completed": 0,
+        "failed": 0,
+        "nextId": 1,
+        "offerDay": 3
+      },
+      "routes": {
+        "active": [],
+        "completed": 0,
+        "nextId": 1,
+        "reputation": {
+          "reedbank": 0,
+          "stonehaven": 0,
+          "lantern_isles": 0,
+          "far_sound": 0
+        }
+      },
+      "imports": {
+        "day": 3,
+        "used": {},
+        "completed": 0,
+        "exportsCompleted": 0,
+        "byResource": {
+          "wood": 0,
+          "stone": 0,
+          "food": 0,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 0,
+          "knowledge": 0
+        },
+        "exported": {
+          "wood": 0,
+          "stone": 0,
+          "food": 0,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 0,
+          "knowledge": 0
+        }
+      },
+      "milestones": [
+        "chapter_0",
+        "chapter_1",
+        "chapter_2"
+      ],
+      "progressionDay": 3,
+      "discovery": {
+        "version": 1,
+        "sites": [
+          {
+            "id": "waystone",
+            "status": "rumor",
+            "surveyProgress": 0,
+            "project": null,
+            "progress": 0,
+            "reportedBy": null,
+            "reportedDay": null,
+            "finishedBy": null,
+            "finishedDay": null,
+            "received": {}
+          },
+          {
+            "id": "spring",
+            "status": "rumor",
+            "surveyProgress": 0,
+            "project": null,
+            "progress": 0,
+            "reportedBy": null,
+            "reportedDay": null,
+            "finishedBy": null,
+            "finishedDay": null,
+            "received": {}
+          },
+          {
+            "id": "kiln",
+            "status": "rumor",
+            "surveyProgress": 0,
+            "project": null,
+            "progress": 0,
+            "reportedBy": null,
+            "reportedDay": null,
+            "finishedBy": null,
+            "finishedDay": null,
+            "received": {}
+          },
+          {
+            "id": "stars",
+            "status": "rumor",
+            "surveyProgress": 0,
+            "project": null,
+            "progress": 0,
+            "reportedBy": null,
+            "reportedDay": null,
+            "finishedBy": null,
+            "finishedDay": null,
+            "received": {}
+          }
+        ]
+      },
+      "pressure": {
+        "version": 1,
+        "sequence": 0,
+        "nextIncidentDay": null,
+        "active": null,
+        "history": [],
+        "defended": 0,
+        "paid": 0,
+        "losses": 0,
+        "graceUntilDay": 0
+      },
+      "frontier": {
+        "version": 1,
+        "clock": 231.75,
+        "subsecond": 0.1634,
+        "nextId": 1,
+        "nextLogId": 1,
+        "units": [],
+        "fortifications": [
+          {
+            "id": "settlement-reedbank",
+            "type": "outpost",
+            "name": "Reedbank",
+            "faction": "reedbank",
+            "x": 18,
+            "z": -13,
+            "rotation": 0,
+            "status": "ready",
+            "hp": 360,
+            "maxHp": 360,
+            "progress": 0,
+            "work": 0,
+            "escrow": {},
+            "open": false,
+            "damageAt": null,
+            "regionId": null
+          },
+          {
+            "id": "settlement-stonehaven",
+            "type": "outpost",
+            "name": "Stonehaven",
+            "faction": "stonehaven",
+            "x": -18,
+            "z": -14,
+            "rotation": 0,
+            "status": "ready",
+            "hp": 360,
+            "maxHp": 360,
+            "progress": 0,
+            "work": 0,
+            "escrow": {},
+            "open": false,
+            "damageAt": null,
+            "regionId": null
+          },
+          {
+            "id": "settlement-blackthorn",
+            "type": "outpost",
+            "name": "Blackthorn",
+            "faction": "blackthorn",
+            "x": 2,
+            "z": -28,
+            "rotation": 0,
+            "status": "ready",
+            "hp": 360,
+            "maxHp": 360,
+            "progress": 0,
+            "work": 0,
+            "escrow": {},
+            "open": false,
+            "damageAt": null,
+            "regionId": null
+          }
+        ],
+        "neighbors": [
+          {
+            "id": "reedbank",
+            "name": "Reedbank",
+            "x": 18,
+            "z": -13,
+            "temper": "friendly",
+            "radius": 2.2,
+            "discovered": false,
+            "relation": 10,
+            "status": "neutral",
+            "envoys": 0,
+            "trades": 0,
+            "lastTradeDay": 0,
+            "aidReadyAt": 0,
+            "nextAttackAt": null,
+            "truceUntil": 0,
+            "hp": 360,
+            "maxHp": 360,
+            "defeated": false
+          },
+          {
+            "id": "stonehaven",
+            "name": "Stonehaven",
+            "x": -18,
+            "z": -14,
+            "temper": "neutral",
+            "radius": 2.2,
+            "discovered": false,
+            "relation": 0,
+            "status": "neutral",
+            "envoys": 0,
+            "trades": 0,
+            "lastTradeDay": 0,
+            "aidReadyAt": 0,
+            "nextAttackAt": null,
+            "truceUntil": 0,
+            "hp": 360,
+            "maxHp": 360,
+            "defeated": false
+          },
+          {
+            "id": "blackthorn",
+            "name": "Blackthorn",
+            "x": 2,
+            "z": -28,
+            "temper": "hostile",
+            "radius": 2.2,
+            "discovered": false,
+            "relation": -15,
+            "status": "neutral",
+            "envoys": 0,
+            "trades": 0,
+            "lastTradeDay": 0,
+            "aidReadyAt": 0,
+            "nextAttackAt": null,
+            "truceUntil": 0,
+            "hp": 360,
+            "maxHp": 360,
+            "defeated": false
+          }
+        ],
+        "claims": [
+          "home"
+        ],
+        "discoveredRegions": [
+          "home"
+        ],
+        "projectiles": [],
+        "log": [],
+        "warning": null,
+        "nextRaidAt": null,
+        "raidActive": false,
+        "raidOutcome": null,
+        "builderTarget": 1,
+        "stats": {
+          "recruited": 0,
+          "wounded": 0,
+          "deaths": 0,
+          "enemiesDefeated": 0,
+          "raidsDefeated": 0,
+          "cargoLost": 0,
+          "wallsBreached": 0,
+          "trades": 0,
+          "missions": 0,
+          "conquests": 0,
+          "deathsThisWave": 0
+        }
+      }
+    },
+    "diagnostics": {
+      "drawCalls": 78,
+      "triangles": 610470,
+      "actors": 10,
+      "buildings": 6,
+      "troops": 0,
+      "fortifications": 0,
+      "neighbors": 3,
+      "pixelRatio": 1,
+      "webgl": true,
+      "fps": 3
+    }
+  },
+  "sourceHashesAtEnd": {
+    "js/discovery.js": "c7978a9f46544467e3ea18e12939e9c4997ea9c69cb517c7d005014172029358",
+    "js/fieldbook-ui.js": "53ac4f6c9bb3372e22060784b41387a76adedbf30e77b8337362d5f8f95ef1e6",
+    "living.css": "5cc81b6b8921efba0ff8a62c7a038b1b5010d8237fb4415dc389f01529ebc404",
+    "assets/living-kit.glb": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c",
+    "index.html": "c080585cdbdc434281ce3de76268de85821a94e7ff1966bcfbf7cc5a25e639fd",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "js/main.js": "ec3865bb87b0bf8374bd8c5f9cc5301d96a96629fcd2d00e8db7e87b05eda22b",
+    "js/world.js": "dd8e8ac8873c29178c8de0247aa224c91577748d6ef71913ec23b7b833083b5d",
+    "js/town-ui.js": "f6444cb865eaf3b6a60a887b3e97287d0383e657deb9ca8df5f8e00d2dc6dda8",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/frontier.js": "0546fc344d6e45d7e0a1c9a4361455888aea181c009e7cae93bd36683ffa0fe6",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218"
+  },
+  "finishedAt": "2026-10-03T03:48:40.089Z"
+}

@@ -1,0 +1,3300 @@
+{
+  "scope": "Isolated prepared visual fixture based on an earned town; extra frontier supplies/discovery/claimed meadow/starting formations and immediate defense completion are prepared art evidence. Real public recruitment/training/war and actual simulation movement, projectiles, attack and damage then run. No user storage touched. Screens require separate visual inspection.",
+  "checkedAt": "2026-10-02T06:10:44.607Z",
+  "sourceHashesAtStart": {
+    "js/world.js": "44e5ae1ad262a072b07f4cc6412f8024860c9104e35e9a55508dc86dcdca722c",
+    "js/island.js": "ebb7e846aadca27575693d3dae2df4aa0af4456f05b051b5f71518876ece6b99",
+    "js/frontier.js": "0d6aa85a6c10d4a04b6e0669202665ca4d82fdfea38cb2a889274cb288d64043",
+    "js/sim.js": "ff81dad5319c4bbfe8ec9d51b6dbf5cb78a4d7d220c26faaec3d97e0bc945364",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "assets/frontier-kit.glb": "113b1c326940e0a0d96a4b803de7f7d09bb4ce864185373525603712ec465da5",
+    "assets/frontier-kit.json": "59d7a6446043ce1f8f5e43a33245375c1336f223f980bfd6428555e7b41cf2d5",
+    "tools/frontier-render.mjs": "9fec32bdf0ee201b320e0ec3565899dd8319a18ca3208466af574593312df9de"
+  },
+  "sourceHashesAtEnd": {
+    "js/world.js": "44e5ae1ad262a072b07f4cc6412f8024860c9104e35e9a55508dc86dcdca722c",
+    "js/island.js": "ebb7e846aadca27575693d3dae2df4aa0af4456f05b051b5f71518876ece6b99",
+    "js/frontier.js": "5478c8968e2fb72ce7290e1a569925c2bcee73c2b2cad75bb4757a77bc47ef3b",
+    "js/sim.js": "ff81dad5319c4bbfe8ec9d51b6dbf5cb78a4d7d220c26faaec3d97e0bc945364",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "assets/frontier-kit.glb": "113b1c326940e0a0d96a4b803de7f7d09bb4ce864185373525603712ec465da5",
+    "assets/frontier-kit.json": "59d7a6446043ce1f8f5e43a33245375c1336f223f980bfd6428555e7b41cf2d5",
+    "tools/frontier-render.mjs": "9fec32bdf0ee201b320e0ec3565899dd8319a18ca3208466af574593312df9de"
+  },
+  "sourcesStable": false,
+  "setup": {
+    "recruited": [
+      "unit-1",
+      "unit-2",
+      "unit-3"
+    ],
+    "enemy": [
+      "unit-4",
+      "unit-5",
+      "unit-6"
+    ],
+    "forts": [
+      "fort-7",
+      "fort-9",
+      "fort-10",
+      "fort-11"
+    ],
+    "fortAttempts": [
+      {
+        "type": "wall",
+        "ok": true,
+        "reason": "Materials are reserved now; a named builder completes the site."
+      },
+      {
+        "type": "wall",
+        "ok": true,
+        "reason": "Materials are reserved now; a named builder completes the site."
+      },
+      {
+        "type": "gate",
+        "ok": true,
+        "reason": "Materials are reserved now; a named builder completes the site."
+      },
+      {
+        "type": "wall",
+        "ok": true,
+        "reason": "Materials are reserved now; a named builder completes the site."
+      },
+      {
+        "type": "tower",
+        "ok": false,
+        "reason": "A builder needs an open route to an adjacent cell."
+      }
+    ],
+    "strip": {
+      "x": 1,
+      "z": -18
+    },
+    "initialClock": 46
+  },
+  "frames": [
+    {
+      "clock": 46,
+      "subsecond": 0.1,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -16.8,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -18,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -18.2,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-8",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": -1.0319497675436204
+        }
+      ]
+    },
+    {
+      "clock": 46,
+      "subsecond": 0.2,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -16.8,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -18,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -18.2,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-8",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": -0.7575504628388349
+        }
+      ]
+    },
+    {
+      "clock": 46.25,
+      "subsecond": 0.05,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.08,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.28,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.77,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.97,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0.338012517886568,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0.33801251788655984,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -0.8645898033750418
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0.3000975570674155,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0.3000975570674223,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -0.8645898033750418
+        }
+      ]
+    },
+    {
+      "clock": 46.25,
+      "subsecond": 0.15,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.08,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.28,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.77,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.97,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -0.5645898033750347
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -0.5645898033750347
+        }
+      ]
+    },
+    {
+      "clock": 46.5,
+      "subsecond": 0,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": -0.30442929456218737,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": -0.30442929456218737,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.25
+          },
+          "arm": -0.45000000000000007
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": -0.05335459972470946,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": true,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": -0.05335459972470946,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.25
+          },
+          "arm": -0.45000000000000007
+        }
+      ]
+    },
+    {
+      "clock": 46.5,
+      "subsecond": 0.1,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3500000000000014
+          },
+          "arm": -0.5645898033750347
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3500000000000014
+          },
+          "arm": -0.5645898033750347
+        }
+      ]
+    },
+    {
+      "clock": 46.5,
+      "subsecond": 0.2,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 70,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 46,
+          "status": "active",
+          "attackAt": null,
+          "damageAt": null
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.45000000000000284
+          },
+          "arm": -0.8645898033750417
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": null
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.45000000000000284
+          },
+          "arm": -0.8645898033750417
+        }
+      ]
+    },
+    {
+      "clock": 46.75,
+      "subsecond": 0.05,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -1.4966322481449132,
+          "weapon": 3.06742857493981
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -1.4966322481449132,
+          "weapon": 3.06742857493981
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.5499999999999972
+          },
+          "arm": -1.05
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -1.5010643118126459,
+          "weapon": 1.6013303897657876
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -1.5010643118126459,
+          "weapon": 1.6013303897657876
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.5499999999999972
+          },
+          "arm": -1.05
+        }
+      ]
+    },
+    {
+      "clock": 46.75,
+      "subsecond": 0.15,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -1.3766322481449105,
+          "weapon": 2.9474285749398073
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -1.3766322481449105,
+          "weapon": 2.9474285749398073
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.6499999999999986
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -0.4510643118126212,
+          "weapon": 1.1382982338594598
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -0.4510643118126212,
+          "weapon": 1.1382982338594598
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.6499999999999986
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47,
+      "subsecond": 0,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.25
+          },
+          "arm": -1.3307963267948966,
+          "weapon": 2.901592653589793
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.25
+          },
+          "arm": -1.3307963267948966,
+          "weapon": 2.901592653589793
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.75
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.25
+          },
+          "arm": -0.04999999999999982,
+          "weapon": 1.0999999999999999
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.25
+          },
+          "arm": -0.04999999999999982,
+          "weapon": 1.0999999999999999
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.75
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47,
+      "subsecond": 0.1,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3500000000000014
+          },
+          "arm": -1.3766322481449105,
+          "weapon": 2.9474285749398073
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3500000000000014
+          },
+          "arm": -1.3766322481449105,
+          "weapon": 2.9474285749398073
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.8500000000000014
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3500000000000014
+          },
+          "arm": -0.4510643118126212,
+          "weapon": 1.1382982338594598
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3500000000000014
+          },
+          "arm": -0.4510643118126212,
+          "weapon": 1.1382982338594598
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.8500000000000014
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47,
+      "subsecond": 0.2,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.45000000000000284
+          },
+          "arm": -1.4966322481449132,
+          "weapon": 3.06742857493981
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.45000000000000284
+          },
+          "arm": -1.4966322481449132,
+          "weapon": 3.06742857493981
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.9500000000000028
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.45000000000000284
+          },
+          "arm": -1.5010643118126454,
+          "weapon": 1.6013303897657871
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.45000000000000284
+          },
+          "arm": -1.5010643118126454,
+          "weapon": 1.6013303897657871
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.9500000000000028
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47.25,
+      "subsecond": 0.05,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.5499999999999972
+          },
+          "arm": -1.5707963267948966,
+          "weapon": 3.141592653589793
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.5499999999999972
+          },
+          "arm": -1.5707963267948966,
+          "weapon": 3.141592653589793
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.0499999999999972
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.5499999999999972
+          },
+          "arm": -2.1499999999999995,
+          "weapon": 2.1499999999999995
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.5499999999999972
+          },
+          "arm": -2.1499999999999995,
+          "weapon": 2.1499999999999995
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.0499999999999972
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47.25,
+      "subsecond": 0.15,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.6499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.6499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.1499999999999986
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.6499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.6499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.1499999999999986
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47.5,
+      "subsecond": 0,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.75
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.75
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.25
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.75
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.75
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.25
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47.5,
+      "subsecond": 0.1,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.8500000000000014
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.8500000000000014
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.3500000000000014
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.8500000000000014
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.8500000000000014
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.3500000000000014
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47.5,
+      "subsecond": 0.2,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.9500000000000028
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.9500000000000028
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.4500000000000028
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.9500000000000028
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 0.9500000000000028
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.4500000000000028
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47.75,
+      "subsecond": 0.05,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.0499999999999972
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.0499999999999972
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.5499999999999972
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.0499999999999972
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.0499999999999972
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.5499999999999972
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 47.75,
+      "subsecond": 0.15,
+      "projectiles": 0,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 30,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 37,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 46.25,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.1499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.1499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.6499999999999986
+          },
+          "arm": 0
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.1499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.1499999999999986
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.6499999999999986
+          },
+          "arm": 0
+        }
+      ]
+    },
+    {
+      "clock": 48,
+      "subsecond": 0,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 21,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 28,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0
+          },
+          "arm": -1.5707963267948966,
+          "weapon": 3.141592653589793
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0
+          },
+          "arm": -1.5707963267948966,
+          "weapon": 3.141592653589793
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0
+          },
+          "arm": -1.05
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.25
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.25
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0
+          },
+          "arm": -1.05
+        }
+      ]
+    },
+    {
+      "clock": 48,
+      "subsecond": 0.1,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 21,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 28,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.10000000000000142
+          },
+          "arm": -1.4297278662447013,
+          "weapon": 3.000524193039598
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.10000000000000142
+          },
+          "arm": -1.4297278662447013,
+          "weapon": 3.000524193039598
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.10000000000000142
+          },
+          "arm": -0.6973288486245119
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.3500000000000014
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.3500000000000014
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.10000000000000142
+          },
+          "arm": -0.6973288486245119
+        }
+      ]
+    },
+    {
+      "clock": 48,
+      "subsecond": 0.2,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 57,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 64,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 46.75
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 21,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 28,
+          "status": "active",
+          "attackAt": 46.75,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.20000000000000284
+          },
+          "arm": -1.3425427628840585,
+          "weapon": 2.913339089678955
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.20000000000000284
+          },
+          "arm": -1.3425427628840585,
+          "weapon": 2.913339089678955
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.20000000000000284
+          },
+          "arm": -0.47936609022290466
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.4500000000000028
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": false,
+            "attackAge": 1.4500000000000028
+          },
+          "arm": 0,
+          "weapon": 0
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.20000000000000284
+          },
+          "arm": -0.47936609022290466
+        }
+      ]
+    },
+    {
+      "clock": 48.25,
+      "subsecond": 0.05,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 51,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 48.25
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 58,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 48.25
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 21,
+          "status": "active",
+          "attackAt": 48.25,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 28,
+          "status": "active",
+          "attackAt": 48.25,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.29999999999999716
+          },
+          "arm": -1.3425427628840585,
+          "weapon": 2.913339089678955
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.29999999999999716
+          },
+          "arm": -1.3425427628840585,
+          "weapon": 2.913339089678955
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.29999999999999716
+          },
+          "arm": -0.47936609022290466
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -1.5010643118126459,
+          "weapon": 1.6013303897657876
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.04999999999999716
+          },
+          "arm": -1.5010643118126459,
+          "weapon": 1.6013303897657876
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.29999999999999716
+          },
+          "arm": -0.47936609022290466
+        }
+      ]
+    },
+    {
+      "clock": 48.25,
+      "subsecond": 0.15,
+      "projectiles": 2,
+      "units": [
+        {
+          "id": "unit-1",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -2,
+          "z": -17.2058,
+          "hp": 51,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 48.25
+        },
+        {
+          "id": "unit-2",
+          "kind": "spearman",
+          "faction": "player",
+          "x": -3,
+          "z": -17.4058,
+          "hp": 58,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": 48.25
+        },
+        {
+          "id": "unit-3",
+          "kind": "archer",
+          "faction": "player",
+          "x": -2,
+          "z": -15.5,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        },
+        {
+          "id": "unit-4",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -2,
+          "z": -17.6426,
+          "hp": 21,
+          "status": "active",
+          "attackAt": 48.25,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-5",
+          "kind": "raider",
+          "faction": "blackthorn",
+          "x": -3,
+          "z": -17.8426,
+          "hp": 28,
+          "status": "active",
+          "attackAt": 48.25,
+          "damageAt": 48
+        },
+        {
+          "id": "unit-6",
+          "kind": "archer",
+          "faction": "blackthorn",
+          "x": -1,
+          "z": -19.2,
+          "hp": 42,
+          "status": "active",
+          "attackAt": 48,
+          "damageAt": null
+        }
+      ],
+      "poses": [
+        {
+          "id": "unit-1",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3999999999999986
+          },
+          "arm": -1.4297278662447013,
+          "weapon": 3.000524193039598
+        },
+        {
+          "id": "unit-2",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3999999999999986
+          },
+          "arm": -1.4297278662447013,
+          "weapon": 3.000524193039598
+        },
+        {
+          "id": "unit-3",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3999999999999986
+          },
+          "arm": -0.6973288486245118
+        },
+        {
+          "id": "unit-4",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -0.4510643118126212,
+          "weapon": 1.1382982338594598
+        },
+        {
+          "id": "unit-5",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.14999999999999858
+          },
+          "arm": -0.4510643118126212,
+          "weapon": 1.1382982338594598
+        },
+        {
+          "id": "unit-6",
+          "motion": {
+            "moving": false,
+            "attacking": true,
+            "attackAge": 0.3999999999999986
+          },
+          "arm": -0.6973288486245118
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "diagnostics": {
+    "drawCalls": 45,
+    "triangles": 516345,
+    "actors": 73,
+    "buildings": 59,
+    "troops": 6,
+    "fortifications": 4,
+    "neighbors": 3,
+    "pixelRatio": 1,
+    "webgl": true,
+    "fps": 4
+  }
+}

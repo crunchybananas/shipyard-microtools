@@ -91,7 +91,7 @@ try{
     console.log(`[builder bake] ${id}: 384 cells pass blank/clipping and repeated-pose checks`);
   }
   const files=[relative(root,source),relative(root,join(dirname(source),'builder.blend')),relative(root,join(dirname(source),'joints.json')),
-    'scripts/citizen-sprites/author_builder.py','scripts/citizen-sprites/export_blender.py','scripts/citizen-sprites/materials.js',
+    'scripts/citizen-sprites/author_builder.py','scripts/citizen-sprites/animate_builder.py','scripts/citizen-sprites/export_blender.py','scripts/citizen-sprites/materials.js',
     'scripts/citizen-sprites/contract.js','scripts/citizen-sprites/bake.mjs',
     'scripts/founder-sprites/rig.js','scripts/founder-sprites/materials.js','scripts/founder-sprites/settlement-materials.js',
     'scripts/founder-sprites/export-glb.mjs','scripts/founder-sprites/contract.js',
@@ -99,7 +99,7 @@ try{
   const sources=await Promise.all(files.map(async file=>({file,sha256:hash(await readFile(join(root,file)))})));
   const stats=await page.evaluate(()=>{const stats=wardrobe.stats;disposeLight();builder.renderer.dispose();return stats;});
   await writeFile(join(out,'manifest.json'),JSON.stringify({version:1,character:'builder',sourceMode:'saved-blender-scene',
-    anatomy:'adult-craftsperson-v1',authoring:'Realm builder geometry and actions; KayKit CC0 derived skeleton',license:'CC0-1.0',
+    anatomy:'adult-craftsperson-v1',motion:'builder-motion-v2',authoring:'Realm builder geometry and actions; KayKit CC0 derived skeleton',license:'CC0-1.0',
     directions:DIRECTIONS,actions,tiers:TIERS,anchor:ANCHOR,viewHeight:2.6,sourceAnchor:{x:.5,y:.86},
     runtime:{cellHeight:44,baseMaps:4,detailSize:128,maxDetailRows:12,maxConcurrentDetailLoads:2,bakedCargo:true},
     render:{samples:[384,504],profile:'settlement-v2',normalMaps:true,roughnessMaps:true,selfShadows:true,...stats},sources,outputs},null,2)+'\n');

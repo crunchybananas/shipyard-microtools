@@ -1,0 +1,176 @@
+{
+  "createdAt": "2026-10-02T05:29:54.014Z",
+  "status": "Local verified town expansion, uncommitted and not deployed",
+  "sourceHashes": {
+    "index.html": "c42337a0d81a79451935b68a9132c055cd8e727d093c26965fa66d67b3d2e232",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+    "js/world.js": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/town-kit.json": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794",
+    "assets/town-kit.blend": "3f73bf82a2cc41f962e3e48d47abc7319cd8a387f927ec5c5466eb840b58348e",
+    "tools/create_town_assets.py": "7a00f2496f19216b15b93918b146800989cc6686e91a2c59a64697e761a2666a"
+  },
+  "simulationTests": {
+    "passed": 72,
+    "command": "node --test wildhaven/test/*.test.mjs",
+    "scope": "Observed pass in this session; simulation, catalog, progression and pressure sources unchanged since that run, independently matched by four earned campaigns."
+  },
+  "evidence": {
+    "town-render-report": {
+      "sourcesStable": true,
+      "currentInputsVerified": [
+        "js/main.js",
+        "js/world.js",
+        "js/town-ui.js",
+        "js/sim.js",
+        "js/catalog.js",
+        "js/progression.js",
+        "js/pressure.js",
+        "style.css",
+        "assets/town-kit.glb"
+      ],
+      "errors": []
+    },
+    "town-geometry-report": {
+      "sourcesStable": true,
+      "currentInputsVerified": [
+        "js/world.js",
+        "js/sim.js",
+        "js/catalog.js",
+        "assets/village-kit.glb",
+        "assets/village-kit.json",
+        "assets/town-kit.glb",
+        "assets/town-kit.json",
+        "tools/town-geometry.mjs",
+        "tools/worksite-fixture.mjs"
+      ],
+      "errors": []
+    },
+    "town-traffic-report": {
+      "sourcesStable": true,
+      "currentInputsVerified": [
+        "js/world.js",
+        "js/sim.js",
+        "js/catalog.js",
+        "assets/village-kit.glb",
+        "assets/town-kit.glb",
+        "assets/town-kit.json",
+        "tools/town-traffic.mjs",
+        "review/campaign-services-lanes-save.json"
+      ],
+      "errors": []
+    },
+    "town-artisan-contact-final": {
+      "sourcesStable": true,
+      "currentInputsVerified": [
+        "js/world.js",
+        "assets/village-kit.glb",
+        "assets/town-kit.glb",
+        "assets/town-kit.json",
+        "tools/town-artisan-contact.mjs"
+      ],
+      "errors": []
+    },
+    "town-artisan-report": {
+      "sourcesStable": true,
+      "currentInputsVerified": [
+        "js/world.js",
+        "js/sim.js",
+        "js/catalog.js",
+        "assets/village-kit.glb",
+        "assets/town-kit.glb",
+        "assets/town-kit.json",
+        "tools/worksite-fixture.mjs",
+        "tools/town-artisan-review.mjs"
+      ],
+      "errors": []
+    },
+    "campaign-services-lanes-report": {
+      "passed": true,
+      "currentRuntimeInputsVerified": [
+        "js/sim.js",
+        "js/catalog.js",
+        "js/progression.js",
+        "js/pressure.js"
+      ],
+      "population": 76,
+      "simulatedMinutes": 90.41666666666667
+    },
+    "campaign-freeport-report": {
+      "passed": true,
+      "currentRuntimeInputsVerified": [
+        "js/sim.js",
+        "js/catalog.js",
+        "js/progression.js",
+        "js/pressure.js"
+      ],
+      "population": 94,
+      "simulatedMinutes": 78
+    },
+    "campaign-forge-report": {
+      "passed": true,
+      "currentRuntimeInputsVerified": [
+        "js/sim.js",
+        "js/catalog.js",
+        "js/progression.js",
+        "js/pressure.js"
+      ],
+      "population": 75,
+      "simulatedMinutes": 93.16666666666667
+    },
+    "campaign-freeport-slow-report": {
+      "passed": true,
+      "currentRuntimeInputsVerified": [
+        "js/sim.js",
+        "js/catalog.js",
+        "js/progression.js",
+        "js/pressure.js"
+      ],
+      "population": 94,
+      "simulatedMinutes": 81
+    },
+    "town-ui-report": {
+      "passed": 14,
+      "currentControlInputsVerified": [
+        "index.html",
+        "style.css",
+        "js/main.js",
+        "js/town-ui.js",
+        "js/sim.js",
+        "js/catalog.js",
+        "js/progression.js"
+      ],
+      "scope": "Later renderer/model revisions separately covered by the final render, geometry and contact reports."
+    },
+    "town-progression-ui-verification": {
+      "passed": 13,
+      "smokePassed": 4,
+      "currentControlInputsVerified": [
+        "index.html",
+        "style.css",
+        "js/main.js",
+        "js/town-ui.js",
+        "js/audio.js",
+        "js/catalog.js",
+        "js/progression.js",
+        "js/sim.js",
+        "js/pressure.js",
+        "assets/village-kit.glb"
+      ]
+    }
+  },
+  "limits": [
+    "Automated simulated campaigns do not prove human-session engagement or pacing.",
+    "No tactical squad combat or campaign maps.",
+    "A brief 0.337 m body separation was observed in the 30-minute motion fixture.",
+    "Browser controls verified in Chromium; other engines and physical touch devices untested."
+  ]
+}

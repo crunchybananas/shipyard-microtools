@@ -1,0 +1,338 @@
+{
+  "scope": "Prepared read-only renderer geometry fixtures, actual original Blender assets; rendered visual review remains separate.",
+  "checkedAt": "2026-10-02T06:22:35.004Z",
+  "sourceHashesAtStart": {
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/frontier-kit.json": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04",
+    "tools/create_frontier_assets.py": "a06db47ff49a865b20607a1e4b738677b80dce91373a7f7948b0f2b55f8e7409",
+    "tools/frontier-geometry.mjs": "eef9214a00d879188428fabab95d459cd066766457caae7392a0b77b52ab0f67"
+  },
+  "sourceHashesAtEnd": {
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/frontier-kit.json": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04",
+    "tools/create_frontier_assets.py": "a06db47ff49a865b20607a1e4b738677b80dce91373a7f7948b0f2b55f8e7409",
+    "tools/frontier-geometry.mjs": "eef9214a00d879188428fabab95d459cd066766457caae7392a0b77b52ab0f67"
+  },
+  "sourcesStable": true,
+  "checks": {
+    "assets": {
+      "sourceMatchesMetadata": true,
+      "totalTriangles": 63791,
+      "bytes": 6435640,
+      "neighborFootprintMaximumMeters": 2.5
+    },
+    "terrain": {
+      "raySamples": 2475,
+      "maxGroundError": 0.02746561750324683,
+      "triangles": 33008
+    },
+    "nature": {
+      "obstacleCells": 364,
+      "trees": 511,
+      "canonical": true
+    },
+    "navigation": {
+      "reachableCells": 1002,
+      "allRegionCenters": true
+    },
+    "gate": {
+      "navigationStateChanges": true,
+      "leaves": [
+        {
+          "name": "gate_gate_left",
+          "position": [
+            -0.5350000262260437,
+            0.03999999910593033,
+            0
+          ],
+          "rotation": [
+            0,
+            -1.5707963267948966,
+            0,
+            "XYZ"
+          ]
+        },
+        {
+          "name": "gate_gate_right",
+          "position": [
+            0.5350000262260437,
+            0.03999999910593033,
+            0
+          ],
+          "rotation": [
+            0,
+            1.5707963267948966,
+            0,
+            "XYZ"
+          ]
+        }
+      ]
+    },
+    "walls": {
+      "corner": true
+    },
+    "units": {
+      "count": 5,
+      "reservedCitizenRenderedOnce": true,
+      "poses": [
+        {
+          "id": "unit-0",
+          "kind": "spearman",
+          "limbs": {
+            "left_arm": -0.2,
+            "left_leg": 0,
+            "right_arm": -1.34254276288406,
+            "right_leg": 0
+          },
+          "bounds": [
+            [
+              1.437000009417534,
+              0.8192685126509287,
+              5.304213256854032
+            ],
+            [
+              2.028000000119209,
+              1.8367558434195526,
+              6.326277817006224
+            ]
+          ]
+        },
+        {
+          "id": "unit-1",
+          "kind": "archer",
+          "limbs": {
+            "left_arm": -1.5707963267948966,
+            "left_leg": 0,
+            "right_arm": -0.47936609022290877,
+            "right_leg": 0
+          },
+          "bounds": [
+            [
+              3.380202329158783,
+              0.8264226669109211,
+              5.206736156344414
+            ],
+            [
+              3.810683829157102,
+              1.7584226781165944,
+              5.727534228563309
+            ]
+          ]
+        },
+        {
+          "id": "unit-2",
+          "kind": "raider",
+          "limbs": {
+            "left_arm": -0.23,
+            "left_leg": 0,
+            "right_arm": -0.15278131578018028,
+            "right_leg": 0
+          },
+          "bounds": [
+            [
+              5.014000037312508,
+              0.8179094455974418,
+              5.199564189352516
+            ],
+            [
+              5.792999991774559,
+              1.7386116505752436,
+              5.940532796022581
+            ]
+          ]
+        },
+        {
+          "id": "unit-3",
+          "kind": "engineer",
+          "limbs": {
+            "left_arm": -0.23,
+            "left_leg": 0,
+            "right_arm": -0.15278131578018028,
+            "right_leg": 0
+          },
+          "bounds": [
+            [
+              6.955290156282998,
+              0.8226463726207845,
+              5.242018942955994
+            ],
+            [
+              7.458000002205372,
+              1.659024488153053,
+              5.713920954503127
+            ]
+          ]
+        },
+        {
+          "id": "unit-4",
+          "kind": "envoy",
+          "limbs": {
+            "left_arm": -0.7,
+            "left_leg": 0,
+            "right_arm": -0.15278131578018028,
+            "right_leg": 0
+          },
+          "bounds": [
+            [
+              8.755290156282998,
+              0.8241531380032191,
+              5.242018942955994
+            ],
+            [
+              9.244709843717002,
+              1.6605312535354875,
+              5.6741230582377025
+            ]
+          ]
+        }
+      ]
+    },
+    "projectiles": {
+      "stateReadOnly": true,
+      "samples": [
+        {
+          "time": 20,
+          "position": [
+            1.8,
+            1.50961294696422,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.1,
+          "position": [
+            2.340000000000008,
+            1.7089669771330385,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.2,
+          "position": [
+            2.8799999999999963,
+            1.8868444044170805,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.3,
+          "position": [
+            3.420000000000004,
+            2.023870905458242,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.4,
+          "position": [
+            3.9599999999999924,
+            2.1046709301841897,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.5,
+          "position": [
+            4.5,
+            2.119372767777234,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.6,
+          "position": [
+            5.040000000000008,
+            2.0645748585093946,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.7,
+          "position": [
+            5.5799999999999965,
+            1.9436787621086538,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.8,
+          "position": [
+            6.120000000000004,
+            1.766556189392697,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 20.9,
+          "position": [
+            6.659999999999992,
+            1.5485826904338613,
+            5.4
+          ],
+          "visible": true
+        },
+        {
+          "time": 21,
+          "position": [
+            7.2,
+            1.3091325885902483,
+            5.4
+          ],
+          "visible": false
+        }
+      ]
+    },
+    "commands": {
+      "wallLineCells": 3,
+      "clears": true
+    },
+    "civilianGate": {
+      "seconds": 60,
+      "positions": [
+        {
+          "id": "gate-person-0",
+          "z": 3,
+          "remaining": 0
+        },
+        {
+          "id": "gate-person-1",
+          "z": 3,
+          "remaining": 0
+        },
+        {
+          "id": "gate-person-2",
+          "z": 6,
+          "remaining": 0
+        },
+        {
+          "id": "gate-person-3",
+          "z": 6,
+          "remaining": 0
+        }
+      ],
+      "pierEntries": 0,
+      "minimumSideClearance": 0.240988380968565
+    }
+  }
+}

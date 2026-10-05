@@ -1,0 +1,183 @@
+{
+  "createdAt": "2026-10-03T04:02:07.621787+00:00",
+  "version": 4,
+  "status": "Local, uncommitted, not deployed. Server left running; actual user village paused.",
+  "scope": "Named fieldwork, authored landmarks and cargo, spatial Foley, responsive fieldbook. Existing frontier/town remain in scope of their retained historical reports.",
+  "tests": {
+    "file": "review/living-tests.txt",
+    "passed": 126,
+    "failed": 0,
+    "note": "Final simulation suite; only fieldbook CSS and browser layout coverage changed afterward."
+  },
+  "reports": {
+    "living-browser-report.json": {
+      "sha256": "ad78e6d432abdbbeb3f47a1c5cfc6e63761bf94dbd93fb048bd05c4d01734146",
+      "sourcesStableDuringRun": true,
+      "recordedInputsMatchCurrent": true,
+      "currentDifferences": {},
+      "errors": [],
+      "passedChecks": 12,
+      "failedChecks": 0
+    },
+    "living-campaign-report.json": {
+      "sha256": "6de9e13812abfd299f2bb173fd8fbb238a930e6a796dab8eb0b80564286904b6",
+      "sourcesStableDuringRun": true,
+      "recordedInputsMatchCurrent": true,
+      "currentDifferences": {},
+      "errors": []
+    },
+    "living-motion-report.json": {
+      "sha256": "dc1afb641b16e2a417c98745455136277e19085acd16edd810c505952f8ebb54",
+      "sourcesStableDuringRun": true,
+      "recordedInputsMatchCurrent": true,
+      "currentDifferences": {},
+      "errors": []
+    },
+    "living-town-ui-report.json": {
+      "sha256": "933a3fbfd35feea3f84db3c50a751030b29862c75aef47c037a4f592087bd335",
+      "sourcesStableDuringRun": true,
+      "recordedInputsMatchCurrent": false,
+      "currentDifferences": {
+        "js/discovery.js": {
+          "tested": "c7978a9f46544467e3ea18e12939e9c4997ea9c69cb517c7d005014172029358",
+          "current": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e"
+        },
+        "js/fieldbook-ui.js": {
+          "tested": "53ac4f6c9bb3372e22060784b41387a76adedbf30e77b8337362d5f8f95ef1e6",
+          "current": "4e83e161204df1dd5ab6619ae4216b892042aa8ae7f01c5845fa4af1d98b6740"
+        },
+        "living.css": {
+          "tested": "5cc81b6b8921efba0ff8a62c7a038b1b5010d8237fb4415dc389f01529ebc404",
+          "current": "84d77e2a7ffacfdf2698054dfddb1d32c21cef5ba49ee87dab25bcec4da398c2"
+        },
+        "js/world.js": {
+          "tested": "dd8e8ac8873c29178c8de0247aa224c91577748d6ef71913ec23b7b833083b5d",
+          "current": "a474bd900914bda496201fc6a1827047774191bc1ab4bafc4280eaa7fffccfbc"
+        },
+        "js/frontier.js": {
+          "tested": "0546fc344d6e45d7e0a1c9a4361455888aea181c009e7cae93bd36683ffa0fe6",
+          "current": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6"
+        }
+      },
+      "errors": [],
+      "passedChecks": 14,
+      "failedChecks": 0
+    },
+    "living-traffic-report.json": {
+      "sha256": "c8593afe50a1a84f76ada51e87f129ba223a3478fe8add32071ba174d4fc4a76",
+      "sourcesStableDuringRun": true,
+      "recordedInputsMatchCurrent": false,
+      "currentDifferences": {
+        "js/discovery.js": {
+          "tested": "c7978a9f46544467e3ea18e12939e9c4997ea9c69cb517c7d005014172029358",
+          "current": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e"
+        },
+        "js/world.js": {
+          "tested": "c6f8a79ec0e94d45f9baca2b284342da8f9bd194e23d79731a913f03b231ae0f",
+          "current": "a474bd900914bda496201fc6a1827047774191bc1ab4bafc4280eaa7fffccfbc"
+        },
+        "js/frontier.js": {
+          "tested": "0546fc344d6e45d7e0a1c9a4361455888aea181c009e7cae93bd36683ffa0fe6",
+          "current": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6"
+        }
+      },
+      "errors": []
+    }
+  },
+  "coverageNotes": {
+    "town": "Earlier v4 regression. Later fieldbook layout is covered by final living browser checks; earlier source hashes are retained.",
+    "traffic": "Earlier v4 crowd replay. Later camera, sound contact timing and field-route status feedback do not change ordinary crowd routing.",
+    "limits": "No new Safari/Firefox/physical-device, human listening, human-session balance or hardware performance acceptance claimed."
+  },
+  "files": {
+    "ASSETS.md": "e6e57bd35be1fa73f2037b25c593fe66668c47bb6b75cc8d4a0808ccda5d3f6b",
+    "DEVELOPMENT.md": "dd13637346a82cb2938638140c82c46836e0d1ad789da3c90f95b9b713da7881",
+    "LIVING_ISLAND_PLAN.md": "1e46c63405cc34f422bb6e500a80c618f6b8a82c74b7d31275847164eb9a5132",
+    "README.md": "550c52147336921d63a67afec5d65ca2d5c3bc8425136853cd555986ad6912fb",
+    "assets/frontier-art-contact.png": "d6665a24708a127ad5d3f4a1218054a51ad5ab1c3650f861881f2293dc52e6ed",
+    "assets/frontier-kit.blend": "10c378ed75cecc2bf4f3d8a6621e9e112177358f5ec8278a282f3f02399233b1",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/frontier-kit.json": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04",
+    "assets/living-art-contact.png": "59ffacc5765ac662c1049236901cbbebe8c48e169099526cf5e04e86d18329ce",
+    "assets/living-kit.blend": "c7b16d6c62608d5f1fc73c0109d91bbed15ebc8f04504cbfb77e9440b4b9a0e9",
+    "assets/living-kit.glb": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c",
+    "assets/living-kit.json": "c305b98c02a9129b2bba7bd24f83dbd021366bb20392b03d3b19362b4e225d7e",
+    "assets/nature-review.png": "f66a1bf4b294642c4ef89a0b5faff2d333459c6499d70de508b9a5e2eef3f0c3",
+    "assets/town-art-contact.png": "578866bef9052eaaccd835bad4e03d34fa731aabdc1343afa4a31b7fe2fdd7e1",
+    "assets/town-kit.blend": "3f73bf82a2cc41f962e3e48d47abc7319cd8a387f927ec5c5466eb840b58348e",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/town-kit.json": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794",
+    "assets/village-kit-contact.png": "62ca3c87fc14d489cad213212a969995a877c9be7283eb5d8b8d057150adee71",
+    "assets/village-kit.blend": "04f62403bbb1bcff23f9a398fc48bd80bae6377dfb38c562667335fd949b8226",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/village-kit.json": "01660a0a2362764f71b574c299902438a7943be92a715d842238147f9e105f1d",
+    "assets/villager-pose-review.png": "d16364ed15df5190a9961d581537a2de3ae0b5f9f3abdd0b50674a372dab9bb8",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "index.html": "c080585cdbdc434281ce3de76268de85821a94e7ff1966bcfbf7cc5a25e639fd",
+    "js/audio.js": "8eaa22d36094c8aaba97412bbd1bd107267ebe4b2a646d997ef6937ef0383475",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/fieldbook-ui.js": "4e83e161204df1dd5ab6619ae4216b892042aa8ae7f01c5845fa4af1d98b6740",
+    "js/frontier-ui.js": "c8930f14a521368ccbe752404437970272b2b519cc52e4b5c104e75c71a978c8",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "ec3865bb87b0bf8374bd8c5f9cc5301d96a96629fcd2d00e8db7e87b05eda22b",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "js/town-ui.js": "f6444cb865eaf3b6a60a887b3e97287d0383e657deb9ca8df5f8e00d2dc6dda8",
+    "js/world.js": "a474bd900914bda496201fc6a1827047774191bc1ab4bafc4280eaa7fffccfbc",
+    "living.css": "84d77e2a7ffacfdf2698054dfddb1d32c21cef5ba49ee87dab25bcec4da398c2",
+    "review/LIVING_ISLAND_VERIFICATION.md": "9abbbd3c0e48716e02f48ac9686c174c0e3ee67134f300b7dc9488116c5f3c92",
+    "review/living-art-kiln.png": "e623a3fd38c953bfbd2f2358ecea1550f970b7b1a4d3fae08a07fe90a4aa62ce",
+    "review/living-art-spring.png": "ab97b8e7835478cb3349c555ad9b425ae9dba227f521ba3275eec89287be6776",
+    "review/living-art-stars.png": "6cff31a1575fd973d83200cfd028606a9c7025f2f70574b96f34c01f9c644d5a",
+    "review/living-art-waystone.png": "37690c38cab95568de6abe9cdc231e3a1e24797698e7d38965b206374c69a83d",
+    "review/living-art-workshop.png": "7c17bcb93468f1277b51b030edc6fb9f287ae7dadd0ab47eca8f19644ff21f5d",
+    "review/living-browser-report.json": "ad78e6d432abdbbeb3f47a1c5cfc6e63761bf94dbd93fb048bd05c4d01734146",
+    "review/living-campaign-report.json": "6de9e13812abfd299f2bb173fd8fbb238a930e6a796dab8eb0b80564286904b6",
+    "review/living-campaign-restore-save.json": "2bfcc6d552e49322baf55bad7a77dce78a2d485011e5d6d099cf5f6cfc7f4a1d",
+    "review/living-campaign-survey-save.json": "8e153b1b63dc5dff33d40913c80f9640f22a44e504df30b4ce238b5663d90229",
+    "review/living-discovery-tests.txt": "496e0a33debb752ca6d8235ab3fbf2dcadcf4cdffd55877c4d52540cfa8314f6",
+    "review/living-first-desktop.png": "f024360750f7361c125238d77f9021f0ce7329e55b1fb84954fa625d6eb81a02",
+    "review/living-first-mobile.png": "aba39f0b5a77eafc1422c98d9d8fa7d2d4493483fe10fbb816c37bd57c662734",
+    "review/living-live-preview.json": "3c22af926a4b60d876c18220de603a69c079a38b08d261145bf61af865692277",
+    "review/living-motion-earned-save.json": "a2dbac51d91f36aebede3775c918194d0c736e00a67d47dcc25fab36fe3bc336",
+    "review/living-motion-report.json": "dc1afb641b16e2a417c98745455136277e19085acd16edd810c505952f8ebb54",
+    "review/living-motion-restorer-0.png": "9f1842793b95ee530a296769ce1b0ef85d71bf9acefa0093d98b2937056c1c1d",
+    "review/living-motion-restorer-1.png": "cd8fd2df668b257d9799b362a25c68a2e6f99a7b9883b32c8fefcfdbcd036758",
+    "review/living-motion-restorer-2.png": "e00efec525f4ac26b828de5e326f49955a27b92e7e0c3fe9a853c88f51820901",
+    "review/living-motion-restorer-3.png": "7de9a504e175918a27d8e6c444f1895be096ddde563ed14e2fdc4fa2a2999382",
+    "review/living-sound-reel.wav": "d9e7ae6d80fd7abec26d6da8dbf221c9e0efe0d7a201d48a497cf87eb968c4e8",
+    "review/living-tests-initial.txt": "1b0a8e90c3c71c1231a0de8d07551f835dcea92395b476737dcb499e82d92938",
+    "review/living-tests.txt": "a623eb647d4377e48676d3b5deb4d5cd3a8ba19a5040b81bb5b15672b9ceca3a",
+    "review/living-town-03-construction-queue.png": "4bb9c384dd8f832bc66d0457d6b44f1c92526b6ac21c53184d36f186b331458e",
+    "review/living-town-04-working-village.png": "ec2d7e1f2a1fe2791d1eb46c6b6c98f8d5cf78f27df81653220f428f7fcf807a",
+    "review/living-town-05-mobile-projects.png": "ddfb331d96787d19764b1cffccbcb2338017abd0dccd63756f04ab849f5dbfb2",
+    "review/living-town-06-mobile-trade.png": "13530083f2a9bac8fd62fcfb5658856b595f9070d406e57feee27974b5a7507b",
+    "review/living-town-ui-report.json": "933a3fbfd35feea3f84db3c50a751030b29862c75aef47c037a4f592087bd335",
+    "review/living-traffic-report.json": "c8593afe50a1a84f76ada51e87f129ba223a3478fe8add32071ba174d4fc4a76",
+    "review/living-ui-01-fieldbook.png": "905a715936f701a7dd0aab91b1d0f64ad6482c06d1d6e1f7d72cfb39e030b1fc",
+    "review/living-ui-02-surveyor.png": "3d71775409781e3d7fba49801d2520797898c241cd6d417f109d35ca6a2e51f9",
+    "review/living-ui-03-report.png": "00d425bdfade72633708c19d18f23508281c6c813e4bb49dd8b443d9577d10a6",
+    "review/living-ui-04-restored.png": "4f2e5b138f7e99a326b8da99a652a7f1ea99b831717c22b0be0324d5f71d7699",
+    "review/living-ui-05-sound.png": "40ef4f3280b4c84da793c7efed1fc47579a48432a3c1c87db2c5a363e8a2acbd",
+    "review/living-ui-06-touch.png": "99ae5825ce74d67318ed793e40552e64fb3e3010899627580330b18fb411ea87",
+    "review/living-ui-07-laptop.png": "cd27ef6e8d40324cd5c87e27770ebd0ff4fa56833a7b5aab8407bf005c8d11d4",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "test/discovery.test.mjs": "3540d436fba1ac294398238c801d279ae4bca86a430554b319395eb76d97e414",
+    "test/frontier-integration.test.mjs": "79c13d596b4934043d95f2d42b27145587372d5079f951fc658adcb36ba14546",
+    "test/frontier.test.mjs": "bf84bca28d00d47614c462ed025009dad97d3a1cdda9d12f734a583797373e00",
+    "test/island.test.mjs": "274a68690165f5469e4a865734d106ad310384ffb99d64ae37de80ba430623c2",
+    "test/pressure.test.mjs": "7ca3fc814826553aad369170916a66c46fa6f62a438c3172d827c4b209cc108e",
+    "test/progression.test.mjs": "b8a0102c23c9d95830a3a6b9a98dd994df50b301533d6d2d73f01b2128d521ac",
+    "test/sim-placement.test.mjs": "ac65de0aedf0f7912be24978f348be577b00a9cd02ee4391eb5730b8b0c1c95a",
+    "test/sim-services.test.mjs": "bcc6e4f57f93b837ba215f70247c512ddf6f6525ea1420675884c2cc086eeb84",
+    "test/sim.test.mjs": "51b0ac05c6021e863b85e3c35176fdc33d6508deefaa5d65668ec9ed32ac1bb0",
+    "tools/create_living_assets.py": "b93f27dd27123ea868bf953b2d8b81ab5fd2e95c901be35efb75f236944508b0",
+    "tools/living-campaign.mjs": "da5f2ad9a3afa97813d59ee940fadcfe3ba54f4d4e1dc66be79255f694bf2448",
+    "tools/living-motion.mjs": "3e067cd1b297b904b0570f7db4a25cb49ed5227daf0977c3395960bb5dd872a4",
+    "tools/living-preview.mjs": "9029485a26ed9d1fd43828c380ad34f46ad7e1030a15ccbdd489b5632b7186c9",
+    "tools/living-review.mjs": "697a6fdba579e152d0d23fc3c2bf4c3ae4451aef7335c8f24a0ac400a9cffeda"
+  }
+}

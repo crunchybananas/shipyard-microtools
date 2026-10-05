@@ -1,0 +1,8545 @@
+{
+  "startedAt": "2026-10-02T04:25:31.645Z",
+  "scope": "Deterministic automated management using public simulation/progression actions from createGame. All resources, citizens, research and buildings are earned; no funded or unlocked fixtures. Simulated duration does not establish enjoyable human playtime or live renderer behavior.",
+  "sourceHashesAtStart": {
+    "js/sim.js": "31800f9145d6b83028613371426bb51fe9ac837d4f083e83277bd81cea933fa3",
+    "js/catalog.js": "16d2679ce196b9fe7df088e66166e5b71f612c3e4e18b9ac771b6a98d81ea07d",
+    "js/progression.js": "e77c08c68d832d958a831b759d43a015ed0a18fb5aad3e6f60f81d4e7e5e5995"
+  },
+  "actions": [
+    {
+      "time": 0,
+      "day": 1,
+      "type": "build",
+      "building": "cottage",
+      "id": "b1",
+      "x": -3,
+      "z": 2
+    },
+    {
+      "time": 0,
+      "day": 1,
+      "type": "accept-contract",
+      "id": "order-1-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 0,
+      "day": 1,
+      "type": "deliver-contract",
+      "id": "order-1-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 0,
+      "day": 1,
+      "type": "accept-contract",
+      "id": "order-1-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 0,
+      "day": 1,
+      "type": "deliver-contract",
+      "id": "order-1-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 5,
+      "day": 1,
+      "type": "build",
+      "building": "orchard",
+      "id": "b2",
+      "x": 3,
+      "z": 2
+    },
+    {
+      "time": 10,
+      "day": 1,
+      "type": "build",
+      "building": "lumber",
+      "id": "b3",
+      "x": -5,
+      "z": -2
+    },
+    {
+      "time": 20,
+      "day": 1,
+      "type": "build",
+      "building": "quarry",
+      "id": "b4",
+      "x": 6,
+      "z": -4
+    },
+    {
+      "time": 35,
+      "day": 1,
+      "type": "build",
+      "building": "garden",
+      "id": "b5",
+      "x": 3,
+      "z": 1
+    },
+    {
+      "time": 50,
+      "day": 1,
+      "type": "build",
+      "building": "cottage",
+      "id": "b6",
+      "x": -3,
+      "z": 1
+    },
+    {
+      "time": 90,
+      "day": 2,
+      "type": "build",
+      "building": "cottage",
+      "id": "b7",
+      "x": -2,
+      "z": 2
+    },
+    {
+      "time": 120,
+      "day": 2,
+      "type": "accept-contract",
+      "id": "order-2-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 120,
+      "day": 2,
+      "type": "deliver-contract",
+      "id": "order-2-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 120,
+      "day": 2,
+      "type": "research",
+      "id": "joinery"
+    },
+    {
+      "time": 210,
+      "day": 3,
+      "type": "accept-contract",
+      "id": "order-3-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 210,
+      "day": 3,
+      "type": "deliver-contract",
+      "id": "order-3-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 295,
+      "day": 4,
+      "type": "accept-contract",
+      "id": "order-4-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 295,
+      "day": 4,
+      "type": "deliver-contract",
+      "id": "order-4-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 335,
+      "day": 4,
+      "type": "build",
+      "building": "bell",
+      "id": "bell",
+      "x": 0,
+      "z": -5
+    },
+    {
+      "time": 410,
+      "day": 5,
+      "type": "build",
+      "building": "cottage",
+      "id": "b8",
+      "x": -3,
+      "z": 3
+    },
+    {
+      "time": 425,
+      "day": 5,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 440,
+      "day": 5,
+      "type": "build",
+      "building": "school",
+      "id": "b9",
+      "x": 1,
+      "z": -2
+    },
+    {
+      "time": 510,
+      "day": 6,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 515,
+      "day": 6,
+      "type": "build",
+      "building": "cottage",
+      "id": "b10",
+      "x": -4,
+      "z": 1
+    },
+    {
+      "time": 530,
+      "day": 6,
+      "type": "research",
+      "id": "cultivation"
+    },
+    {
+      "time": 580,
+      "day": 7,
+      "type": "build",
+      "building": "well",
+      "id": "b11",
+      "x": -2,
+      "z": 1
+    },
+    {
+      "time": 605,
+      "day": 7,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 610,
+      "day": 7,
+      "type": "build",
+      "building": "lumber",
+      "id": "b12",
+      "x": -5,
+      "z": -3
+    },
+    {
+      "time": 625,
+      "day": 7,
+      "type": "research",
+      "id": "barter"
+    },
+    {
+      "time": 630,
+      "day": 8,
+      "type": "build",
+      "building": "orchard",
+      "id": "b13",
+      "x": 2,
+      "z": 2
+    },
+    {
+      "time": 675,
+      "day": 8,
+      "type": "build",
+      "building": "cottage",
+      "id": "b14",
+      "x": -2,
+      "z": 3
+    },
+    {
+      "time": 675,
+      "day": 8,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 700,
+      "day": 8,
+      "type": "accept-contract",
+      "id": "order-8-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 700,
+      "day": 8,
+      "type": "deliver-contract",
+      "id": "order-8-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 720,
+      "day": 9,
+      "type": "build",
+      "building": "quarry",
+      "id": "b15",
+      "x": 6,
+      "z": -5
+    },
+    {
+      "time": 740,
+      "day": 9,
+      "type": "research",
+      "id": "civic_order"
+    },
+    {
+      "time": 750,
+      "day": 9,
+      "type": "build",
+      "building": "farm",
+      "id": "b16",
+      "x": 4,
+      "z": 2
+    },
+    {
+      "time": 765,
+      "day": 9,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 785,
+      "day": 9,
+      "type": "build",
+      "building": "sawmill",
+      "id": "b17",
+      "x": 1,
+      "z": -3
+    },
+    {
+      "time": 795,
+      "day": 9,
+      "type": "accept-contract",
+      "id": "order-9-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 795,
+      "day": 9,
+      "type": "deliver-contract",
+      "id": "order-9-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 810,
+      "day": 10,
+      "type": "build",
+      "building": "cottage",
+      "id": "b18",
+      "x": -3,
+      "z": 0
+    },
+    {
+      "time": 855,
+      "day": 10,
+      "type": "build",
+      "building": "orchard",
+      "id": "b19",
+      "x": 3,
+      "z": 3
+    },
+    {
+      "time": 865,
+      "day": 10,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 875,
+      "day": 10,
+      "type": "build",
+      "building": "school",
+      "id": "b20",
+      "x": 2,
+      "z": -2
+    },
+    {
+      "time": 885,
+      "day": 10,
+      "type": "accept-contract",
+      "id": "order-10-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 885,
+      "day": 10,
+      "type": "deliver-contract",
+      "id": "order-10-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 925,
+      "day": 11,
+      "type": "research",
+      "id": "textiles"
+    },
+    {
+      "time": 940,
+      "day": 11,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 955,
+      "day": 11,
+      "type": "accept-contract",
+      "id": "order-11-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 955,
+      "day": 11,
+      "type": "deliver-contract",
+      "id": "order-11-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 980,
+      "day": 11,
+      "type": "build",
+      "building": "flaxfield",
+      "id": "b21",
+      "x": 2,
+      "z": 1
+    },
+    {
+      "time": 980,
+      "day": 11,
+      "type": "accept-contract",
+      "id": "order-11-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 980,
+      "day": 11,
+      "type": "deliver-contract",
+      "id": "order-11-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 990,
+      "day": 12,
+      "type": "build",
+      "building": "market",
+      "id": "b22",
+      "x": 1,
+      "z": -1
+    },
+    {
+      "time": 1025,
+      "day": 12,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1025,
+      "day": 12,
+      "type": "accept-contract",
+      "id": "order-12-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 1025,
+      "day": 12,
+      "type": "deliver-contract",
+      "id": "order-12-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 13,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 1025,
+      "day": 12,
+      "type": "research",
+      "id": "milling"
+    },
+    {
+      "time": 1050,
+      "day": 12,
+      "type": "accept-contract",
+      "id": "order-12-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1050,
+      "day": 12,
+      "type": "deliver-contract",
+      "id": "order-12-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1080,
+      "day": 13,
+      "type": "build",
+      "building": "cottage",
+      "id": "b23",
+      "x": -1,
+      "z": 2
+    },
+    {
+      "time": 1110,
+      "day": 13,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1110,
+      "day": 13,
+      "type": "accept-contract",
+      "id": "order-13-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 1110,
+      "day": 13,
+      "type": "deliver-contract",
+      "id": "order-13-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 13,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 1110,
+      "day": 13,
+      "type": "research",
+      "id": "logistics"
+    },
+    {
+      "time": 1130,
+      "day": 13,
+      "type": "accept-contract",
+      "id": "order-13-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 1130,
+      "day": 13,
+      "type": "deliver-contract",
+      "id": "order-13-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 1170,
+      "day": 14,
+      "type": "build",
+      "building": "farm",
+      "id": "b24",
+      "x": 4,
+      "z": 1
+    },
+    {
+      "time": 1190,
+      "day": 14,
+      "type": "build",
+      "building": "sawmill",
+      "id": "b25",
+      "x": 2,
+      "z": -3
+    },
+    {
+      "time": 1195,
+      "day": 14,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1220,
+      "day": 14,
+      "type": "accept-contract",
+      "id": "order-14-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1220,
+      "day": 14,
+      "type": "deliver-contract",
+      "id": "order-14-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1235,
+      "day": 14,
+      "type": "research",
+      "id": "metallurgy"
+    },
+    {
+      "time": 1260,
+      "day": 15,
+      "type": "build",
+      "building": "cottage",
+      "id": "b26",
+      "x": -3,
+      "z": 4
+    },
+    {
+      "time": 1265,
+      "day": 15,
+      "type": "build",
+      "building": "flaxfield",
+      "id": "b27",
+      "x": 2,
+      "z": 3
+    },
+    {
+      "time": 1290,
+      "day": 15,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1295,
+      "day": 15,
+      "type": "build",
+      "building": "windmill",
+      "id": "b28",
+      "x": 4,
+      "z": 3
+    },
+    {
+      "time": 1315,
+      "day": 15,
+      "type": "accept-contract",
+      "id": "order-15-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1315,
+      "day": 15,
+      "type": "deliver-contract",
+      "id": "order-15-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1335,
+      "day": 15,
+      "type": "accept-contract",
+      "id": "order-15-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 1335,
+      "day": 15,
+      "type": "deliver-contract",
+      "id": "order-15-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 1385,
+      "day": 16,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1400,
+      "day": 16,
+      "type": "accept-contract",
+      "id": "order-16-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 1400,
+      "day": 16,
+      "type": "deliver-contract",
+      "id": "order-16-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 1435,
+      "day": 16,
+      "type": "build",
+      "building": "bakery",
+      "id": "b29",
+      "x": 3,
+      "z": 0
+    },
+    {
+      "time": 1440,
+      "day": 17,
+      "type": "build",
+      "building": "orchard",
+      "id": "b30",
+      "x": 1,
+      "z": 2
+    },
+    {
+      "time": 1460,
+      "day": 17,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1470,
+      "day": 17,
+      "type": "accept-contract",
+      "id": "order-17-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1470,
+      "day": 17,
+      "type": "deliver-contract",
+      "id": "order-17-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1515,
+      "day": 17,
+      "type": "build",
+      "building": "weaver",
+      "id": "b31",
+      "x": 2,
+      "z": -1
+    },
+    {
+      "time": 1530,
+      "day": 18,
+      "type": "build",
+      "building": "cottage",
+      "id": "b32",
+      "x": -4,
+      "z": 0
+    },
+    {
+      "time": 1530,
+      "day": 18,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1530,
+      "day": 18,
+      "type": "accept-contract",
+      "id": "order-18-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1530,
+      "day": 18,
+      "type": "deliver-contract",
+      "id": "order-18-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1530,
+      "day": 18,
+      "type": "accept-contract",
+      "id": "order-18-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 1530,
+      "day": 18,
+      "type": "deliver-contract",
+      "id": "order-18-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 1595,
+      "day": 18,
+      "type": "accept-contract",
+      "id": "order-18-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 1595,
+      "day": 18,
+      "type": "deliver-contract",
+      "id": "order-18-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 13,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 1620,
+      "day": 19,
+      "type": "build",
+      "building": "school",
+      "id": "b33",
+      "x": 1,
+      "z": -4
+    },
+    {
+      "time": 1620,
+      "day": 19,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1650,
+      "day": 19,
+      "type": "accept-contract",
+      "id": "order-19-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 1650,
+      "day": 19,
+      "type": "deliver-contract",
+      "id": "order-19-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 1710,
+      "day": 20,
+      "type": "build",
+      "building": "cottage",
+      "id": "b34",
+      "x": -2,
+      "z": 0
+    },
+    {
+      "time": 1710,
+      "day": 20,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1710,
+      "day": 20,
+      "type": "accept-contract",
+      "id": "order-20-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1710,
+      "day": 20,
+      "type": "deliver-contract",
+      "id": "order-20-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1715,
+      "day": 20,
+      "type": "build",
+      "building": "well",
+      "id": "b35",
+      "x": -1,
+      "z": 1
+    },
+    {
+      "time": 1755,
+      "day": 20,
+      "type": "build",
+      "building": "market",
+      "id": "b36",
+      "x": -1,
+      "z": -2
+    },
+    {
+      "time": 1800,
+      "day": 21,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1800,
+      "day": 21,
+      "type": "accept-contract",
+      "id": "order-21-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1800,
+      "day": 21,
+      "type": "deliver-contract",
+      "id": "order-21-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1800,
+      "day": 21,
+      "type": "accept-contract",
+      "id": "order-21-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 1800,
+      "day": 21,
+      "type": "deliver-contract",
+      "id": "order-21-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 13,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 1810,
+      "day": 21,
+      "type": "accept-contract",
+      "id": "order-21-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 1810,
+      "day": 21,
+      "type": "deliver-contract",
+      "id": "order-21-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 1890,
+      "day": 22,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1890,
+      "day": 22,
+      "type": "accept-contract",
+      "id": "order-22-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 1890,
+      "day": 22,
+      "type": "deliver-contract",
+      "id": "order-22-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 1910,
+      "day": 22,
+      "type": "build",
+      "building": "mine",
+      "id": "b37",
+      "x": 5,
+      "z": -4
+    },
+    {
+      "time": 1980,
+      "day": 23,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 1980,
+      "day": 23,
+      "type": "accept-contract",
+      "id": "order-23-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 1980,
+      "day": 23,
+      "type": "deliver-contract",
+      "id": "order-23-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 1995,
+      "day": 23,
+      "type": "accept-contract",
+      "id": "order-23-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 1995,
+      "day": 23,
+      "type": "deliver-contract",
+      "id": "order-23-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 29,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 2010,
+      "day": 23,
+      "type": "build",
+      "building": "weaver",
+      "id": "b38",
+      "x": 3,
+      "z": -2
+    },
+    {
+      "time": 2070,
+      "day": 24,
+      "type": "build",
+      "building": "mine",
+      "id": "b39",
+      "x": 7,
+      "z": -4
+    },
+    {
+      "time": 2070,
+      "day": 24,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 2070,
+      "day": 24,
+      "type": "accept-contract",
+      "id": "order-24-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 2070,
+      "day": 24,
+      "type": "deliver-contract",
+      "id": "order-24-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 2070,
+      "day": 24,
+      "type": "accept-contract",
+      "id": "order-24-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 2070,
+      "day": 24,
+      "type": "deliver-contract",
+      "id": "order-24-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 13,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 2105,
+      "day": 24,
+      "type": "accept-contract",
+      "id": "order-24-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 2105,
+      "day": 24,
+      "type": "deliver-contract",
+      "id": "order-24-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 2160,
+      "day": 25,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 2160,
+      "day": 25,
+      "type": "accept-contract",
+      "id": "order-25-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 2160,
+      "day": 25,
+      "type": "deliver-contract",
+      "id": "order-25-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 2160,
+      "day": 25,
+      "type": "accept-contract",
+      "id": "order-25-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 2160,
+      "day": 25,
+      "type": "deliver-contract",
+      "id": "order-25-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 29,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 2225,
+      "day": 25,
+      "type": "build",
+      "building": "smith",
+      "id": "b40",
+      "x": 1,
+      "z": 0
+    },
+    {
+      "time": 2250,
+      "day": 26,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 2250,
+      "day": 26,
+      "type": "accept-contract",
+      "id": "order-26-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 2250,
+      "day": 26,
+      "type": "deliver-contract",
+      "id": "order-26-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 29,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 2250,
+      "day": 26,
+      "type": "accept-contract",
+      "id": "order-26-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 2250,
+      "day": 26,
+      "type": "deliver-contract",
+      "id": "order-26-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 2290,
+      "day": 26,
+      "type": "build",
+      "building": "smith",
+      "id": "b41",
+      "x": 2,
+      "z": -4
+    },
+    {
+      "time": 2340,
+      "day": 27,
+      "type": "accept-contract",
+      "id": "order-27-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 2340,
+      "day": 27,
+      "type": "deliver-contract",
+      "id": "order-27-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 2340,
+      "day": 27,
+      "type": "accept-contract",
+      "id": "order-27-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 2340,
+      "day": 27,
+      "type": "deliver-contract",
+      "id": "order-27-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 13,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 2340,
+      "day": 27,
+      "type": "accept-contract",
+      "id": "order-27-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 2340,
+      "day": 27,
+      "type": "deliver-contract",
+      "id": "order-27-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 2345,
+      "day": 27,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 2385,
+      "day": 27,
+      "type": "build",
+      "building": "toolmaker",
+      "id": "b42",
+      "x": -1,
+      "z": -3
+    },
+    {
+      "time": 2430,
+      "day": 28,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 12
+    },
+    {
+      "time": 2430,
+      "day": 28,
+      "type": "accept-contract",
+      "id": "order-28-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 2430,
+      "day": 28,
+      "type": "deliver-contract",
+      "id": "order-28-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 8,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 2430,
+      "day": 28,
+      "type": "accept-contract",
+      "id": "order-28-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 2430,
+      "day": 28,
+      "type": "deliver-contract",
+      "id": "order-28-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 29,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 2480,
+      "day": 28,
+      "type": "build",
+      "building": "toolmaker",
+      "id": "b43",
+      "x": 3,
+      "z": -3
+    },
+    {
+      "time": 2520,
+      "day": 29,
+      "type": "accept-contract",
+      "id": "order-29-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 2520,
+      "day": 29,
+      "type": "deliver-contract",
+      "id": "order-29-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 29,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 2520,
+      "day": 29,
+      "type": "accept-contract",
+      "id": "order-29-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 2520,
+      "day": 29,
+      "type": "deliver-contract",
+      "id": "order-29-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 8,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 2520,
+      "day": 29,
+      "type": "research",
+      "id": "coastal_routes"
+    },
+    {
+      "time": 2580,
+      "day": 29,
+      "type": "build",
+      "building": "chapel",
+      "id": "b44",
+      "x": -1,
+      "z": 3
+    },
+    {
+      "time": 2580,
+      "day": 29,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 32
+    },
+    {
+      "time": 2610,
+      "day": 30,
+      "type": "accept-contract",
+      "id": "order-30-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 2610,
+      "day": 30,
+      "type": "deliver-contract",
+      "id": "order-30-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 2610,
+      "day": 30,
+      "type": "accept-contract",
+      "id": "order-30-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 2610,
+      "day": 30,
+      "type": "deliver-contract",
+      "id": "order-30-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 2610,
+      "day": 30,
+      "type": "accept-contract",
+      "id": "order-30-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 2610,
+      "day": 30,
+      "type": "deliver-contract",
+      "id": "order-30-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 2610,
+      "day": 30,
+      "type": "research",
+      "id": "watchkeeping"
+    },
+    {
+      "time": 2615,
+      "day": 30,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 2695,
+      "day": 30,
+      "type": "research",
+      "id": "brewing"
+    },
+    {
+      "time": 2700,
+      "day": 31,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 2700,
+      "day": 31,
+      "type": "accept-contract",
+      "id": "order-31-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 2700,
+      "day": 31,
+      "type": "deliver-contract",
+      "id": "order-31-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 2700,
+      "day": 31,
+      "type": "accept-contract",
+      "id": "order-31-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 2700,
+      "day": 31,
+      "type": "deliver-contract",
+      "id": "order-31-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 2710,
+      "day": 31,
+      "type": "build",
+      "building": "warehouse",
+      "id": "b45",
+      "x": -1,
+      "z": -1
+    },
+    {
+      "time": 2790,
+      "day": 32,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 2790,
+      "day": 32,
+      "type": "accept-contract",
+      "id": "order-32-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 2790,
+      "day": 32,
+      "type": "deliver-contract",
+      "id": "order-32-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 2790,
+      "day": 32,
+      "type": "accept-contract",
+      "id": "order-32-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 2790,
+      "day": 32,
+      "type": "deliver-contract",
+      "id": "order-32-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 2795,
+      "day": 32,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 35
+    },
+    {
+      "time": 2805,
+      "day": 32,
+      "type": "research",
+      "id": "public_health"
+    },
+    {
+      "time": 2840,
+      "day": 32,
+      "type": "build",
+      "building": "brewery",
+      "id": "b46",
+      "x": -2,
+      "z": 4
+    },
+    {
+      "time": 2880,
+      "day": 33,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 2880,
+      "day": 33,
+      "type": "accept-contract",
+      "id": "order-33-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 2880,
+      "day": 33,
+      "type": "deliver-contract",
+      "id": "order-33-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 2945,
+      "day": 33,
+      "type": "research",
+      "id": "mastercraft"
+    },
+    {
+      "time": 2970,
+      "day": 34,
+      "type": "accept-contract",
+      "id": "order-34-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 2970,
+      "day": 34,
+      "type": "deliver-contract",
+      "id": "order-34-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 2970,
+      "day": 34,
+      "type": "upgrade",
+      "id": "b1",
+      "building": "cottage",
+      "level": 2
+    },
+    {
+      "time": 3030,
+      "day": 34,
+      "type": "build",
+      "building": "clinic",
+      "id": "b47",
+      "x": -1,
+      "z": 0
+    },
+    {
+      "time": 3060,
+      "day": 35,
+      "type": "accept-contract",
+      "id": "order-35-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 3060,
+      "day": 35,
+      "type": "deliver-contract",
+      "id": "order-35-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 3060,
+      "day": 35,
+      "type": "accept-contract",
+      "id": "order-35-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 3060,
+      "day": 35,
+      "type": "deliver-contract",
+      "id": "order-35-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 3060,
+      "day": 35,
+      "type": "accept-contract",
+      "id": "order-35-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 3060,
+      "day": 35,
+      "type": "deliver-contract",
+      "id": "order-35-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 3065,
+      "day": 35,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3115,
+      "day": 35,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 38
+    },
+    {
+      "time": 3145,
+      "day": 35,
+      "type": "build",
+      "building": "barracks",
+      "id": "b48",
+      "x": 3,
+      "z": -1
+    },
+    {
+      "time": 3150,
+      "day": 36,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3150,
+      "day": 36,
+      "type": "accept-contract",
+      "id": "order-36-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 3150,
+      "day": 36,
+      "type": "deliver-contract",
+      "id": "order-36-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 3150,
+      "day": 36,
+      "type": "accept-contract",
+      "id": "order-36-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 3150,
+      "day": 36,
+      "type": "deliver-contract",
+      "id": "order-36-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 3240,
+      "day": 37,
+      "type": "accept-contract",
+      "id": "order-37-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 3240,
+      "day": 37,
+      "type": "deliver-contract",
+      "id": "order-37-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 3255,
+      "day": 37,
+      "type": "build",
+      "building": "barracks",
+      "id": "b49",
+      "x": 2,
+      "z": 0
+    },
+    {
+      "time": 3330,
+      "day": 38,
+      "type": "accept-contract",
+      "id": "order-38-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 3330,
+      "day": 38,
+      "type": "deliver-contract",
+      "id": "order-38-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 3330,
+      "day": 38,
+      "type": "accept-contract",
+      "id": "order-38-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 3330,
+      "day": 38,
+      "type": "deliver-contract",
+      "id": "order-38-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 3335,
+      "day": 38,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3335,
+      "day": 38,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 41
+    },
+    {
+      "time": 3405,
+      "day": 38,
+      "type": "research",
+      "id": "town_charter"
+    },
+    {
+      "time": 3420,
+      "day": 39,
+      "type": "accept-contract",
+      "id": "order-39-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 3420,
+      "day": 39,
+      "type": "deliver-contract",
+      "id": "order-39-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 3420,
+      "day": 39,
+      "type": "accept-contract",
+      "id": "order-39-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 3420,
+      "day": 39,
+      "type": "deliver-contract",
+      "id": "order-39-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 3425,
+      "day": 39,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3425,
+      "day": 39,
+      "type": "accept-contract",
+      "id": "order-39-boards",
+      "title": "Weatherproof the boathouse"
+    },
+    {
+      "time": 3425,
+      "day": 39,
+      "type": "deliver-contract",
+      "id": "order-39-boards",
+      "title": "Weatherproof the boathouse",
+      "reward": {
+        "gold": 28,
+        "knowledge": 10
+      }
+    },
+    {
+      "time": 3475,
+      "day": 39,
+      "type": "charter",
+      "id": "breadbasket"
+    },
+    {
+      "time": 3510,
+      "day": 40,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3510,
+      "day": 40,
+      "type": "accept-contract",
+      "id": "order-40-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 3510,
+      "day": 40,
+      "type": "deliver-contract",
+      "id": "order-40-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 3510,
+      "day": 40,
+      "type": "accept-contract",
+      "id": "order-40-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 3510,
+      "day": 40,
+      "type": "deliver-contract",
+      "id": "order-40-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 3510,
+      "day": 40,
+      "type": "accept-contract",
+      "id": "order-40-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 3510,
+      "day": 40,
+      "type": "deliver-contract",
+      "id": "order-40-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 3575,
+      "day": 40,
+      "type": "research",
+      "id": "navigation"
+    },
+    {
+      "time": 3600,
+      "day": 41,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3600,
+      "day": 41,
+      "type": "accept-contract",
+      "id": "order-41-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 3600,
+      "day": 41,
+      "type": "deliver-contract",
+      "id": "order-41-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 3600,
+      "day": 41,
+      "type": "accept-contract",
+      "id": "order-41-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 3600,
+      "day": 41,
+      "type": "deliver-contract",
+      "id": "order-41-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 3605,
+      "day": 41,
+      "type": "accept-contract",
+      "id": "order-41-boards",
+      "title": "Weatherproof the boathouse"
+    },
+    {
+      "time": 3605,
+      "day": 41,
+      "type": "deliver-contract",
+      "id": "order-41-boards",
+      "title": "Weatherproof the boathouse",
+      "reward": {
+        "gold": 28,
+        "knowledge": 10
+      }
+    },
+    {
+      "time": 3625,
+      "day": 41,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 44
+    },
+    {
+      "time": 3690,
+      "day": 42,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3690,
+      "day": 42,
+      "type": "accept-contract",
+      "id": "order-42-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 3690,
+      "day": 42,
+      "type": "deliver-contract",
+      "id": "order-42-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 3690,
+      "day": 42,
+      "type": "accept-contract",
+      "id": "order-42-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 3690,
+      "day": 42,
+      "type": "deliver-contract",
+      "id": "order-42-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 3780,
+      "day": 43,
+      "type": "accept-contract",
+      "id": "order-43-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 3780,
+      "day": 43,
+      "type": "deliver-contract",
+      "id": "order-43-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 3785,
+      "day": 43,
+      "type": "accept-contract",
+      "id": "order-43-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 3785,
+      "day": 43,
+      "type": "deliver-contract",
+      "id": "order-43-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 3845,
+      "day": 43,
+      "type": "route",
+      "id": "stonehaven",
+      "returnDay": 47
+    },
+    {
+      "time": 3870,
+      "day": 44,
+      "type": "accept-contract",
+      "id": "order-44-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 3870,
+      "day": 44,
+      "type": "deliver-contract",
+      "id": "order-44-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 3870,
+      "day": 44,
+      "type": "accept-contract",
+      "id": "order-44-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 3870,
+      "day": 44,
+      "type": "deliver-contract",
+      "id": "order-44-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 3870,
+      "day": 44,
+      "type": "accept-contract",
+      "id": "order-44-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 3870,
+      "day": 44,
+      "type": "deliver-contract",
+      "id": "order-44-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 3875,
+      "day": 44,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3890,
+      "day": 44,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 47
+    },
+    {
+      "time": 3960,
+      "day": 45,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 3960,
+      "day": 45,
+      "type": "accept-contract",
+      "id": "order-45-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 3960,
+      "day": 45,
+      "type": "deliver-contract",
+      "id": "order-45-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 3960,
+      "day": 45,
+      "type": "accept-contract",
+      "id": "order-45-boards",
+      "title": "Weatherproof the boathouse"
+    },
+    {
+      "time": 3960,
+      "day": 45,
+      "type": "deliver-contract",
+      "id": "order-45-boards",
+      "title": "Weatherproof the boathouse",
+      "reward": {
+        "gold": 28,
+        "knowledge": 10
+      }
+    },
+    {
+      "time": 3960,
+      "day": 45,
+      "type": "accept-contract",
+      "id": "order-45-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 3960,
+      "day": 45,
+      "type": "deliver-contract",
+      "id": "order-45-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 3995,
+      "day": 45,
+      "type": "route",
+      "id": "lantern_isles",
+      "returnDay": 51
+    },
+    {
+      "time": 4050,
+      "day": 46,
+      "type": "build",
+      "building": "orchard",
+      "id": "b50",
+      "x": 5,
+      "z": 2
+    },
+    {
+      "time": 4050,
+      "day": 46,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4055,
+      "day": 46,
+      "type": "build",
+      "building": "manor",
+      "id": "b51",
+      "x": -1,
+      "z": -4
+    },
+    {
+      "time": 4140,
+      "day": 47,
+      "type": "accept-contract",
+      "id": "order-47-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 4140,
+      "day": 47,
+      "type": "deliver-contract",
+      "id": "order-47-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 4140,
+      "day": 47,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 50
+    },
+    {
+      "time": 4210,
+      "day": 47,
+      "type": "accept-contract",
+      "id": "order-47-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 4210,
+      "day": 47,
+      "type": "deliver-contract",
+      "id": "order-47-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 4230,
+      "day": 48,
+      "type": "accept-contract",
+      "id": "order-48-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 4230,
+      "day": 48,
+      "type": "deliver-contract",
+      "id": "order-48-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 4230,
+      "day": 48,
+      "type": "accept-contract",
+      "id": "order-48-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 4230,
+      "day": 48,
+      "type": "deliver-contract",
+      "id": "order-48-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 4230,
+      "day": 48,
+      "type": "accept-contract",
+      "id": "order-48-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 4230,
+      "day": 48,
+      "type": "deliver-contract",
+      "id": "order-48-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 4235,
+      "day": 48,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4305,
+      "day": 48,
+      "type": "upgrade",
+      "id": "b6",
+      "building": "cottage",
+      "level": 2
+    },
+    {
+      "time": 4320,
+      "day": 49,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4320,
+      "day": 49,
+      "type": "accept-contract",
+      "id": "order-49-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 4320,
+      "day": 49,
+      "type": "deliver-contract",
+      "id": "order-49-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 4340,
+      "day": 49,
+      "type": "accept-contract",
+      "id": "order-49-boards",
+      "title": "Weatherproof the boathouse"
+    },
+    {
+      "time": 4340,
+      "day": 49,
+      "type": "deliver-contract",
+      "id": "order-49-boards",
+      "title": "Weatherproof the boathouse",
+      "reward": {
+        "gold": 28,
+        "knowledge": 10
+      }
+    },
+    {
+      "time": 4340,
+      "day": 49,
+      "type": "accept-contract",
+      "id": "order-49-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 4340,
+      "day": 49,
+      "type": "deliver-contract",
+      "id": "order-49-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 4410,
+      "day": 50,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4410,
+      "day": 50,
+      "type": "accept-contract",
+      "id": "order-50-ironwork",
+      "title": "Hinges, axes, and good iron"
+    },
+    {
+      "time": 4410,
+      "day": 50,
+      "type": "deliver-contract",
+      "id": "order-50-ironwork",
+      "title": "Hinges, axes, and good iron",
+      "reward": {
+        "gold": 55,
+        "knowledge": 18
+      }
+    },
+    {
+      "time": 4410,
+      "day": 50,
+      "type": "accept-contract",
+      "id": "order-50-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 4410,
+      "day": 50,
+      "type": "deliver-contract",
+      "id": "order-50-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 4435,
+      "day": 50,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 53
+    },
+    {
+      "time": 4500,
+      "day": 51,
+      "type": "build",
+      "building": "orchard",
+      "id": "b52",
+      "x": 3,
+      "z": 4
+    },
+    {
+      "time": 4500,
+      "day": 51,
+      "type": "accept-contract",
+      "id": "order-51-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 4500,
+      "day": 51,
+      "type": "deliver-contract",
+      "id": "order-51-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 4505,
+      "day": 51,
+      "type": "build",
+      "building": "warehouse",
+      "id": "b53",
+      "x": 3,
+      "z": -4
+    },
+    {
+      "time": 4515,
+      "day": 51,
+      "type": "accept-contract",
+      "id": "order-51-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 4515,
+      "day": 51,
+      "type": "deliver-contract",
+      "id": "order-51-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 4590,
+      "day": 52,
+      "type": "accept-contract",
+      "id": "order-52-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 4590,
+      "day": 52,
+      "type": "deliver-contract",
+      "id": "order-52-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 4590,
+      "day": 52,
+      "type": "accept-contract",
+      "id": "order-52-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 4590,
+      "day": 52,
+      "type": "deliver-contract",
+      "id": "order-52-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 4590,
+      "day": 52,
+      "type": "accept-contract",
+      "id": "order-52-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 4590,
+      "day": 52,
+      "type": "deliver-contract",
+      "id": "order-52-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 4595,
+      "day": 52,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4655,
+      "day": 52,
+      "type": "upgrade",
+      "id": "b7",
+      "building": "cottage",
+      "level": 2
+    },
+    {
+      "time": 4680,
+      "day": 53,
+      "type": "build",
+      "building": "clinic",
+      "id": "b54",
+      "x": -1,
+      "z": 4
+    },
+    {
+      "time": 4680,
+      "day": 53,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4680,
+      "day": 53,
+      "type": "accept-contract",
+      "id": "order-53-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 4680,
+      "day": 53,
+      "type": "deliver-contract",
+      "id": "order-53-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 4680,
+      "day": 53,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 56
+    },
+    {
+      "time": 4765,
+      "day": 53,
+      "type": "accept-contract",
+      "id": "order-53-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 4765,
+      "day": 53,
+      "type": "deliver-contract",
+      "id": "order-53-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 4770,
+      "day": 54,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4770,
+      "day": 54,
+      "type": "accept-contract",
+      "id": "order-54-ironwork",
+      "title": "Hinges, axes, and good iron"
+    },
+    {
+      "time": 4770,
+      "day": 54,
+      "type": "deliver-contract",
+      "id": "order-54-ironwork",
+      "title": "Hinges, axes, and good iron",
+      "reward": {
+        "gold": 55,
+        "knowledge": 18
+      }
+    },
+    {
+      "time": 4830,
+      "day": 54,
+      "type": "accept-contract",
+      "id": "order-54-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 4830,
+      "day": 54,
+      "type": "deliver-contract",
+      "id": "order-54-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 4860,
+      "day": 55,
+      "type": "accept-contract",
+      "id": "order-55-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 4860,
+      "day": 55,
+      "type": "deliver-contract",
+      "id": "order-55-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 4870,
+      "day": 55,
+      "type": "upgrade",
+      "id": "b8",
+      "building": "cottage",
+      "level": 2
+    },
+    {
+      "time": 4915,
+      "day": 55,
+      "type": "accept-contract",
+      "id": "order-55-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 4915,
+      "day": 55,
+      "type": "deliver-contract",
+      "id": "order-55-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 4950,
+      "day": 56,
+      "type": "build",
+      "building": "barracks",
+      "id": "b55",
+      "x": 1,
+      "z": -5
+    },
+    {
+      "time": 4950,
+      "day": 56,
+      "type": "accept-contract",
+      "id": "order-56-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 4950,
+      "day": 56,
+      "type": "deliver-contract",
+      "id": "order-56-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 4950,
+      "day": 56,
+      "type": "accept-contract",
+      "id": "order-56-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 4950,
+      "day": 56,
+      "type": "deliver-contract",
+      "id": "order-56-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 4950,
+      "day": 56,
+      "type": "accept-contract",
+      "id": "order-56-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 4950,
+      "day": 56,
+      "type": "deliver-contract",
+      "id": "order-56-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 4955,
+      "day": 56,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 4960,
+      "day": 56,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 59
+    },
+    {
+      "time": 4980,
+      "day": 56,
+      "type": "build",
+      "building": "barracks",
+      "id": "b56",
+      "x": -2,
+      "z": -2
+    },
+    {
+      "time": 5040,
+      "day": 57,
+      "type": "build",
+      "building": "cottage",
+      "id": "b57",
+      "x": -3,
+      "z": -1
+    },
+    {
+      "time": 5040,
+      "day": 57,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 5040,
+      "day": 57,
+      "type": "accept-contract",
+      "id": "order-57-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 5040,
+      "day": 57,
+      "type": "deliver-contract",
+      "id": "order-57-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 5110,
+      "day": 57,
+      "type": "accept-contract",
+      "id": "order-57-linen",
+      "title": "Linen for the guesthouse"
+    },
+    {
+      "time": 5110,
+      "day": 57,
+      "type": "deliver-contract",
+      "id": "order-57-linen",
+      "title": "Linen for the guesthouse",
+      "reward": {
+        "gold": 32,
+        "knowledge": 12
+      }
+    },
+    {
+      "time": 5130,
+      "day": 58,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 5130,
+      "day": 58,
+      "type": "accept-contract",
+      "id": "order-58-ironwork",
+      "title": "Hinges, axes, and good iron"
+    },
+    {
+      "time": 5130,
+      "day": 58,
+      "type": "deliver-contract",
+      "id": "order-58-ironwork",
+      "title": "Hinges, axes, and good iron",
+      "reward": {
+        "gold": 55,
+        "knowledge": 18
+      }
+    },
+    {
+      "time": 5175,
+      "day": 58,
+      "type": "accept-contract",
+      "id": "order-58-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 5175,
+      "day": 58,
+      "type": "deliver-contract",
+      "id": "order-58-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 5220,
+      "day": 59,
+      "type": "build",
+      "building": "cottage",
+      "id": "b58",
+      "x": -3,
+      "z": 5
+    },
+    {
+      "time": 5220,
+      "day": 59,
+      "type": "accept-contract",
+      "id": "order-59-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 5220,
+      "day": 59,
+      "type": "deliver-contract",
+      "id": "order-59-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 5220,
+      "day": 59,
+      "type": "route",
+      "id": "reedbank",
+      "returnDay": 62
+    },
+    {
+      "time": 5245,
+      "day": 59,
+      "type": "upgrade",
+      "id": "b17",
+      "building": "sawmill",
+      "level": 2
+    },
+    {
+      "time": 5305,
+      "day": 59,
+      "type": "accept-contract",
+      "id": "order-59-gathering",
+      "title": "A coastwide gathering"
+    },
+    {
+      "time": 5305,
+      "day": 59,
+      "type": "deliver-contract",
+      "id": "order-59-gathering",
+      "title": "A coastwide gathering",
+      "reward": {
+        "gold": 83,
+        "knowledge": 24
+      }
+    },
+    {
+      "time": 5310,
+      "day": 60,
+      "type": "accept-contract",
+      "id": "order-60-pantry",
+      "title": "Supper for the ferry crew"
+    },
+    {
+      "time": 5310,
+      "day": 60,
+      "type": "deliver-contract",
+      "id": "order-60-pantry",
+      "title": "Supper for the ferry crew",
+      "reward": {
+        "gold": 9,
+        "knowledge": 4
+      }
+    },
+    {
+      "time": 5310,
+      "day": 60,
+      "type": "accept-contract",
+      "id": "order-60-repairs",
+      "title": "Mend the neighboring jetty"
+    },
+    {
+      "time": 5310,
+      "day": 60,
+      "type": "deliver-contract",
+      "id": "order-60-repairs",
+      "title": "Mend the neighboring jetty",
+      "reward": {
+        "gold": 14,
+        "knowledge": 6
+      }
+    },
+    {
+      "time": 5310,
+      "day": 60,
+      "type": "upgrade",
+      "id": "b25",
+      "building": "sawmill",
+      "level": 2
+    },
+    {
+      "time": 5315,
+      "day": 60,
+      "type": "landing-exchange",
+      "resource": "wood",
+      "cost": 12,
+      "amount": 13
+    },
+    {
+      "time": 5320,
+      "day": 60,
+      "type": "accept-contract",
+      "id": "order-60-provisions",
+      "title": "A basket and a bundle"
+    },
+    {
+      "time": 5320,
+      "day": 60,
+      "type": "deliver-contract",
+      "id": "order-60-provisions",
+      "title": "A basket and a bundle",
+      "reward": {
+        "gold": 9,
+        "knowledge": 5
+      }
+    },
+    {
+      "time": 5375,
+      "day": 60,
+      "type": "upgrade",
+      "id": "b10",
+      "building": "cottage",
+      "level": 2
+    }
+  ],
+  "staffingChanges": 4252,
+  "milestones": {
+    "firstBell": {
+      "day": 5,
+      "elapsedSeconds": 365,
+      "population": 14,
+      "morale": 75.535519,
+      "housing": 18,
+      "workforce": {
+        "builders": 0,
+        "employed": 9,
+        "idle": 5
+      },
+      "resources": {
+        "wood": 6.63,
+        "stone": 8.62,
+        "food": 24.17,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 70,
+        "knowledge": 9
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 3,
+        "orchard": 1,
+        "lumber": 1,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1
+      },
+      "research": [],
+      "activeResearch": "joinery",
+      "upgrades": 0,
+      "contracts": 5,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 38.167006,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn.",
+      "macroActions": 19
+    },
+    "twentyCitizens": {
+      "day": 8,
+      "elapsedSeconds": 630,
+      "population": 20,
+      "morale": 76.897067,
+      "housing": 26,
+      "workforce": {
+        "builders": 0,
+        "employed": 13,
+        "idle": 7
+      },
+      "resources": {
+        "wood": 29.03,
+        "stone": 4.27,
+        "food": 23.49,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 70,
+        "knowledge": 0.73
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 5,
+        "orchard": 1,
+        "lumber": 2,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1,
+        "school": 1,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation"
+      ],
+      "activeResearch": "barter",
+      "upgrades": 0,
+      "contracts": 5,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 47.489318999999995,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn.",
+      "macroActions": 29
+    },
+    "fortyCitizens": {
+      "day": 20,
+      "elapsedSeconds": 1710,
+      "population": 40,
+      "morale": 81.955425,
+      "housing": 46,
+      "workforce": {
+        "builders": 0,
+        "employed": 22,
+        "idle": 18
+      },
+      "resources": {
+        "wood": 36.87,
+        "stone": 108.94,
+        "food": 100.25,
+        "grain": 90,
+        "flour": 63.26,
+        "planks": 3.72,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 64.63,
+        "cloth": 9.18,
+        "ale": 0,
+        "gold": 212.27,
+        "knowledge": 114.11
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 10,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "weaver": 1,
+        "market": 1,
+        "school": 3,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 23,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 57.184775,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens.",
+      "macroActions": 103
+    },
+    "firstVoyageReturn": {
+      "day": 32,
+      "elapsedSeconds": 2790,
+      "population": 40,
+      "morale": 85.626622,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 33,
+        "idle": 7
+      },
+      "resources": {
+        "wood": 47.02,
+        "stone": 131.7,
+        "food": 112.66,
+        "grain": 92.54,
+        "flour": 65.03,
+        "planks": 12.28,
+        "ore": 89.56,
+        "iron": 14.05,
+        "tools": 5.29,
+        "flax": 64.49,
+        "cloth": 21.41,
+        "ale": 0,
+        "gold": 616.1,
+        "knowledge": 448.22
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "chapel": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 49,
+      "voyages": 1,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 73.29382100000001,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens.",
+      "macroActions": 182
+    },
+    "firstUpgrade": {
+      "day": 34,
+      "elapsedSeconds": 2985,
+      "population": 40,
+      "morale": 84.214748,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 58.46,
+        "stone": 129.38,
+        "food": 121.04,
+        "grain": 89.99,
+        "flour": 64.13,
+        "planks": 11.11,
+        "ore": 90.2,
+        "iron": 14.43,
+        "tools": 2.22,
+        "flax": 64.45,
+        "cloth": 21.5,
+        "ale": 5,
+        "gold": 636.02,
+        "knowledge": 418.53
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "chapel": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health"
+      ],
+      "activeResearch": "mastercraft",
+      "upgrades": 1,
+      "contracts": 53,
+      "voyages": 1,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 69.221075,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens.",
+      "macroActions": 197
+    },
+    "charter": {
+      "day": 39,
+      "elapsedSeconds": 3480,
+      "population": 40,
+      "morale": 83.425596,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 38.29,
+        "stone": 132.71,
+        "food": 141.12,
+        "grain": 91.11,
+        "flour": 65.55,
+        "planks": 20.73,
+        "ore": 89.79,
+        "iron": 40.16,
+        "tools": 4.14,
+        "flax": 65.73,
+        "cloth": 35.97,
+        "ale": 20.17,
+        "gold": 882.77,
+        "knowledge": 563.88
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 64,
+      "voyages": 3,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 73.13804400000001,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn.",
+      "macroActions": 230
+    },
+    "allResearch": {
+      "day": 41,
+      "elapsedSeconds": 3650,
+      "population": 40,
+      "morale": 84.400192,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 41.59,
+        "stone": 135.11,
+        "food": 141.56,
+        "grain": 89.9,
+        "flour": 65.65,
+        "planks": 20.27,
+        "ore": 89.4,
+        "iron": 41.5,
+        "tools": 4.75,
+        "flax": 64.57,
+        "cloth": 36.47,
+        "ale": 30.41,
+        "gold": 988.94,
+        "knowledge": 587.15
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 70,
+      "voyages": 4,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 73.752776,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn.",
+      "macroActions": 246
+    },
+    "seventyFiveCitizens": {
+      "day": 61,
+      "elapsedSeconds": 5400,
+      "population": 76,
+      "morale": 96.840441,
+      "housing": 85,
+      "workforce": {
+        "builders": 0,
+        "employed": 45,
+        "idle": 31
+      },
+      "resources": {
+        "wood": 35.78,
+        "stone": 129.83,
+        "food": 158.74,
+        "grain": 90,
+        "flour": 65.21,
+        "planks": 32.85,
+        "ore": 90.86,
+        "iron": 80.1,
+        "tools": 80.42,
+        "flax": 65.55,
+        "cloth": 19.36,
+        "ale": 43.97,
+        "gold": 2918.84,
+        "knowledge": 1142.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 13,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 4,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 7,
+      "contracts": 113,
+      "voyages": 12,
+      "objective": {
+        "title": "A harbor with a future",
+        "description": "Every town ambition is fulfilled. Keep shaping its neighborhoods, workshops, and coastal friendships.",
+        "current": 1,
+        "total": 1,
+        "complete": true,
+        "step": 10
+      },
+      "migration": "New settlers can arrive at dawn.",
+      "macroActions": 369
+    },
+    "allCurrentAmbitions": {
+      "day": 61,
+      "elapsedSeconds": 5400,
+      "population": 76,
+      "morale": 96.840441,
+      "housing": 85,
+      "workforce": {
+        "builders": 0,
+        "employed": 45,
+        "idle": 31
+      },
+      "resources": {
+        "wood": 35.78,
+        "stone": 129.83,
+        "food": 158.74,
+        "grain": 90,
+        "flour": 65.21,
+        "planks": 32.85,
+        "ore": 90.86,
+        "iron": 80.1,
+        "tools": 80.42,
+        "flax": 65.55,
+        "cloth": 19.36,
+        "ale": 43.97,
+        "gold": 2918.84,
+        "knowledge": 1142.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 13,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 4,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 7,
+      "contracts": 113,
+      "voyages": 12,
+      "objective": {
+        "title": "A harbor with a future",
+        "description": "Every town ambition is fulfilled. Keep shaping its neighborhoods, workshops, and coastal friendships.",
+        "current": 1,
+        "total": 1,
+        "complete": true,
+        "step": 10
+      },
+      "migration": "New settlers can arrive at dawn.",
+      "macroActions": 369
+    }
+  },
+  "daily": [
+    {
+      "day": 2,
+      "elapsedSeconds": 90,
+      "population": 8,
+      "morale": 76.95,
+      "housing": 10,
+      "workforce": {
+        "builders": 2,
+        "employed": 6,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 16.01,
+        "stone": 38.01,
+        "food": 41.85,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 46,
+        "knowledge": 9
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 2,
+        "orchard": 1,
+        "lumber": 1,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1
+      },
+      "research": [],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 2,
+      "voyages": 0,
+      "objective": {
+        "title": "Make room for the next neighbors",
+        "description": "1/3 finished cottages · 2/2 food gardens. Construction and production share the same workers.",
+        "current": 3,
+        "total": 5,
+        "complete": false,
+        "step": 3,
+        "type": "cottage"
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 3,
+      "elapsedSeconds": 180,
+      "population": 10,
+      "morale": 76.2675,
+      "housing": 18,
+      "workforce": {
+        "builders": 0,
+        "employed": 9,
+        "idle": 1
+      },
+      "resources": {
+        "wood": 17.24,
+        "stone": 37.57,
+        "food": 43.44,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 54,
+        "knowledge": 1
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 3,
+        "orchard": 1,
+        "lumber": 1,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1
+      },
+      "research": [],
+      "activeResearch": "joinery",
+      "upgrades": 0,
+      "contracts": 3,
+      "voyages": 0,
+      "objective": {
+        "title": "Put Wildhaven on the map",
+        "description": "Restore the bell, then develop workshops, research, services and trade. The town’s story is just beginning.",
+        "current": 74.807136,
+        "total": 130,
+        "complete": false,
+        "step": 5,
+        "type": "bell"
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 4,
+      "elapsedSeconds": 270,
+      "population": 12,
+      "morale": 75.823875,
+      "housing": 18,
+      "workforce": {
+        "builders": 0,
+        "employed": 9,
+        "idle": 3
+      },
+      "resources": {
+        "wood": 36.39,
+        "stone": 52.66,
+        "food": 43.6,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 62,
+        "knowledge": 5
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 3,
+        "orchard": 1,
+        "lumber": 1,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1
+      },
+      "research": [],
+      "activeResearch": "joinery",
+      "upgrades": 0,
+      "contracts": 4,
+      "voyages": 0,
+      "objective": {
+        "title": "Put Wildhaven on the map",
+        "description": "Restore the bell, then develop workshops, research, services and trade. The town’s story is just beginning.",
+        "current": 109.049691,
+        "total": 130,
+        "complete": false,
+        "step": 5,
+        "type": "bell"
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 5,
+      "elapsedSeconds": 360,
+      "population": 14,
+      "morale": 75.535519,
+      "housing": 18,
+      "workforce": {
+        "builders": 3,
+        "employed": 9,
+        "idle": 2
+      },
+      "resources": {
+        "wood": 5.57,
+        "stone": 7.78,
+        "food": 22.27,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 70,
+        "knowledge": 9
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 3,
+        "orchard": 1,
+        "lumber": 1,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1
+      },
+      "research": [],
+      "activeResearch": "joinery",
+      "upgrades": 0,
+      "contracts": 5,
+      "voyages": 0,
+      "objective": {
+        "title": "Raise a sound across the water",
+        "description": "Finish restoring the bell. This first milestone opens Wildhaven’s wider future.",
+        "current": 75.362917,
+        "total": 90,
+        "complete": false,
+        "step": 5,
+        "type": "bell"
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 6,
+      "elapsedSeconds": 450,
+      "population": 16,
+      "morale": 75.348087,
+      "housing": 22,
+      "workforce": {
+        "builders": 3,
+        "employed": 9,
+        "idle": 4
+      },
+      "resources": {
+        "wood": 2.68,
+        "stone": 2.87,
+        "food": 25.35,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 70,
+        "knowledge": 9
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 4,
+        "orchard": 1,
+        "lumber": 1,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1,
+        "school": 1
+      },
+      "research": [],
+      "activeResearch": "joinery",
+      "upgrades": 0,
+      "contracts": 5,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 41.346768999999995,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 7,
+      "elapsedSeconds": 540,
+      "population": 18,
+      "morale": 75.226257,
+      "housing": 26,
+      "workforce": {
+        "builders": 0,
+        "employed": 11,
+        "idle": 7
+      },
+      "resources": {
+        "wood": 17.89,
+        "stone": 10.03,
+        "food": 25.08,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 70,
+        "knowledge": 3.7
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 5,
+        "orchard": 1,
+        "lumber": 1,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1,
+        "school": 1
+      },
+      "research": [
+        "joinery"
+      ],
+      "activeResearch": "cultivation",
+      "upgrades": 0,
+      "contracts": 5,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 45.08179,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 8,
+      "elapsedSeconds": 630,
+      "population": 20,
+      "morale": 76.897067,
+      "housing": 26,
+      "workforce": {
+        "builders": 0,
+        "employed": 13,
+        "idle": 7
+      },
+      "resources": {
+        "wood": 29.03,
+        "stone": 4.27,
+        "food": 23.49,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 70,
+        "knowledge": 0.73
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 5,
+        "orchard": 1,
+        "lumber": 2,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1,
+        "school": 1,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation"
+      ],
+      "activeResearch": "barter",
+      "upgrades": 0,
+      "contracts": 5,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 47.489318999999995,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 9,
+      "elapsedSeconds": 720,
+      "population": 22,
+      "morale": 77.983094,
+      "housing": 30,
+      "workforce": {
+        "builders": 0,
+        "employed": 15,
+        "idle": 7
+      },
+      "resources": {
+        "wood": 35.19,
+        "stone": 8.31,
+        "food": 24.24,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 78,
+        "knowledge": 12.73
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 6,
+        "orchard": 2,
+        "lumber": 2,
+        "quarry": 1,
+        "garden": 1,
+        "bell": 1,
+        "school": 1,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 6,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 49.241731,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 10,
+      "elapsedSeconds": 810,
+      "population": 24,
+      "morale": 78.689011,
+      "housing": 30,
+      "workforce": {
+        "builders": 0,
+        "employed": 20,
+        "idle": 4
+      },
+      "resources": {
+        "wood": 26.99,
+        "stone": 8.36,
+        "food": 19.02,
+        "grain": 14.69,
+        "flour": 0,
+        "planks": 0.27,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 86,
+        "knowledge": 8.81
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 6,
+        "orchard": 2,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "bell": 1,
+        "farm": 1,
+        "sawmill": 1,
+        "school": 1,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter"
+      ],
+      "activeResearch": "civic_order",
+      "upgrades": 0,
+      "contracts": 7,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 44.018299999999996,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "Keep breakfast and 4 extra food per newcomer in the pantry."
+    },
+    {
+      "day": 11,
+      "elapsedSeconds": 900,
+      "population": 26,
+      "morale": 79.847857,
+      "housing": 34,
+      "workforce": {
+        "builders": 0,
+        "employed": 24,
+        "idle": 2
+      },
+      "resources": {
+        "wood": 27.2,
+        "stone": 12.51,
+        "food": 19.39,
+        "grain": 41.16,
+        "flour": 0,
+        "planks": 0.27,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 94,
+        "knowledge": 20.21
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 7,
+        "orchard": 3,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "bell": 1,
+        "farm": 1,
+        "sawmill": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 8,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 44.389106999999996,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "Keep breakfast and 4 extra food per newcomer in the pantry."
+    },
+    {
+      "day": 12,
+      "elapsedSeconds": 990,
+      "population": 26,
+      "morale": 80.601107,
+      "housing": 34,
+      "workforce": {
+        "builders": 0,
+        "employed": 26,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 40.82,
+        "stone": 35.74,
+        "food": 22.46,
+        "grain": 67.71,
+        "flour": 0,
+        "planks": 6.05,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 104,
+        "knowledge": 18.17
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 7,
+        "orchard": 3,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "bell": 1,
+        "farm": 1,
+        "sawmill": 1,
+        "flaxfield": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 10,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 47.463021999999995,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "Keep breakfast and 4 extra food per newcomer in the pantry."
+    },
+    {
+      "day": 13,
+      "elapsedSeconds": 1080,
+      "population": 28,
+      "morale": 81.09072,
+      "housing": 34,
+      "workforce": {
+        "builders": 0,
+        "employed": 27,
+        "idle": 1
+      },
+      "resources": {
+        "wood": 41.27,
+        "stone": 43.1,
+        "food": 29.6,
+        "grain": 91.42,
+        "flour": 0,
+        "planks": 2.73,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 8.46,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 117.22,
+        "knowledge": 15.93
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 7,
+        "orchard": 3,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "bell": 1,
+        "farm": 1,
+        "sawmill": 1,
+        "flaxfield": 1,
+        "market": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 12,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 54.598112,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 14,
+      "elapsedSeconds": 1170,
+      "population": 30,
+      "morale": 81.408968,
+      "housing": 38,
+      "workforce": {
+        "builders": 0,
+        "employed": 25,
+        "idle": 5
+      },
+      "resources": {
+        "wood": 34.57,
+        "stone": 52.6,
+        "food": 36.09,
+        "grain": 91.42,
+        "flour": 0,
+        "planks": 3.62,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 20.15,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 129.78,
+        "knowledge": 16
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 8,
+        "orchard": 3,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "bell": 1,
+        "farm": 1,
+        "sawmill": 1,
+        "flaxfield": 1,
+        "market": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 14,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 61.094546,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 15,
+      "elapsedSeconds": 1260,
+      "population": 32,
+      "morale": 81.615829,
+      "housing": 38,
+      "workforce": {
+        "builders": 0,
+        "employed": 29,
+        "idle": 3
+      },
+      "resources": {
+        "wood": 36.29,
+        "stone": 62.24,
+        "food": 34.64,
+        "grain": 92.89,
+        "flour": 0,
+        "planks": 5.67,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 32.24,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 129.79,
+        "knowledge": 4.13
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 8,
+        "orchard": 3,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "bell": 1,
+        "farm": 2,
+        "sawmill": 2,
+        "flaxfield": 1,
+        "market": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics"
+      ],
+      "activeResearch": "metallurgy",
+      "upgrades": 0,
+      "contracts": 15,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 59.637604,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 16,
+      "elapsedSeconds": 1350,
+      "population": 32,
+      "morale": 81.750289,
+      "housing": 42,
+      "workforce": {
+        "builders": 0,
+        "employed": 32,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 19.93,
+        "stone": 60.01,
+        "food": 29.6,
+        "grain": 90.85,
+        "flour": 8.21,
+        "planks": 0.56,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 53.36,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 148.69,
+        "knowledge": 27.25
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 9,
+        "orchard": 3,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "market": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 17,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 54.597529,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "Keep breakfast and 4 extra food per newcomer in the pantry."
+    },
+    {
+      "day": 17,
+      "elapsedSeconds": 1440,
+      "population": 34,
+      "morale": 81.837688,
+      "housing": 42,
+      "workforce": {
+        "builders": 4,
+        "employed": 30,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 30.02,
+        "stone": 67.89,
+        "food": 37.35,
+        "grain": 90.55,
+        "flour": 26.28,
+        "planks": 1.24,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 65.8,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 158.25,
+        "knowledge": 44.78
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 9,
+        "orchard": 3,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "market": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 18,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_5",
+        "title": "A village that can teach",
+        "description": "Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.",
+        "current": 61.354668,
+        "total": 65,
+        "type": "school",
+        "complete": false,
+        "step": 5
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 18,
+      "elapsedSeconds": 1530,
+      "population": 36,
+      "morale": 81.894497,
+      "housing": 42,
+      "workforce": {
+        "builders": 0,
+        "employed": 26,
+        "idle": 10
+      },
+      "resources": {
+        "wood": 30.68,
+        "stone": 84.15,
+        "food": 99.05,
+        "grain": 90.43,
+        "flour": 30.91,
+        "planks": 1.04,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 65.53,
+        "cloth": 0.17,
+        "ale": 0,
+        "gold": 168.65,
+        "knowledge": 59.88
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 9,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "weaver": 1,
+        "market": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 19,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 44.166677,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 19,
+      "elapsedSeconds": 1620,
+      "population": 38,
+      "morale": 81.931423,
+      "housing": 46,
+      "workforce": {
+        "builders": 0,
+        "employed": 20,
+        "idle": 18
+      },
+      "resources": {
+        "wood": 20.23,
+        "stone": 93.48,
+        "food": 99.73,
+        "grain": 90.31,
+        "flour": 45.03,
+        "planks": 3.72,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 65.45,
+        "cloth": 4.45,
+        "ale": 0,
+        "gold": 200.81,
+        "knowledge": 88.66
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 10,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "weaver": 1,
+        "market": 1,
+        "school": 2,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 22,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 50.448951,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 20,
+      "elapsedSeconds": 1710,
+      "population": 40,
+      "morale": 81.955425,
+      "housing": 46,
+      "workforce": {
+        "builders": 0,
+        "employed": 22,
+        "idle": 18
+      },
+      "resources": {
+        "wood": 36.87,
+        "stone": 108.94,
+        "food": 100.25,
+        "grain": 90,
+        "flour": 63.26,
+        "planks": 3.72,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 64.63,
+        "cloth": 9.18,
+        "ale": 0,
+        "gold": 212.27,
+        "knowledge": 114.11
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 10,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "weaver": 1,
+        "market": 1,
+        "school": 3,
+        "well": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 23,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 57.184775,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 21,
+      "elapsedSeconds": 1800,
+      "population": 40,
+      "morale": 81.971026,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 22,
+        "idle": 18
+      },
+      "resources": {
+        "wood": 35.43,
+        "stone": 102.54,
+        "food": 109.5,
+        "grain": 90.81,
+        "flour": 65.33,
+        "planks": 1.29,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 64.99,
+        "cloth": 13.65,
+        "ale": 0,
+        "gold": 225.09,
+        "knowledge": 139.25
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "weaver": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 24,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 61.645877,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 22,
+      "elapsedSeconds": 1890,
+      "population": 40,
+      "morale": 81.981167,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 26,
+        "idle": 14
+      },
+      "resources": {
+        "wood": 37.45,
+        "stone": 120.28,
+        "food": 115.26,
+        "grain": 91.52,
+        "flour": 65.38,
+        "planks": 6.66,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 65.13,
+        "cloth": 18.67,
+        "ale": 0,
+        "gold": 261.92,
+        "knowledge": 175.49
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "flaxfield": 2,
+        "weaver": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 27,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 66.674904,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 23,
+      "elapsedSeconds": 1980,
+      "population": 40,
+      "morale": 81.987759,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 39.15,
+        "stone": 130.15,
+        "food": 117.24,
+        "grain": 90.71,
+        "flour": 64.42,
+        "planks": 4.72,
+        "ore": 10.81,
+        "iron": 0,
+        "tools": 0,
+        "flax": 65.78,
+        "cloth": 23.31,
+        "ale": 0,
+        "gold": 275.98,
+        "knowledge": 201.83
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 1,
+        "flaxfield": 2,
+        "weaver": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 28,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 67,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 24,
+      "elapsedSeconds": 2070,
+      "population": 40,
+      "morale": 81.992043,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 31,
+        "idle": 9
+      },
+      "resources": {
+        "wood": 44.74,
+        "stone": 132.27,
+        "food": 113.83,
+        "grain": 91.98,
+        "flour": 65.52,
+        "planks": 10.83,
+        "ore": 27.16,
+        "iron": 0,
+        "tools": 0,
+        "flax": 64.85,
+        "cloth": 18.9,
+        "ale": 0,
+        "gold": 319.01,
+        "knowledge": 239.28
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 1,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 30,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 66.897453,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 25,
+      "elapsedSeconds": 2160,
+      "population": 40,
+      "morale": 81.994828,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 34.65,
+        "stone": 130.94,
+        "food": 112.1,
+        "grain": 90.61,
+        "flour": 65.53,
+        "planks": 1.72,
+        "ore": 59.4,
+        "iron": 0,
+        "tools": 0,
+        "flax": 65.19,
+        "cloth": 28.99,
+        "ale": 0,
+        "gold": 351.92,
+        "knowledge": 275.84
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 33,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 68,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 26,
+      "elapsedSeconds": 2250,
+      "population": 40,
+      "morale": 81.996638,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 45.6,
+        "stone": 115.75,
+        "food": 111.46,
+        "grain": 91.63,
+        "flour": 65.6,
+        "planks": 5,
+        "ore": 88.65,
+        "iron": 0.67,
+        "tools": 0,
+        "flax": 65.39,
+        "cloth": 26.64,
+        "ale": 0,
+        "gold": 386.17,
+        "knowledge": 314.5
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 1,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 35,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 68,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 27,
+      "elapsedSeconds": 2340,
+      "population": 40,
+      "morale": 81.997815,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 38,
+        "idle": 2
+      },
+      "resources": {
+        "wood": 63.31,
+        "stone": 119.97,
+        "food": 111.72,
+        "grain": 91.28,
+        "flour": 65.67,
+        "planks": 9.21,
+        "ore": 90.94,
+        "iron": 7.01,
+        "tools": 0,
+        "flax": 64.4,
+        "cloth": 23.51,
+        "ale": 0,
+        "gold": 419.07,
+        "knowledge": 352.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 37,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 68,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 28,
+      "elapsedSeconds": 2430,
+      "population": 40,
+      "morale": 81.99858,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 34,
+        "idle": 6
+      },
+      "resources": {
+        "wood": 46.44,
+        "stone": 120.33,
+        "food": 114.39,
+        "grain": 92.59,
+        "flour": 65.76,
+        "planks": 7.93,
+        "ore": 89.64,
+        "iron": 5.73,
+        "tools": 1.29,
+        "flax": 64.54,
+        "cloth": 32.25,
+        "ale": 0,
+        "gold": 451.42,
+        "knowledge": 389.13
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 1,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 40,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 69.290089,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 29,
+      "elapsedSeconds": 2520,
+      "population": 40,
+      "morale": 81.999077,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 36,
+        "idle": 4
+      },
+      "resources": {
+        "wood": 51.29,
+        "stone": 125.23,
+        "food": 112.46,
+        "grain": 90.59,
+        "flour": 65.83,
+        "planks": 6.84,
+        "ore": 90.13,
+        "iron": 5.08,
+        "tools": 4.14,
+        "flax": 64.29,
+        "cloth": 29.57,
+        "ale": 0,
+        "gold": 491.94,
+        "knowledge": 428.11
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 42,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 72.138468,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 30,
+      "elapsedSeconds": 2610,
+      "population": 40,
+      "morale": 83.7494,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 37,
+        "idle": 3
+      },
+      "resources": {
+        "wood": 56.99,
+        "stone": 117.18,
+        "food": 111.07,
+        "grain": 92.09,
+        "flour": 65.92,
+        "planks": 5.22,
+        "ore": 90.39,
+        "iron": 7.43,
+        "tools": 4.15,
+        "flax": 64.2,
+        "cloth": 16.2,
+        "ale": 0,
+        "gold": 512.29,
+        "knowledge": 426.19
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "chapel": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 44,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 68.341434,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 31,
+      "elapsedSeconds": 2700,
+      "population": 40,
+      "morale": 84.88711,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 39,
+        "idle": 1
+      },
+      "resources": {
+        "wood": 40.78,
+        "stone": 131.63,
+        "food": 114.3,
+        "grain": 90.15,
+        "flour": 66,
+        "planks": 18.59,
+        "ore": 90.31,
+        "iron": 9.96,
+        "tools": 0.49,
+        "flax": 64.37,
+        "cloth": 24.57,
+        "ale": 0,
+        "gold": 523.53,
+        "knowledge": 401.38
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "chapel": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping"
+      ],
+      "activeResearch": "brewing",
+      "upgrades": 0,
+      "contracts": 47,
+      "voyages": 0,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 68.491315,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 32,
+      "elapsedSeconds": 2790,
+      "population": 40,
+      "morale": 85.626622,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 33,
+        "idle": 7
+      },
+      "resources": {
+        "wood": 47.02,
+        "stone": 131.7,
+        "food": 112.66,
+        "grain": 92.54,
+        "flour": 65.03,
+        "planks": 12.28,
+        "ore": 89.56,
+        "iron": 14.05,
+        "tools": 5.29,
+        "flax": 64.49,
+        "cloth": 21.41,
+        "ale": 0,
+        "gold": 616.1,
+        "knowledge": 448.22
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "chapel": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 49,
+      "voyages": 1,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 73.29382100000001,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 33,
+      "elapsedSeconds": 2880,
+      "population": 40,
+      "morale": 85.407304,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 39.57,
+        "stone": 123.48,
+        "food": 116.29,
+        "grain": 92.13,
+        "flour": 65.1,
+        "planks": 6.75,
+        "ore": 89.35,
+        "iron": 10.27,
+        "tools": 4.29,
+        "flax": 64.8,
+        "cloth": 24.64,
+        "ale": 1,
+        "gold": 621.9,
+        "knowledge": 436.35
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "chapel": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health"
+      ],
+      "activeResearch": null,
+      "upgrades": 0,
+      "contracts": 51,
+      "voyages": 1,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 72.289935,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 34,
+      "elapsedSeconds": 2970,
+      "population": 40,
+      "morale": 84.214748,
+      "housing": 50,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 57.54,
+        "stone": 133.98,
+        "food": 110.59,
+        "grain": 92.75,
+        "flour": 65.14,
+        "planks": 20.4,
+        "ore": 90.28,
+        "iron": 13.87,
+        "tools": 2.11,
+        "flax": 65.2,
+        "cloth": 22.39,
+        "ale": 5,
+        "gold": 627.02,
+        "knowledge": 410.78
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "chapel": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health"
+      ],
+      "activeResearch": "mastercraft",
+      "upgrades": 0,
+      "contracts": 52,
+      "voyages": 1,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 69.109797,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 35,
+      "elapsedSeconds": 3060,
+      "population": 40,
+      "morale": 83.439586,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 62.71,
+        "stone": 120.76,
+        "food": 118.63,
+        "grain": 92.73,
+        "flour": 65.21,
+        "planks": 5.67,
+        "ore": 91.77,
+        "iron": 18.39,
+        "tools": 3.29,
+        "flax": 65.2,
+        "cloth": 23.98,
+        "ale": 7.61,
+        "gold": 686.48,
+        "knowledge": 445.32
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 53,
+      "voyages": 2,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 70.294089,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 36,
+      "elapsedSeconds": 3150,
+      "population": 40,
+      "morale": 82.935731,
+      "housing": 53,
+      "workforce": {
+        "builders": 4,
+        "employed": 36,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 46.86,
+        "stone": 111.28,
+        "food": 112.98,
+        "grain": 93.12,
+        "flour": 65.3,
+        "planks": 1.42,
+        "ore": 91.56,
+        "iron": 22.13,
+        "tools": 1.57,
+        "flax": 65.24,
+        "cloth": 28.16,
+        "ale": 9.44,
+        "gold": 719.6,
+        "knowledge": 482.97
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 56,
+      "voyages": 2,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 68.565567,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 37,
+      "elapsedSeconds": 3240,
+      "population": 40,
+      "morale": 83.697848,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 53.01,
+        "stone": 131.87,
+        "food": 115.65,
+        "grain": 92.7,
+        "flour": 65.37,
+        "planks": 17.84,
+        "ore": 89.68,
+        "iron": 27.71,
+        "tools": 6.6,
+        "flax": 65.05,
+        "cloth": 26.05,
+        "ale": 12.44,
+        "gold": 762.61,
+        "knowledge": 522.44
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 1,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 58,
+      "voyages": 2,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 73.599829,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 38,
+      "elapsedSeconds": 3330,
+      "population": 40,
+      "morale": 84.193224,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 57.86,
+        "stone": 131.1,
+        "food": 114.6,
+        "grain": 92.65,
+        "flour": 65.4,
+        "planks": 13.69,
+        "ore": 89.66,
+        "iron": 33.96,
+        "tools": 6.98,
+        "flax": 64.82,
+        "cloth": 25.49,
+        "ale": 15.92,
+        "gold": 844.85,
+        "knowledge": 565.02
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 59,
+      "voyages": 3,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 73.982055,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 39,
+      "elapsedSeconds": 3420,
+      "population": 40,
+      "morale": 83.425596,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 54.36,
+        "stone": 133.19,
+        "food": 118.83,
+        "grain": 92.56,
+        "flour": 64.45,
+        "planks": 29.72,
+        "ore": 91.03,
+        "iron": 37.74,
+        "tools": 1.03,
+        "flax": 65.38,
+        "cloth": 29.2,
+        "ale": 18.59,
+        "gold": 830.43,
+        "knowledge": 527.7
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft"
+      ],
+      "activeResearch": "town_charter",
+      "upgrades": 1,
+      "contracts": 61,
+      "voyages": 3,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 68.03121300000001,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 40,
+      "elapsedSeconds": 3510,
+      "population": 40,
+      "morale": 84.01626,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 40.01,
+        "stone": 133.88,
+        "food": 119.56,
+        "grain": 91.08,
+        "flour": 65.82,
+        "planks": 25.3,
+        "ore": 91.03,
+        "iron": 41.3,
+        "tools": 6.43,
+        "flax": 65.8,
+        "cloth": 39.32,
+        "ale": 22.26,
+        "gold": 884.56,
+        "knowledge": 571.49
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 64,
+      "voyages": 3,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 73.42518,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 41,
+      "elapsedSeconds": 3600,
+      "population": 40,
+      "morale": 84.400192,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 37.92,
+        "stone": 133.15,
+        "food": 117.49,
+        "grain": 92.59,
+        "flour": 65.06,
+        "planks": 29.81,
+        "ore": 91,
+        "iron": 39.39,
+        "tools": 2.59,
+        "flax": 65.76,
+        "cloth": 49.41,
+        "ale": 28.95,
+        "gold": 918.59,
+        "knowledge": 547.38
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter"
+      ],
+      "activeResearch": "navigation",
+      "upgrades": 1,
+      "contracts": 67,
+      "voyages": 4,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 69.592377,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 42,
+      "elapsedSeconds": 3690,
+      "population": 40,
+      "morale": 84.649747,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 40,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 43.42,
+        "stone": 136.68,
+        "food": 120.38,
+        "grain": 89.91,
+        "flour": 64.61,
+        "planks": 26.14,
+        "ore": 90.26,
+        "iron": 43.45,
+        "tools": 8.35,
+        "flax": 64.76,
+        "cloth": 40.79,
+        "ale": 33.54,
+        "gold": 991.63,
+        "knowledge": 587.15
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 70,
+      "voyages": 4,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 75.345234,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 43,
+      "elapsedSeconds": 3780,
+      "population": 42,
+      "morale": 88.642147,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 42,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 59.8,
+        "stone": 140.22,
+        "food": 111.54,
+        "grain": 90.56,
+        "flour": 65.21,
+        "planks": 39.89,
+        "ore": 90.89,
+        "iron": 48.28,
+        "tools": 15.43,
+        "flax": 64.98,
+        "cloth": 32.44,
+        "ale": 26.78,
+        "gold": 1111.58,
+        "knowledge": 623.15
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 72,
+      "voyages": 4,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 84.428535,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 44,
+      "elapsedSeconds": 3870,
+      "population": 44,
+      "morale": 91.567396,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 41,
+        "idle": 3
+      },
+      "resources": {
+        "wood": 63.31,
+        "stone": 143.77,
+        "food": 105.11,
+        "grain": 92.56,
+        "flour": 66.07,
+        "planks": 33.77,
+        "ore": 89.72,
+        "iron": 52.73,
+        "tools": 14.42,
+        "flax": 65.25,
+        "cloth": 36.05,
+        "ale": 20.85,
+        "gold": 1257.4,
+        "knowledge": 659.15
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 74,
+      "voyages": 5,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 83.42254,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 45,
+      "elapsedSeconds": 3960,
+      "population": 44,
+      "morale": 89.30843,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 44,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 44.75,
+        "stone": 137.35,
+        "food": 126.8,
+        "grain": 90.1,
+        "flour": 64.84,
+        "planks": 46.46,
+        "ore": 90.77,
+        "iron": 56.73,
+        "tools": 22.03,
+        "flax": 65.11,
+        "cloth": 39.82,
+        "ale": 27.12,
+        "gold": 1295.12,
+        "knowledge": 674.15
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 77,
+      "voyages": 5,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 88,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "Staff and supply clinics covering at least 40% of housing before welcoming more citizens."
+    },
+    {
+      "day": 46,
+      "elapsedSeconds": 4050,
+      "population": 46,
+      "morale": 92.00048,
+      "housing": 53,
+      "workforce": {
+        "builders": 0,
+        "employed": 37,
+        "idle": 9
+      },
+      "resources": {
+        "wood": 49.64,
+        "stone": 140.93,
+        "food": 116.27,
+        "grain": 90.27,
+        "flour": 65.16,
+        "planks": 42.35,
+        "ore": 89.66,
+        "iron": 61.15,
+        "tools": 17.31,
+        "flax": 65.09,
+        "cloth": 17.36,
+        "ale": 17.83,
+        "gold": 1371.2,
+        "knowledge": 701.15
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 4,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 80,
+      "voyages": 5,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 83.674429,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 47,
+      "elapsedSeconds": 4140,
+      "population": 48,
+      "morale": 93.265697,
+      "housing": 65,
+      "workforce": {
+        "builders": 0,
+        "employed": 41,
+        "idle": 7
+      },
+      "resources": {
+        "wood": 56.5,
+        "stone": 134.17,
+        "food": 122.37,
+        "grain": 92.74,
+        "flour": 65.2,
+        "planks": 15.17,
+        "ore": 90.03,
+        "iron": 54.33,
+        "tools": 14.25,
+        "flax": 64.94,
+        "cloth": 17.02,
+        "ale": 24.1,
+        "gold": 1444.78,
+        "knowledge": 721.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 5,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 80,
+      "voyages": 7,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 80.27754300000001,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 48,
+      "elapsedSeconds": 4230,
+      "population": 50,
+      "morale": 93.065011,
+      "housing": 65,
+      "workforce": {
+        "builders": 0,
+        "employed": 50,
+        "idle": 0
+      },
+      "resources": {
+        "wood": 61.18,
+        "stone": 137.77,
+        "food": 119.63,
+        "grain": 89.71,
+        "flour": 63.95,
+        "planks": 27.46,
+        "ore": 90.14,
+        "iron": 58.65,
+        "tools": 22.29,
+        "flax": 65.07,
+        "cloth": 14.59,
+        "ale": 19.02,
+        "gold": 1543.79,
+        "knowledge": 749.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 5,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 1,
+      "contracts": 82,
+      "voyages": 7,
+      "objective": {
+        "id": "chapter_6",
+        "title": "Hands that make things",
+        "description": "Grow to forty people. Store twenty tools and twenty cloth, staff a market and clinic, and understand seven fields of research.",
+        "current": 83.594552,
+        "total": 89,
+        "type": "clinic",
+        "complete": false,
+        "step": 6
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 49,
+      "elapsedSeconds": 4320,
+      "population": 52,
+      "morale": 93.901816,
+      "housing": 68,
+      "workforce": {
+        "builders": 0,
+        "employed": 51,
+        "idle": 1
+      },
+      "resources": {
+        "wood": 44.25,
+        "stone": 129.15,
+        "food": 122.43,
+        "grain": 89.68,
+        "flour": 65.86,
+        "planks": 27.65,
+        "ore": 91.1,
+        "iron": 62.17,
+        "tools": 30.43,
+        "flax": 65.32,
+        "cloth": 22.03,
+        "ale": 26.55,
+        "gold": 1583.09,
+        "knowledge": 764.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 5,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 2,
+      "contracts": 85,
+      "voyages": 7,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 185.42916400000001,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 50,
+      "elapsedSeconds": 4410,
+      "population": 54,
+      "morale": 94.445739,
+      "housing": 68,
+      "workforce": {
+        "builders": 0,
+        "employed": 39,
+        "idle": 15
+      },
+      "resources": {
+        "wood": 49.37,
+        "stone": 134.19,
+        "food": 127.74,
+        "grain": 92.51,
+        "flour": 65.11,
+        "planks": 22.91,
+        "ore": 89.16,
+        "iron": 66.37,
+        "tools": 38.6,
+        "flax": 65.93,
+        "cloth": 19.45,
+        "ale": 34.08,
+        "gold": 1704.82,
+        "knowledge": 799.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 5,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 2,
+      "contracts": 88,
+      "voyages": 8,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 192.74312600000002,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 51,
+      "elapsedSeconds": 4500,
+      "population": 56,
+      "morale": 94.799289,
+      "housing": 68,
+      "workforce": {
+        "builders": 0,
+        "employed": 39,
+        "idle": 17
+      },
+      "resources": {
+        "wood": 65.82,
+        "stone": 137.79,
+        "food": 129.84,
+        "grain": 91.16,
+        "flour": 65.17,
+        "planks": 36.28,
+        "ore": 89.25,
+        "iron": 58.62,
+        "tools": 40.71,
+        "flax": 65.68,
+        "cloth": 16.89,
+        "ale": 29.21,
+        "gold": 2005.45,
+        "knowledge": 871.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 5,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 1,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 2,
+      "contracts": 90,
+      "voyages": 9,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 196.839647,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 52,
+      "elapsedSeconds": 4590,
+      "population": 58,
+      "morale": 95.029097,
+      "housing": 68,
+      "workforce": {
+        "builders": 0,
+        "employed": 39,
+        "idle": 19
+      },
+      "resources": {
+        "wood": 59.52,
+        "stone": 131.94,
+        "food": 130.71,
+        "grain": 91.75,
+        "flour": 66.02,
+        "planks": 28.74,
+        "ore": 89.52,
+        "iron": 63.01,
+        "tools": 48.56,
+        "flax": 65.88,
+        "cloth": 20.37,
+        "ale": 24.12,
+        "gold": 2100.94,
+        "knowledge": 899.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 2,
+      "contracts": 92,
+      "voyages": 9,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 199.709035,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 53,
+      "elapsedSeconds": 4680,
+      "population": 60,
+      "morale": 95.275251,
+      "housing": 71,
+      "workforce": {
+        "builders": 0,
+        "employed": 45,
+        "idle": 15
+      },
+      "resources": {
+        "wood": 43.03,
+        "stone": 130.39,
+        "food": 139.03,
+        "grain": 91.26,
+        "flour": 65.25,
+        "planks": 29.09,
+        "ore": 90.64,
+        "iron": 66.59,
+        "tools": 56.6,
+        "flax": 64.1,
+        "cloth": 27.76,
+        "ale": 31.24,
+        "gold": 2184.77,
+        "knowledge": 922.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 1,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 3,
+      "contracts": 95,
+      "voyages": 10,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 210.026479,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 54,
+      "elapsedSeconds": 4770,
+      "population": 62,
+      "morale": 95.435251,
+      "housing": 71,
+      "workforce": {
+        "builders": 0,
+        "employed": 47,
+        "idle": 15
+      },
+      "resources": {
+        "wood": 49.87,
+        "stone": 131.86,
+        "food": 145.5,
+        "grain": 91.06,
+        "flour": 66.1,
+        "planks": 23.49,
+        "ore": 90.84,
+        "iron": 70.76,
+        "tools": 60.72,
+        "flax": 65.92,
+        "cloth": 12.49,
+        "ale": 38.8,
+        "gold": 2229.66,
+        "knowledge": 939.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 3,
+      "contracts": 97,
+      "voyages": 10,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 219.502368,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 55,
+      "elapsedSeconds": 4860,
+      "population": 64,
+      "morale": 95.539251,
+      "housing": 71,
+      "workforce": {
+        "builders": 0,
+        "employed": 49,
+        "idle": 15
+      },
+      "resources": {
+        "wood": 68.85,
+        "stone": 135.46,
+        "food": 144.36,
+        "grain": 92.3,
+        "flour": 65.6,
+        "planks": 35.86,
+        "ore": 91.05,
+        "iron": 62.94,
+        "tools": 62.88,
+        "flax": 64.47,
+        "cloth": 14.92,
+        "ale": 34.39,
+        "gold": 2371.69,
+        "knowledge": 981.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 3,
+      "contracts": 99,
+      "voyages": 10,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 220.357007,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 56,
+      "elapsedSeconds": 4950,
+      "population": 66,
+      "morale": 95.624837,
+      "housing": 74,
+      "workforce": {
+        "builders": 0,
+        "employed": 47,
+        "idle": 19
+      },
+      "resources": {
+        "wood": 74.6,
+        "stone": 133.8,
+        "food": 150.55,
+        "grain": 92.14,
+        "flour": 65.36,
+        "planks": 36.33,
+        "ore": 91.15,
+        "iron": 67.19,
+        "tools": 70.99,
+        "flax": 65.92,
+        "cloth": 15.3,
+        "ale": 29.93,
+        "gold": 2515.72,
+        "knowledge": 1017.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 2,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 4,
+      "contracts": 101,
+      "voyages": 11,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 228,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 57,
+      "elapsedSeconds": 5040,
+      "population": 68,
+      "morale": 96.106144,
+      "housing": 74,
+      "workforce": {
+        "builders": 0,
+        "employed": 51,
+        "idle": 17
+      },
+      "resources": {
+        "wood": 57.35,
+        "stone": 110.84,
+        "food": 144.79,
+        "grain": 91.96,
+        "flour": 65.13,
+        "planks": 8.86,
+        "ore": 89.14,
+        "iron": 71.47,
+        "tools": 67.13,
+        "flax": 66.04,
+        "cloth": 17.71,
+        "ale": 37.47,
+        "gold": 2551.65,
+        "knowledge": 1032.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 11,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 4,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 4,
+      "contracts": 104,
+      "voyages": 11,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 225.786198,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 58,
+      "elapsedSeconds": 5130,
+      "population": 70,
+      "morale": 96.418994,
+      "housing": 78,
+      "workforce": {
+        "builders": 0,
+        "employed": 47,
+        "idle": 23
+      },
+      "resources": {
+        "wood": 48.48,
+        "stone": 131.29,
+        "food": 148.36,
+        "grain": 89.51,
+        "flour": 65.69,
+        "planks": 21.46,
+        "ore": 89.18,
+        "iron": 75.78,
+        "tools": 75.31,
+        "flax": 64.47,
+        "cloth": 14.06,
+        "ale": 45.04,
+        "gold": 2596.67,
+        "knowledge": 1049.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 12,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 4,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 4,
+      "contracts": 106,
+      "voyages": 11,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 231.355736,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 59,
+      "elapsedSeconds": 5220,
+      "population": 72,
+      "morale": 96.622346,
+      "housing": 78,
+      "workforce": {
+        "builders": 0,
+        "employed": 45,
+        "idle": 27
+      },
+      "resources": {
+        "wood": 66.73,
+        "stone": 134.89,
+        "food": 164.01,
+        "grain": 91.11,
+        "flour": 65.71,
+        "planks": 34.11,
+        "ore": 89.1,
+        "iron": 68.1,
+        "tools": 77.53,
+        "flax": 64.18,
+        "cloth": 16.45,
+        "ale": 40.64,
+        "gold": 2786.71,
+        "knowledge": 1099.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 12,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 4,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 4,
+      "contracts": 108,
+      "voyages": 12,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 235,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 60,
+      "elapsedSeconds": 5310,
+      "population": 74,
+      "morale": 96.754525,
+      "housing": 82,
+      "workforce": {
+        "builders": 0,
+        "employed": 50,
+        "idle": 24
+      },
+      "resources": {
+        "wood": 54.82,
+        "stone": 131.67,
+        "food": 119.99,
+        "grain": 92.3,
+        "flour": 65.19,
+        "planks": 37.65,
+        "ore": 91,
+        "iron": 76.09,
+        "tools": 80.11,
+        "flax": 66,
+        "cloth": 12.89,
+        "ale": 36.29,
+        "gold": 2882.77,
+        "knowledge": 1127.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 13,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 4,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 5,
+      "contracts": 110,
+      "voyages": 12,
+      "objective": {
+        "id": "chapter_8",
+        "title": "Seventy-five lives",
+        "description": "Welcome seventy-five residents with one hundred fifty food in reserve, two wells, two supplied clinics, a staffed chapel or brewhouse, and eight points of staffed watch readiness.",
+        "current": 206.991603,
+        "total": 238,
+        "type": "cottage",
+        "complete": false,
+        "step": 8
+      },
+      "migration": "New settlers can arrive at dawn."
+    },
+    {
+      "day": 61,
+      "elapsedSeconds": 5400,
+      "population": 76,
+      "morale": 96.840441,
+      "housing": 85,
+      "workforce": {
+        "builders": 0,
+        "employed": 45,
+        "idle": 31
+      },
+      "resources": {
+        "wood": 35.78,
+        "stone": 129.83,
+        "food": 158.74,
+        "grain": 90,
+        "flour": 65.21,
+        "planks": 32.85,
+        "ore": 90.86,
+        "iron": 80.1,
+        "tools": 80.42,
+        "flax": 65.55,
+        "cloth": 19.36,
+        "ale": 43.97,
+        "gold": 2918.84,
+        "knowledge": 1142.26
+      },
+      "buildings": {
+        "hearth": 1,
+        "cottage": 13,
+        "orchard": 6,
+        "lumber": 2,
+        "quarry": 2,
+        "garden": 1,
+        "windmill": 1,
+        "bell": 1,
+        "farm": 2,
+        "bakery": 1,
+        "sawmill": 2,
+        "mine": 2,
+        "smith": 2,
+        "toolmaker": 2,
+        "flaxfield": 2,
+        "weaver": 2,
+        "brewery": 1,
+        "market": 2,
+        "school": 3,
+        "well": 2,
+        "clinic": 2,
+        "chapel": 1,
+        "barracks": 4,
+        "warehouse": 2,
+        "manor": 1
+      },
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "activeResearch": null,
+      "upgrades": 7,
+      "contracts": 113,
+      "voyages": 12,
+      "objective": {
+        "title": "A harbor with a future",
+        "description": "Every town ambition is fulfilled. Keep shaping its neighborhoods, workshops, and coastal friendships.",
+        "current": 1,
+        "total": 1,
+        "complete": true,
+        "step": 10
+      },
+      "migration": "New settlers can arrive at dawn."
+    }
+  ],
+  "errors": [],
+  "checkpointsReloaded": 6,
+  "final": {
+    "day": 61,
+    "elapsedSeconds": 5400,
+    "population": 76,
+    "morale": 96.840441,
+    "housing": 85,
+    "workforce": {
+      "builders": 0,
+      "employed": 45,
+      "idle": 31
+    },
+    "resources": {
+      "wood": 35.78,
+      "stone": 129.83,
+      "food": 158.74,
+      "grain": 90,
+      "flour": 65.21,
+      "planks": 32.85,
+      "ore": 90.86,
+      "iron": 80.1,
+      "tools": 80.42,
+      "flax": 65.55,
+      "cloth": 19.36,
+      "ale": 43.97,
+      "gold": 2918.84,
+      "knowledge": 1142.26
+    },
+    "buildings": {
+      "hearth": 1,
+      "cottage": 13,
+      "orchard": 6,
+      "lumber": 2,
+      "quarry": 2,
+      "garden": 1,
+      "windmill": 1,
+      "bell": 1,
+      "farm": 2,
+      "bakery": 1,
+      "sawmill": 2,
+      "mine": 2,
+      "smith": 2,
+      "toolmaker": 2,
+      "flaxfield": 2,
+      "weaver": 2,
+      "brewery": 1,
+      "market": 2,
+      "school": 3,
+      "well": 2,
+      "clinic": 2,
+      "chapel": 1,
+      "barracks": 4,
+      "warehouse": 2,
+      "manor": 1
+    },
+    "research": [
+      "joinery",
+      "cultivation",
+      "barter",
+      "civic_order",
+      "textiles",
+      "milling",
+      "logistics",
+      "metallurgy",
+      "coastal_routes",
+      "watchkeeping",
+      "brewing",
+      "public_health",
+      "mastercraft",
+      "town_charter",
+      "navigation"
+    ],
+    "activeResearch": null,
+    "upgrades": 7,
+    "contracts": 113,
+    "voyages": 12,
+    "objective": {
+      "title": "A harbor with a future",
+      "description": "Every town ambition is fulfilled. Keep shaping its neighborhoods, workshops, and coastal friendships.",
+      "current": 1,
+      "total": 1,
+      "complete": true,
+      "step": 10
+    },
+    "migration": "New settlers can arrive at dawn."
+  },
+  "finishedAt": "2026-10-02T04:25:38.775Z",
+  "sourceHashesAtEnd": {
+    "js/sim.js": "31800f9145d6b83028613371426bb51fe9ac837d4f083e83277bd81cea933fa3",
+    "js/catalog.js": "16d2679ce196b9fe7df088e66166e5b71f612c3e4e18b9ac771b6a98d81ea07d",
+    "js/progression.js": "e77c08c68d832d958a831b759d43a015ed0a18fb5aad3e6f60f81d4e7e5e5995"
+  },
+  "sourcesStable": true,
+  "longestGapBetweenMacroActionsSeconds": 90,
+  "pass": true,
+  "completeCurrentAmbitions": true,
+  "limitations": [
+    "Automated economy evidence, not a human gameplay session.",
+    "Threats and combat remain absent; route escort readiness is not combat.",
+    "Simulated elapsed time includes waiting for labor, arrivals, research and production.",
+    "Automated stock-target staffing is more frequent and precise than ordinary player control."
+  ]
+}

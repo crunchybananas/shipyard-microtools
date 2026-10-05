@@ -1,0 +1,1290 @@
+{
+  "createdAt": "2026-10-02T05:10:12.600Z",
+  "scope": "Earned automated Free Port campaign with a strict global staffing action limit and hysteresis. Runtime unchanged; other macro decisions still automated every5seconds. Entrance proof is numerical, not rendered motion.",
+  "runtimeIdenticalToEarlierFreePort": {
+    "js/sim.js": true,
+    "js/catalog.js": true,
+    "js/progression.js": true,
+    "js/pressure.js": true
+  },
+  "complete": true,
+  "elapsedSeconds": 4860,
+  "elapsedMinutes": 81,
+  "staffing": {
+    "intervalSeconds": 30,
+    "scope": "One global manual setWorkers, setBuilderTarget, or setPriority mutation per interval; automatic assignment, arrivals and construction completions are simulation behavior.",
+    "lowerStockFraction": 0.65,
+    "timberStopBelow": 35,
+    "timberResumeAt": 70,
+    "actions": [
+      {
+        "time": 0,
+        "day": 1,
+        "kind": "priority",
+        "id": "hearth",
+        "building": "hearth",
+        "before": 100,
+        "value": 0,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 35,
+        "day": 1,
+        "kind": "priority",
+        "id": "b2",
+        "building": "orchard",
+        "before": 10,
+        "value": 1,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 65,
+        "day": 1,
+        "kind": "priority",
+        "id": "b3",
+        "building": "lumber",
+        "before": 10,
+        "value": 5,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 95,
+        "day": 2,
+        "kind": "priority",
+        "id": "b4",
+        "building": "quarry",
+        "before": 10,
+        "value": 6,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 125,
+        "day": 2,
+        "kind": "priority",
+        "id": "b5",
+        "building": "garden",
+        "before": 10,
+        "value": 1,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 180,
+        "day": 3,
+        "kind": "builders",
+        "id": null,
+        "building": null,
+        "before": 2,
+        "value": 3,
+        "reason": "Adjust construction crew after population growth"
+      },
+      {
+        "time": 455,
+        "day": 6,
+        "kind": "priority",
+        "id": "b9",
+        "building": "school",
+        "before": 10,
+        "value": 8,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 625,
+        "day": 7,
+        "kind": "priority",
+        "id": "b12",
+        "building": "lumber",
+        "before": 10,
+        "value": 5,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 655,
+        "day": 8,
+        "kind": "builders",
+        "id": null,
+        "building": null,
+        "before": 3,
+        "value": 4,
+        "reason": "Adjust construction crew after population growth"
+      },
+      {
+        "time": 685,
+        "day": 8,
+        "kind": "priority",
+        "id": "b13",
+        "building": "orchard",
+        "before": 10,
+        "value": 1,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 720,
+        "day": 9,
+        "kind": "priority",
+        "id": "b15",
+        "building": "farm",
+        "before": 10,
+        "value": 2,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 760,
+        "day": 9,
+        "kind": "priority",
+        "id": "b16",
+        "building": "quarry",
+        "before": 10,
+        "value": 6,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 810,
+        "day": 10,
+        "kind": "priority",
+        "id": "b17",
+        "building": "school",
+        "before": 10,
+        "value": 8,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 875,
+        "day": 10,
+        "kind": "priority",
+        "id": "b19",
+        "building": "orchard",
+        "before": 10,
+        "value": 1,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 945,
+        "day": 11,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 975,
+        "day": 11,
+        "kind": "priority",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 10,
+        "value": 7,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1025,
+        "day": 12,
+        "kind": "workers",
+        "id": "b15",
+        "building": "farm",
+        "before": 3,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 1275,
+        "day": 15,
+        "kind": "workers",
+        "id": "b22",
+        "building": "farm",
+        "before": 3,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 1305,
+        "day": 15,
+        "kind": "priority",
+        "id": "b22",
+        "building": "farm",
+        "before": 10,
+        "value": 2,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1335,
+        "day": 15,
+        "kind": "priority",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 10,
+        "value": 7,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1365,
+        "day": 16,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 1395,
+        "day": 16,
+        "kind": "priority",
+        "id": "b24",
+        "building": "windmill",
+        "before": 10,
+        "value": 3,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1495,
+        "day": 17,
+        "kind": "workers",
+        "id": "b15",
+        "building": "farm",
+        "before": 0,
+        "value": 3,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 1525,
+        "day": 17,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 1555,
+        "day": 18,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 1585,
+        "day": 18,
+        "kind": "workers",
+        "id": "b22",
+        "building": "farm",
+        "before": 0,
+        "value": 3,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 1615,
+        "day": 18,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 1645,
+        "day": 19,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 1675,
+        "day": 19,
+        "kind": "priority",
+        "id": "b26",
+        "building": "market",
+        "before": 10,
+        "value": 15,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1705,
+        "day": 19,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 1735,
+        "day": 20,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 1765,
+        "day": 20,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 1795,
+        "day": 20,
+        "kind": "workers",
+        "id": "b24",
+        "building": "windmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 1825,
+        "day": 21,
+        "kind": "priority",
+        "id": "b27",
+        "building": "bakery",
+        "before": 10,
+        "value": 4,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1855,
+        "day": 21,
+        "kind": "priority",
+        "id": "b28",
+        "building": "orchard",
+        "before": 10,
+        "value": 1,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1895,
+        "day": 22,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 1925,
+        "day": 22,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 1955,
+        "day": 22,
+        "kind": "priority",
+        "id": "b30",
+        "building": "school",
+        "before": 10,
+        "value": 8,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 1985,
+        "day": 23,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2015,
+        "day": 23,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2045,
+        "day": 23,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2075,
+        "day": 24,
+        "kind": "workers",
+        "id": "b24",
+        "building": "windmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2105,
+        "day": 24,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2135,
+        "day": 24,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2165,
+        "day": 25,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2195,
+        "day": 25,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2225,
+        "day": 25,
+        "kind": "workers",
+        "id": "b9",
+        "building": "school",
+        "before": 2,
+        "value": 0,
+        "reason": "Strategy research complete"
+      },
+      {
+        "time": 2255,
+        "day": 26,
+        "kind": "workers",
+        "id": "b17",
+        "building": "school",
+        "before": 2,
+        "value": 0,
+        "reason": "Strategy research complete"
+      },
+      {
+        "time": 2285,
+        "day": 26,
+        "kind": "workers",
+        "id": "b30",
+        "building": "school",
+        "before": 2,
+        "value": 0,
+        "reason": "Strategy research complete"
+      },
+      {
+        "time": 2315,
+        "day": 26,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2345,
+        "day": 27,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2375,
+        "day": 27,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2405,
+        "day": 27,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2435,
+        "day": 28,
+        "kind": "priority",
+        "id": "b33",
+        "building": "market",
+        "before": 10,
+        "value": 15,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 2465,
+        "day": 28,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 2495,
+        "day": 28,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 2525,
+        "day": 29,
+        "kind": "priority",
+        "id": "b34",
+        "building": "chapel",
+        "before": 10,
+        "value": 17,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 2555,
+        "day": 29,
+        "kind": "priority",
+        "id": "b35",
+        "building": "clinic",
+        "before": 10,
+        "value": 16,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 2585,
+        "day": 29,
+        "kind": "priority",
+        "id": "b38",
+        "building": "orchard",
+        "before": 10,
+        "value": 1,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 2615,
+        "day": 30,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2645,
+        "day": 30,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2675,
+        "day": 30,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2705,
+        "day": 31,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2735,
+        "day": 31,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2765,
+        "day": 31,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2795,
+        "day": 32,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2825,
+        "day": 32,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2855,
+        "day": 32,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2885,
+        "day": 33,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 2915,
+        "day": 33,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2945,
+        "day": 33,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 2975,
+        "day": 34,
+        "kind": "priority",
+        "id": "b42",
+        "building": "chapel",
+        "before": 10,
+        "value": 17,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 3005,
+        "day": 34,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 3035,
+        "day": 34,
+        "kind": "priority",
+        "id": "b44",
+        "building": "orchard",
+        "before": 10,
+        "value": 1,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 3065,
+        "day": 35,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3100,
+        "day": 35,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 3130,
+        "day": 35,
+        "kind": "workers",
+        "id": "b24",
+        "building": "windmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 3160,
+        "day": 36,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3190,
+        "day": 36,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3220,
+        "day": 36,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3250,
+        "day": 37,
+        "kind": "priority",
+        "id": "b47",
+        "building": "clinic",
+        "before": 10,
+        "value": 16,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 3330,
+        "day": 38,
+        "kind": "workers",
+        "id": "b26",
+        "building": "market",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve food for households"
+      },
+      {
+        "time": 3360,
+        "day": 38,
+        "kind": "workers",
+        "id": "b26",
+        "building": "market",
+        "before": 0,
+        "value": 2,
+        "reason": "Reopen market after food reserve recovers"
+      },
+      {
+        "time": 3390,
+        "day": 38,
+        "kind": "workers",
+        "id": "b24",
+        "building": "windmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3420,
+        "day": 39,
+        "kind": "workers",
+        "id": "b33",
+        "building": "market",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve food for households"
+      },
+      {
+        "time": 3450,
+        "day": 39,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 3480,
+        "day": 39,
+        "kind": "workers",
+        "id": "b33",
+        "building": "market",
+        "before": 0,
+        "value": 2,
+        "reason": "Reopen market after food reserve recovers"
+      },
+      {
+        "time": 3510,
+        "day": 40,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3540,
+        "day": 40,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 3570,
+        "day": 40,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 3600,
+        "day": 41,
+        "kind": "workers",
+        "id": "b26",
+        "building": "market",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve food for households"
+      },
+      {
+        "time": 3630,
+        "day": 41,
+        "kind": "workers",
+        "id": "b26",
+        "building": "market",
+        "before": 0,
+        "value": 2,
+        "reason": "Reopen market after food reserve recovers"
+      },
+      {
+        "time": 3780,
+        "day": 43,
+        "kind": "workers",
+        "id": "b50",
+        "building": "manor",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 3810,
+        "day": 43,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3840,
+        "day": 43,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 3870,
+        "day": 44,
+        "kind": "priority",
+        "id": "b50",
+        "building": "manor",
+        "before": 10,
+        "value": 18,
+        "reason": "Set stable workplace priority once"
+      },
+      {
+        "time": 4010,
+        "day": 45,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 4040,
+        "day": 45,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 4140,
+        "day": 47,
+        "kind": "workers",
+        "id": "b33",
+        "building": "market",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve food for households"
+      },
+      {
+        "time": 4170,
+        "day": 47,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 4200,
+        "day": 47,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 4230,
+        "day": 48,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4260,
+        "day": 48,
+        "kind": "workers",
+        "id": "b33",
+        "building": "market",
+        "before": 0,
+        "value": 2,
+        "reason": "Reopen market after food reserve recovers"
+      },
+      {
+        "time": 4290,
+        "day": 48,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 4320,
+        "day": 49,
+        "kind": "workers",
+        "id": "b26",
+        "building": "market",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve food for households"
+      },
+      {
+        "time": 4350,
+        "day": 49,
+        "kind": "workers",
+        "id": "b26",
+        "building": "market",
+        "before": 0,
+        "value": 2,
+        "reason": "Reopen market after food reserve recovers"
+      },
+      {
+        "time": 4380,
+        "day": 49,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 4410,
+        "day": 50,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 2,
+        "value": 0,
+        "reason": "Preserve timber; reopen only after 70 wood"
+      },
+      {
+        "time": 4440,
+        "day": 50,
+        "kind": "workers",
+        "id": "b15",
+        "building": "farm",
+        "before": 3,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 4470,
+        "day": 50,
+        "kind": "workers",
+        "id": "b22",
+        "building": "farm",
+        "before": 3,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 4500,
+        "day": 51,
+        "kind": "workers",
+        "id": "b20",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4530,
+        "day": 51,
+        "kind": "workers",
+        "id": "b23",
+        "building": "sawmill",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4560,
+        "day": 51,
+        "kind": "workers",
+        "id": "b27",
+        "building": "bakery",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4625,
+        "day": 52,
+        "kind": "workers",
+        "id": "b4",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4655,
+        "day": 52,
+        "kind": "workers",
+        "id": "b15",
+        "building": "farm",
+        "before": 0,
+        "value": 3,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4685,
+        "day": 53,
+        "kind": "workers",
+        "id": "b16",
+        "building": "quarry",
+        "before": 0,
+        "value": 2,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4715,
+        "day": 53,
+        "kind": "workers",
+        "id": "b22",
+        "building": "farm",
+        "before": 0,
+        "value": 3,
+        "reason": "Resume production below the lower stock threshold"
+      },
+      {
+        "time": 4745,
+        "day": 53,
+        "kind": "workers",
+        "id": "b2",
+        "building": "orchard",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 4775,
+        "day": 54,
+        "kind": "workers",
+        "id": "b5",
+        "building": "garden",
+        "before": 1,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 4805,
+        "day": 54,
+        "kind": "workers",
+        "id": "b13",
+        "building": "orchard",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      },
+      {
+        "time": 4835,
+        "day": 54,
+        "kind": "workers",
+        "id": "b19",
+        "building": "orchard",
+        "before": 2,
+        "value": 0,
+        "reason": "Release workers at the upper stock threshold"
+      }
+    ],
+    "minimumGapSeconds": 30,
+    "actionsPerSimulatedMinute": 1.4938271604938271,
+    "actionCounts": {
+      "workers": 91,
+      "builders": 2,
+      "priority": 28
+    }
+  },
+  "comparison": {
+    "earlier": {
+      "elapsedMinutes": 78,
+      "staffingChanges": 539,
+      "limitation": "Earlier count excluded setPriority mutations; cannot compare total input counts exactly."
+    },
+    "slow": {
+      "elapsedMinutes": 81,
+      "staffingChanges": 121,
+      "macroActions": 460,
+      "limitation": "Staffing count includes setWorkers, setBuilderTarget, and setPriority; construction completions reset requested staffing automatically and are game behavior."
+    }
+  },
+  "macroCounts": {
+    "build": 51,
+    "accept-contract": 103,
+    "deliver-contract": 103,
+    "research": 9,
+    "landing-exchange": 44,
+    "coastal-choice": 7,
+    "harbor-import": 61,
+    "harbor-export": 63,
+    "route": 12,
+    "charter": 1,
+    "upgrade": 6
+  },
+  "invariants": {
+    "resourcesValid": true,
+    "checkpointsReloaded": 5,
+    "entrancesConnected": 52,
+    "totalEntrances": 52,
+    "reachableLandCells": 172,
+    "disconnected": []
+  },
+  "outcome": {
+    "people": 94,
+    "contracts": 103,
+    "voyages": 12,
+    "imports": 61,
+    "exports": 63,
+    "upgrades": 6,
+    "coast": {
+      "defended": 0,
+      "paid": 7,
+      "losses": 0
+    },
+    "foodPotentialBalance": 62.143221,
+    "minimumDailyFood": 19.46,
+    "longestMacroGapSeconds": 90
+  },
+  "deadend": null
+}

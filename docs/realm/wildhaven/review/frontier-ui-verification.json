@@ -1,0 +1,238 @@
+{
+  "verifiedAt": "2026-10-02T06:53:10.833Z",
+  "passed": true,
+  "scope": "13 unique real UI checks against one unchanged runtime, reconciled from 12 passing controls checks and one focused outpost rerun. Both used isolated Chromium contexts and previously earned saves; clock skips and public actions prepare the scenarios. This is not a physical-device test or a browser-played earned combat campaign.",
+  "evidence": {
+    "controls": {
+      "file": "frontier-ui-all-report.json",
+      "sha256": "da06726f81df903438034a68dd0433535d07da9387e1f5717d7934712cff540b"
+    },
+    "outpost": {
+      "file": "frontier-ui-outpost-report.json",
+      "sha256": "edddf1f7ea7e30b421e24ce20db2e9c5220679171203051e79d051facef67af2"
+    },
+    "component": {
+      "file": "frontier-ui-component-report.json",
+      "sha256": "57a43df8ef1c9d9993a076041cb4230bdf36afdaad29c748b424d77f32faa81b"
+    }
+  },
+  "currentSources": {
+    "js/frontier-ui.js": "c8930f14a521368ccbe752404437970272b2b519cc52e4b5c104e75c71a978c8",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "checks": [
+    {
+      "name": "V3 migration opens the earned town and preserves its V2 source save",
+      "passed": true,
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "Frontier exposes real quotes, region prerequisites and an interactive coastline",
+      "passed": true,
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "Named recruitment spends the exact quote and reserves a real resident through training",
+      "passed": true,
+      "detail": {
+        "unitId": "unit-1",
+        "citizenId": "c9",
+        "name": "Ida",
+        "cost": {
+          "wood": 10,
+          "iron": 2,
+          "food": 8
+        }
+      },
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "Frontier units and named labor survive save/reload without altering the V2 save",
+      "passed": true,
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "Accidental recruitment can cancel training at home, releasing labor without an equipment refund",
+      "passed": true,
+      "detail": {
+        "citizenId": "c52",
+        "refund": {}
+      },
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "An envoy spends real provisions, walks to first contact, and releases their town job on return",
+      "passed": true,
+      "detail": {
+        "citizenId": "c52",
+        "name": "Dev 3",
+        "elapsed": 58,
+        "cost": {
+          "food": 8,
+          "gold": 15
+        }
+      },
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "Mouse and touch company Move/Attack target actual world picks; Retreat keeps an explicit order",
+      "passed": true,
+      "detail": {
+        "destination": {
+          "x": -4,
+          "z": 0
+        },
+        "attackTarget": "settlement-reedbank"
+      },
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "Neighbor trade, deliberate war, and a priced truce use their actual action quotes",
+      "passed": true,
+      "detail": {
+        "trade": {
+          "cost": {
+            "wood": 18
+          },
+          "reward": {
+            "food": 32,
+            "gold": 8
+          }
+        },
+        "truceCost": {
+          "gold": 45,
+          "food": 15
+        },
+        "note": "Paused after declaration; verifies real war state/garrison and withdrawal, not a won battle."
+      },
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "A completed wall can be salvaged through its inspector for the exact visible refund",
+      "passed": true,
+      "detail": {
+        "id": "fort-7",
+        "refund": {
+          "stone": 3,
+          "wood": 1
+        }
+      },
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "World targeting queues a paid wall line, named engineering completes it, and a gate opens/closes",
+      "passed": true,
+      "detail": {
+        "walls": [
+          "fort-7",
+          "fort-9"
+        ],
+        "wallCost": {
+          "stone": 14,
+          "wood": 4
+        },
+        "gate": "fort-10",
+        "gateCost": {
+          "stone": 9,
+          "wood": 8,
+          "tools": 1
+        },
+        "touchWallCost": {
+          "stone": 14,
+          "wood": 4
+        },
+        "touchGateCost": {
+          "stone": 9,
+          "wood": 8,
+          "tools": 1
+        }
+      },
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "Island chart and management controls fit a 390px phone viewport without hiding action text",
+      "passed": true,
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "No browser or application errors during actual frontier control checks",
+      "passed": true,
+      "evidence": "frontier-ui-all-report.json"
+    },
+    {
+      "name": "An earned outpost can be removed and rebuilt through the UI; claim loss blocks new buildings and preserves existing homes",
+      "passed": true,
+      "detail": {
+        "region": "highmeadow",
+        "preservedBuildings": [
+          "b51"
+        ],
+        "refund": {
+          "wood": 15,
+          "stone": 8,
+          "planks": 4,
+          "gold": 12
+        },
+        "reclaimCost": {
+          "wood": 30,
+          "stone": 16,
+          "planks": 8,
+          "gold": 25
+        },
+        "constructionSecondsSkipped": 100
+      },
+      "evidence": "frontier-ui-outpost-report.json"
+    }
+  ],
+  "supersededFixtureFailure": {
+    "report": "frontier-ui-all-report.json",
+    "checkpoint": {
+      "file": "frontier-campaign-expansion-save.json",
+      "sha256": "46e7fef0baab711daf7ab7205399fbde80e7b8936239c5b2f13c3f72dbc4ff2c",
+      "label": "Separately earned frontier expansion checkpoint, imported into a second isolated browser context."
+    },
+    "check": {
+      "name": "An earned outpost can be removed and rebuilt through the UI; claim loss blocks new buildings and preserves existing homes",
+      "passed": false,
+      "error": "Clear hostile troops from this region first.\n\nfalse !== true\n"
+    },
+    "explanation": "The expansion checkpoint contains two living raiders in Highmeadow. Salvage correctly revoked the claim and preserved existing buildings, then reclaim correctly refused while hostiles remained. The focused rerun uses the later earned complete checkpoint after those hostiles were defeated. The raw failing report is preserved unchanged.",
+    "replacementCheckpoint": {
+      "file": "frontier-campaign-complete-save.json",
+      "sha256": "8fd6a9a3bc2e2d0558a2efd5024d5318257c6052701fcc86f59f10fb80d545e0",
+      "label": "Separately earned completed frontier checkpoint with hostiles defeated, imported into an isolated browser context."
+    }
+  },
+  "componentEvidence": {
+    "report": "frontier-ui-component-report.json",
+    "passed": 9,
+    "scope": "Frontier DOM component behavior with an explicit simulation test double. Does not verify real economy, combat, navigation, or earned play."
+  },
+  "worldPointerEvidence": {
+    "report": "frontier-ui-all-report.json",
+    "events": 11,
+    "pointerKinds": [
+      "mouse",
+      "touch"
+    ]
+  },
+  "visualReview": [
+    "frontier-ui-01-island-chart.png",
+    "frontier-ui-touch-company.png",
+    "frontier-ui-07-touch-fortifications.png",
+    "frontier-ui-06-mobile-chart.png",
+    "frontier-ui-08-outpost-consequences.png",
+    "frontier-ui-09-claim-restored.png"
+  ]
+}

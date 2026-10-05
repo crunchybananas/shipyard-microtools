@@ -1,0 +1,224 @@
+{
+  "startedAt": "2026-10-02T03:51:39.778Z",
+  "url": "http://127.0.0.1:4751/wildhaven/?review",
+  "scope": "Isolated Chromium context. Controlled navigation fixtures directly construct funded villages and reposition one actor. This is not ordinary gameplay progression evidence. No user save is read or written.",
+  "sourceHashesAtStart": {
+    "js/world.js": "94d3ca3af1ca3ad9bb831de8ecd4661abad3f2dadea8fb88b06d1b221bbf99e6",
+    "js/main.js": "c7600f3bd71479085c6bb247ac5a24c3e754bb4348f570a4b59efe79c07735f7",
+    "js/sim.js": "7ee6b1d902fbac5af90c3863056fad9483ee8764d188f5e0544bafd991c0996b",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "checks": [
+    {
+      "name": "Fixture: representative shortest paths avoid natural obstacles and occupied buildings",
+      "passed": true,
+      "elapsedMs": 188,
+      "detail": {
+        "paths": 69,
+        "traversedCells": 806,
+        "reachableCells": 205,
+        "buildings": 10,
+        "population": 13,
+        "errors": []
+      }
+    },
+    {
+      "name": "Fixture: every villager moves through legal cells during 30 simulated seconds",
+      "passed": true,
+      "elapsedMs": 150,
+      "detail": {
+        "simulatedSeconds": 30,
+        "actorCount": 13,
+        "distances": [
+          25.01,
+          26.94,
+          27.55,
+          24.95,
+          24.07,
+          24.38,
+          25.72,
+          27.61,
+          20.35,
+          23.33,
+          19.85,
+          25.68,
+          20.61
+        ],
+        "legRanges": [
+          {
+            "min": -0.47999834519238244,
+            "max": 0.4799878547738609
+          },
+          {
+            "min": -0.4799812606509857,
+            "max": 0.47999999994547904
+          },
+          {
+            "min": -0.479999843753277,
+            "max": 0.4799958915645785
+          },
+          {
+            "min": -0.4799912264332008,
+            "max": 0.4799640843825595
+          },
+          {
+            "min": -0.47999989827354017,
+            "max": 0.4799983153658913
+          },
+          {
+            "min": -0.47999849929950283,
+            "max": 0.47999032007039855
+          },
+          {
+            "min": -0.47999436337881557,
+            "max": 0.47999699657136985
+          },
+          {
+            "min": -0.47999676824062204,
+            "max": 0.47997668397436277
+          },
+          {
+            "min": -0.47997900234118146,
+            "max": 0.47998414793404315
+          },
+          {
+            "min": -0.47999849929950283,
+            "max": 0.4799903200703984
+          },
+          {
+            "min": -0.47999858590306294,
+            "max": 0.4799998042025394
+          },
+          {
+            "min": -0.47999987410374884,
+            "max": 0.4799928381988561
+          },
+          {
+            "min": -0.4799900227889878,
+            "max": 0.4799973991258436
+          }
+        ],
+        "illegal": []
+      }
+    },
+    {
+      "name": "Real pause control freezes actor positions and articulated limbs",
+      "passed": true,
+      "elapsedMs": 557,
+      "detail": {
+        "actorsChecked": 13,
+        "pauseWallTimeMs": 300
+      }
+    },
+    {
+      "name": "Fixture: enclosing construction rescues a villager into the hearth-connected component",
+      "passed": true,
+      "elapsedMs": 272,
+      "detail": {
+        "before": {
+          "x": 1,
+          "z": 2
+        },
+        "after": {
+          "x": 0,
+          "z": 1
+        },
+        "reachable": true,
+        "walkable": true,
+        "pathToHearth": [
+          {
+            "x": -1,
+            "z": 1
+          },
+          {
+            "x": -1,
+            "z": 2
+          },
+          {
+            "x": -1,
+            "z": 3
+          },
+          {
+            "x": 0,
+            "z": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "Fixture: capture three actual rendered gait poses for visual review",
+      "passed": true,
+      "elapsedMs": 2416,
+      "detail": {
+        "cameraZoom": 4.6,
+        "poses": [
+          {
+            "position": [
+              1.796203036356857,
+              0.8484230630089543,
+              5.49492409107857
+            ],
+            "limbs": {
+              "left_arm": -0.3904394422988994,
+              "left_leg": 0.3904394422988994,
+              "right_arm": 0.3904394422988994,
+              "right_leg": -0.3904394422988994
+            }
+          },
+          {
+            "position": [
+              1.7810151817842854,
+              0.8501562098939146,
+              5.874620455392847
+            ],
+            "limbs": {
+              "left_arm": 0.4796605387081814,
+              "left_leg": -0.4796605387081814,
+              "right_arm": -0.4796605387081814,
+              "right_leg": 0.4796605387081814
+            }
+          },
+          {
+            "position": [
+              1.7658273272117144,
+              0.8420551667213029,
+              6.254316819707125
+            ],
+            "limbs": {
+              "left_arm": -0.368352555296395,
+              "left_leg": 0.368352555296395,
+              "right_arm": 0.368352555296395,
+              "right_leg": -0.368352555296395
+            }
+          }
+        ],
+        "note": "Close-up actual game meshes, lighting, shadows and movement. Camera/position staged only for inspection."
+      }
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "navigation-pose-1.png",
+    "navigation-pose-2.png",
+    "navigation-pose-3.png"
+  ],
+  "testWallTimeMs": 3583,
+  "diagnostics": {
+    "drawCalls": 17,
+    "triangles": 143890,
+    "actors": 13,
+    "buildings": 10,
+    "pixelRatio": 1,
+    "webgl": true,
+    "fps": 13
+  },
+  "finishedAt": "2026-10-02T03:51:49.525Z",
+  "sourceHashesAtEnd": {
+    "js/world.js": "94d3ca3af1ca3ad9bb831de8ecd4661abad3f2dadea8fb88b06d1b221bbf99e6",
+    "js/main.js": "c7600f3bd71479085c6bb247ac5a24c3e754bb4348f570a4b59efe79c07735f7",
+    "js/sim.js": "7ee6b1d902fbac5af90c3863056fad9483ee8764d188f5e0544bafd991c0996b",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "sourcesStable": true,
+  "passed": true
+}
