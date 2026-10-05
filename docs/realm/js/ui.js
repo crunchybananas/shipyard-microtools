@@ -1588,7 +1588,7 @@ const TUTORIAL_STEPS = [
     id: 'build_farm',
     text: '🌾 Your settlers need food! Build a Farm first. Click Farm below (or press 2).',
     action: 'Select Farm from the build bar ↓',
-    check: () => G.selectedBuild === 'farm',
+    check: () => G.selectedBuild === 'farm' || G.buildings.some(building => building.type === 'farm'),
     // Target the specific building by data-build-key — `.build-btn` alone matches
     // all build buttons and querySelector returns the first (House), so the
     // pulsing tutorial highlight was landing on the wrong card and actively
