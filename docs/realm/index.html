@@ -376,7 +376,7 @@ body.title-active #hud,body.title-active #build-bar,body.title-active #missions,
 @media(max-width:600px){#info-panel{top:auto;bottom:5.5rem;right:0.4rem;width:min(220px,calc(100vw - 0.8rem));max-height:calc(100vh - 6.3rem);font-size:0.72rem}}
 
 /* Minimap */
-#minimap{position:fixed;bottom:5.1rem;right:0.9rem;width:184px;height:184px;border:1px solid rgba(209,170,96,0.52);border-radius:8px;z-index:10;cursor:pointer;background:#0d1110;image-rendering:auto;box-shadow:0 10px 28px rgba(0,0,0,0.48),inset 0 0 0 1px rgba(255,235,180,0.08),inset 0 0 24px rgba(126,93,44,0.20);opacity:0.95}
+#minimap{position:fixed;bottom:calc(var(--realm-build-bar-height,8rem) + 0.5rem);right:0.9rem;width:184px;height:184px;border:1px solid rgba(209,170,96,0.52);border-radius:8px;z-index:10;cursor:pointer;background:#0d1110;image-rendering:auto;box-shadow:0 10px 28px rgba(0,0,0,0.48),inset 0 0 0 1px rgba(255,235,180,0.08),inset 0 0 24px rgba(126,93,44,0.20);opacity:0.95}
 #minimap.minimap-raid{box-shadow:0 0 12px rgba(239,68,68,0.68),0 10px 28px rgba(0,0,0,0.48),inset 0 0 0 1px rgba(255,235,180,0.08),inset 0 0 24px rgba(126,93,44,0.20)}
 
 /* Notification log */
@@ -803,7 +803,7 @@ body.photo-mode #wonder-chip{display:none!important}
   .build-btn .icon{font-size:1.1rem}
   .build-sprite{width:36px;height:30px}
   #missions{width:170px;font-size:0.68rem;top:2.5rem;right:0.4rem}
-  #minimap{width:150px;height:150px;bottom:3.5rem}
+  #minimap{width:150px;height:150px}
   #achievement-toast{right:0.5rem;bottom:13.4rem;max-width:min(260px,72vw)}
 }
 </style>

@@ -51,6 +51,7 @@ let imageCache = new Map();
 let reviews = new Map();
 let currentMetrics = null;
 let rowManifest = { version: 2, rows: {} };
+let initialized = false;
 
 export function initSpriteLab() {
   const root = document.getElementById('sprite-lab');
@@ -88,18 +89,23 @@ export function initSpriteLab() {
     ambientControls: document.getElementById('sl-actor-controls'),
   };
 
-  loadReviews();
-  hydrateControls();
-  bindEvents();
-  applyQuerySelection();
-  renderAll();
-  loadRowManifest();
-
   window.toggleSpriteLab = (force) => setOpen(force == null ? !state.open : !!force);
   window.openSpriteLab = () => setOpen(true);
 
   const params = new URLSearchParams(location.search);
   if (params.has('spritelab')) setOpen(true);
+}
+
+// Ordinary settlement play should not populate 224 inspection rows or fetch
+// source sheets for a closed tool. Prepare once on explicit open/deep link.
+function prepareSpriteLab() {
+  if (initialized) return;
+  initialized = true;
+  loadReviews();
+  hydrateControls();
+  bindEvents();
+  applyQuerySelection();
+  loadRowManifest();
 }
 
 function hydrateControls() {
@@ -239,6 +245,7 @@ function applyQuerySelection() {
 }
 
 function setOpen(next) {
+  if (next) prepareSpriteLab();
   state.open = next;
   els.root.classList.toggle('open', next);
   els.root.setAttribute('aria-hidden', next ? 'false' : 'true');

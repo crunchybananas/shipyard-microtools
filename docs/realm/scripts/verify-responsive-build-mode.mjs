@@ -34,14 +34,14 @@ try {
   await page.waitForLoadState('domcontentloaded');
   await page.waitForFunction(() => typeof window.startNewGame === 'function' && window.G);
   await page.locator('#kingdom-name-input').fill('Touch Gate');
-  await page.locator('#title-screen .title-btn.primary').click();
+  await page.locator('#title-screen .title-btn.primary').tap();
   await page.waitForFunction(() => !document.body.classList.contains('title-active'));
   await page.evaluate(() => {
     window.setSpeed(0);
     window.dismissTutorial();
   });
 
-  await page.locator('[data-build-key="farm"]').click();
+  await page.locator('[data-build-key="farm"]').tap();
   const selected = await page.evaluate(() => ({
     key: window.G.selectedBuild,
     viewport: [window.innerWidth, window.innerHeight],
@@ -148,14 +148,22 @@ try {
   assert.equal(pinchAfter.selectedBuild, 'farm', 'pinch unexpectedly exited build mode');
   assert.equal(pinchAfter.dragging, false, 'pinch end left camera dragging active');
 
+  const mapClearance = await page.evaluate(() => {
+    const map = document.getElementById('minimap').getBoundingClientRect();
+    const bar = document.getElementById('build-bar').getBoundingClientRect();
+    return { mapBottom: map.bottom, barTop: bar.top, gap: bar.top - map.bottom };
+  });
+  assert.ok(mapClearance.gap >= 4, `Minimap intercepted the build cards: ${JSON.stringify(mapClearance)}`);
   await page.screenshot({ path: join(proofDir, 'phone-build-mode-active.png') });
-  await page.locator('.build-cancel').click();
+  await page.locator('.build-cancel').tap();
   const afterCancel = await page.evaluate(() => ({
     selectedBuild: window.G.selectedBuild,
     cancelPresent: !!document.querySelector('.build-cancel'),
+    tooltipHidden: getComputedStyle(document.getElementById('tooltip')).display === 'none',
   }));
   assert.equal(afterCancel.selectedBuild, null, 'Cancel did not leave build mode');
   assert.equal(afterCancel.cancelPresent, false, 'Cancel remained after leaving build mode');
+  assert.equal(afterCancel.tooltipHidden, true, 'touch cancellation left a desktop tooltip over the map');
 
   const selectionTarget = await page.evaluate(() => {
     const g = window.G;
