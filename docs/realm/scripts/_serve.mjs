@@ -26,6 +26,10 @@ export async function ensureServer() {
     mode: 'file',
     stop: async () => {},
   };
+  // Caller-owned URLs support isolated file-origin QA when loopback is blocked.
+  if (process.env.REALM_QA_URL) {
+    return { ...fallback, gameUrl: process.env.REALM_QA_URL, mode: 'external' };
+  }
   if (await isUp()) {
     const origin = `http://127.0.0.1:${PORT}`;
     return { origin, gameUrl: `${origin}/index.html`, stop: async () => {}, started: false, mode: 'http' };

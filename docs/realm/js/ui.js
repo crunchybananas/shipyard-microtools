@@ -704,10 +704,18 @@ const CATEGORIES = [
 // Day 1 is `quarry` (locked, not on the bar). Keeping this in module scope
 // lets one source of truth drive both the badge and the hotkey.
 let _visibleBuildKeys = [];
+let buildBarSizeObserver = null;
 
 export function renderBuildBar() {
   const bar = document.getElementById('build-bar');
   if (!bar) return;
+  if (!buildBarSizeObserver) {
+    buildBarSizeObserver = new ResizeObserver(() => {
+      const height = bar.getBoundingClientRect().height;
+      if (height > 0) document.documentElement.style.setProperty('--realm-build-bar-height', `${height}px`);
+    });
+    buildBarSizeObserver.observe(bar);
+  }
   bar.innerHTML = '';
   _visibleBuildKeys = [];
   if (G.selectedBuild) {
@@ -771,8 +779,15 @@ export function renderBuildBar() {
         // Escape remains the keyboard equivalent.
         activateBuildMode(key);
       };
-      btn.onmouseenter = () => showTooltip(btn, key, def);
-      btn.onmouseleave = hideTooltip;
+      // Touch synthesizes mouse hover events; keep those from leaving a
+      // large desktop tooltip over the map after selecting a build card.
+      btn.onpointerenter = event => {
+        if (event.pointerType === 'mouse') showTooltip(btn, key, def);
+      };
+      btn.onpointerdown = event => {
+        if (event.pointerType === 'touch') hideTooltip();
+      };
+      btn.onpointerleave = hideTooltip;
       bar.appendChild(btn);
     }
   }
@@ -1588,7 +1603,7 @@ const TUTORIAL_STEPS = [
     id: 'build_farm',
     text: '🌾 Your settlers need food! Build a Farm first. Click Farm below (or press 2).',
     action: 'Select Farm from the build bar ↓',
-    check: () => G.selectedBuild === 'farm',
+    check: () => G.selectedBuild === 'farm' || G.buildings.some(building => building.type === 'farm'),
     // Target the specific building by data-build-key — `.build-btn` alone matches
     // all build buttons and querySelector returns the first (House), so the
     // pulsing tutorial highlight was landing on the wrong card and actively

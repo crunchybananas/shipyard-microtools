@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "realm-mini-responsiveness",
+  "title": "Realm makes room for touch controls",
+  "appSlug": "realm",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "in-revision",
+  "publishedAt": null,
+  "thesis": "The opening needs clear, responsive controls before more visual experiments.",
+  "summary": "Phone controls now clear the minimap and touch tooltips. Closed Sprite Lab work waits until it is opened. Real opening delivery and Save \u2192 reload \u2192 Continue checks pass.",
+  "versions": {
+    "before": {
+      "label": "Before touch and startup fixes",
+      "commit": "1946599"
+    },
+    "after": {
+      "label": "Tested working branch",
+      "commit": "6d1b141bb452ffd34e6ad5c2c387e35611d0d855"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "phone-build",
+      "title": "The build bar gets its space back",
+      "caption": "Separate detached worktrees; identical named seed, paused tick 120, camera, 390 \u00d7 844 viewport and serialized world hash. Before: minimap overlap of 67 pixels and a tooltip lingering after a Farm tap. After: 8 pixels of clearance and no touch tooltip.",
+      "before": {
+        "src": "assets/realm-mini-responsiveness/before-phone-build.png",
+        "alt": "Before: selected Farm with a lingering tooltip and minimap overlapping the phone build bar."
+      },
+      "after": {
+        "src": "assets/realm-mini-responsiveness/after-phone-build.png",
+        "alt": "After: same Farm selection, no tooltip and minimap above the phone build bar."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "Controls respect the input device",
+      "body": "Mouse hover still shows help. Touch selection clears the tooltip. The minimap follows the measured build-bar height."
+    },
+    {
+      "title": "Sprite Lab waits until opened",
+      "body": "Ordinary startup now creates zero lab rows and makes zero lab-source requests, compared with 224 rows and two requests before. First-open, reopen and deep-link browser checks pass."
+    },
+    {
+      "title": "The opening stays playable",
+      "body": "Tutorial guidance recognizes an existing Farm. Real build-bar clicks create a Farm and Granary, physical food reaches storage, and Save \u2192 reload \u2192 Continue restores the exact saved tick."
+    }
+  ],
+  "builderNote": {
+    "quote": "The opening needs clear, responsive controls before more visual experiments.",
+    "context": "Implementation note from this recovery pass, not an owner endorsement. Captures were recorded on the working branch before release; the in-revision label reflects remaining gameplay and art work."
+  },
+  "proof": [
+    {
+      "label": "Matched world",
+      "value": "Both serialized worlds: SHA-256 699a336d53d893ecea9a39791b97e399f7141c776223beae69b3df036ce00e83."
+    },
+    {
+      "label": "Passed",
+      "value": "Desktop and phone opening tutorial, real touch cancellation, tooltip input, Sprite Lab opening, real food delivery, citizen food routes, browser save shell, source save continuity, module graph and core purity."
+    },
+    {
+      "label": "Limits",
+      "value": "Matched captures used isolated headless Chrome with file-origin loading. The subsequent release run passed all 68 affected gates, lint and archive validation. Measurements are not a timing benchmark."
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/realm/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/6d1b141bb452ffd34e6ad5c2c387e35611d0d855/docs/realm",
+    "download": "assets/realm-mini-responsiveness/social.png"
+  },
+  "share": {
+    "summary": "Phone controls now clear the minimap and touch tooltips. Closed Sprite Lab work waits until it is opened. Real opening delivery and Save \u2192 reload \u2192 Continue checks pass. Matched captures from the pre-release working branch.",
+    "image": "assets/realm-mini-responsiveness/social.png"
+  }
+}

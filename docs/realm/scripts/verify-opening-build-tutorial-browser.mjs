@@ -185,6 +185,18 @@ try {
   assert.match(placed.tutorialText, /Select Lumber Mill from the build bar/);
   assert.equal(await desktop.locator('[data-build-key="lumber"]').getAttribute('data-tutorial-hint'), 'Select');
 
+  // Continue resets tutorial guidance even when a Farm already exists.
+  // Reproduce that shell state without mutating the completed settlement.
+  await desktop.keyboard.press('Escape');
+  await desktop.evaluate(async () => {
+    const ui = await import('./js/ui.js?realm=198');
+    ui.resetTutorial();
+    ui.updateTutorialTip();
+  });
+  await desktop.locator('.tut-next').click();
+  assert.match((await openingState(desktop)).tutorialText, /Select Lumber Mill from the build bar/,
+    'restarted guidance asked for a Farm that already exists');
+
   await desktop.locator('#btn-newgame').click();
   const restarted = await openingState(desktop);
   assert.equal(restarted.buildings, 0);
