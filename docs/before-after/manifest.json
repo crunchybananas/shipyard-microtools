@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-05T04:10:00Z",
+  "updatedAt": "2026-10-05T00:00:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,18 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "realm-mini-responsiveness",
+      "title": "Realm makes room for touch controls",
+      "appSlug": "realm",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "in-revision",
+      "publishedAt": null,
+      "data": "stories/realm-mini-responsiveness.json",
+      "href": "./realm-mini-responsiveness/",
+      "cover": "assets/realm-mini-responsiveness/social.png"
+    },
     {
       "slug": "beacon",
       "title": "Beacon left the box, then left the canvas",
@@ -70,7 +82,7 @@
     },
     {
       "slug": "demo-hub",
-      "title": "The demo hub — Useful little worlds",
+      "title": "The demo hub \u2014 Useful little worlds",
       "appSlug": null,
       "surfaceSlug": "demo-hub",
       "kind": "surface",
@@ -256,8 +268,8 @@
       "slug": "realm",
       "title": "Realm",
       "category": "Games",
-      "status": "published",
-      "story": "realm"
+      "status": "in-revision",
+      "story": "realm-mini-responsiveness"
     },
     {
       "slug": "regex-tester",

@@ -144,7 +144,7 @@
       const mark = make("span", "status-mark");
       mark.setAttribute("aria-hidden", "true");
       const name = app.name || app.title || app.slug || "Untitled app";
-      const story = storyByAppSlug.get(app.slug);
+      const story = stories.find((entry) => entry.slug === app.story) || storyByAppSlug.get(app.slug);
       const href = story
         ? storyRoute(story)
         : app.href || (app.slug ? `../${app.slug}/` : null);

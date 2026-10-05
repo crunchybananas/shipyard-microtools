@@ -1,0 +1,37 @@
+{
+  "baseline": "1946599",
+  "method": "isolated Chrome; separate detached Git worktrees 1946599 and 6d1b141; identical named seed, paused tick120, camera, viewport and save hash",
+  "samples": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "tick": 120,
+      "selectedBuild": "farm",
+      "tooltipDisplayed": true,
+      "minimapGap": -67.203125,
+      "closedLabRows": 224,
+      "worldSha256": "699a336d53d893ecea9a39791b97e399f7141c776223beae69b3df036ce00e83",
+      "phase": "before",
+      "hiddenLabRequests": [
+        "file:///tmp/realm-proof-before/docs/realm/assets/sprites/actor-rows/manifest.json",
+        "file:///tmp/realm-proof-before/docs/realm/assets/sprites/actors-compiled/miner.png"
+      ]
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "tick": 120,
+      "selectedBuild": "farm",
+      "tooltipDisplayed": false,
+      "minimapGap": 8,
+      "closedLabRows": 0,
+      "worldSha256": "699a336d53d893ecea9a39791b97e399f7141c776223beae69b3df036ce00e83",
+      "phase": "after",
+      "hiddenLabRequests": []
+    }
+  ]
+}
