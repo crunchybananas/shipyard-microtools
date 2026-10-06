@@ -79,6 +79,7 @@ const checks = [
   ['shell isolation', 'verify-shell-isolation.mjs'],
   ['browser save shell', 'verify-browser-save-shell.mjs'],
   ['opening build tutorial', 'verify-opening-build-tutorial-browser.mjs'],
+  ['first neighborhood and research rewards', 'verify-first-neighborhood-browser.mjs'],
   ['responsive phone build mode', 'verify-responsive-build-mode.mjs'],
   ['browser citizen work orders', 'verify-citizen-work-orders-browser.mjs'],
   ['browser first muster and Founder controls', 'verify-first-muster-browser.mjs'],
