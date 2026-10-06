@@ -83,6 +83,9 @@ jobs:
       - name: Verify before/after archive
         run: node scripts/verify-before-after.mjs
 
+      - name: Verify Wildhaven
+        run: node --test docs/realm/wildhaven/test/*.test.mjs
+
       - name: Prepare deployment
         run: |
           # Create output directory
@@ -99,6 +102,13 @@ jobs:
             --exclude='tmp/' \
             --exclude='attic/' \
             --exclude='ember/.gitkeep' \
+            --exclude='/realm/wildhaven/review/' \
+            --exclude='/realm/wildhaven/tools/' \
+            --exclude='/realm/wildhaven/test/' \
+            --exclude='/realm/wildhaven/review-*.html' \
+            --exclude='/realm/wildhaven/*.md' \
+            --exclude='/realm/wildhaven/assets/*.blend' \
+            --exclude='/realm/wildhaven/assets/*.png' \
             --exclude='MISSION.md' \
             --exclude='RENDER_LOG.md' \
             --exclude='CRITIQUES.md' \

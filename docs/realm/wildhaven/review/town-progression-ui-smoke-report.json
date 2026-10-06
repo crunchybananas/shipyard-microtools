@@ -1,0 +1,66 @@
+{
+  "startedAt": "2026-10-02T05:15:11.913Z",
+  "scope": "Scoped browser smoke after renderer-only changes. Verifies load, roof selection, panel navigation and phone glyph bounds, without replaying the separately recorded full functional suite.",
+  "section": "smoke",
+  "sourceHashesAtStart": {
+    "index.html": "c42337a0d81a79451935b68a9132c055cd8e727d093c26965fa66d67b3d2e232",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+    "js/world.js": "fb23fb0e79dc6df8f13be9b832a14605e55a77193936675d7f3c01235137706a",
+    "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "checks": [
+    {
+      "name": "Updated renderer loads the earned town and an actual cottage roof opens its inspector",
+      "passed": true
+    },
+    {
+      "name": "Council, trade, stores and watch remain accessible with the updated renderer",
+      "passed": true
+    },
+    {
+      "name": "Phone toolbar glyphs and town panels fit after the renderer update",
+      "passed": true
+    },
+    {
+      "name": "No browser or application errors in prepared UI review",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "town-progression-smoke-roof.png",
+    "town-progression-smoke-trade.png",
+    "town-progression-smoke-mobile-watch.png"
+  ],
+  "fixtures": {
+    "campaign": {
+      "file": "campaign-services-lanes-save.json",
+      "sha256": "bbe9106df94ec942d7ec99f5eaf0e7e0d31bca4dbb9bf52d57dd0e5fcf8ac38c",
+      "label": "Previously earned simulation checkpoint, imported into an isolated browser."
+    }
+  },
+  "browser": "147.0.7727.15",
+  "finishedAt": "2026-10-02T05:16:57.742Z",
+  "sourceHashesAtFinish": {
+    "index.html": "c42337a0d81a79451935b68a9132c055cd8e727d093c26965fa66d67b3d2e232",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+    "js/world.js": "fb23fb0e79dc6df8f13be9b832a14605e55a77193936675d7f3c01235137706a",
+    "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "sourcesChangedDuringRun": [],
+  "passed": true
+}

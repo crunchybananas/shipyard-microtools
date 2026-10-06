@@ -1,0 +1,58 @@
+{
+  "observedAt": "2026-10-02T05:17:00Z",
+  "scope": "Manual Codex in-app browser observation of the separate review-town.html, using saved earned checkpoints. Rendering and presentation motion ran live; the simulation clock and player save were untouched. Approximate observation time. Samples are not averaged device benchmarks.",
+  "worldSha256": "fb23fb0e79dc6df8f13be9b832a14605e55a77193936675d7f3c01235137706a",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "samples": [
+    {
+      "checkpoint": "campaign-services-lanes-save.json",
+      "population": 76,
+      "fps": 91,
+      "drawCalls": 577,
+      "triangles": 927532,
+      "states": {
+        "waiting": 4,
+        "watching": 11,
+        "working": 57,
+        "unloading": 1,
+        "walking": 3
+      }
+    },
+    {
+      "checkpoint": "campaign-freeport-save.json",
+      "population": 94,
+      "fps": 89,
+      "drawCalls": 624,
+      "triangles": 1146090,
+      "states": {
+        "waiting": 47,
+        "walking": 19,
+        "unloading": 3,
+        "working": 25
+      }
+    }
+  ],
+  "consoleWarningsAndErrors": [],
+  "cleanup": "Temporary review tab closed. Main player village retained paused.",
+  "finalRendererSample": {
+    "recordedAt": "2026-10-02T05:30:40.371843+00:00",
+    "worldSha256": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "townGlbSha256": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "checkpoint": "campaign-services-lanes-save.json",
+    "population": 76,
+    "fps": 113,
+    "drawCalls": 577,
+    "triangles": 926728,
+    "states": {
+      "waiting": 3,
+      "watching": 6,
+      "walking": 17,
+      "working": 49,
+      "unloading": 1
+    },
+    "consoleWarningsAndErrors": []
+  }
+}

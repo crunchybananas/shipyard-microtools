@@ -1,0 +1,223 @@
+{
+  "recordedAt": "2026-10-02T06:58:31.188Z",
+  "status": "Delivered locally; uncommitted and not deployed.",
+  "runtimeSourceAndEditableAssetHashes": {
+    "ASSETS.md": "9fb7d2d39d8b1b6509595ec578aeb8af2c1bad462c3865479d0982ad55e4c23a",
+    "DEVELOPMENT.md": "2ffd68de9bc4795c2ef7b26c88bc01a98cd8bbf235bfe7289dcf895c50d6d5da",
+    "FRONTIER_PLAN.md": "f2b6882a4e3d6d5f661597b064434307f8058dffa82316646c81745915585c9b",
+    "README.md": "24c05bb0b207a8d9207d4cb35e4ffdea30297d192e03b32a90ee01a16ba8bece",
+    "assets/frontier-kit.blend": "10c378ed75cecc2bf4f3d8a6621e9e112177358f5ec8278a282f3f02399233b1",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/frontier-kit.json": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04",
+    "assets/town-kit.blend": "3f73bf82a2cc41f962e3e48d47abc7319cd8a387f927ec5c5466eb840b58348e",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/town-kit.json": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794",
+    "assets/village-kit.blend": "04f62403bbb1bcff23f9a398fc48bd80bae6377dfb38c562667335fd949b8226",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/village-kit.json": "01660a0a2362764f71b574c299902438a7943be92a715d842238147f9e105f1d",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "js/frontier-ui.js": "c8930f14a521368ccbe752404437970272b2b519cc52e4b5c104e75c71a978c8",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/town-ui.js": "f6444cb865eaf3b6a60a887b3e97287d0383e657deb9ca8df5f8e00d2dc6dda8",
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "review-town.html": "6df657cadb48a3a634675edfa58913d2aa3938e3289fa90561a07beaed0364e4",
+    "review/FRONTIER_VERIFICATION.md": "151d1034290a40729f320e384972f5b7d1eecdc34ee925b33b55477b69efea24",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "test/frontier-integration.test.mjs": "cab0cd48ee633836795a6e6fcf977ce86e87628074c965b53bad9fa0176ebc44",
+    "test/frontier.test.mjs": "bf84bca28d00d47614c462ed025009dad97d3a1cdda9d12f734a583797373e00",
+    "test/island.test.mjs": "274a68690165f5469e4a865734d106ad310384ffb99d64ae37de80ba430623c2",
+    "test/pressure.test.mjs": "7ca3fc814826553aad369170916a66c46fa6f62a438c3172d827c4b209cc108e",
+    "test/progression.test.mjs": "b8a0102c23c9d95830a3a6b9a98dd994df50b301533d6d2d73f01b2128d521ac",
+    "test/sim-placement.test.mjs": "ac65de0aedf0f7912be24978f348be577b00a9cd02ee4391eb5730b8b0c1c95a",
+    "test/sim-services.test.mjs": "bcc6e4f57f93b837ba215f70247c512ddf6f6525ea1420675884c2cc086eeb84",
+    "test/sim.test.mjs": "51b0ac05c6021e863b85e3c35176fdc33d6508deefaa5d65668ec9ed32ac1bb0",
+    "tools/campaign.mjs": "ab69255f2b381b2b495e5bb89fb63d74f0b867cfc4fa6d459647c30f53dabe2d",
+    "tools/capture.mjs": "780f69806ce861edee29b7fc04d00172aeb8e6169ff2412b31a2d264426039ae",
+    "tools/create_assets.py": "f5f196d7ddbf5a3e18e6e2df503715eef7145a030f293d2058fa97e710801e8b",
+    "tools/create_frontier_assets.py": "a06db47ff49a865b20607a1e4b738677b80dce91373a7f7948b0f2b55f8e7409",
+    "tools/create_town_assets.py": "7a00f2496f19216b15b93918b146800989cc6686e91a2c59a64697e761a2666a",
+    "tools/forge-campaign.mjs": "8eb9074047417733cf4fd5a9ec16c107c005a558e836736997dba210188f7a71",
+    "tools/frontier-campaign.mjs": "3c9e3f6e974c11c5d44db31280bf7ee32f0f5442b6091ba390699f271da67b47",
+    "tools/frontier-earned-battle-render.mjs": "325cb24bdb7fe9f68bed3236da3967758fdd86c164bc4f95d90cd142005807b1",
+    "tools/frontier-earned-render.mjs": "8a0b31c1b920ae2a8f86464ca5e5d387d50f9d92ce6865a1fdb617dbc7391776",
+    "tools/frontier-geometry.mjs": "eef9214a00d879188428fabab95d459cd066766457caae7392a0b77b52ab0f67",
+    "tools/frontier-render.mjs": "9fec32bdf0ee201b320e0ec3565899dd8319a18ca3208466af574593312df9de",
+    "tools/frontier-ui-component.mjs": "3ebd92c1eaa333e91366eab81a5b39ca879925f22e45ca4c731bfbe9160dfe33",
+    "tools/frontier-ui-review.mjs": "97ae0d5579fd32472150d4daa3ac4141ea991db20ddae64448b4a6d7b4f87ea9",
+    "tools/frontier-ui-verification.mjs": "dac3655002ecd14c2bce9d90a44fccc93f55be2aff91cf2aabc6d8c36a768e6c",
+    "tools/navigation.mjs": "6a46e4b46e87519bda3019d78f75c28f0c1f6f8bee68103e9c7efda7b963ad5f",
+    "tools/playthrough.mjs": "a2be498b5967d713f0d0dca6cf7ca33766f652a47d0318458e1b290eabd219f9",
+    "tools/port-campaign.mjs": "ffad33ed27086b5536404a0b25dec6e4bd84bb8381237adb4f5688cf112a0222",
+    "tools/slow-campaign.mjs": "1031b730e21a6b5f4cec5ced5caef6724842eedfe918c9fdf637ddb7818d6380",
+    "tools/slow-staffing.mjs": "19255974a559256e38b9c2de49ad85880265f18db9f12031b2addae8631918f0",
+    "tools/town-artisan-contact.mjs": "a6d7ffbeabe8a1a1ee39c781951dd9c7563cb5fd9e8961a2be265b9766b3b0db",
+    "tools/town-artisan-review.mjs": "c0455094472245b5892c775289acc27d959acb3b9ab9e803aa8271594a8992e0",
+    "tools/town-geometry.mjs": "7013e4f3832faf4aba618bd2633d149a41d8883c56e6edb5c3069e6b0f1f0a6c",
+    "tools/town-playthrough.mjs": "dfdf5c82d427523a2352aacd66d65950095a40d329ac096062a4dc65492c26f6",
+    "tools/town-progression-ui.mjs": "cdc8a31bd405345bcb029101b54f5bd931e59bb406ccf518ab8d61d15fe9dae4",
+    "tools/town-render.mjs": "6c2f4085b39094886027abe762100f531a2327bc1164f52c7e02e8c422cbb1aa",
+    "tools/town-smoke.mjs": "77408a38048be73b5251113a7217f68034840b1cb74014dc9945a51d30d8ffaf",
+    "tools/town-traffic.mjs": "3884add829a4e0b9b222d340553d40b5941867e2ee25f411a06fad5745267e3e",
+    "tools/worksite-fixture.mjs": "f78fb44ccf2077f05253fcf1a06b1a615706663cf80e36faa6d38b1fff2b8532"
+  },
+  "evidence": [
+    {
+      "file": "review/frontier-town-foundation-report.json",
+      "sha256": "8da92145be75a6287a34d5fd90ec008d4a56c010b372f7a1da70f36f2f17c3d9",
+      "scope": "Deterministic automated management using public simulation/progression actions from createGame. All resources, citizens, research and buildings are earned; no funded or unlocked fixtures. Simulated duration does not establish enjoyable human playtime or live renderer behavior."
+    },
+    {
+      "file": "review/frontier-campaign-report.json",
+      "sha256": "08d55a61af3803d68a1a4af31ac374bb1fc6f12eb054fa75516a49fefc15f5cd",
+      "scope": "Automated continuation of the independently earned Forge Town checkpoint named in seedName. No new stock, residents, research, geography, relations, units or damage are injected. All frontier progress uses public actions and the integrated clock. Clock skips are not measured human playtime. Rendered behavior is reviewed separately."
+    },
+    {
+      "file": "review/frontier-geometry-report.json",
+      "sha256": "f7e54e2ba29f7f0fbe36b15292162519b009d20abf87eba05f8a240def90974e",
+      "scope": "Prepared read-only renderer geometry fixtures, actual original Blender assets; rendered visual review remains separate."
+    },
+    {
+      "file": "review/frontier-town-traffic-report.json",
+      "sha256": "a59d06b5a775a1bdcab45393ed7b498c69dc61a4c7cecae00fd79bee767f058c",
+      "scope": "Presentation-only replay of the earned campaign with public full-staff requests. Every actor is measured; the final 60-second window reports walked distance, spatial range, net displacement and completed waypoints. No browser or save is changed."
+    },
+    {
+      "file": "review/frontier-earned-render-report.json",
+      "sha256": "891bd16e2fff49a1874e06e39c6656aebf3393a6a65a5ecb7b46c6ef378f1097",
+      "scope": "Earned public-action campaign checkpoints loaded into isolated browser storage. Wall/company/hamlet/island shots change only presentation. Battle shots continue saved units through public attack order and actual simulation ticks; no resources, HP, positions, entities or claims are inserted. Screens require separate visual inspection. Headless diagnostics are not hardware performance claims."
+    },
+    {
+      "file": "review/frontier-earned-battle-render-report.json",
+      "sha256": "9eceaf6ff413adf7172292114c93f9bbd8a5112969579d86f81bce62174485d4",
+      "scope": "Final earned public-action campaign battle checkpoint, copied to a content-addressed immutable input and loaded into fresh isolated browser storage. Uses only a public attack order and actual simulation ticks; no resources, HP, positions, entities or claims inserted. Rendered frames require separate visual inspection. Headless diagnostics are not hardware performance claims."
+    },
+    {
+      "file": "review/frontier-town-ui-report.json",
+      "sha256": "05ad63adf8829bf9f8d43df768d65df567ae81e829fbcb79d700416a126c6c7d",
+      "scope": "Fresh opening and mobile use real controls, with review clock to skip waits. Migration uses a labeled legacy fixture. No opening resources or population are injected."
+    },
+    {
+      "file": "review/frontier-town-progression-ui-report.json",
+      "sha256": "718504761b17f66f98c0931b59e13d352944073057d38b82f7ca6b3481670b36",
+      "scope": "Isolated Chromium UI review, not a browser-played campaign. Fresh school prepared with public build/tick/workforce APIs; late fixture imported from the separately recorded earned simulation campaign. UI buttons perform the reviewed actions. Clock skips are explicit."
+    },
+    {
+      "file": "review/frontier-ui-all-report.json",
+      "sha256": "da06726f81df903438034a68dd0433535d07da9387e1f5717d7934712cff540b",
+      "scope": "Actual UI actions against real frontier/simulation APIs. Isolated browser imports a previously earned village checkpoint; public workforce changes and clock skips prepare this review. No stock, population, diplomacy or unlock injection. This does not claim an earned frontier campaign or physical-device play."
+    },
+    {
+      "file": "review/frontier-ui-outpost-report.json",
+      "sha256": "edddf1f7ea7e30b421e24ce20db2e9c5220679171203051e79d051facef67af2",
+      "scope": "Actual UI actions against real frontier/simulation APIs. Isolated browser imports a previously earned village checkpoint; public workforce changes and clock skips prepare this review. No stock, population, diplomacy or unlock injection. This does not claim an earned frontier campaign or physical-device play."
+    },
+    {
+      "file": "review/frontier-ui-verification.json",
+      "sha256": "e48c527d8ba03548094399cdafb76f3dcced2235a813ef88dbd6157751b95d2c",
+      "scope": "13 unique real UI checks against one unchanged runtime, reconciled from 12 passing controls checks and one focused outpost rerun. Both used isolated Chromium contexts and previously earned saves; clock skips and public actions prepare the scenarios. This is not a physical-device test or a browser-played earned combat campaign."
+    },
+    {
+      "file": "review/frontier-ui-component-report.json",
+      "sha256": "57a43df8ef1c9d9993a076041cb4230bdf36afdaad29c748b424d77f32faa81b",
+      "scope": "Frontier DOM component behavior with an explicit simulation test double. Does not verify real economy, combat, navigation, or earned play."
+    },
+    {
+      "file": "review/frontier-live-preview.json",
+      "sha256": "b610930a70624d591e690ba7b00036daa3245e27d7f633e92a2b70208fb45e7e",
+      "scope": "Native in-app browser UI observation. Existing save opened through Come back home in a fresh preview; no fixture imports or gameplay time advances."
+    }
+  ],
+  "tests": {
+    "count": 114,
+    "passed": 114,
+    "failed": 0,
+    "log": "review/frontier-tests.txt",
+    "sha256": "e19ea5b3fc78f18c910c3726b413e2ab2def1377599a0d4b7d05207885341a35",
+    "hashScope": "Source and test files recorded after the passing run; no runtime changes followed that run."
+  },
+  "browserChecks": {
+    "opening": 14,
+    "advancedTown": 13,
+    "frontierUnique": 13,
+    "totalReal": 40,
+    "componentMocked": 9,
+    "errors": 0
+  },
+  "earnedCampaign": {
+    "foundationSeconds": 5590,
+    "frontierSeconds": 1032,
+    "reloads": 34,
+    "claims": [
+      "home",
+      "highmeadow",
+      "reedmarch",
+      "pineward",
+      "crownhill"
+    ],
+    "seedMatches": true
+  },
+  "renderedEvidence": {
+    "wallCheckpointMatches": true,
+    "finalBattleCheckpointMatches": true,
+    "oldBattleSubsectionExcluded": "frontier-earned-render-report.json has an older battle input; use frontier-earned-battle-render-report.json for current battle lineage.",
+    "images": [
+      "review/frontier-earned-01-walls-company.png",
+      "review/frontier-earned-03-island.png",
+      "review/frontier-earned-final-fight-3.png",
+      "review/frontier-ui-07-touch-fortifications.png"
+    ],
+    "imageHashes": {
+      "review/frontier-earned-01-walls-company.png": "a7cfc5a2c62e1ed7084d2348d8526383df48678e6e45a73bee4cb09ec577de84",
+      "review/frontier-earned-03-island.png": "dea5ac4c26f776872c948dcc107180574bc5c1f4908152c91f0c693cf9e966e6",
+      "review/frontier-earned-final-fight-3.png": "8b44240220ee9729683b4f2749c97c08601f9db45f4ca3e6b621ed631968952e",
+      "review/frontier-ui-07-touch-fortifications.png": "0ff132e90e6f27be91a535556530ccd5285a74606b23ab7d51713260452ab8a9"
+    }
+  },
+  "livePreview": {
+    "checkedAt": "2026-10-02T06:57:44.438Z",
+    "scope": "Native in-app browser UI observation. Existing save opened through Come back home in a fresh preview; no fixture imports or gameplay time advances.",
+    "originalTab": {
+      "id": "1",
+      "status": "Browser-control connection timed out; tab left untouched."
+    },
+    "playableTab": {
+      "id": "5",
+      "url": "http://127.0.0.1:4751/wildhaven/",
+      "keptAsDeliverable": true,
+      "day": 21,
+      "population": 7,
+      "housing": 10,
+      "resourcesVisible": {
+        "wood": 106,
+        "stone": 81,
+        "food": 14
+      },
+      "queuedProjects": 2,
+      "paused": true,
+      "newFrontierPanelOpenedAndClosed": true,
+      "threeUncontactedNeighborsVisible": true,
+      "unclaimedRegionRequirementsVisible": true,
+      "visibleStateUnchangedDuringInspection": true
+    },
+    "comparisonLimit": "The original tab could not be read. Values record the current persisted save and its unchanged paused state across this inspection, not equality with every historical snapshot.",
+    "cleanup": {
+      "temporaryReadOnlyReviewTabClosed": true,
+      "isolatedTestBrowsersClosed": true,
+      "localPlayServerRetained": true
+    }
+  },
+  "limitations": [
+    "Human-session pacing and final balance unmeasured.",
+    "Safari, Firefox and physical devices unverified.",
+    "Some ordinary building/upgrade art is shared.",
+    "Original unresponsive preview tab left untouched; current saved village is paused in a fresh preview."
+  ]
+}

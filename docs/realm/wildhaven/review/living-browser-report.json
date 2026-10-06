@@ -1,0 +1,688 @@
+{
+  "startedAt": "2026-10-03T03:58:24.558Z",
+  "scope": "Isolated real Chromium UI and Web Audio checks. Fresh village fieldwork uses clicked controls and public simulation clock advances. Mature art review loads the independently earned fieldwork campaign. No player browser storage is touched. Offline audio renders use the production sound graph. Headless speed is not a hardware benchmark.",
+  "sourcesAtStart": {
+    "js/main.js": "ec3865bb87b0bf8374bd8c5f9cc5301d96a96629fcd2d00e8db7e87b05eda22b",
+    "js/world.js": "a474bd900914bda496201fc6a1827047774191bc1ab4bafc4280eaa7fffccfbc",
+    "js/audio.js": "8eaa22d36094c8aaba97412bbd1bd107267ebe4b2a646d997ef6937ef0383475",
+    "js/fieldbook-ui.js": "4e83e161204df1dd5ab6619ae4216b892042aa8ae7f01c5845fa4af1d98b6740",
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "index.html": "c080585cdbdc434281ce3de76268de85821a94e7ff1966bcfbf7cc5a25e639fd",
+    "living.css": "84d77e2a7ffacfdf2698054dfddb1d32c21cef5ba49ee87dab25bcec4da398c2",
+    "assets/living-kit.glb": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c",
+    "tools/living-review.mjs": "697a6fdba579e152d0d23fc3c2bf4c3ae4451aef7335c8f24a0ac400a9cffeda"
+  },
+  "checks": [
+    {
+      "name": "Four modeled places open through the fieldbook and keyboard",
+      "passed": true
+    },
+    {
+      "name": "Laptop fieldbook exposes the expedition action and restores the building shelf on close",
+      "passed": true
+    },
+    {
+      "name": "Clicked resident assignment spends exact provisions and reserves that person",
+      "passed": true
+    },
+    {
+      "name": "Surveyor walks to the real site and works there before returning the report",
+      "passed": true
+    },
+    {
+      "name": "Restoration UI pays once, recalls physically, and resumes its paid project",
+      "passed": true
+    },
+    {
+      "name": "V4 reload resumes paused and retains the completed discovery",
+      "passed": true
+    },
+    {
+      "name": "Live sound controls enable Web Audio, mix channels, and mute every source",
+      "passed": true
+    },
+    {
+      "name": "Touch-sized fieldbook, nonoverlapping toolbar and working scroll controls",
+      "passed": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390,
+        "rects": [
+          {
+            "id": "landing-button",
+            "x": 20,
+            "y": 791,
+            "width": 78.5,
+            "height": 44
+          },
+          {
+            "id": "journal-button",
+            "x": 102.5,
+            "y": 791,
+            "width": 78.5,
+            "height": 44
+          },
+          {
+            "id": "frontier-toggle",
+            "x": 185,
+            "y": 791,
+            "width": 90.5,
+            "height": 44
+          },
+          {
+            "id": "fieldbook-toggle",
+            "x": 279.5,
+            "y": 791,
+            "width": 90.5,
+            "height": 44
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mature earned village renders every restored landmark without changing its state",
+      "passed": true
+    },
+    {
+      "name": "Landmark raycasting opens the matching page from an actual island click",
+      "passed": true
+    },
+    {
+      "name": "Foley follows visible village work and stops when paused",
+      "passed": true,
+      "detail": {
+        "cues": 53,
+        "kinds": [
+          "anvil",
+          "axe",
+          "step",
+          "chisel",
+          "rustle",
+          "saw"
+        ],
+        "workers": 31,
+        "cargo": 8
+      }
+    },
+    {
+      "name": "Production Foley renders distinct nonclipping stereo audio",
+      "passed": true,
+      "detail": [
+        {
+          "kind": "step",
+          "peak": 0.02048167958855629
+        },
+        {
+          "kind": "axe",
+          "peak": 0.09858967363834381
+        },
+        {
+          "kind": "hammer",
+          "peak": 0.0536721907556057
+        },
+        {
+          "kind": "chisel",
+          "peak": 0.057402465492486954
+        },
+        {
+          "kind": "anvil",
+          "peak": 0.07188902050256729
+        },
+        {
+          "kind": "saw",
+          "peak": 0.02328486181795597
+        },
+        {
+          "kind": "rustle",
+          "peak": 0.014422785490751266
+        },
+        {
+          "kind": "cloth",
+          "peak": 0.009435090236365795
+        },
+        {
+          "kind": "page",
+          "peak": 0.007607609964907169
+        },
+        {
+          "kind": "cargo",
+          "peak": 0.03380105644464493
+        },
+        {
+          "kind": "bow",
+          "peak": 0.0234078299254179
+        },
+        {
+          "kind": "impact",
+          "peak": 0.045656073838472366
+        },
+        {
+          "kind": "gate",
+          "peak": 0.045616406947374344
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "living-ui-01-fieldbook.png",
+    "living-ui-07-laptop.png",
+    "living-ui-02-surveyor.png",
+    "living-ui-03-report.png",
+    "living-ui-04-restored.png",
+    "living-ui-05-sound.png",
+    "living-ui-06-touch.png",
+    "living-art-waystone.png",
+    "living-art-spring.png",
+    "living-art-kiln.png",
+    "living-art-stars.png",
+    "living-art-workshop.png"
+  ],
+  "audio": [
+    {
+      "kind": "step",
+      "peak": 0.02048167958855629,
+      "rms": [
+        0.001392173031678974,
+        0.001392173031678974
+      ],
+      "startSeconds": 0
+    },
+    {
+      "kind": "axe",
+      "peak": 0.09858967363834381,
+      "rms": [
+        0.006326030779765104,
+        0.0015187456847636802
+      ],
+      "startSeconds": 0.9
+    },
+    {
+      "kind": "hammer",
+      "peak": 0.0536721907556057,
+      "rms": [
+        0.003536274420095759,
+        0.003536274420095759
+      ],
+      "startSeconds": 1.8
+    },
+    {
+      "kind": "chisel",
+      "peak": 0.057402465492486954,
+      "rms": [
+        0.0020337773983996527,
+        0.0020337773983996527
+      ],
+      "startSeconds": 2.7
+    },
+    {
+      "kind": "anvil",
+      "peak": 0.07188902050256729,
+      "rms": [
+        0.001398452838524141,
+        0.0058249750526511495
+      ],
+      "startSeconds": 3.6
+    },
+    {
+      "kind": "saw",
+      "peak": 0.02328486181795597,
+      "rms": [
+        0.0013710868889987978,
+        0.0013710868889987978
+      ],
+      "startSeconds": 4.5
+    },
+    {
+      "kind": "rustle",
+      "peak": 0.014422785490751266,
+      "rms": [
+        0.0007826625870274492,
+        0.0007826625870274492
+      ],
+      "startSeconds": 5.4
+    },
+    {
+      "kind": "cloth",
+      "peak": 0.009435090236365795,
+      "rms": [
+        0.0004943222030159281,
+        0.0004943222030159281
+      ],
+      "startSeconds": 6.3
+    },
+    {
+      "kind": "page",
+      "peak": 0.007607609964907169,
+      "rms": [
+        0.0003557653009659632,
+        0.0003557653009659632
+      ],
+      "startSeconds": 7.2
+    },
+    {
+      "kind": "cargo",
+      "peak": 0.03380105644464493,
+      "rms": [
+        0.0028975024557142026,
+        0.0028975024557142026
+      ],
+      "startSeconds": 8.1
+    },
+    {
+      "kind": "bow",
+      "peak": 0.0234078299254179,
+      "rms": [
+        0.0016848670572367655,
+        0.0016848670572367655
+      ],
+      "startSeconds": 9
+    },
+    {
+      "kind": "impact",
+      "peak": 0.045656073838472366,
+      "rms": [
+        0.002742205652614858,
+        0.002742205652614858
+      ],
+      "startSeconds": 9.9
+    },
+    {
+      "kind": "gate",
+      "peak": 0.045616406947374344,
+      "rms": [
+        0.003809696945011841,
+        0.003809696945011841
+      ],
+      "startSeconds": 10.8
+    }
+  ],
+  "earnedCheckpoint": {
+    "file": "living-campaign-restore-save.json",
+    "sha256": "2bfcc6d552e49322baf55bad7a77dce78a2d485011e5d6d099cf5f6cfc7f4a1d"
+  },
+  "workAudio": {
+    "count": 53,
+    "cues": [
+      {
+        "kind": "anvil",
+        "at": 10.396734693877551,
+        "gain": 0.49165978029309193,
+        "pan": -0.2418114907528215
+      },
+      {
+        "kind": "axe",
+        "at": 10.866938775510205,
+        "gain": 0.213774385468076,
+        "pan": -0.2201501192188329
+      },
+      {
+        "kind": "step",
+        "at": 10.866938775510205,
+        "gain": 0.08992710589420595,
+        "pan": 0.470238222273822
+      },
+      {
+        "kind": "step",
+        "at": 11.337142857142856,
+        "gain": 0.10688274073650997,
+        "pan": -0.34514230250940103
+      },
+      {
+        "kind": "step",
+        "at": 11.81315192743764,
+        "gain": 0.12598812631309347,
+        "pan": 0.015561668077723332
+      },
+      {
+        "kind": "step",
+        "at": 12.289160997732425,
+        "gain": 0.129643044756509,
+        "pan": -0.2624902445515563
+      },
+      {
+        "kind": "chisel",
+        "at": 12.289160997732425,
+        "gain": 0.31653360766033806,
+        "pan": 0.3070511478181817
+      },
+      {
+        "kind": "step",
+        "at": 12.753560090702948,
+        "gain": 0.09513659832055589,
+        "pan": 0.460532666114819
+      },
+      {
+        "kind": "chisel",
+        "at": 12.753560090702948,
+        "gain": 0.281633225194255,
+        "pan": 0.33236207563218
+      },
+      {
+        "kind": "step",
+        "at": 13.241179138321996,
+        "gain": 0.12699458105648265,
+        "pan": -0.010784812977572143
+      },
+      {
+        "kind": "axe",
+        "at": 13.241179138321996,
+        "gain": 0.2089248645512236,
+        "pan": -0.06950279441542745
+      },
+      {
+        "kind": "step",
+        "at": 13.734603174603174,
+        "gain": 0.06421109428999314,
+        "pan": 0.9
+      },
+      {
+        "kind": "step",
+        "at": 14.222222222222221,
+        "gain": 0.13465184332803973,
+        "pan": -0.2407352084115014
+      },
+      {
+        "kind": "chisel",
+        "at": 14.692426303854875,
+        "gain": 0.18343452630674878,
+        "pan": -0.7206173086175545
+      },
+      {
+        "kind": "step",
+        "at": 14.692426303854875,
+        "gain": 0.10048865087517861,
+        "pan": 0.4508271099558474
+      },
+      {
+        "kind": "anvil",
+        "at": 14.692426303854875,
+        "gain": 0.3947986466241971,
+        "pan": -0.35417633895868295
+      },
+      {
+        "kind": "step",
+        "at": 15.16843537414966,
+        "gain": 0.1282065045884066,
+        "pan": -0.046373732577506536
+      },
+      {
+        "kind": "step",
+        "at": 16.15528344671202,
+        "gain": 0.13972269817802827,
+        "pan": -0.21898017227144245
+      },
+      {
+        "kind": "rustle",
+        "at": 16.724172335600908,
+        "gain": 0.21791389800988162,
+        "pan": 0.9
+      },
+      {
+        "kind": "step",
+        "at": 16.724172335600908,
+        "gain": 0.21612219374959027,
+        "pan": 0.3236899674385178
+      },
+      {
+        "kind": "step",
+        "at": 17.28145124716553,
+        "gain": 0.12887305635817953,
+        "pan": -0.08460263338559199
+      },
+      {
+        "kind": "axe",
+        "at": 17.28145124716553,
+        "gain": 0.2059744546293082,
+        "pan": -0.017788041124695272
+      },
+      {
+        "kind": "saw",
+        "at": 17.28145124716553,
+        "gain": 0.5119441549473013,
+        "pan": -0.2995389173864719
+      },
+      {
+        "kind": "rustle",
+        "at": 17.943219954648526,
+        "gain": 0.4887491723214417,
+        "pan": 0.3423111065591797
+      },
+      {
+        "kind": "step",
+        "at": 17.943219954648526,
+        "gain": 0.11270015131292706,
+        "pan": -0.05029922162887101
+      },
+      {
+        "kind": "step",
+        "at": 18.488888888888887,
+        "gain": 0.14485008912705558,
+        "pan": -0.19722513613138346
+      },
+      {
+        "kind": "saw",
+        "at": 18.488888888888887,
+        "gain": 0.49035733868201753,
+        "pan": -0.2570769718286183
+      },
+      {
+        "kind": "saw",
+        "at": 18.99392290249433,
+        "gain": 0.5015986534523322,
+        "pan": -0.20536221853788528
+      },
+      {
+        "kind": "step",
+        "at": 18.99392290249433,
+        "gain": 0.22387745162848155,
+        "pan": 0.3055017321520655
+      },
+      {
+        "kind": "step",
+        "at": 19.49315192743764,
+        "gain": 0.13022434752040252,
+        "pan": -0.12127631479681956
+      },
+      {
+        "kind": "axe",
+        "at": 19.49315192743764,
+        "gain": 0.21409385594811675,
+        "pan": -0.27186487250960123
+      },
+      {
+        "kind": "anvil",
+        "at": 19.49895691609977,
+        "gain": 0.49165978029306273,
+        "pan": -0.24181149075289396
+      }
+    ],
+    "workers": [
+      {
+        "name": "Bram",
+        "job": "quarryworker"
+      },
+      {
+        "name": "Ida",
+        "job": "farmer"
+      },
+      {
+        "name": "Milo",
+        "job": "farmer"
+      },
+      {
+        "name": "Nell",
+        "job": "farmer"
+      },
+      {
+        "name": "Orin",
+        "job": "farmer"
+      },
+      {
+        "name": "Pia",
+        "job": "farmer"
+      },
+      {
+        "name": "Quinn",
+        "job": "farmer"
+      },
+      {
+        "name": "Remy",
+        "job": "farmer"
+      },
+      {
+        "name": "Sage",
+        "job": "farmer"
+      },
+      {
+        "name": "Tess",
+        "job": "lumberjack"
+      },
+      {
+        "name": "Vale",
+        "job": "lumberjack"
+      },
+      {
+        "name": "Wren",
+        "job": "lumberjack"
+      },
+      {
+        "name": "Yara",
+        "job": "lumberjack"
+      },
+      {
+        "name": "Ada 2",
+        "job": "lumberjack"
+      },
+      {
+        "name": "Remy 2",
+        "job": "carpenter"
+      },
+      {
+        "name": "Sage 2",
+        "job": "carpenter"
+      },
+      {
+        "name": "Una 2",
+        "job": "carpenter"
+      },
+      {
+        "name": "Vale 2",
+        "job": "miner"
+      },
+      {
+        "name": "Wren 2",
+        "job": "miner"
+      },
+      {
+        "name": "Yara 2",
+        "job": "miner"
+      },
+      {
+        "name": "Bram 3",
+        "job": "miner"
+      },
+      {
+        "name": "Cora 3",
+        "job": "miner"
+      },
+      {
+        "name": "Hollis 3",
+        "job": "smith"
+      },
+      {
+        "name": "Ida 3",
+        "job": "smith"
+      },
+      {
+        "name": "Jory 3",
+        "job": "smith"
+      },
+      {
+        "name": "Kit 3",
+        "job": "smith"
+      },
+      {
+        "name": "Nell 3",
+        "job": "medic"
+      },
+      {
+        "name": "Orin 3",
+        "job": "medic"
+      },
+      {
+        "name": "Pia 3",
+        "job": "medic"
+      },
+      {
+        "name": "Quinn 3",
+        "job": "medic"
+      },
+      {
+        "name": "Remy 3",
+        "job": "chaplain"
+      }
+    ],
+    "cargo": [
+      {
+        "name": "Hollis",
+        "job": "farmer",
+        "cargo": "fruit"
+      },
+      {
+        "name": "Jory",
+        "job": "farmer",
+        "cargo": "fruit"
+      },
+      {
+        "name": "Kit",
+        "job": "farmer",
+        "cargo": "fruit"
+      },
+      {
+        "name": "Lina",
+        "job": "farmer",
+        "cargo": "fruit"
+      },
+      {
+        "name": "Tess 2",
+        "job": "carpenter",
+        "cargo": "planks"
+      },
+      {
+        "name": "Ada 3",
+        "job": "miner",
+        "cargo": "ore"
+      },
+      {
+        "name": "Elin 3",
+        "job": "smith",
+        "cargo": "iron"
+      },
+      {
+        "name": "Finn 3",
+        "job": "smith",
+        "cargo": "iron"
+      }
+    ]
+  },
+  "sourcesAtEnd": {
+    "js/main.js": "ec3865bb87b0bf8374bd8c5f9cc5301d96a96629fcd2d00e8db7e87b05eda22b",
+    "js/world.js": "a474bd900914bda496201fc6a1827047774191bc1ab4bafc4280eaa7fffccfbc",
+    "js/audio.js": "8eaa22d36094c8aaba97412bbd1bd107267ebe4b2a646d997ef6937ef0383475",
+    "js/fieldbook-ui.js": "4e83e161204df1dd5ab6619ae4216b892042aa8ae7f01c5845fa4af1d98b6740",
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "index.html": "c080585cdbdc434281ce3de76268de85821a94e7ff1966bcfbf7cc5a25e639fd",
+    "living.css": "84d77e2a7ffacfdf2698054dfddb1d32c21cef5ba49ee87dab25bcec4da398c2",
+    "assets/living-kit.glb": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c",
+    "tools/living-review.mjs": "697a6fdba579e152d0d23fc3c2bf4c3ae4451aef7335c8f24a0ac400a9cffeda"
+  },
+  "sourcesStable": true,
+  "finishedAt": "2026-10-03T04:00:57.578Z"
+}

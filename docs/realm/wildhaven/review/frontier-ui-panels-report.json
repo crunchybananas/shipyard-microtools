@@ -1,0 +1,226 @@
+{
+  "startedAt": "2026-10-02T06:02:16.696Z",
+  "mode": "panels",
+  "scope": "Actual UI actions against real frontier/simulation APIs. Isolated browser imports a previously earned village checkpoint; public workforce changes and clock skips prepare this review. No stock, population, diplomacy or unlock injection. This does not claim an earned frontier campaign or physical-device play.",
+  "checkpoint": {
+    "file": "campaign-services-lanes-save.json",
+    "sha256": "bbe9106df94ec942d7ec99f5eaf0e7e0d31bca4dbb9bf52d57dd0e5fcf8ac38c"
+  },
+  "sourcesAtStart": {
+    "js/frontier-ui.js": "8b9f425af61c5c63ab9ed31d63d94a7d17ca013a969b4b70ea12cb5d4054427a",
+    "frontier.css": "54cb2a3aa56004fd51c6ba0fba5912a87ba88f422809a4c373ad96b0e4929480",
+    "js/frontier.js": "2559ea6cdc4c2d4ddc05b865cfe43fba824b8d8435c13872a5a079b164b0f585",
+    "js/island.js": "ebb7e846aadca27575693d3dae2df4aa0af4456f05b051b5f71518876ece6b99",
+    "js/main.js": "690e727f6c2ec8de525563177ee0c06c5a039aa2d1f6158a8d5abc78efd8e177",
+    "js/sim.js": "2b81da983da26ae5d6344d5e146c013f3b62d58db55f549f1bfe07abaa6212d8",
+    "js/world.js": "4a4d5bd47a0967e8fb31c2e385a6b089ae41c631a02945c05f50192f8aa867b2",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c"
+  },
+  "checks": [
+    {
+      "name": "V3 migration opens the earned town and preserves its V2 source save",
+      "passed": true
+    },
+    {
+      "name": "Frontier exposes real quotes, region prerequisites and an interactive coastline",
+      "passed": true
+    },
+    {
+      "name": "Named recruitment spends the exact quote and reserves a real resident through training",
+      "passed": true,
+      "detail": {
+        "unitId": "unit-1",
+        "citizenId": "c9",
+        "name": "Ida",
+        "cost": {
+          "wood": 10,
+          "iron": 2,
+          "food": 8
+        }
+      }
+    },
+    {
+      "name": "Frontier units and named labor survive save/reload without altering the V2 save",
+      "passed": true
+    },
+    {
+      "name": "An envoy spends real provisions, walks to first contact, and releases their town job on return",
+      "passed": true,
+      "detail": {
+        "citizenId": "c52",
+        "name": "Dev 3",
+        "elapsed": 68,
+        "cost": {
+          "food": 8,
+          "gold": 15
+        }
+      }
+    },
+    {
+      "name": "Neighbor trade, deliberate war, and a priced truce use their actual action quotes",
+      "passed": true,
+      "detail": {
+        "trade": {
+          "cost": {
+            "wood": 18
+          },
+          "reward": {
+            "food": 32,
+            "gold": 8
+          }
+        },
+        "truceCost": {
+          "gold": 45,
+          "food": 15
+        },
+        "note": "Paused after declaration; verifies real war state/garrison and withdrawal, not a won battle."
+      }
+    },
+    {
+      "name": "Island chart and management controls fit a 390px phone viewport without hiding action text",
+      "passed": true
+    },
+    {
+      "name": "No browser or application errors during actual frontier control checks",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "frontier-ui-01-island-chart.png",
+    "frontier-ui-02-trained-company.png",
+    "frontier-ui-03-first-contact.png",
+    "frontier-ui-04-truce.png",
+    "frontier-ui-06-mobile-chart.png"
+  ],
+  "fixture": {
+    "preparation": {
+      "method": "Public setWorkers restores food/timber/stone production and rests plank-consuming craft workers before time skips.",
+      "assignments": [
+        {
+          "id": "b2",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b3",
+          "type": "lumber",
+          "count": 2
+        },
+        {
+          "id": "b4",
+          "type": "quarry",
+          "count": 2
+        },
+        {
+          "id": "b12",
+          "type": "lumber",
+          "count": 2
+        },
+        {
+          "id": "b13",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b15",
+          "type": "quarry",
+          "count": 2
+        },
+        {
+          "id": "b16",
+          "type": "farm",
+          "count": 3
+        },
+        {
+          "id": "b17",
+          "type": "sawmill",
+          "count": 0
+        },
+        {
+          "id": "b19",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b23",
+          "type": "windmill",
+          "count": 2
+        },
+        {
+          "id": "b25",
+          "type": "farm",
+          "count": 3
+        },
+        {
+          "id": "b26",
+          "type": "sawmill",
+          "count": 0
+        },
+        {
+          "id": "b28",
+          "type": "bakery",
+          "count": 2
+        },
+        {
+          "id": "b30",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b40",
+          "type": "smith",
+          "count": 0
+        },
+        {
+          "id": "b41",
+          "type": "smith",
+          "count": 0
+        },
+        {
+          "id": "b42",
+          "type": "toolmaker",
+          "count": 0
+        },
+        {
+          "id": "b43",
+          "type": "toolmaker",
+          "count": 0
+        },
+        {
+          "id": "b50",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b52",
+          "type": "orchard",
+          "count": 2
+        }
+      ]
+    }
+  },
+  "finishedAt": "2026-10-02T06:06:27.876Z",
+  "sourcesAtEnd": {
+    "js/frontier-ui.js": "720f726f6e5073e771ed26766a670ab47b928429abb6000825b89db6b6bcd01d",
+    "frontier.css": "54cb2a3aa56004fd51c6ba0fba5912a87ba88f422809a4c373ad96b0e4929480",
+    "js/frontier.js": "9eb32b97fe0c451a99c891a357634081dbce2a21a16b7b4a3abe70fedfe52132",
+    "js/island.js": "ebb7e846aadca27575693d3dae2df4aa0af4456f05b051b5f71518876ece6b99",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "js/sim.js": "ff81dad5319c4bbfe8ec9d51b6dbf5cb78a4d7d220c26faaec3d97e0bc945364",
+    "js/world.js": "22aa90c029ea3b2abd357649f6d3f20285f5129eacbcb898bee15fec2caf2154",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c"
+  },
+  "sourceChanges": [
+    "js/frontier-ui.js",
+    "js/frontier.js",
+    "js/main.js",
+    "js/sim.js",
+    "js/world.js"
+  ],
+  "passed": true
+}

@@ -1,0 +1,49 @@
+{
+  "startedAt": "2026-10-02T06:28:25.526Z",
+  "scope": "Frontier DOM component behavior with an explicit simulation test double. Does not verify real economy, combat, navigation, or earned play.",
+  "checks": [
+    {
+      "name": "Disabled construction shows its price and an actionable reason",
+      "passed": true
+    },
+    {
+      "name": "Wall lines preview total cost and preserve invalid placement mode",
+      "passed": true
+    },
+    {
+      "name": "Named recruitment survives live DOM updates without detached controls",
+      "passed": true
+    },
+    {
+      "name": "Company targets only player troops and shows training/healing limitations",
+      "passed": true
+    },
+    {
+      "name": "A settlement world hit opens diplomacy even when it also has a fortification hit",
+      "passed": true
+    },
+    {
+      "name": "War requires a visible consequence confirmation before issuing the action",
+      "passed": true
+    },
+    {
+      "name": "Actual island chart focuses land and closes the panel with keyboard Find alternatives retained",
+      "passed": true
+    },
+    {
+      "name": "Phone frontier panels and touch actions fit a 390px viewport",
+      "passed": true
+    },
+    {
+      "name": "No component browser errors",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "sources": {
+    "js/frontier-ui.js": "c8930f14a521368ccbe752404437970272b2b519cc52e4b5c104e75c71a978c8",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b"
+  },
+  "finishedAt": "2026-10-02T06:28:26.072Z",
+  "passed": true
+}

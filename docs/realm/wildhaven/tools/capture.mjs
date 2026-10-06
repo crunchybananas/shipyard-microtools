@@ -1,0 +1,14 @@
+import { chromium } from '@playwright/test';
+import {mkdir,writeFile} from 'node:fs/promises';
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+await page.goto('http://127.0.0.1:4751/wildhaven/?review');
+await page.waitForFunction(()=>window.Wildhaven,{timeout:30000});
+await page.waitForTimeout(2000);
+await mkdir(new URL('../review/',import.meta.url),{recursive:true});
+await page.screenshot({path:new URL('../review/01-arrival.png',import.meta.url).pathname});
+await page.locator('#start').click();await page.waitForTimeout(1500);
+await page.screenshot({path:new URL('../review/02-new-village.png',import.meta.url).pathname});
+console.log(JSON.stringify({errors,diagnostics:await page.evaluate(()=>window.Wildhaven.getDiagnostics())},null,2));
+await browser.close();

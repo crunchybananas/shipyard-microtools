@@ -1,0 +1,45 @@
+✔ all four places replace natural obstacles with reachable adjacent approaches (33.7435ms)
+✔ v3 migration preserves its economy, frontier and original input while adding untouched places (9.288041ms)
+✔ survey uses a named citizen, costs provisions, physically travels and credits only at home (39.128667ms)
+✔ one person cannot do two jobs, one place cannot host two missions, and two civilians remain (4.74375ms)
+✔ recall retains survey progress and returns the worker without granting the report (6.108917ms)
+✖ restoration escrow survives recall and reload; resumed work is free and benefit arrives on return (4.390834ms)
+✔ restored mason lesson changes actual construction work (10.454583ms)
+✔ salvage credits capacity-limited goods once and never grants the restoration benefit (11.747042ms)
+✔ every phase reloads and a restored site cannot pay twice (48.493458ms)
+✔ blocked route never teleports a fieldworker or progresses remote work (0.757125ms)
+✔ hostile forces trigger a physical retreat; unfinished work remains resumable (32.5875ms)
+✔ strict save validation rejects corrupt site enums, rewards, duplicate places and orphan missions (2.054875ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 254.507291
+
+✖ failing tests:
+
+test at wildhaven/test/discovery.test.mjs:17:1
+✖ restoration escrow survives recall and reload; resumed work is free and benefit arrives on return (4.390834ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 17.999999999999993
+  - 18
+  
+      at TestContext.<anonymous> (file:///Users/cloken/code/Dockhand/shipyard-microtools/docs/realm/wildhaven/test/discovery.test.mjs:17:269)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 17.999999999999993,
+    expected: 18,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

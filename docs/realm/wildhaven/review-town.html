@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Wildhaven — earned town motion review</title>
+<script type="importmap">{"imports":{"three":"../vendor/three/three.module.js"}}</script>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#233f37;font:14px system-ui;background:#75acac}canvas{display:block;width:100vw;height:100vh;touch-action:none}aside{position:fixed;top:18px;left:18px;max-width:420px;background:#f3eed9ee;border-radius:10px;padding:18px;box-shadow:0 4px 24px #244b4220}h1{margin:0 0 8px;font:25px Georgia}p{line-height:1.5;margin:8px 0}button,select{font:inherit;padding:9px;border:1px solid #b4bea4;background:#f7f2df;color:#233f37;border-radius:5px;margin:3px 0}button{cursor:pointer}label{display:block;margin:8px 0}output{display:block;font-size:12px;line-height:1.5;margin-top:10px}#status{font-weight:600}.buttons{display:flex;gap:6px;flex-wrap:wrap}details{margin-top:8px}summary{cursor:pointer}small{display:block;margin-top:8px;color:#61705b}@media(max-width:600px){aside{left:10px;right:10px;top:10px;padding:12px}h1{font-size:20px}}
+</style></head><body>
+<canvas id="world" tabindex="0" aria-label="Earned town. Drag to pan and scroll to zoom."></canvas>
+<aside><h1>Earned town motion review</h1><p>This review never reads or writes your village save. Only presentation moves; the economy stays at its recorded checkpoint.</p>
+<label>Town <select id="checkpoint"><option value="campaign-services-lanes-save.json">Breadbasket · 76 residents</option><option value="campaign-freeport-save.json">Free Port · 94 residents</option><option value="campaign-forge-save.json">Forge Town · 75 residents</option></select></label>
+<label><input id="staff" type="checkbox"> Request full staffing for workplace review</label>
+<div class="buttons"><button id="load">Load checkpoint</button><button id="motion" disabled>Pause motion</button><button id="home" disabled>Whole town</button></div>
+<details><summary>Inspect a worker</summary><label>Resident <select id="person"></select></label><div class="buttons"><button id="focus" disabled>Find resident</button><button id="turn" disabled>Turn camera</button></div></details>
+<output id="status" role="status">Loading models…</output><output id="metrics"></output><small>Camera drag, scroll and rotation change this review only.</small></aside>
+<script type="module">
+import {VillageWorld} from './js/world.js';
+import * as sim from './js/sim.js';
+import {getBuildingSpec,JOBS} from './js/catalog.js';
+const $=id=>document.getElementById(id),world=new VillageWorld($('world'));
+let state=null,running=true,busy=false,last=performance.now(),frames=0,elapsed=0;
+await world.load();
+async function load(){
+ if(busy)return;busy=true;$('load').disabled=true;
+ try{
+  const response=await fetch('./review/'+$('checkpoint').value);if(!response.ok)throw new Error('Checkpoint could not be read.');
+  state=sim.restore(await response.text());if(!state)throw new Error('Checkpoint is invalid.');
+  if($('staff').checked)for(const b of state.buildings)if(b.status==='ready'&&getBuildingSpec(b.type,b.level).workers)sim.setWorkers(state,b.id,getBuildingSpec(b.type,b.level).workers);
+  // Start each review independently; retained actor assignments must not leak between checkpoints.
+  for(const a of world.actors)world.disposePresentation(a.root);world.actors=[];
+  for(const b of world.buildings.values())world.disposePresentation(b);world.buildings.clear();world.layoutSignature=null;
+  world.sync(state);world.home();world.clock=0;
+  $('person').replaceChildren(...state.citizens.map(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name+' · '+(JOBS[c.job]?.name||'Available');return o;}));
+  $('status').textContent='Day '+state.day+' · '+state.population+' residents · '+state.buildings.length+' buildings';
+  for(const id of ['motion','home','focus','turn'])$(id).disabled=false;
+ }catch(e){$('status').textContent=e.message;}finally{busy=false;$('load').disabled=false;}
+}
+$('load').onclick=load;$('home').onclick=()=>world.home();$('turn').onclick=()=>world.rotate(1);
+$('motion').onclick=()=>{running=!running;$('motion').textContent=running?'Pause motion':'Run motion';};
+$('focus').onclick=()=>{const a=world.actors.find(a=>a.citizen.id===$('person').value);if(a){world.pan.set(a.root.position.x,0,a.root.position.z);world.targetZoom=7;}};
+await load();
+function frame(now){const wall=(now-last)/1000;last=now;if(state){world.render(Math.min(.08,wall),{speed:running?1:0,playing:running,dayTime:state.time/sim.DAY_LENGTH,won:state.won});frames++;elapsed+=wall;if(elapsed>=2){const states={};for(const a of world.actors){const key=a.root.userData.workState||'starting';states[key]=(states[key]||0)+1;}const d=world.diagnostics();$('metrics').textContent=Math.round(frames/elapsed)+' fps · '+d.drawCalls+' draws · '+d.triangles.toLocaleString()+' triangles\n'+Object.entries(states).map(([k,v])=>v+' '+k).join(' · ');document.documentElement.dataset.fps=String(Math.round(frames/elapsed));frames=0;elapsed=0;}}requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></body></html>

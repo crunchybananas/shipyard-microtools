@@ -1,0 +1,80 @@
+{
+  "startedAt": "2026-10-02T06:51:29.210Z",
+  "mode": "outpost",
+  "scope": "Actual UI actions against real frontier/simulation APIs. Isolated browser imports a previously earned village checkpoint; public workforce changes and clock skips prepare this review. No stock, population, diplomacy or unlock injection. This does not claim an earned frontier campaign or physical-device play.",
+  "checkpoint": null,
+  "sourcesAtStart": {
+    "js/frontier-ui.js": "c8930f14a521368ccbe752404437970272b2b519cc52e4b5c104e75c71a978c8",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "checks": [
+    {
+      "name": "An earned outpost can be removed and rebuilt through the UI; claim loss blocks new buildings and preserves existing homes",
+      "passed": true,
+      "detail": {
+        "region": "highmeadow",
+        "preservedBuildings": [
+          "b51"
+        ],
+        "refund": {
+          "wood": 15,
+          "stone": 8,
+          "planks": 4,
+          "gold": 12
+        },
+        "reclaimCost": {
+          "wood": 30,
+          "stone": 16,
+          "planks": 8,
+          "gold": 25
+        },
+        "constructionSecondsSkipped": 100
+      }
+    },
+    {
+      "name": "No browser or application errors during actual frontier control checks",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "frontier-ui-08-outpost-consequences.png",
+    "frontier-ui-09-claim-restored.png"
+  ],
+  "fixture": {
+    "claimCheckpoint": {
+      "file": "frontier-campaign-complete-save.json",
+      "sha256": "8fd6a9a3bc2e2d0558a2efd5024d5318257c6052701fcc86f59f10fb80d545e0",
+      "label": "Separately earned completed frontier checkpoint with hostiles defeated, imported into an isolated browser context."
+    }
+  },
+  "finishedAt": "2026-10-02T06:52:52.202Z",
+  "sourcesAtEnd": {
+    "js/frontier-ui.js": "c8930f14a521368ccbe752404437970272b2b519cc52e4b5c104e75c71a978c8",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "sourceChanges": [],
+  "passed": true
+}

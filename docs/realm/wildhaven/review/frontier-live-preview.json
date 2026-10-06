@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-02T06:57:44.438Z",
+  "scope": "Native in-app browser UI observation. Existing save opened through Come back home in a fresh preview; no fixture imports or gameplay time advances.",
+  "originalTab": {
+    "id": "1",
+    "status": "Browser-control connection timed out; tab left untouched."
+  },
+  "playableTab": {
+    "id": "5",
+    "url": "http://127.0.0.1:4751/wildhaven/",
+    "keptAsDeliverable": true,
+    "day": 21,
+    "population": 7,
+    "housing": 10,
+    "resourcesVisible": {
+      "wood": 106,
+      "stone": 81,
+      "food": 14
+    },
+    "queuedProjects": 2,
+    "paused": true,
+    "newFrontierPanelOpenedAndClosed": true,
+    "threeUncontactedNeighborsVisible": true,
+    "unclaimedRegionRequirementsVisible": true,
+    "visibleStateUnchangedDuringInspection": true
+  },
+  "comparisonLimit": "The original tab could not be read. Values record the current persisted save and its unchanged paused state across this inspection, not equality with every historical snapshot.",
+  "cleanup": {
+    "temporaryReadOnlyReviewTabClosed": true,
+    "isolatedTestBrowsersClosed": true,
+    "localPlayServerRetained": true
+  }
+}

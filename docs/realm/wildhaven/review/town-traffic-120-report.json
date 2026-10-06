@@ -1,0 +1,2893 @@
+{
+  "checkedAt": "2026-10-02T05:26:27.033Z",
+  "scope": "Presentation-only replay of the earned campaign with public full-staff requests. Every actor is measured; the final 60-second window reports walked distance, spatial range, net displacement and completed waypoints. No browser or save is changed.",
+  "sourceHashesAtStart": {
+    "js/world.js": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/town-kit.json": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794",
+    "tools/town-traffic.mjs": "56c903c4a19b843aab83fed39d9f60ebd1f7e6bb52c336eee546910f66345de2",
+    "review/campaign-services-lanes-save.json": "bbe9106df94ec942d7ec99f5eaf0e7e0d31bca4dbb9bf52d57dd0e5fcf8ac38c"
+  },
+  "sourceHashesAtEnd": {
+    "js/world.js": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/town-kit.json": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794",
+    "tools/town-traffic.mjs": "56c903c4a19b843aab83fed39d9f60ebd1f7e6bb52c336eee546910f66345de2",
+    "review/campaign-services-lanes-save.json": "bbe9106df94ec942d7ec99f5eaf0e7e0d31bca4dbb9bf52d57dd0e5fcf8ac38c"
+  },
+  "sourcesStable": true,
+  "summary": {
+    "seconds": 120,
+    "measurementSeconds": 60,
+    "actors": 76,
+    "walking": 13,
+    "working": 58,
+    "stalled": [],
+    "maxNoWaypointSeconds": 7.999999999999988,
+    "illegal": 0,
+    "illegalExamples": [],
+    "minSeparation": 0.44570827627084225,
+    "minimumPair": {
+      "at": 80.09999999999972,
+      "a": "c11",
+      "b": "c16",
+      "states": [
+        "walking",
+        "walking"
+      ],
+      "stations": [
+        null,
+        null
+      ]
+    },
+    "stateUnchanged": true
+  },
+  "actors": [
+    {
+      "id": "c5",
+      "job": "forager",
+      "workplace": "hearth",
+      "workSeconds": 0,
+      "walkSeconds": 55.60000000000052,
+      "walkMeters": 52.882706621294204,
+      "start": [
+        6.94584027578032,
+        -0.33082585947063226
+      ],
+      "last": [
+        -5.6227173465612506,
+        -0.30146876268061895
+      ],
+      "min": [
+        -5.6227173465612506,
+        -7.4232773880322656
+      ],
+      "max": [
+        7.350088494336663,
+        5.633232705701289
+      ],
+      "waypoints": 32,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.2000000000000015,
+      "netMeters": 12.568591907817371,
+      "rangeMeters": 18.40560097398075,
+      "state": "foraging",
+      "activity": "gather",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "hearth"
+    },
+    {
+      "id": "c6",
+      "job": "forager",
+      "workplace": "hearth",
+      "workSeconds": 0,
+      "walkSeconds": 44.50000000000036,
+      "walkMeters": 44.4287340343759,
+      "start": [
+        -0.23502588685984682,
+        0.033326595560918604
+      ],
+      "last": [
+        -0.684,
+        1.116
+      ],
+      "min": [
+        -3.8247496488020984,
+        -0.28464309271689986
+      ],
+      "max": [
+        3.8335881352554413,
+        8.79750495549698
+      ],
+      "waypoints": 29,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 7.999999999999988,
+      "netMeters": 1.1720748504040592,
+      "rangeMeters": 11.880048433588078,
+      "state": "unloading",
+      "activity": "deliver",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "hearth"
+    },
+    {
+      "id": "c7",
+      "job": "farmer",
+      "workplace": "b2",
+      "workSeconds": 30.30000000000016,
+      "walkSeconds": 29.700000000000152,
+      "walkMeters": 31.190000000000104,
+      "start": [
+        4.49,
+        3.9499999999999997
+      ],
+      "last": [
+        5.067196142505615,
+        -12.364945401259115
+      ],
+      "min": [
+        -3.36251669284688,
+        -12.364945401259115
+      ],
+      "max": [
+        5.067196142505615,
+        3.9499999999999997
+      ],
+      "waypoints": 19,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.8000000000000005,
+      "netMeters": 16.32515233720621,
+      "rangeMeters": 18.36402738869044,
+      "state": "walking",
+      "activity": "deliver",
+      "path": [
+        {
+          "x": 3,
+          "z": -8
+        },
+        {
+          "x": 3.38,
+          "z": -7.62,
+          "exact": true,
+          "public": true
+        }
+      ],
+      "remainingWaypoints": 2,
+      "goal": "b54"
+    },
+    {
+      "id": "c8",
+      "job": "farmer",
+      "workplace": "b2",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        4.49,
+        3.4899999999999998
+      ],
+      "last": [
+        4.49,
+        3.4899999999999998
+      ],
+      "min": [
+        4.49,
+        3.4899999999999998
+      ],
+      "max": [
+        4.49,
+        3.4899999999999998
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 0.6,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b2",
+      "station": "b2"
+    },
+    {
+      "id": "c9",
+      "job": "farmer",
+      "workplace": "b5",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        4.460000000000001,
+        1.1099999999999999
+      ],
+      "last": [
+        4.460000000000001,
+        1.1099999999999999
+      ],
+      "min": [
+        4.460000000000001,
+        1.1099999999999999
+      ],
+      "max": [
+        4.460000000000001,
+        1.1099999999999999
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 0.8999999999999999,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b5",
+      "station": "b5"
+    },
+    {
+      "id": "c10",
+      "job": "farmer",
+      "workplace": "b13",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        7.550000000000001,
+        4.51
+      ],
+      "last": [
+        7.550000000000001,
+        4.51
+      ],
+      "min": [
+        7.550000000000001,
+        4.51
+      ],
+      "max": [
+        7.550000000000001,
+        4.51
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.7000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b13",
+      "station": "b13"
+    },
+    {
+      "id": "c11",
+      "job": "farmer",
+      "workplace": "b13",
+      "workSeconds": 0,
+      "walkSeconds": 56.50000000000053,
+      "walkMeters": 59.514030672928335,
+      "start": [
+        8.051445835381063,
+        -0.20105498210455183
+      ],
+      "last": [
+        9.135269025713342,
+        -1.5648691396459529
+      ],
+      "min": [
+        -3.8300319230458792,
+        -12.361477272147523
+      ],
+      "max": [
+        9.135269025713342,
+        0.46693784502890373
+      ],
+      "waypoints": 35,
+      "noWaypointSeconds": 0.4,
+      "maxNoWaypointSeconds": 4.799999999999999,
+      "netMeters": 1.7420280606845575,
+      "rangeMeters": 18.239168377711124,
+      "state": "walking",
+      "activity": "work",
+      "path": [
+        {
+          "x": 6,
+          "z": -1,
+          "laneX": 0,
+          "laneZ": 0.235
+        },
+        {
+          "x": 6,
+          "z": 0
+        },
+        {
+          "x": 6,
+          "z": 1
+        }
+      ],
+      "remainingWaypoints": 8,
+      "goal": "b13",
+      "station": "b13"
+    },
+    {
+      "id": "c12",
+      "job": "farmer",
+      "workplace": "b19",
+      "workSeconds": 25.100000000000087,
+      "walkSeconds": 31.400000000000176,
+      "walkMeters": 34.48736482930847,
+      "start": [
+        6.8500000000000005,
+        0.89
+      ],
+      "last": [
+        1.6953042089824863,
+        -14.254888653067038
+      ],
+      "min": [
+        -3.362460105111593,
+        -14.254888653067038
+      ],
+      "max": [
+        7.355732278596768,
+        0.89
+      ],
+      "waypoints": 22,
+      "noWaypointSeconds": 0.30000000000000004,
+      "maxNoWaypointSeconds": 1.7000000000000004,
+      "netMeters": 15.998079291331582,
+      "rangeMeters": 18.55390256221,
+      "state": "walking",
+      "activity": "work",
+      "path": [
+        {
+          "x": 0,
+          "z": -8,
+          "laneX": 0,
+          "laneZ": -0.235
+        },
+        {
+          "x": -1,
+          "z": -8
+        },
+        {
+          "x": -1,
+          "z": -7
+        }
+      ],
+      "remainingWaypoints": 20,
+      "goal": "b19",
+      "station": "b19"
+    },
+    {
+      "id": "c13",
+      "job": "farmer",
+      "workplace": "b19",
+      "workSeconds": 6.099999999999994,
+      "walkSeconds": 50.400000000000446,
+      "walkMeters": 47.779280537068665,
+      "start": [
+        3.780825358019352,
+        -1.6572925283557702
+      ],
+      "last": [
+        7.31,
+        0.89
+      ],
+      "min": [
+        -3.82336286326379,
+        -10.978843091206986
+      ],
+      "max": [
+        7.31,
+        0.89
+      ],
+      "waypoints": 30,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.0000000000000004,
+      "netMeters": 4.35244447162929,
+      "rangeMeters": 16.273328023756942,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b19",
+      "station": "b19"
+    },
+    {
+      "id": "c14",
+      "job": "farmer",
+      "workplace": "b30",
+      "workSeconds": 0,
+      "walkSeconds": 56.50000000000053,
+      "walkMeters": 56.62417316554171,
+      "start": [
+        3.2387392043503107,
+        -0.2774967329101249
+      ],
+      "last": [
+        6.151826488844681,
+        -1.5599967093925715
+      ],
+      "min": [
+        -3.8266036900262623,
+        -12.832272213532862
+      ],
+      "max": [
+        6.151826488844681,
+        0.24086506208271913
+      ],
+      "waypoints": 34,
+      "noWaypointSeconds": 0.9999999999999999,
+      "maxNoWaypointSeconds": 2.2000000000000006,
+      "netMeters": 3.1829049179578486,
+      "rangeMeters": 16.446154172379998,
+      "state": "walking",
+      "activity": "work",
+      "path": [
+        {
+          "x": 4,
+          "z": -1,
+          "laneX": 0,
+          "laneZ": 0.235
+        },
+        {
+          "x": 5,
+          "z": -1
+        },
+        {
+          "x": 4.805555555555555,
+          "z": 0.0833333333333333,
+          "exact": true,
+          "stationBuilding": "b30",
+          "stationEntry": true,
+          "y": 0.8477840401745198
+        }
+      ],
+      "remainingWaypoints": 4,
+      "goal": "b30",
+      "station": "b30"
+    },
+    {
+      "id": "c15",
+      "job": "farmer",
+      "workplace": "b30",
+      "workSeconds": 0,
+      "walkSeconds": 56.50000000000053,
+      "walkMeters": 59.3250468992852,
+      "start": [
+        0.24684331549015578,
+        -1.6006098426190352
+      ],
+      "last": [
+        5.630106130478821,
+        -1.5666180104068472
+      ],
+      "min": [
+        -3.8228815787823573,
+        -12.893117462458532
+      ],
+      "max": [
+        6.084,
+        0.31667419304658584
+      ],
+      "waypoints": 35,
+      "noWaypointSeconds": 0.5,
+      "maxNoWaypointSeconds": 2.0000000000000004,
+      "netMeters": 5.383370132165987,
+      "rangeMeters": 16.511962275812945,
+      "state": "walking",
+      "activity": "work",
+      "path": [
+        {
+          "x": 4,
+          "z": -1,
+          "laneX": 0,
+          "laneZ": 0.235
+        },
+        {
+          "x": 5,
+          "z": -1
+        },
+        {
+          "x": 5.061111111111111,
+          "z": 0.08333333333333333,
+          "exact": true,
+          "stationBuilding": "b30",
+          "stationEntry": true,
+          "y": 0.8397527734825134
+        }
+      ],
+      "remainingWaypoints": 4,
+      "goal": "b30",
+      "station": "b30"
+    },
+    {
+      "id": "c16",
+      "job": "farmer",
+      "workplace": "b50",
+      "workSeconds": 0,
+      "walkSeconds": 56.50000000000053,
+      "walkMeters": 61.96791146221895,
+      "start": [
+        8.498149674238453,
+        -0.1914227080490399
+      ],
+      "last": [
+        7.611366795835718,
+        -1.5638682066454013
+      ],
+      "min": [
+        -3.8257694314022626,
+        -12.767747422163987
+      ],
+      "max": [
+        8.498149674238453,
+        0.7285370494103778
+      ],
+      "waypoints": 36,
+      "noWaypointSeconds": 0.6,
+      "maxNoWaypointSeconds": 3.1000000000000014,
+      "netMeters": 1.634010563015324,
+      "rangeMeters": 18.276451424169725,
+      "state": "walking",
+      "activity": "work",
+      "path": [
+        {
+          "x": 5,
+          "z": -1,
+          "laneX": 0,
+          "laneZ": 0.235
+        },
+        {
+          "x": 6,
+          "z": -1
+        },
+        {
+          "x": 6,
+          "z": 0
+        }
+      ],
+      "remainingWaypoints": 9,
+      "goal": "b50",
+      "station": "b50"
+    },
+    {
+      "id": "c17",
+      "job": "farmer",
+      "workplace": "b52",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        9.35,
+        8.11
+      ],
+      "last": [
+        9.35,
+        8.11
+      ],
+      "min": [
+        9.35,
+        8.11
+      ],
+      "max": [
+        9.35,
+        8.11
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.3000000000000007,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b52",
+      "station": "b52"
+    },
+    {
+      "id": "c19",
+      "job": "miller",
+      "workplace": "b23",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        2.37,
+        4.57
+      ],
+      "last": [
+        2.37,
+        4.57
+      ],
+      "min": [
+        2.37,
+        4.57
+      ],
+      "max": [
+        2.37,
+        4.57
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.5000000000000002,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b23",
+      "station": "b23"
+    },
+    {
+      "id": "c20",
+      "job": "miller",
+      "workplace": "b23",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        1.9100000000000001,
+        4.57
+      ],
+      "last": [
+        1.9100000000000001,
+        4.57
+      ],
+      "min": [
+        1.9100000000000001,
+        4.57
+      ],
+      "max": [
+        1.9100000000000001,
+        4.57
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.400000000000001,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b23",
+      "station": "b23"
+    },
+    {
+      "id": "c22",
+      "job": "baker",
+      "workplace": "b28",
+      "workSeconds": 2.9000000000000012,
+      "walkSeconds": 53.60000000000049,
+      "walkMeters": 53.58947644197461,
+      "start": [
+        0.29180079915536816,
+        -0.42315500199846257
+      ],
+      "last": [
+        4.3,
+        7.72
+      ],
+      "min": [
+        -3.8220325455741775,
+        -12.860928731739508
+      ],
+      "max": [
+        4.3,
+        7.72
+      ],
+      "waypoints": 33,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.500000000000001,
+      "netMeters": 9.076157458981422,
+      "rangeMeters": 22.125596944089597,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b28",
+      "station": "b28"
+    },
+    {
+      "id": "c23",
+      "job": "farmer",
+      "workplace": "b25",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        9.13,
+        4.54
+      ],
+      "last": [
+        9.13,
+        4.54
+      ],
+      "min": [
+        9.13,
+        4.54
+      ],
+      "max": [
+        9.13,
+        4.54
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.5000000000000018,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b25",
+      "station": "b25"
+    },
+    {
+      "id": "c24",
+      "job": "farmer",
+      "workplace": "b52",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        8.89,
+        8.11
+      ],
+      "last": [
+        8.89,
+        8.11
+      ],
+      "min": [
+        8.89,
+        8.11
+      ],
+      "max": [
+        8.89,
+        8.11
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 0.6,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b52",
+      "station": "b52"
+    },
+    {
+      "id": "c25",
+      "job": "baker",
+      "workplace": "b28",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        4.300000000000001,
+        7.26
+      ],
+      "last": [
+        4.300000000000001,
+        7.26
+      ],
+      "min": [
+        4.300000000000001,
+        7.26
+      ],
+      "max": [
+        4.300000000000001,
+        7.26
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 0.6,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b28",
+      "station": "b28"
+    },
+    {
+      "id": "c26",
+      "job": "farmer",
+      "workplace": "b50",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        7.31,
+        6.29
+      ],
+      "last": [
+        7.31,
+        6.29
+      ],
+      "min": [
+        7.31,
+        6.29
+      ],
+      "max": [
+        7.31,
+        6.29
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.9000000000000006,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b50",
+      "station": "b50"
+    },
+    {
+      "id": "c27",
+      "job": "lumberjack",
+      "workplace": "b3",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -6.2,
+        -3.1599999999999997
+      ],
+      "last": [
+        -6.2,
+        -3.1599999999999997
+      ],
+      "min": [
+        -6.2,
+        -3.1599999999999997
+      ],
+      "max": [
+        -6.2,
+        -3.1599999999999997
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.7000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b3",
+      "station": "b3"
+    },
+    {
+      "id": "c28",
+      "job": "lumberjack",
+      "workplace": "b3",
+      "workSeconds": 40.60000000000031,
+      "walkSeconds": 15.89999999999996,
+      "walkMeters": 17.409968542201558,
+      "start": [
+        -6.2,
+        -3.62
+      ],
+      "last": [
+        -6.2,
+        -3.62
+      ],
+      "min": [
+        -6.2,
+        -9.684
+      ],
+      "max": [
+        -2.9160000000000004,
+        -3.4060523306679027
+      ],
+      "waypoints": 12,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.7000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 7.08500408883949,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b3",
+      "station": "b3"
+    },
+    {
+      "id": "c29",
+      "job": "lumberjack",
+      "workplace": "b12",
+      "workSeconds": 40.80000000000031,
+      "walkSeconds": 19.200000000000003,
+      "walkMeters": 18.22499999999995,
+      "start": [
+        -6.2,
+        -1.3599999999999999
+      ],
+      "last": [
+        1.0489988353888622,
+        -12.362377523468853
+      ],
+      "min": [
+        -6.2,
+        -12.362377523468853
+      ],
+      "max": [
+        1.0489988353888622,
+        -1.3599999999999999
+      ],
+      "waypoints": 10,
+      "noWaypointSeconds": 1.4000000000000001,
+      "maxNoWaypointSeconds": 3.2000000000000015,
+      "netMeters": 13.175746479209506,
+      "rangeMeters": 13.175746479209506,
+      "state": "walking",
+      "activity": "deliver",
+      "path": [
+        {
+          "x": 1,
+          "z": -7,
+          "laneX": 0,
+          "laneZ": 0.235
+        },
+        {
+          "x": 2,
+          "z": -7
+        },
+        {
+          "x": 3,
+          "z": -7
+        }
+      ],
+      "remainingWaypoints": 5,
+      "goal": "b54"
+    },
+    {
+      "id": "c30",
+      "job": "farmer",
+      "workplace": "b25",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        8.67,
+        4.54
+      ],
+      "last": [
+        8.67,
+        4.54
+      ],
+      "min": [
+        8.67,
+        4.54
+      ],
+      "max": [
+        8.67,
+        4.54
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.8000000000000005,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b25",
+      "station": "b25"
+    },
+    {
+      "id": "c31",
+      "job": "farmer",
+      "workplace": "b25",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        9.59,
+        4.54
+      ],
+      "last": [
+        9.59,
+        4.54
+      ],
+      "min": [
+        9.59,
+        4.54
+      ],
+      "max": [
+        9.59,
+        4.54
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.0000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b25",
+      "station": "b25"
+    },
+    {
+      "id": "c32",
+      "job": "lumberjack",
+      "workplace": "b12",
+      "workSeconds": 20.50000000000002,
+      "walkSeconds": 36.00000000000024,
+      "walkMeters": 39.47112479682774,
+      "start": [
+        -6.2,
+        -0.8999999999999998
+      ],
+      "last": [
+        -6.2,
+        -0.8999999999999998
+      ],
+      "min": [
+        -6.2,
+        -13.284
+      ],
+      "max": [
+        1.5332123271687246,
+        -0.24227979955837858
+      ],
+      "waypoints": 25,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.500000000000001,
+      "netMeters": 0,
+      "rangeMeters": 15.162092160506127,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b12",
+      "station": "b12"
+    },
+    {
+      "id": "c33",
+      "job": "quarryworker",
+      "workplace": "b4",
+      "workSeconds": 49.000000000000426,
+      "walkSeconds": 8.799999999999985,
+      "walkMeters": 8.284776680155375,
+      "start": [
+        4.284,
+        -13.284
+      ],
+      "last": [
+        10.670000000000002,
+        -11.74
+      ],
+      "min": [
+        3.813773990510945,
+        -13.284
+      ],
+      "max": [
+        10.670000000000002,
+        -11.74
+      ],
+      "waypoints": 6,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.0000000000000004,
+      "netMeters": 6.570002435311575,
+      "rangeMeters": 7.02792793739337,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b4",
+      "station": "b4"
+    },
+    {
+      "id": "c34",
+      "job": "quarryworker",
+      "workplace": "b4",
+      "workSeconds": 59.10000000000057,
+      "walkSeconds": 0.8999999999999999,
+      "walkMeters": 0.9099999999999999,
+      "start": [
+        10.21,
+        -11.74
+      ],
+      "last": [
+        10.01941484399735,
+        -12.510640731455391
+      ],
+      "min": [
+        10.01941484399735,
+        -12.510640731455391
+      ],
+      "max": [
+        10.21,
+        -11.74
+      ],
+      "waypoints": 1,
+      "noWaypointSeconds": 0.2,
+      "maxNoWaypointSeconds": 0.6,
+      "netMeters": 0.7938575682492763,
+      "rangeMeters": 0.7938575682492763,
+      "state": "walking",
+      "activity": "deliver",
+      "path": [
+        {
+          "x": 5,
+          "z": -7,
+          "laneX": 0,
+          "laneZ": -0.235
+        },
+        {
+          "x": 4,
+          "z": -7
+        },
+        {
+          "x": 3,
+          "z": -7
+        }
+      ],
+      "remainingWaypoints": 9,
+      "goal": "b45"
+    },
+    {
+      "id": "c35",
+      "job": "quarryworker",
+      "workplace": "b15",
+      "workSeconds": 49.50000000000043,
+      "walkSeconds": 6.999999999999991,
+      "walkMeters": 7.236782947808256,
+      "start": [
+        6.26,
+        -7.07
+      ],
+      "last": [
+        6.26,
+        -7.07
+      ],
+      "min": [
+        4.716,
+        -9.684
+      ],
+      "max": [
+        6.26,
+        -7.069999999999999
+      ],
+      "waypoints": 6,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.0000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 3.035940052109066,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b15",
+      "station": "b15"
+    },
+    {
+      "id": "c36",
+      "job": "quarryworker",
+      "workplace": "b15",
+      "workSeconds": 35.90000000000024,
+      "walkSeconds": 20.600000000000023,
+      "walkMeters": 22.520156848409826,
+      "start": [
+        0.1805006598856374,
+        -12.833837086613014
+      ],
+      "last": [
+        6.260000000000001,
+        -7.53
+      ],
+      "min": [
+        -4.284,
+        -12.83480593595329
+      ],
+      "max": [
+        6.260000000000001,
+        -7.53
+      ],
+      "waypoints": 15,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.6000000000000003,
+      "netMeters": 8.067899359051438,
+      "rangeMeters": 11.803258110289942,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b15",
+      "station": "b15"
+    },
+    {
+      "id": "c37",
+      "job": "carpenter",
+      "workplace": "b17",
+      "workSeconds": 43.50000000000035,
+      "walkSeconds": 16.499999999999964,
+      "walkMeters": 15.635866929992096,
+      "start": [
+        1.08,
+        -5.2700000000000005
+      ],
+      "last": [
+        0.3802422487580239,
+        -12.047902833935911
+      ],
+      "min": [
+        -3.363055867603602,
+        -12.350614725319293
+      ],
+      "max": [
+        1.08,
+        -5.263817685719536
+      ],
+      "waypoints": 9,
+      "noWaypointSeconds": 0.7999999999999999,
+      "maxNoWaypointSeconds": 3.0000000000000013,
+      "netMeters": 6.813928950077163,
+      "rangeMeters": 8.364414965980986,
+      "state": "walking",
+      "activity": "deliver",
+      "path": [
+        {
+          "x": 0.38,
+          "z": -6.62,
+          "exact": true,
+          "public": true
+        }
+      ],
+      "remainingWaypoints": 1,
+      "goal": "b45"
+    },
+    {
+      "id": "c38",
+      "job": "carpenter",
+      "workplace": "b17",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        1.08,
+        -4.8100000000000005
+      ],
+      "last": [
+        1.08,
+        -4.8100000000000005
+      ],
+      "min": [
+        1.08,
+        -4.8100000000000005
+      ],
+      "max": [
+        1.08,
+        -4.8100000000000005
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.1000000000000005,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b17",
+      "station": "b17"
+    },
+    {
+      "id": "c39",
+      "job": "carpenter",
+      "workplace": "b26",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        3.47,
+        -6.12
+      ],
+      "last": [
+        3.47,
+        -6.12
+      ],
+      "min": [
+        3.47,
+        -6.12
+      ],
+      "max": [
+        3.47,
+        -6.12
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.0000000000000013,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b26",
+      "station": "b26"
+    },
+    {
+      "id": "c40",
+      "job": "carpenter",
+      "workplace": "b26",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        3.0100000000000002,
+        -6.12
+      ],
+      "last": [
+        3.0100000000000002,
+        -6.12
+      ],
+      "min": [
+        3.0100000000000002,
+        -6.12
+      ],
+      "max": [
+        3.0100000000000002,
+        -6.12
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.0000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b26",
+      "station": "b26"
+    },
+    {
+      "id": "c48",
+      "job": "weaver",
+      "workplace": "b31",
+      "workSeconds": 48.70000000000042,
+      "walkSeconds": 11.299999999999976,
+      "walkMeters": 12.369999999999973,
+      "start": [
+        0.9700000000000002,
+        -7.07
+      ],
+      "last": [
+        -1.3092624819889875,
+        -12.303296093578119
+      ],
+      "min": [
+        -3.4433237639641456,
+        -12.303296093578119
+      ],
+      "max": [
+        0.9700000000000002,
+        -7.069999999999999
+      ],
+      "waypoints": 7,
+      "noWaypointSeconds": 0.30000000000000004,
+      "maxNoWaypointSeconds": 2.2000000000000006,
+      "netMeters": 5.7081017391828786,
+      "rangeMeters": 6.845788095510309,
+      "state": "walking",
+      "activity": "deliver",
+      "path": [
+        {
+          "x": 0,
+          "z": -7,
+          "laneX": 0,
+          "laneZ": 0.235
+        },
+        {
+          "x": 1,
+          "z": -7
+        },
+        {
+          "x": 2,
+          "z": -7
+        }
+      ],
+      "remainingWaypoints": 6,
+      "goal": "b54"
+    },
+    {
+      "id": "c49",
+      "job": "weaver",
+      "workplace": "b31",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.9700000000000002,
+        -7.53
+      ],
+      "last": [
+        0.9700000000000002,
+        -7.53
+      ],
+      "min": [
+        0.9700000000000002,
+        -7.53
+      ],
+      "max": [
+        0.9700000000000002,
+        -7.53
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.3000000000000007,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b31",
+      "station": "b31"
+    },
+    {
+      "id": "c1",
+      "job": "farmer",
+      "workplace": "b16",
+      "workSeconds": 54.80000000000051,
+      "walkSeconds": 5.1999999999999975,
+      "walkMeters": 4.889999999999998,
+      "start": [
+        4.460000000000001,
+        5.53
+      ],
+      "last": [
+        3.8336861960128528,
+        1.3516035087344467
+      ],
+      "min": [
+        3.7500000000000004,
+        1.3516035087344467
+      ],
+      "max": [
+        4.460000000000001,
+        5.53
+      ],
+      "waypoints": 3,
+      "noWaypointSeconds": 0.7999999999999999,
+      "maxNoWaypointSeconds": 2.500000000000001,
+      "netMeters": 4.225075883257618,
+      "rangeMeters": 4.238289423602438,
+      "state": "walking",
+      "activity": "deliver",
+      "path": [
+        {
+          "x": 2,
+          "z": 0,
+          "laneX": 0.235,
+          "laneZ": 0
+        },
+        {
+          "x": 1,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "z": 0
+        }
+      ],
+      "remainingWaypoints": 17,
+      "goal": "b45"
+    },
+    {
+      "id": "c2",
+      "job": "farmer",
+      "workplace": "b16",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        4.460000000000001,
+        5.07
+      ],
+      "last": [
+        4.460000000000001,
+        5.07
+      ],
+      "min": [
+        4.460000000000001,
+        5.07
+      ],
+      "max": [
+        4.460000000000001,
+        5.07
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.3000000000000007,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b16",
+      "station": "b16"
+    },
+    {
+      "id": "c3",
+      "job": "farmer",
+      "workplace": "b16",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        4.46,
+        5.99
+      ],
+      "last": [
+        4.46,
+        5.99
+      ],
+      "min": [
+        4.46,
+        5.99
+      ],
+      "max": [
+        4.46,
+        5.99
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.6000000000000003,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b16",
+      "station": "b16"
+    },
+    {
+      "id": "c4",
+      "job": "scholar",
+      "workplace": "b9",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.71,
+        -4.0200000000000005
+      ],
+      "last": [
+        0.71,
+        -4.0200000000000005
+      ],
+      "min": [
+        0.71,
+        -4.0200000000000005
+      ],
+      "max": [
+        0.71,
+        -4.0200000000000005
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.2000000000000006,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b9",
+      "station": "b9"
+    },
+    {
+      "id": "c18",
+      "job": "scholar",
+      "workplace": "b9",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.7100000000000002,
+        -4.48
+      ],
+      "last": [
+        0.7100000000000002,
+        -4.48
+      ],
+      "min": [
+        0.7100000000000002,
+        -4.48
+      ],
+      "max": [
+        0.7100000000000002,
+        -4.48
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.700000000000001,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b9",
+      "station": "b9"
+    },
+    {
+      "id": "c21",
+      "job": "scholar",
+      "workplace": "b20",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        3.18,
+        -2.51
+      ],
+      "last": [
+        3.18,
+        -2.51
+      ],
+      "min": [
+        3.18,
+        -2.51
+      ],
+      "max": [
+        3.18,
+        -2.51
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.600000000000001,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b20",
+      "station": "b20"
+    },
+    {
+      "id": "c41",
+      "job": "scholar",
+      "workplace": "b20",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        3.64,
+        -2.51
+      ],
+      "last": [
+        3.64,
+        -2.51
+      ],
+      "min": [
+        3.64,
+        -2.51
+      ],
+      "max": [
+        3.64,
+        -2.51
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.2000000000000006,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b20",
+      "station": "b20"
+    },
+    {
+      "id": "c42",
+      "job": "scholar",
+      "workplace": "b33",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -0.71,
+        -3.1799999999999997
+      ],
+      "last": [
+        -0.71,
+        -3.1799999999999997
+      ],
+      "min": [
+        -0.71,
+        -3.1799999999999997
+      ],
+      "max": [
+        -0.71,
+        -3.1799999999999997
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 5.799999999999995,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b33",
+      "station": "b33"
+    },
+    {
+      "id": "c43",
+      "job": "scholar",
+      "workplace": "b33",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -0.71,
+        -3.64
+      ],
+      "last": [
+        -0.71,
+        -3.64
+      ],
+      "min": [
+        -0.71,
+        -3.64
+      ],
+      "max": [
+        -0.71,
+        -3.64
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.9000000000000006,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b33",
+      "station": "b33"
+    },
+    {
+      "id": "c44",
+      "job": "farmer",
+      "workplace": "b21",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        4.460000000000001,
+        0.12999999999999978
+      ],
+      "last": [
+        4.460000000000001,
+        0.12999999999999978
+      ],
+      "min": [
+        4.460000000000001,
+        0.12999999999999978
+      ],
+      "max": [
+        4.460000000000001,
+        0.12999999999999978
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.0000000000000013,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b21",
+      "station": "b21"
+    },
+    {
+      "id": "c45",
+      "job": "farmer",
+      "workplace": "b21",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        4.460000000000001,
+        -0.33000000000000024
+      ],
+      "last": [
+        4.460000000000001,
+        -0.33000000000000024
+      ],
+      "min": [
+        4.460000000000001,
+        -0.33000000000000024
+      ],
+      "max": [
+        4.460000000000001,
+        -0.33000000000000024
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.3000000000000007,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b21",
+      "station": "b21"
+    },
+    {
+      "id": "c46",
+      "job": "farmer",
+      "workplace": "b29",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.8600000000000001,
+        1.9299999999999995
+      ],
+      "last": [
+        0.8600000000000001,
+        1.9299999999999995
+      ],
+      "min": [
+        0.8600000000000001,
+        1.9299999999999995
+      ],
+      "max": [
+        0.8600000000000001,
+        1.9299999999999995
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.2000000000000006,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b29",
+      "station": "b29"
+    },
+    {
+      "id": "c47",
+      "job": "farmer",
+      "workplace": "b29",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.8600000000000002,
+        1.4699999999999998
+      ],
+      "last": [
+        0.8600000000000002,
+        1.4699999999999998
+      ],
+      "min": [
+        0.8600000000000002,
+        1.4699999999999998
+      ],
+      "max": [
+        0.8600000000000002,
+        1.4699999999999998
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.7000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b29",
+      "station": "b29"
+    },
+    {
+      "id": "c50",
+      "job": "weaver",
+      "workplace": "b38",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        5.2700000000000005,
+        -6.23
+      ],
+      "last": [
+        5.2700000000000005,
+        -6.23
+      ],
+      "min": [
+        5.2700000000000005,
+        -6.23
+      ],
+      "max": [
+        5.2700000000000005,
+        -6.23
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.2000000000000006,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b38",
+      "station": "b38"
+    },
+    {
+      "id": "c51",
+      "job": "weaver",
+      "workplace": "b38",
+      "workSeconds": 36.60000000000025,
+      "walkSeconds": 19.900000000000013,
+      "walkMeters": 20.80898332098413,
+      "start": [
+        5.73,
+        -6.23
+      ],
+      "last": [
+        5.73,
+        -6.23
+      ],
+      "min": [
+        1.9446577552033912,
+        -12.822397968309751
+      ],
+      "max": [
+        5.73,
+        -6.23
+      ],
+      "waypoints": 14,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.400000000000001,
+      "netMeters": 0,
+      "rangeMeters": 7.601876536935888,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b38",
+      "station": "b38"
+    },
+    {
+      "id": "c52",
+      "job": "miner",
+      "workplace": "b37",
+      "workSeconds": 10.399999999999979,
+      "walkSeconds": 46.100000000000385,
+      "walkMeters": 50.6799564547339,
+      "start": [
+        10.930000000000001,
+        -2.55
+      ],
+      "last": [
+        -3.6310154294220998,
+        -9.767285629423803
+      ],
+      "min": [
+        -3.6310154294220998,
+        -13.284
+      ],
+      "max": [
+        10.930000000000001,
+        -0.2246074245335889
+      ],
+      "waypoints": 30,
+      "noWaypointSeconds": 1.2,
+      "maxNoWaypointSeconds": 3.5000000000000018,
+      "netMeters": 16.251534764217066,
+      "rangeMeters": 19.559419847633922,
+      "state": "walking",
+      "activity": "work",
+      "path": [
+        {
+          "x": -2,
+          "z": -5,
+          "laneX": -0.235,
+          "laneZ": 0
+        },
+        {
+          "x": -2,
+          "z": -4
+        },
+        {
+          "x": -1,
+          "z": -4
+        }
+      ],
+      "remainingWaypoints": 16,
+      "goal": "b37",
+      "station": "b37"
+    },
+    {
+      "id": "c53",
+      "job": "miner",
+      "workplace": "b37",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        10.47,
+        -2.55
+      ],
+      "last": [
+        10.47,
+        -2.55
+      ],
+      "min": [
+        10.47,
+        -2.55
+      ],
+      "max": [
+        10.47,
+        -2.55
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.2000000000000015,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b37",
+      "station": "b37"
+    },
+    {
+      "id": "c54",
+      "job": "miner",
+      "workplace": "b37",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        11.39,
+        -2.55
+      ],
+      "last": [
+        11.39,
+        -2.55
+      ],
+      "min": [
+        11.39,
+        -2.55
+      ],
+      "max": [
+        11.39,
+        -2.55
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.600000000000001,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b37",
+      "station": "b37"
+    },
+    {
+      "id": "c55",
+      "job": "miner",
+      "workplace": "b39",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        7.950000000000001,
+        -10.670000000000002
+      ],
+      "last": [
+        7.950000000000001,
+        -10.670000000000002
+      ],
+      "min": [
+        7.950000000000001,
+        -10.670000000000002
+      ],
+      "max": [
+        7.950000000000001,
+        -10.670000000000002
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.1000000000000014,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b39",
+      "station": "b39"
+    },
+    {
+      "id": "c56",
+      "job": "miner",
+      "workplace": "b39",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        7.950000000000001,
+        -11.13
+      ],
+      "last": [
+        7.950000000000001,
+        -11.13
+      ],
+      "min": [
+        7.950000000000001,
+        -11.13
+      ],
+      "max": [
+        7.950000000000001,
+        -11.13
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.1000000000000014,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b39",
+      "station": "b39"
+    },
+    {
+      "id": "c57",
+      "job": "miner",
+      "workplace": "b39",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        7.949999999999999,
+        -10.21
+      ],
+      "last": [
+        7.949999999999999,
+        -10.21
+      ],
+      "min": [
+        7.949999999999999,
+        -10.21
+      ],
+      "max": [
+        7.949999999999999,
+        -10.21
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 4.699999999999999,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b39",
+      "station": "b39"
+    },
+    {
+      "id": "c58",
+      "job": "smith",
+      "workplace": "b40",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        1.59,
+        -9.74
+      ],
+      "last": [
+        1.59,
+        -9.74
+      ],
+      "min": [
+        1.59,
+        -9.74
+      ],
+      "max": [
+        1.59,
+        -9.74
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 6.499999999999993,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b40",
+      "station": "b40"
+    },
+    {
+      "id": "c59",
+      "job": "smith",
+      "workplace": "b40",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        2.08,
+        -9.42
+      ],
+      "last": [
+        2.08,
+        -9.42
+      ],
+      "min": [
+        2.08,
+        -9.42
+      ],
+      "max": [
+        2.08,
+        -9.42
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.3000000000000016,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b40",
+      "station": "b40"
+    },
+    {
+      "id": "c60",
+      "job": "smith",
+      "workplace": "b41",
+      "workSeconds": 24.400000000000077,
+      "walkSeconds": 32.60000000000019,
+      "walkMeters": 35.76165089082184,
+      "start": [
+        7.409999999999999,
+        -2.8600000000000003
+      ],
+      "last": [
+        6.084,
+        -11.916
+      ],
+      "min": [
+        -3.3598192195019165,
+        -12.375569194200216
+      ],
+      "max": [
+        7.409999999999999,
+        -0.22320287509669406
+      ],
+      "waypoints": 21,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.4000000000000017,
+      "netMeters": 9.152563138268974,
+      "rangeMeters": 16.23788819934521,
+      "state": "unloading",
+      "activity": "deliver",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b54"
+    },
+    {
+      "id": "c61",
+      "job": "smith",
+      "workplace": "b41",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        6.92,
+        -3.18
+      ],
+      "last": [
+        6.92,
+        -3.18
+      ],
+      "min": [
+        6.92,
+        -3.18
+      ],
+      "max": [
+        6.92,
+        -3.18
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.3000000000000016,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b41",
+      "station": "b41"
+    },
+    {
+      "id": "c62",
+      "job": "smith",
+      "workplace": "b42",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        3.81,
+        -8.26
+      ],
+      "last": [
+        3.81,
+        -8.26
+      ],
+      "min": [
+        3.81,
+        -8.26
+      ],
+      "max": [
+        3.81,
+        -8.26
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 5.799999999999995,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b42",
+      "station": "b42"
+    },
+    {
+      "id": "c63",
+      "job": "smith",
+      "workplace": "b42",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        3.3200000000000003,
+        -8.58
+      ],
+      "last": [
+        3.3200000000000003,
+        -8.58
+      ],
+      "min": [
+        3.3200000000000003,
+        -8.58
+      ],
+      "max": [
+        3.3200000000000003,
+        -8.58
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 4.799999999999999,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b42",
+      "station": "b42"
+    },
+    {
+      "id": "c64",
+      "job": "smith",
+      "workplace": "b43",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -1.59,
+        -8.26
+      ],
+      "last": [
+        -1.59,
+        -8.26
+      ],
+      "min": [
+        -1.59,
+        -8.26
+      ],
+      "max": [
+        -1.59,
+        -8.26
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 3.700000000000002,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b43",
+      "station": "b43"
+    },
+    {
+      "id": "c65",
+      "job": "smith",
+      "workplace": "b43",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -2.08,
+        -8.58
+      ],
+      "last": [
+        -2.08,
+        -8.58
+      ],
+      "min": [
+        -2.08,
+        -8.58
+      ],
+      "max": [
+        -2.08,
+        -8.58
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.400000000000001,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b43",
+      "station": "b43"
+    },
+    {
+      "id": "c66",
+      "job": "brewer",
+      "workplace": "b46",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.6999999999999997,
+        7.72
+      ],
+      "last": [
+        0.6999999999999997,
+        7.72
+      ],
+      "min": [
+        0.6999999999999997,
+        7.72
+      ],
+      "max": [
+        0.6999999999999997,
+        7.72
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.8000000000000005,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b46",
+      "station": "b46"
+    },
+    {
+      "id": "c67",
+      "job": "brewer",
+      "workplace": "b46",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.7,
+        7.26
+      ],
+      "last": [
+        0.7,
+        7.26
+      ],
+      "min": [
+        0.7,
+        7.26
+      ],
+      "max": [
+        0.7,
+        7.26
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.0000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b46",
+      "station": "b46"
+    },
+    {
+      "id": "c68",
+      "job": "trader",
+      "workplace": "b22",
+      "workSeconds": 33.60000000000021,
+      "walkSeconds": 22.900000000000055,
+      "walkMeters": 25.145561013643583,
+      "start": [
+        0.9700000000000002,
+        -1.6700000000000002
+      ],
+      "last": [
+        -2.9414379529827763,
+        -11.056316025946709
+      ],
+      "min": [
+        -3.3520376413939936,
+        -14.182690475583124
+      ],
+      "max": [
+        0.9700000000000002,
+        -1.6700000000000002
+      ],
+      "waypoints": 15,
+      "noWaypointSeconds": 0.7,
+      "maxNoWaypointSeconds": 2.9000000000000012,
+      "netMeters": 10.168690938315418,
+      "rangeMeters": 13.238105314257595,
+      "state": "walking",
+      "activity": "work",
+      "path": [
+        {
+          "x": -2,
+          "z": -6,
+          "laneX": 0,
+          "laneZ": -0.235
+        },
+        {
+          "x": -2,
+          "z": -5
+        },
+        {
+          "x": -2,
+          "z": -4
+        }
+      ],
+      "remainingWaypoints": 9,
+      "goal": "b22",
+      "station": "b22"
+    },
+    {
+      "id": "c69",
+      "job": "trader",
+      "workplace": "b22",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.9700000000000002,
+        -2.1300000000000003
+      ],
+      "last": [
+        0.9700000000000002,
+        -2.1300000000000003
+      ],
+      "min": [
+        0.9700000000000002,
+        -2.1300000000000003
+      ],
+      "max": [
+        0.9700000000000002,
+        -2.1300000000000003
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.700000000000001,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b22",
+      "station": "b22"
+    },
+    {
+      "id": "c70",
+      "job": "trader",
+      "workplace": "b36",
+      "workSeconds": 33.70000000000021,
+      "walkSeconds": 25.600000000000094,
+      "walkMeters": 25.639680829236152,
+      "start": [
+        5.53,
+        -2.77
+      ],
+      "last": [
+        -2.484,
+        -11.916
+      ],
+      "min": [
+        -3.520421300481733,
+        -12.333121048568666
+      ],
+      "max": [
+        5.53,
+        -0.23594102970463474
+      ],
+      "waypoints": 16,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.9000000000000006,
+      "netMeters": 12.160325324595556,
+      "rangeMeters": 15.108007483616648,
+      "state": "unloading",
+      "activity": "deliver",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b45"
+    },
+    {
+      "id": "c71",
+      "job": "trader",
+      "workplace": "b36",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        5.07,
+        -2.77
+      ],
+      "last": [
+        5.07,
+        -2.77
+      ],
+      "min": [
+        5.07,
+        -2.77
+      ],
+      "max": [
+        5.07,
+        -2.77
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.7000000000000004,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b36",
+      "station": "b36"
+    },
+    {
+      "id": "c72",
+      "job": "medic",
+      "workplace": "b47",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -0.82,
+        8.31
+      ],
+      "last": [
+        -0.82,
+        8.31
+      ],
+      "min": [
+        -0.82,
+        8.31
+      ],
+      "max": [
+        -0.82,
+        8.31
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.500000000000001,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b47",
+      "station": "b47"
+    },
+    {
+      "id": "c73",
+      "job": "medic",
+      "workplace": "b47",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -0.8200000000000001,
+        8.77
+      ],
+      "last": [
+        -0.8200000000000001,
+        8.77
+      ],
+      "min": [
+        -0.8200000000000001,
+        8.77
+      ],
+      "max": [
+        -0.8200000000000001,
+        8.77
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 1.9000000000000006,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b47",
+      "station": "b47"
+    },
+    {
+      "id": "c74",
+      "job": "medic",
+      "workplace": "b47",
+      "workSeconds": 0,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        0.684,
+        11.916
+      ],
+      "last": [
+        0.684,
+        11.916
+      ],
+      "min": [
+        0.684,
+        11.916
+      ],
+      "max": [
+        0.684,
+        11.916
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 0,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "waiting",
+      "activity": "waiting",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b47"
+    },
+    {
+      "id": "c75",
+      "job": "medic",
+      "workplace": "b53",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -11.780000000000001,
+        6.09
+      ],
+      "last": [
+        -11.780000000000001,
+        6.09
+      ],
+      "min": [
+        -11.780000000000001,
+        6.09
+      ],
+      "max": [
+        -11.780000000000001,
+        6.09
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.9000000000000012,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b53",
+      "station": "b53"
+    },
+    {
+      "id": "c76",
+      "job": "medic",
+      "workplace": "b53",
+      "workSeconds": 60.00000000000058,
+      "walkSeconds": 0,
+      "walkMeters": 0,
+      "start": [
+        -11.780000000000001,
+        5.63
+      ],
+      "last": [
+        -11.780000000000001,
+        5.63
+      ],
+      "min": [
+        -11.780000000000001,
+        5.63
+      ],
+      "max": [
+        -11.780000000000001,
+        5.63
+      ],
+      "waypoints": 0,
+      "noWaypointSeconds": 0,
+      "maxNoWaypointSeconds": 2.9000000000000012,
+      "netMeters": 0,
+      "rangeMeters": 0,
+      "state": "working",
+      "activity": "work",
+      "path": [],
+      "remainingWaypoints": 0,
+      "goal": "b53",
+      "station": "b53"
+    }
+  ]
+}

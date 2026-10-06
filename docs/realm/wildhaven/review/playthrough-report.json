@@ -1,0 +1,573 @@
+{
+  "startedAt": "2026-10-02T03:52:44.032Z",
+  "url": "http://127.0.0.1:4751/wildhaven/?review",
+  "browser": "Chromium",
+  "scope": "Isolated browser contexts. UI actions only; review.advance skips day waits. No resources or population are edited.",
+  "checks": [
+    {
+      "name": "Desktop opens a fresh island without application errors",
+      "passed": true,
+      "elapsedMs": 4535
+    },
+    {
+      "name": "Pause freezes the clock; speed controls expose their state",
+      "passed": true,
+      "elapsedMs": 3312
+    },
+    {
+      "name": "User gesture starts real Web Audio; mute suspends it",
+      "passed": true,
+      "elapsedMs": 4184
+    },
+    {
+      "name": "Cottage placement spends once; occupied placement cannot spend",
+      "passed": true,
+      "elapsedMs": 2975
+    },
+    {
+      "name": "Cancel removes the ghost and undo returns every material",
+      "passed": true,
+      "elapsedMs": 2143
+    },
+    {
+      "name": "Clicking the visible cottage roof opens its inspector",
+      "passed": true,
+      "elapsedMs": 2810
+    },
+    {
+      "name": "Opening production chain is built through the shelf and island",
+      "passed": true,
+      "elapsedMs": 7587
+    },
+    {
+      "name": "Dawn yields resources and arrivals; village grows with earned supplies",
+      "passed": true,
+      "elapsedMs": 11408
+    },
+    {
+      "name": "Reload restores the earned village and Continue resumes it",
+      "passed": true,
+      "elapsedMs": 8895
+    },
+    {
+      "name": "Bell restoration and first ending complete through visible controls",
+      "passed": true,
+      "elapsedMs": 12466
+    },
+    {
+      "name": "Completed village survives reload without repeating the ending",
+      "passed": true,
+      "elapsedMs": 9326
+    },
+    {
+      "name": "Landing exchanges earned food once per day and persists its limit",
+      "passed": true,
+      "elapsedMs": 18224
+    },
+    {
+      "name": "390×844 touch layout keeps every supply label inside the viewport",
+      "passed": true,
+      "elapsedMs": 8526
+    },
+    {
+      "name": "Touch places and rotates a cottage; visible Done cancels placement",
+      "passed": true,
+      "elapsedMs": 3812
+    },
+    {
+      "name": "Touch shelf scrolls to the bell; inspector and help remain usable",
+      "passed": true,
+      "elapsedMs": 5595
+    },
+    {
+      "name": "No application or Web Audio errors during both browser sessions",
+      "passed": true,
+      "elapsedMs": 0
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "qa-01-desktop-arrival.png",
+    "qa-02-cottage-inspector.png",
+    "qa-03-working-village.png",
+    "qa-04-ten-islanders.png",
+    "qa-05-welcome-home.png",
+    "qa-06-completed-village.png",
+    "qa-11-landing-exchange.png",
+    "qa-07-mobile-arrival.png",
+    "qa-08-mobile-new-village.png",
+    "qa-09-mobile-cottage.png",
+    "qa-10-mobile-bell.png"
+  ],
+  "desktop": {
+    "restoredVillage": {
+      "resources": {
+        "wood": 22,
+        "stone": 37,
+        "food": 49.2
+      },
+      "population": 10,
+      "day": 4,
+      "buildings": [
+        {
+          "id": "hearth",
+          "type": "hearth",
+          "x": 0,
+          "z": 2,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "bell",
+          "type": "bell",
+          "x": 0,
+          "z": -5,
+          "rotation": 0,
+          "builtDay": 1,
+          "restored": false
+        },
+        {
+          "id": "b2",
+          "type": "cottage",
+          "x": -2,
+          "z": 2,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b3",
+          "type": "orchard",
+          "x": 2,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b4",
+          "type": "lumber",
+          "x": -4,
+          "z": -3,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b5",
+          "type": "quarry",
+          "x": 5,
+          "z": -3,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b6",
+          "type": "garden",
+          "x": 3,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 2
+        },
+        {
+          "id": "b7",
+          "type": "cottage",
+          "x": -2,
+          "z": 3,
+          "rotation": 0,
+          "builtDay": 2
+        },
+        {
+          "id": "b8",
+          "type": "cottage",
+          "x": -2,
+          "z": 4,
+          "rotation": 0,
+          "builtDay": 3
+        }
+      ],
+      "won": false,
+      "lastTradeDay": 0
+    },
+    "finishedVillage": {
+      "version": 1,
+      "resources": {
+        "wood": 44,
+        "stone": 37,
+        "food": 80.4
+      },
+      "population": 13,
+      "day": 8,
+      "time": 5.519999999999982,
+      "elapsed": 635.5199999999998,
+      "nextId": 9,
+      "nextEventId": 7,
+      "won": true,
+      "lastTradeDay": 0,
+      "buildings": [
+        {
+          "id": "hearth",
+          "type": "hearth",
+          "x": 0,
+          "z": 2,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "bell",
+          "type": "bell",
+          "x": 0,
+          "z": -5,
+          "rotation": 0,
+          "builtDay": 1,
+          "restored": true,
+          "restoredDay": 7
+        },
+        {
+          "id": "b2",
+          "type": "cottage",
+          "x": -2,
+          "z": 2,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b3",
+          "type": "orchard",
+          "x": 2,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b4",
+          "type": "lumber",
+          "x": -4,
+          "z": -3,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b5",
+          "type": "quarry",
+          "x": 5,
+          "z": -3,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b6",
+          "type": "garden",
+          "x": 3,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 2
+        },
+        {
+          "id": "b7",
+          "type": "cottage",
+          "x": -2,
+          "z": 3,
+          "rotation": 0,
+          "builtDay": 2
+        },
+        {
+          "id": "b8",
+          "type": "cottage",
+          "x": -2,
+          "z": 4,
+          "rotation": 0,
+          "builtDay": 3
+        }
+      ],
+      "events": [
+        {
+          "id": 6,
+          "day": 8,
+          "text": "Day 8. Fresh supplies, a warm hearth, and another day to make this island yours.",
+          "type": "dawn"
+        },
+        {
+          "id": 5,
+          "day": 7,
+          "text": "The bell rings across the bay. A ferry is coming home. You made a place worth finding.",
+          "type": "victory"
+        },
+        {
+          "id": 4,
+          "day": 7,
+          "text": "Day 7. Fresh supplies, a warm hearth, and another day to make this island yours.",
+          "type": "dawn"
+        },
+        {
+          "id": 3,
+          "day": 6,
+          "text": "A new islander has come to stay. There is room at the table.",
+          "type": "arrival"
+        },
+        {
+          "id": 2,
+          "day": 5,
+          "text": "2 new islanders have come to stay. There is room at the table.",
+          "type": "arrival"
+        },
+        {
+          "id": 1,
+          "day": 4,
+          "text": "Welcome back to Wildhaven. Day 4, 10 islanders, and a hearth still burning.",
+          "type": "welcome"
+        }
+      ],
+      "stats": {
+        "built": 8,
+        "arrivals": 9,
+        "harvests": 7
+      },
+      "wonDay": 7
+    },
+    "afterTrade": {
+      "resources": {
+        "wood": 74,
+        "stone": 62,
+        "food": 71.6
+      },
+      "population": 13,
+      "day": 9,
+      "buildings": [
+        {
+          "id": "hearth",
+          "type": "hearth",
+          "x": 0,
+          "z": 2,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "bell",
+          "type": "bell",
+          "x": 0,
+          "z": -5,
+          "rotation": 0,
+          "builtDay": 1,
+          "restored": true,
+          "restoredDay": 7
+        },
+        {
+          "id": "b2",
+          "type": "cottage",
+          "x": -2,
+          "z": 2,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b3",
+          "type": "orchard",
+          "x": 2,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b4",
+          "type": "lumber",
+          "x": -4,
+          "z": -3,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b5",
+          "type": "quarry",
+          "x": 5,
+          "z": -3,
+          "rotation": 0,
+          "builtDay": 1
+        },
+        {
+          "id": "b6",
+          "type": "garden",
+          "x": 3,
+          "z": 0,
+          "rotation": 0,
+          "builtDay": 2
+        },
+        {
+          "id": "b7",
+          "type": "cottage",
+          "x": -2,
+          "z": 3,
+          "rotation": 0,
+          "builtDay": 2
+        },
+        {
+          "id": "b8",
+          "type": "cottage",
+          "x": -2,
+          "z": 4,
+          "rotation": 0,
+          "builtDay": 3
+        }
+      ],
+      "won": true,
+      "lastTradeDay": 9
+    },
+    "diagnostics": {
+      "drawCalls": 100,
+      "triangles": 274190,
+      "actors": 13,
+      "buildings": 9,
+      "pixelRatio": 1,
+      "webgl": true,
+      "fps": 12
+    }
+  },
+  "mobile": {
+    "supplyBounds": [
+      {
+        "selector": ".supplies",
+        "left": 12,
+        "right": 378,
+        "top": 66,
+        "bottom": 132.1875,
+        "viewport": 390
+      },
+      {
+        "selector": "#wood",
+        "left": 40,
+        "right": 68.34375,
+        "top": 75,
+        "bottom": 96.59375,
+        "viewport": 390
+      },
+      {
+        "selector": "#wood-rate",
+        "left": 40,
+        "right": 68.34375,
+        "top": 112.390625,
+        "bottom": 123.1875,
+        "viewport": 390
+      },
+      {
+        "selector": "#stone",
+        "left": 124.734375,
+        "right": 153.078125,
+        "top": 75,
+        "bottom": 96.59375,
+        "viewport": 390
+      },
+      {
+        "selector": "#stone-rate",
+        "left": 124.734375,
+        "right": 153.078125,
+        "top": 112.390625,
+        "bottom": 123.1875,
+        "viewport": 390
+      },
+      {
+        "selector": "#food",
+        "left": 209.484375,
+        "right": 245.859375,
+        "top": 75,
+        "bottom": 96.59375,
+        "viewport": 390
+      },
+      {
+        "selector": "#food-rate",
+        "left": 209.484375,
+        "right": 245.859375,
+        "top": 112.390625,
+        "bottom": 123.1875,
+        "viewport": 390
+      },
+      {
+        "selector": "#people",
+        "left": 294.234375,
+        "right": 335.125,
+        "top": 75,
+        "bottom": 96.59375,
+        "viewport": 390
+      },
+      {
+        "selector": "#arrival-status",
+        "left": 294.234375,
+        "right": 335.125,
+        "top": 112.390625,
+        "bottom": 123.1875,
+        "viewport": 390
+      }
+    ],
+    "layout": {
+      "viewport": 390,
+      "document": 390,
+      "body": 390,
+      "shelf": 645
+    },
+    "smallTouchTargets": [
+      {
+        "id": "home",
+        "label": "WildhavenA beginning",
+        "width": 115.71875,
+        "height": 29.6875
+      },
+      {
+        "id": "pause",
+        "label": "Resume",
+        "width": 40,
+        "height": 44
+      },
+      {
+        "id": "1",
+        "label": "1×",
+        "width": 40,
+        "height": 44
+      },
+      {
+        "id": "3",
+        "label": "3×",
+        "width": 40,
+        "height": 44
+      },
+      {
+        "id": "collapse-objective",
+        "label": "Expand ambition",
+        "width": 32,
+        "height": 32
+      },
+      {
+        "id": "undo",
+        "label": "Undo",
+        "width": 42.890625,
+        "height": 30
+      }
+    ],
+    "diagnostics": {
+      "drawCalls": 12,
+      "triangles": 112402,
+      "actors": 4,
+      "buildings": 3,
+      "pixelRatio": 1,
+      "webgl": true,
+      "fps": 20
+    }
+  },
+  "sourceHashesAtStart": {
+    "index.html": "584faaabf5c95e835decdd955a7101b7121e2e1648314f36cf4ef10770d9ed32",
+    "style.css": "8e0550553828864ddad28b6eed9338ef2ec96ba0f7b0776e3ba6a90d1fa2abf1",
+    "js/main.js": "c7600f3bd71479085c6bb247ac5a24c3e754bb4348f570a4b59efe79c07735f7",
+    "js/world.js": "94d3ca3af1ca3ad9bb831de8ecd4661abad3f2dadea8fb88b06d1b221bbf99e6",
+    "js/sim.js": "7ee6b1d902fbac5af90c3863056fad9483ee8764d188f5e0544bafd991c0996b",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "browserVersion": "147.0.7727.15",
+  "finishedAt": "2026-10-02T03:54:38.317Z",
+  "sourceHashesAtFinish": {
+    "index.html": "584faaabf5c95e835decdd955a7101b7121e2e1648314f36cf4ef10770d9ed32",
+    "style.css": "8e0550553828864ddad28b6eed9338ef2ec96ba0f7b0776e3ba6a90d1fa2abf1",
+    "js/main.js": "c7600f3bd71479085c6bb247ac5a24c3e754bb4348f570a4b59efe79c07735f7",
+    "js/world.js": "94d3ca3af1ca3ad9bb831de8ecd4661abad3f2dadea8fb88b06d1b221bbf99e6",
+    "js/sim.js": "7ee6b1d902fbac5af90c3863056fad9483ee8764d188f5e0544bafd991c0996b",
+    "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "sourcesChangedDuringRun": [],
+  "passed": true
+}
