@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "slug": "realm-first-neighborhood",
+  "title": "Realm gives its first discovery a purpose",
+  "appSlug": "realm",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "in-revision",
+  "publishedAt": null,
+  "thesis": "A discovery feels rewarding when it visibly improves the neighborhood the player is building.",
+  "summary": "Shelter comes earlier, research guidance follows the actual action, and new building cards appear as soon as a discovery finishes. The opening connects a first Well to a Cottage with room for more neighbors.",
+  "versions": {
+    "before": {
+      "label": "Deployed opening",
+      "commit": "2b951b8"
+    },
+    "after": {
+      "label": "First-neighborhood candidate",
+      "commit": "d6edb596fba5b25ccaf8dc80eb64911c9d2f7f7f"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "research-target",
+      "title": "Point to the choice the player can actually make",
+      "caption": "The same player-built paused save in separate immutable worktrees, at identical camera, viewport and world-state hash. Before, Open Research highlighted the Founder. After, Research is highlighted and the guidance connects the next discovery to the home already built.",
+      "before": {
+        "src": "assets/realm-first-neighborhood/before-ready.jpg",
+        "alt": "Before: the Research instruction incorrectly highlights Founder."
+      },
+      "after": {
+        "src": "assets/realm-first-neighborhood/after-ready.jpg",
+        "alt": "After: Research is highlighted, with the home established before the next discovery."
+      }
+    },
+    {
+      "id": "research-feedback",
+      "title": "Acknowledge the decision and explain the wait",
+      "caption": "The same Masonry choice, made through the real Research button in both revisions, with matching saved-world hashes. Before, the tutorial still asked to open Research. After, it reports research progress and explains that paused time must resume.",
+      "before": {
+        "src": "assets/realm-first-neighborhood/before-research.jpg",
+        "alt": "Before: Masonry has started, but the tutorial still says Open Research and highlights Founder."
+      },
+      "after": {
+        "src": "assets/realm-first-neighborhood/after-research.jpg",
+        "alt": "After: the tutorial shows Masonry progress and a Resume time instruction."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "The first home comes before the first discovery",
+      "body": "The opening explains shelter, rest, neighbors and taxes. Construction progress remains visible, and paused time has an explicit next action."
+    },
+    {
+      "title": "A discovery immediately changes the available choices",
+      "body": "The shell refreshes building cards when the researched set changes. Affordability updates follow the actual UI cadence, so skipped tick multiples cannot leave stale locks."
+    },
+    {
+      "title": "Masonry pays off in the neighborhood",
+      "body": "Guidance connects a nearby Well and pantry food to a Cottage upgrade. Other first discoveries remain valid. The fourth building no longer dismisses an active tutorial before its payoff."
+    },
+    {
+      "title": "Hover help clears when its card is replaced",
+      "body": "Selecting a desktop build card now clears its old tooltip, keeping it from lingering over the world."
+    }
+  ],
+  "builderNote": {
+    "quote": "The strongest moment was a home improving and another named resident moving in.",
+    "context": "Playtest observation from this pass, not an owner endorsement. The original Peaceful Valley opening was played through Day 5. This candidate has not been deployed. Focused checks cover opening/research, desktop and touch input, military guidance, save continuity and shell isolation. A single replay is not a balance benchmark. Early happiness advice and placement readability remain follow-up work."
+  },
+  "proof": [
+    {
+      "label": "Same saved world",
+      "value": "2 matched pairs"
+    },
+    {
+      "label": "Fresh Cottage replay",
+      "value": "Day 2 \u00b7 5 settlers"
+    },
+    {
+      "label": "Opening, saves, shell and military",
+      "value": "Focused checks pass"
+    },
+    {
+      "label": "Full suite and deployment",
+      "value": "Release pending"
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/realm/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/d6edb596fba5b25ccaf8dc80eb64911c9d2f7f7f/docs/realm",
+    "download": "assets/realm-first-neighborhood/social.png"
+  },
+  "share": {
+    "summary": "Shelter comes earlier, research guidance follows the actual action, and new building cards appear as soon as a discovery finishes. The opening connects a first Well to a Cottage with room for more neighbors. Candidate under review.",
+    "image": "assets/realm-first-neighborhood/social.png"
+  }
+}
