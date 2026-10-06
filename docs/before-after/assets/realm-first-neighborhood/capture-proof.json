@@ -1,0 +1,45 @@
+{
+  "before": "2b951b8",
+  "after": "d6edb59",
+  "method": "Same player-built paused save, separate immutable worktrees; identical browser, viewport, camera and serialized state per pair.",
+  "records": [
+    {
+      "side": "before",
+      "phase": "ready",
+      "sha": "0b6fd39bb761679f72f8b26fc0bd305542b9487a8fed4d87a79ffa03efb0ae78",
+      "tick": 2819,
+      "guide": "🔬 Click Research in the top bar to unlock new buildings like Quarry, Market, and more!\nOpen the Research panel\nSTEP 7 OF 10\nSkip tutorial",
+      "highlight": [
+        "btn-founder"
+      ]
+    },
+    {
+      "side": "before",
+      "phase": "research",
+      "sha": "a079feafc3b45d657e61e19edd3ea1bac7dd01d5cc6d202d5dd852086afd3698",
+      "tick": 2819,
+      "guide": "🔬 Click Research in the top bar to unlock new buildings like Quarry, Market, and more!\nOpen the Research panel\nSTEP 7 OF 10\nSkip tutorial",
+      "highlight": [
+        "btn-founder"
+      ]
+    },
+    {
+      "side": "after",
+      "phase": "ready",
+      "sha": "0b6fd39bb761679f72f8b26fc0bd305542b9487a8fed4d87a79ffa03efb0ae78",
+      "tick": 2819,
+      "guide": "🔬 Your settlers have a home. Open Research to choose what your settlement becomes next.\nOpen the Research panel\nSTEP 8 OF 11\nSkip tutorial",
+      "highlight": [
+        "btn-research"
+      ]
+    },
+    {
+      "side": "after",
+      "phase": "research",
+      "sha": "a079feafc3b45d657e61e19edd3ea1bac7dd01d5cc6d202d5dd852086afd3698",
+      "tick": 2819,
+      "guide": "🔬 Masonry is 0% researched. New building cards appear when it finishes.\nResume time to finish your discovery\nSTEP 8 OF 11\nSkip tutorial",
+      "highlight": []
+    }
+  ]
+}

@@ -21,7 +21,8 @@ try {
    } else {
     await house.hover();await page.waitForFunction(()=>document.querySelector('#tooltip').style.display==='block');
     assert.match(await page.locator('#tooltip').textContent(),/House/);
-    await page.mouse.move(700,450);assert.equal(await page.evaluate(()=>getComputedStyle(document.querySelector('#tooltip')).display),'none');
+    await house.click();
+    await page.mouse.move(700,450);assert.equal(await page.evaluate(()=>getComputedStyle(document.querySelector('#tooltip')).display),'none','rebuilding a clicked hover card left its tooltip behind');
    }
    await page.screenshot({path:proof+(touch?'phone-touch.png':'desktop-hover-exit.png')});
   } finally {await context.close()}

@@ -374,6 +374,9 @@ if (typeof window !== 'undefined') {
 }
 
 export function updateUI() {
+  // Research finishes in the core. Refresh only when the unlocked set changes,
+  // so rewards appear without requiring an unrelated click or Escape.
+  if (renderedResearchKey !== researchBuildKey()) renderBuildBar();
   if (G._refreshPanelFor && G.selectedBuilding === G._refreshPanelFor) {
     const bb = G._refreshPanelFor; G._refreshPanelFor = null;
     showInfoPanel(bb);
@@ -646,7 +649,8 @@ export function updateUI() {
   // Update affordability classes in place — avoids re-rendering the whole
   // bar every 30 ticks (which was destroying hover tooltips, tearing down
   // the lifted selected-state CSS, and feeling flaky to click)
-  if (G.gameTick % 30 === 0) updateBuildBarAffordability();
+  // shellGates already throttles this call; its ticks need not be multiples of 30.
+  updateBuildBarAffordability();
 }
 
 // In-place update: toggles .disabled class + .cost-short spans without
@@ -706,6 +710,9 @@ const CATEGORIES = [
 let _visibleBuildKeys = [];
 let buildBarSizeObserver = null;
 
+let renderedResearchKey = '';
+const researchBuildKey = () => [...G.researchedTechs].sort().join('|');
+
 export function renderBuildBar() {
   const bar = document.getElementById('build-bar');
   if (!bar) return;
@@ -716,6 +723,9 @@ export function renderBuildBar() {
     });
     buildBarSizeObserver.observe(bar);
   }
+  // Replacing a hovered card removes its pointerleave listener with it.
+  hideTooltip();
+  renderedResearchKey = researchBuildKey();
   bar.innerHTML = '';
   _visibleBuildKeys = [];
   if (G.selectedBuild) {
@@ -974,7 +984,7 @@ export function renderResearchPanel() {
         const btn = document.createElement('button');
         btn.className = 'tech-btn';
         btn.textContent = 'Research';
-        btn.onclick = () => { dispatch({ type: 'START_RESEARCH', tech: id }); renderResearchPanel(); renderBuildBar(); };
+        btn.onclick = () => { dispatch({ type: 'START_RESEARCH', tech: id }); renderResearchPanel(); renderBuildBar(); updateTutorialTip(); };
         card.appendChild(btn);
       }
 
@@ -1001,6 +1011,7 @@ export function toggleResearchPanel() {
     // clip off-screen at 1280×627 with no indicator.
     _wireScrollCue(panel);
   }
+  updateTutorialTip();
 }
 
 // Loop 042: toggles body.has-more-below class on a panel element based
@@ -1460,6 +1471,7 @@ export function setSpeed(s) {
   document.querySelectorAll('#speed button').forEach((b, i) => {
     b.classList.toggle('active', [0, 1, 2, 4][i] === s);
   });
+  updateTutorialTip();
 }
 
 export function toggleHappinessPanel() {
@@ -1632,27 +1644,60 @@ const TUTORIAL_STEPS = [
     check: () => G.buildings.some(b => b.type === 'lumber'),
   },
   {
+    id: 'build_house',
+    text: () => {
+      const home = G.buildings.find(b => b.type === 'house');
+      return home
+        ? `🏠 Your first home is ${Math.round(home.buildProgress * 100)}% built. Once finished, settlers can sleep here and new neighbors can move in.`
+        : '🏠 Food and timber are a start. Give your settlers a home so they can rest, welcome new neighbors, and pay taxes for future discoveries.';
+    },
+    action: () => G.buildings.some(b => b.type === 'house')
+      ? (G.speed === 0 ? 'Resume time to let your builders finish' : 'Your builders are making a home')
+      : 'Select House and place it near your workplaces',
+    check: () => G.buildings.some(b => b.type === 'house' && b.buildProgress >= 1),
+    highlight: '[data-build-key="house"]',
+    hint: 'Select',
+    highlightWhen: () => G.selectedBuild !== 'house' && !G.buildings.some(b => b.type === 'house'),
+  },
+  {
     id: 'speed',
-    text: '⏩ Nice! Use the speed controls (top-left) or try 4× speed to watch your settlement grow.',
-    action: 'Try pressing the ▶▶▶ button',
+    text: '⏩ Your first home is ready. Watch settlers work and return to rest, or speed up while you plan your next addition.',
+    action: 'Try the ▶▶▶ button; Pause whenever you want to plan',
     check: () => G.speed >= 2 || G.day >= 2,
   },
   {
     id: 'research',
-    text: '🔬 Click Research in the top bar to unlock new buildings like Quarry, Market, and more!',
-    action: 'Open the Research panel',
+    text: () => {
+      const progress = getResearchProgress();
+      if (progress) return `🔬 ${progress.name} is ${Math.round(progress.fraction * 100)}% researched. New building cards appear when it finishes.`;
+      return document.getElementById('research-panel')?.style.display !== 'none'
+        ? '🔬 Choose your first discovery. Masonry unlocks a Well to improve your first home; Animal Husbandry opens another food source.'
+        : '🔬 Your settlers have a home. Open Research to choose what your settlement becomes next.';
+    },
+    action: () => G.currentResearch
+      ? (G.speed === 0 ? 'Resume time to finish your discovery' : 'Research is underway — you can keep building')
+      : document.getElementById('research-panel')?.style.display !== 'none'
+        ? 'Choose an available Research button'
+        : 'Open the Research panel',
     check: () => G.researchedTechs.size > 2,
-    highlight: '.hud-btn',
+    highlight: '#btn-research',
+    highlightWhen: () => !G.currentResearch && document.getElementById('research-panel')?.style.display === 'none',
     hint: 'Open',
   },
   {
-    id: 'build_house',
-    text: '🏠 Build a House to grow your population! More citizens = more workers for buildings.',
-    action: 'Select House and place on grass',
-    check: () => G.buildings.some(b => b.type === 'house'),
-    highlight: '[data-build-key="house"]',
+    id: 'improve_home',
+    text: () => {
+      const well = G.buildings.find(b => b.type === 'well');
+      if (well && well.buildProgress < 1) return `🪣 Your Well is ${Math.round(well.buildProgress * 100)}% built. A nearby home with water access and pantry food can grow into a Cottage.`;
+      return '🪣 Put your discovery to work: a Well near your first House, plus food in its pantry, lets it become a Cottage with room for more neighbors.';
+    },
+    action: () => G.buildings.some(b => b.type === 'well')
+      ? (G.speed === 0 ? 'Resume time, then inspect your House for its next upgrade' : 'Inspect your House to check Well access and pantry food')
+      : 'Select Well and place it beside your House',
+    check: () => !G.researchedTechs.has('masonry') || G.buildings.some(b => b.type === 'house' && b.level >= 2),
+    highlight: '[data-build-key="well"]',
     hint: 'Select',
-    highlightWhen: () => G.selectedBuild !== 'house',
+    highlightWhen: () => G.selectedBuild !== 'well' && !G.buildings.some(b => b.type === 'well'),
   },
   {
     id: 'tip_hotkeys',
@@ -1662,7 +1707,7 @@ const TUTORIAL_STEPS = [
   },
   {
     id: 'done',
-    text: '🎉 You\'re on your own now! Build, research, trade, and survive.',
+    text: '🎉 Your first neighborhood is taking shape. Add homes and food as it grows, and use discoveries to give your settlers a better life.',
     action: '',
     check: () => G.gameTick > 99999, // stays until dismissed
   },
@@ -1681,12 +1726,13 @@ function reconcileOpeningTutorial() {
 
 export function updateTutorialTip() {
   reconcileOpeningTutorial();
-  // Auto-dismiss if player is already past the tutorial.
+  // Hide the introduction for an established save. An acknowledged tour
+  // stays available through its first upgrade, even after day six/four builds.
   // Loop 49 (render S4): added day and population thresholds. Earlier
   // dismissal was ONLY buildings>=4, so a player with 11 citizens,
   // a barracks, and a house on Day 7 still saw "Select Farm from the
   // build bar ↓" — absurd.
-  if (!tutorialDismissed) {
+  if (!tutorialDismissed && !tutorialWelcomeAcknowledged) {
     if (authoredBuildingCount(G) >= 4) { dismissTutorial(); return; }
     if (G.day >= 6 && authoredBuildingCount(G) >= 2) { dismissTutorial(); return; }
     if (G.population >= 8) { dismissTutorial(); return; }
@@ -1723,12 +1769,14 @@ export function updateTutorialTip() {
   } catch {}
 
   const current = TUTORIAL_STEPS[Math.min(tutorialStep, TUTORIAL_STEPS.length - 1)];
+  const text = typeof current.text === 'function' ? current.text() : current.text;
+  const action = typeof current.action === 'function' ? current.action() : current.action;
   const tutorialText = current.id === 'done'
-    ? `${current.text} The first raid is expected on Day ${getActiveScenario().raidStart}. Open the 📖 Chronicle to read your story!`
-    : current.text;
+    ? `${text} The first raid is expected on Day ${getActiveScenario().raidStart}. Open the 📖 Chronicle to read your story!`
+    : text;
   tipEl.innerHTML = `
     <div class="tut-text">${tutorialText}</div>
-    ${current.action ? `<div class="tut-action">${current.action}</div>` : ''}
+    ${action ? `<div class="tut-action">${action}</div>` : ''}
     ${current.continueLabel ? `<button class="tut-next" type="button">${current.continueLabel}</button>` : ''}
     <div class="tut-progress">Step ${tutorialStep + 1} of ${TUTORIAL_STEPS.length}</div>
     <button class="tut-skip" onclick="dismissTutorial()">Skip tutorial</button>

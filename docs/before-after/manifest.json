@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-05T00:00:00Z",
+  "updatedAt": "2026-10-06T13:16:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,18 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "realm-first-neighborhood",
+      "title": "Realm gives its first discovery a purpose",
+      "appSlug": "realm",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "in-revision",
+      "publishedAt": null,
+      "data": "stories/realm-first-neighborhood.json",
+      "href": "./realm-first-neighborhood/",
+      "cover": "assets/realm-first-neighborhood/social.png"
+    },
     {
       "slug": "realm-mini-responsiveness",
       "title": "Realm makes room for touch controls",
@@ -269,7 +281,7 @@
       "title": "Realm",
       "category": "Games",
       "status": "in-revision",
-      "story": "realm-mini-responsiveness"
+      "story": "realm-first-neighborhood"
     },
     {
       "slug": "regex-tester",

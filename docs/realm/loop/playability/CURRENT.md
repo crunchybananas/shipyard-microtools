@@ -11,6 +11,15 @@ Production graphics follow the atomic workflow in
 focus is gameplay feel, responsive UX, movement correctness, and removal of old
 or surprising behavior that no longer fits the game.
 
+## Current local polish pass: first neighborhood
+
+Round 009 follows a real Peaceful Valley playthrough through the first Cottage.
+The shell now exposes research rewards immediately, keeps affordability current,
+and guides shelter → discovery → a tangible home upgrade. It also fixes the
+Research/Founder highlight and stale desktop build tooltips. Focused browser
+replays cover the first neighborhood and Save/Continue; this pass is not deployed.
+See [`rounds/009-first-neighborhood.md`](rounds/009-first-neighborhood.md).
+
 ## Fixed Architecture
 
 - The game remains a two-dimensional Canvas2D settlement renderer with painted
