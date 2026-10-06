@@ -1,0 +1,80 @@
+{
+  "scope": "Fresh createGame, public survey/restore actions and normal clock ticks earn a restorer at the waystone. Four actual rendering phases are sampled; these are not a claim of human playtesting or every animation being reviewed.",
+  "sourcesAtStart": {
+    "js/world.js": "a474bd900914bda496201fc6a1827047774191bc1ab4bafc4280eaa7fffccfbc",
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "assets/living-kit.glb": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "tools/living-motion.mjs": "3e067cd1b297b904b0570f7db4a25cb49ed5227daf0977c3395960bb5dd872a4"
+  },
+  "frames": [
+    {
+      "time": 48.25,
+      "work": 0.5,
+      "position": [
+        5.976,
+        1.2150524102725855,
+        -7.2
+      ],
+      "rightArm": -1.5685880771443579,
+      "phase": "working",
+      "citizen": "Cora",
+      "image": "living-motion-restorer-0.png"
+    },
+    {
+      "time": 48.5,
+      "work": 0.75,
+      "position": [
+        5.976,
+        1.2150524102725855,
+        -7.2
+      ],
+      "rightArm": -1.5484984467385745,
+      "phase": "working",
+      "citizen": "Cora",
+      "image": "living-motion-restorer-1.png"
+    },
+    {
+      "time": 49,
+      "work": 1.25,
+      "position": [
+        5.976,
+        1.2150524102725855,
+        -7.2
+      ],
+      "rightArm": -0.6276412521546755,
+      "phase": "working",
+      "citizen": "Cora",
+      "image": "living-motion-restorer-2.png"
+    },
+    {
+      "time": 49.25,
+      "work": 1.5,
+      "position": [
+        5.976,
+        1.2150524102725855,
+        -7.2
+      ],
+      "rightArm": -0.6554728251884474,
+      "phase": "working",
+      "citizen": "Cora",
+      "image": "living-motion-restorer-3.png"
+    }
+  ],
+  "errors": [],
+  "seedSHA256": "a2dbac51d91f36aebede3775c918194d0c736e00a67d47dcc25fab36fe3bc336",
+  "sourcesAtEnd": {
+    "js/world.js": "a474bd900914bda496201fc6a1827047774191bc1ab4bafc4280eaa7fffccfbc",
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "assets/living-kit.glb": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "tools/living-motion.mjs": "3e067cd1b297b904b0570f7db4a25cb49ed5227daf0977c3395960bb5dd872a4"
+  },
+  "sourcesStable": true
+}

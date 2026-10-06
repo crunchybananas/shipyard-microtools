@@ -1,0 +1,6131 @@
+{
+  "at": "2026-10-02T05:18:46.725Z",
+  "scope": "Prepared isolated smith fixtures with actual current GLBs and jobPose. No user save or runtime edits. Every reservable valid station, rotations0-3, levels1-3, and all3 actor scales are sampled for3seconds after2seconds warmup. Contact tests actual metal hammer-head triangles against the flat authored anvil interior or triangular horn top as selected by station target; raised recovery requires every head vertex at least0.1 model units above face. Numerical geometry does not substitute for captured pose review.",
+  "face": {
+    "minX": 0.06,
+    "maxX": 0.48,
+    "minZ": 0.17,
+    "maxZ": 0.39,
+    "y": 0.775
+  },
+  "sourceHashesAtStart": {
+    "js/world.js": "fb23fb0e79dc6df8f13be9b832a14605e55a77193936675d7f3c01235137706a",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/town-kit.glb": "c1f3ca97a861d97456714d654d245d77bb89ebdd1daab42bb9ece93efa641b59",
+    "assets/town-kit.json": "e9eefd9a37730d2931dd69a03138f33659ce4ddfe9a8080fbc0462b3ec0e6c3c",
+    "tools/town-artisan-contact.mjs": "8b1cbc68b1d8cccf87f3981d22532dce49ddb09c5c29c47e685ce03218d64259"
+  },
+  "sourceHashesAtEnd": {
+    "js/world.js": "fb23fb0e79dc6df8f13be9b832a14605e55a77193936675d7f3c01235137706a",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527",
+    "assets/town-kit.glb": "c1f3ca97a861d97456714d654d245d77bb89ebdd1daab42bb9ece93efa641b59",
+    "assets/town-kit.json": "e9eefd9a37730d2931dd69a03138f33659ce4ddfe9a8080fbc0462b3ec0e6c3c",
+    "tools/town-artisan-contact.mjs": "8b1cbc68b1d8cccf87f3981d22532dce49ddb09c5c29c47e685ce03218d64259"
+  },
+  "sourcesStable": true,
+  "cases": 144,
+  "impactCases": 4,
+  "recoveryCases": 0,
+  "results": [
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          -0.12155975870341607,
+          0.6973750859502836,
+          0.44097296534825303
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11062476617517293
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          -0.12218697471688511,
+          0.7210346365787785,
+          0.4165563842620503
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08841976778399954
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.65,
+        "arm": -1.1951206631653695,
+        "headCenter": [
+          -0.12179900254008658,
+          0.7386689170871603,
+          0.3895567799698434
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.07582645860690133
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5713512017587563,
+          0.6572847806584161,
+          0.6411281987082063
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.22072938735266745
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          0.55003192549374,
+          0.6800659213588482,
+          0.6332311617031932
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1905019403469346
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.16666666666666666,
+        "arm": -1.0555117551636435,
+        "headCenter": [
+          0.5285782174008595,
+          0.701439332304812,
+          0.6251993795094111
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.16178225524081774
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.060000000000000275
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.2781733077138656,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          0.5932421662727139,
+          0.7108997579783269,
+          0.2952816180458917
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.05270641161295769
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.060000000000000275
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.25453389874082377,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          0.5753432532551717,
+          0.7332702300916896,
+          0.31462343294961737
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.020527470138357408
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.060000000000000275
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 7,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.24551373035525403,
+      "closest": {
+        "time": 2.316666666666667,
+        "arm": -1.2244441741936614,
+        "headCenter": [
+          0.5566150172284496,
+          0.7477698021050101,
+          0.33437069465783176
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 22,
+        "lowestOverFace": 0.7697855021517195,
+        "nearestVertexDistance": 0.00006577237696425708
+      },
+      "firstImpact": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5529692703620812,
+          0.7459055030607613,
+          0.33615305979250043
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 33,
+        "lowestOverFace": 0.7624221717200124,
+        "nearestVertexDistance": 0.0021500944578652925
+      },
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.1699999999999997
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          -0.1944473243502598,
+          0.6766484680739457,
+          0.08767302081400996
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10651819649063586
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.1699999999999997
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6333333333333333,
+        "arm": -1.1529752165206755,
+        "headCenter": [
+          -0.16825289312049563,
+          0.6940997791413281,
+          0.08534998320897591
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08581102898149291
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.1699999999999997
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          -0.143801915798079,
+          0.7128969430077872,
+          0.08252226157813136
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.06638663536818688
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.06000000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10900000000000021,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          -0.12155975870341607,
+          0.6973750859502836,
+          0.44097296534825325
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11062476617517301
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.06000000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10900000000000021,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          -0.12218697471688489,
+          0.7210346365787785,
+          0.41655638426205144
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08841976778399968
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.06000000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10900000000000021,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.65,
+        "arm": -1.1951206631653695,
+        "headCenter": [
+          -0.1217990025400868,
+          0.7386689170871603,
+          0.38955677996984406
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.07582645860690176
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000002,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.43100000000000027,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5713512017587559,
+          0.6572847806584161,
+          0.6411281987082074
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.22072938735266803
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000002,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.43100000000000027,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          0.55003192549374,
+          0.6800659213588482,
+          0.6332311617031943
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.19050194034693535
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000002,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.43100000000000027,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.16666666666666666,
+        "arm": -1.0555117551636435,
+        "headCenter": [
+          0.5285782174008598,
+          0.701439332304812,
+          0.6251993795094117
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.16178225524081757
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.72,
+        0.10999999999999999,
+        0.0600000000000005
+      ],
+      "target": [
+        0.27000000000000024,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.2781733077138656,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          0.5932421662727148,
+          0.7108997579783269,
+          0.29528161804589104
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.052706411612958734
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.72,
+        0.10999999999999999,
+        0.0600000000000005
+      ],
+      "target": [
+        0.27000000000000024,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.25453389874082377,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          0.5753432532551725,
+          0.7332702300916896,
+          0.3146234329496176
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.02052747013835832
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.72,
+        0.10999999999999999,
+        0.0600000000000005
+      ],
+      "target": [
+        0.27000000000000024,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 7,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.24551373035525403,
+      "closest": {
+        "time": 2.316666666666667,
+        "arm": -1.2244441741936614,
+        "headCenter": [
+          0.5566150172284496,
+          0.7477698021050101,
+          0.3343706946578324
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 22,
+        "lowestOverFace": 0.7697855021517195,
+        "nearestVertexDistance": 0.00006577237696425708
+      },
+      "firstImpact": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5529692703620821,
+          0.7459055030607613,
+          0.3361530597925011
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 33,
+        "lowestOverFace": 0.7624221717200124,
+        "nearestVertexDistance": 0.0021500944578652925
+      },
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          -0.19444732435026002,
+          0.6766484680739457,
+          0.08767302081401063
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10651819649063528
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6333333333333333,
+        "arm": -1.1529752165206755,
+        "headCenter": [
+          -0.1682528931204963,
+          0.6940997791413281,
+          0.08534998320897635
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.085811028981493
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          -0.14380191579807944,
+          0.7128969430077872,
+          0.08252226157813158
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.06638663536818737
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          -0.12155975870341695,
+          0.6973750859502836,
+          0.44097296534825303
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11062476617517374
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          -0.12218697471688511,
+          0.7210346365787785,
+          0.41655638426205055
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.0884197677839996
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.65,
+        "arm": -1.1951206631653695,
+        "headCenter": [
+          -0.12179900254008746,
+          0.7386689170871603,
+          0.3895567799698436
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.07582645860690221
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5713512017587563,
+          0.6572847806584161,
+          0.6411281987082067
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.22072938735266778
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          0.5500319254937409,
+          0.6800659213588482,
+          0.6332311617031936
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.19050194034693566
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.16666666666666666,
+        "arm": -1.0555117551636435,
+        "headCenter": [
+          0.5285782174008595,
+          0.701439332304812,
+          0.6251993795094117
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.16178225524081793
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.2781733077138656,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          0.5932421662727139,
+          0.7108997579783269,
+          0.2952816180458915
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.05270641161295769
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.25453389874082377,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          0.5753432532551717,
+          0.7332702300916896,
+          0.31462343294961714
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.020527470138357408
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 7,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.24551373035525403,
+      "closest": {
+        "time": 2.316666666666667,
+        "arm": -1.2244441741936614,
+        "headCenter": [
+          0.5566150172284496,
+          0.7477698021050101,
+          0.33437069465783154
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 22,
+        "lowestOverFace": 0.7697855021517195,
+        "nearestVertexDistance": 0.00006577237696425708
+      },
+      "firstImpact": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5529692703620812,
+          0.7459055030607613,
+          0.3361530597925
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 33,
+        "lowestOverFace": 0.7624221717200124,
+        "nearestVertexDistance": 0.0021500944578652925
+      },
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          -0.1944473243502598,
+          0.6766484680739457,
+          0.08767302081401018
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10651819649063567
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6333333333333333,
+        "arm": -1.1529752165206755,
+        "headCenter": [
+          -0.16825289312049563,
+          0.6940997791413281,
+          0.08534998320897635
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08581102898149237
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          -0.143801915798079,
+          0.7128969430077872,
+          0.0825222615781318
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.06638663536818669
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.06000000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          -0.12155975870341629,
+          0.6973750859502836,
+          0.44097296534825325
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1106247661751732
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.06000000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          -0.12218697471688511,
+          0.7210346365787785,
+          0.41655638426205144
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08841976778399988
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.06000000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.65,
+        "arm": -1.1951206631653695,
+        "headCenter": [
+          -0.1217990025400868,
+          0.7386689170871603,
+          0.38955677996984406
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.07582645860690199
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4309999999999996,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5713512017587563,
+          0.6572847806584161,
+          0.6411281987082065
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.22072938735266762
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4309999999999996,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          0.55003192549374,
+          0.6800659213588482,
+          0.6332311617031934
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.19050194034693466
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4309999999999996,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.16666666666666666,
+        "arm": -1.0555117551636435,
+        "headCenter": [
+          0.5285782174008595,
+          0.701439332304812,
+          0.6251993795094108
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.16178225524081685
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.05999999999999961
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.2781733077138656,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          0.5932421662727143,
+          0.7108997579783269,
+          0.29528161804589104
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.05270641161295838
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.05999999999999961
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.25453389874082377,
+      "closest": {
+        "time": 1.7,
+        "arm": -1.3192033023516452,
+        "headCenter": [
+          0.5753432532551717,
+          0.7332702300916896,
+          0.3146234329496167
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.020527470138357772
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.05999999999999961
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 7,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.24551373035525403,
+      "closest": {
+        "time": 2.316666666666667,
+        "arm": -1.2244441741936614,
+        "headCenter": [
+          0.5566150172284492,
+          0.7477698021050103,
+          0.33437069465783154
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 22,
+        "lowestOverFace": 0.7697855021517195,
+        "nearestVertexDistance": 0.00006577237696447913
+      },
+      "firstImpact": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5529692703620812,
+          0.7459055030607613,
+          0.3361530597925002
+        ],
+        "impact": true,
+        "raised": false,
+        "overFaceVertices": 33,
+        "lowestOverFace": 0.7624221717200124,
+        "nearestVertexDistance": 0.0021500944578652925
+      },
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.47,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.09000000000000008,
+        0.73,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          -0.19444732435025958,
+          0.6766484680739457,
+          0.08767302081401063
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10651819649063528
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.47,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.09000000000000008,
+        0.73,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6333333333333333,
+        "arm": -1.1529752165206755,
+        "headCenter": [
+          -0.16825289312049585,
+          0.6940997791413281,
+          0.08534998320897635
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08581102898149294
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 1,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.47,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.09000000000000008,
+        0.73,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.18333333333333332,
+        "arm": -1.0973473563379572,
+        "headCenter": [
+          -0.14380191579807944,
+          0.7128969430077872,
+          0.08252226157813158
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.0663866353681875
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364842742,
+        "headCenter": [
+          -0.12780826116358668,
+          0.6580052253847631,
+          0.45687152190371516
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.14422569781794015
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          -0.12945547835247329,
+          0.6844337025718742,
+          0.43505021008041056
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11709948637262475
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.13083670477584164,
+          0.7095398236742007,
+          0.4125521170193982
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.0947622628017819
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5790000945326357,
+          0.6204941153819331,
+          0.6487949210689721
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.2489592026881127
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.21666666666666667,
+        "arm": -1.1816412375842458,
+        "headCenter": [
+          0.5576507767445058,
+          0.6425724208615274,
+          0.6408677725139837
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21776329828148722
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7099999999999997
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5360719041959383,
+          0.6633109394044051,
+          0.6327105341058761
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.18763293833760286
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.060000000000000275
+      ],
+      "target": [
+        0.2699999999999996,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.316507484426906,
+      "closest": {
+        "time": 1.7833333333333334,
+        "arm": -1.5050981111118475,
+        "headCenter": [
+          0.6122704715364282,
+          0.6716036171496474,
+          0.28597889102807605
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.09557943284806734
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.060000000000000275
+      ],
+      "target": [
+        0.2699999999999996,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.29521071958632783,
+      "closest": {
+        "time": 1.7666666666666666,
+        "arm": -1.4709764785293036,
+        "headCenter": [
+          0.5996914186423963,
+          0.7000460108750753,
+          0.30271988542697437
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.06217541785004561
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.060000000000000275
+      ],
+      "target": [
+        0.2699999999999996,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.28708444176149017,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364921546,
+        "headCenter": [
+          0.5842344732866893,
+          0.724983641822183,
+          0.3208678494738033
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.029834773668231757
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.1699999999999997
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7166666666666666,
+        "arm": -1.3590383822822265,
+        "headCenter": [
+          -0.21388460207093907,
+          0.6465681954717345,
+          0.08204644042118181
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13239020647447045
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.1699999999999997
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.26666666666666666,
+        "arm": -1.3062454509372512,
+        "headCenter": [
+          -0.18977504656468103,
+          0.6688959037328465,
+          0.07911988615934362
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10985284665704644
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.1699999999999997
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          -0.162762619155421,
+          0.6859067672957259,
+          0.077033636922059
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08829246567683639
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.060000000000000275,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364842742,
+        "headCenter": [
+          -0.12780826116358668,
+          0.6580052253847631,
+          0.45687152190371627
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1442256978179411
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.060000000000000275,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          -0.12945547835247329,
+          0.6844337025718742,
+          0.43505021008041034
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11709948637262498
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.060000000000000275,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.1308367047758423,
+          0.7095398236742007,
+          0.4125521170193984
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.09476226280178289
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.86,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5790000945326352,
+          0.6204941153819331,
+          0.6487949210689719
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.248959202688112
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.86,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.21666666666666667,
+        "arm": -1.1816412375842458,
+        "headCenter": [
+          0.5576507767445054,
+          0.6425724208615274,
+          0.6408677725139844
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21776329828148694
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.86,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5360719041959372,
+          0.6633109394044051,
+          0.6327105341058763
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.18763293833760208
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.0600000000000005
+      ],
+      "target": [
+        0.27,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.316507484426906,
+      "closest": {
+        "time": 1.7833333333333334,
+        "arm": -1.5050981111118475,
+        "headCenter": [
+          0.612270471536428,
+          0.6716036171496474,
+          0.2859788910280754
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.0955794328480675
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.0600000000000005
+      ],
+      "target": [
+        0.27,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.29521071958632783,
+      "closest": {
+        "time": 1.7666666666666666,
+        "arm": -1.4709764785293036,
+        "headCenter": [
+          0.599691418642397,
+          0.7000460108750753,
+          0.30271988542697503
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.062175417850046426
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.0600000000000005
+      ],
+      "target": [
+        0.27,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.28708444176149017,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364921546,
+        "headCenter": [
+          0.58423447328669,
+          0.724983641822183,
+          0.320867849473804
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.029834773668232666
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.47,
+        0.10999999999999999,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.09000000000000008,
+        0.7299999999999999,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7166666666666666,
+        "arm": -1.3590383822822265,
+        "headCenter": [
+          -0.2138846020709384,
+          0.6465681954717345,
+          0.08204644042118314
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13239020647447003
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.47,
+        0.10999999999999999,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.09000000000000008,
+        0.7299999999999999,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.26666666666666666,
+        "arm": -1.3062454509372512,
+        "headCenter": [
+          -0.18977504656468125,
+          0.6688959037328465,
+          0.07911988615934362
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10985284665704609
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.47,
+        0.10999999999999999,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.09000000000000008,
+        0.7299999999999999,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          -0.162762619155421,
+          0.6859067672957259,
+          0.07703363692206011
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08829246567683548
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364842742,
+        "headCenter": [
+          -0.12780826116358668,
+          0.6580052253847631,
+          0.4568715219037156
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.14422569781794042
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          -0.12945547835247417,
+          0.6844337025718742,
+          0.435050210080411
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11709948637262567
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.13083670477584164,
+          0.7095398236742007,
+          0.4125521170193982
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.09476226280178274
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5790000945326357,
+          0.6204941153819331,
+          0.6487949210689719
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.2489592026881127
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.21666666666666667,
+        "arm": -1.1816412375842458,
+        "headCenter": [
+          0.5576507767445058,
+          0.6425724208615274,
+          0.6408677725139842
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21776329828148752
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.10999999999999999,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5360719041959383,
+          0.6633109394044051,
+          0.6327105341058765
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1876329383376032
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.316507484426906,
+      "closest": {
+        "time": 1.7833333333333334,
+        "arm": -1.5050981111118475,
+        "headCenter": [
+          0.6122704715364282,
+          0.6716036171496474,
+          0.28597889102807583
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.09557943284806734
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.29521071958632783,
+      "closest": {
+        "time": 1.7666666666666666,
+        "arm": -1.4709764785293036,
+        "headCenter": [
+          0.5996914186423963,
+          0.7000460108750753,
+          0.30271988542697437
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.06217541785004561
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.10999999999999999,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.7200000000000001,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.28708444176149017,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364921546,
+        "headCenter": [
+          0.5842344732866893,
+          0.724983641822183,
+          0.32086784947380287
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.029834773668231757
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7166666666666666,
+        "arm": -1.3590383822822265,
+        "headCenter": [
+          -0.21388460207093907,
+          0.6465681954717345,
+          0.08204644042118203
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13239020647447028
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.26666666666666666,
+        "arm": -1.3062454509372512,
+        "headCenter": [
+          -0.18977504656468103,
+          0.6688959037328465,
+          0.07911988615934384
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10985284665704621
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          -0.162762619155421,
+          0.6859067672957259,
+          0.07703363692205922
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08829246567683621
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999983,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10900000000000021,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364842742,
+        "headCenter": [
+          -0.12780826116358623,
+          0.6580052253847631,
+          0.4568715219037154
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.14422569781794042
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999983,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10900000000000021,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3,
+        "arm": -1.3854895022166362,
+        "headCenter": [
+          -0.12945547835247284,
+          0.6844337025718742,
+          0.43505021008041034
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11709948637262464
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999983,
+        0.10999999999999999,
+        0.71
+      ],
+      "target": [
+        0.10900000000000021,
+        0.7200000000000001,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.13083670477584186,
+          0.7095398236742007,
+          0.4125521170193984
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.09476226280178249
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000005,
+        0.10999999999999999,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4309999999999998,
+        0.7200000000000001,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5790000945326359,
+          0.6204941153819331,
+          0.648794921068971
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.24895920268811175
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000005,
+        0.10999999999999999,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4309999999999998,
+        0.7200000000000001,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.21666666666666667,
+        "arm": -1.1816412375842458,
+        "headCenter": [
+          0.557650776744506,
+          0.6425724208615274,
+          0.6408677725139835
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21776329828148663
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000005,
+        0.10999999999999999,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4309999999999998,
+        0.7200000000000001,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2,
+        "arm": -1.1394659848564765,
+        "headCenter": [
+          0.5360719041959376,
+          0.6633109394044051,
+          0.6327105341058754
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1876329383376016
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.72,
+        0.10999999999999999,
+        0.05999999999999961
+      ],
+      "target": [
+        0.2699999999999998,
+        0.7200000000000001,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.316507484426906,
+      "closest": {
+        "time": 1.7833333333333334,
+        "arm": -1.5050981111118475,
+        "headCenter": [
+          0.612270471536428,
+          0.6716036171496474,
+          0.2859788910280745
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.09557943284806719
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.72,
+        0.10999999999999999,
+        0.05999999999999961
+      ],
+      "target": [
+        0.2699999999999998,
+        0.7200000000000001,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.29521071958632783,
+      "closest": {
+        "time": 1.7666666666666666,
+        "arm": -1.4709764785293036,
+        "headCenter": [
+          0.5996914186423965,
+          0.7000460108750753,
+          0.30271988542697414
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.06217541785004609
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.72,
+        0.10999999999999999,
+        0.05999999999999961
+      ],
+      "target": [
+        0.2699999999999998,
+        0.7200000000000001,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.28708444176149017,
+      "closest": {
+        "time": 0.31666666666666665,
+        "arm": -1.4233178364921546,
+        "headCenter": [
+          0.5842344732866895,
+          0.724983641822183,
+          0.3208678494738022
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.0298347736682323
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7166666666666666,
+        "arm": -1.3590383822822265,
+        "headCenter": [
+          -0.21388460207093862,
+          0.6465681954717345,
+          0.08204644042118225
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1323902064744701
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.26666666666666666,
+        "arm": -1.3062454509372512,
+        "headCenter": [
+          -0.18977504656468103,
+          0.6688959037328465,
+          0.07911988615934362
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10985284665704609
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 2,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.10999999999999999,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.7299999999999999,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          -0.16276261915542078,
+          0.6859067672957259,
+          0.07703363692206011
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.08829246567683548
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.1100000000000001,
+        0.7099999999999995
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.35,
+        "arm": -1.494371509223756,
+        "headCenter": [
+          -0.1324714905815627,
+          0.6194015686783418,
+          0.468736543499749
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.17939874134393613
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.1100000000000001,
+        0.7099999999999995
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3333333333333333,
+        "arm": -1.4596769867693578,
+        "headCenter": [
+          -0.13444272471721685,
+          0.6450322883331292,
+          0.44773965349366396
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.15024345002659983
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999961,
+        0.1100000000000001,
+        0.7099999999999995
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.13694236984435992,
+          0.6716092046346589,
+          0.4280872411582304
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.12411105846993979
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.1100000000000001,
+        0.7099999999999995
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          0.5831336458021914,
+          0.5820034099398343,
+          0.6529381076561713
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.2770517725142362
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.1100000000000001,
+        0.7099999999999995
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          0.5632141543672633,
+          0.6054471422430079,
+          0.6464441183829486
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.24589970297145558
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.1100000000000001,
+        0.7099999999999995
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5446556616421798,
+          0.6312340189022636,
+          0.6413143003107344
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21541041929590696
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.1100000000000001,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.3479289407490701,
+      "closest": {
+        "time": 0.4,
+        "arm": -1.5866530527404512,
+        "headCenter": [
+          0.6264571359421129,
+          0.6322740211124591,
+          0.27904318842974085
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13730854382038207
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.1100000000000001,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32855237601706866,
+      "closest": {
+        "time": 0.38333333333333336,
+        "arm": -1.5580306378415543,
+        "headCenter": [
+          0.6153431729241277,
+          0.6601084818145799,
+          0.2950679166670165
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10447211131752014
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.1100000000000001,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.2799999999999998
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32115879537315906,
+      "closest": {
+        "time": 0.36666666666666664,
+        "arm": -1.5272149080401283,
+        "headCenter": [
+          0.6033145018971737,
+          0.6869765887135837,
+          0.31153983548645536
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.07206304554384814
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.1100000000000001,
+        0.16999999999999948
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.2799999999999998
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.22621635792450512,
+          0.6104438457140526,
+          0.0784767216214648
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.16089703813055745
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.1100000000000001,
+        0.16999999999999948
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.2799999999999998
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7333333333333334,
+        "arm": -1.397749803946671,
+        "headCenter": [
+          -0.20475994296691447,
+          0.6347469915165622,
+          0.07478215299027591
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1366392342921763
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 0,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.1100000000000001,
+        0.16999999999999948
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.2799999999999998
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.18038694536846211,
+          0.6554829543265268,
+          0.07193185828144166
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11393380296755212
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999983,
+        0.1100000000000001,
+        0.7099999999999991
+      ],
+      "target": [
+        0.10900000000000043,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.35,
+        "arm": -1.494371509223756,
+        "headCenter": [
+          -0.13247149058156227,
+          0.6194015686783418,
+          0.46873654349974814
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.17939874134393596
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999983,
+        0.1100000000000001,
+        0.7099999999999991
+      ],
+      "target": [
+        0.10900000000000043,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3333333333333333,
+        "arm": -1.4596769867693578,
+        "headCenter": [
+          -0.13444272471721663,
+          0.6450322883331292,
+          0.44773965349366307
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.15024345002659922
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.05999999999999983,
+        0.1100000000000001,
+        0.7099999999999991
+      ],
+      "target": [
+        0.10900000000000043,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.13694236984435948,
+          0.6716092046346589,
+          0.42808724115822905
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.12411105846993889
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000004,
+        0.1100000000000001,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4310000000000005,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          0.5831336458021912,
+          0.5820034099398343,
+          0.6529381076561709
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.2770517725142352
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000004,
+        0.1100000000000001,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4310000000000005,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          0.5632141543672637,
+          0.6054471422430079,
+          0.6464441183829477
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.2458997029714559
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000004,
+        0.1100000000000001,
+        0.7099999999999991
+      ],
+      "target": [
+        0.4310000000000005,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.54465566164218,
+          0.6312340189022636,
+          0.641314300310734
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21541041929590665
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7200000000000002,
+        0.1100000000000001,
+        0.05999999999999961
+      ],
+      "target": [
+        0.27000000000000046,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.3479289407490701,
+      "closest": {
+        "time": 0.4,
+        "arm": -1.5866530527404512,
+        "headCenter": [
+          0.6264571359421143,
+          0.6322740211124591,
+          0.27904318842973996
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1373085438203826
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7200000000000002,
+        0.1100000000000001,
+        0.05999999999999961
+      ],
+      "target": [
+        0.27000000000000046,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32855237601706866,
+      "closest": {
+        "time": 0.38333333333333336,
+        "arm": -1.5580306378415543,
+        "headCenter": [
+          0.6153431729241285,
+          0.6601084818145799,
+          0.2950679166670165
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10447211131752068
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7200000000000002,
+        0.1100000000000001,
+        0.05999999999999961
+      ],
+      "target": [
+        0.27000000000000046,
+        0.72,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32115879537315906,
+      "closest": {
+        "time": 0.36666666666666664,
+        "arm": -1.5272149080401283,
+        "headCenter": [
+          0.6033145018971735,
+          0.6869765887135837,
+          0.3115398354864558
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.07206304554384799
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999953,
+        0.1100000000000001,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999964,
+        0.73,
+        0.27999999999999936
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.22621635792450445,
+          0.6104438457140526,
+          0.0784767216214659
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1608970381305569
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999953,
+        0.1100000000000001,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999964,
+        0.73,
+        0.27999999999999936
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7333333333333334,
+        "arm": -1.397749803946671,
+        "headCenter": [
+          -0.20475994296691424,
+          0.6347469915165622,
+          0.07478215299027635
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1366392342921769
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 1,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999953,
+        0.1100000000000001,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999964,
+        0.73,
+        0.27999999999999936
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.18038694536846123,
+          0.6554829543265268,
+          0.07193185828144166
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11393380296755239
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.1100000000000001,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.35,
+        "arm": -1.494371509223756,
+        "headCenter": [
+          -0.1324714905815636,
+          0.6194015686783418,
+          0.46873654349974925
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1793987413439369
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.1100000000000001,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3333333333333333,
+        "arm": -1.4596769867693578,
+        "headCenter": [
+          -0.13444272471721685,
+          0.6450322883331292,
+          0.44773965349366396
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1502434500265999
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.0600000000000005,
+        0.1100000000000001,
+        0.71
+      ],
+      "target": [
+        0.10899999999999999,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.13694236984435992,
+          0.6716092046346589,
+          0.4280872411582306
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1241110584699399
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.1100000000000001,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          0.5831336458021905,
+          0.5820034099398343,
+          0.6529381076561718
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.27705177251423607
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.1100000000000001,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          0.5632141543672633,
+          0.6054471422430079,
+          0.6464441183829488
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.24589970297145627
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000003,
+        0.1100000000000001,
+        0.7100000000000002
+      ],
+      "target": [
+        0.43100000000000005,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.5446556616421798,
+          0.6312340189022636,
+          0.6413143003107349
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21541041929590712
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.1100000000000001,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.3479289407490701,
+      "closest": {
+        "time": 0.4,
+        "arm": -1.5866530527404512,
+        "headCenter": [
+          0.6264571359421129,
+          0.6322740211124591,
+          0.27904318842974063
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13730854382038207
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.1100000000000001,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32855237601706866,
+      "closest": {
+        "time": 0.38333333333333336,
+        "arm": -1.5580306378415543,
+        "headCenter": [
+          0.6153431729241277,
+          0.6601084818145799,
+          0.2950679166670165
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10447211131752014
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999998,
+        0.1100000000000001,
+        0.06000000000000005
+      ],
+      "target": [
+        0.2699999999999996,
+        0.72,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32115879537315906,
+      "closest": {
+        "time": 0.36666666666666664,
+        "arm": -1.5272149080401283,
+        "headCenter": [
+          0.6033145018971737,
+          0.6869765887135837,
+          0.3115398354864558
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.07206304554384814
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.1100000000000001,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.22621635792450512,
+          0.6104438457140526,
+          0.07847672162146524
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.16089703813055714
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.1100000000000001,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7333333333333334,
+        "arm": -1.397749803946671,
+        "headCenter": [
+          -0.20475994296691447,
+          0.6347469915165622,
+          0.07478215299027635
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13663923429217592
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 2,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.46999999999999975,
+        0.1100000000000001,
+        0.16999999999999993
+      ],
+      "target": [
+        -0.08999999999999986,
+        0.73,
+        0.28
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.18038694536846211,
+          0.6554829543265268,
+          0.07193185828144211
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.11393380296755179
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.060000000000000275,
+        0.1100000000000001,
+        0.7100000000000009
+      ],
+      "target": [
+        0.10899999999999976,
+        0.72,
+        0.28000000000000114
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.35,
+        "arm": -1.494371509223756,
+        "headCenter": [
+          -0.1324714905815627,
+          0.6194015686783418,
+          0.4687365434997499
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.17939874134393696
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653546555,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.060000000000000275,
+        0.1100000000000001,
+        0.7100000000000009
+      ],
+      "target": [
+        0.10899999999999976,
+        0.72,
+        0.28000000000000114
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.3333333333333333,
+        "arm": -1.4596769867693578,
+        "headCenter": [
+          -0.13444272471721708,
+          0.6450322883331292,
+          0.44773965349366485
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1502434500266001
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 0,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        -0.060000000000000275,
+        0.1100000000000001,
+        0.7100000000000009
+      ],
+      "target": [
+        0.10899999999999976,
+        0.72,
+        0.28000000000000114
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.13694236984435992,
+          0.6716092046346589,
+          0.4280872411582308
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.12411105846993971
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000001,
+        0.1100000000000001,
+        0.71
+      ],
+      "target": [
+        0.4309999999999994,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.25,
+        "arm": -1.265255699884118,
+        "headCenter": [
+          0.5831336458021907,
+          0.5820034099398343,
+          0.6529381076561718
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.2770517725142357
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000001,
+        0.1100000000000001,
+        0.71
+      ],
+      "target": [
+        0.4309999999999994,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.6666666666666667,
+        "arm": -1.2370235696335379,
+        "headCenter": [
+          0.5632141543672631,
+          0.6054471422430079,
+          0.6464441183829486
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.24589970297145627
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 1,
+      "access": "front",
+      "surfaceName": "face",
+      "stance": [
+        0.8600000000000001,
+        0.1100000000000001,
+        0.71
+      ],
+      "target": [
+        0.4309999999999994,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.23333333333333334,
+        "arm": -1.2236464070103226,
+        "headCenter": [
+          0.54465566164218,
+          0.6312340189022636,
+          0.6413143003107349
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.21541041929590718
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999995,
+        0.1100000000000001,
+        0.0600000000000005
+      ],
+      "target": [
+        0.26999999999999935,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.3479289407490701,
+      "closest": {
+        "time": 0.4,
+        "arm": -1.5866530527404512,
+        "headCenter": [
+          0.6264571359421132,
+          0.6322740211124591,
+          0.27904318842974085
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13730854382038193
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999995,
+        0.1100000000000001,
+        0.0600000000000005
+      ],
+      "target": [
+        0.26999999999999935,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32855237601706866,
+      "closest": {
+        "time": 0.38333333333333336,
+        "arm": -1.5580306378415543,
+        "headCenter": [
+          0.6153431729241274,
+          0.6601084818145799,
+          0.29506791666701737
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.10447211131752
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 2,
+      "access": "side",
+      "surfaceName": "face",
+      "stance": [
+        0.7199999999999995,
+        0.1100000000000001,
+        0.0600000000000005
+      ],
+      "target": [
+        0.26999999999999935,
+        0.72,
+        0.28000000000000025
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0.32115879537315906,
+      "closest": {
+        "time": 0.36666666666666664,
+        "arm": -1.5272149080401283,
+        "headCenter": [
+          0.6033145018971726,
+          0.6869765887135837,
+          0.3115398354864567
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.0720630455438474
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.4700000000000002,
+        0.1100000000000001,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.0900000000000003,
+        0.73,
+        0.28000000000000114
+      ],
+      "actorScale": 0.9,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.75,
+        "arm": -1.435129479201202,
+        "headCenter": [
+          -0.22621635792450534,
+          0.6104438457140526,
+          0.0784767216214668
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.16089703813055645
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.4700000000000002,
+        0.1100000000000001,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.0900000000000003,
+        0.73,
+        0.28000000000000114
+      ],
+      "actorScale": 0.955,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 1.7333333333333334,
+        "arm": -1.397749803946671,
+        "headCenter": [
+          -0.2047599429669147,
+          0.6347469915165622,
+          0.07478215299027724
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.13663923429217575
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    },
+    {
+      "level": 3,
+      "rotation": 3,
+      "stationIndex": 3,
+      "access": "side",
+      "surfaceName": "horn",
+      "stance": [
+        -0.4700000000000002,
+        0.1100000000000001,
+        0.17000000000000082
+      ],
+      "target": [
+        -0.0900000000000003,
+        0.73,
+        0.28000000000000114
+      ],
+      "actorScale": 1.01,
+      "headTriangles": 88,
+      "impactFrames": 0,
+      "raisedRecoveryFrames": 0,
+      "maximumPenetrationBelowFace": 0,
+      "closest": {
+        "time": 0.2833333333333333,
+        "arm": -1.3463953251667142,
+        "headCenter": [
+          -0.1803869453684619,
+          0.6554829543265268,
+          0.07193185828144344
+        ],
+        "impact": false,
+        "raised": false,
+        "overFaceVertices": 0,
+        "lowestOverFace": null,
+        "nearestVertexDistance": 0.1139338029675513
+      },
+      "firstImpact": null,
+      "firstRecovery": null,
+      "armRange": [
+        -1.7251740653551668,
+        -0.5747125521549439
+      ]
+    }
+  ]
+}

@@ -1,0 +1,217 @@
+{
+  "startedAt": "2026-10-02T06:18:12.337Z",
+  "mode": "all",
+  "scope": "Actual UI actions against real frontier/simulation APIs. Isolated browser imports a previously earned village checkpoint; public workforce changes and clock skips prepare this review. No stock, population, diplomacy or unlock injection. This does not claim an earned frontier campaign or physical-device play.",
+  "checkpoint": {
+    "file": "campaign-services-lanes-save.json",
+    "sha256": "bbe9106df94ec942d7ec99f5eaf0e7e0d31bca4dbb9bf52d57dd0e5fcf8ac38c"
+  },
+  "sourcesAtStart": {
+    "js/frontier-ui.js": "21aede8fbdb0225022a7da84e9b7d1cf43d528f7b8d6a15c30feb1d7ea5e7a7a",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "js/frontier.js": "167071f01c183288f7958af75e47abae8041b72a6e33bf4cb9f292de6208d068",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "js/sim.js": "a764dd34739302af3ef9710d9aa8529a7028602653e56eb2ab5099b1da335b58",
+    "js/world.js": "f0e9daffa24362b5e41f46da7f9f4425c56b5bce63761e8d98abdab4bb5915ca",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "assets/frontier-kit.glb": "84ce4f001afa008eb1bbddb656f67b2bcc49fa813c09c444c3d2c37b99d62b23",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "checks": [
+    {
+      "name": "V3 migration opens the earned town and preserves its V2 source save",
+      "passed": true
+    },
+    {
+      "name": "Frontier exposes real quotes, region prerequisites and an interactive coastline",
+      "passed": true
+    },
+    {
+      "name": "Named recruitment spends the exact quote and reserves a real resident through training",
+      "passed": true,
+      "detail": {
+        "unitId": "unit-1",
+        "citizenId": "c9",
+        "name": "Ida",
+        "cost": {
+          "wood": 10,
+          "iron": 2,
+          "food": 8
+        }
+      }
+    },
+    {
+      "name": "Frontier units and named labor survive save/reload without altering the V2 save",
+      "passed": true
+    },
+    {
+      "name": "Accidental recruitment can cancel training at home, releasing labor without an equipment refund",
+      "passed": true,
+      "detail": {
+        "citizenId": "c52",
+        "refund": {}
+      }
+    },
+    {
+      "name": "An envoy spends real provisions, walks to first contact, and releases their town job on return",
+      "passed": true,
+      "detail": {
+        "citizenId": "c52",
+        "name": "Dev 3",
+        "elapsed": 58,
+        "cost": {
+          "food": 8,
+          "gold": 15
+        }
+      }
+    },
+    {
+      "name": "Neighbor trade, deliberate war, and a priced truce use their actual action quotes",
+      "passed": false,
+      "error": "Expected values to be strictly equal:\n\n'hold' !== 'move'\n"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "frontier-ui-01-island-chart.png",
+    "frontier-ui-02-trained-company.png",
+    "frontier-ui-03-first-contact.png",
+    "frontier-ui-failure.png"
+  ],
+  "fixture": {
+    "preparation": {
+      "method": "Public setWorkers restores food/timber/stone production and rests plank-consuming craft workers before time skips.",
+      "assignments": [
+        {
+          "id": "b2",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b3",
+          "type": "lumber",
+          "count": 2
+        },
+        {
+          "id": "b4",
+          "type": "quarry",
+          "count": 2
+        },
+        {
+          "id": "b12",
+          "type": "lumber",
+          "count": 2
+        },
+        {
+          "id": "b13",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b15",
+          "type": "quarry",
+          "count": 2
+        },
+        {
+          "id": "b16",
+          "type": "farm",
+          "count": 3
+        },
+        {
+          "id": "b17",
+          "type": "sawmill",
+          "count": 0
+        },
+        {
+          "id": "b19",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b23",
+          "type": "windmill",
+          "count": 2
+        },
+        {
+          "id": "b25",
+          "type": "farm",
+          "count": 3
+        },
+        {
+          "id": "b26",
+          "type": "sawmill",
+          "count": 0
+        },
+        {
+          "id": "b28",
+          "type": "bakery",
+          "count": 2
+        },
+        {
+          "id": "b30",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b40",
+          "type": "smith",
+          "count": 0
+        },
+        {
+          "id": "b41",
+          "type": "smith",
+          "count": 0
+        },
+        {
+          "id": "b42",
+          "type": "toolmaker",
+          "count": 0
+        },
+        {
+          "id": "b43",
+          "type": "toolmaker",
+          "count": 0
+        },
+        {
+          "id": "b50",
+          "type": "orchard",
+          "count": 2
+        },
+        {
+          "id": "b52",
+          "type": "orchard",
+          "count": 2
+        }
+      ]
+    }
+  },
+  "fatal": "Expected values to be strictly equal:\n\n'hold' !== 'move'\n",
+  "finishedAt": "2026-10-02T06:22:48.568Z",
+  "sourcesAtEnd": {
+    "js/frontier-ui.js": "c8930f14a521368ccbe752404437970272b2b519cc52e4b5c104e75c71a978c8",
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "index.html": "3243e93f7a83ee76f52244d736e94417fbf0c2a1da44b0905ee32cb93f58619e",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218",
+    "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+  },
+  "sourceChanges": [
+    "js/frontier-ui.js",
+    "js/frontier.js",
+    "js/sim.js",
+    "js/world.js",
+    "assets/frontier-kit.glb"
+  ],
+  "passed": false
+}

@@ -1,0 +1,1042 @@
+{
+  "at": "2026-10-02T05:27:38.871Z",
+  "sourceSave": "campaign-services-lanes-save.json",
+  "sourceHashesAtStart": {
+    "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+    "js/world.js": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218"
+  },
+  "sourceHashesAtEnd": {
+    "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+    "js/world.js": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+    "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+    "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+    "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "assets/town-kit.glb": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218"
+  },
+  "sourcesStable": true,
+  "workingActorFound": true,
+  "scope": "Isolated browser loaded the named earned campaign checkpoint. Public staffing actions requested full workplaces for pose review. Worker motion advanced only presentation; coastal warning uses real simulation clock. Camera placed for inspection. Finding a working actor does not replace human/model inspection of the captured poses. Headless rendering is not hardware performance evidence.",
+  "actor": {
+    "id": "c58",
+    "job": "smith",
+    "workplace": "b40",
+    "activity": "work",
+    "state": "working",
+    "position": [
+      1.59,
+      1.7203445328966767,
+      -9.74
+    ],
+    "tool": "tool_hammer"
+  },
+  "workers": [
+    {
+      "id": "c5",
+      "job": "forager",
+      "workplace": "hearth",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        3.366538649658439,
+        0.8838542682199602,
+        1.4790094253642012
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c6",
+      "job": "forager",
+      "workplace": "hearth",
+      "activity": "gather",
+      "state": "walking",
+      "position": [
+        3.364096583996905,
+        0.8429567946096329,
+        4.533110416610517
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c7",
+      "job": "farmer",
+      "workplace": "b2",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        4.49,
+        0.8604938640692532,
+        3.9499999999999997
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c8",
+      "job": "farmer",
+      "workplace": "b2",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        -3.828913688734683,
+        1.4560879607242811,
+        -7.493162851204389
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c9",
+      "job": "farmer",
+      "workplace": "b5",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        4.460000000000001,
+        0.889098165122727,
+        1.1099999999999999
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c10",
+      "job": "farmer",
+      "workplace": "b13",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        5.505702764592305,
+        0.9517001268505959,
+        -1.496323104628744
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c11",
+      "job": "farmer",
+      "workplace": "b13",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        7.09,
+        0.8523368842533288,
+        4.51
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c12",
+      "job": "farmer",
+      "workplace": "b19",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        6.8500000000000005,
+        0.8729856476930502,
+        0.89
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c13",
+      "job": "farmer",
+      "workplace": "b19",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        7.31,
+        0.8729856476930502,
+        0.89
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c14",
+      "job": "farmer",
+      "workplace": "b30",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        8.65,
+        0.8476291321328631,
+        0.89
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c15",
+      "job": "farmer",
+      "workplace": "b30",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        8.371680219609495,
+        0.9002258702224624,
+        -1.5645075327656714
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c16",
+      "job": "farmer",
+      "workplace": "b50",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        -0.23918884519999825,
+        1.2722305187740568,
+        -4.522505238284926
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c17",
+      "job": "farmer",
+      "workplace": "b52",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        9.35,
+        0.8403113590194351,
+        8.11
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c19",
+      "job": "miller",
+      "workplace": "b23",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        2.37,
+        0.8583117898981594,
+        4.57
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c20",
+      "job": "miller",
+      "workplace": "b23",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        1.9100000000000001,
+        0.8583117898981594,
+        4.57
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c22",
+      "job": "baker",
+      "workplace": "b28",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        4.3,
+        0.8198810503302987,
+        7.72
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c23",
+      "job": "farmer",
+      "workplace": "b25",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        9.13,
+        0.8375364054279681,
+        4.54
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c24",
+      "job": "farmer",
+      "workplace": "b52",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        -1.8641860137172581,
+        1.518581216468733,
+        -11.404380272466483
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c25",
+      "job": "baker",
+      "workplace": "b28",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        2.948163732840958,
+        0.9263401043528199,
+        0.4813075989991036
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c26",
+      "job": "farmer",
+      "workplace": "b50",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        7.31,
+        0.8268390187774284,
+        6.29
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c27",
+      "job": "lumberjack",
+      "workplace": "b3",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        -3.826517368347271,
+        1.4054106121992067,
+        -6.899100844335692
+      ],
+      "tool": "tool_axe"
+    },
+    {
+      "id": "c28",
+      "job": "lumberjack",
+      "workplace": "b3",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -6.2,
+        1.0347329325010253,
+        -3.62
+      ],
+      "tool": "tool_axe"
+    },
+    {
+      "id": "c29",
+      "job": "lumberjack",
+      "workplace": "b12",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -6.2,
+        0.926087145324267,
+        -1.3599999999999999
+      ],
+      "tool": "tool_axe"
+    },
+    {
+      "id": "c30",
+      "job": "farmer",
+      "workplace": "b25",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        8.67,
+        0.8375364054279681,
+        4.54
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c31",
+      "job": "farmer",
+      "workplace": "b25",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        9.59,
+        0.8375364054279681,
+        4.54
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c32",
+      "job": "lumberjack",
+      "workplace": "b12",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        -3.602271935507713,
+        1.1880071069175169,
+        -4.418342299681297
+      ],
+      "tool": "tool_axe"
+    },
+    {
+      "id": "c33",
+      "job": "quarryworker",
+      "workplace": "b4",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        3.611218056222643,
+        1.202620330984498,
+        -12.819987526381137
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c34",
+      "job": "quarryworker",
+      "workplace": "b4",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        10.21,
+        0.6882569545556052,
+        -11.74
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c35",
+      "job": "quarryworker",
+      "workplace": "b15",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        6.26,
+        1.2033007661925337,
+        -7.07
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c36",
+      "job": "quarryworker",
+      "workplace": "b15",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        6.260000000000001,
+        1.20376208859795,
+        -7.53
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c37",
+      "job": "carpenter",
+      "workplace": "b17",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        -3.3561455582813897,
+        1.5543476137938228,
+        -8.659452997626124
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c38",
+      "job": "carpenter",
+      "workplace": "b17",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        1.08,
+        1.624334025540196,
+        -4.8100000000000005
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c39",
+      "job": "carpenter",
+      "workplace": "b26",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        3.47,
+        1.5486936755604548,
+        -6.12
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c40",
+      "job": "carpenter",
+      "workplace": "b26",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        3.8768409930879635,
+        1.396462983561166,
+        -7.208196994198867
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c48",
+      "job": "weaver",
+      "workplace": "b31",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.9700000000000002,
+        1.721424979170255,
+        -7.07
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c49",
+      "job": "weaver",
+      "workplace": "b31",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.9700000000000002,
+        1.721424979170255,
+        -7.53
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c1",
+      "job": "farmer",
+      "workplace": "b16",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        4.460000000000001,
+        0.8375254543643698,
+        5.53
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c2",
+      "job": "farmer",
+      "workplace": "b16",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        3.295782183449168,
+        0.9353131988624552,
+        0.0736618899289685
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c3",
+      "job": "farmer",
+      "workplace": "b16",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        4.46,
+        0.8375254543643698,
+        5.99
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c4",
+      "job": "scholar",
+      "workplace": "b9",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.71,
+        1.2512613470534157,
+        -4.0200000000000005
+      ],
+      "tool": "tool_book"
+    },
+    {
+      "id": "c18",
+      "job": "scholar",
+      "workplace": "b9",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.7100000000000002,
+        1.2645007166395321,
+        -4.48
+      ],
+      "tool": "tool_book"
+    },
+    {
+      "id": "c21",
+      "job": "scholar",
+      "workplace": "b20",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        3.18,
+        1.2086835298787897,
+        -2.51
+      ],
+      "tool": "tool_book"
+    },
+    {
+      "id": "c41",
+      "job": "scholar",
+      "workplace": "b20",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        3.64,
+        1.2086835298787897,
+        -2.51
+      ],
+      "tool": "tool_book"
+    },
+    {
+      "id": "c42",
+      "job": "scholar",
+      "workplace": "b33",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -0.71,
+        1.2456091188961373,
+        -3.1799999999999997
+      ],
+      "tool": "tool_book"
+    },
+    {
+      "id": "c43",
+      "job": "scholar",
+      "workplace": "b33",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -0.71,
+        1.2456091188961373,
+        -3.64
+      ],
+      "tool": "tool_book"
+    },
+    {
+      "id": "c44",
+      "job": "farmer",
+      "workplace": "b21",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        0.2625281653832059,
+        0.9231496593440949,
+        -0.23771416676169665
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c45",
+      "job": "farmer",
+      "workplace": "b21",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        4.460000000000001,
+        0.9350584615333002,
+        -0.33000000000000024
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c46",
+      "job": "farmer",
+      "workplace": "b29",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.8600000000000001,
+        0.8900620118038016,
+        1.9299999999999995
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c47",
+      "job": "farmer",
+      "workplace": "b29",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.8600000000000002,
+        0.8900620118038016,
+        1.4699999999999998
+      ],
+      "tool": "tool_hoe"
+    },
+    {
+      "id": "c50",
+      "job": "weaver",
+      "workplace": "b38",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        5.2700000000000005,
+        1.3856839535919976,
+        -6.23
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c51",
+      "job": "weaver",
+      "workplace": "b38",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        5.73,
+        1.3856839535919976,
+        -6.23
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c52",
+      "job": "miner",
+      "workplace": "b37",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        10.930000000000001,
+        0.9028290988871059,
+        -2.55
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c53",
+      "job": "miner",
+      "workplace": "b37",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        10.47,
+        0.9028290988871059,
+        -2.55
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c54",
+      "job": "miner",
+      "workplace": "b37",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        11.39,
+        0.9028290988871059,
+        -2.55
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c55",
+      "job": "miner",
+      "workplace": "b39",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        7.950000000000001,
+        1.0486709632921152,
+        -10.670000000000002
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c56",
+      "job": "miner",
+      "workplace": "b39",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        7.950000000000001,
+        1.0486709632921152,
+        -11.13
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c57",
+      "job": "miner",
+      "workplace": "b39",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        7.949999999999999,
+        1.0634927081384848,
+        -10.21
+      ],
+      "tool": "tool_pick"
+    },
+    {
+      "id": "c58",
+      "job": "smith",
+      "workplace": "b40",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        1.59,
+        1.7203445328966767,
+        -9.74
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c59",
+      "job": "smith",
+      "workplace": "b40",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        2.08,
+        1.6206164882991405,
+        -10.019999999999998
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c60",
+      "job": "smith",
+      "workplace": "b41",
+      "activity": "deliver",
+      "state": "unloading",
+      "position": [
+        4.716,
+        0.9168573912578069,
+        -13.284
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c61",
+      "job": "smith",
+      "workplace": "b41",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        6.92,
+        1.1564227813505308,
+        -3.18
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c62",
+      "job": "smith",
+      "workplace": "b42",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        3.81,
+        1.6307233597077961,
+        -8.26
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c63",
+      "job": "smith",
+      "workplace": "b42",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        3.3200000000000003,
+        1.6307233597077961,
+        -8.58
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c64",
+      "job": "smith",
+      "workplace": "b43",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        -0.9633766321758896,
+        0.765723986050826,
+        -14.447417126357468
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c65",
+      "job": "smith",
+      "workplace": "b43",
+      "activity": "work",
+      "state": "walking",
+      "position": [
+        -1.597388154005606,
+        1.3691129012985739,
+        -12.650051886861139
+      ],
+      "tool": "tool_hammer"
+    },
+    {
+      "id": "c66",
+      "job": "brewer",
+      "workplace": "b46",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.6999999999999997,
+        0.8258245808847862,
+        7.72
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c67",
+      "job": "brewer",
+      "workplace": "b46",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.7,
+        0.8258245808847862,
+        7.26
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c68",
+      "job": "trader",
+      "workplace": "b22",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.9700000000000002,
+        1.1856554492912807,
+        -1.6700000000000002
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c69",
+      "job": "trader",
+      "workplace": "b22",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        0.9700000000000002,
+        1.1856554492912807,
+        -2.1300000000000003
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c70",
+      "job": "trader",
+      "workplace": "b36",
+      "activity": "deliver",
+      "state": "walking",
+      "position": [
+        4.730774732903965,
+        0.9919833237575856,
+        -1.985199040260706
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c71",
+      "job": "trader",
+      "workplace": "b36",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        5.07,
+        1.253754586832287,
+        -2.77
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c72",
+      "job": "medic",
+      "workplace": "b47",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -0.82,
+        0.8578804973949687,
+        8.31
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c73",
+      "job": "medic",
+      "workplace": "b47",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -0.8200000000000001,
+        0.8578804973949687,
+        8.77
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c74",
+      "job": "medic",
+      "workplace": "b47",
+      "activity": "waiting",
+      "state": "waiting",
+      "position": [
+        0.684,
+        0.8157144240633014,
+        11.916
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c75",
+      "job": "medic",
+      "workplace": "b53",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -11.780000000000001,
+        0.8351745819503811,
+        6.09
+      ],
+      "tool": "tool_basket"
+    },
+    {
+      "id": "c76",
+      "job": "medic",
+      "workplace": "b53",
+      "activity": "work",
+      "state": "working",
+      "position": [
+        -11.780000000000001,
+        0.8351745819503811,
+        5.63
+      ],
+      "tool": "tool_basket"
+    }
+  ],
+  "errors": [],
+  "diagnostics": {
+    "drawCalls": 586,
+    "triangles": 932779,
+    "actors": 76,
+    "buildings": 59,
+    "pixelRatio": 1,
+    "webgl": true,
+    "fps": 2
+  }
+}

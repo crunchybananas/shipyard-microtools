@@ -1,0 +1,77 @@
+/* Frontier commands share the town's paper, ink and practical scale. */
+#frontier-toggle{position:absolute;right:24px;bottom:25px;z-index:10;min-height:36px!important;padding:8px 14px!important;border-radius:5px;background:#315f4c!important;color:#fff4d8!important;font-weight:700;white-space:nowrap;box-shadow:var(--shadow)}
+#frontier-toggle[aria-pressed=true]{background:#986c41!important}
+#frontier-toggle.threatened{background:#955b45!important}
+.frontier-warning{background:#ebdbc0;border-left:3px solid #ac7448;padding:11px 12px;margin-bottom:14px;font-size:12px}
+#frontier-panel{position:absolute;right:75px;top:144px;bottom:205px;width:min(470px,calc(100% - 110px));display:flex;flex-direction:column;overflow:hidden;background:#f5eeddf7;border-radius:9px;box-shadow:0 10px 45px #143f3440;z-index:7;pointer-events:auto}
+.frontier-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 19px 10px;border-bottom:1px solid var(--line)}
+.frontier-heading h2{font:25px/1.15 Georgia,serif;margin:0;letter-spacing:-.5px}
+.frontier-heading button{flex-shrink:0;background:transparent;font-size:25px;width:40px;height:40px;border-radius:5px}
+.frontier-tabs{display:flex;gap:3px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.frontier-tabs button{flex:1;min-height:36px;background:none;border-radius:4px;font-size:12px}
+.frontier-tabs button[aria-pressed=true]{background:#d5dfc1;font-weight:700}
+#frontier-content{overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:12px 19px 22px;min-height:0}
+#frontier-content p{font-size:12px;line-height:1.55;margin:7px 0;color:#64715d}
+#frontier-content .frontier-intro{margin:0 0 16px}
+.frontier-section{font:21px/1.2 Georgia,serif;margin:20px 0 11px}
+.frontier-row{padding:13px 0;border-top:1px solid var(--line)}
+.frontier-row:first-child{border-top:0;padding-top:0}
+.frontier-row-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.frontier-row-title strong{font-size:14px;line-height:1.35}
+.frontier-tag{font-size:10px;white-space:nowrap;color:#687d63;background:#e3e6d2;border-radius:3px;padding:4px 7px}
+.frontier-tag.hostile{color:#8d3d30;background:#edd5bd}
+.frontier-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.frontier-actions button{font-size:11px;line-height:1.3;border-radius:4px;background:#dbe2c7;padding:9px 12px;min-height:36px}
+.frontier-actions button.primary{background:var(--green);color:#fff6dd}
+.frontier-actions button.danger{background:#955b45;color:#fff1d6}
+#frontier-content .frontier-reason{font-size:11px;color:#8a6748;margin-top:7px}
+#frontier-content .frontier-cost{font-size:11px;color:#526b58}
+.frontier-selection{padding:11px 12px;margin:0 0 12px;background:#e4e6cf;border-radius:5px}
+.frontier-selection h3{font:23px Georgia,serif;margin:0 0 8px}
+.frontier-health{height:6px;border-radius:3px;background:#cdd4bb;overflow:hidden;margin:10px 0 6px}
+.frontier-health span{display:block;height:100%;background:#69865d}
+.frontier-health.wounded span{background:#b17d49}
+.frontier-unit{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.frontier-unit>button{flex:1;text-align:left;background:transparent;padding:8px;border-radius:5px;min-width:0}
+.frontier-unit>button[aria-pressed=true]{background:#d7dfbf}
+.frontier-unit strong,.frontier-unit small{display:block}
+.frontier-unit strong{font-size:12px}
+.frontier-unit small{font-size:10px;color:#6d7b62;margin-top:4px;line-height:1.4}
+.frontier-unit .frontier-locate{flex:0 0 auto;padding:8px 10px;font-size:10px;background:#e2e5d0;text-align:center}
+.frontier-log{list-style:none;padding:0;margin:0}
+.frontier-log li{font-size:11px;line-height:1.55;padding:9px 0;border-top:1px solid var(--line);color:#5f705c}
+.frontier-log small{display:block;color:#879070;font-size:10px;margin-bottom:3px}
+.frontier-diplomacy{padding:12px;border-left:3px solid #b98150;background:#eee1c9;margin-top:10px}
+.frontier-diplomacy strong{font-size:12px}
+.frontier-choice{display:flex;align-items:center;gap:8px;font-size:12px;padding:9px 0}
+.frontier-choice input{width:19px;height:19px;accent-color:#315f4c}
+.frontier-choice select{min-width:0;flex:1;max-width:100%;font:inherit;font-size:11px;background:#f6efdb;border:1px solid var(--line);border-radius:4px;color:var(--ink);padding:9px 6px}
+.frontier-chart-wrap{margin:0 0 15px}
+.frontier-chart{display:block;width:100%;height:240px;border-radius:5px;background:#84aaa3;cursor:crosshair;touch-action:manipulation}
+.frontier-chart-wrap figcaption{font-size:10px;color:#63755c;line-height:1.5;margin-top:6px}
+.frontier-chart-legend{display:flex;flex-wrap:wrap;gap:6px 13px;margin-top:5px;font-size:9px;color:#63755c}
+.frontier-chart-legend span{display:flex;align-items:center;gap:4px}.frontier-chart-legend i{width:8px;height:8px;border:1px solid #52795d;border-radius:2px}
+#frontier-command{position:absolute;bottom:218px;left:50%;transform:translateX(-50%);width:min(620px,calc(100% - 36px));padding:12px 14px;background:#f6eedbf5;border-left:4px solid #899a65;border-radius:7px;box-shadow:var(--shadow);z-index:8;pointer-events:auto;display:flex;align-items:center;gap:12px}
+#frontier-command.invalid{border-left-color:#b17350}
+#frontier-command>div{flex:1;min-width:0}
+#frontier-command strong{display:block;font-size:12px}
+#frontier-command p{font-size:11px;line-height:1.4;margin:4px 0 0;color:#65745e}
+#frontier-command button{background:#dbe2c7;border-radius:4px;padding:9px 12px;font-size:11px;min-height:36px}
+.frontier-view-active #inspector,.frontier-view-active #town-book{display:none!important}
+.frontier-view-active .ambition{opacity:.6}
+.frontier-command-active #world{cursor:crosshair!important}
+@media(max-width:1050px){#frontier-panel{right:64px;width:430px}}
+@media(min-width:761px) and (max-width:1100px){#frontier-toggle{left:18px;right:auto;bottom:220px}}
+@media(max-width:760px){
+  #frontier-toggle{right:auto;left:50%;bottom:2px;transform:translateX(-50%);width:76px;min-height:44px!important;font-size:10px!important;padding:7px 6px!important}
+  #frontier-panel{top:190px;left:12px;right:12px;bottom:205px;width:auto;min-height:200px}
+  .frontier-heading{padding:9px 13px 6px}.frontier-heading h2{font-size:22px}
+  .frontier-heading button,.frontier-tabs button,.frontier-actions button,.frontier-unit>button,.frontier-unit .frontier-locate{min-height:44px}
+  .frontier-tabs{padding:5px 8px}.frontier-tabs button{font-size:11px}
+  #frontier-content{padding:12px 14px 18px}
+  .frontier-chart{height:220px}
+  #frontier-command{bottom:211px;width:calc(100% - 24px);padding:10px 11px;gap:8px}
+  #frontier-command button{min-height:44px;padding:9px}
+  .frontier-view-active .ambition{display:none}
+}
+@media(max-height:680px) and (min-width:761px){#frontier-panel{top:135px;bottom:170px}#frontier-command{bottom:180px}}

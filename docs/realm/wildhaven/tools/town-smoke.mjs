@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test';
+const browser = await chromium.launch({headless:true});
+const page = await browser.newPage({viewport:{width:1440,height:1000}});
+const errors=[];page.on('pageerror', e=>errors.push(e.stack));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+await page.goto('http://127.0.0.1:4751/wildhaven/?review',{waitUntil:'networkidle'});
+await page.waitForFunction(()=>window.__wildhaven,{timeout:30000});
+await page.locator('#start').click();await page.locator('#pause').click();
+await page.screenshot({path:new URL('../review/town-01-fresh.png',import.meta.url).pathname});
+await page.locator('#town-tools [data-town-tab="workforce"]').click();
+await page.screenshot({path:new URL('../review/town-02-workforce.png',import.meta.url).pathname});
+console.log(JSON.stringify({errors,diagnostics:await page.evaluate(()=>Wildhaven.getDiagnostics()),body:await page.locator('#town-book').innerText()}));
+await browser.close();if(errors.length)process.exitCode=1;

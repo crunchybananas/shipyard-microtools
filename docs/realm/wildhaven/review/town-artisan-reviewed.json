@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-10-02T05:28:15.100Z",
+  "scope": "Independent numerical contact plus model-reviewed prepared screenshots; not earned gameplay, traffic or performance evidence.",
+  "worldHash": "d59ce6cd37860b6135709ee62eb0c156014a319beedf884557645bfe5aadeb8c",
+  "sourcesStable": true,
+  "visualReview": {
+    "reviewed": [
+      "town-artisan-smith-pose-0.png",
+      "town-artisan-smith-pose-1.png",
+      "town-artisan-smith-pose-2.png"
+    ],
+    "finding": "Hammer visibly lifts and returns over the lowered anvil. Tool remains in hand; exact impact, raised recovery and descending frames are distinct. Side-on body stance reads as a working gesture; eye/gaze polish was not tested.",
+    "camera": "Building rotation + facade-relative -30 degrees, orthographic zoom3.5, aim at real station/actor-chest midpoint height.",
+    "actor": {
+      "id": "fixture-smith-worker-1",
+      "name": "Smithy 1",
+      "job": "smith",
+      "workplace": "fixture-smith",
+      "experience": {}
+    },
+    "stages": [
+      {
+        "file": "town-artisan-smith-pose-0.png",
+        "stage": "impact",
+        "headBottomInModel": 0.5429997535193418,
+        "lowestOverAnvil": 0.5429997535193418
+      },
+      {
+        "file": "town-artisan-smith-pose-1.png",
+        "stage": "raised recovery",
+        "headBottomInModel": 0.728462478441656,
+        "lowestOverAnvil": 0.7363017816142006
+      },
+      {
+        "file": "town-artisan-smith-pose-2.png",
+        "stage": "descending",
+        "headBottomInModel": 0.652475175777085,
+        "lowestOverAnvil": 0.652475175777085
+      }
+    ]
+  },
+  "geometry": {
+    "cases": 144,
+    "impacts": 144,
+    "raisedRecoveries": 144,
+    "faceSurfaceHeight": 0.545,
+    "maximumFlatFacePenetration": 0.0020412718033927524,
+    "dimensions": "Four reservable stations, four rotations, three building levels, three actor sizes; three seconds at60Hz aftertwo secondwarmup."
+  },
+  "browserErrors": []
+}

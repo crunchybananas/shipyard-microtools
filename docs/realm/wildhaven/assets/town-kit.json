@@ -1,0 +1,509 @@
+{
+  "title": "Wildhaven original town expansion kit",
+  "authoring": "Original Blender geometry; no downloaded models, textures, fonts or add-ons.",
+  "blender_version": "5.2.1 LTS",
+  "generator": "../tools/create_town_assets.py",
+  "generator_sha256": "7a00f2496f19216b15b93918b146800989cc6686e91a2c59a64697e761a2666a",
+  "coordinates": "GLB: Three Y-up, +Z front. Buildings: ground origin. Tools: hand grip origin, handle along +Y.",
+  "upgrade_cottage": "Complete replacement for cottage, not an attachment. Same ground origin and facing.",
+  "construction": "Open scaffold shell, no house; hide after construction completes.",
+  "assets": {
+    "farm": {
+      "size_three": [
+        1.5,
+        0.6351,
+        1.4355
+      ],
+      "bounds_three": {
+        "min": [
+          -0.75,
+          0.0,
+          -0.7325
+        ],
+        "max": [
+          0.75,
+          0.6351,
+          0.703
+        ]
+      },
+      "triangles": 3992,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0,
+        0.37,
+        0.4
+      ]
+    },
+    "bakery": {
+      "size_three": [
+        1.4918,
+        2.1135,
+        1.5209
+      ],
+      "bounds_three": {
+        "min": [
+          -0.7549,
+          0.0,
+          -0.6959
+        ],
+        "max": [
+          0.7369,
+          2.1135,
+          0.825
+        ]
+      },
+      "triangles": 5362,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0.39,
+        0.43,
+        0.76
+      ]
+    },
+    "sawmill": {
+      "size_three": [
+        1.6839,
+        1.7158,
+        1.6119
+      ],
+      "bounds_three": {
+        "min": [
+          -0.8419,
+          0.0,
+          -0.8059
+        ],
+        "max": [
+          0.8419,
+          1.7158,
+          0.8059
+        ]
+      },
+      "triangles": 4788,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0,
+        0.67,
+        0.25
+      ]
+    },
+    "mine": {
+      "size_three": [
+        1.6292,
+        1.463,
+        1.5139
+      ],
+      "bounds_three": {
+        "min": [
+          -0.8314,
+          0.0,
+          -0.7139
+        ],
+        "max": [
+          0.7978,
+          1.463,
+          0.8
+        ]
+      },
+      "triangles": 1608,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0,
+        0.38,
+        0.53
+      ]
+    },
+    "smith": {
+      "size_three": [
+        1.6839,
+        1.9335,
+        1.5719
+      ],
+      "bounds_three": {
+        "min": [
+          -0.8419,
+          0.0,
+          -0.7859
+        ],
+        "max": [
+          0.8419,
+          1.9335,
+          0.7859
+        ]
+      },
+      "triangles": 4326,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0.27,
+        0.545,
+        0.28
+      ]
+    },
+    "market": {
+      "size_three": [
+        1.49,
+        1.48,
+        1.35
+      ],
+      "bounds_three": {
+        "min": [
+          -0.745,
+          0.0,
+          -0.675
+        ],
+        "max": [
+          0.745,
+          1.48,
+          0.675
+        ]
+      },
+      "triangles": 4232,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0,
+        0.72,
+        0.39
+      ]
+    },
+    "school": {
+      "size_three": [
+        1.4835,
+        2.0458,
+        1.4901
+      ],
+      "bounds_three": {
+        "min": [
+          -0.7319,
+          0.0,
+          -0.7009
+        ],
+        "max": [
+          0.7516,
+          2.0458,
+          0.7892
+        ]
+      },
+      "triangles": 4841,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        -0.55,
+        0.6,
+        0.75
+      ]
+    },
+    "well": {
+      "size_three": [
+        1.4019,
+        1.6758,
+        1.142
+      ],
+      "bounds_three": {
+        "min": [
+          -0.6619,
+          0.0,
+          -0.5359
+        ],
+        "max": [
+          0.74,
+          1.6758,
+          0.6061
+        ]
+      },
+      "triangles": 5916,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0,
+        0.91,
+        0
+      ]
+    },
+    "barracks": {
+      "size_three": [
+        1.5039,
+        1.7058,
+        1.5269
+      ],
+      "bounds_three": {
+        "min": [
+          -0.7519,
+          0.0,
+          -0.7209
+        ],
+        "max": [
+          0.7519,
+          1.7058,
+          0.806
+        ]
+      },
+      "triangles": 4641,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0.43,
+        0.53,
+        0.72
+      ]
+    },
+    "warehouse": {
+      "size_three": [
+        1.6939,
+        1.9858,
+        1.5909
+      ],
+      "bounds_three": {
+        "min": [
+          -0.8469,
+          0.0,
+          -0.7659
+        ],
+        "max": [
+          0.8469,
+          1.9858,
+          0.825
+        ]
+      },
+      "triangles": 5006,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        0,
+        0.6,
+        0.74
+      ]
+    },
+    "clinic": {
+      "size_three": [
+        1.4839,
+        1.6658,
+        1.4709
+      ],
+      "bounds_three": {
+        "min": [
+          -0.7419,
+          0.0,
+          -0.6909
+        ],
+        "max": [
+          0.7419,
+          1.6658,
+          0.78
+        ]
+      },
+      "triangles": 7550,
+      "mesh_nodes": 1,
+      "anchor": "ground",
+      "work_target_three": [
+        -0.25,
+        0.65,
+        0.6
+      ]
+    },
+    "upgrade_cottage": {
+      "size_three": [
+        1.5339,
+        2.6335,
+        1.5244
+      ],
+      "bounds_three": {
+        "min": [
+          -0.7669,
+          0.0,
+          -0.7159
+        ],
+        "max": [
+          0.7669,
+          2.6335,
+          0.8085
+        ]
+      },
+      "triangles": 8133,
+      "mesh_nodes": 1,
+      "anchor": "ground"
+    },
+    "construction": {
+      "size_three": [
+        1.5,
+        1.5,
+        1.45
+      ],
+      "bounds_three": {
+        "min": [
+          -0.75,
+          0.0,
+          -0.725
+        ],
+        "max": [
+          0.75,
+          1.5,
+          0.725
+        ]
+      },
+      "triangles": 1932,
+      "mesh_nodes": 1,
+      "anchor": "ground"
+    },
+    "tool_hammer": {
+      "size_three": [
+        0.18,
+        0.384,
+        0.079
+      ],
+      "bounds_three": {
+        "min": [
+          -0.095,
+          -0.16,
+          -0.0395
+        ],
+        "max": [
+          0.085,
+          0.224,
+          0.0395
+        ]
+      },
+      "triangles": 180,
+      "mesh_nodes": 1,
+      "anchor": "hand_grip"
+    },
+    "tool_axe": {
+      "size_three": [
+        0.1797,
+        0.4151,
+        0.05
+      ],
+      "bounds_three": {
+        "min": [
+          -0.03,
+          -0.1707,
+          -0.025
+        ],
+        "max": [
+          0.1497,
+          0.2444,
+          0.025
+        ]
+      },
+      "triangles": 152,
+      "mesh_nodes": 1,
+      "anchor": "hand_grip"
+    },
+    "tool_pick": {
+      "size_three": [
+        0.36,
+        0.43,
+        0.069
+      ],
+      "bounds_three": {
+        "min": [
+          -0.18,
+          -0.18,
+          -0.0345
+        ],
+        "max": [
+          0.18,
+          0.25,
+          0.0345
+        ]
+      },
+      "triangles": 148,
+      "mesh_nodes": 1,
+      "anchor": "hand_grip"
+    },
+    "tool_hoe": {
+      "size_three": [
+        0.13,
+        0.3843,
+        0.1393
+      ],
+      "bounds_three": {
+        "min": [
+          -0.065,
+          -0.19,
+          -0.0137
+        ],
+        "max": [
+          0.065,
+          0.1943,
+          0.1256
+        ]
+      },
+      "triangles": 204,
+      "mesh_nodes": 1,
+      "anchor": "hand_grip"
+    },
+    "tool_spear": {
+      "size_three": [
+        0.072,
+        0.502,
+        0.044
+      ],
+      "bounds_three": {
+        "min": [
+          -0.036,
+          -0.2,
+          -0.022
+        ],
+        "max": [
+          0.036,
+          0.302,
+          0.022
+        ]
+      },
+      "triangles": 290,
+      "mesh_nodes": 1,
+      "anchor": "hand_grip"
+    },
+    "tool_book": {
+      "size_three": [
+        0.1895,
+        0.232,
+        0.0855
+      ],
+      "bounds_three": {
+        "min": [
+          -0.0995,
+          -0.081,
+          -0.0105
+        ],
+        "max": [
+          0.09,
+          0.151,
+          0.075
+        ]
+      },
+      "triangles": 352,
+      "mesh_nodes": 1,
+      "anchor": "hand_grip"
+    },
+    "tool_basket": {
+      "size_three": [
+        0.248,
+        0.3105,
+        0.248
+      ],
+      "bounds_three": {
+        "min": [
+          -0.124,
+          -0.2985,
+          -0.124
+        ],
+        "max": [
+          0.124,
+          0.012,
+          0.124
+        ]
+      },
+      "triangles": 596,
+      "mesh_nodes": 1,
+      "anchor": "hand_grip"
+    }
+  },
+  "total_triangles": 64249,
+  "glb_bytes": 6476180
+}

@@ -1,0 +1,3037 @@
+{
+  "scope": "Earned public-action campaign checkpoints loaded into isolated browser storage. Wall/company/hamlet/island shots change only presentation. Battle shots continue saved units through public attack order and actual simulation ticks; no resources, HP, positions, entities or claims are inserted. Screens require separate visual inspection. Headless diagnostics are not hardware performance claims.",
+  "checkedAt": "2026-10-02T06:25:43.220Z",
+  "sourceHashesAtStart": {
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/frontier-kit.json": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04",
+    "tools/frontier-earned-render.mjs": "8a0b31c1b920ae2a8f86464ca5e5d387d50f9d92ce6865a1fdb617dbc7391776"
+  },
+  "sourceHashesAtEnd": {
+    "js/world.js": "87c7201aa68f67966a715d8bdd0d0a0e14a6be5d95271421f0e5be33e12c411d",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/main.js": "8873965689810d7dd0077421aff454a741ceac7e9a14eab3457e6cf720c26840",
+    "assets/frontier-kit.glb": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b",
+    "assets/frontier-kit.json": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04",
+    "tools/frontier-earned-render.mjs": "8a0b31c1b920ae2a8f86464ca5e5d387d50f9d92ce6865a1fdb617dbc7391776"
+  },
+  "sourcesStable": true,
+  "checkpoints": {
+    "walls": {
+      "sha256": "1430cc1bc5c87880c97107790f0359f1d9f5dbd37b6102f9ac90830dd85af227",
+      "presentationReadOnly": true,
+      "diagnostics": {
+        "drawCalls": 606,
+        "triangles": 1359944,
+        "actors": 69,
+        "buildings": 52,
+        "troops": 9,
+        "fortifications": 9,
+        "neighbors": 3,
+        "pixelRatio": 1,
+        "webgl": true,
+        "fps": 2
+      },
+      "sha256AtEnd": "1430cc1bc5c87880c97107790f0359f1d9f5dbd37b6102f9ac90830dd85af227",
+      "checkpointStable": true
+    },
+    "battle-start": {
+      "sha256": "9da82408c6cb226faa83fe8b0649bbfe8991a26ff83bfb86c0df50ecfb30b05d",
+      "orders": {
+        "ok": true,
+        "reason": "7 troops: attack.",
+        "cost": {}
+      },
+      "samples": [
+        {
+          "time": 6384,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6384.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6385.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6386.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6387.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388.75,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-2",
+              "kind": "archer",
+              "x": 0.143119,
+              "z": -23.927589,
+              "hp": 42,
+              "attackAt": 6388.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6388.75,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-2",
+              "kind": "archer",
+              "x": 0.143119,
+              "z": -23.927589,
+              "hp": 42,
+              "attackAt": 6388.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-2",
+              "kind": "archer",
+              "x": 0.143119,
+              "z": -23.927589,
+              "hp": 42,
+              "attackAt": 6388.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-2",
+              "kind": "archer",
+              "x": 0.143119,
+              "z": -23.927589,
+              "hp": 42,
+              "attackAt": 6388.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-2",
+              "kind": "archer",
+              "x": 0.143119,
+              "z": -23.927589,
+              "hp": 42,
+              "attackAt": 6388.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389.25,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6389.25
+            },
+            {
+              "id": "unit-2",
+              "kind": "archer",
+              "x": 0.143119,
+              "z": -23.927589,
+              "hp": 42,
+              "attackAt": 6388.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 35.65,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389.25,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6389.25
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 35.65,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389.5,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6389.25
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 27.6,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389.5,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6389.25
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 27.6,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389.5,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6389.25
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 27.6,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389.75,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6389.25
+            },
+            {
+              "id": "unit-5",
+              "kind": "spearman",
+              "x": 0.380059,
+              "z": -27.512499,
+              "hp": 70,
+              "attackAt": 6389.75
+            },
+            {
+              "id": "unit-6",
+              "kind": "archer",
+              "x": 0.439425,
+              "z": -23.866646,
+              "hp": 42,
+              "attackAt": 6389.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 17.25,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6389.75,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-5",
+              "kind": "spearman",
+              "x": 0.380059,
+              "z": -27.512499,
+              "hp": 70,
+              "attackAt": 6389.75
+            },
+            {
+              "id": "unit-6",
+              "kind": "archer",
+              "x": 0.439425,
+              "z": -23.866646,
+              "hp": 42,
+              "attackAt": 6389.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 17.25,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-5",
+              "kind": "spearman",
+              "x": 0.380059,
+              "z": -27.512499,
+              "hp": 70,
+              "attackAt": 6389.75
+            },
+            {
+              "id": "unit-6",
+              "kind": "archer",
+              "x": 0.439425,
+              "z": -23.866646,
+              "hp": 42,
+              "attackAt": 6389.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 17.25,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-5",
+              "kind": "spearman",
+              "x": 0.380059,
+              "z": -27.512499,
+              "hp": 70,
+              "attackAt": 6389.75
+            },
+            {
+              "id": "unit-6",
+              "kind": "archer",
+              "x": 0.439425,
+              "z": -23.866646,
+              "hp": 42,
+              "attackAt": 6389.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 17.25,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-5",
+              "kind": "spearman",
+              "x": 0.380059,
+              "z": -27.512499,
+              "hp": 70,
+              "attackAt": 6389.75
+            },
+            {
+              "id": "unit-6",
+              "kind": "archer",
+              "x": 0.439425,
+              "z": -23.866646,
+              "hp": 42,
+              "attackAt": 6389.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 17.25,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390.25,
+          "projectiles": 1,
+          "attacking": [
+            {
+              "id": "unit-5",
+              "kind": "spearman",
+              "x": 0.380059,
+              "z": -27.512499,
+              "hp": 70,
+              "attackAt": 6389.75
+            },
+            {
+              "id": "unit-6",
+              "kind": "archer",
+              "x": 0.439425,
+              "z": -23.866646,
+              "hp": 42,
+              "attackAt": 6389.75
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 17.25,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390.25,
+          "projectiles": 1,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 17.25,
+              "status": "active"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390.5,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6390.5
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390.5,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6390.5
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390.5,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6390.5
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390.75,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6390.5
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6390.75,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6390.5
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6390.5
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391,
+          "projectiles": 0,
+          "attacking": [
+            {
+              "id": "unit-1",
+              "kind": "spearman",
+              "x": 0.0328070209833537,
+              "z": -27.436754636615447,
+              "hp": 63.913043,
+              "attackAt": 6390.5
+            }
+          ],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6391.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6392.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6393.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6394.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395.25,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395.5,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6395.75,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6396,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6396,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "time": 6396,
+          "projectiles": 0,
+          "attacking": [],
+          "enemyHp": [
+            {
+              "id": "unit-67",
+              "hp": 0,
+              "status": "dead"
+            },
+            {
+              "id": "unit-68",
+              "hp": 46,
+              "status": "active"
+            },
+            {
+              "id": "unit-69",
+              "hp": 42,
+              "status": "active"
+            }
+          ]
+        }
+      ],
+      "diagnostics": {
+        "drawCalls": 66,
+        "triangles": 526945,
+        "actors": 75,
+        "buildings": 53,
+        "troops": 16,
+        "fortifications": 11,
+        "neighbors": 3,
+        "pixelRatio": 1,
+        "webgl": true,
+        "fps": 5
+      },
+      "sha256AtEnd": "9da82408c6cb226faa83fe8b0649bbfe8991a26ff83bfb86c0df50ecfb30b05d",
+      "checkpointStable": true
+    }
+  },
+  "captures": [
+    "frontier-earned-01-walls-company",
+    "frontier-earned-02-reedbank",
+    "frontier-earned-02-stonehaven",
+    "frontier-earned-02-blackthorn",
+    "frontier-earned-03-island",
+    "frontier-earned-04-battle-orders",
+    "frontier-earned-05-fight-0",
+    "frontier-earned-05-fight-1",
+    "frontier-earned-05-fight-2",
+    "frontier-earned-05-fight-3"
+  ],
+  "errors": []
+}

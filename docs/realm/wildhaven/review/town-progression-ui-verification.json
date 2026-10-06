@@ -1,0 +1,385 @@
+{
+  "createdAt": "2026-10-02T05:17:39.214Z",
+  "scope": "Combined automated UI/economy verification. Thirteen functional checks are reconciled with one targeted fixture correction; four renderer smoke checks were then run on one stable renderer revision. Final movement/hammer-contact pose review belongs to the separate renderer evidence.",
+  "passed": true,
+  "functionalChecks": [
+    {
+      "name": "Council exposes research and charter prerequisites before spending",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Visible research action charges knowledge and displays staffed progress",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Research progress survives reload and the UI changes to Learned",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Stores shows every resource, physical capacity, services and production chains",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Trade UI accepts then delivers a real order, with dates, costs and named trust",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Earned checkpoint restores the late town and an explicit priced charter choice",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Harbor counter imports and exports spend exact quotes, with visible quotas preserved on reload",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "An earned town can queue and complete an upgrade through the inspector",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Trade UI dispatches earned cargo and reports its actual return date",
+      "passed": true,
+      "evidence": "town-progression-ui-report.json"
+    },
+    {
+      "name": "Watch shows a real warning, patrol progress, exact shelter/payment costs and a quiet record",
+      "passed": true,
+      "evidence": "town-progression-ui-watch-report.json"
+    },
+    {
+      "name": "No browser or application errors in prepared UI review",
+      "passed": true,
+      "evidence": "town-progression-ui-watch-report.json"
+    },
+    {
+      "name": "Late Stores panel includes neighborhood access and the earned economy",
+      "passed": true,
+      "evidence": "town-progression-ui-watch-report.json"
+    },
+    {
+      "name": "Council, Trade and Stores remain legible and operable at 390px",
+      "passed": true,
+      "evidence": "town-progression-ui-watch-report.json"
+    }
+  ],
+  "rendererSmokeChecks": [
+    {
+      "name": "Updated renderer loads the earned town and an actual cottage roof opens its inspector",
+      "passed": true,
+      "evidence": "town-progression-ui-smoke-report.json"
+    },
+    {
+      "name": "Council, trade, stores and watch remain accessible with the updated renderer",
+      "passed": true,
+      "evidence": "town-progression-ui-smoke-report.json"
+    },
+    {
+      "name": "Phone toolbar glyphs and town panels fit after the renderer update",
+      "passed": true,
+      "evidence": "town-progression-ui-smoke-report.json"
+    },
+    {
+      "name": "No browser or application errors in prepared UI review",
+      "passed": true,
+      "evidence": "town-progression-ui-smoke-report.json"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "town-progression-ui-report.json",
+      "section": "all",
+      "startedAt": "2026-10-02T05:01:07.769Z",
+      "finishedAt": "2026-10-02T05:07:17.784Z",
+      "sourceChangesDuringThatRun": [
+        "js/world.js"
+      ]
+    },
+    {
+      "file": "town-progression-ui-watch-report.json",
+      "section": "watch",
+      "startedAt": "2026-10-02T05:08:58.069Z",
+      "finishedAt": "2026-10-02T05:10:40.222Z",
+      "sourceChangesDuringThatRun": [
+        "js/world.js"
+      ]
+    },
+    {
+      "file": "town-progression-ui-smoke-report.json",
+      "section": "smoke",
+      "startedAt": "2026-10-02T05:15:11.913Z",
+      "finishedAt": "2026-10-02T05:16:57.742Z",
+      "sourceChangesDuringThatRun": []
+    }
+  ],
+  "supersededFailures": [
+    {
+      "check": "Watch shows a real warning, patrol progress, exact shelter/payment costs and a quiet record",
+      "evidence": "town-progression-ui-report.json",
+      "cause": "The prepared fixture rested sawmills but left toolmakers consuming the plank reserve during five skipped days. The game correctly disabled an unaffordable shelter action.",
+      "correction": "The independent fixture now rests toolmakers through public setWorkers as well. No supplies, residents or unlocks are injected.",
+      "verifiedBy": "town-progression-ui-watch-report.json"
+    }
+  ],
+  "sourceVerification": {
+    "nonWorldDrift": [],
+    "verifiedSources": {
+      "index.html": "c42337a0d81a79451935b68a9132c055cd8e727d093c26965fa66d67b3d2e232",
+      "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+      "js/main.js": "939de929b415c7796c10866ec7ed64b9e2ebaffc4d7c4ec2bbcff258ca517575",
+      "js/town-ui.js": "51fa4e3c95adec2d38384663e1a721e889765a9f1e43dd12ac85ed46e4974750",
+      "js/audio.js": "3a9ea0f59ee88bfb24b0531c831a1303a3be778dfc15df7869b01805235211fa",
+      "js/catalog.js": "59b24498e2c5089da5181488626f610df19bafe04ef150abbc35cbc4024fcb56",
+      "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+      "js/sim.js": "c0614b7d57557dfc7d5aa800aaad0b0b6f67625126586318db0e143114614d51",
+      "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+      "assets/village-kit.glb": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+    },
+    "worldExcludedFromLatestSourceEquivalence": true,
+    "reason": "This historical control check covers its recorded UI/economy source hashes. Renderer movement, hammer-contact poses and the town-kit anvil geometry were reviewed separately after the control checks. The town-kit GLB, JSON and Blender source are explicitly excluded from asset-equivalence claims; the unchanged village-kit.glb remains the recorded asset hash.",
+    "excludedFromLatestSourceEquivalence": [
+      "js/world.js",
+      "assets/town-kit.glb",
+      "assets/town-kit.json",
+      "assets/town-kit.blend"
+    ]
+  },
+  "renderer": {
+    "smokePassed": true,
+    "smokeWorldHash": "fb23fb0e79dc6df8f13be9b832a14605e55a77193936675d7f3c01235137706a",
+    "smokeSourcesStable": true,
+    "latestWorldHashAtVerification": "fb23fb0e79dc6df8f13be9b832a14605e55a77193936675d7f3c01235137706a",
+    "latestWorldMatchesSmoke": true,
+    "finalPoseReview": "Separate final renderer review by the root agent covers updated world.js and town-kit GLB/JSON/Blender anvil geometry."
+  },
+  "browserErrors": [],
+  "fixtures": {
+    "earnedCheckpoint": {
+      "label": "Imported earned simulation-campaign checkpoint. This UI test did not play that campaign.",
+      "file": "campaign-services-lanes-save.json",
+      "sha256": "bbe9106df94ec942d7ec99f5eaf0e7e0d31bca4dbb9bf52d57dd0e5fcf8ac38c",
+      "day": 61,
+      "population": 76,
+      "research": [
+        "joinery",
+        "cultivation",
+        "barter",
+        "civic_order",
+        "textiles",
+        "milling",
+        "logistics",
+        "metallurgy",
+        "coastal_routes",
+        "watchkeeping",
+        "brewing",
+        "public_health",
+        "mastercraft",
+        "town_charter",
+        "navigation"
+      ],
+      "charter": "breadbasket",
+      "contracts": 108,
+      "voyages": 10
+    },
+    "routePreparation": {
+      "label": "Prepared earned checkpoint: food/timber jobs staffed and wood-consuming craft jobs rested through public setWorkers for independent clock skips. No resources or unlocks injected.",
+      "assignments": [
+        {
+          "id": "b2",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b3",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b12",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b13",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b16",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b17",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b19",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b23",
+          "type": "windmill",
+          "workers": 2
+        },
+        {
+          "id": "b25",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b26",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b28",
+          "type": "bakery",
+          "workers": 2
+        },
+        {
+          "id": "b30",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b40",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b41",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b50",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b52",
+          "type": "orchard",
+          "workers": 2
+        }
+      ],
+      "foodPerDay": 185.479098,
+      "timberPerDay": 34.804556
+    },
+    "warningPreparation": {
+      "label": "Prepared earned checkpoint: food/timber jobs staffed and timber/plank-consuming craft jobs rested through public setWorkers for independent clock skips. No resources or unlocks injected.",
+      "assignments": [
+        {
+          "id": "b2",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b3",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b12",
+          "type": "lumber",
+          "workers": 2
+        },
+        {
+          "id": "b13",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b16",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b17",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b19",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b23",
+          "type": "windmill",
+          "workers": 2
+        },
+        {
+          "id": "b25",
+          "type": "farm",
+          "workers": 3
+        },
+        {
+          "id": "b26",
+          "type": "sawmill",
+          "workers": 0
+        },
+        {
+          "id": "b28",
+          "type": "bakery",
+          "workers": 2
+        },
+        {
+          "id": "b30",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b40",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b41",
+          "type": "smith",
+          "workers": 0
+        },
+        {
+          "id": "b42",
+          "type": "toolmaker",
+          "workers": 0
+        },
+        {
+          "id": "b43",
+          "type": "toolmaker",
+          "workers": 0
+        },
+        {
+          "id": "b50",
+          "type": "orchard",
+          "workers": 2
+        },
+        {
+          "id": "b52",
+          "type": "orchard",
+          "workers": 2
+        }
+      ],
+      "foodPerDay": 185.479098,
+      "timberPerDay": 34.804556
+    }
+  },
+  "visualInspection": [
+    "town-progression-mobile-trade.png",
+    "town-progression-11-prepared-patrol.png",
+    "town-progression-smoke-mobile-watch.png"
+  ],
+  "limitations": [
+    "Browser fixtures use public simulation APIs and clock skips. This suite did not play the full earned campaign in the browser.",
+    "Phone coverage is a 390\u00d7844 Chromium viewport, not a physical-device test.",
+    "This scoped pass is not a claim about the final renderer pose revision or hours of human play."
+  ]
+}

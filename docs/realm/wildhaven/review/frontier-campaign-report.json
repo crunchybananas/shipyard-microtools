@@ -1,0 +1,1245 @@
+{
+  "startedAt": "2026-10-02T06:25:48.538Z",
+  "seedName": "frontier-town-foundation-save.json",
+  "scope": "Automated continuation of the independently earned Forge Town checkpoint named in seedName. No new stock, residents, research, geography, relations, units or damage are injected. All frontier progress uses public actions and the integrated clock. Clock skips are not measured human playtime. Rendered behavior is reviewed separately.",
+  "seedSHA256": "15aa1dcd96eb7bcc63af19df7c20c1dddc6e1ad275bcde7d8e6dbeb1abb5361e",
+  "sourceHashesAtStart": {
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "tools/frontier-campaign.mjs": "3c9e3f6e974c11c5d44db31280bf7ee32f0f5442b6091ba390699f271da67b47"
+  },
+  "actions": [
+    {
+      "time": 0,
+      "day": 63,
+      "label": "Recruit spearman",
+      "reason": "Bram 2 is training for 36 seconds.",
+      "cost": {
+        "wood": 10,
+        "iron": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 0,
+      "day": 63,
+      "label": "Import food",
+      "reason": "Pantry baskets: paid 18 coin; received 24 food. 1 shipments left today.",
+      "cost": {
+        "gold": 18
+      }
+    },
+    {
+      "time": 0,
+      "day": 63,
+      "label": "Import planks",
+      "reason": "Seasoned boards: paid 26 coin; received 10 planks. 1 shipments left today.",
+      "cost": {
+        "gold": 26
+      }
+    },
+    {
+      "time": 0,
+      "day": 63,
+      "label": "Landing timber exchange",
+      "reason": "Exchange 12 food for 12 timber.",
+      "cost": 12
+    },
+    {
+      "time": 2,
+      "day": 63,
+      "label": "Recruit archer",
+      "reason": "Elin 2 is training for 45 seconds.",
+      "cost": {
+        "wood": 14,
+        "tools": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 4,
+      "day": 63,
+      "label": "Recruit spearman",
+      "reason": "Finn 2 is training for 36 seconds.",
+      "cost": {
+        "wood": 10,
+        "iron": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 4,
+      "day": 63,
+      "label": "Import food",
+      "reason": "Pantry baskets: paid 18 coin; received 24 food. 0 shipments left today.",
+      "cost": {
+        "gold": 18
+      }
+    },
+    {
+      "time": 6,
+      "day": 63,
+      "label": "Recruit archer",
+      "reason": "Greta 2 is training for 45 seconds.",
+      "cost": {
+        "wood": 14,
+        "tools": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 8,
+      "day": 63,
+      "label": "Recruit spearman",
+      "reason": "Hollis 2 is training for 36 seconds.",
+      "cost": {
+        "wood": 10,
+        "iron": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 10,
+      "day": 63,
+      "label": "Recruit archer",
+      "reason": "Ida 2 is training for 45 seconds.",
+      "cost": {
+        "wood": 14,
+        "tools": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 13,
+      "day": 63,
+      "label": "Recruit spearman",
+      "reason": "Jory 2 is training for 36 seconds.",
+      "cost": {
+        "wood": 10,
+        "iron": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 36,
+      "day": 63,
+      "label": "Recruit spearman",
+      "reason": "Kit 2 is training for 36 seconds.",
+      "cost": {
+        "wood": 10,
+        "iron": 2,
+        "food": 8
+      }
+    },
+    {
+      "time": 72,
+      "day": 63,
+      "label": "Survey Highmeadow",
+      "reason": "8 troops: move.",
+      "cost": {}
+    },
+    {
+      "time": 80,
+      "day": 64,
+      "label": "Landing timber exchange",
+      "reason": "Exchange 12 food for 12 timber.",
+      "cost": 12
+    },
+    {
+      "time": 86,
+      "day": 64,
+      "label": "Claim Highmeadow",
+      "reason": "Pay for an outpost; its completed construction opens this region to civilian buildings.",
+      "cost": {
+        "wood": 30,
+        "stone": 16,
+        "planks": 8,
+        "gold": 25
+      }
+    },
+    {
+      "time": 170,
+      "day": 65,
+      "label": "Landing timber exchange",
+      "reason": "Exchange 12 food for 12 timber.",
+      "cost": 12
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build wall at -4,-19",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 7,
+        "wood": 2
+      }
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build wall at -3,-19",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 7,
+        "wood": 2
+      }
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build wall at -2,-19",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 7,
+        "wood": 2
+      }
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build wall at -1,-19",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 7,
+        "wood": 2
+      }
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build gate at 0,-19",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 9,
+        "wood": 8,
+        "tools": 1
+      }
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build wall at 1,-19",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 7,
+        "wood": 2
+      }
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build wall at 2,-19",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 7,
+        "wood": 2
+      }
+    },
+    {
+      "time": 180,
+      "day": 65,
+      "label": "Build tower at -3,-17",
+      "reason": "Materials are reserved now; a named builder completes the site.",
+      "cost": {
+        "stone": 24,
+        "planks": 10,
+        "tools": 2
+      }
+    },
+    {
+      "time": 260,
+      "day": 66,
+      "label": "Landing timber exchange",
+      "reason": "Exchange 12 food for 12 timber.",
+      "cost": 12
+    },
+    {
+      "time": 340,
+      "day": 66,
+      "label": "Close the gate",
+      "reason": "Gate closed: it blocks movement and arrows.",
+      "cost": {}
+    },
+    {
+      "time": 340,
+      "day": 66,
+      "label": "Open the gate for the company",
+      "reason": "Gate open: everyone can pass, including enemies.",
+      "cost": {}
+    },
+    {
+      "time": 340,
+      "day": 66,
+      "label": "Send envoy to Reedbank",
+      "reason": "A named envoy walks to the settlement and returns; arrival improves relations.",
+      "cost": {
+        "food": 8,
+        "gold": 15
+      }
+    },
+    {
+      "time": 399,
+      "day": 67,
+      "label": "Trade with Reedbank",
+      "reason": "Exchange 18 wood for 32 food, 8 coin.",
+      "cost": {
+        "wood": 18
+      }
+    },
+    {
+      "time": 399,
+      "day": 67,
+      "label": "Send envoy to Reedbank",
+      "reason": "A named envoy walks to the settlement and returns; arrival improves relations.",
+      "cost": {
+        "food": 8,
+        "gold": 15
+      }
+    },
+    {
+      "time": 458,
+      "day": 68,
+      "label": "Trade with Reedbank",
+      "reason": "Exchange 18 wood for 32 food, 8 coin.",
+      "cost": {
+        "wood": 18
+      }
+    },
+    {
+      "time": 458,
+      "day": 68,
+      "label": "Send envoy to Reedbank",
+      "reason": "A named envoy walks to the settlement and returns; arrival improves relations.",
+      "cost": {
+        "food": 8,
+        "gold": 15
+      }
+    },
+    {
+      "time": 517,
+      "day": 68,
+      "label": "Ally with Reedbank",
+      "reason": "Requires 35 relations and three completed exchanges; allies can send real reinforcements.",
+      "cost": {
+        "gold": 60,
+        "food": 20
+      }
+    },
+    {
+      "time": 517,
+      "day": 68,
+      "label": "Call allied reinforcements",
+      "reason": "Call two allied spearmen for three days; food and a three-day cooldown apply.",
+      "cost": {
+        "food": 15
+      }
+    },
+    {
+      "time": 546,
+      "day": 69,
+      "label": "Build a Highmeadow cottage",
+      "reason": "Reserve materials and queue cottage.",
+      "cost": {
+        "wood": 16,
+        "stone": 8
+      }
+    },
+    {
+      "time": 554,
+      "day": 69,
+      "label": "Claim reedmarch",
+      "reason": "Pay for an outpost; its completed construction opens this region to civilian buildings.",
+      "cost": {
+        "wood": 30,
+        "stone": 16,
+        "planks": 8,
+        "gold": 25
+      }
+    },
+    {
+      "time": 634,
+      "day": 70,
+      "label": "Send envoy to stonehaven",
+      "reason": "A named envoy walks to the settlement and returns; arrival improves relations.",
+      "cost": {
+        "food": 8,
+        "gold": 15
+      }
+    },
+    {
+      "time": 673,
+      "day": 70,
+      "label": "Claim pineward",
+      "reason": "Pay for an outpost; its completed construction opens this region to civilian buildings.",
+      "cost": {
+        "wood": 30,
+        "stone": 16,
+        "planks": 8,
+        "gold": 25
+      }
+    },
+    {
+      "time": 720,
+      "day": 71,
+      "label": "Import cloth",
+      "reason": "Clean linen: paid 30 coin; received 6 cloth. 1 shipments left today.",
+      "cost": {
+        "gold": 30
+      }
+    },
+    {
+      "time": 783,
+      "day": 71,
+      "label": "March to Blackthorn",
+      "reason": "8 troops: move.",
+      "cost": {}
+    },
+    {
+      "time": 792,
+      "day": 71,
+      "label": "Declare war on Blackthorn",
+      "reason": "War closes trade, creates a real enemy garrison and warns of an attack in one day.",
+      "cost": {}
+    },
+    {
+      "time": 792,
+      "day": 71,
+      "label": "Engage the Blackthorn garrison",
+      "reason": "7 troops: attack.",
+      "cost": {}
+    },
+    {
+      "time": 796,
+      "day": 71,
+      "label": "Engage the Blackthorn garrison",
+      "reason": "7 troops: attack.",
+      "cost": {}
+    },
+    {
+      "time": 800,
+      "day": 72,
+      "label": "Engage the Blackthorn garrison",
+      "reason": "7 troops: attack.",
+      "cost": {}
+    },
+    {
+      "time": 804,
+      "day": 72,
+      "label": "Engage the Blackthorn garrison",
+      "reason": "7 troops: attack.",
+      "cost": {}
+    },
+    {
+      "time": 808,
+      "day": 72,
+      "label": "Engage the Blackthorn garrison",
+      "reason": "7 troops: attack.",
+      "cost": {}
+    },
+    {
+      "time": 812,
+      "day": 72,
+      "label": "Engage the Blackthorn garrison",
+      "reason": "7 troops: attack.",
+      "cost": {}
+    },
+    {
+      "time": 814,
+      "day": 72,
+      "label": "Attack Blackthorn stronghold",
+      "reason": "7 troops: attack.",
+      "cost": {}
+    },
+    {
+      "time": 824,
+      "day": 72,
+      "label": "Return the company to the town",
+      "reason": "7 troops: retreat.",
+      "cost": {}
+    },
+    {
+      "time": 871,
+      "day": 72,
+      "label": "Claim Crownhill",
+      "reason": "Pay for an outpost; its completed construction opens this region to civilian buildings.",
+      "cost": {
+        "wood": 30,
+        "stone": 36,
+        "planks": 8,
+        "gold": 50
+      }
+    },
+    {
+      "time": 968,
+      "day": 73,
+      "label": "Import cloth",
+      "reason": "Clean linen: paid 30 coin; received 6 cloth. 1 shipments left today.",
+      "cost": {
+        "gold": 30
+      }
+    },
+    {
+      "time": 972,
+      "day": 73,
+      "label": "Declare a test conflict with Stonehaven",
+      "reason": "War closes trade, creates a real enemy garrison and warns of an attack in one day.",
+      "cost": {}
+    },
+    {
+      "time": 972,
+      "day": 73,
+      "label": "Negotiate an immediate truce",
+      "reason": "Pay reparations to stop attacks and send surviving armies home.",
+      "cost": {
+        "gold": 45,
+        "food": 15
+      }
+    },
+    {
+      "time": 980,
+      "day": 74,
+      "label": "Import food",
+      "reason": "Pantry baskets: paid 18 coin; received 24 food. 1 shipments left today.",
+      "cost": {
+        "gold": 18
+      }
+    },
+    {
+      "time": 981,
+      "day": 74,
+      "label": "Import food",
+      "reason": "Pantry baskets: paid 18 coin; received 24 food. 0 shipments left today.",
+      "cost": {
+        "gold": 18
+      }
+    }
+  ],
+  "staffing": [
+    {
+      "time": 5590,
+      "day": 63,
+      "kind": "workers",
+      "id": "b15",
+      "building": "quarry",
+      "before": 0,
+      "value": 2,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 5620,
+      "day": 63,
+      "kind": "workers",
+      "id": "b20",
+      "building": "market",
+      "before": 1,
+      "value": 2,
+      "reason": "Reopen market after food reserve recovers"
+    },
+    {
+      "time": 5650,
+      "day": 63,
+      "kind": "workers",
+      "id": "b31",
+      "building": "market",
+      "before": 1,
+      "value": 2,
+      "reason": "Reopen market after food reserve recovers"
+    },
+    {
+      "time": 5680,
+      "day": 64,
+      "kind": "workers",
+      "id": "b39",
+      "building": "barracks",
+      "before": 0,
+      "value": 4,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 5710,
+      "day": 64,
+      "kind": "workers",
+      "id": "b40",
+      "building": "barracks",
+      "before": 0,
+      "value": 4,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 5740,
+      "day": 64,
+      "kind": "workers",
+      "id": "b44",
+      "building": "barracks",
+      "before": 0,
+      "value": 4,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 5770,
+      "day": 65,
+      "kind": "workers",
+      "id": "b50",
+      "building": "barracks",
+      "before": 0,
+      "value": 4,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 5800,
+      "day": 65,
+      "kind": "workers",
+      "id": "b22",
+      "building": "mine",
+      "before": 3,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 5830,
+      "day": 65,
+      "kind": "workers",
+      "id": "b26",
+      "building": "mine",
+      "before": 3,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 5860,
+      "day": 66,
+      "kind": "workers",
+      "id": "b16",
+      "building": "sawmill",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 5890,
+      "day": 66,
+      "kind": "workers",
+      "id": "b23",
+      "building": "sawmill",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 5920,
+      "day": 66,
+      "kind": "workers",
+      "id": "b32",
+      "building": "smith",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 5950,
+      "day": 67,
+      "kind": "workers",
+      "id": "b33",
+      "building": "smith",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 5980,
+      "day": 67,
+      "kind": "workers",
+      "id": "b34",
+      "building": "toolmaker",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6010,
+      "day": 67,
+      "kind": "workers",
+      "id": "b35",
+      "building": "toolmaker",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6040,
+      "day": 68,
+      "kind": "workers",
+      "id": "b2",
+      "building": "orchard",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6070,
+      "day": 68,
+      "kind": "workers",
+      "id": "b5",
+      "building": "garden",
+      "before": 1,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6100,
+      "day": 68,
+      "kind": "workers",
+      "id": "b13",
+      "building": "orchard",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6130,
+      "day": 69,
+      "kind": "workers",
+      "id": "b18",
+      "building": "orchard",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6160,
+      "day": 69,
+      "kind": "workers",
+      "id": "b25",
+      "building": "orchard",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6190,
+      "day": 69,
+      "kind": "workers",
+      "id": "b42",
+      "building": "orchard",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6220,
+      "day": 70,
+      "kind": "workers",
+      "id": "b47",
+      "building": "orchard",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6250,
+      "day": 70,
+      "kind": "workers",
+      "id": "hearth",
+      "building": "hearth",
+      "before": 2,
+      "value": 0,
+      "reason": "Founders released while staples have a safe reserve"
+    },
+    {
+      "time": 6280,
+      "day": 70,
+      "kind": "workers",
+      "id": "b4",
+      "building": "quarry",
+      "before": 3,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6310,
+      "day": 71,
+      "kind": "workers",
+      "id": "b15",
+      "building": "quarry",
+      "before": 2,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6340,
+      "day": 71,
+      "kind": "workers",
+      "id": "b3",
+      "building": "lumber",
+      "before": 3,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6370,
+      "day": 71,
+      "kind": "workers",
+      "id": "b12",
+      "building": "lumber",
+      "before": 3,
+      "value": 0,
+      "reason": "Release workers at the upper stock threshold"
+    },
+    {
+      "time": 6400,
+      "day": 72,
+      "kind": "priority",
+      "id": "b9",
+      "building": "school",
+      "before": 8,
+      "value": 20,
+      "reason": "Set stable workplace priority once"
+    },
+    {
+      "time": 6430,
+      "day": 72,
+      "kind": "priority",
+      "id": "b19",
+      "building": "school",
+      "before": 8,
+      "value": 20,
+      "reason": "Set stable workplace priority once"
+    },
+    {
+      "time": 6460,
+      "day": 72,
+      "kind": "priority",
+      "id": "b20",
+      "building": "market",
+      "before": 15,
+      "value": 8,
+      "reason": "Set stable workplace priority once"
+    },
+    {
+      "time": 6490,
+      "day": 73,
+      "kind": "priority",
+      "id": "b22",
+      "building": "mine",
+      "before": 11,
+      "value": 13,
+      "reason": "Set stable workplace priority once"
+    },
+    {
+      "time": 6520,
+      "day": 73,
+      "kind": "workers",
+      "id": "b2",
+      "building": "orchard",
+      "before": 0,
+      "value": 2,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 6550,
+      "day": 73,
+      "kind": "workers",
+      "id": "b5",
+      "building": "garden",
+      "before": 0,
+      "value": 1,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 6580,
+      "day": 74,
+      "kind": "workers",
+      "id": "b13",
+      "building": "orchard",
+      "before": 0,
+      "value": 2,
+      "reason": "Resume production below the lower stock threshold"
+    },
+    {
+      "time": 6610,
+      "day": 74,
+      "kind": "workers",
+      "id": "b18",
+      "building": "orchard",
+      "before": 0,
+      "value": 2,
+      "reason": "Resume production below the lower stock threshold"
+    }
+  ],
+  "milestones": {
+    "company": {
+      "time": 72,
+      "day": 63,
+      "population": 75,
+      "resources": {
+        "wood": 16.161259,
+        "stone": 176.283377,
+        "food": 270.556202,
+        "grain": 0,
+        "flour": 0,
+        "planks": 67.532652,
+        "ore": 115.52397,
+        "iron": 75.007134,
+        "tools": 85.506967,
+        "flax": 0,
+        "cloth": 30.276769,
+        "ale": 0,
+        "gold": 1670.015337,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 0,
+        "deaths": 0,
+        "enemiesDefeated": 0,
+        "raidsDefeated": 0,
+        "cargoLost": 0,
+        "wallsBreached": 0,
+        "trades": 0,
+        "missions": 0,
+        "conquests": 0,
+        "deathsThisWave": 0
+      }
+    },
+    "walls": {
+      "time": 340,
+      "day": 66,
+      "population": 78,
+      "resources": {
+        "wood": 145.400148,
+        "stone": 254.521813,
+        "food": 530.630889,
+        "grain": 0,
+        "flour": 0,
+        "planks": 116.894636,
+        "ore": 136.266877,
+        "iron": 118.473282,
+        "tools": 136.548366,
+        "flax": 0,
+        "cloth": 24.014171,
+        "ale": 0,
+        "gold": 1669.690859,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home",
+        "highmeadow"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 0,
+        "deaths": 0,
+        "enemiesDefeated": 0,
+        "raidsDefeated": 0,
+        "cargoLost": 0,
+        "wallsBreached": 0,
+        "trades": 0,
+        "missions": 0,
+        "conquests": 0,
+        "deathsThisWave": 0
+      }
+    },
+    "alliance": {
+      "time": 546,
+      "day": 69,
+      "population": 81,
+      "resources": {
+        "wood": 321.880053,
+        "stone": 386.163145,
+        "food": 619.01824,
+        "grain": 0,
+        "flour": 0,
+        "planks": 112.171456,
+        "ore": 133.320191,
+        "iron": 112.120943,
+        "tools": 149.773271,
+        "flax": 0,
+        "cloth": 19.14011,
+        "ale": 0,
+        "gold": 1599.89896,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home",
+        "highmeadow"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 0,
+        "deaths": 0,
+        "enemiesDefeated": 0,
+        "raidsDefeated": 0,
+        "cargoLost": 0,
+        "wallsBreached": 0,
+        "trades": 2,
+        "missions": 3,
+        "conquests": 0,
+        "deathsThisWave": 0
+      }
+    },
+    "expansion": {
+      "time": 783,
+      "day": 71,
+      "population": 83,
+      "resources": {
+        "wood": 469.4585,
+        "stone": 443.368106,
+        "food": 429.958504,
+        "grain": 0,
+        "flour": 0,
+        "planks": 96.171456,
+        "ore": 133.320191,
+        "iron": 112.120943,
+        "tools": 149.773271,
+        "flax": 0,
+        "cloth": 19.467764,
+        "ale": 0,
+        "gold": 1559.343737,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home",
+        "highmeadow",
+        "reedmarch",
+        "pineward"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 0,
+        "deaths": 0,
+        "enemiesDefeated": 4,
+        "raidsDefeated": 0,
+        "cargoLost": 0,
+        "wallsBreached": 0,
+        "trades": 2,
+        "missions": 4,
+        "conquests": 0,
+        "deathsThisWave": 0
+      }
+    },
+    "battle-start": {
+      "time": 792,
+      "day": 71,
+      "population": 82,
+      "resources": {
+        "wood": 469.4585,
+        "stone": 443.368106,
+        "food": 426.364226,
+        "grain": 0,
+        "flour": 0,
+        "planks": 96.171456,
+        "ore": 133.320191,
+        "iron": 112.120943,
+        "tools": 149.773271,
+        "flax": 0,
+        "cloth": 19.250991,
+        "ale": 0,
+        "gold": 1560.201538,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home",
+        "highmeadow",
+        "reedmarch",
+        "pineward"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 1,
+        "deaths": 1,
+        "enemiesDefeated": 6,
+        "raidsDefeated": 1,
+        "cargoLost": 0,
+        "wallsBreached": 0,
+        "trades": 2,
+        "missions": 4,
+        "conquests": 0,
+        "deathsThisWave": 0
+      }
+    },
+    "battle": {
+      "time": 814,
+      "day": 72,
+      "population": 83,
+      "resources": {
+        "wood": 469.4585,
+        "stone": 443.368106,
+        "food": 341.903058,
+        "grain": 0,
+        "flour": 0,
+        "planks": 96.171456,
+        "ore": 133.320191,
+        "iron": 112.120943,
+        "tools": 149.773271,
+        "flax": 0,
+        "cloth": 18.720683,
+        "ale": 0,
+        "gold": 1562.300065,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home",
+        "highmeadow",
+        "reedmarch",
+        "pineward"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 1,
+        "deaths": 1,
+        "enemiesDefeated": 9,
+        "raidsDefeated": 1,
+        "cargoLost": 0,
+        "wallsBreached": 0,
+        "trades": 2,
+        "missions": 4,
+        "conquests": 0,
+        "deathsThisWave": 0
+      }
+    },
+    "conquest": {
+      "time": 824,
+      "day": 72,
+      "population": 83,
+      "resources": {
+        "wood": 469.4585,
+        "stone": 473.368106,
+        "food": 337.902805,
+        "grain": 0,
+        "flour": 0,
+        "planks": 96.171456,
+        "ore": 133.320191,
+        "iron": 112.120943,
+        "tools": 149.773271,
+        "flax": 0,
+        "cloth": 18.479435,
+        "ale": 0,
+        "gold": 1623.254733,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home",
+        "highmeadow",
+        "reedmarch",
+        "pineward"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 1,
+        "deaths": 1,
+        "enemiesDefeated": 9,
+        "raidsDefeated": 1,
+        "cargoLost": 0,
+        "wallsBreached": 1,
+        "trades": 2,
+        "missions": 4,
+        "conquests": 1,
+        "deathsThisWave": 0
+      }
+    },
+    "complete": {
+      "time": 1032,
+      "day": 74,
+      "population": 85,
+      "resources": {
+        "wood": 439.4585,
+        "stone": 437.368106,
+        "food": 196.566133,
+        "grain": 0,
+        "flour": 0,
+        "planks": 88.171456,
+        "ore": 133.320191,
+        "iron": 112.120943,
+        "tools": 149.773271,
+        "flax": 0,
+        "cloth": 19.43351,
+        "ale": 0,
+        "gold": 1482.22376,
+        "knowledge": 842.763767
+      },
+      "claims": [
+        "home",
+        "highmeadow",
+        "reedmarch",
+        "pineward",
+        "crownhill"
+      ],
+      "stats": {
+        "recruited": 8,
+        "wounded": 1,
+        "deaths": 1,
+        "enemiesDefeated": 9,
+        "raidsDefeated": 1,
+        "cargoLost": 0,
+        "wallsBreached": 1,
+        "trades": 2,
+        "missions": 4,
+        "conquests": 1,
+        "deathsThisWave": 0
+      }
+    }
+  },
+  "reloads": 34,
+  "maxArmy": 10,
+  "errors": [],
+  "ok": true,
+  "finishedAt": "2026-10-02T06:25:51.136Z",
+  "simulatedSeconds": 1032,
+  "final": {
+    "day": 74,
+    "population": 85,
+    "resources": {
+      "wood": 439.4585,
+      "stone": 437.368106,
+      "food": 196.566133,
+      "grain": 0,
+      "flour": 0,
+      "planks": 88.171456,
+      "ore": 133.320191,
+      "iron": 112.120943,
+      "tools": 149.773271,
+      "flax": 0,
+      "cloth": 19.43351,
+      "ale": 0,
+      "gold": 1482.22376,
+      "knowledge": 842.763767
+    },
+    "stats": {
+      "recruited": 8,
+      "wounded": 1,
+      "deaths": 1,
+      "enemiesDefeated": 9,
+      "raidsDefeated": 1,
+      "cargoLost": 0,
+      "wallsBreached": 1,
+      "trades": 2,
+      "missions": 4,
+      "conquests": 1,
+      "deathsThisWave": 0
+    },
+    "claims": [
+      "home",
+      "highmeadow",
+      "reedmarch",
+      "pineward",
+      "crownhill"
+    ]
+  },
+  "sourceHashesAtEnd": {
+    "js/sim.js": "f8a784d51373ee30b25e13954960400834d8fce89172a4e6ce368e3c9c4142da",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/frontier.js": "8b24cba590d8dbf15e422fe7285abb2c788eb134b71213cc5d3448d4dca38dae",
+    "js/catalog.js": "7ca404eda396c259b1ab5a5660a6073d138056a2a740404df452852cd50e1546",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "tools/frontier-campaign.mjs": "3c9e3f6e974c11c5d44db31280bf7ee32f0f5442b6091ba390699f271da67b47"
+  },
+  "sourceStable": true
+}

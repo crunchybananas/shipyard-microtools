@@ -1,0 +1,1946 @@
+{
+  "scope": "Public-action fieldwork continuation of an independently earned v3 village. No stock, citizen, building, research, unit or position injection. Simulated time is not human playtime.",
+  "sourceHashesAtStart": {
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "tools/living-campaign.mjs": "da5f2ad9a3afa97813d59ee940fadcfe3ba54f4d4e1dc66be79255f694bf2448"
+  },
+  "seed": {
+    "file": "frontier-town-foundation-save.json",
+    "sha256": "15aa1dcd96eb7bcc63af19df7c20c1dddc6e1ad275bcde7d8e6dbeb1abb5361e"
+  },
+  "actions": [
+    {
+      "seconds": 0,
+      "place": "waystone",
+      "mode": "survey",
+      "person": "Bram 2",
+      "cost": {
+        "food": 6
+      }
+    },
+    {
+      "seconds": 0,
+      "place": "spring",
+      "mode": "survey",
+      "person": "Cora 2",
+      "cost": {
+        "food": 6
+      }
+    },
+    {
+      "seconds": 0,
+      "place": "kiln",
+      "mode": "survey",
+      "person": "Dev 2",
+      "cost": {
+        "food": 6
+      }
+    },
+    {
+      "seconds": 0,
+      "place": "stars",
+      "mode": "survey",
+      "person": "Elin 2",
+      "cost": {
+        "food": 6
+      }
+    },
+    {
+      "seconds": 129.75,
+      "place": "waystone",
+      "mode": "restore",
+      "person": "Bram 2",
+      "cost": {
+        "wood": 12,
+        "stone": 18
+      }
+    },
+    {
+      "seconds": 129.75,
+      "place": "spring",
+      "mode": "restore",
+      "person": "Cora 2",
+      "cost": {
+        "wood": 22,
+        "stone": 14
+      }
+    },
+    {
+      "seconds": 129.75,
+      "place": "kiln",
+      "mode": "restore",
+      "person": "Dev 2",
+      "cost": {
+        "wood": 26,
+        "stone": 28,
+        "planks": 6
+      }
+    },
+    {
+      "seconds": 129.75,
+      "place": "stars",
+      "mode": "restore",
+      "person": "Elin 2",
+      "cost": {
+        "wood": 18,
+        "stone": 24,
+        "iron": 6,
+        "gold": 20
+      }
+    }
+  ],
+  "samples": [
+    {
+      "seconds": 10,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "outbound",
+          "x": 5.277562,
+          "z": 2.919922
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": 5.179943,
+          "z": 3.243496
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": 6.133456,
+          "z": 2.305119
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 6.044485,
+          "z": 2.888373
+        }
+      ],
+      "food": 147.114787
+    },
+    {
+      "seconds": 20,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "outbound",
+          "x": 10.18,
+          "z": -4
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": 10.179378,
+          "z": -3.439735
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": 9.072056,
+          "z": -4.467071
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 10.18,
+          "z": -4.885
+        }
+      ],
+      "food": 167.950181
+    },
+    {
+      "seconds": 30,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "outbound",
+          "x": 2.866544,
+          "z": -5.305119
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": 2.05,
+          "z": -7.18
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": 0,
+          "z": -7.18
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 9.18,
+          "z": -15.59
+        }
+      ],
+      "food": 188.793333
+    },
+    {
+      "seconds": 40,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 8.75
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "working",
+          "x": 3.32,
+          "z": -4
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": -7.8735,
+          "z": -8.75628
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": -6.111627,
+          "z": -13.044485
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 3.18,
+          "z": -21.295
+        }
+      ],
+      "food": 209.644237
+    },
+    {
+      "seconds": 50,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 18.75
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 0
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 2.25
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 8.5
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "working",
+          "x": 3.32,
+          "z": -4
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": -14.295,
+          "z": -14.18
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 230.502895
+    },
+    {
+      "seconds": 60,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 4.75
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 12.25
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 18.5
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "returning",
+          "x": 7.885,
+          "z": -6.82
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "working",
+          "x": -14,
+          "z": -9.68
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 251.36931
+    },
+    {
+      "seconds": 70,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 14.75
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "returning",
+          "x": 6.043452,
+          "z": -0.893808
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "working",
+          "x": -14,
+          "z": -9.68
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": -11.039858,
+          "z": -17.027705
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 2.82,
+          "z": -15.705
+        }
+      ],
+      "food": 272.243478
+    },
+    {
+      "seconds": 80,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-1",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "returning",
+          "x": 2.013493,
+          "z": 4.822058
+        },
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": -14.694881,
+          "z": -12.133456
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": -8.130619,
+          "z": -8.2438
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 5.734735,
+          "z": -6.820294
+        }
+      ],
+      "food": 223.575399
+    },
+    {
+      "seconds": 90,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": -9.18,
+          "z": -10.115
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": 2.295,
+          "z": -6.82
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 8.115,
+          "z": -1.18
+        }
+      ],
+      "food": 244.46508
+    },
+    {
+      "seconds": 100,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": -0.596746,
+          "z": -6.911029
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": 9.82,
+          "z": -2.705
+        },
+        {
+          "id": "unit-4",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 3.115,
+          "z": 5.82
+        }
+      ],
+      "food": 265.362508
+    },
+    {
+      "seconds": 110,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": 8.82,
+          "z": -4.41
+        },
+        {
+          "id": "unit-3",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": 4.821459,
+          "z": 4.281506
+        }
+      ],
+      "food": 286.267648
+    },
+    {
+      "seconds": 120,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "rumor",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-2",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": 5.820016,
+          "z": 2.641504
+        }
+      ],
+      "food": 307.180141
+    },
+    {
+      "seconds": 130,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "outbound",
+          "x": 0.258348,
+          "z": 3.046503
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": -0.741652,
+          "z": 3.046503
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": 1.258348,
+          "z": 3.046503
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": -0.046503,
+          "z": 4.258348
+        }
+      ],
+      "food": 328.09991
+    },
+    {
+      "seconds": 140,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "outbound",
+          "x": 5.065822,
+          "z": 3.138633
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": 5.177618,
+          "z": 3.842426
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": 6.006561,
+          "z": 2.915395
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 5.692175,
+          "z": 3.113192
+        }
+      ],
+      "food": 349.02696
+    },
+    {
+      "seconds": 150,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "outbound",
+          "x": 10.162848,
+          "z": -2.612765
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": 10.141338,
+          "z": -2.090646
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": 10.178438,
+          "z": -3.664783
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 10.178671,
+          "z": -3.170304
+        }
+      ],
+      "food": 369.961287
+    },
+    {
+      "seconds": 160,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "outbound",
+          "x": 3.960416,
+          "z": -6.920502
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": 4.261087,
+          "z": -7.179972
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": 2.6875,
+          "z": -7.18
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 9.179466,
+          "z": -12.914982
+        }
+      ],
+      "food": 390.902145
+    },
+    {
+      "seconds": 170,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 6.25,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "working",
+          "x": 3.32,
+          "z": -4
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": -5.2625,
+          "z": -8.18
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": -4.874763,
+          "z": -10.438581
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "outbound",
+          "x": 3.661053,
+          "z": -18.078671
+        }
+      ],
+      "food": 341.424629
+    },
+    {
+      "seconds": 180,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 16.25,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 0,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 4.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "working",
+          "x": 3.32,
+          "z": -4
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "outbound",
+          "x": -10.828443,
+          "z": -13.667854
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "outbound",
+          "x": -10.375279,
+          "z": -16.163167
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 362.376729
+    },
+    {
+      "seconds": 190,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 26.25,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 0.5,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 8.25,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 14.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "working",
+          "x": 3.32,
+          "z": -4
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "working",
+          "x": -14,
+          "z": -9.68
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 383.334448
+    },
+    {
+      "seconds": 200,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 36.25,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 10.5,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 18.25,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 24.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "working",
+          "x": 3.32,
+          "z": -4
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "working",
+          "x": -14,
+          "z": -9.68
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 404.297789
+    },
+    {
+      "seconds": 210,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 20.5,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 28.25,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 34.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "returning",
+          "x": 8.337023,
+          "z": -5.939452
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "working",
+          "x": -14,
+          "z": -9.68
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 425.266747
+    },
+    {
+      "seconds": 220,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 30.5,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 38.25,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 44.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "returning",
+          "x": 5.942984,
+          "z": -0.423713
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "working",
+          "x": -14,
+          "z": -9.68
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 446.241327
+    },
+    {
+      "seconds": 230,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "surveyed",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 40.5,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 48.25,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 54.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-5",
+          "name": "Bram 2",
+          "site": "waystone",
+          "stage": "returning",
+          "x": 2.653792,
+          "z": 4.949106
+        },
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "working",
+          "x": -14,
+          "z": -9.68
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 467.221525
+    },
+    {
+      "seconds": 240,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "restored",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 48,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 58.25,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 64.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": -14.079498,
+          "z": -12.039584
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "working",
+          "x": -11,
+          "z": -17.32
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 488.207344
+    },
+    {
+      "seconds": 250,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "restored",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 48,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 65,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 74.75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": -9.168001,
+          "z": -11.325586
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": -11.18,
+          "z": -13.95
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "working",
+          "x": 3.32,
+          "z": -23
+        }
+      ],
+      "food": 509.198785
+    },
+    {
+      "seconds": 260,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "restored",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 48,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 65,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": -1.646542,
+          "z": -7.82
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": -5.846845,
+          "z": -7.822691
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 2.82,
+          "z": -12.9
+        }
+      ],
+      "food": 458.897842
+    },
+    {
+      "seconds": 270,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "restored",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 48,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 65,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": 7.9875,
+          "z": -6.82
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": 3.7875,
+          "z": -6.82
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 7.510892,
+          "z": -6.820001
+        }
+      ],
+      "food": 479.900518
+    },
+    {
+      "seconds": 280,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "restored",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 48,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 65,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": 6.6875,
+          "z": -1.18
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": 9.818049,
+          "z": -2.071702
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 7.2125,
+          "z": -1.18
+        }
+      ],
+      "food": 500.908819
+    },
+    {
+      "seconds": 290,
+      "sites": [
+        {
+          "id": "waystone",
+          "status": "restored",
+          "progress": 38,
+          "survey": 22
+        },
+        {
+          "id": "spring",
+          "status": "surveyed",
+          "progress": 48,
+          "survey": 22
+        },
+        {
+          "id": "kiln",
+          "status": "surveyed",
+          "progress": 65,
+          "survey": 22
+        },
+        {
+          "id": "stars",
+          "status": "surveyed",
+          "progress": 75,
+          "survey": 22
+        }
+      ],
+      "workers": [
+        {
+          "id": "unit-6",
+          "name": "Cora 2",
+          "site": "spring",
+          "stage": "returning",
+          "x": 3,
+          "z": 5.82
+        },
+        {
+          "id": "unit-7",
+          "name": "Dev 2",
+          "site": "kiln",
+          "stage": "returning",
+          "x": 4.897003,
+          "z": 3.602106
+        },
+        {
+          "id": "unit-8",
+          "name": "Elin 2",
+          "site": "stars",
+          "stage": "returning",
+          "x": 3.51881,
+          "z": 5.823714
+        }
+      ],
+      "food": 521.922733
+    }
+  ],
+  "benefits": {
+    "cottage": 1.1,
+    "garden": 1.15,
+    "orchard": 1.15,
+    "quarry": 1.12,
+    "smith": 1.12,
+    "toolmaker": 1.12,
+    "school": 1.2
+  },
+  "errors": [],
+  "seconds": 298.75,
+  "reloads": 59,
+  "maxQuarterSecondMovement": 0.2950005276690198,
+  "final": {
+    "day": 66,
+    "population": 78,
+    "sites": [
+      {
+        "id": "waystone",
+        "status": "restored",
+        "surveyProgress": 22,
+        "project": "restore",
+        "progress": 38,
+        "reportedBy": "Bram 2",
+        "reportedDay": 64,
+        "finishedBy": "Bram 2",
+        "finishedDay": 65,
+        "received": {}
+      },
+      {
+        "id": "spring",
+        "status": "restored",
+        "surveyProgress": 22,
+        "project": "restore",
+        "progress": 48,
+        "reportedBy": "Cora 2",
+        "reportedDay": 64,
+        "finishedBy": "Cora 2",
+        "finishedDay": 66,
+        "received": {}
+      },
+      {
+        "id": "kiln",
+        "status": "restored",
+        "surveyProgress": 22,
+        "project": "restore",
+        "progress": 65,
+        "reportedBy": "Dev 2",
+        "reportedDay": 64,
+        "finishedBy": "Dev 2",
+        "finishedDay": 66,
+        "received": {}
+      },
+      {
+        "id": "stars",
+        "status": "restored",
+        "surveyProgress": 22,
+        "project": "restore",
+        "progress": 75,
+        "reportedBy": "Elin 2",
+        "reportedDay": 64,
+        "finishedBy": "Elin 2",
+        "finishedDay": 66,
+        "received": {}
+      }
+    ],
+    "resources": {
+      "wood": 117.778342,
+      "stone": 168.099734,
+      "food": 540.002783,
+      "grain": 0,
+      "flour": 0,
+      "planks": 127.333792,
+      "ore": 194.802752,
+      "iron": 116.967279,
+      "tools": 137.026693,
+      "flax": 0,
+      "cloth": 25.001483,
+      "ale": 0,
+      "gold": 1721.129971,
+      "knowledge": 842.763767
+    }
+  },
+  "sourceHashesAtEnd": {
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/sim.js": "782a5241e1de6ee9517febb3a69366be49be7414a541326eba1cba1e24fd06fe",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "js/progression.js": "a46f71db284da3b02993d4d24de00bbf42233cdf0a7a950637e484923526025d",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "tools/living-campaign.mjs": "da5f2ad9a3afa97813d59ee940fadcfe3ba54f4d4e1dc66be79255f694bf2448"
+  },
+  "sourcesStable": true
+}

@@ -1,0 +1,286 @@
+{
+  "title": "Wildhaven original village kit",
+  "authoring": "Original geometry generated in Blender; editable generator and .blend included.",
+  "license": "Original project art. No third-party model, texture, or font sources.",
+  "blender_version": "5.2.1 LTS",
+  "generator": "../tools/create_assets.py",
+  "generator_sha256": "f5f196d7ddbf5a3e18e6e2df503715eef7145a030f293d2058fa97e710801e8b",
+  "units": "meters; 1.8 meter game tiles",
+  "coordinates": "GLB uses Y up and +Z front; Blender source uses Z up and -Y front.",
+  "motion": {
+    "rotor": "local Z rotation in Three.js",
+    "bell_body": "local X rocking in Three.js",
+    "left_arm": "local X rotation",
+    "right_arm": "local X rotation",
+    "left_leg": "local X rotation",
+    "right_leg": "local X rotation"
+  },
+  "assets": {
+    "cottage": {
+      "size_three": [
+        1.667,
+        2.02,
+        1.585
+      ],
+      "mesh_nodes": 1,
+      "triangles": 19222,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -0.8337,
+          0.0,
+          -0.7822
+        ],
+        "max": [
+          0.8332,
+          2.0205,
+          0.8026
+        ]
+      }
+    },
+    "lumber": {
+      "size_three": [
+        1.669,
+        1.737,
+        1.56
+      ],
+      "mesh_nodes": 1,
+      "triangles": 15740,
+      "bottom": -0.0,
+      "bounds_three": {
+        "min": [
+          -0.8282,
+          -0.0,
+          -0.7372
+        ],
+        "max": [
+          0.841,
+          1.7367,
+          0.8223
+        ]
+      }
+    },
+    "quarry": {
+      "size_three": [
+        1.666,
+        1.755,
+        1.367
+      ],
+      "mesh_nodes": 1,
+      "triangles": 2384,
+      "bottom": -0.0,
+      "bounds_three": {
+        "min": [
+          -0.7957,
+          -0.0,
+          -0.7109
+        ],
+        "max": [
+          0.8704,
+          1.755,
+          0.6559
+        ]
+      }
+    },
+    "orchard": {
+      "size_three": [
+        1.547,
+        1.478,
+        1.27
+      ],
+      "mesh_nodes": 1,
+      "triangles": 8492,
+      "bottom": -0.0,
+      "bounds_three": {
+        "min": [
+          -0.7981,
+          -0.0,
+          -0.6377
+        ],
+        "max": [
+          0.7494,
+          1.4783,
+          0.6325
+        ]
+      }
+    },
+    "garden": {
+      "size_three": [
+        1.523,
+        0.448,
+        1.712
+      ],
+      "mesh_nodes": 1,
+      "triangles": 7660,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -0.6975,
+          0.0,
+          -0.82
+        ],
+        "max": [
+          0.8252,
+          0.448,
+          0.8925
+        ]
+      }
+    },
+    "windmill": {
+      "size_three": [
+        2.044,
+        2.902,
+        1.305
+      ],
+      "mesh_nodes": 2,
+      "triangles": 8812,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -1.0219,
+          0.0,
+          -0.6
+        ],
+        "max": [
+          1.0219,
+          2.9019,
+          0.705
+        ]
+      }
+    },
+    "bell": {
+      "size_three": [
+        1.431,
+        3.117,
+        1.447
+      ],
+      "mesh_nodes": 2,
+      "triangles": 16812,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -0.756,
+          0.0,
+          -0.6272
+        ],
+        "max": [
+          0.6748,
+          3.1167,
+          0.82
+        ]
+      }
+    },
+    "hearth": {
+      "size_three": [
+        1.52,
+        0.944,
+        1.22
+      ],
+      "mesh_nodes": 1,
+      "triangles": 4500,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -0.76,
+          0.0,
+          -0.61
+        ],
+        "max": [
+          0.76,
+          0.9438,
+          0.61
+        ]
+      }
+    },
+    "villager": {
+      "size_three": [
+        0.426,
+        0.82,
+        0.336
+      ],
+      "mesh_nodes": 5,
+      "triangles": 4408,
+      "bottom": 0.0005,
+      "bounds_three": {
+        "min": [
+          -0.2132,
+          0.0005,
+          -0.176
+        ],
+        "max": [
+          0.2132,
+          0.82,
+          0.16
+        ]
+      }
+    },
+    "boat": {
+      "size_three": [
+        1.153,
+        0.476,
+        2.044
+      ],
+      "mesh_nodes": 1,
+      "triangles": 5430,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -0.5314,
+          0.0,
+          -1.0218
+        ],
+        "max": [
+          0.6212,
+          0.4759,
+          1.0224
+        ]
+      }
+    },
+    "broadleaf": {
+      "size_three": [
+        1.868,
+        3.048,
+        1.362
+      ],
+      "mesh_nodes": 1,
+      "triangles": 990,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -0.9749,
+          0.0,
+          -0.7245
+        ],
+        "max": [
+          0.8926,
+          3.0484,
+          0.6379
+        ]
+      }
+    },
+    "cypress": {
+      "size_three": [
+        0.849,
+        3.097,
+        0.78
+      ],
+      "mesh_nodes": 1,
+      "triangles": 524,
+      "bottom": 0.0,
+      "bounds_three": {
+        "min": [
+          -0.4111,
+          0.0,
+          -0.4014
+        ],
+        "max": [
+          0.4383,
+          3.0968,
+          0.3789
+        ]
+      }
+    }
+  },
+  "total_triangles": 94974,
+  "glb_bytes": 9004100
+}

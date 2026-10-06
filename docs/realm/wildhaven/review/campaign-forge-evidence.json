@@ -1,0 +1,799 @@
+{
+  "scope": "Earned Forge Town: no injected resources; recorded staffed watch labor and completed defenses, native metal production, upgraded industry, and numerical doorway access. Rendered movement is reviewed separately.",
+  "runtimeIdenticalToFreePort": true,
+  "population": 75,
+  "buildings": 52,
+  "omittedBuildings": [
+    "farm",
+    "windmill",
+    "bakery",
+    "flaxfield",
+    "weaver",
+    "brewery"
+  ],
+  "connectedEntrances": 52,
+  "walkableConnectedCells": 175,
+  "upgradedIndustry": [
+    {
+      "id": "b16",
+      "type": "sawmill",
+      "level": 2
+    },
+    {
+      "id": "b23",
+      "type": "sawmill",
+      "level": 2
+    },
+    {
+      "id": "b32",
+      "type": "smith",
+      "level": 2
+    },
+    {
+      "id": "b33",
+      "type": "smith",
+      "level": 2
+    },
+    {
+      "id": "b34",
+      "type": "toolmaker",
+      "level": 2
+    },
+    {
+      "id": "b35",
+      "type": "toolmaker",
+      "level": 2
+    }
+  ],
+  "defenses": 5,
+  "incidentHistory": [
+    {
+      "id": "coast-1",
+      "day": 12,
+      "outcome": "paid",
+      "loss": {},
+      "reward": {}
+    },
+    {
+      "id": "coast-2",
+      "day": 19,
+      "outcome": "paid",
+      "loss": {},
+      "reward": {}
+    },
+    {
+      "id": "coast-3",
+      "day": 26,
+      "outcome": "paid",
+      "loss": {},
+      "reward": {}
+    },
+    {
+      "id": "coast-4",
+      "day": 33,
+      "outcome": "paid",
+      "loss": {},
+      "reward": {}
+    },
+    {
+      "id": "coast-5",
+      "day": 39,
+      "outcome": "defended",
+      "loss": {},
+      "reward": {
+        "gold": 20
+      }
+    },
+    {
+      "id": "coast-6",
+      "day": 45,
+      "outcome": "defended",
+      "loss": {},
+      "reward": {
+        "gold": 24
+      }
+    },
+    {
+      "id": "coast-7",
+      "day": 51,
+      "outcome": "defended",
+      "loss": {},
+      "reward": {
+        "gold": 36
+      }
+    },
+    {
+      "id": "coast-8",
+      "day": 57,
+      "outcome": "defended",
+      "loss": {},
+      "reward": {
+        "gold": 40
+      }
+    },
+    {
+      "id": "coast-9",
+      "day": 63,
+      "outcome": "defended",
+      "loss": {},
+      "reward": {
+        "gold": 28
+      }
+    }
+  ],
+  "guards": [
+    {
+      "id": "c1",
+      "name": "Ada",
+      "suppliedGuardSeconds": 151
+    },
+    {
+      "id": "c2",
+      "name": "Bram",
+      "suppliedGuardSeconds": 151
+    },
+    {
+      "id": "c3",
+      "name": "Cora",
+      "suppliedGuardSeconds": 236
+    },
+    {
+      "id": "c4",
+      "name": "Dev",
+      "suppliedGuardSeconds": 159
+    },
+    {
+      "id": "c16",
+      "name": "Pia",
+      "suppliedGuardSeconds": 10
+    },
+    {
+      "id": "c18",
+      "name": "Remy",
+      "suppliedGuardSeconds": 15
+    },
+    {
+      "id": "c19",
+      "name": "Sage",
+      "suppliedGuardSeconds": 20
+    },
+    {
+      "id": "c20",
+      "name": "Tess",
+      "suppliedGuardSeconds": 140
+    },
+    {
+      "id": "c21",
+      "name": "Una",
+      "suppliedGuardSeconds": 140
+    },
+    {
+      "id": "c22",
+      "name": "Vale",
+      "suppliedGuardSeconds": 330
+    },
+    {
+      "id": "c23",
+      "name": "Wren",
+      "suppliedGuardSeconds": 285
+    },
+    {
+      "id": "c24",
+      "name": "Yara",
+      "suppliedGuardSeconds": 555
+    },
+    {
+      "id": "c25",
+      "name": "Ada 2",
+      "suppliedGuardSeconds": 555
+    },
+    {
+      "id": "c26",
+      "name": "Bram 2",
+      "suppliedGuardSeconds": 475
+    },
+    {
+      "id": "c27",
+      "name": "Cora 2",
+      "suppliedGuardSeconds": 475
+    },
+    {
+      "id": "c28",
+      "name": "Dev 2",
+      "suppliedGuardSeconds": 380
+    },
+    {
+      "id": "c29",
+      "name": "Elin 2",
+      "suppliedGuardSeconds": 380
+    },
+    {
+      "id": "c30",
+      "name": "Finn 2",
+      "suppliedGuardSeconds": 380
+    },
+    {
+      "id": "c31",
+      "name": "Greta 2",
+      "suppliedGuardSeconds": 195
+    },
+    {
+      "id": "c32",
+      "name": "Hollis 2",
+      "suppliedGuardSeconds": 195
+    },
+    {
+      "id": "c33",
+      "name": "Ida 2",
+      "suppliedGuardSeconds": 190
+    },
+    {
+      "id": "c34",
+      "name": "Jory 2",
+      "suppliedGuardSeconds": 190
+    },
+    {
+      "id": "c35",
+      "name": "Kit 2",
+      "suppliedGuardSeconds": 190
+    },
+    {
+      "id": "c36",
+      "name": "Lina 2",
+      "suppliedGuardSeconds": 95
+    },
+    {
+      "id": "c37",
+      "name": "Milo 2",
+      "suppliedGuardSeconds": 90
+    },
+    {
+      "id": "c38",
+      "name": "Nell 2",
+      "suppliedGuardSeconds": 90
+    },
+    {
+      "id": "c39",
+      "name": "Orin 2",
+      "suppliedGuardSeconds": 15
+    },
+    {
+      "id": "c40",
+      "name": "Pia 2",
+      "suppliedGuardSeconds": 15
+    },
+    {
+      "id": "c41",
+      "name": "Quinn 2",
+      "suppliedGuardSeconds": 15
+    }
+  ],
+  "guardWorkerMinutes": 101.95,
+  "metalImports": {
+    "iron": 0,
+    "tools": 0
+  },
+  "pass": true,
+  "entrances": [
+    {
+      "id": "hearth",
+      "type": "hearth",
+      "rotation": 0,
+      "entrance": {
+        "x": 0,
+        "z": 3
+      },
+      "connected": true
+    },
+    {
+      "id": "bell",
+      "type": "bell",
+      "rotation": 0,
+      "entrance": {
+        "x": 0,
+        "z": -4
+      },
+      "connected": true
+    },
+    {
+      "id": "b1",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": -2,
+        "z": 2
+      },
+      "connected": true
+    },
+    {
+      "id": "b2",
+      "type": "orchard",
+      "rotation": 3,
+      "entrance": {
+        "x": 2,
+        "z": 2
+      },
+      "connected": true
+    },
+    {
+      "id": "b3",
+      "type": "lumber",
+      "rotation": 1,
+      "entrance": {
+        "x": -3,
+        "z": -2
+      },
+      "connected": true
+    },
+    {
+      "id": "b4",
+      "type": "quarry",
+      "rotation": 2,
+      "entrance": {
+        "x": 6,
+        "z": -7
+      },
+      "connected": true
+    },
+    {
+      "id": "b5",
+      "type": "garden",
+      "rotation": 3,
+      "entrance": {
+        "x": 2,
+        "z": 1
+      },
+      "connected": true
+    },
+    {
+      "id": "b6",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": -2,
+        "z": 1
+      },
+      "connected": true
+    },
+    {
+      "id": "b7",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": -2,
+        "z": 3
+      },
+      "connected": true
+    },
+    {
+      "id": "b8",
+      "type": "cottage",
+      "rotation": 2,
+      "entrance": {
+        "x": -4,
+        "z": 0
+      },
+      "connected": true
+    },
+    {
+      "id": "b9",
+      "type": "school",
+      "rotation": 3,
+      "entrance": {
+        "x": 0,
+        "z": -2
+      },
+      "connected": true
+    },
+    {
+      "id": "b10",
+      "type": "cottage",
+      "rotation": 0,
+      "entrance": {
+        "x": -1,
+        "z": 3
+      },
+      "connected": true
+    },
+    {
+      "id": "b11",
+      "type": "well",
+      "rotation": 1,
+      "entrance": {
+        "x": -2,
+        "z": 4
+      },
+      "connected": true
+    },
+    {
+      "id": "b12",
+      "type": "lumber",
+      "rotation": 1,
+      "entrance": {
+        "x": -3,
+        "z": -1
+      },
+      "connected": true
+    },
+    {
+      "id": "b13",
+      "type": "orchard",
+      "rotation": 0,
+      "entrance": {
+        "x": 4,
+        "z": 3
+      },
+      "connected": true
+    },
+    {
+      "id": "b14",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": -1,
+        "z": 0
+      },
+      "connected": true
+    },
+    {
+      "id": "b15",
+      "type": "quarry",
+      "rotation": 3,
+      "entrance": {
+        "x": 3,
+        "z": -4
+      },
+      "connected": true
+    },
+    {
+      "id": "b16",
+      "type": "sawmill",
+      "rotation": 3,
+      "entrance": {
+        "x": 0,
+        "z": -3
+      },
+      "connected": true
+    },
+    {
+      "id": "b17",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": 0,
+        "z": 1
+      },
+      "connected": true
+    },
+    {
+      "id": "b18",
+      "type": "orchard",
+      "rotation": 3,
+      "entrance": {
+        "x": 2,
+        "z": 3
+      },
+      "connected": true
+    },
+    {
+      "id": "b19",
+      "type": "school",
+      "rotation": 0,
+      "entrance": {
+        "x": 2,
+        "z": -1
+      },
+      "connected": true
+    },
+    {
+      "id": "b20",
+      "type": "market",
+      "rotation": 3,
+      "entrance": {
+        "x": 0,
+        "z": -1
+      },
+      "connected": true
+    },
+    {
+      "id": "b21",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": 0,
+        "z": 4
+      },
+      "connected": true
+    },
+    {
+      "id": "b22",
+      "type": "mine",
+      "rotation": 0,
+      "entrance": {
+        "x": 6,
+        "z": -1
+      },
+      "connected": true
+    },
+    {
+      "id": "b23",
+      "type": "sawmill",
+      "rotation": 2,
+      "entrance": {
+        "x": 2,
+        "z": -4
+      },
+      "connected": true
+    },
+    {
+      "id": "b24",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": -2,
+        "z": 5
+      },
+      "connected": true
+    },
+    {
+      "id": "b25",
+      "type": "orchard",
+      "rotation": 2,
+      "entrance": {
+        "x": 4,
+        "z": 0
+      },
+      "connected": true
+    },
+    {
+      "id": "b26",
+      "type": "mine",
+      "rotation": 3,
+      "entrance": {
+        "x": 4,
+        "z": -6
+      },
+      "connected": true
+    },
+    {
+      "id": "b27",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": -1,
+        "z": -1
+      },
+      "connected": true
+    },
+    {
+      "id": "b28",
+      "type": "school",
+      "rotation": 3,
+      "entrance": {
+        "x": 0,
+        "z": -4
+      },
+      "connected": true
+    },
+    {
+      "id": "b29",
+      "type": "cottage",
+      "rotation": 3,
+      "entrance": {
+        "x": -7,
+        "z": 1
+      },
+      "connected": true
+    },
+    {
+      "id": "b30",
+      "type": "well",
+      "rotation": 3,
+      "entrance": {
+        "x": 0,
+        "z": 1
+      },
+      "connected": true
+    },
+    {
+      "id": "b31",
+      "type": "market",
+      "rotation": 1,
+      "entrance": {
+        "x": 0,
+        "z": -2
+      },
+      "connected": true
+    },
+    {
+      "id": "b32",
+      "type": "smith",
+      "rotation": 0,
+      "entrance": {
+        "x": 3,
+        "z": -1
+      },
+      "connected": true
+    },
+    {
+      "id": "b33",
+      "type": "smith",
+      "rotation": 1,
+      "entrance": {
+        "x": 0,
+        "z": -3
+      },
+      "connected": true
+    },
+    {
+      "id": "b34",
+      "type": "toolmaker",
+      "rotation": 2,
+      "entrance": {
+        "x": 3,
+        "z": -4
+      },
+      "connected": true
+    },
+    {
+      "id": "b35",
+      "type": "toolmaker",
+      "rotation": 3,
+      "entrance": {
+        "x": 2,
+        "z": 0
+      },
+      "connected": true
+    },
+    {
+      "id": "b36",
+      "type": "chapel",
+      "rotation": 0,
+      "entrance": {
+        "x": -4,
+        "z": 5
+      },
+      "connected": true
+    },
+    {
+      "id": "b37",
+      "type": "warehouse",
+      "rotation": 2,
+      "entrance": {
+        "x": 1,
+        "z": -6
+      },
+      "connected": true
+    },
+    {
+      "id": "b38",
+      "type": "clinic",
+      "rotation": 0,
+      "entrance": {
+        "x": 1,
+        "z": 3
+      },
+      "connected": true
+    },
+    {
+      "id": "b39",
+      "type": "barracks",
+      "rotation": 3,
+      "entrance": {
+        "x": 0,
+        "z": 4
+      },
+      "connected": true
+    },
+    {
+      "id": "b40",
+      "type": "barracks",
+      "rotation": 1,
+      "entrance": {
+        "x": -2,
+        "z": -3
+      },
+      "connected": true
+    },
+    {
+      "id": "b41",
+      "type": "cottage",
+      "rotation": 1,
+      "entrance": {
+        "x": 0,
+        "z": 5
+      },
+      "connected": true
+    },
+    {
+      "id": "b42",
+      "type": "orchard",
+      "rotation": 0,
+      "entrance": {
+        "x": 5,
+        "z": 3
+      },
+      "connected": true
+    },
+    {
+      "id": "b43",
+      "type": "manor",
+      "rotation": 3,
+      "entrance": {
+        "x": -7,
+        "z": 2
+      },
+      "connected": true
+    },
+    {
+      "id": "b44",
+      "type": "barracks",
+      "rotation": 1,
+      "entrance": {
+        "x": -2,
+        "z": 6
+      },
+      "connected": true
+    },
+    {
+      "id": "b45",
+      "type": "warehouse",
+      "rotation": 0,
+      "entrance": {
+        "x": 4,
+        "z": -1
+      },
+      "connected": true
+    },
+    {
+      "id": "b46",
+      "type": "chapel",
+      "rotation": 1,
+      "entrance": {
+        "x": -4,
+        "z": 0
+      },
+      "connected": true
+    },
+    {
+      "id": "b47",
+      "type": "orchard",
+      "rotation": 3,
+      "entrance": {
+        "x": 2,
+        "z": 4
+      },
+      "connected": true
+    },
+    {
+      "id": "b48",
+      "type": "clinic",
+      "rotation": 0,
+      "entrance": {
+        "x": -7,
+        "z": 4
+      },
+      "connected": true
+    },
+    {
+      "id": "b49",
+      "type": "cottage",
+      "rotation": 0,
+      "entrance": {
+        "x": -6,
+        "z": 6
+      },
+      "connected": true
+    },
+    {
+      "id": "b50",
+      "type": "barracks",
+      "rotation": 1,
+      "entrance": {
+        "x": -4,
+        "z": 5
+      },
+      "connected": true
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "observedAt": "2026-10-03T04:02:07.621787+00:00",
+  "method": "Native in-app browser accessibility and rendered UI; reloaded latest source through Come back home, then opened Fieldbook. No hidden save inspection, fixture import, clock advance, sound preference change or assignments.",
+  "url": "http://127.0.0.1:4751/wildhaven/",
+  "browserTab": "2",
+  "paused": true,
+  "visible": {
+    "day": 21,
+    "population": 7,
+    "beds": 10,
+    "timber": 106,
+    "stone": 81,
+    "food": 14,
+    "moralePercent": 78,
+    "freeHands": 3,
+    "constructionProjects": 2,
+    "constructionPercent": 0,
+    "gold": 0,
+    "knowledge": 0,
+    "sound": "off",
+    "openPanel": "Island fieldbook",
+    "place": "The mason\u2019s waystone",
+    "availableResidents": [
+      "Elin",
+      "Finn",
+      "Greta"
+    ],
+    "assignedResidents": {
+      "Ada": "Builder",
+      "Bram": "Builder",
+      "Cora": "Forager",
+      "Dev": "Forager"
+    }
+  },
+  "markedDeliverable": true
+}
