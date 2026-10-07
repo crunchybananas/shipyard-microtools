@@ -6,7 +6,7 @@ export const HOME_SAVE_KEY = 'wildhaven.v4';
 export const COMPANION_SAVE_KEY = 'wildhaven.companions.v1';
 export const TRADE_RESOURCES = Object.freeze(RESOURCE_NAMES.filter(key => key !== 'knowledge'));
 const IDS = ['home', 'companion'];
-const DEFAULT_NAMES = { home: 'Cory’s Wildhaven', companion: 'Melissa’s Wildhaven' };
+const DEFAULT_NAMES = { home: 'Cory’s village', companion: 'Melissa’s village' };
 const fail = reason => ({ ok: false, reason });
 const clone = value => JSON.parse(JSON.stringify(value));
 const validName = name => typeof name === 'string' && name.trim().length > 0 && name.trim().length <= 40 && !/[<>\x00-\x1f\x7f]/.test(name);
@@ -76,7 +76,7 @@ export function createCompanionStore({ storage, locks = globalThis.navigator?.lo
           Promise.resolve(locks.request('wildhaven.local-towns.writer', { mode: 'exclusive', ifAvailable: true }, lock => {
             leasePending = false;
             if (blocked) { resolveReady(); return; }
-            if (!lock) { block('Wildhaven is already open in another tab. Close that tab, then reload this one to continue safely.'); resolveReady(); return; }
+            if (!lock) { block('Your village is already open in another tab. Close that tab, then reload this one to continue safely.'); resolveReady(); return; }
             resolveReady(); return new Promise(resolve => { releaseLease = resolve; });
           })).catch(() => { leasePending = false; block('A safe local save lock could not be acquired. Existing saves have been kept untouched; reload to retry.'); resolveReady(); });
         } catch { leasePending = false; block('A safe local save lock could not be acquired. Existing saves have been kept untouched; reload to retry.'); resolveReady(); }

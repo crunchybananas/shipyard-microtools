@@ -88,7 +88,7 @@ export function createCompanionUI({ store, getState, onStateChange, beforeOpen, 
     content.append(el('div', 'companion-postcard', 'A second hearth, a different story.'),
       el('h3', '', 'Give your towns a name'),
       el('p', '', 'Your home keeps its progress. A companion town starts with six founders. Take turns, visit, and exchange goods by agreement.'));
-    const form = el('form', 'companion-form'), home = textField('Your existing home', info.towns[0].name, 'home-name'), companion = textField('A companion town · local draft', 'Melissa’s Wildhaven', 'companion-name');
+    const form = el('form', 'companion-form'), home = textField('Your existing home', info.towns[0].name, 'home-name'), companion = textField('A companion town · local draft', 'Melissa’s village', 'companion-name');
     const submit = el('button', 'primary', 'Create the companion town'); submit.type = 'submit'; submit.disabled = info.blocked;
     form.append(home.label, companion.label, submit);
     form.onsubmit = event => { event.preventDefault(); finish(store.create({ homeName: home.input.value, companionName: companion.input.value }, getState())); };

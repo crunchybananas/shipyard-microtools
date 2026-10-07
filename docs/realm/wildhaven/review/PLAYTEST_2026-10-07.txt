@@ -38,4 +38,18 @@ Changes prepared from these observations
 - Painted transparent resource icons from image generation; actual 3D model thumbnails retained.
 - Successful placement explains Queued instead of presenting an occupied-site error.
 
-Post-deployment observations: to be appended after computer-control review of the release.
+Post-deployment computer-control observations (PR 154)
+- Reloaded the same public-origin test village: Day 2, 58 timber, 51 stone, 71 food, eight residents and the active Hollis survey were preserved. It reopened paused.
+- Same 665 x 675 pane: the wordmark and management row were gone, all four painted resource icons rendered, and most of the island was visible above the bottom dock.
+- Opened Build, chose a cottage: the catalogue closed and only the compact placement tray remained. Placed the cottage in clearly visible meadow. The tray said Queued rather than showing an occupied-site error.
+- Resumed at 1x. Followed Hollis in the world, watched work continue, and read the completed survey credited to Hollis on Day 2.
+- At 95 wall-clock seconds since Resume, the UI still showed Day 2; housing construction and new arrivals had progressed. Built a third cottage and a kitchen garden through ordinary controls. At the next pause the UI showed 12 residents, 18 beds, 50 timber, 49 stone and 82 food, still Day 2.
+- No speed-up or injected game state was used. The 95-second sample supports the calmer feel; the exact six-minute period is also covered by deterministic tests.
+- Follow-up: surface ongoing expeditions and active coast countdowns in the folded dock; avoid hiding the selected citizen behind the compact inspector; remove the remaining bell-objective wordmark.
+- Remaining human-test scope: combat aftermath, perceived audio quality, physical phones/tablets and long sessions. Management books still run time until Pause is selected.
+
+Release evidence
+- PR 154 merge: 4f5b707d10952d9f3bbaef876744136bff99aa68.
+- Pages run 37695148841 succeeded.
+- 25 public runtime files, including all game JS, HTML, layout CSS and generated WebP, matched local SHA-256 values.
+- Full game suite: 198 passed. Archive verification: 2,020 checks passed.

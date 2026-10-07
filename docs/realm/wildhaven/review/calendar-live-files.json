@@ -1,0 +1,131 @@
+{
+  "build": "4f5b707d10952d9f3bbaef876744136bff99aa68",
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "ba8d968a09d8cfce1a6d4370e857cb5bf22c4c2e5a310fee3e486b0e28d33729",
+      "match": true
+    },
+    {
+      "path": "compact.css",
+      "sha256": "7278b6f6d1e8ab1a7f6a82f0dde5fa96a3465227ab3bf7196d717f5c66b3b5f1",
+      "match": true
+    },
+    {
+      "path": "tablet.css",
+      "sha256": "17eab0e26ef34c46a4a7d51a729eeb629fe8098de2e3b0486d6f561d958c5571",
+      "match": true
+    },
+    {
+      "path": "assets/resource-icons.webp",
+      "sha256": "9305fd20e16d16fd46213701ca94ef7d6e9d21b56ce5e875b443c64053d33b49",
+      "match": true
+    },
+    {
+      "path": "js/audio.js",
+      "sha256": "8eaa22d36094c8aaba97412bbd1bd107267ebe4b2a646d997ef6937ef0383475",
+      "match": true
+    },
+    {
+      "path": "js/calendar.js",
+      "sha256": "71c332ea311269be999efe4713cbaedc1ff435dbe3ec5d891d727ea0432411ec",
+      "match": true
+    },
+    {
+      "path": "js/catalog.js",
+      "sha256": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+      "match": true
+    },
+    {
+      "path": "js/clarity-ui.js",
+      "sha256": "9558bd51e491c17a6d50cc6cf87f7300faf0132a9070fe8956b0e05fc1e78bdd",
+      "match": true
+    },
+    {
+      "path": "js/clarity.js",
+      "sha256": "476fdbfacab3cabfa1e3550a16616ab6be4314fd1b1db9f4246056db94626da3",
+      "match": true
+    },
+    {
+      "path": "js/companion-store.js",
+      "sha256": "a26f404b4d928a8b622c01149bbfc5ae27d57113193efc73b1a4ebf769d5ff4c",
+      "match": true
+    },
+    {
+      "path": "js/companion-ui.js",
+      "sha256": "c00a1e9defd317bc4ab47ff40ad928eeb5fc5ae7bd4da52b88481eac75e6f087",
+      "match": true
+    },
+    {
+      "path": "js/discovery.js",
+      "sha256": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+      "match": true
+    },
+    {
+      "path": "js/fieldbook-ui.js",
+      "sha256": "06e9a4df427043b0522704080dbcfa94bec231e2a65a67dc6ccee2b4d21d8af4",
+      "match": true
+    },
+    {
+      "path": "js/frontier-ui.js",
+      "sha256": "ef5d97d2649cc462a97801e1b3f589574944445b308a57d58c21d0f23e8d4740",
+      "match": true
+    },
+    {
+      "path": "js/frontier.js",
+      "sha256": "a6e5cc403fb962f66b1f60b19206715e77539f9b408c8b804cfba269e7e18713",
+      "match": true
+    },
+    {
+      "path": "js/island.js",
+      "sha256": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+      "match": true
+    },
+    {
+      "path": "js/main.js",
+      "sha256": "e9db5e4b673d5c014eec6874be82c38f1f8da1cde1e71b567cf89d73687b8e48",
+      "match": true
+    },
+    {
+      "path": "js/path-choice.js",
+      "sha256": "9e35877d46301deea0805229ea4519d6f71d500da55dc1ab5dc71764471bbe63",
+      "match": true
+    },
+    {
+      "path": "js/pressure.js",
+      "sha256": "db68bb77f443a2de53bdd219fec0290b459817a818e085363d76a09c8005ae85",
+      "match": true
+    },
+    {
+      "path": "js/progression.js",
+      "sha256": "4082fb383430172102b96c2bed6509c798e17f9f7c1e4b31c686b84b0b46d3b3",
+      "match": true
+    },
+    {
+      "path": "js/research-map.js",
+      "sha256": "0935f16b68f9d1edb94a3ad4188fab6464e36de95148f0173e7fdb8323b2b55e",
+      "match": true
+    },
+    {
+      "path": "js/sim.js",
+      "sha256": "a208b1df1bc561dd2768a629d08cdb88cd5f99348ef4dd8703f5897274893561",
+      "match": true
+    },
+    {
+      "path": "js/town-ui.js",
+      "sha256": "64c5cc15c022475705790a419c46295480608e95cab8baf2305686037a6a5800",
+      "match": true
+    },
+    {
+      "path": "js/world-cues.js",
+      "sha256": "e9444937fca5792cc8c099d01d801314ef8f6a154dfba80c3bf28c5a8a99ed56",
+      "match": true
+    },
+    {
+      "path": "js/world.js",
+      "sha256": "daba9ca0f2aaa2055aca3d22de17c48daee1371d494472729e4f53a0f72d5d28",
+      "match": true
+    }
+  ],
+  "allMatch": true
+}

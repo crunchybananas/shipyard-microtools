@@ -51,7 +51,7 @@ function mountTabletControls() {
     companionUI?.close(); fieldbook?.close(); frontierUI?.close(); town.close(); closeInspector(); cancelTool(); $('journal').hidden = true;
     if (!wasOpen) { document.body.classList.add('tablet-build-open'); buildButton.setAttribute('aria-expanded', 'true'); }
   };
-  townButton.onclick = () => { if (town.activeTab) town.close(); else if (state.won && !state.policies.charter) town.revealPaths(); else town.open('workforce'); };
+  townButton.onclick = () => { if (town.activeTab) town.close(); else if (state.pressure?.active) town.open('watch'); else if (state.won && !state.policies.charter) town.revealPaths(); else town.open('workforce'); };
   compactTablet.addEventListener('change', tabletLayoutChanged); tabletLayoutChanged();
 }
 
@@ -235,7 +235,15 @@ function updateUI() {
   $('objective-action').hidden = !currentNextStep; $('objective-action').textContent = currentNextStep?.label || '';
   $('objective-bigger').hidden = !currentNextStep; $('objective-bigger-text').textContent = `${ambition.title}: ${ambition.description}`;
   $('choose-town-path').hidden = !state.won || !!state.policies.charter;
-  $('tablet-town-toggle')?.setAttribute('aria-expanded', String(!!town?.activeTab));
+  const townToggle = $('tablet-town-toggle'), incident = pressureOptions(state).active;
+  townToggle?.setAttribute('aria-expanded', String(!!town?.activeTab));
+  if (townToggle) {
+    townToggle.textContent = incident ? `Town · ${until(state, incident.deadline)}` : 'Town';
+    townToggle.classList.toggle('threatened', !!incident);
+    townToggle.title = incident ? `${incident.title}: arrival in ${until(state, incident.deadline)} at 1×. Open the watch.` : 'People, projects, stores, council and trade';
+  }
+  const projects = sim.constructionQueue(state).length;
+  if ($('tablet-build-toggle')) $('tablet-build-toggle').textContent = projects ? `Build · ${projects}` : 'Build';
   $('find-bell').hidden = state.won || ambition.step < 4; $('undo').disabled = !state.undo;
   $('pause').classList.toggle('active', speed === 0); $('pause').textContent = speed === 0 ? '▶' : 'Ⅱ'; $('pause').setAttribute('aria-label', speed === 0 ? 'Resume' : 'Pause');
   for (const button of document.querySelectorAll('[data-speed]')) button.setAttribute('aria-pressed', String(Number(button.dataset.speed) === speed));
@@ -372,7 +380,7 @@ async function boot() {
     window.Wildhaven = Object.freeze({ getSnapshot: () => JSON.parse(sim.serialize(state)), getDiagnostics: () => ({ ...world.diagnostics(), fps: Number(document.documentElement.dataset.fps || 0) }) });
     if (['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).has('review')) window.__wildhaven = { world, frontierUI, fieldbook, companionUI, audio, companionInfo:()=>companions.info(), frontierContext: () => sim.frontierContext(state), get state() { return state; }, advance, sync, project: (x,z) => world.project(x,z), snapshot: () => JSON.parse(sim.serialize(state)), canBuild: (type,x,z) => sim.canBuild(state,type,x,z) };
   } catch (error) {
-    console.error(error); $('loading').replaceChildren(); const title = document.createElement('p'); title.textContent = 'The island couldn’t open.'; const message = document.createElement('small'); message.textContent = 'Wildhaven needs WebGL 2 and its local model files. Reload, or try a current browser.'; const retry = document.createElement('button'); retry.textContent = 'Try again'; retry.className = 'primary'; retry.onclick = () => location.reload(); $('loading').append(title,message,retry);
+    console.error(error); $('loading').replaceChildren(); const title = document.createElement('p'); title.textContent = 'The island couldn’t open.'; const message = document.createElement('small'); message.textContent = 'The island needs WebGL 2 and its local model files. Reload, or try a current browser.'; const retry = document.createElement('button'); retry.textContent = 'Try again'; retry.className = 'primary'; retry.onclick = () => location.reload(); $('loading').append(title,message,retry);
   }
 }
 boot();
