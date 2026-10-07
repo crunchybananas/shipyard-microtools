@@ -104,9 +104,9 @@ function hover(tile, pointer = {}) {
   hovered = tile; if (!playing) return; world.hoverCitizen?.(!tool ? tile?.citizen?.id || null : null); if (frontierUI?.hover(tile)) return; if (!tool) return;
   if (!tile) { world.showPreview(null); world.showServiceArea(null, null); $('placement-detail').textContent = 'Choose a site on the island.'; $('placement').classList.remove('invalid'); return; }
   const verdict = sim.canBuild(state, tool, tile.x, tile.z, rotation), spec = BUILDINGS[tool];
-  world.showPreview(tool, tile, verdict.ok, rotation, { entranceLabel: !touchPlacement }); const reach = world.showServiceArea(tool, tile); $('placement').classList.toggle('invalid', !verdict.ok);
+  world.showPreview(tool, tile, verdict.ok, rotation, { entranceLabel: !touchPlacement }); const reach = world.showServiceArea(tool, tile, 1, { label: !touchPlacement }); $('placement').classList.toggle('invalid', !verdict.ok);
   $('confirm-building').disabled = !verdict.ok || !touchSite;
-  $('placement-detail').textContent = verdict.ok ? `${touchPlacement ? 'Entrance clear · ' : ''}${spec.work} person-seconds to build.${verdict.boosted ? ` ${verdict.bonus}` : touchPlacement ? '' : ' Keep the arrow’s approach clear.'}${reach ? ` ✓ ${reach.inRangeHomes} homes in reach · − ${reach.outsideHomes} outside.${touchPlacement ? '' : ' Staff and supplies determine service.'}` : ''}` : verdict.reason;
+  $('placement-detail').textContent = verdict.ok ? `${touchPlacement ? 'Entrance clear · ' : ''}${spec.work} person-seconds to build.${verdict.boosted ? ` ${verdict.bonus}` : touchPlacement ? '' : ' Keep the arrow’s approach clear.'}${reach ? ` ${touchPlacement ? `${reach.radius}-space reach · ` : ''}✓ ${reach.inRangeHomes} homes in reach · − ${reach.outsideHomes} outside.${touchPlacement ? '' : ' Staff and supplies determine service.'}` : ''}` : verdict.reason;
 }
 function commitBuilding(tile) {
   if (!tool || !tile || !companions.canManage) return;
