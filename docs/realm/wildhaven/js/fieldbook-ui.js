@@ -1,3 +1,4 @@
+import { calendarDay } from './calendar.js';
 import { DISCOVERIES, discoverySpec, fieldworkerFor, fieldworkDuration } from './discovery.js';
 import { fieldworkOffer, sendFieldworker, recallFieldworker } from './frontier.js';
 import { JOBS } from './catalog.js';
@@ -27,7 +28,7 @@ export function createFieldbook({getState,getContext,getIcons,mutate,beforeOpen,
     content.replaceChildren();const illustration=el('div','field-illustration'),img=el('img');img.src=getIcons()['discovery_'+active+(site.status==='restored'?'_restored':'')];img.alt='';illustration.style.setProperty('--place-ink',spec.tint);illustration.append(el('span','field-plate',spec.mark),img,el('span','field-region',spec.region));
     const title=el('h3','',spec.name);content.append(illustration,title,el('p','field-story',site.status==='rumor'?spec.rumor:spec.story));
     content.append(button('Find this place ↗','find',()=>{close();focus(spec);},'field-link'));
-    if(site.reportedBy)content.append(el('p','field-byline',`Recorded by ${site.reportedBy} · Day ${site.reportedDay}`));
+    if(site.reportedBy)content.append(el('p','field-byline',`Recorded by ${site.reportedBy} · Day ${calendarDay(state, site.reportedDay)}`));
     if(worker){
       const card=el('section','field-assignment'),phase=worker.status==='wounded'?(Math.hypot(worker.x,worker.z-3)<1.5?'Recovering at home':'Wounded · making for home'):worker.fieldBlocked?'Route blocked · check gates and the approach':worker.missionStage==='outbound'?'Walking to the site':worker.missionStage==='working'?(worker.missionMode==='survey'?'Reading the place':worker.missionMode==='restore'?'Restoring the place':'Gathering the materials'):worker.missionComplete?'Bringing the findings home':'Returning home';
       card.append(el('small','','In the field'),el('h4','',`${worker.name} · ${JOBS[worker.kind].name}`),el('p','',phase));
@@ -37,7 +38,7 @@ export function createFieldbook({getState,getContext,getIcons,mutate,beforeOpen,
       if(worker.missionStage!=='returning')card.append(button('Call them home','recall',()=>{if(!canMutate())return;mutate(recallFieldworker(getState(),worker.id),'depart');signature='';update();}));
       card.append(el('p','field-fine','Their village job is reserved while they travel. Reports and recovered goods arrive at the hearth.'));content.append(card);
     }else if(['restored','salvaged'].includes(site.status)){
-      const result=el('section','field-keepsake');result.append(el('small','',site.status==='restored'?'A place in village life':'Recovered for the village'),el('h4','',site.status==='restored'?spec.benefit:resourceText(site.received)),el('p','',site.status==='restored'?spec.note:'The useful materials have found another life. This place’s story remains in the fieldbook.'),el('small','',`${site.finishedBy} · Day ${site.finishedDay}`));content.append(result);
+      const result=el('section','field-keepsake');result.append(el('small','',site.status==='restored'?'A place in village life':'Recovered for the village'),el('h4','',site.status==='restored'?spec.benefit:resourceText(site.received)),el('p','',site.status==='restored'?spec.note:'The useful materials have found another life. This place’s story remains in the fieldbook.'),el('small','',`${site.finishedBy} · Day ${calendarDay(state, site.finishedDay)}`));content.append(result);
     }else{
       const mode=site.status==='rumor'?'survey':site.project||'restore',offer=fieldworkOffer(state,active,mode,getContext());
       const label=el('label','field-resident','Send a resident'),select=el('select');select.dataset.fieldAction='resident';select.setAttribute('aria-label','Resident for fieldwork');

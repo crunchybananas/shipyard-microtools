@@ -1,0 +1,76 @@
+/* The island is the main surface. A six-minute sky above a pocket-sized dock. */
+#hud header{grid-template-columns:minmax(0,1fr) 156px;gap:12px;max-width:920px;margin:0 auto;pointer-events:none}
+#hud header>*{pointer-events:auto}
+#hud header .supplies{padding:7px 12px;gap:12px;border:0}
+#hud header .supply{flex:1;gap:5px;min-width:0}
+#hud header .supply>div>span{font-size:20px}
+#hud header .supply small{font-size:10px}
+#hud header .supply small b{display:block;padding:0;font-size:9px}
+#hud header .day-controls{background:#f5efdcf2;padding:5px 6px;border-radius:7px}
+#hud header .day-title{font-size:11px;line-height:16px}
+#hud header .time-buttons{margin:0}
+#hud header .time-buttons button{min-height:32px;height:32px;min-width:40px}
+#hud header .day-track{display:block;margin-top:3px;height:2px}
+#hud .resource{display:block;flex:0 0 30px;width:30px;height:40px;margin:0;border:0;border-radius:0;transform:none;box-shadow:none;clip-path:none;background:transparent url('./assets/resource-icons.webp') 0 50% / 400% 100% no-repeat}
+#hud .resource::before{content:none}
+#hud .resource.stone{background-position-x:33.333333%}
+#hud .resource.food{background-position-x:66.666667%}
+#hud .resource.people-icon{background-position-x:100%}
+#hud #home{font-size:10px;min-width:44px;min-height:44px}
+#hud .camera-tools{gap:4px}
+#hud .camera-tools button{width:44px;height:44px}
+#hud .camera-tools #zoom-in,#hud .camera-tools #zoom-out,#hud .camera-tools>span{display:none}
+#hud .ambition{width:236px}
+#hud .ambition h2{font-size:16px}
+#hud footer .shelf-heading{font-size:11px}
+body.tablet-build-open #hud #build-shelf .build-choice{flex-basis:106px;min-width:106px;max-width:106px;padding:2px 5px 6px}
+#hud #build-shelf .build-choice img{height:40px;width:65px}
+#hud #build-shelf .build-choice .build-use{display:none}
+#hud #build-shelf .build-choice .build-flow{min-height:16px;font-size:10px}
+#hud #build-shelf .build-choice .cost{font-size:9px}
+#hud #placement{min-width:0;width:min(630px,calc(100% - 24px));max-height:30dvh;padding:8px 12px;gap:8px;align-items:center}
+#hud #placement>div{min-width:0}
+#hud #placement-purpose .building-purpose{padding:2px 0;margin:0}
+#hud #placement .purpose-flow,#hud #placement .purpose-staff{display:inline-flex;font-size:10px;margin-right:6px}
+#hud #placement .purpose-next,#hud #placement .purpose-short-use{display:none}
+#hud #placement-detail{font-size:11px;line-height:1.4}
+#hud #placement-title{font-size:12px!important}
+#hud #placement button{min-height:44px;padding:8px 12px;font-size:11px}
+#hud #inspector{padding:12px 16px;text-align:left}
+#hud #inspect-image{float:left;width:62px;height:55px;margin:0 10px 5px 0}
+#hud #inspector h2{font-size:22px}#hud #inspect-description{clear:both}
+#hud #toast{top:var(--tablet-panel-top);max-width:min(420px,calc(100% - 24px));padding:10px 14px;pointer-events:none}
+#hud footer .controls-hint>div>button[aria-expanded=true]{background:#dce5cb!important}
+@media(max-width:760px){
+ #hud header{left:12px;right:12px;top:10px;grid-template-columns:minmax(0,1fr) 144px;gap:8px}
+ #hud header .supplies{padding:6px;gap:4px}
+ #hud header .supply{gap:3px}
+ #hud header .supply>div>span{font-size:17px}
+ #hud header .supply small{font-size:9px}
+ #hud header .resource{flex-basis:24px;width:24px;height:32px}
+ #hud footer{width:calc(100% - 24px)}
+ #hud #town-book,#hud #fieldbook,#hud #frontier-panel,#hud #companion-panel{left:12px;right:64px;width:auto;top:var(--tablet-panel-top);bottom:var(--tablet-dock-clearance);min-height:0}
+ #hud #inspector{right:64px;width:min(290px,calc(100% - 84px));min-height:0}
+ #hud .camera-tools{right:12px}
+ #hud .ambition{left:12px;width:220px}
+ #hud footer .controls-hint>div>button{font-size:11px!important;padding:6px 4px!important}
+ #hud footer .controls-hint>div>button::after{font-size:11px}
+}
+@media(max-width:520px){
+ :root{--tablet-panel-top:132px}
+ #hud header{grid-template-columns:1fr;gap:5px}
+ #hud header .supplies{padding:5px 9px}
+ #hud header .supply>div>span{font-size:19px}
+ #hud header .day-controls{display:flex;justify-content:space-between;align-items:center;padding:2px 6px;gap:10px}
+ #hud header .day-title{font-size:12px;padding-left:6px}
+ #hud header .day-track{display:none}
+ #hud header .time-buttons button{height:44px}
+ #hud footer .controls-hint>div{display:flex;overflow-x:auto;scrollbar-width:none;gap:3px}
+ #hud footer .controls-hint>div>button{flex:0 0 68px}
+ #hud #town-book,#hud #fieldbook,#hud #frontier-panel,#hud #companion-panel{right:12px}
+ body.town-view-active #hud .camera-tools,body.fieldbook-active #hud .camera-tools,body.frontier-view-active #hud .camera-tools{display:none}
+ #hud #placement{display:grid;grid-template-columns:1fr auto auto}
+ #hud #placement>div{grid-column:1/-1}
+ .intro-copy{top:20%}h1{font-size:55px}
+}
+@media(any-pointer:coarse){#hud header .time-buttons button{height:44px}}

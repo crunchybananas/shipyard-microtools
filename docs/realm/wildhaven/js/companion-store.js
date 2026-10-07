@@ -1,3 +1,4 @@
+import { calendarDay } from './calendar.js';
 import { createGame, serialize, restore, storageCapacity } from './sim.js';
 import { RESOURCE_NAMES } from './catalog.js';
 
@@ -173,7 +174,7 @@ export function createCompanionStore({ storage, locks = globalThis.navigator?.lo
     if (result.next.offers.filter(offer => offer.status === 'pending').length >= 12) return fail('Resolve an existing offer before opening another.');
     if (Object.entries(give).some(([key, amount]) => currentState.resources[key] < amount)) return fail('This town does not have the goods offered. Nothing has been reserved.');
     const id = `o${result.next.nextOfferId++}`;
-    result.next.offers.unshift({ id, from: activeId, to: other(activeId), give: clone(give), request: clone(request), status: 'pending', proposedDay: currentState.day });
+    result.next.offers.unshift({ id, from: activeId, to: other(activeId), give: clone(give), request: clone(request), status: 'pending', proposedDay: calendarDay(currentState) });
     const saved = commit(result.next);
     return saved.ok ? { ...saved, offerId: id, reason: 'Offer saved. Pass the device and open the receiving town to review and accept it. Goods stay in their stores until then.' } : saved;
   }
@@ -220,7 +221,7 @@ export function createCompanionStore({ storage, locks = globalThis.navigator?.lo
         }
         state = summaries.get(id).state;
       }
-      return { id, name: names[id], day: state?.day || 1, population: state?.population || 6, resources: { ...state?.resources } };
+      return { id, name: names[id], day: state ? calendarDay(state) : 1, population: state?.population || 6, resources: { ...state?.resources } };
     });
     return { enabled: !!record, activeId, mode, readOnly: mode === 'visit', blocked, reason: reason || warning,
       towns, offers: clone(record?.offers || []), revision: record?.revision || 0 };

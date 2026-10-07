@@ -1,3 +1,4 @@
+import { perMinute } from './calendar.js';
 import { RESOURCES } from './catalog.js';
 import { buildingFacts } from './clarity.js';
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
@@ -17,13 +18,13 @@ export function buildingPurpose(type, level = 1) {
   card.setAttribute('aria-label', 'Building purpose');
   const flow = el('div', 'purpose-flow');
   if (facts.input.length) {
-    flow.append(resourceChips(Object.fromEntries(facts.input.map(r => [r.id, r.amount]))), el('b', 'flow-arrow', '→'));
+    flow.append(resourceChips(Object.fromEntries(facts.input.map(r => [r.id, perMinute(r.amount)]))), el('b', 'flow-arrow', '→'));
   }
-  if (facts.output.length) flow.append(resourceChips(Object.fromEntries(facts.output.map(r => [r.id, r.amount]))));
+  if (facts.output.length) flow.append(resourceChips(Object.fromEntries(facts.output.map(r => [r.id, perMinute(r.amount)]))));
   if (!facts.output.length || facts.housing) {
     const output = facts.housing ? `${facts.housing} beds` : facts.storage ? `+${facts.storage} storage / good` : facts.service ? `${facts.service.name} for ${facts.service.capacity} beds` : 'First town milestone';
     flow.append(el('span', 'purpose-benefit', output));
   }
-  card.append(flow, el('small', 'purpose-staff', `${facts.staffing}${facts.input.length || facts.output.length ? ' · base / day when fully supplied' : ''}`), el('span', 'purpose-short-use', facts.next), el('span', 'purpose-next', facts.payoff));
+  card.append(flow, el('small', 'purpose-staff', `${facts.staffing}${facts.input.length || facts.output.length ? ' · base / minute when supplied' : ''}`), el('span', 'purpose-short-use', facts.next), el('span', 'purpose-next', facts.payoff));
   return card;
 }
