@@ -1,0 +1,223 @@
+{
+  "method": "Affected runtime surface packaged with the Pages workflow exclusion rules; unrelated sparse-excluded applications are not claimed as locally rebuilt. No compiler/build step exists for Wildhaven.",
+  "files": [
+    {
+      "path": "realm/wildhaven/index.html",
+      "bytes": 13012,
+      "sha256": "6f2cfd019683196336885a71c9c3074ed24cd470da81e86d342ec1697502306e"
+    },
+    {
+      "path": "realm/wildhaven/frontier.css",
+      "bytes": 6845,
+      "sha256": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b"
+    },
+    {
+      "path": "realm/wildhaven/research-map.css",
+      "bytes": 3425,
+      "sha256": "9b8afebfb83386996fc15834a1cb8127b9a02e0ecc8756cec87691b98c568640"
+    },
+    {
+      "path": "realm/wildhaven/companion.css",
+      "bytes": 9123,
+      "sha256": "17293a873eba4da410bb1cea9940216016f654034360ffea852d4facd201de36"
+    },
+    {
+      "path": "realm/wildhaven/living.css",
+      "bytes": 6751,
+      "sha256": "84d77e2a7ffacfdf2698054dfddb1d32c21cef5ba49ee87dab25bcec4da398c2"
+    },
+    {
+      "path": "realm/wildhaven/path-choice.css",
+      "bytes": 2114,
+      "sha256": "6a3d777fcc78467006926ee7326865e17cb65f4886112f2d276e1616d59a0a80"
+    },
+    {
+      "path": "realm/wildhaven/clarity.css",
+      "bytes": 14200,
+      "sha256": "b99415587e66089e92005f73c567ea04a3f532a4c35f21212fc093182587718c"
+    },
+    {
+      "path": "realm/wildhaven/style.css",
+      "bytes": 27825,
+      "sha256": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c"
+    },
+    {
+      "path": "realm/wildhaven/tablet.css",
+      "bytes": 8207,
+      "sha256": "4b45cf052647d6c6943e8c6acccf69723be624c153147ad69a803012e48d0f0a"
+    },
+    {
+      "path": "realm/vendor/three/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "path": "realm/vendor/three/LICENSE",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "realm/vendor/three/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "path": "realm/vendor/three/README.md",
+      "bytes": 587,
+      "sha256": "29b90d082513832bdd53ff0426c62401054934035e12ced7eb67739b30f75b9f"
+    },
+    {
+      "path": "realm/vendor/three/GLTFLoader.js",
+      "bytes": 114732,
+      "sha256": "adbbafe8ce40416525b6be0ee5cac0d3782482bcf0122c8ca8ec1ffa77d3440b"
+    },
+    {
+      "path": "realm/vendor/three/BufferGeometryUtils.js",
+      "bytes": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751"
+    },
+    {
+      "path": "realm/wildhaven/js/companion-ui.js",
+      "bytes": 16879,
+      "sha256": "c00a1e9defd317bc4ab47ff40ad928eeb5fc5ae7bd4da52b88481eac75e6f087"
+    },
+    {
+      "path": "realm/wildhaven/js/town-ui.js",
+      "bytes": 41895,
+      "sha256": "5d9012428e8fb78f17cae4bbc33604e365875deb9764ca65c8cb4906ff47552f"
+    },
+    {
+      "path": "realm/wildhaven/js/path-choice.js",
+      "bytes": 1318,
+      "sha256": "9e35877d46301deea0805229ea4519d6f71d500da55dc1ab5dc71764471bbe63"
+    },
+    {
+      "path": "realm/wildhaven/js/world.js",
+      "bytes": 110457,
+      "sha256": "daba9ca0f2aaa2055aca3d22de17c48daee1371d494472729e4f53a0f72d5d28"
+    },
+    {
+      "path": "realm/wildhaven/js/sim.js",
+      "bytes": 66261,
+      "sha256": "4ec793830eab9162f3e3c3ec75b81193e90737179fd4225eacc52fe40a81b4fa"
+    },
+    {
+      "path": "realm/wildhaven/js/progression.js",
+      "bytes": 43951,
+      "sha256": "3ea66650191cfd6fe26b0126e86e10cce74c18be9295b1f2bd78d1eecef95994"
+    },
+    {
+      "path": "realm/wildhaven/js/clarity.js",
+      "bytes": 8615,
+      "sha256": "ef59fc298fe5348579e8f0880a157921f5818944bb4e2c984d2e721307826967"
+    },
+    {
+      "path": "realm/wildhaven/js/catalog.js",
+      "bytes": 18147,
+      "sha256": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77"
+    },
+    {
+      "path": "realm/wildhaven/js/discovery.js",
+      "bytes": 6497,
+      "sha256": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e"
+    },
+    {
+      "path": "realm/wildhaven/js/companion-store.js",
+      "bytes": 15742,
+      "sha256": "c0244952939235b497bec2ca6ddb713cb33a0a1b45b6015cc857c26700bc3b74"
+    },
+    {
+      "path": "realm/wildhaven/js/pressure.js",
+      "bytes": 14863,
+      "sha256": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20"
+    },
+    {
+      "path": "realm/wildhaven/js/fieldbook-ui.js",
+      "bytes": 9073,
+      "sha256": "b50d8b17e6e9765063424feacdb01a797924e4baa9c38d9ef2890b5b6e468554"
+    },
+    {
+      "path": "realm/wildhaven/js/clarity-ui.js",
+      "bytes": 1904,
+      "sha256": "cdd7374fc2427bd14cc65d5ab4b07d59b8023c4adb973d4b7e6ce1333775df6b"
+    },
+    {
+      "path": "realm/wildhaven/js/main.js",
+      "bytes": 41070,
+      "sha256": "1ad93782cf148deb16878b8a30d6fa0d1a9d68f41bfa3ccb515d9a0fde33d068"
+    },
+    {
+      "path": "realm/wildhaven/js/research-map.js",
+      "bytes": 6917,
+      "sha256": "0935f16b68f9d1edb94a3ad4188fab6464e36de95148f0173e7fdb8323b2b55e"
+    },
+    {
+      "path": "realm/wildhaven/js/audio.js",
+      "bytes": 14503,
+      "sha256": "8eaa22d36094c8aaba97412bbd1bd107267ebe4b2a646d997ef6937ef0383475"
+    },
+    {
+      "path": "realm/wildhaven/js/frontier.js",
+      "bytes": 72756,
+      "sha256": "910e01edc0eb74c91c7da1c84cbeec3bd0e938c1c4451e5586340f931658a006"
+    },
+    {
+      "path": "realm/wildhaven/js/island.js",
+      "bytes": 6339,
+      "sha256": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243"
+    },
+    {
+      "path": "realm/wildhaven/js/world-cues.js",
+      "bytes": 3813,
+      "sha256": "e9444937fca5792cc8c099d01d801314ef8f6a154dfba80c3bf28c5a8a99ed56"
+    },
+    {
+      "path": "realm/wildhaven/js/frontier-ui.js",
+      "bytes": 38756,
+      "sha256": "d90ceb12585e7a7489025022543c973f315a89be3ed92675b6c550b271694e08"
+    },
+    {
+      "path": "realm/wildhaven/assets/town-kit.glb",
+      "bytes": 6476180,
+      "sha256": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218"
+    },
+    {
+      "path": "realm/wildhaven/assets/frontier-kit.json",
+      "bytes": 6524,
+      "sha256": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04"
+    },
+    {
+      "path": "realm/wildhaven/assets/living-kit.glb",
+      "bytes": 1434160,
+      "sha256": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c"
+    },
+    {
+      "path": "realm/wildhaven/assets/living-kit.json",
+      "bytes": 7395,
+      "sha256": "c305b98c02a9129b2bba7bd24f83dbd021366bb20392b03d3b19362b4e225d7e"
+    },
+    {
+      "path": "realm/wildhaven/assets/village-kit.glb",
+      "bytes": 9004100,
+      "sha256": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+    },
+    {
+      "path": "realm/wildhaven/assets/village-kit.json",
+      "bytes": 5152,
+      "sha256": "01660a0a2362764f71b574c299902438a7943be92a715d842238147f9e105f1d"
+    },
+    {
+      "path": "realm/wildhaven/assets/town-kit.json",
+      "bytes": 8862,
+      "sha256": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794"
+    },
+    {
+      "path": "realm/wildhaven/assets/frontier-kit.glb",
+      "bytes": 6435640,
+      "sha256": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b"
+    }
+  ],
+  "passed": true,
+  "bytes": 26167778,
+  "sourceCommit": "1f50826ddb37465c6199a56f30b7247219fe4457"
+}

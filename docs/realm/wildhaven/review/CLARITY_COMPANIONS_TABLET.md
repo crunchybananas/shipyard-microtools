@@ -1,5 +1,7 @@
 # Wildhaven: clearer decisions, companion towns, and touch play
 
+> Follow-up independent release review: [RELEASE_REVIEW_2026-10-07.md](RELEASE_REVIEW_2026-10-07.md). Final source is `1f50826`, with 194 tests and additional touch fixes. The source references and paired captures below retain the first-pass checkpoint.
+
 This is a local review candidate for **Wildhaven**, the town/frontier resource RTS in `docs/realm/wildhaven`. It starts from published main `c3bbc7a03f86ca4de76d23b36d1dad1adc2a49a8` (the full verified revision is recorded in the source checkpoint). It does not change the older Realm game in `docs/realm/js`. No deployment, online service, invitation, or account was created.
 
 ## Player-facing changes
