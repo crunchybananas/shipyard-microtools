@@ -198,7 +198,7 @@ function updateInspector() {
     }
     if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(production.output)} per day` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(production.input)} per day` : ''}.`);
     if (spec.service) {
-      const reach = world.showServiceArea(selected.type, selected, selected.level);
+      const reach = world.showServiceArea(selected.type, selected, selected.level, { label: !matchMedia('(pointer: coarse)').matches });
       if (reach) details.push(`✓ ${reach.inRangeHomes} homes in reach · − ${reach.outsideHomes} outside. ${Math.round(reach.allocatedBeds || 0)} beds served / ${Math.round(reach.capacity || 0)} supplied capacity. Radius ${reach.radius}.`);
     }
     detail.textContent = details.join(' ');

@@ -171,7 +171,7 @@ export function cancelFortification(state,id) {
   const f=state.frontier.fortifications.find(v=>v.id===id);if(!f||f.faction!=='player'||f.status!=='building')return quote(false,'Choose an unfinished player defense.');
   const refund=Object.fromEntries(Object.entries(f.escrow).map(([r,n])=>[r,Math.floor(n*Math.max(0,1-f.progress/f.work))]));reward(state,refund);if(f.repairing){f.hp=Math.min(f.hp,f.repairStartHp);f.status=f.hp>0?'ready':'ruined';f.progress=f.work=FORTIFICATIONS[f.type].work;f.escrow={};f.repairing=false;}else state.frontier.fortifications=state.frontier.fortifications.filter(v=>v!==f);for(const u of state.frontier.units)if(u.targetId===id||u.order.targetId===id||u.breachId===id){u.targetId=null;u.breachId=null;u.order={type:u.kind==='engineer'?'build':'hold'};u.path=[];}state.frontier.projectiles=state.frontier.projectiles.filter(p=>p.targetId!==id);return quote(true,'Unused construction materials recovered.',{}, {refund});
 }
-export function repairOffer(state,id,ctx={}) {
+export function repairOffer(state,id,_ctx={}) {
   const f=state.frontier.fortifications.find(v=>v.id===id);if(!f||f.faction!=='player'||f.status==='building')return quote(false,'Choose a damaged completed defense.');
   const fraction=1-f.hp/f.maxHp,cost=Object.fromEntries(Object.entries(FORTIFICATIONS[f.type].cost).map(([r,n])=>[r,Math.ceil(n*fraction*.6)]).filter(([,n])=>n));
   if(fraction<EPS)return quote(false,'This defense is intact.',cost);
@@ -180,7 +180,7 @@ export function repairOffer(state,id,ctx={}) {
   return quote(enough(state,cost),enough(state,cost)?'Repair costs materials and takes a builder back to the site.':`Needs ${costText(cost)}.`,cost,{work:Math.max(4,Math.ceil(FORTIFICATIONS[f.type].work*fraction*.6))});
 }
 export function repairFortification(state,id,ctx={}) {const offer=repairOffer(state,id,ctx);if(!offer.ok)return offer;if(availableCitizens(state).length<=2&&!state.frontier.units.some(u=>u.kind==='engineer'&&alive(u)))return quote(false,'A builder and two available civilians are needed for repairs.',offer.cost);spend(state,offer.cost);const f=state.frontier.fortifications.find(v=>v.id===id);f.repairing=true;f.repairStartHp=f.hp;f.status='building';f.progress=0;f.work=offer.work;f.escrow={...offer.cost};ensureEngineer(state,ctx);return{...offer,fortification:f};}
-export function salvageOffer(state,id,ctx={}) {
+export function salvageOffer(state,id,_ctx={}) {
   const fort=state.frontier.fortifications.find(v=>v.id===id);
   if(!fort||fort.faction!=='player'||!['ready','ruined'].includes(fort.status))return quote(false,'Choose a completed or ruined player defense. Cancel unfinished work instead.');
   if(state.frontier.units.some(u=>alive(u)&&Math.round(u.x)===fort.x&&Math.round(u.z)===fort.z))return quote(false,'Let troops clear this defense before dismantling it.');

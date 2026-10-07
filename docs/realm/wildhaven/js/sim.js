@@ -6,7 +6,7 @@ import { createFrontierState, normalizeFrontier, frontierAssignments, tickFronti
 import { createPressureState, normalizePressure, tickPressure, dailyPressure, actOnPressure as pressureAction } from './pressure.js';
 export { pressureOptions } from './pressure.js';
 export { BUILDINGS, RESOURCE_NAMES } from './catalog.js';
-import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, islandShape, isLand, groundHeight, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
+import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, isLand, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, islandShape, isLand, groundHeight, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export const VERSION = 4;
 export const DAY_LENGTH = 90;

@@ -57,3 +57,23 @@ test('dragging pans but cannot tap, including capture loss during the drag', () 
   send('pointerdown'); send('pointermove', 1, 70, 55); assert.equal(pans.length, 1);
   send('lostpointercapture'); send('pointerup', 1, 70, 55); assert.equal(taps.length, 0);
 });
+
+test('either finger can continue panning after a pinch without jumping or placing', () => {
+  for (const released of [1, 2]) {
+    const { world, taps, pans, send } = input();
+    send('pointerdown', 1, 10, 20); send('pointerdown', 2, 100, 20);
+    send('pointermove', 1, -10, 25); send('pointermove', 2, 150, 25);
+    const remaining = released === 1 ? 2 : 1, startX = remaining === 1 ? -10 : 150;
+    send('pointerup', released, released === 1 ? -10 : 150, 25);
+    send('lostpointercapture', released);
+    assert.equal(world.pointers.size, 1);
+    send('pointermove', remaining, startX + 5, 29);
+    assert.deepEqual(pans, [[-5 * 20 / 800, -4 * 20 / 800 * 1.4]],
+      `Releasing finger ${released} must preserve only the remaining finger's new movement`);
+    send('pointerup', remaining, startX + 5, 29); send('lostpointercapture', remaining);
+    assert.equal(taps.length, 0, 'Finishing a pinch-to-pan gesture must not place a building');
+    assert.equal(world.pointers.size, 0);
+    send('pointerdown', 3); send('pointerup', 3);
+    assert.equal(taps.length, 1, 'The next independent tap still works');
+  }
+});

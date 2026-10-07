@@ -992,7 +992,17 @@ export class VillageWorld {
       if(drag){const dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5)drag.moved=true;if(drag.moved){if(drag.button===2)this.targetAzimuth-=dx*.008;else this.moveCamera(-dx*this.zoom/this.height,-dy*this.zoom/this.height*1.4);this.onCamera?.();}drag.lastX=e.clientX;drag.lastY=e.clientY;}
       if(!drag?.moved)this.onHover?.(this.pick(e.clientX,e.clientY),{x:e.clientX,y:e.clientY,pointerType:e.pointerType});
     });
-    c.addEventListener('pointerup',e=>{this.pointers.delete(e.pointerId);if(drag&&!drag.moved&&e.button===0&&this.pointers.size===0)this.onTap?.(this.pick(e.clientX,e.clientY),{pointerType:e.pointerType});if(!this.pointers.size)drag=null;});
+    c.addEventListener('pointerup',e=>{
+      const wasPinching=this.pointers.size===2;this.pointers.delete(e.pointerId);
+      if(wasPinching&&this.pointers.size===1){
+        // Either finger can remain after a pinch. Continue from its current
+        // position, keeping the whole gesture ineligible for a placement tap.
+        const remaining=this.pointers.values().next().value;
+        drag={...drag,x:remaining.x,y:remaining.y,lastX:remaining.x,lastY:remaining.y,moved:true};pinch=0;
+      }
+      if(drag&&!drag.moved&&e.button===0&&this.pointers.size===0)this.onTap?.(this.pick(e.clientX,e.clientY),{pointerType:e.pointerType});
+      if(!this.pointers.size)drag=null;
+    });
     const endGesture=()=>{this.pointers.clear();drag=null;pinch=0;};
     c.addEventListener('pointercancel',endGesture);
     // Normal pointerup already removed this pointer. Unexpected capture loss
