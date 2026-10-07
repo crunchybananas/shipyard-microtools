@@ -3627,15 +3627,23 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
   // modelCanopyMat — the 1:240 chart-table crowns: opaque closed lobes with the object-space
   // foliage dapple and needle grain the old crowns wore. An alpha test at four pixels mips a
   // tree into nothing, so the model keeps its silhouette solid.
-  const canopyMat = new THREE.MeshStandardMaterial({
+  // TWO SPECIES. One drawn bough for every silhouette made the stand read as one tree
+  // repeated; the fir fan and the hanging spruce twiglets are different textures on the same
+  // card geometry, and each silhouette names its card in forest-profile.js.
+  const makeCardMaterial = (card) => new THREE.MeshStandardMaterial({
     flatShading: false, roughness: 0.88, vertexColors: true, side: THREE.DoubleSide,
-    map: getTexture('needle_card'), alphaMap: getTexture('needle_alpha'), alphaTest: 0.34,
+    map: getTexture(card === 'spruce' ? 'needle_card_spruce' : 'needle_card'),
+    alphaMap: getTexture(card === 'spruce' ? 'needle_alpha_spruce' : 'needle_alpha'), alphaTest: 0.34,
   });
+  const canopyMat = makeCardMaterial('fir');
+  const spruceMat = makeCardMaterial('spruce');
+  const CARD_MAT = CANOPY.map((c) => (c.card === 'spruce' ? spruceMat : canopyMat));
   canopyMat.color = new THREE.Color(0xf4f6ee);
-  canopyMat.onBeforeCompile = (sh) => {
+  spruceMat.color = new THREE.Color(0xf4f6ee);
+  const cardPatch = (mat) => (sh) => {
     sh.uniforms.uTime = { value: 0 };
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
-    canopyMat.userData.shader = sh;
+    mat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
       vRim = aRim;                            // 0 at the trunk -> 1 at the frond tips
@@ -3672,7 +3680,10 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
         #include <fog_fragment>
       `);
   };
+  canopyMat.onBeforeCompile = cardPatch(canopyMat);
+  spruceMat.onBeforeCompile = cardPatch(spruceMat);
   canopyMat.customProgramCacheKey = () => 'needle-card-crown-v1';
+  spruceMat.customProgramCacheKey = () => 'needle-card-crown-v1';
 
   const modelCanopyMat = new THREE.MeshStandardMaterial({ flatShading: false, roughness: 0.85, vertexColors: true, side: THREE.DoubleSide });
   modelCanopyMat.color = new THREE.Color(0xe1e6d6);
@@ -3721,8 +3732,8 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
       `);
   };
   modelCanopyMat.customProgramCacheKey = () => 'model-crown-lobes-v1';
-  // main.js drives uTime/uHaze through the island's canopy material; the model's rides along
-  canopyMat.userData.siblings = [modelCanopyMat];
+  // main.js drives uTime/uHaze through the island's canopy material; the spruce's and the model's ride along
+  canopyMat.userData.siblings = [spruceMat, modelCanopyMat];
 
   const leanValues = new Float32Array(spots.length);
   trunkGeo.setAttribute('aTrunkLean', new THREE.InstancedBufferAttribute(leanValues, 1));
@@ -3751,8 +3762,8 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
   // places — the constructor, the partition's ternaries, the count assignment and the
   // name/visibility list — so adding a silhouette meant editing all four and the L4
   // surface-strip in puzzles.js, and forgetting any one of them fails silently.
-  const nearMesh = CANOPY.map((c, i) => new THREE.InstancedMesh(c.geo, canopyMat, vCount[i]));
-  const farMesh = CANOPY.map((c, i) => new THREE.InstancedMesh(c.farGeo, canopyMat, vCount[i]));
+  const nearMesh = CANOPY.map((c, i) => new THREE.InstancedMesh(c.geo, CARD_MAT[i], vCount[i]));
+  const farMesh = CANOPY.map((c, i) => new THREE.InstancedMesh(c.farGeo, CARD_MAT[i], vCount[i]));
   // ONE group, so everything that needs "the canopies" gets them all forever: swayMats
   // (main.js) reads the shared material off the first child, and the L4 surface-strip
   // (puzzles.js) hides the group instead of listing meshes it will one day not know about.

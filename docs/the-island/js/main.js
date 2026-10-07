@@ -2551,6 +2551,19 @@ renderer.setAnimationLoop((tMs) => {
     treeLodTimer = 0.35;
     if (MODE === 'title') core.userData.treeLod(camera.position.x, camera.position.z);   // the title's sea camera, not the beach spawn
     else core.userData.treeLod(player.pos.x, player.pos.z);
+    // GRASS DISTANCE CUT. A tuft is 0.5 m tall: past ~150 m it is under two pixels and
+    // 133k triangles of nothing from the gallery, the bluff or the title's sea camera. The
+    // island's nine culling chunks switch off by distance from the eye (never the 1:240
+    // model's, which sit a metre away on the table). Same 0.35 s clock, no hysteresis
+    // needed: a chunk's whole edge is sub-pixel where the cut falls.
+    if (refs.grass && refs.grass.children.length) {
+      const ex = camera.position.x, ez = camera.position.z;
+      for (const chunk of refs.grass.children) {
+        let c = chunk.userData.lodCenter;
+        if (!c) { chunk.computeBoundingSphere(); c = chunk.userData.lodCenter = chunk.boundingSphere ? { x: chunk.boundingSphere.center.x, z: chunk.boundingSphere.center.z, r: chunk.boundingSphere.radius } : { x: 0, z: 0, r: 1e9 }; }
+        chunk.visible = Math.hypot(c.x - ex, c.z - ez) - c.r < 150;
+      }
+    }
   }
   interact.update();
   interact.tickGlint(dt, elapsed);   // the hover glint eases in and out (see interact.js)

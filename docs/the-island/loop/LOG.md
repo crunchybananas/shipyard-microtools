@@ -4674,7 +4674,12 @@ first frame (camera drift in title mode; curtain lifts at boot; Begin continues 
 Continue covers its cut with the curtain; title idles at half rate, DPR 1, far LODs, no model
 clone). Trunk bark lightness narrowed to 0.33–0.48.
 
-**Debt:** the needle card is one drawn bough for all four profiles — a second card
+**Later still:** a second needle card (spruce: hanging twiglets, bluer, stiffer) on the same card
+geometry — forest-profile.js `card` names each silhouette's pair (fir: broad fir + sapling; spruce:
+slim spruce + storm elder); grass chunks cut past 150 m on the tree-LOD clock (title tris 598k →
+485k). Manifest 23 rows.
+
+**Debt:** the needle card is one drawn bough per species — a second card
 (a spruce's drooping twiglets) would separate the profiles further; the storm elder's bare
 trunk reads pale. Far crowns are now ~40% of near (was 25%) because the cards are the LOD.
 

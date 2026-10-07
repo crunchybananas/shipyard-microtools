@@ -207,3 +207,15 @@ renders half as often. `day2/before/title.jpg` → `day2/after/title.jpg`,
 
 **The trunks.** Per-trunk bark lightness ran to 0.6, and the lightest trunks beside the
 new dark crowns read as bleached driftwood poles. The range is 0.33–0.48 now.
+
+**Two species.** One drawn bough for all four silhouettes made the stand read as one
+tree repeated. A second card draws a spruce bough — forty shorter twiglets hanging back
+toward the root, stiffer blue-green needles — on the same routine, and each silhouette
+names its card: the broad fir and the sapling wear the fir fan, the slim spruce and the
+storm elder the spruce. Same card geometry, different material; the ridge from the beach
+is now firs and spruces. `day2/needle-card-spruce.png`, `day2/after/path-midslope.jpg`.
+
+**Grass distance cut.** A tuft is half a metre tall, under two pixels past 150 m, and the
+island's nine grass chunks were drawn from everywhere. They switch off by distance from
+the eye on the tree-LOD clock (never the model's, which sit a metre away on the table).
+The title's sea view lost a fifth of its triangles; nothing visible changed.

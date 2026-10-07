@@ -96,7 +96,7 @@ spare chair, carved bird mobile, stitched boat, tide bench and source cradle.
 It adds no texture images, external models or external asset licenses. The original
 12 WebGL textures and two CSS-native textures retain their original ownership;
 the imagegen shore timber below is the thirteenth WebGL texture.
-The manifest owns 21 WebGL assets: 15 textures and six models.
+The manifest owns 23 WebGL assets: 17 textures and six models.
 
 Source: `tools/blender/harbor-rooms.blend`. Generator:
 `tools/blender/harbor_rooms.py`, Blender 5.2.1 LTS. `geometry.json` records per-part
@@ -296,6 +296,12 @@ short needles a side, dark blue-green inside to a lighter yellow-green at the ti
 unlit colour over the body green so the alpha-tested edge never fringes black. The alpha
 is a separate greyscale JPEG so each file stays under the size contract; three.js reads
 the alpha map from its green channel. `needle-card-preview.png` composites the two.
+A second pair, `needle-card-spruce.jpg` (36,002 bytes) and `needle-alpha-spruce.jpg`
+(105,974 bytes), draws a spruce bough — forty shorter twiglets hanging back toward the
+root, stiffer blue-green needles — on the same routine (seed 20261007). Each silhouette
+names its card in `js/forest-profile.js`: the broad fir and the sapling wear the fir fan,
+the slim spruce and the storm elder the spruce, so the stand is two species rather than
+one bough repeated. The card geometry is shared; only the material differs.
 
 `js/encounter-sightline.js` now reads a card's coverage at the raycast hit, so a figure
 seen through the air between twigs counts as seen; any other solid still blocks outright.

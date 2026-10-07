@@ -1,6 +1,6 @@
-# Release gate on the day-two code, final — 2026-10-07 (M4, headless Chrome, real GPU)
+# Release gate on the final day-two code — 2026-10-07 (M4, headless Chrome, real GPU)
 
-## Full run (tools/harness/run.sh), end to end in one go
+## Full run (tools/harness/run.sh), end to end, exit 0
 == saves schema ==
 SAVES 24 / 24
 == coverage ==
@@ -63,4 +63,4 @@ ENCOUNTERS 8 / 8
 == the walk ==
 WALK PASS 69 / 69
 
-Unit tests 116 / 116 · asset contract 21 rows · console clean on every capture.
+Unit tests 116 / 116 · asset contract 23 rows · syntax green · console clean on every capture.

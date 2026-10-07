@@ -53,6 +53,18 @@ export const MANIFEST = {
     prompt: 'Conifer bough seen from above: central twig, 26 alternating forward-swept twiglets, short tapered needles fanned to both sides, dark blue-green inside to lighter yellow-green new growth at the tips, flat unlit colour over the body green.',
     wrap: 'clamp', colorSpace: 'srgb', anisotropy: 4,
   },
+  needle_card_spruce: {
+    kind: 'texture', file: 'needle-card-spruce.jpg', bytes: 36002,
+    license: 'project-original', source: 'procedural; tools/blender/needle_card.py (PIL, deterministic seed 20261007)',
+    prompt: 'Spruce bough seen from above: central twig, forty short twiglets hanging back toward the root, shorter stiffer blue-green needles, flat unlit colour over the body green.',
+    wrap: 'clamp', colorSpace: 'srgb', anisotropy: 4,
+  },
+  needle_alpha_spruce: {
+    kind: 'texture', file: 'needle-alpha-spruce.jpg', bytes: 105974,
+    license: 'project-original', source: 'procedural; tools/blender/needle_card.py (PIL, deterministic seed 20261007)',
+    prompt: 'Coverage mask of the spruce card above.',
+    wrap: 'clamp', colorSpace: 'linear', anisotropy: 4,
+  },
   needle_alpha: {
     kind: 'texture', file: 'needle-alpha.jpg', bytes: 104580,
     license: 'project-original', source: 'procedural; tools/blender/needle_card.py (PIL, deterministic seed 20261006)',

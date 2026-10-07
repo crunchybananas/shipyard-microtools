@@ -20,9 +20,15 @@ export default async function(h){
  // blocked fixed coordinate, and the Watcher is allowed to drift out of cover.
  await place('watcher',3,0,-78,14,-82);
  const canopy=await h.evaluate(`(async()=>{const{heightAt}=await import('./js/terrain.js');const{THREE,core,player,refs,game,W}=ABYME;core.updateMatrixWorld(true);const eye=player.camera.getWorldPosition(new THREE.Vector3()),ray=new THREE.Raycaster(),target=new THREE.Vector3();let site;
- for(const x of [14,13,15,12,16,11,17]){for(const z of [-82,-83,-81,-84,-80,-85]){target.set(x,heightAt(x,z)+1.48,z);ray.set(eye,target.clone().sub(eye).normalize());ray.far=eye.distanceTo(target)-.12;if(ray.intersectObject(core.children.find(o=>o.name==='canopies'),true).length){site={x,z};break;}}if(site)break;}
+ // The crowns are alpha-tested needle cards: a ray through a card quad may pass through the
+ // air between twigs, and the production sightline reads the card's coverage at the hit. So a
+ // real obstruction is one the production rule itself calls hidden — place the figure at each
+ // candidate and ask the sightline, exactly as the shore-rock fixture above does.
+ const f=refs.watcher;
+ for(const x of [14,13,15,12,16,11,17,10,18]){for(const z of [-82,-83,-81,-84,-80,-85,-79,-86]){target.set(x,heightAt(x,z)+1.48,z);ray.set(eye,target.clone().sub(eye).normalize());ray.far=eye.distanceTo(target)-.12;if(!ray.intersectObject(core.children.find(o=>o.name==='canopies'),true).length)continue;
+  f.position.set(x,heightAt(x,z),z);player.yaw=Math.atan2(player.pos.x-x,player.pos.z-z);player.pitch=Math.atan2(f.position.y+1.48-player.pos.y-player.eye,Math.hypot(player.pos.x-x,player.pos.z-z));player.syncCamera();core.updateMatrixWorld(true);
+  if(!game._encounterInView(player,f)){site={x,z};break;}}if(site)break;}
  if(!site)return{error:'No real branch obstruction found'};
- const f=refs.watcher;f.position.set(site.x,heightAt(site.x,site.z),site.z);player.yaw=Math.atan2(player.pos.x-site.x,player.pos.z-site.z);player.pitch=Math.atan2(f.position.y+1.48-player.pos.y-player.eye,Math.hypot(player.pos.x-site.x,player.pos.z-site.z));player.syncCamera();
  const samples=[];
  for(let i=0;i<60&&!W.flags.watcherSeen;i++){const hidden=!game._encounterInView(player,f),before=game._watcherRegard;game.tick(.05,40+i*.05);samples.push({hidden,before,after:game._watcherRegard,resolved:W.flags.watcherSeen});}
  return{site,samples};})()`);
