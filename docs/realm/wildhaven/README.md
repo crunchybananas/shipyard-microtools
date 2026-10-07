@@ -110,3 +110,5 @@ A displayed day now lasts six minutes at 1×. The original 90-second economy cyc
 V4 saves remain compatible. A validated calendar epoch preserves the current day and time on the first load of an older village, preserves earlier date labels, and prevents later reloads from re-anchoring the clock.
 
 Build and Town are now available in the bottom dock on all devices. The building catalogue opens on request and closes during placement. Home camera control lives beside the camera buttons; the large title is removed from the HUD. Generated transparent painted resource icons replace the CSS resource shapes. Their source prompt is in `assets/resource-icons-prompt.txt`; model-derived building and landmark thumbnails remain actual views of the 3D assets.
+
+The entry document versions its styles and native import-map module URLs together. Bump the shared `v` token in `index.html` for runtime releases so cached modules cannot mix old and new interface behavior. The 3D vendor library remains unchanged.
