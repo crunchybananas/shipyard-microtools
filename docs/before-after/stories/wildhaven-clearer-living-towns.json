@@ -5,8 +5,8 @@
   "appSlug": "realm",
   "surfaceSlug": null,
   "kind": "app",
-  "status": "in-revision",
-  "publishedAt": null,
+  "status": "published",
+  "publishedAt": "2026-10-06",
   "thesis": "A deep town simulation is more inviting when each choice shows its purpose and its next action.",
   "summary": "Clear building payoffs, visible service reach, an explorable research map, direct town paths, and a compact touch layout make the next decision easier to understand.",
   "versions": {
@@ -15,7 +15,7 @@
       "commit": "c3bbc7a03f86ca4de76d23b36d1dad1adc2a49a8"
     },
     "after": {
-      "label": "Clarity, companion towns and touch candidate",
+      "label": "Clarity review capture; released with final touch fixes",
       "commit": "dbae8edaba34a0b6c8e0c470051dae4a20aa008a"
     }
   },
@@ -30,7 +30,7 @@
       },
       "after": {
         "src": "assets/wildhaven-clearer-living-towns/after-well-selected.png",
-        "alt": "Local Wildhaven candidate: see which homes a well reaches after the clarity pass."
+        "alt": "Wildhaven clarity checkpoint: see which homes a well reaches after the clarity pass."
       }
     },
     {
@@ -43,7 +43,7 @@
       },
       "after": {
         "src": "assets/wildhaven-clearer-living-towns/after-windmill.png",
-        "alt": "Local Wildhaven candidate: know what the windmill does after the clarity pass."
+        "alt": "Wildhaven clarity checkpoint: know what the windmill does after the clarity pass."
       }
     },
     {
@@ -56,7 +56,7 @@
       },
       "after": {
         "src": "assets/wildhaven-clearer-living-towns/after-council.png",
-        "alt": "Local Wildhaven candidate: choose a direction without guessing after the clarity pass."
+        "alt": "Wildhaven clarity checkpoint: choose a direction without guessing after the clarity pass."
       }
     },
     {
@@ -69,7 +69,7 @@
       },
       "after": {
         "src": "assets/wildhaven-clearer-living-towns/after-phone-trade.png",
-        "alt": "Local Wildhaven candidate: put usable trade choices within reach after the clarity pass."
+        "alt": "Wildhaven clarity checkpoint: put usable trade choices within reach after the clarity pass."
       }
     }
   ],
@@ -101,12 +101,12 @@
   ],
   "builderNote": {
     "quote": "Show the consequence and the next button where the player makes the decision.",
-    "context": "Implementation principle from this pass, not an owner endorsement. Fresh control play, earned mature fixtures and pure regression tests are separate evidence. The candidate has not been deployed. iPad viewport and touch emulation do not establish native Safari, hardware-keyboard or sustained physical-device performance. Paired gameplay state matches exactly after excluding the deliberately repaired journal fields."
+    "context": "Implementation principle from this pass, not an owner endorsement. Captures retain their exact reviewed source revision; the released source also includes final touch-label and pinch-continuity fixes. Fresh control play, earned mature fixtures and pure regression tests are separate evidence. iPad touch emulation does not establish native Safari, keyboard behavior or sustained physical-device performance. Earned-fixture pairs preserve gameplay state exactly apart from the repaired journal fields. Final runtime source: 1f50826ddb37465c6199a56f30b7247219fe4457."
   },
   "proof": [
     {
       "label": "Aggregate game regression suite",
-      "value": "See source-pinned review checkpoint"
+      "value": "194 tests pass; all 20 game modules pass supplemental lint"
     },
     {
       "label": "Real controls and earned saves",
@@ -118,7 +118,7 @@
     },
     {
       "label": "Publication",
-      "value": "Local review candidate"
+      "value": "Reviewed release · companion towns share this device"
     }
   ],
   "links": {
@@ -127,7 +127,7 @@
     "download": "assets/wildhaven-clearer-living-towns/social.png"
   },
   "share": {
-    "summary": "Clear building payoffs, visible service reach, an explorable research map, direct town paths, and a compact touch layout make the next decision easier to understand. Local candidate under review; companion towns share this device only.",
+    "summary": "Clear building payoffs, visible service reach, an explorable research map, direct town paths, and a compact touch layout make the next decision easier to understand. Companion towns share this device; native iPad validation remains.",
     "image": "assets/wildhaven-clearer-living-towns/social.png"
   }
 }
