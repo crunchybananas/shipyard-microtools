@@ -3796,7 +3796,7 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
     trunks.setMatrixAt(i, tm4);
     // per-trunk bark tone (loop #141): warm browns, light↔dark, so the trunks aren't 131 identical
     // poles; multiplies the shared bark albedo. Uses the separate br() rng (canopy tone unchanged).
-    bark.setHSL(0.055 + br() * 0.05, 0.28 + br() * 0.24, 0.40 + br() * 0.2);
+    bark.setHSL(0.055 + br() * 0.05, 0.28 + br() * 0.24, 0.33 + br() * 0.15);   // (was .40-.60: the lightest trunks read as bleached driftwood poles beside the dark needle crowns)
     trunks.setColorAt(i, bark);
     addCollider(x, z, 0.3 * s * CANOPY[variant[i]].scale);   // the trunk is solid — you walked through every tree in the forest
     // A pale botanical tint rather than a second full foliage colour: multiplying two

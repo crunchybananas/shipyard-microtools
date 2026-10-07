@@ -624,6 +624,8 @@ UI.init({ notebook });
 
 // ---------------- modes ----------------
 let MODE = 'title';
+let titleShown = false;   // the curtain lifts once, on the first title frame
+let titleDprDropped = false, titleFrame = 0;
 let intro = null;
 let dive = null;
 let finale = null;
@@ -718,6 +720,10 @@ btnContinue.addEventListener('click', () => {
     const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen', 6: 'keeperSong' };
     for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
     dismissTitle();
+    // The title now shows the live sea; a hard cut from it to the saved stance would show
+    // through the fading card. Close the curtain fast, set the stance at once (state first,
+    // so nothing waits on a timer), and lift the curtain on the player half a second later.
+    UI.fadeOut(false, true);
     const savedPos = W.playerPos || new THREE.Vector3(4, 0, -104);
     const pos = W.tideTarget > 1
       ? spawnAboveWater(savedPos.clone(), player.eye, W.tideTarget)
@@ -731,7 +737,7 @@ btnContinue.addEventListener('click', () => {
     player.locked = false;
     interact.enabled = true;
     MODE = 'play';
-    UI.fadeIn();
+    scheduleRun(() => UI.fadeIn(), 480);
     if (W.flags.endingCommitted) commitEnding(W.disposition);
     else UI.showHint();
   }
@@ -2450,13 +2456,14 @@ function tickModelGate(dt) {
   modelGateTimer = 0.25;
   modelGateMode = MODE;
   const dx = player.pos.x - SPOTS.lighthouse.x, dz = player.pos.z - SPOTS.lighthouse.y;
-  modelRoot.visible = MODE !== 'play' || (dx * dx + dz * dz < MODEL_GATE_R2);
+  modelRoot.visible = MODE !== 'title' && (MODE !== 'play' || (dx * dx + dz * dz < MODEL_GATE_R2));   // the title's sea view never needs the chart-table clone
 }
 
 renderer.setAnimationLoop((tMs) => {
   const nowMs = tMs ?? performance.now();
   if (nowMs < nextTickMs - TICK_SLOP_MS) return; // 60fps cap, remainder-carrying (see above)
   nextTickMs = Math.max(nextTickMs + TICK_MS, nowMs); // book one tick; a stall re-bases, never banks debt
+  if (MODE === 'title' && (++titleFrame & 1)) return;   // the title idles at half rate (see the title block below)
   renderer.info.reset();                 // autoReset is off — one reset per tick = whole-frame stats
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
@@ -2464,9 +2471,39 @@ renderer.setAnimationLoop((tMs) => {
 
   // #77: collision reads GATES, not W — one unmissable sync at the top of the frame
   syncGates(W);
+  if (titleDprDropped && MODE !== 'title') {   // the title's idle economy ends with the title, however it was left
+    titleDprDropped = false;
+    renderer.setPixelRatio(BASE_DPR); composer.setPixelRatio(BASE_DPR);
+    core.userData.treeLod?.(player.pos.x, player.pos.z);
+  }
   // idle drift of the sun — barely perceptible, but the island lives
   if (MODE === 'play') W.time = (W.time + W.timeDrift * dt) % 24;
   if (MODE === 'play') A.musicTo(W.level);   // the generative era bed retargets with the descent
+
+  // THE TITLE IS A WINDOW. Behind the title card the renderer used to draw from the camera's
+  // default (0,0,0) — underground — behind an opaque black curtain, so the first thing a
+  // player saw was a flat navy rectangle. The card is translucent now and the camera holds
+  // at the approach's first frame, riding the swell on the open sea at dawn with the island a
+  // low shape in the haze: Begin continues from exactly here, with no cut.
+  if (MODE === 'title') {
+    if (!titleShown) {
+      titleShown = true; UI.fadeIn();
+      // A title screen can sit for minutes, so it idles cheaply (power policy): every crown
+      // to its far LOD for a camera 300 m out, the drawing buffer at DPR 1, and only every
+      // other tick rendered — the swell under a dim card does not need 60 of them.
+      renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); composer.setPixelRatio(Math.min(BASE_DPR, 1.0));
+      titleDprDropped = true;
+    }
+    INTRO_PATH.getPoint(0, camera.position);
+    const sway = W.reduceMotion ? 0 : 1;
+    camera.position.x += Math.sin(elapsed * 0.11) * 1.6 * sway;
+    camera.position.y += Math.sin(elapsed * 0.9) * 0.35 * sway;
+    camera.position.z += Math.cos(elapsed * 0.08) * 1.6 * sway;
+    INTRO_LOOK.getPoint(0, _introLookV);
+    _introLookV.x += Math.sin(elapsed * 0.06) * 9 * sway;
+    camera.lookAt(_introLookV);
+    camera.rotation.z += Math.sin(elapsed * 0.55 + 1.7) * 0.012 * sway;
+  }
 
   if (MODE === 'intro' && intro) {
     intro.t += dt;
@@ -2512,7 +2549,8 @@ renderer.setAnimationLoop((tMs) => {
   treeLodTimer -= dt;
   if (treeLodTimer <= 0 && core.userData.treeLod) {
     treeLodTimer = 0.35;
-    core.userData.treeLod(player.pos.x, player.pos.z);
+    if (MODE === 'title') core.userData.treeLod(camera.position.x, camera.position.z);   // the title's sea camera, not the beach spawn
+    else core.userData.treeLod(player.pos.x, player.pos.z);
   }
   interact.update();
   interact.tickGlint(dt, elapsed);   // the hover glint eases in and out (see interact.js)

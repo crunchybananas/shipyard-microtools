@@ -1,6 +1,6 @@
-# Release gate on the day-two code — 2026-10-07 (M4, headless Chrome, real GPU)
+# Release gate on the day-two code, final — 2026-10-07 (M4, headless Chrome, real GPU)
 
-## Full run (tools/harness/run.sh)
+## Full run (tools/harness/run.sh), end to end in one go
 == saves schema ==
 SAVES 24 / 24
 == coverage ==
@@ -37,36 +37,30 @@ GULLS 11 / 11
 VAULT-OUTCROP 8 / 8
 == the trees ==
 TREES 16 / 16
-TREES FAILED
-(TREES FAILED above is run.sh's hard-coded 'TREES 13 / 13' string; the script itself reported 16 / 16 and run.sh now expects 16.)
-
-## The scripts after trees, in two fresh-browser batches (tools/harness/one.sh)
-== tabletop.mjs ==
+== the tabletop ==
 TABLETOP 29 / 29
 TABLETOP OK
-== glare.mjs ==
+== the glare ==
 GLARE 8 / 8
-== spines.mjs ==
+== the signal index ==
 SPINES 20 / 20
-== glint.mjs ==
+== the hover glint ==
 GLINT 25 / 25
-== harbor.mjs ==
+== the inhabited room ==
 HARBOR 11 / 11
-== landfall.mjs ==
+== the tower and underground rooms ==
 LANDFALL 21 / 21
-=== BATCH D rc=0 ===
-== working-coast.mjs ==
+== the working coast ==
 WORKING COAST 10 / 10
-== shore-details.mjs ==
+== the landing-beach details ==
 SHORE DETAILS 18 / 18
-== cohesion.mjs ==
+== human scale and keyboard circulation ==
 COHESION 9 / 9
-== handwork.mjs ==
+== grounded keeper and refuge handwork ==
 HANDWORK 11 / 11
-== encounters.mjs ==
+== visible coastal encounters ==
 ENCOUNTERS 8 / 8
-== walk.mjs ==
+== the walk ==
 WALK PASS 69 / 69
-=== BATCH E rc=0 ===
 
 Unit tests 116 / 116 · asset contract 21 rows · console clean on every capture.

@@ -137,7 +137,8 @@ gave the drowned hall weathered stone, the drained bay a mud floor, the cliffs a
 face, the east room a plastered wall and a ceiling, and stopped the lantern gallery from
 blowing out to white at night. It also measured and rejected a multisampled post chain.
 Its second day rebuilt the conifer crowns as textured needle cards, the drowned channel's
-bell-buoy as a real iron buoy, and gave the cellar walls their damp and their staining.
+bell-buoy as a real iron buoy, gave the cellar walls their damp and their staining, and
+made the title screen a window over the live sea.
 
 ## Current visual and walking review
 

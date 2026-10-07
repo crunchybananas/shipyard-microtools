@@ -191,3 +191,19 @@ courses, and a tide mark where the drowned years stood. `day2/before/drain-chamb
 Also fixed on the way: the regard sightline treated a card's transparent texels as
 solid, so a figure seen through the gap between two twigs would not have counted as
 seen. It reads the card's coverage at the hit now.
+
+**The title screen.** The first thing a player saw was a flat navy rectangle: behind the
+card the renderer drew from the camera's default position, underground, behind an opaque
+black curtain. The card is a window now. The camera holds at the approach's first frame,
+riding the swell on the open sea at dawn with the islet and its stones low in the haze,
+and the card only dims it enough to carry the type; Begin continues from exactly that
+frame with no cut, and Continue closes the curtain for half a second so the jump to the
+saved stance never shows through the fading card. Because a title can sit for minutes,
+it idles cheaply: every crown at its far LOD for a camera 300 m out, the drawing buffer at
+DPR 1, the chart-table clone hidden, and only every other tick rendered. Measured on the
+M4 at DPR 1.5 the title's rendered frame is cheaper than standing on the beach, and it
+renders half as often. `day2/before/title.jpg` → `day2/after/title.jpg`,
+`day2/after/title-begin.jpg`.
+
+**The trunks.** Per-trunk bark lightness ran to 0.6, and the lightest trunks beside the
+new dark crowns read as bleached driftwood poles. The range is 0.33–0.48 now.

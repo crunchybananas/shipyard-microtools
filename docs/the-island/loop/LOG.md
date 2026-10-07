@@ -4669,6 +4669,11 @@ mottle + streaks + tide mark. Trees gate rewritten for the mechanism (16/16); wo
 
 **Evidence:** loop/player-walk/2026-10-06/day2/ (before/after), REPORT.md "Day two".
 
+**Also:** the title screen is a translucent window over the live dawn sea at the approach's
+first frame (camera drift in title mode; curtain lifts at boot; Begin continues seamlessly;
+Continue covers its cut with the curtain; title idles at half rate, DPR 1, far LODs, no model
+clone). Trunk bark lightness narrowed to 0.33–0.48.
+
 **Debt:** the needle card is one drawn bough for all four profiles — a second card
 (a spruce's drooping twiglets) would separate the profiles further; the storm elder's bare
 trunk reads pale. Far crowns are now ~40% of near (was 25%) because the cards are the LOD.
