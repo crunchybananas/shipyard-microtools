@@ -71,7 +71,7 @@ test('next action accounts for upgraded school upkeep and paused water service',
   const state = createGame(); state.won = true;
   const school = { id: 'b9', type: 'school', status: 'ready', level: 3, workerIds: [], production: { efficiency: 0 } };
   state.buildings.push(school);
-  assert.match(nextTownStep(state, { step: 5 }, villageNeeds(state)).count, /5\.4 food/);
+  assert.match(nextTownStep(state, { step: 5 }, villageNeeds(state)).count, /3\.6 food\/min/);
   school.production.efficiency = 1; state.research.completed = ['cultivation', 'joinery', 'barter']; state.resources.food = 40;
   state.buildings.push({ id: 'b10', type: 'well', status: 'ready', level: 1, paused: true });
   assert.equal(nextTownStep(state, { step: 5 }, villageNeeds(state)).buildingId, 'b10');

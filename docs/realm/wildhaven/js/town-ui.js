@@ -1,3 +1,4 @@
+import { calendarDay, perMinute, perMinuteGoods, until } from './calendar.js';
 import * as sim from './sim.js';
 import { BUILDINGS, RESOURCES, RESOURCE_NAMES, JOBS, getBuildingSpec } from './catalog.js';
 import * as progression from './progression.js';
@@ -97,14 +98,14 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     }); return nodes;
   }
   function storesContent(state) {
-    const daily = sim.rates(state), needs = sim.villageNeeds(state), nodes = [el('p', 'town-intro', 'Made or imported goods enter these stores automatically. Daily rates reflect workers and supplies. A warehouse increases capacity.')];
+    const daily = sim.rates(state), needs = sim.villageNeeds(state), nodes = [el('p', 'town-intro', 'Made or imported goods enter these stores automatically. Rates are per minute at 1× and reflect workers and supplies. A warehouse increases capacity.')];
     for (const key of RESOURCE_NAMES) {
-      const row = el('div', 'stock-row'), label = el('div'), amount = el('span', 'stock-amount'), rate = daily[key] || 0;
+      const row = el('div', 'stock-row'), label = el('div'), amount = el('span', 'stock-amount'), rate = perMinute(daily[key] || 0);
       row.dataset.resource = key;
       label.append(el('strong', '', RESOURCES[key].name));
-      if (key === 'food') label.append(el('small', 'stock-note', `${Math.round(daily.foodConsumed * 10) / 10} eaten each day`));
+      if (key === 'food') label.append(el('small', 'stock-note', `${Math.round(perMinute(daily.foodConsumed) * 10) / 10} eaten per minute`));
       amount.append(document.createTextNode(format(state.resources[key]))); if (RESOURCES[key].physical) amount.append(el('em', '', ` / ${format(daily.storage[key])}`));
-      row.append(label, amount, el('span', `stock-rate${rate < 0 ? ' negative' : ''}`, `${rate >= 0 ? '+' : ''}${Math.round(rate * 10) / 10} / day`)); nodes.push(row);
+      row.append(label, amount, el('span', `stock-rate${rate < 0 ? ' negative' : ''}`, `${rate >= 0 ? '+' : ''}${Math.round(rate * 10) / 10} / min`)); nodes.push(row);
       if (key === 'tools') {
         label.append(el('small', 'stock-note', 'Made by a toolmaker · or bought at market'));
         const help = el('div', 'stock-tools-help'), controls = el('div', 'town-row-actions'), chain = disclosure('tools-chain', 'Make tools locally');
@@ -155,7 +156,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     }
     const choices = {
       breadbasket: { title: 'Food town', icon: 'farm', payoff: '+25% food workplaces & flax', tradeoffs: 'Industry output −10% · Residents eat 5% more.' },
-      freeport: { title: 'Trading town', icon: 'market', payoff: '+30% landing cargo & trade coin', tradeoffs: 'Imports 15% cheaper · 3 shipments per offer/day · 1 extra arrival when needs are met · Food workplaces & flax −10%.' },
+      freeport: { title: 'Trading town', icon: 'market', payoff: '+30% landing cargo & trade coin', tradeoffs: 'Imports 15% cheaper · 3 shipments per supply boat · 1 extra arrival when needs are met · Food workplaces & flax −10%.' },
       forge: { title: 'Craft town', icon: 'toolmaker', payoff: '+25% industry output', tradeoffs: 'Residents eat 15% more · 1 fewer arrival per opportunity.' },
     };
     for (const policy of progression.policyOptions(state)) {
@@ -211,7 +212,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     for (const [id, name] of [['landing','Landing'], ['orders','Orders'], ['market','Buy / sell'], ['routes','Voyages']]) jumps.append(btn(name, `trade-jump-${id}`, () => { const target = $('town-book-content').querySelector(`[data-trade-section="${id}"]`); if (target?.tagName === 'DETAILS') target.open = true; target?.scrollIntoView({ block: 'start' }); }));
     nodes.push(jumps);
     const tradeHeading = (name, id) => { const heading = el('h3', 'town-section', name); heading.dataset.tradeSection = id; return heading; };
-    nodes.push(tradeHeading('Today at the landing', 'landing'));
+    nodes.push(tradeHeading('At the landing', 'landing'));
     const offers = el('div', 'town-row-actions landing-offers');
     for (const key of ['wood', 'stone']) { const offer = sim.tradeOffer(state, key); offers.append(btn(`12 food → ${offer.amount} ${RESOURCES[key].name.toLowerCase()}`, `landing-${key}`, () => action(() => sim.trade(state, key)), { disabled: !offer.ok })); }
     nodes.push(offers, el('p', 'town-meta', sim.tradeOffer(state, 'wood').reason));
@@ -219,19 +220,19 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     for (const contract of rankContracts(progression.contractOptions(state), state.resources)) {
       const row = el('div', 'town-row contract-card'), ready = Object.entries(contract.requirements).every(([key, n]) => state.resources[key] >= n);
       row.append(el('strong', '', contract.title), el('p', 'contract-flow', `${resourceText(contract.requirements)} → ${resourceText(contract.reward)}`));
-      if (contract.status === 'active') row.append(el('p', 'contract-deadline', `Due day ${contract.deadline} · ${Math.max(0, contract.deadline - state.day)} days left`));
+      if (contract.status === 'active') row.append(el('p', 'contract-deadline', `Due in ${until(state, contract.deadline + 1)} at 1×`));
       else if (ready) row.append(el('span', 'job-tag', 'Cargo in store · ready to accept'));
-      row.append(btn(contract.status === 'active' ? 'Deliver the order' : `Accept · ${contract.duration} days to deliver`, `contract-${contract.id}`, () => action(() => contract.status === 'active' ? progression.completeContract(state, contract.id) : progression.acceptContract(state, contract.id)), { disabled: contract.status === 'active' ? !contract.canComplete : !contract.canAccept, className: 'primary' }));
+      row.append(btn(contract.status === 'active' ? 'Deliver the order' : `Accept · ${until(state, contract.deadline + 1)} to deliver`, `contract-${contract.id}`, () => action(() => contract.status === 'active' ? progression.completeContract(state, contract.id) : progression.acceptContract(state, contract.id)), { disabled: contract.status === 'active' ? !contract.canComplete : !contract.canAccept, className: 'primary' }));
       if (contract.status === 'active' && !contract.canComplete || contract.status !== 'active' && !contract.canAccept) row.append(el('p', 'town-meta', contract.reason)); nodes.push(row);
     }
     const imports = progression.importOptions(state), exports = progression.exportOptions(state), hasMarket = state.buildings.some(b => b.type === 'market' && b.status === 'ready');
     const market = disclosure('market-trade', hasMarket ? 'Harbor counter · buy & sell' : 'Buy & sell cargo · needs a supplied market', hasMarket); market.dataset.tradeSection = 'market';
-    market.append(el('p', 'town-meta', 'Staff and supply a market to exchange cargo for coin. Quotes include your charter; quotas reset each day.'));
+    market.append(el('p', 'town-meta', 'Staff and supply a market to exchange cargo for coin. Quotes include your charter; quotas reset every 90 seconds at 1×.'));
     if (!hasMarket) market.append(btn(state.research.completed.includes('barter') ? 'Build a market hall' : 'Study Fair measures', 'market-unlock', () => state.research.completed.includes('barter') ? build('market') : revealResearch('barter')));
     for (const [label, list, buying] of [['Buy cargo', imports, true], ['Sell a surplus', exports, false]]) {
       const section = tradeHeading(label, buying ? 'imports' : 'exports'); market.append(section);
       for (const offer of list) {
-        const row = el('div', 'market-quote'), detail = el('div'); detail.append(el('strong', '', `${resourceText(offer.cost)} → ${resourceText(offer.reward)}`), el('small', '', `${offer.remaining} / ${offer.dailyLimit} shipments left today`));
+        const row = el('div', 'market-quote'), detail = el('div'); detail.append(el('strong', '', `${resourceText(offer.cost)} → ${resourceText(offer.reward)}`), el('small', '', `${offer.remaining} / ${offer.dailyLimit} shipments on this boat`));
         row.append(detail, btn(buying ? 'Buy cargo' : 'Sell cargo', `${buying ? 'import' : 'export'}-${offer.id}`, () => action(() => buying ? progression.importGoods(state, offer.id) : progression.exportGoods(state, offer.id)), { disabled: !offer.ok }));
         if (!offer.ok) row.append(el('p', 'town-meta', offer.reason)); market.append(row);
       }
@@ -239,8 +240,8 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     nodes.push(market);
     const routes = progression.routeOptions(state), voyages = disclosure('voyages', state.research.completed.includes('coastal_routes') ? 'Voyages along the coast' : 'Voyages · study Coastal partnerships', routes.some(r => r.active || r.canDispatch)); voyages.dataset.tradeSection = 'routes';
     for (const route of routes) {
-      const row = el('div', 'town-row'); row.append(el('strong', '', route.name), el('p', 'contract-flow', `${resourceText(route.cargo)} → ${resourceText(route.reward)}`), el('p', 'town-meta', `${route.duration} days at sea · trust ${route.trust}/${route.requiredTrust}`));
-      if (route.active) row.append(el('p', 'contract-deadline', `At sea · expected day ${route.returnDay}`));
+      const row = el('div', 'town-row'); row.append(el('strong', '', route.name), el('p', 'contract-flow', `${resourceText(route.cargo)} → ${resourceText(route.reward)}`), el('p', 'town-meta', `${until(state, route.returnDay)} at sea at 1× · trust ${route.trust}/${route.requiredTrust}`));
+      if (route.active) row.append(el('p', 'contract-deadline', `At sea · back in ${until(state, route.returnDay)} at 1×`));
       else { row.append(btn('Send a voyage', `route-${route.id}`, () => action(() => progression.dispatchRoute(state, route.id)), { disabled: !route.canDispatch, className: 'primary' })); if (!route.canDispatch) row.append(el('p', 'town-meta', route.reason)); }
       voyages.append(row);
     }
@@ -265,7 +266,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
         step.querySelectorAll('button')[0].setAttribute('aria-label', 'Request one fewer coastal guard'); step.querySelectorAll('button')[1].setAttribute('aria-label', 'Request one more coastal guard');
         control.append(label, step); row.append(control);
         const names = state.citizens.filter(c => c.workplace === b.id && c.job === 'guard').map(c => c.name);
-        row.append(el('p', 'guard-names', names.length ? `On the watch: ${names.join(', ')}` : 'No residents assigned here.'), el('p', 'town-meta', `${Math.round((daily.buildings[b.id]?.input.food || 0) * 10) / 10} food/day for watch supplies · ${spec.recipe.input.food} at full staffing`));
+        row.append(el('p', 'guard-names', names.length ? `On the watch: ${names.join(', ')}` : 'No residents assigned here.'), el('p', 'town-meta', `${Math.round(perMinute(daily.buildings[b.id]?.input.food || 0) * 10) / 10} food/min for watch supplies · ${Math.round(perMinute(spec.recipe.input.food) * 10) / 10} at full staffing`));
         if (status.blockedReason) row.append(el('p', 'problem', status.blockedReason));
         if (status.workers < status.desiredWorkers) row.append(el('p', 'problem', 'Requested posts are unfilled. Free residents from other work or raise this workplace’s priority.'));
         const controls = el('div', 'town-row-actions');
@@ -275,9 +276,9 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       return box;
     }
     if (!incident) {
-      nodes.push(el('p', 'town-empty', 'Quiet water. A chance to prepare.'), el('p', 'town-intro', coast.nextIncidentDay ? `Lookouts expect unfamiliar sails around day ${coast.nextIncidentDay}. Keep a reserve of food and building supplies, or establish a standing watch.` : 'After the bell and twenty residents, coastal crews begin demanding cargo. You can supply them, shelter stores or prepare guards.'), watchStaffing());
+      nodes.push(el('p', 'town-empty', 'Quiet water. A chance to prepare.'), el('p', 'town-intro', coast.nextIncidentDay ? `Lookouts expect unfamiliar sails in ${until(state, coast.nextIncidentDay)} at 1×. Keep a reserve of food and building supplies, or establish a standing watch.` : 'After the bell and twenty residents, coastal crews begin demanding cargo. You can supply them, shelter stores or prepare guards.'), watchStaffing());
     } else {
-      const heading = el('div', 'coastal-warning'); heading.append(el('small', '', `Arrival day ${incident.deadline} · ${incident.daysLeft.toFixed(1)} days left`), el('h3', '', incident.title), el('p', 'problem', `Cargo at risk: ${resourceText(incident.projectedLoss)}`)); nodes.push(heading);
+      const heading = el('div', 'coastal-warning'); heading.append(el('small', '', `Arrival in ${until(state, incident.deadline)} at 1×`), el('h3', '', incident.title), el('p', 'problem', `Cargo at risk: ${resourceText(incident.projectedLoss)}`)); nodes.push(heading);
       const choices = el('div', 'watch-decisions');
       const pay = el('section'); pay.append(el('strong', '', 'Provision the crew'), el('p', '', `${resourceText(incident.demand)} → warning ends now`), btn('Pay the demand', 'pressure-pay', () => action(() => sim.actOnPressure(state, 'pay')), { disabled: !incident.canPay, className: 'primary' }));
       if (!incident.canPay) pay.append(el('small', '', incident.payReason)); choices.append(pay);
@@ -286,11 +287,11 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       shelter.append(el('small', '', 'The warning continues.')); if (!incident.canShelter && !incident.sheltered) shelter.append(el('small', '', incident.shelterReason)); choices.append(shelter);
       const defend = el('section'); defend.append(el('strong', '', 'Send the prepared watch'), el('p', '', `${incident.readiness.toFixed(1)} / ${incident.requiredReadiness} readiness · patrol ${Math.floor(incident.preparedness * 100)}%`), btn('Repel the crew', 'pressure-defend', () => action(() => sim.actOnPressure(state, 'defend')), { disabled: !incident.canDefend, className: 'primary' }));
       defend.append(el('small', '', `${resourceText(incident.reward)} + 1 ${incident.partner} trust. Automatic at the deadline if still ready.`)); choices.append(defend); nodes.push(choices);
-      const patrol = el('div', 'town-row'); patrol.append(el('strong', '', `${incident.guards} supplied guards · ${incident.readiness.toFixed(1)} / ${incident.requiredReadiness} readiness`), progressBar(incident.preparedness), el('p', '', `Patrol ${Math.floor(incident.preparedness * 100)}% prepared · at least one game day with enough supplied guards.`), el('p', 'town-meta', incident.defendReason), watchStaffing()); nodes.push(patrol);
-      const risk = disclosure('coast-risk', 'Cargo exposure & recovery'); risk.append(el('p', 'town-meta', `Maximum loss: ${resourceText(incident.maximumLoss)}. Warehouses reduce exposure by ${Math.round(incident.warehouseProtection * 100)}%. A failed defense leaves people and buildings intact and grants five quiet days.`)); nodes.push(risk);
+      const patrol = el('div', 'town-row'); patrol.append(el('strong', '', `${incident.guards} supplied guards · ${incident.readiness.toFixed(1)} / ${incident.requiredReadiness} readiness`), progressBar(incident.preparedness), el('p', '', `Patrol ${Math.floor(incident.preparedness * 100)}% prepared · 90 seconds at 1× with enough supplied guards.`), el('p', 'town-meta', incident.defendReason), watchStaffing()); nodes.push(patrol);
+      const risk = disclosure('coast-risk', 'Cargo exposure & recovery'); risk.append(el('p', 'town-meta', `Maximum loss: ${resourceText(incident.maximumLoss)}. Warehouses reduce exposure by ${Math.round(incident.warehouseProtection * 100)}%. A failed defense leaves people and buildings intact and grants a recovery interval of up to 7m 30s at 1×.`)); nodes.push(risk);
     }
     const history = disclosure('coastal-history', `Coastal record · ${coast.totals.defended} defenses · ${coast.totals.paid} paid · ${coast.totals.losses} raids`);
-    for (const record of [...(state.pressure?.history || [])].reverse().slice(0, 8)) { const row = el('div', 'town-row'); row.append(el('strong', '', `Day ${record.day} · ${record.outcome === 'defended' ? 'Shore secured' : record.outcome === 'paid' ? 'Crew provisioned' : 'Cargo taken'}`), el('p', 'town-meta', record.outcome === 'defended' ? `Earned ${resourceText(record.reward)}` : record.outcome === 'paid' ? 'Five quiet days to prepare.' : `Lost ${resourceText(record.loss)}`)); history.append(row); }
+    for (const record of [...(state.pressure?.history || [])].reverse().slice(0, 8)) { const row = el('div', 'town-row'); row.append(el('strong', '', `Day ${calendarDay(state, record.day)} · ${record.outcome === 'defended' ? 'Shore secured' : record.outcome === 'paid' ? 'Crew provisioned' : 'Cargo taken'}`), el('p', 'town-meta', record.outcome === 'defended' ? `Earned ${resourceText(record.reward)}` : record.outcome === 'paid' ? 'Time to replenish stores before the next warning.' : `Lost ${resourceText(record.loss)}`)); history.append(row); }
     nodes.push(history);
     return nodes;
   }
@@ -302,15 +303,15 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     $('council-summary').textContent = state.research.active ? 'Researching' : state.policies.charter ? progression.POLICIES[state.policies.charter].name : `${format(state.resources.knowledge)} knowledge`;
     $('trade-summary').textContent = state.contracts.active.length ? `${state.contracts.active.length} ${narrow ? 'orders' : 'active orders'}` : narrow ? 'Requests' : 'Coastal requests';
     const coast = pressureOptions(state);
-    $('watch-summary').textContent = coast.active ? `${coast.active.daysLeft.toFixed(1)}d · ${narrow ? 'Sails' : 'Sails offshore'}` : 'Quiet coast';
+    $('watch-summary').textContent = coast.active ? `${until(state, coast.active.deadline)} · ${narrow ? 'Sails' : 'Sails offshore'}` : 'Quiet coast';
     $('watch-button').classList.toggle('threatened', !!coast.active);
     document.querySelectorAll('[data-town-tab]').forEach(button => button.setAttribute('aria-pressed', String(tab === button.dataset.townTab)));
     if (!tab) return;
     if (researchMapOpen && (mapGesture || performance.now() < mapScrollUntil) && !force) return;
-    const signature = JSON.stringify([tab, state.day, getPaused(), Object.values(state.resources).map(Math.floor), state.morale, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
+    const signature = JSON.stringify([tab, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), state.morale, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
     if (!force && signature === lastSignature) return; lastSignature = signature;
     $('town-book-title').textContent = tab === 'council' && researchMapOpen ? 'Research map' : titleFor[tab];
-    $('town-book-kicker').textContent = `Day ${state.day} · ${state.population} residents · ${Math.round(state.morale)}% morale`;
+    $('town-book-kicker').textContent = `Day ${calendarDay(state)} · ${state.population} residents · ${Math.round(state.morale)}% morale`;
     const render = { workforce: workforceContent, construction: queueContent, stores: storesContent, council: councilContent, trade: tradeContent, watch: watchContent }[tab];
     preserveReplace($('town-book-content'), render(state));
   }
@@ -335,8 +336,8 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
         box.append(el('strong', '', `Improve to level ${building.level + 1}`));
         if (next.housing) box.append(el('p', '', `Housing: ${current.housing} → ${next.housing} beds.`));
         if (next.workers) box.append(el('p', '', `Staff for full output: ${current.workers} → ${next.workers}.`));
-        if (Object.values(next.recipe.output).some(n => n > 0)) box.append(el('p', '', `Full daily output: ${resourceText(current.recipe.output)} → ${resourceText(next.recipe.output)}.`));
-        if (Object.values(next.recipe.input).some(n => n > 0)) box.append(el('p', '', `Full daily inputs: ${resourceText(current.recipe.input)} → ${resourceText(next.recipe.input)}.`));
+        if (Object.values(next.recipe.output).some(n => n > 0)) box.append(el('p', '', `Full output/min: ${resourceText(perMinuteGoods(current.recipe.output))} → ${resourceText(perMinuteGoods(next.recipe.output))}.`));
+        if (Object.values(next.recipe.input).some(n => n > 0)) box.append(el('p', '', `Full inputs/min: ${resourceText(perMinuteGoods(current.recipe.input))} → ${resourceText(perMinuteGoods(next.recipe.input))}.`));
         if (next.service) box.append(el('p', '', `Service reach: ${current.service.radius} → ${next.service.radius} spaces. Full capacity: ${Math.round((current.service.capacity || 0) * (current.service.strength || 1))} → ${Math.round((next.service.capacity || 0) * (next.service.strength || 1))} beds.`));
         if (next.storage) box.append(el('p', '', `Extra storage: ${current.storage} → ${next.storage} of every physical good.`));
         box.append(el('p', 'upgrade-cost', `Build with ${resourceText(upgrade.cost || {})}.`));

@@ -1,3 +1,4 @@
+import { until } from './calendar.js';
 /** Research, charters, orders and voyages. Pure game data; no simulation cycle. */
 import { BUILDINGS, RESOURCE_NAMES, RESOURCES, getBuildingSpec } from './catalog.js';
 
@@ -52,7 +53,7 @@ export const RESEARCH = Object.freeze({
 
 export const POLICIES = Object.freeze({
   breadbasket: { name: 'Breadbasket', description: 'The island puts its best labor and land into the harvest.', tradeoffs: ['Food and field production +25%', 'Industry production −10%', 'Food consumption +5%'] },
-  freeport: { name: 'Free Port', description: 'A generous landing welcomes merchants and new neighbors.', tradeoffs: ['Landing supplies and contract or voyage coin +30%', 'Imported goods cost 15% less; three daily shipments per offer instead of two', 'One additional arrival when all arrival needs are met', 'Food and field production −10%'] },
+  freeport: { name: 'Free Port', description: 'A generous landing welcomes merchants and new neighbors.', tradeoffs: ['Landing supplies and contract or voyage coin +30%', 'Imported goods cost 15% less; three shipments per supply boat instead of two', 'One additional arrival when all arrival needs are met', 'Food and field production −10%'] },
   forge: { name: 'Forge Town', description: 'Workshops set the rhythm of the town, and skilled trades prosper.', tradeoffs: ['Industry production +25%', 'Food consumption +15%', 'One fewer arrival per arrival opportunity'] },
 });
 const SWITCH_POLICY_COST = Object.freeze({ gold: 60, knowledge: 25 });
@@ -296,8 +297,8 @@ export function contractOptions(state) {
     const canAccept = !active && state.contracts.active.length < capacity;
     const canComplete = active && !expired && afford(state, spec.requirements);
     const reason = expired ? 'The delivery deadline has passed.' : active
-      ? canComplete ? 'The full delivery is ready.' : `Deliver ${costText(spec.requirements)} by day ${order.deadline}.`
-      : canAccept ? `Accept now; deliver within ${spec.duration} days. No supplies are taken until you deliver.` : `You can handle ${capacity} orders at once.`;
+      ? canComplete ? 'The full delivery is ready.' : `Deliver ${costText(spec.requirements)} within ${until(state, order.deadline + 1)} at 1×.`
+      : canAccept ? `Accept now; deliver within ${until(state, dayOf(state) + spec.duration + 1)} at 1×. No supplies are taken until you deliver.` : `You can handle ${capacity} orders at once.`;
     return { ...order, ...spec, description: `${spec.description} Delivery earns 1 trust with ${partner}.`, partnerId, partner, trust: state.routes.reputation[partnerId], trustGain: 1, reward: coinReward(spec.reward, supplyModifiers(state, 'market').tradeReward), deadline: active ? order.deadline : dayOf(state) + spec.duration, canAccept, canComplete, ok: active ? canComplete : canAccept, reason };
   });
 }
@@ -308,7 +309,7 @@ export function acceptContract(state, id) {
   state.contracts.offers = state.contracts.offers.filter(order => order.id !== id);
   const order = { id, definitionId: option.definitionId, acceptedDay: dayOf(state), deadline: dayOf(state) + option.duration, status: 'active' };
   state.contracts.active.push(order);
-  return { ok: true, reason: `${option.title} accepted. Deliver by day ${order.deadline}.`, contract: order };
+  return { ok: true, reason: `${option.title} accepted. Deliver within ${until(state, order.deadline + 1)} at 1×.`, contract: order };
 }
 
 export function completeContract(state, id) {
@@ -355,10 +356,10 @@ function goodsOptions(state, buying) {
     const reward = buying ? { [spec.resource]: spec.quantity } : { gold: price };
     const remaining = Math.max(0, dailyLimit - (state.imports.used[id] || 0));
     const room = !buying || !Number.isFinite(state.storage?.[spec.resource]) || amount(state, spec.resource) + spec.quantity <= state.storage[spec.resource] + 1e-6;
-    let reason = `${remaining} of ${dailyLimit} shipments left today. ${costText(cost)} → ${costText(reward)}.`;
+    let reason = `${remaining} of ${dailyLimit} shipments on this supply boat. ${costText(cost)} → ${costText(reward)}.`;
     if (!researched(state, 'barter')) reason = 'Research Fair measures before opening the harbor counter.';
     else if (!staffedMarket(state)) reason = 'Staff and supply a market hall to receive or sell goods.';
-    else if (!remaining) reason = `Today’s ${dailyLimit} shipments are used. The next cargo arrives at dawn.`;
+    else if (!remaining) reason = `This boat’s ${dailyLimit} shipments are used. Cargo refreshes every 90 seconds at 1×.`;
     else if (!room) reason = `Make room for all ${spec.quantity} ${RESOURCES[spec.resource].name.toLowerCase()} before paying for this cargo.`;
     else if (!afford(state, cost)) reason = `This shipment costs ${costText(cost)}.`;
     const ok = researched(state, 'barter') && staffedMarket(state) && remaining > 0 && room && afford(state, cost);
@@ -375,7 +376,7 @@ function exchangeGoods(state, id, buying) {
   state.imports[buying ? 'completed' : 'exportsCompleted']++;
   const spec = (buying ? IMPORTS : EXPORTS)[id], ledger = state.imports[buying ? 'byResource' : 'exported'];
   ledger[spec.resource] = Math.min(MAX, (ledger[spec.resource] || 0) + spec.quantity);
-  return { ok: true, reason: `${option.name}: paid ${costText(option.cost)}; received ${costText(delivered.credited)}. ${option.remaining - 1} shipments left today.`, cost: option.cost, reward: delivered.credited };
+  return { ok: true, reason: `${option.name}: paid ${costText(option.cost)}; received ${costText(delivered.credited)}. ${option.remaining - 1} shipments on this supply boat.`, cost: option.cost, reward: delivered.credited };
 }
 export const importGoods = (state, id) => exchangeGoods(state, id, true);
 export const exportGoods = (state, id) => exchangeGoods(state, id, false);
@@ -386,10 +387,10 @@ export function routeOptions(state) {
     const voyage = state.routes.active.find(voyage => voyage.routeId === id);
     const trust = state.routes.reputation[id], requiredGuards = Math.ceil(spec.guards / supplyModifiers(state, 'barracks').defense);
     const canDispatch = researched(state, spec.requires) && staffedMarket(state) && !voyage && trust >= spec.requiredTrust && defenseReadiness(state) >= spec.guards && afford(state, spec.cargo);
-    let reason = `Cargo returns in ${spec.duration} days.`;
+    let reason = `Cargo returns in ${until(state, dayOf(state) + spec.duration)} at 1×.`;
     if (!researched(state, spec.requires)) reason = `Research ${RESEARCH[spec.requires].name} first.`;
     else if (!staffedMarket(state)) reason = 'Staff and supply a market hall before dispatching cargo.';
-    else if (voyage) reason = `Already at sea. Returns on day ${voyage.returnDay}.`;
+    else if (voyage) reason = `Already at sea. Returns in ${until(state, voyage.returnDay)} at 1×.`;
     else if (trust < spec.requiredTrust) reason = `${spec.name} trust ${trust}/${spec.requiredTrust}. Complete delivery orders for this harbor to build a partnership.`;
     else if (defenseReadiness(state) < spec.guards) reason = `Need ${spec.guards} escort readiness; ${defenseReadiness(state).toFixed(1)} ready. About ${requiredGuards} fully supplied guards before experience bonuses. Keep their food supplied.`;
     else if (!afford(state, spec.cargo)) reason = `Cargo requires ${costText(spec.cargo)}.`;
@@ -404,7 +405,7 @@ export function dispatchRoute(state, id) {
   spend(state, option.cargo);
   const voyage = { id: `voyage-${state.routes.nextId++}`, routeId: id, departedDay: dayOf(state), returnDay: dayOf(state) + option.duration, rewardMultiplier: supplyModifiers(state, 'market').tradeReward * partnerBonus(state, id) };
   state.routes.active.push(voyage);
-  return { ok: true, reason: `${option.name} cargo departed. Returns on day ${voyage.returnDay}.`, voyage };
+  return { ok: true, reason: `${option.name} cargo departed. Returns in ${until(state, voyage.returnDay)} at 1×.`, voyage };
 }
 
 function staffedService(state, type) {

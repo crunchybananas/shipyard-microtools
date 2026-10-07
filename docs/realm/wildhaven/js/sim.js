@@ -1,3 +1,4 @@
+import { WORK_CYCLE_SECONDS, workPosition } from './calendar.js';
 import { createDiscoveryState, normalizeDiscovery, discoveryModifier } from './discovery.js';
 /** Wildhaven v2: named labor, escrowed construction, continuous production and town needs. */
 import { BUILDINGS, RESOURCE_NAMES, getBuildingSpec, getUpgrade } from './catalog.js';
@@ -9,7 +10,8 @@ export { BUILDINGS, RESOURCE_NAMES } from './catalog.js';
 import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, isLand, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, islandShape, isLand, groundHeight, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export const VERSION = 4;
-export const DAY_LENGTH = 90;
+// Legacy save/API name: this is the work cycle, not the displayed calendar day.
+export const DAY_LENGTH = WORK_CYCLE_SECONDS;
 const MAX_RESOURCE = 1000000000;
 const MAX_BUILDINGS = 1800;
 const JOURNAL_LIMIT = 60;
@@ -157,7 +159,7 @@ export function createGame() {
   const hearth = baseBuilding('hearth', 'hearth', 0, 2), bell = baseBuilding('bell', 'bell', 0, -5); bell.restored = false;
   const state = {
     version: VERSION, resources, population: 6, citizens: Array.from({ length: 6 }, (_, i) => ({ ...citizen(i + 1), experience: {} })),
-    nextCitizenId: 7, day: 1, time: 0, subsecond: 0, elapsed: 0, nextId: 1, nextEventId: 1, nextQueueOrder: 1,
+    nextCitizenId: 7, calendarEpoch: 0, day: 1, time: 0, subsecond: 0, elapsed: 0, nextId: 1, nextEventId: 1, nextQueueOrder: 1,
     won: false, undo: null, lastTradeDay: 0, builderTarget: 2, morale: 78, buildings: [hearth, bell], events: [],
     stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
   };
@@ -368,10 +370,10 @@ function serviceAccess(state) {
 }
 export function villageNeeds(state) {
   const food = foodUpkeep(state), beds = housing(state), spare = Math.max(0, beds - state.population), extra = modifier(state, 'cottage', 'arrival');
-  let expected = Math.min(Math.max(0, 2 + Math.floor(extra)), spare, Math.max(0, Math.floor((state.resources.food - food) / 4))), reason = 'New settlers can arrive at dawn.';
+  let expected = Math.min(Math.max(0, 2 + Math.floor(extra)), spare, Math.max(0, Math.floor((state.resources.food - food) / 4))), reason = 'New settlers can arrive with the next supply boat.';
   if (!spare) { expected = 0; reason = 'More completed housing is needed.'; }
   else if (state.morale < 45) { expected = 0; reason = 'Raise morale to 45 before new settlers arrive.'; }
-  else if (state.resources.food < food + 4) { expected = 0; reason = 'Keep breakfast and 4 extra food per newcomer in the pantry.'; }
+  else if (state.resources.food < food + 4) { expected = 0; reason = 'Keep the next meal and 4 extra food per newcomer in the pantry.'; }
   const { homes, services } = serviceAccess(state);
   const civicNeeds = [
     { population: 20, coverage: services.water.coverage, target: .5, reason: 'A growing town needs wells covering at least half its housing.' },
@@ -576,7 +578,7 @@ function dawn(state) {
     for (let i = 0; i < arrivals; i++) state.citizens.push({ ...citizen(state.nextCitizenId++, state.day), experience: {} });
     state.resources.food = round(state.resources.food - arrivals * 4); state.stats.arrivals += arrivals;
     addEvent(state, `${arrivals} ${arrivals === 1 ? 'new citizen has' : 'new citizens have'} arrived. Assign their skills to the town’s next task.`, 'arrival');
-  } else addEvent(state, `Day ${state.day}. ${!fed ? 'The pantry could not feed everyone. Gardens need workers.' : needs.migration.reason}`, fed ? 'dawn' : 'food');
+  } else addEvent(state, `${!fed ? 'The pantry could not feed everyone. Gardens need workers.' : needs.migration.reason}`, fed ? 'dawn' : 'food');
   reconcileWorkforce(state); refreshProduction(state); progressionEvents(state, dailyProgression(state)); reconcileWorkforce(state); refreshProduction(state);
   progressionEvents(state, dailyPressure(state)); updateNeeds(state);
   return arrivals;
@@ -622,8 +624,8 @@ export function tradeOffer(state, resource) {
   const fail = reason => ({ ...offer, ok: false, reason });
   if (!baseAmount) return fail('The landing exchanges food for timber or stone.');
   if (state.population < 6) return fail('Supply skiffs stop when 6 citizens call Wildhaven home.');
-  if (state.lastTradeDay === state.day) return fail('Today’s exchange is complete. Another skiff passes tomorrow.');
-  if (state.resources.food < offer.cost + reserve) return fail(`Keep ${reserve} food for breakfast. The pantry needs ${offer.cost + reserve} food.`);
+  if (state.lastTradeDay === state.day) return fail('This skiff’s exchange is complete. Another passes every 90 seconds at 1×.');
+  if (state.resources.food < offer.cost + reserve) return fail(`Keep ${reserve} food for the next meal. The pantry needs ${offer.cost + reserve} food.`);
   if (state.resources[resource] + amount > storageCapacity(state)[resource]) return fail(`There is no storage room for this ${resource} delivery.`);
   return { ...offer, ok: true, reason: `Exchange 12 food for ${amount} ${resource === 'wood' ? 'timber' : 'stone'}.` };
 }
@@ -687,7 +689,7 @@ function restoreV1(input) {
   state.citizens = Array.from({ length: input.population }, (_, i) => ({ ...citizen(i + 1, 1), experience: {} })); state.nextCitizenId = input.population + 1;
   state.day = input.day; state.time = Math.floor(input.time); state.subsecond = input.time % 1; state.elapsed = input.elapsed; state.won = bell.restored;
   if (state.won) state.wonDay = bell.restoredDay;
-  state.lastTradeDay = input.lastTradeDay ?? 0; state.migratedFromVersion = 1;
+  state.lastTradeDay = input.lastTradeDay ?? 0; state.migratedFromVersion = 1; state.calendarEpoch = workPosition(state);
   state.nextId = Math.max(0, ...state.buildings.filter(b => /^b\d/.test(b.id)).map(b => Number(b.id.slice(1)))) + 1;
   restoreJournal(state, input);
   addEvent(state, 'Your original village is preserved. Its buildings are complete; citizens now choose real jobs and builders raise the next generation.', 'migration');
@@ -698,6 +700,7 @@ export function restore(raw) {
   let input; try { input = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { return null; }
   if (!input || typeof input !== 'object' || Array.isArray(input) || ![1, 2, 3, VERSION].includes(input.version)) return null;
   if (!validInteger(input.day, 1, 1000000) || !isFiniteNumber(input.time) || input.time < 0 || input.time >= DAY_LENGTH || !isFiniteNumber(input.elapsed) || input.elapsed < 0 || input.elapsed > DAY_LENGTH * 1000000) return null;
+  if (input.calendarEpoch !== undefined && (!isFiniteNumber(input.calendarEpoch) || input.calendarEpoch < 0 || input.calendarEpoch > workPosition(input))) return null;
   if (input.lastTradeDay !== undefined && !validInteger(input.lastTradeDay, 0, input.day)) return null;
   if (input.version === 1) { try { return restoreV1(input); } catch { return null; } }
   if (!validBag(input.resources, { complete: true }) || !Array.isArray(input.buildings) || input.buildings.length < 2 || input.buildings.length > MAX_BUILDINGS) return null;
@@ -749,6 +752,7 @@ export function restore(raw) {
   Object.assign(state, {
     resources: { ...input.resources }, citizens, population: citizens.length, builderTarget: input.builderTarget,
     day: input.day, time: input.time, subsecond: input.subsecond, elapsed: input.elapsed, morale: input.morale,
+    calendarEpoch: input.calendarEpoch ?? workPosition(input),
     won: bell.restored, lastTradeDay: input.lastTradeDay ?? 0, undo: null,
     nextId: Math.max(0, ...state.buildings.filter(b => /^b\d/.test(b.id)).map(b => Number(b.id.slice(1)))) + 1,
     nextCitizenId: Math.max(...citizens.map(c => Number(c.id.slice(1)))) + 1,

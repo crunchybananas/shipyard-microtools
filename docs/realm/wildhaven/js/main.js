@@ -1,3 +1,4 @@
+import { calendarDay, calendarFraction, perMinute, perMinuteGoods, until } from './calendar.js';
 import { createFieldbook } from './fieldbook-ui.js';
 import { isFieldworker } from './discovery.js';
 import { VillageWorld } from './world.js';
@@ -14,7 +15,7 @@ import { createCompanionStore } from './companion-store.js';
 import { createCompanionUI } from './companion-ui.js';
 
 const $ = id => document.getElementById(id);
-const compactTablet = matchMedia('(any-pointer:coarse) and (min-width:761px) and (orientation:landscape)');
+const compactTablet = matchMedia('(min-width:0px)');
 const SAVE_KEY = 'wildhaven.v4', SETTINGS_KEY = 'wildhaven.preferences.v1';
 const CATEGORIES = {
   beginnings: { name: 'Foundations', types: ['cottage','orchard','lumber','quarry','garden','well','school','bell'] },
@@ -112,7 +113,7 @@ function commitBuilding(tile) {
   if (!tool || !tile || !companions.canManage) return;
   const result = sim.build(state, tool, tile.x, tile.z, rotation);
   if (!result.ok) { announce(result.reason, true); audio.play('error'); hover(tile); return; }
-  audio.play('build'); sync(); hover(tile); announce(`${BUILDINGS[tool].name} added to the construction queue.`);
+  audio.play('build'); sync(); world.showPreview(null); hovered = null; $('placement').classList.remove('invalid'); $('placement-detail').textContent = 'Queued. Choose another site, or Done to watch it grow.'; announce(`${BUILDINGS[tool].name} added to the construction queue.`);
 }
 function tap(tile, pointer = {}) {
   if (!playing || !companions.canManage || document.querySelector('dialog[open]')) return;
@@ -166,7 +167,7 @@ function updateInspector() {
   if (selected.type === 'citizen') {
     const citizen = state.citizens.find(c => c.id === selected.id); if (!citizen) { closeInspector(); return; }
     const workplace = state.buildings.find(b => b.id === citizen.workplace), job = JOBS[citizen.job];
-    $('inspect-title').textContent = citizen.name; $('inspect-kind').textContent = `${job?.name || 'Available for work'} · arrived day ${citizen.arrivalDay}`;
+    $('inspect-title').textContent = citizen.name; $('inspect-kind').textContent = `${job?.name || 'Available for work'} · arrived day ${calendarDay(state, citizen.arrivalDay)}`;
     $('inspect-description').textContent = workplace ? `${citizen.name} works at ${BUILDINGS[workplace.type].name.toLowerCase()}. Work assignments follow your staffing requests and workplace priorities.` : `${citizen.name} is available. Open People & jobs to give this neighbor a place to work.`;
     $('inspect-image').hidden = true; $('inspect-management').replaceChildren();
     const actor=world.actors.find(a=>a.citizen.id===citizen.id),activity=world.citizenCue?.(citizen.id)?.action || (actor?.parcel.visible?`Carrying ${actor.parcel.userData.cargo} to the village stores`:({working:'At the workbench',foraging:'Gathering food',walking:'On the way',unloading:'Delivering goods',watching:'Keeping watch',waiting:'Taking a short break'})[actor?.root.userData.workState]||'Finding the next task');
@@ -196,7 +197,7 @@ function updateInspector() {
       const home = sim.villageNeeds(state).homes?.find(h => h.id === selected.id);
       if (home) details.push(['water', 'health', 'community'].map(k => `${k}: ${Math.round((home.coverage[k] || 0) * 100)}%`).join(' · ') + '.');
     }
-    if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(production.output)} per day` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(production.input)} per day` : ''}.`);
+    if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
     if (spec.service) {
       const reach = world.showServiceArea(selected.type, selected, selected.level, { label: !matchMedia('(pointer: coarse)').matches });
       if (reach) details.push(`✓ ${reach.inRangeHomes} homes in reach · − ${reach.outsideHomes} outside. ${Math.round(reach.allocatedBeds || 0)} beds served / ${Math.round(reach.capacity || 0)} supplied capacity. Radius ${reach.radius}.`);
@@ -219,11 +220,11 @@ function updateShelf() {
 function updateUI() {
   if (!companions.canManage) speed = 0;
   const daily = sim.rates(state), ambition = sim.objective(state), needs = sim.villageNeeds(state);
-  for (const key of ['wood','stone','food']) { $(key).textContent = format(state.resources[key]); $(`${key}-rate`).textContent = `${rateFormat(daily[key])}/day`; $(`${key}-rate`).classList.toggle('negative', daily[key] < 0); }
+  for (const key of ['wood','stone','food']) { $(key).textContent = format(state.resources[key]); $(`${key}-rate`).textContent = `${rateFormat(perMinute(daily[key]))}/min`; $(`${key}-rate`).classList.toggle('negative', daily[key] < 0); }
   $('people').innerHTML = `${state.population} <em>/ ${daily.capacity}</em>`;
   $('arrival-status').textContent = needs.migration.eligible ? 'Welcoming arrivals' : daily.capacity <= state.population ? 'Homes are full' : 'Check town needs';
-  $('arrival-status').parentElement.title = needs.migration.reason; $('day').textContent = `Day ${state.day}`;
-  const portion = state.time / sim.DAY_LENGTH;
+  $('arrival-status').parentElement.title = needs.migration.reason; $('day').textContent = `Day ${calendarDay(state)}`;
+  const portion = calendarFraction(state);
   $('season').textContent = speed === 0 ? 'Taking a breath' : portion < .3 ? 'Early morning' : portion < .65 ? 'A good afternoon' : 'Almost tomorrow';
   $('day-progress').style.width = `${portion * 100}%`; $('village-mood').textContent = `${Math.round(state.morale)}% morale · ${state.population >= 40 ? 'A growing town' : state.population >= 20 ? 'Finding its purpose' : 'Putting down roots'}`;
   currentNextStep = nextTownStep(state, ambition, needs);
@@ -238,7 +239,7 @@ function updateUI() {
   $('find-bell').hidden = state.won || ambition.step < 4; $('undo').disabled = !state.undo;
   $('pause').classList.toggle('active', speed === 0); $('pause').textContent = speed === 0 ? '▶' : 'Ⅱ'; $('pause').setAttribute('aria-label', speed === 0 ? 'Resume' : 'Pause');
   for (const button of document.querySelectorAll('[data-speed]')) button.setAttribute('aria-pressed', String(Number(button.dataset.speed) === speed));
-  $('journal-entries').replaceChildren(...state.events.map(event => { const item = document.createElement('li'), label = document.createElement('small'); label.textContent = `Day ${event.day}`; item.append(label, document.createTextNode(event.text)); return item; }));
+  $('journal-entries').replaceChildren(...state.events.map(event => { const item = document.createElement('li'), label = document.createElement('small'); label.textContent = `Day ${calendarDay(state, event.day)}`; item.append(label, document.createTextNode(event.text)); return item; }));
   updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); if (tool && hovered) hover(hovered);
 }
 function setSpeed(value) { if (value > 0 && !companions.canManage) { announce(companions.readOnly ? 'This is a paused visit. Take the chair to manage this local town.' : companions.reason, true); return; } speed = value; if (value > 0) previousSpeed = value; updateUI(); audio.play('select'); }
@@ -247,19 +248,20 @@ function toggleAudio() { soundEnabled = !soundEnabled; audio.mute(!soundEnabled)
 function updateAudio() { $('sound').setAttribute('aria-pressed', String(soundEnabled)); $('sound').setAttribute('aria-label', soundEnabled ? 'Mute sound' : 'Enable sound'); $('sound').title = soundEnabled ? 'Mute sound' : 'Enable sound'; $('intro-sound').textContent = soundEnabled ? 'Sound is on' : 'Sound is off';$('mixer-toggle').textContent=soundEnabled?'Mute the island':'Enable sound';$('mixer-toggle').setAttribute('aria-pressed',String(soundEnabled)); }
 function win() {
   if (victorySeen) return; victorySeen = true; cancelTool(); closeInspector(); town.close(); audio.play('win'); world.home();
-  $('win-stats').innerHTML = `<span><strong>${state.population}</strong>islanders</span><span><strong>${state.day}</strong>days together</span><span><strong>${state.buildings.length - 2}</strong>little places</span>`;
+  $('win-stats').innerHTML = `<span><strong>${state.population}</strong>islanders</span><span><strong>${calendarDay(state)}</strong>days together</span><span><strong>${state.buildings.length - 2}</strong>little places</span>`;
   setTimeout(() => { if (playing) $('win-dialog').showModal(); }, 1200);
 }
 function advance(dt) {
   if (!companions.canManage) return { changed: false, newDay: false, completed: 0 };
-  const priorIncident = state.pressure?.active?.id;
+  const priorIncident = state.pressure?.active?.id, priorDay = calendarDay(state);
   const result = sim.tick(state, dt); if (result.changed) world.sync(state);
   if (result.newDay || result.completed) { updateUI(); save(); }
-  if (result.newDay) { audio.play('day'); announce(result.arrivals ? `${result.arrivals} new ${result.arrivals === 1 ? 'neighbor has' : 'neighbors have'} arrived. ${state.migration.reason}` : `Day ${state.day}. ${state.migration.reason}`); }
+  if (calendarDay(state) !== priorDay) { audio.play('day'); announce(`Day ${calendarDay(state)}. A new morning on the island.`); }
+  if (result.arrivals) { announce(`${result.arrivals} new ${result.arrivals === 1 ? 'neighbor has' : 'neighbors have'} arrived. ${state.migration.reason}`); }
   else if (result.completed) { audio.play('build'); announce(`${result.completed} ${result.completed === 1 ? 'project is' : 'projects are'} finished. Your builders are finding their next job.`); }
   if (state.pressure?.active?.id !== priorIncident) {
     const coast = pressureOptions(state);
-    if (coast.active) { announce(`${coast.active.title}: the crew arrives on day ${coast.active.deadline}. Open the watch to plan your response.`, true); audio.play('bell'); }
+    if (coast.active) { announce(`${coast.active.title}: the crew arrives in ${until(state, coast.active.deadline)} at 1×. Open the watch to plan your response.`, true); audio.play('bell'); }
     else if (priorIncident) announce(state.events.find(e => ['pressure','defense'].includes(e.type))?.text, true);
   }
   const frontierNotice = result.frontierEvents?.findLast(event => ['warning','battle','war','conquest','death'].includes(event.type));
@@ -351,7 +353,7 @@ async function boot() {
         if (dx || dz) world.moveCamera(dx * dt * 8, dz * dt * 8); if (speed > 0 && companions.canManage) advance(Math.min(wallDt, .5) * speed);
         uiClock += dt; saveClock += dt; if (uiClock > .5) { updateUI(); uiClock = 0; } if (saveClock > 5) { save(); saveClock = 0; }
       }
-      world.render(dt, { speed: playing ? (companions.canManage ? speed : 0) : 1, playing: !modal, dayTime: state.time / sim.DAY_LENGTH, won: playing && state.won }); frames++; total += wallDt;
+      world.render(dt, { speed: playing ? (companions.canManage ? speed : 0) : 1, playing: !modal, dayTime: calendarFraction(state), won: playing && state.won }); frames++; total += wallDt;
       if (total > 2) { document.documentElement.dataset.fps = String(Math.round(frames / total)); frames = 0; total = 0; }
     }
     requestAnimationFrame(frame);

@@ -1,3 +1,4 @@
+import { until } from './calendar.js';
 /** Coastal pressure: announced cargo risks, real patrol labor and bounded recovery. */
 import { getBuildingSpec, RESOURCE_NAMES } from './catalog.js';
 import { supplyModifiers } from './progression.js';
@@ -96,7 +97,7 @@ export function pressureOptions(state) {
   const projectedLoss = Object.fromEntries(Object.entries(maximumLoss).map(([key, amount]) => [key, Math.min(state.resources[key] || 0, Math.ceil(amount * (1 - defense) - 1e-8))]));
   const canPay = enough(state, spec.demand), canShelter = !active.sheltered && enough(state, SHELTER_COST);
   const canDefend = watch.readiness + 1e-6 >= spec.strength && preparedness + 1e-8 >= 1;
-  const defendReason = canDefend ? 'The watch is supplied and prepared. Repel the raiders now.' : watch.readiness + 1e-6 < spec.strength ? `Need ${spec.strength} supplied watch readiness; ${watch.readiness.toFixed(1)} ready. Staff watch houses and keep food supplied.` : `Complete the patrol rotation: ${Math.floor(preparedness * 100)}% prepared. Guards must actually patrol for a full day.`;
+  const defendReason = canDefend ? 'The watch is supplied and prepared. Repel the raiders now.' : watch.readiness + 1e-6 < spec.strength ? `Need ${spec.strength} supplied watch readiness; ${watch.readiness.toFixed(1)} ready. Staff watch houses and keep food supplied.` : `Complete the patrol rotation: ${Math.floor(preparedness * 100)}% prepared. Guards must actually patrol for 90 seconds at 1×.`;
   result.active = {
     id: active.id, title: spec.title, description: spec.description, announcedDay: active.announcedDay, deadline: active.deadline,
     daysLeft: round(Math.max(0, active.deadline - state.day - (state.time || 0) / DAY_SECONDS)),
@@ -132,7 +133,7 @@ function finish(state, outcome, option) {
   }
   pressure.history.push({ id, day: state.day, outcome, loss, reward }); pressure.history = pressure.history.slice(-20);
   pressure.active = null; pressure.graceUntilDay = state.day + QUIET_DAYS; pressure.nextIncidentDay = pressure.graceUntilDay;
-  const reason = outcome === 'paid' ? `${option.title}: the crew accepted ${text(option.demand)} and sailed away.` : outcome === 'defended' ? `${option.title}: the prepared watch secured the shore. Earned ${text(reward)} and 1 trust with ${option.partner}.` : `${option.title}: the raiders took ${text(loss)}. Everyone is safe; the town has five quiet days to replenish its stores.`;
+  const reason = outcome === 'paid' ? `${option.title}: the crew accepted ${text(option.demand)} and sailed away.` : outcome === 'defended' ? `${option.title}: the prepared watch secured the shore. Earned ${text(reward)} and 1 trust with ${option.partner}.` : `${option.title}: the raiders took ${text(loss)}. Everyone is safe; the town has a recovery interval of up to 7m 30s at 1× to replenish its stores.`;
   return { ok: true, outcome, reason, loss, reward, changed: true, events: [{ type: outcome === 'raided' ? 'pressure' : 'defense', text: reason }] };
 }
 
@@ -146,7 +147,7 @@ export function actOnPressure(state, action) {
   if (!option.canShelter) return { ok: false, reason: option.shelterReason, events: [] };
   for (const [key, amount] of Object.entries(SHELTER_COST)) state.resources[key] = round(Math.max(0, state.resources[key] - amount));
   state.pressure.active.sheltered = true;
-  const reason = `${option.title}: citizens sheltered the stores. Maximum losses are reduced by 40%. Keep preparing the watch before day ${option.deadline}.`;
+  const reason = `${option.title}: citizens sheltered the stores. Maximum losses are reduced by 40%. Keep preparing the watch for the arrival in ${until(state, option.deadline)} at 1×.`;
   return { ok: true, reason, changed: true, events: [{ type: 'defense', text: reason }] };
 }
 
@@ -168,7 +169,7 @@ export function dailyPressure(state) {
   if (!state.won || (state.citizens?.length ?? state.population) < 20) return { changed: false, events: [] };
   if (pressure.nextIncidentDay === null) {
     pressure.nextIncidentDay = state.day + 2;
-    return { changed: true, events: [{ type: 'coast', text: 'A growing town draws eyes from the coast. Lookouts expect unfamiliar sails in two days; build reserves and plan a watch.' }] };
+    return { changed: true, events: [{ type: 'coast', text: 'A growing town draws eyes from the coast. Lookouts expect unfamiliar sails in three minutes at 1×; build reserves and plan a watch.' }] };
   }
   if (state.day < pressure.nextIncidentDay) return { changed: false, events: [] };
   const tier = (state.citizens?.length ?? state.population) >= 60 ? 2 : (state.citizens?.length ?? state.population) >= 35 ? 1 : 0;
@@ -176,5 +177,5 @@ export function dailyPressure(state) {
   pressure.active = { id: `coast-${pressure.sequence}`, templateId: spec.id, tier, announcedDay: state.day, deadline: state.day + WARNING_DAYS, watchProgress: 0, sheltered: false };
   pressure.nextIncidentDay = null;
   const option = pressureOptions(state).active;
-  return { changed: true, events: [{ type: 'pressure', text: `${option.title}. The crew arrives on day ${option.deadline}. Give ${text(option.demand)}, or prepare ${option.requiredReadiness} watch readiness. At most ${text(option.maximumLoss)} is at risk; people and buildings are safe.` }] };
+  return { changed: true, events: [{ type: 'pressure', text: `${option.title}. The crew arrives in ${until(state, option.deadline)} at 1×. Give ${text(option.demand)}, or prepare ${option.requiredReadiness} watch readiness. At most ${text(option.maximumLoss)} is at risk; people and buildings are safe.` }] };
 }

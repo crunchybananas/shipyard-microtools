@@ -102,3 +102,11 @@ Browser tests use isolated contexts and never overwrite the user's town. Opening
 `review-town.html` is a separate visual review page for the three earned town checkpoints. It runs worker motion, offers camera/worker controls and shows render diagnostics, while leaving the economy frozen and never reading or writing the player's local save. `review/LIVING_ISLAND_VERIFICATION.md` records current evidence and limits. The v3 frontier checkpoint remains in `review/FRONTIER_VERIFICATION.md`.
 
 The original `tools/playthrough.mjs`, `tools/navigation.mjs` and older `review/qa-*` evidence belong to v1 and are retained as history. The v2 town reports remain historical; the v3 frontier reports have a `frontier-` prefix and this v4 increment uses `living-`. The original local checkpoint was committed as `30dbd2fb`; its reports retain their historical status and source hashes. The public release brings this Wildhaven directory and its vendored Three.js dependencies onto `main` without merging unrelated development-branch work.
+
+## Calendar and compact controls (October 2026)
+
+A displayed day now lasts six minutes at 1×. The original 90-second economy cycle is retained for production, meals, arrivals, market quotas and saved deadlines; movement, combat, construction and fieldwork keep their previous timings. The sky, calendar and day chime use the slower clock. Goods rates are shown per minute and pending deliveries or threats use countdowns at 1×. Pausing and 3× retain their existing behavior.
+
+V4 saves remain compatible. A validated calendar epoch preserves the current day and time on the first load of an older village, preserves earlier date labels, and prevents later reloads from re-anchoring the clock.
+
+Build and Town are now available in the bottom dock on all devices. The building catalogue opens on request and closes during placement. Home camera control lives beside the camera buttons; the large title is removed from the HUD. Generated transparent painted resource icons replace the CSS resource shapes. Their source prompt is in `assets/resource-icons-prompt.txt`; model-derived building and landmark thumbnails remain actual views of the 3D assets.

@@ -1,3 +1,4 @@
+import { calendarDay } from './calendar.js';
 import * as frontier from './frontier.js';
 import { RESOURCES } from './catalog.js';
 import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, terrainAt, regionAt, isLand } from './island.js';
@@ -135,7 +136,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     if (!entries.length) return [];
     const list = el('ol', 'frontier-log');
     for (const event of entries.slice(0, 8)) {
-      const item = el('li'); item.append(el('small', '', `Day ${event.day ?? state.day}`), document.createTextNode(event.text || event.message || event.reason || 'Activity on the frontier.')); list.append(item);
+      const item = el('li'); item.append(el('small', '', `Day ${calendarDay(state, event.day ?? state.day)}`), document.createTextNode(event.text || event.message || event.reason || 'Activity on the frontier.')); list.append(item);
     }
     return [section('Word from the frontier'), list];
   }
