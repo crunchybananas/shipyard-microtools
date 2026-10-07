@@ -74,3 +74,15 @@ body.tablet-build-open #hud #build-shelf .build-choice{flex-basis:106px;min-widt
  .intro-copy{top:20%}h1{font-size:55px}
 }
 @media(any-pointer:coarse){#hud header .time-buttons button{height:44px}}
+
+/* Keep active work and warnings visible when the management row is folded. */
+#hud footer #fieldbook-toggle,#hud footer #frontier-toggle{font-size:11px!important;white-space:normal}
+#hud footer #fieldbook-toggle::after,#hud footer #frontier-toggle::after{content:none}
+#hud footer #tablet-town-toggle{white-space:normal}
+#hud footer #tablet-town-toggle.threatened{background:#a95e38!important;color:#fff4de!important}
+@media(min-width:521px) and (max-width:760px){
+ #hud #inspector{left:12px;right:auto;width:min(260px,calc(50% - 24px))}
+}
+@media(max-width:520px){
+ #hud #inspector{left:12px;right:12px;top:auto;bottom:var(--tablet-dock-clearance);width:auto;max-height:36dvh}
+}

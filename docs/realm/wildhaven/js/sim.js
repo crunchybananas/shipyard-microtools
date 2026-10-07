@@ -544,7 +544,7 @@ function completeConstruction(state, b) {
   if (state.undo?.id === b.id) state.undo = null;
   if (b.type === 'bell' && !b.restored) {
     b.restored = true; b.restoredDay = state.day; state.won = true; state.wonDay = state.day;
-    addEvent(state, 'The bell rings again. Wildhaven is on the map; now choose what kind of town it will become.', 'milestone');
+    addEvent(state, 'The bell rings again. Your village is on the map; now choose what kind of town it will become.', 'milestone');
   } else addEvent(state, `${BUILDINGS[b.type].name} ${upgrading ? `reopens at level ${b.level}` : 'is complete'}. ${specFor(b).workers ? 'Its workplace is ready for citizens.' : 'The neighborhood has grown.'}`, upgrading ? 'upgrade' : 'complete');
   state.stats[upgrading ? 'upgrades' : 'built']++;
 }
@@ -623,7 +623,7 @@ export function tradeOffer(state, resource) {
   const amount = Math.floor(baseAmount * modifier(state, 'market', 'tradeReward')), reserve = Math.ceil(foodUpkeep(state)), offer = { cost: 12, amount, reserve };
   const fail = reason => ({ ...offer, ok: false, reason });
   if (!baseAmount) return fail('The landing exchanges food for timber or stone.');
-  if (state.population < 6) return fail('Supply skiffs stop when 6 citizens call Wildhaven home.');
+  if (state.population < 6) return fail('Supply skiffs stop when 6 citizens call the village home.');
   if (state.lastTradeDay === state.day) return fail('This skiff’s exchange is complete. Another passes every 90 seconds at 1×.');
   if (state.resources.food < offer.cost + reserve) return fail(`Keep ${reserve} food for the next meal. The pantry needs ${offer.cost + reserve} food.`);
   if (state.resources[resource] + amount > storageCapacity(state)[resource]) return fail(`There is no storage room for this ${resource} delivery.`);
@@ -652,9 +652,9 @@ export function objective(state) {
   if (cottages < 3 || food < 2) return { title: 'Make room for the next neighbors', description: `${Math.min(cottages, 3)}/3 finished cottages · ${Math.min(food, 2)}/2 food gardens. Construction and production share the same workers.`, current: Math.min(cottages, 3) + Math.min(food, 2), total: 5, complete: false, step: 3, type: cottages < 3 ? 'cottage' : 'garden' };
   if (state.population < 10) return { title: 'A town needs people', description: `${state.migration?.reason || 'Keep spare housing and food for newcomers.'} Welcome 10 citizens.`, current: state.population, total: 10, complete: false, step: 4 };
   const bell = state.buildings.find(b => b.type === 'bell');
-  if (bell.status !== 'ready') return { title: 'Raise a sound across the water', description: 'Finish restoring the bell. This first milestone opens Wildhaven’s wider future.', current: bell.progress, total: bell.workRequired, complete: false, step: 5, type: 'bell' };
+  if (bell.status !== 'ready') return { title: 'Raise a sound across the water', description: 'Finish restoring the bell. This first milestone opens the village’s wider future.', current: bell.progress, total: bell.workRequired, complete: false, step: 5, type: 'bell' };
   const cost = resourceCost(BUILDINGS.bell.cost);
-  return { title: 'Put Wildhaven on the map', description: 'Restore the bell, then develop workshops, research, services and trade. The town’s story is just beginning.', current: Object.entries(cost).reduce((sum, [key, value]) => sum + Math.min(value, state.resources[key]), 0), total: Object.values(cost).reduce((sum, value) => sum + value, 0), complete: false, step: 5, type: 'bell' };
+  return { title: 'Put your village on the map', description: 'Restore the bell, then develop workshops, research, services and trade. The town’s story is just beginning.', current: Object.entries(cost).reduce((sum, [key, value]) => sum + Math.min(value, state.resources[key]), 0), total: Object.values(cost).reduce((sum, value) => sum + value, 0), complete: false, step: 5, type: 'bell' };
 }
 /** The v3 envelope is self-contained; ephemeral assignments/rates are reconciled on load. */
 export function serialize(state) {
