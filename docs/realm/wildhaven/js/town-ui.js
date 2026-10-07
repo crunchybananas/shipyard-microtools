@@ -37,7 +37,7 @@ function stepper(value, min, max, id, update) {
   node.append(btn('−', `${id}-less`, () => update(value - 1), { disabled: value <= min, title: 'Assign one fewer person' }), el('output', '', `${value}`), btn('+', `${id}-more`, () => update(value + 1), { disabled: value >= max, title: 'Assign one more person' })); return node;
 }
 
-export function createTownUI({ getState, mutate, canMutate = () => true, inspect, focusCitizen, getIcons, getPaused = () => false, resume = () => {}, build = () => {}, beforeOpen = () => {} }) {
+export function createTownUI({ getState, mutate, canMutate = () => true, inspect, focusCitizen, getIcons, getPaused = () => false, resume = () => {}, build = () => {}, beforeOpen = () => {}, onGoalSelected = () => {} }) {
   let tab = null, lastSignature = '', previousFocus = null, researchMapOpen = false, mapSelection = null, mapGesture = false, mapScroll = null, mapScrollUntil = 0;
   function action(fn) { if (!canMutate()) return; mutate(fn()); lastSignature = ''; update(true); }
   function open(next) {
@@ -141,7 +141,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       return nodes;
     }
     const paths = el('section', 'town-paths'); paths.dataset.councilSection = 'paths';
-    paths.append(el('h3', 'town-section', 'Choose your town’s path'), el('p', 'path-terms', 'First choice free after The island charter. Switching costs 60 coin + 25 knowledge.'));
+    paths.append(el('h3', 'town-section', 'Choose your town’s path'), el('p', 'path-terms', 'You can build toward a direction now. Charter bonuses begin only after learning The island charter and choosing below. First charter free; switching costs 60 coin + 25 knowledge.'));
     const requirement = pathRequirement(state);
     if (requirement) {
       const next = el('div', 'path-requirement');
@@ -167,7 +167,12 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       top.append(image(choice.icon), label, choose);
       row.append(top, el('p', 'path-payoff', choice.payoff));
       const details = disclosure(`path-${policy.id}`, 'Tradeoffs'); details.append(el('p', '', choice.tradeoffs));
-      row.append(details); paths.append(row);
+      row.append(details);
+      if (policy.id === 'breadbasket') {
+        const following = state.guidance?.goal === 'first_bread', made = state.guidance?.firstBread;
+        row.append(el('p', 'town-meta', made ? `First bread made on day ${made.day}.` : 'A first step: turn grain into flour, then bread. This free goal guides your next action; it grants no charter bonuses.'), btn(following ? 'Stop following bread goal' : made ? 'Revisit first bread' : 'Work toward first bread', 'goal-first-bread', () => { if (!canMutate()) return; action(() => progression.setTownGoal(state, following ? null : 'first_bread')); if (!following) { close(); onGoalSelected(); } }));
+      }
+      paths.append(row);
     }
     nodes.push(paths);
     const schools = state.buildings.filter(b => b.type === 'school' && b.status === 'ready'), workingSchools = schools.filter(b => !b.paused && b.production?.efficiency > 0);
@@ -189,7 +194,10 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       }
       row.append(el('p', 'research-payoff', item.description));
       if (mapSelection === item.id) row.append(btn('Back to research map', `research-map-back-${item.id}`, () => showResearchMap(item.id), { className: 'text-button' }));
-      if (item.completed) return row;
+      if (item.completed) {
+        for (const type of item.unlocks) row.append(btn(`Plan ${BUILDINGS[type].name.toLowerCase()}`, `research-build-${type}`, () => build(type)));
+        return row;
+      }
       const requirements = researchRequirements(state, item), prerequisites = el('div', 'research-requires');
       for (const prerequisite of requirements) prerequisites.append(btn(`${prerequisite.met ? '✓' : '○'} ${prerequisite.name}`, `requires-${item.id}-${prerequisite.id}`, () => revealResearch(prerequisite.id), { className: prerequisite.met ? 'requirement met' : 'requirement missing' }));
       if (requirements.length) row.append(el('small', 'requirement-label', 'Learn first'), prerequisites);
@@ -307,7 +315,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     document.querySelectorAll('[data-town-tab]').forEach(button => button.setAttribute('aria-pressed', String(tab === button.dataset.townTab)));
     if (!tab) return;
     if (researchMapOpen && (mapGesture || performance.now() < mapScrollUntil) && !force) return;
-    const signature = JSON.stringify([tab, state.day, getPaused(), Object.values(state.resources).map(Math.floor), state.morale, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
+    const signature = JSON.stringify([tab, state.day, getPaused(), Object.values(state.resources).map(Math.floor), state.morale, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.guidance, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
     if (!force && signature === lastSignature) return; lastSignature = signature;
     $('town-book-title').textContent = tab === 'council' && researchMapOpen ? 'Research map' : titleFor[tab];
     $('town-book-kicker').textContent = `Day ${state.day} · ${state.population} residents · ${Math.round(state.morale)}% morale`;
@@ -326,7 +334,8 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       if (status.maxWorkers) {
         const box = el('div', 'inspect-staffing'), row = el('div', 'town-control'); row.append(el('strong', '', `${status.workers} / ${status.desiredWorkers} working`), stepper(status.desiredWorkers, 0, status.maxWorkers, `inspect-staff-${building.id}`, count => action(() => sim.setWorkers(state, building.id, count))));
         box.append(row, el('p', 'town-meta', `${JOBS[BUILDINGS[building.type].job]?.plural || 'Workers'} · ${Math.round(status.efficiency * 100)}% output`));
-        box.append(btn(building.paused ? 'Resume work' : 'Rest this workplace', `inspect-rest-${building.id}`, () => action(() => sim.pauseBuilding(state, building.id, !building.paused)))); nodes.push(box);
+        box.append(btn(building.paused ? 'Resume work' : 'Rest this workplace', `inspect-rest-${building.id}`, () => action(() => sim.pauseBuilding(state, building.id, !building.paused)))); if (status.workers < status.desiredWorkers) box.append(btn('Find available workers', `inspect-people-${building.id}`, () => revealWorkplace(building.id)), el('p', 'town-meta', 'Requested workers share the same residents. Rest another workplace or raise this one’s priority in People.'));
+        nodes.push(box);
       }
       const upgrade = sim.canUpgrade(state, building.id);
       if (getBuildingSpec(building.type).upgrades?.length && building.level < 3) {
@@ -364,6 +373,10 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     const viewport = $('town-book-content').querySelector('[data-scroll-region="research-map"]');
     if (viewport && mapScroll) { viewport.scrollLeft = mapScroll.left; viewport.scrollTop = mapScroll.top; }
   }
+  function revealWorkplace(id) {
+    open('workforce'); const row = $('town-book-content').querySelector(`[data-workplace="${CSS.escape(id)}"]`);
+    row?.scrollIntoView({ block: 'start' }); row?.querySelector(`[data-action-id="priority-${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+  }
   function revealResource(id) { open('stores'); $('town-book-content').querySelector(`[data-resource="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'start' }); }
-  return { open, close, update, inspectorControls, revealResearch, revealPaths, revealResource, get activeTab() { return tab; } };
+  return { open, close, update, inspectorControls, revealResearch, revealPaths, revealResource, revealWorkplace, get activeTab() { return tab; } };
 }
