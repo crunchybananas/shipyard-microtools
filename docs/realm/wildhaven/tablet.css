@@ -1,0 +1,231 @@
+/* These two controls are mounted once; only landscape touch layouts use them. */
+#tablet-build-toggle,
+#tablet-town-toggle { display: none; }
+
+@media (any-pointer: coarse) and (min-width: 761px) and (orientation: landscape) {
+  :root {
+    --tablet-panel-top: 92px;
+    --tablet-dock-bottom: max(10px, env(safe-area-inset-bottom));
+    --tablet-dock-clearance: calc(68px + var(--tablet-dock-bottom));
+  }
+
+  /* One quiet header row replaces the second row of management shortcuts. */
+  #hud header {
+    top: max(10px, env(safe-area-inset-top));
+    left: max(18px, env(safe-area-inset-left));
+    right: max(18px, env(safe-area-inset-right));
+    display: grid;
+    grid-template-columns: minmax(116px, 1fr) minmax(350px, 460px) 144px;
+    align-items: center;
+    gap: 12px;
+  }
+  #hud header .village-sign { min-width: 0; }
+  #hud header .village-sign > span { font-size: 27px; }
+  #hud header .village-sign small { display: none; }
+  #hud header .supplies {
+    order: initial;
+    min-width: 0;
+    margin: 0;
+    padding: 9px 12px;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  #hud header .supply { min-width: 0; gap: 5px; }
+  #hud header .supply > div > span { font-size: 21px; }
+  #hud header .supply small,
+  #hud header .supply small b { font-size: 9px; }
+  #hud header #arrival-status { display: none; }
+  #hud header .day-controls { display: block; min-width: 0; }
+  #hud header .day-title { display: block; font-size: 11px; text-align: center; }
+  #hud header #season,
+  #hud header .day-track { display: none; }
+  #hud header .time-buttons { display: flex; justify-content: center; gap: 4px; margin-top: 3px; }
+  #hud #town-tools { display: none; }
+
+  /* The footer measures only the dock until Build opens its drawer. */
+  #hud footer {
+    left: 50%;
+    right: auto;
+    bottom: var(--tablet-dock-bottom);
+    width: min(900px, calc(100% - 36px));
+    transform: translateX(-50%);
+    z-index: 12;
+    padding: 0;
+  }
+  #hud footer > .shelf-heading,
+  #hud #build-categories,
+  #hud #build-shelf { display: none; }
+  #hud footer .controls-hint {
+    height: 56px;
+    padding: 5px;
+    border: 1px solid #b8bda0;
+    border-radius: 9px;
+    background: #f5efdc;
+    color: #284a3c;
+    box-shadow: 0 3px 14px #173c3426;
+    text-shadow: none;
+  }
+  #hud footer .controls-hint > span,
+  #hud footer .hint-separator { display: none; }
+  #hud footer .controls-hint > div {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(44px, 1fr));
+    width: 100%;
+    height: 44px;
+    gap: 4px;
+  }
+  #hud footer .controls-hint > div > button {
+    position: static;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px !important;
+    margin: 0;
+    padding: 6px 8px !important;
+    border-radius: 5px;
+    background: transparent !important;
+    color: #284a3c !important;
+    font-size: 12px !important;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    text-shadow: none;
+    white-space: nowrap;
+    box-shadow: none;
+    transform: none;
+    touch-action: manipulation;
+  }
+  #hud footer #tablet-build-toggle { order: 0; }
+  #hud footer #tablet-town-toggle { order: 1; }
+  #hud footer #landing-button { order: 2; }
+  #hud footer #journal-button { order: 3; }
+  #hud footer #frontier-toggle { order: 4; }
+  #hud footer #fieldbook-toggle { order: 5; }
+  #hud footer #companion-toggle { order: 6; }
+  #hud footer .controls-hint > div > button[aria-pressed="true"],
+  #hud footer .controls-hint > div > button[aria-expanded="true"],
+  body.tablet-build-open #hud footer #tablet-build-toggle,
+  body.town-view-active #hud footer #tablet-town-toggle {
+    background: #dce5cb !important;
+    color: #244b37 !important;
+  }
+  #hud footer #frontier-toggle.threatened { box-shadow: inset 0 -3px #9c6144; }
+  #hud footer .controls-hint > div > button:focus-visible { outline: 2px solid #315f4c; outline-offset: -2px; }
+  #hud footer #landing-button,
+  #hud footer #journal-button,
+  #hud footer #frontier-toggle,
+  #hud footer #fieldbook-toggle,
+  #hud footer #companion-toggle { font-size: 0 !important; }
+  #hud footer #landing-button::after { content: 'Landing'; }
+  #hud footer #journal-button::after { content: 'Journal'; }
+  #hud footer #frontier-toggle::after { content: 'Frontier'; }
+  #hud footer #fieldbook-toggle::after { content: 'Fieldbook'; }
+  #hud footer #companion-toggle::after { content: 'Companion'; }
+  #hud footer .controls-hint > div > button::after { font-size: 12px; }
+
+  /* The optional catalog stays compact and scrolls horizontally above the dock. */
+  body.tablet-build-open #hud footer > .shelf-heading {
+    display: flex;
+    margin: 0;
+    padding: 4px 10px;
+    border-radius: 9px 9px 0 0;
+    background: #f5efdc;
+    color: #345540;
+    text-shadow: none;
+  }
+  body.tablet-build-open #hud #save-state { display: none; }
+  body.tablet-build-open #hud #undo { background: #dce5cb; color: #345540; padding: 7px 14px; }
+  body.tablet-build-open #hud #build-categories {
+    display: flex;
+    padding: 7px 8px 0;
+    gap: 4px;
+    border-radius: 0;
+    background: #f5efdc;
+  }
+  body.tablet-build-open #hud #build-shelf {
+    display: flex;
+    max-height: min(210px, 34dvh);
+    margin-bottom: 7px;
+    padding: 5px 8px 8px;
+    gap: 5px;
+    border-radius: 0 0 9px 9px;
+    background: #f5efdc;
+    overscroll-behavior-x: contain;
+  }
+  #hud #build-categories button { flex: 0 0 auto; padding: 8px 14px; font-size: 11px; color: #345540; }
+  #hud #build-shelf .build-choice { flex: 0 0 126px; min-width: 126px; max-width: 126px; padding: 5px 7px; }
+  #hud #build-shelf .build-choice img { height: 45px; }
+  #hud #build-shelf .build-choice strong { margin-bottom: 3px; font-size: 11px; }
+  #hud #build-shelf .build-flow { min-height: 24px; font-size: 10px; }
+  #hud #build-shelf .build-use { min-height: 22px; margin-bottom: 3px; }
+  body.touch-placement-active #hud footer > .shelf-heading,
+  body.touch-placement-active #hud #build-categories,
+  body.touch-placement-active #hud #build-shelf { display: none !important; }
+
+  #hud .ambition {
+    top: var(--tablet-panel-top);
+    left: max(18px, env(safe-area-inset-left));
+    width: 220px;
+    max-height: calc(100dvh - var(--tablet-panel-top) - var(--tablet-dock-clearance) - 12px);
+    overflow: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    align-items: center;
+    column-gap: 4px;
+    padding: 6px 8px;
+  }
+  #hud .ambition-heading { grid-column: 2; grid-row: 1; min-height: 44px; color: #53664f; }
+  #hud .ambition-heading > span { display: none; }
+  #hud .ambition-heading button { width: 44px; height: 44px; margin: 0; padding: 0; }
+  #hud .ambition > #objective-title {
+    grid-column: 1;
+    grid-row: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  #hud #ambition-body { grid-column: 1 / -1; padding: 7px 4px 4px; }
+  body.touch-placement-active #hud .ambition,
+  body.town-view-active #hud .ambition,
+  body.fieldbook-active #hud .ambition,
+  body.frontier-view-active #hud .ambition { display: none; }
+  #hud .camera-tools { top: var(--tablet-panel-top); right: max(18px, env(safe-area-inset-right)); }
+  #hud #town-book,
+  #hud #fieldbook,
+  #hud #frontier-panel {
+    top: var(--tablet-panel-top);
+    bottom: var(--tablet-dock-clearance);
+    left: auto;
+    right: 76px;
+    width: min(470px, calc(100% - 104px));
+    min-height: 0;
+    max-height: none;
+  }
+  #hud #inspector {
+    top: var(--tablet-panel-top);
+    right: 76px;
+    width: 290px;
+    min-height: 0;
+    max-height: calc(100dvh - var(--tablet-panel-top) - var(--tablet-dock-clearance));
+  }
+  #hud #journal {
+    top: var(--tablet-panel-top);
+    bottom: var(--tablet-dock-clearance);
+    right: 76px;
+    max-height: none;
+  }
+  #hud #placement,
+  #hud #frontier-command {
+    bottom: var(--tablet-dock-clearance);
+    max-height: calc(100dvh - var(--tablet-panel-top) - var(--tablet-dock-clearance) - 12px);
+  }
+  #hud #toast { top: var(--tablet-panel-top); }
+  #hud .save-warning { bottom: var(--tablet-dock-clearance); }
+}
