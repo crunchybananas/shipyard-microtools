@@ -1,0 +1,217 @@
+{
+  "started": "2026-10-07T02:49:43.656Z",
+  "method": "Real mouse, keyboard and touch controls. No review advance, injected resources or simulator actions. Separate earned mature-save fixtures are labeled.",
+  "actions": [
+    {
+      "action": "place",
+      "type": "cottage",
+      "cell": {
+        "x": -3,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "orchard",
+      "cell": {
+        "x": -2,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "quarry",
+      "cell": {
+        "x": -1,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "garden",
+      "cell": {
+        "x": 1,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "lumber",
+      "cell": {
+        "x": 2,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "cottage",
+      "cell": {
+        "x": -2,
+        "z": -3
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "Fresh real-time building loop",
+      "value": {
+        "wallSeconds": 25.668,
+        "day": 1,
+        "population": 6,
+        "buildings": 7
+      }
+    },
+    {
+      "name": "Fresh earned journal survives reload",
+      "value": 11
+    },
+    {
+      "name": "Visit is read-only and original home preserved",
+      "value": true
+    },
+    {
+      "name": "Home building transforms after switching",
+      "value": [
+        {
+          "id": "hearth",
+          "expected": [
+            0,
+            3.6
+          ],
+          "actual": [
+            0,
+            3.6
+          ]
+        },
+        {
+          "id": "bell",
+          "expected": [
+            0,
+            -9
+          ],
+          "actual": [
+            0,
+            -9
+          ]
+        },
+        {
+          "id": "b1",
+          "expected": [
+            -5.4,
+            -5.4
+          ],
+          "actual": [
+            -5.4,
+            -5.4
+          ]
+        },
+        {
+          "id": "b2",
+          "expected": [
+            -3.6,
+            -5.4
+          ],
+          "actual": [
+            -3.6,
+            -5.4
+          ]
+        },
+        {
+          "id": "b3",
+          "expected": [
+            -1.8,
+            -5.4
+          ],
+          "actual": [
+            -1.8,
+            -5.4
+          ]
+        },
+        {
+          "id": "b4",
+          "expected": [
+            1.8,
+            -5.4
+          ],
+          "actual": [
+            1.8,
+            -5.4
+          ]
+        },
+        {
+          "id": "b5",
+          "expected": [
+            3.6,
+            -5.4
+          ],
+          "actual": [
+            3.6,
+            -5.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Consented exchange conserves both towns’ resources",
+      "value": {
+        "homeWood": 52.279348,
+        "companionWood": 74,
+        "companionFood": 70
+      }
+    },
+    {
+      "name": "Trade reload returns home without duplication",
+      "value": true
+    },
+    {
+      "name": "Second tab blocked without advancing or overwriting",
+      "value": "Wildhaven is already open in another tab. Close that tab, then reload this one to continue safely."
+    },
+    {
+      "name": "Phone companion panel",
+      "value": {
+        "overflow": false,
+        "panel": {
+          "x": 8,
+          "y": 151,
+          "width": 374,
+          "height": 506
+        },
+        "content": {
+          "x": 9,
+          "y": 222,
+          "width": 372,
+          "height": 434
+        }
+      }
+    },
+    {
+      "name": "Prior earned bell save next action",
+      "value": "Open a schoolhouse"
+    },
+    {
+      "name": "Research prerequisite jump",
+      "value": true
+    },
+    {
+      "name": "Locked path points to building its required school",
+      "value": true
+    },
+    {
+      "name": "Coastal guard staffing changes requested posts",
+      "value": true
+    },
+    {
+      "name": "Choose Trading town applies actual charter and exact displayed switching cost",
+      "value": true
+    },
+    {
+      "name": "Buy tools quote adds four directly to stock",
+      "value": true
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "finished": "2026-10-07T02:50:20.106Z",
+  "passed": true
+}

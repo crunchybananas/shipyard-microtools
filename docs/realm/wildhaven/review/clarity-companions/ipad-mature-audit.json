@@ -1,0 +1,92 @@
+{
+  "method": "Earned mature campaign fixture, real touch actions, paused UI capture except explicit real-time fieldwork resume; no review advance.",
+  "errors": [],
+  "checks": [
+    {
+      "id": "portrait-well",
+      "diagnostics": {
+        "drawCalls": 281,
+        "triangles": 976227,
+        "actors": 76,
+        "buildings": 59,
+        "troops": 0,
+        "fortifications": 0,
+        "neighbors": 3,
+        "pixelRatio": 1,
+        "webgl": true,
+        "fps": 0
+      }
+    },
+    {
+      "id": "landscape-well",
+      "diagnostics": {
+        "drawCalls": 483,
+        "triangles": 1245486,
+        "actors": 76,
+        "buildings": 59,
+        "troops": 0,
+        "fortifications": 0,
+        "neighbors": 3,
+        "pixelRatio": 1,
+        "webgl": true,
+        "fps": 0
+      }
+    },
+    {
+      "id": "worker",
+      "diagnostics": {
+        "drawCalls": 309,
+        "triangles": 957308,
+        "actors": 76,
+        "buildings": 59,
+        "troops": 0,
+        "fortifications": 0,
+        "neighbors": 3,
+        "pixelRatio": 1,
+        "webgl": true,
+        "fps": 0
+      }
+    },
+    {
+      "id": "survey-paused",
+      "diagnostics": {
+        "drawCalls": 308,
+        "triangles": 957758,
+        "actors": 75,
+        "buildings": 59,
+        "troops": 1,
+        "fortifications": 0,
+        "neighbors": 3,
+        "pixelRatio": 1,
+        "webgl": true,
+        "fps": 0
+      }
+    },
+    {
+      "id": "survey-resumed",
+      "diagnostics": {
+        "drawCalls": 308,
+        "triangles": 957758,
+        "actors": 75,
+        "buildings": 59,
+        "troops": 1,
+        "fortifications": 0,
+        "neighbors": 3,
+        "pixelRatio": 1,
+        "webgl": true,
+        "fps": 51
+      }
+    },
+    {
+      "realTimeFieldworkProgress": [
+        {
+          "name": "Ada",
+          "mission": "survey",
+          "status": "active",
+          "stage": "outbound"
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

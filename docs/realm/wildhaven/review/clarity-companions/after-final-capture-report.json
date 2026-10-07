@@ -1,0 +1,330 @@
+{
+  "label": "after-final",
+  "base": "http://127.0.0.1:14722/realm/wildhaven/",
+  "at": "2026-10-07T02:56:58.519Z",
+  "scenes": [
+    {
+      "id": "placement",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "b12988994c6b55e55ab842cc611b562cc64eba783d9bc9f31250a35b98abe47b",
+      "file": "after-final-placement.png",
+      "camera": {
+        "position": [
+          30.40559159102154,
+          36.897309698871595,
+          30.405591591021544
+        ],
+        "quaternion": [
+          -0.31550339066846905,
+          0.3596774046650398,
+          0.13068578338957687,
+          0.868338068421495
+        ],
+        "zoom": 19,
+        "targetZoom": 19,
+        "pan": [
+          0,
+          0,
+          0
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1440,
+          960
+        ]
+      },
+      "renderer": {
+        "calls": 55,
+        "triangles": 583121,
+        "geometries": 61,
+        "textures": 3
+      }
+    },
+    {
+      "id": "well-selected",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+      "file": "after-final-well-selected.png",
+      "camera": {
+        "position": [
+          25.005591591021542,
+          36.84928525080658,
+          37.60559159102154
+        ],
+        "quaternion": [
+          -0.31550339066846905,
+          0.3596774046650398,
+          0.13068578338957687,
+          0.868338068421495
+        ],
+        "zoom": 18,
+        "targetZoom": 18,
+        "pan": [
+          -5.4,
+          0,
+          7.2
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1440,
+          960
+        ]
+      },
+      "renderer": {
+        "calls": 414,
+        "triangles": 1169170,
+        "geometries": 350,
+        "textures": 19
+      }
+    },
+    {
+      "id": "well-placement",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+      "file": "after-final-well-placement.png",
+      "camera": {
+        "position": [
+          25.005591591021542,
+          36.84928525080658,
+          37.60559159102154
+        ],
+        "quaternion": [
+          -0.31550339066846905,
+          0.3596774046650398,
+          0.13068578338957687,
+          0.868338068421495
+        ],
+        "zoom": 18,
+        "targetZoom": 18,
+        "pan": [
+          -5.4,
+          0,
+          7.2
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1440,
+          960
+        ]
+      },
+      "renderer": {
+        "calls": 417,
+        "triangles": 1179789,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "id": "windmill",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+      "file": "after-final-windmill.png",
+      "camera": {
+        "position": [
+          32.20559159102154,
+          36.84538407315224,
+          34.00559159102154
+        ],
+        "quaternion": [
+          -0.31550339066846916,
+          0.3596774046650398,
+          0.1306857833895769,
+          0.8683380684214952
+        ],
+        "zoom": 18,
+        "targetZoom": 18,
+        "pan": [
+          1.8,
+          0,
+          3.6
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1440,
+          960
+        ]
+      },
+      "renderer": {
+        "calls": 553,
+        "triangles": 1295807,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "id": "council",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+      "file": "after-final-council.png",
+      "camera": {
+        "position": [
+          32.20559159102154,
+          36.84538407315224,
+          34.00559159102154
+        ],
+        "quaternion": [
+          -0.31550339066846916,
+          0.3596774046650398,
+          0.1306857833895769,
+          0.8683380684214952
+        ],
+        "zoom": 18,
+        "targetZoom": 18,
+        "pan": [
+          1.8,
+          0,
+          3.6
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1440,
+          960
+        ]
+      },
+      "renderer": {
+        "calls": 549,
+        "triangles": 1295692,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "id": "phone-trade",
+      "viewport": {
+        "width": 390,
+        "height": 667
+      },
+      "worldHash": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+      "file": "after-final-phone-trade.png",
+      "camera": {
+        "position": [
+          32.20559159102154,
+          36.84538407315224,
+          34.00559159102154
+        ],
+        "quaternion": [
+          -0.31550339066846916,
+          0.3596774046650398,
+          0.1306857833895769,
+          0.8683380684214952
+        ],
+        "zoom": 18,
+        "targetZoom": 18,
+        "pan": [
+          1.8,
+          0,
+          3.6
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          390,
+          667
+        ]
+      },
+      "renderer": {
+        "calls": 303,
+        "triangles": 970639,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "id": "watch",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "6b31aa4939d80e1ff4349d5f5e04f96c3e6911e9c422fcea710cd127af67c7a8",
+      "file": "after-final-watch.png",
+      "camera": {
+        "position": [
+          30.40559159102154,
+          36.897309698871595,
+          30.405591591021544
+        ],
+        "quaternion": [
+          -0.31550339066846905,
+          0.3596774046650398,
+          0.13068578338957687,
+          0.868338068421495
+        ],
+        "zoom": 30,
+        "targetZoom": 30,
+        "pan": [
+          0,
+          0,
+          0
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1440,
+          960
+        ]
+      },
+      "renderer": {
+        "calls": 614,
+        "triangles": 1349322,
+        "geometries": 377,
+        "textures": 9
+      }
+    },
+    {
+      "id": "social",
+      "viewport": {
+        "width": 1200,
+        "height": 630
+      },
+      "worldHash": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+      "file": "after-final-social.png",
+      "camera": {
+        "position": [
+          25.005591591021542,
+          36.84928525080658,
+          37.60559159102154
+        ],
+        "quaternion": [
+          -0.31550339066846905,
+          0.3596774046650398,
+          0.13068578338957687,
+          0.868338068421495
+        ],
+        "zoom": 18,
+        "targetZoom": 18,
+        "pan": [
+          -5.4,
+          0,
+          7.2
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1200,
+          630
+        ]
+      },
+      "renderer": {
+        "calls": 484,
+        "triangles": 1245498,
+        "geometries": 350,
+        "textures": 19
+      }
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "fixture": "Existing independently earned campaign-services-lanes and campaign-pressure saves; paused presentation only, no generated resources or clock advances."
+}

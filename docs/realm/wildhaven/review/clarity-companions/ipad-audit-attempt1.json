@@ -1,0 +1,113 @@
+{
+  "started": "2026-10-07T02:11:50.737Z",
+  "engine": "Installed Chrome, touch/isMobile viewport emulation. Not a physical iPad or native Safari run.",
+  "checks": [
+    {
+      "name": "768x1024 fresh layout",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          768,
+          1024
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "768x1024 touch preview/rotate/pan/pinch/confirm/undo",
+      "value": {
+        "placed": {
+          "id": "b1",
+          "type": "cottage",
+          "x": -3,
+          "z": -3,
+          "rotation": 1,
+          "builtDay": 1,
+          "level": 1,
+          "status": "building",
+          "constructionKind": "build",
+          "targetLevel": 1,
+          "progress": 0,
+          "workRequired": 36,
+          "escrow": {
+            "wood": 16,
+            "stone": 8
+          },
+          "investment": {
+            "wood": 0,
+            "stone": 0,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 1,
+          "desiredWorkers": 0,
+          "paused": false,
+          "priority": 10
+        },
+        "targets": [
+          {
+            "text": "Build here",
+            "width": 483.859375,
+            "height": 44
+          },
+          {
+            "text": "Rotate R",
+            "width": 57.6875,
+            "height": 44
+          },
+          {
+            "text": "Done esc",
+            "width": 58.453125,
+            "height": 44
+          }
+        ]
+      }
+    },
+    {
+      "name": "768x1024 after return home",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          768,
+          1024
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1024x768 orientation change",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1024,
+          768
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1024x768 fresh layout",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1024,
+          768
+        ],
+        "clipped": []
+      }
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'placement'\n- 'world'\n\n    at gesture (file:///private/tmp/realm-browser-qa/wildhaven-ipad-audit.mjs:14:178)\n    at async file:///private/tmp/realm-browser-qa/wildhaven-ipad-audit.mjs:22:3"
+}

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "slug": "wildhaven-clearer-living-towns",
+  "title": "Wildhaven makes the next move clear",
+  "appSlug": "realm",
+  "surfaceSlug": null,
+  "kind": "app",
+  "status": "in-revision",
+  "publishedAt": null,
+  "thesis": "A deep town simulation is more inviting when each choice shows its purpose and its next action.",
+  "summary": "Clear building payoffs, visible service reach, an explorable research map, direct town paths, and a compact touch layout make the next decision easier to understand.",
+  "versions": {
+    "before": {
+      "label": "Published Wildhaven",
+      "commit": "c3bbc7a03f86ca4de76d23b36d1dad1adc2a49a8"
+    },
+    "after": {
+      "label": "Clarity, companion towns and touch candidate",
+      "commit": "dbae8edaba34a0b6c8e0c470051dae4a20aa008a"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "well-selected",
+      "title": "See which homes a well reaches",
+      "caption": "The same earned town, paused at the same camera and viewport. A continuous boundary and roof markers reveal geographic reach; the inspector separately reports actual supplied capacity.",
+      "before": {
+        "src": "assets/wildhaven-clearer-living-towns/before-well-selected.png",
+        "alt": "Published Wildhaven: see which homes a well reaches before the clarity pass."
+      },
+      "after": {
+        "src": "assets/wildhaven-clearer-living-towns/after-well-selected.png",
+        "alt": "Local Wildhaven candidate: see which homes a well reaches after the clarity pass."
+      }
+    },
+    {
+      "id": "windmill",
+      "title": "Know what the windmill does",
+      "caption": "The same earned windmill now shows grain → flour, its two millers, and the bakery that uses its output. Actual current rates remain separate from base recipes.",
+      "before": {
+        "src": "assets/wildhaven-clearer-living-towns/before-windmill.png",
+        "alt": "Published Wildhaven: know what the windmill does before the clarity pass."
+      },
+      "after": {
+        "src": "assets/wildhaven-clearer-living-towns/after-windmill.png",
+        "alt": "Local Wildhaven candidate: know what the windmill does after the clarity pass."
+      }
+    },
+    {
+      "id": "council",
+      "title": "Choose a direction without guessing",
+      "caption": "The same earned town now presents Food, Trading and Craft paths as concrete choices, with their current selection and switching cost. Research requirements and the tappable dependency map remain available in Council.",
+      "before": {
+        "src": "assets/wildhaven-clearer-living-towns/before-council.png",
+        "alt": "Published Wildhaven: choose a direction without guessing before the clarity pass."
+      },
+      "after": {
+        "src": "assets/wildhaven-clearer-living-towns/after-council.png",
+        "alt": "Local Wildhaven candidate: choose a direction without guessing after the clarity pass."
+      }
+    },
+    {
+      "id": "phone-trade",
+      "title": "Put usable trade choices within reach",
+      "caption": "At the same 390×667 viewport and earned state, the town book folds the building shelf and puts landing exchanges and orders before the larger market catalog.",
+      "before": {
+        "src": "assets/wildhaven-clearer-living-towns/before-phone-trade.png",
+        "alt": "Published Wildhaven: put usable trade choices within reach before the clarity pass."
+      },
+      "after": {
+        "src": "assets/wildhaven-clearer-living-towns/after-phone-trade.png",
+        "alt": "Local Wildhaven candidate: put usable trade choices within reach after the clarity pass."
+      }
+    }
+  ],
+  "changes": [
+    {
+      "title": "Placement and neighborhood services are visible",
+      "body": "Broad entrance arrows, clear approach lanes and bounded service markers explain siting. Job pictograms and resident callouts identify the people doing the work."
+    },
+    {
+      "title": "Research and paths lead to an actual choice",
+      "body": "The dependency graph follows the real prerequisite data. Nodes open details without spending resources. Food, Trading and Craft paths expose their benefits and point to required research while locked."
+    },
+    {
+      "title": "Stores describe what already happens",
+      "body": "Made and imported tools enter the stockpile automatically. The tools objective leads to its stock count, local production chain or exact market quote."
+    },
+    {
+      "title": "The island gets the iPad landscape screen back",
+      "body": "A 56px dock replaces the persistent building shelf and management row. Build and Town open only when needed. Touch placement previews before confirmation; rotation, pan, pinch and undo remain available."
+    },
+    {
+      "title": "A companion town can begin on this device",
+      "body": "Separate towns can be visited, managed and connected by explicitly accepted exchanges. Atomic saves, writer locks and home-only storage protect earned work. This is a local prototype, not online multiplayer."
+    },
+    {
+      "title": "The town keeps its history",
+      "body": "Reload retains valid journal entries and unique event IDs. Optional invalid history is filtered without discarding the village or replaying rewards."
+    }
+  ],
+  "builderNote": {
+    "quote": "Show the consequence and the next button where the player makes the decision.",
+    "context": "Implementation principle from this pass, not an owner endorsement. Fresh control play, earned mature fixtures and pure regression tests are separate evidence. The candidate has not been deployed. iPad viewport and touch emulation do not establish native Safari, hardware-keyboard or sustained physical-device performance. Paired gameplay state matches exactly after excluding the deliberately repaired journal fields."
+  },
+  "proof": [
+    {
+      "label": "Aggregate game regression suite",
+      "value": "See source-pinned review checkpoint"
+    },
+    {
+      "label": "Real controls and earned saves",
+      "value": "Fresh construction, research, staffing, visits and trade checked"
+    },
+    {
+      "label": "iPad touch layouts",
+      "value": "Four portrait/landscape sizes; native device validation remains"
+    },
+    {
+      "label": "Publication",
+      "value": "Local review candidate"
+    }
+  ],
+  "links": {
+    "live": "https://crunchybananas.github.io/shipyard-microtools/realm/wildhaven/",
+    "source": "https://github.com/crunchybananas/shipyard-microtools/tree/dbae8edaba34a0b6c8e0c470051dae4a20aa008a/docs/realm/wildhaven",
+    "download": "assets/wildhaven-clearer-living-towns/social.png"
+  },
+  "share": {
+    "summary": "Clear building payoffs, visible service reach, an explorable research map, direct town paths, and a compact touch layout make the next decision easier to understand. Local candidate under review; companion towns share this device only.",
+    "image": "assets/wildhaven-clearer-living-towns/social.png"
+  }
+}

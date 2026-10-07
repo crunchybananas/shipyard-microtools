@@ -1,0 +1,68 @@
+{
+  "started": "2026-10-07T02:05:17.510Z",
+  "method": "Real mouse, keyboard and touch controls. No review advance, injected resources or simulator actions. Separate earned mature-save fixtures are labeled.",
+  "actions": [
+    {
+      "action": "place",
+      "type": "cottage",
+      "cell": {
+        "x": -3,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "orchard",
+      "cell": {
+        "x": -2,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "quarry",
+      "cell": {
+        "x": -1,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "garden",
+      "cell": {
+        "x": 1,
+        "z": -3
+      }
+    },
+    {
+      "action": "place",
+      "type": "lumber",
+      "cell": {
+        "x": 2,
+        "z": -3
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "Fresh real-time building loop",
+      "value": {
+        "wallSeconds": 25.667,
+        "day": 1,
+        "population": 6,
+        "buildings": 7
+      }
+    },
+    {
+      "name": "Fresh earned journal survives reload",
+      "value": 11
+    },
+    {
+      "name": "Visit is read-only and original home preserved",
+      "value": true
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n90 !== 50\n\n    at file:///private/tmp/realm-browser-qa/wildhaven-play-audit.mjs:26:373"
+}

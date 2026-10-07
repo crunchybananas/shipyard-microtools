@@ -1,0 +1,50 @@
+{
+  "label": "after-final",
+  "base": "http://127.0.0.1:14722/realm/wildhaven/",
+  "at": "2026-10-07T02:55:55.937Z",
+  "scenes": [
+    {
+      "id": "placement",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "ca3def6de6f29bc516be5c4203cca16562c15893b9d5b367ea91907ca07a3556",
+      "file": "after-final-placement.png",
+      "camera": {
+        "position": [
+          30.40559159102154,
+          36.897309698871595,
+          30.405591591021544
+        ],
+        "quaternion": [
+          -0.31550339066846905,
+          0.3596774046650398,
+          0.13068578338957687,
+          0.868338068421495
+        ],
+        "zoom": 19,
+        "targetZoom": 19,
+        "pan": [
+          0,
+          0,
+          0
+        ],
+        "azimuth": 0.7853981633974483,
+        "canvas": [
+          1440,
+          960
+        ]
+      },
+      "renderer": {
+        "calls": 55,
+        "triangles": 583121,
+        "geometries": 61,
+        "textures": 3
+      }
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "fixture": "Existing independently earned campaign-services-lanes and campaign-pressure saves; paused presentation only, no generated resources or clock advances."
+}
