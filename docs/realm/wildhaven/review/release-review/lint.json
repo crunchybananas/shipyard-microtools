@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "exitCode": 0,
+  "files": 20,
+  "rules": [
+    "no-unused-vars (underscore names allowed)",
+    "no-unreachable",
+    "no-constant-condition"
+  ],
+  "scope": "Supplemental all-Wildhaven JavaScript check using existing ESLint; global workspace lint targets archived apps and is not a docs deployment gate.",
+  "priorFindings": "Four pre-existing unused bindings: two sim imports (public re-exports retained), two unused frontier context parameters (renamed _ctx). Cleaned without gameplay changes."
+}

@@ -1,0 +1,32 @@
+{
+  "capturedAt": "2026-10-07T02:23:33.783604+00:00",
+  "purpose": "Pre-final source checkpoint; further user-directed compact landscape and path clarity edits pending.",
+  "files": {
+    "frontier.css": "b2effd02b057ed5e7f8cbbd06b8085abc7320ed19674dda5cd6b576e0d85e97b",
+    "companion.css": "17293a873eba4da410bb1cea9940216016f654034360ffea852d4facd201de36",
+    "living.css": "84d77e2a7ffacfdf2698054dfddb1d32c21cef5ba49ee87dab25bcec4da398c2",
+    "clarity.css": "b99415587e66089e92005f73c567ea04a3f532a4c35f21212fc093182587718c",
+    "style.css": "485df8c1d1b20da73299f9713d3554f7a8e3d1a1ce97ca2f5f170c63f964c65c",
+    "tablet.css": "0010e679b3640c582a98c7c320c8cf3f111c8c93b18c30e6bb19f55a2eef4757",
+    "index.html": "d2233511937d611160c00cd854f26a9e829abdd180e95d69fdd7826eb35d1587",
+    "review-town.html": "6df657cadb48a3a634675edfa58913d2aa3938e3289fa90561a07beaed0364e4",
+    "js/companion-ui.js": "c00a1e9defd317bc4ab47ff40ad928eeb5fc5ae7bd4da52b88481eac75e6f087",
+    "js/town-ui.js": "5a4ef0f8aad348de0e63ec96f7fa41f60578b3d8e2753f0fcd492fc3cabb092e",
+    "js/world.js": "2b38717bbb918c15499710615b92ac7acfef2588c56a9c6a4459ebf2a88adda7",
+    "js/sim.js": "d4645b745973779b779abf1e88f528559cfe8d878d580692ef3a54643e47155f",
+    "js/progression.js": "6bb6d67fca208dd77f9b5dcb3cbe75636ad0bd0212f2e7bd0523d4c1c8d76b5b",
+    "js/clarity.js": "ef59fc298fe5348579e8f0880a157921f5818944bb4e2c984d2e721307826967",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/companion-store.js": "c0244952939235b497bec2ca6ddb713cb33a0a1b45b6015cc857c26700bc3b74",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "js/fieldbook-ui.js": "b50d8b17e6e9765063424feacdb01a797924e4baa9c38d9ef2890b5b6e468554",
+    "js/clarity-ui.js": "cdd7374fc2427bd14cc65d5ab4b07d59b8023c4adb973d4b7e6ce1333775df6b",
+    "js/main.js": "b01ff0c7afba6d0268af8a57f67acc9f691455f4cd83787d927c506f6a5060bf",
+    "js/audio.js": "8eaa22d36094c8aaba97412bbd1bd107267ebe4b2a646d997ef6937ef0383475",
+    "js/frontier.js": "f416045d71957ba93ad4022ed50fa1cf3eb381fcf2c2f68cc39c702bdea092a6",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/world-cues.js": "e9444937fca5792cc8c099d01d801314ef8f6a154dfba80c3bf28c5a8a99ed56",
+    "js/frontier-ui.js": "d90ceb12585e7a7489025022543c973f315a89be3ed92675b6c550b271694e08"
+  }
+}

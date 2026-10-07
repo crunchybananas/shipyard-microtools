@@ -1,0 +1,12 @@
+.council-jumps{display:flex;position:sticky;top:-18px;z-index:2;gap:6px;padding:5px 0 9px;background:#f5eedd}
+.council-jumps button{flex:1;min-height:44px;padding:8px;border-radius:4px;background:#dce3c9;color:#365d43;font-size:12px}
+[data-council-section]{scroll-margin-top:62px}
+.town-paths>.town-section{margin:8px 0}.path-terms{font-size:11px;line-height:1.5;color:#5e6d51;margin:0 0 9px}
+.path-requirement{display:flex;align-items:center;gap:10px;padding:7px 9px;background:#eadfc6;border-radius:4px;font-size:11px;line-height:1.4;color:#775333}
+.path-requirement span{flex:1}.path-requirement button{min-height:44px;max-width:52%;padding:7px 9px;border-radius:4px;background:#d9ca9e;color:#503f26;font-size:11px}
+.path-option{display:grid;grid-template-columns:1fr auto;column-gap:8px;padding:8px 10px;margin:7px 0}.path-choice-top{grid-column:1/-1;display:flex;align-items:center;gap:8px}.path-choice-top>img{width:40px;height:37px;object-fit:contain}
+.path-choice-label{flex:1;min-width:0}.path-choice-label strong{display:block;font-size:17px}.path-choice-label small{display:block;margin-top:2px;font-size:10px;color:#637151}
+.path-choice-top button{min-height:44px;max-width:116px;font-size:11px;color:#31563d}.path-choice-top button:disabled{color:#657052;opacity:.8}.path-option.selected .path-choice-top button{color:#fff3d5;background:#315f4c;opacity:1}
+.path-option .path-payoff{align-self:center;margin:0;font-size:11px;color:#3c6346}.path-option .town-disclosure{margin:0;border:0;justify-self:end}.path-option .town-disclosure>summary{font-family:inherit;font-size:11px;line-height:1.4;padding:8px 0;min-height:44px;align-content:center;color:#526748}.path-option .town-disclosure[open]{grid-column:1/-1;justify-self:stretch}.path-option .town-disclosure[open]>summary{margin-bottom:3px}.path-option .town-disclosure p{margin:2px 0 5px;color:#795638}
+.town-paths+.research-work{margin-top:18px}
+@media(max-width:760px){.council-jumps{top:-8px}.path-choice-top{gap:6px}.path-choice-top>img{width:32px}.path-choice-top button{max-width:104px;padding:7px}.path-choice-label strong{font-size:16px}}

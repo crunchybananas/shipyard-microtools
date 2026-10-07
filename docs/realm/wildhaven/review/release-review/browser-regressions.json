@@ -1,0 +1,123 @@
+{
+  "started": "2026-10-07T03:08:42.539Z",
+  "method": "Installed Chrome touch emulation, actual controls, isolated saves, one browser, packaged Pages runtime at localhost14723. No review clock or injected game resources.",
+  "checks": [
+    {
+      "name": "1024 cancel staged plan spends nothing",
+      "value": true
+    },
+    {
+      "name": "1024 repeat build then Done, Undo and cancel remaining construction",
+      "value": {
+        "first": {
+          "x": -3,
+          "z": -5
+        },
+        "second": {
+          "x": -2,
+          "z": -5
+        }
+      }
+    },
+    {
+      "name": "Supplemental CDP partial-pinch observation",
+      "value": {
+        "before": [
+          -5.4,
+          0,
+          -9
+        ],
+        "after": [
+          -5.4,
+          0,
+          -9
+        ],
+        "distance": 0,
+        "input": {
+          "events": [
+            {
+              "type": "pointerdown",
+              "id": 20,
+              "x": 400,
+              "y": 400
+            },
+            {
+              "type": "pointerdown",
+              "id": 21,
+              "x": 500,
+              "y": 400
+            },
+            {
+              "type": "pointermove",
+              "id": 21,
+              "x": 540,
+              "y": 400
+            },
+            {
+              "type": "pointermove",
+              "id": 21,
+              "x": 545,
+              "y": 404
+            },
+            {
+              "type": "pointerup",
+              "id": 20,
+              "x": 400,
+              "y": 400
+            },
+            {
+              "type": "lostpointercapture",
+              "id": 20,
+              "x": 400,
+              "y": 400
+            },
+            {
+              "type": "pointerup",
+              "id": 21,
+              "x": 545,
+              "y": 404
+            },
+            {
+              "type": "lostpointercapture",
+              "id": 21,
+              "x": 545,
+              "y": 404
+            }
+          ],
+          "pointers": []
+        }
+      }
+    },
+    {
+      "name": "390 cancel staged plan spends nothing",
+      "value": true
+    },
+    {
+      "name": "390 repeat build then Done, Undo and cancel remaining construction",
+      "value": {
+        "first": {
+          "x": -1,
+          "z": -4
+        },
+        "second": {
+          "x": -3,
+          "z": -3
+        }
+      }
+    },
+    {
+      "name": "Selected well retains ring and hides duplicate label after live refresh/orientation",
+      "value": true
+    },
+    {
+      "name": "Preview well has reach and label; cancel removes it",
+      "value": true
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "partialPinchBrowserLimit": "Recorded pointer events show both pointers remained until the final all-fingers touchEnd. The CDP sequence did not exercise a one-finger continuation, so it is not browser proof of continuity. The actual VillageWorld class regression tests both release orders; native device behavior remains unverified.",
+  "passed": true,
+  "finished": "2026-10-07T03:08:50.435Z",
+  "sourceCommit": "d60c08409b28f09935302c2e4435baefbfd92c96"
+}

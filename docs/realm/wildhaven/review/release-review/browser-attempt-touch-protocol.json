@@ -1,0 +1,43 @@
+{
+  "started": "2026-10-07T03:06:58.330Z",
+  "method": "Installed Chrome touch emulation, actual controls, isolated saves, one browser, packaged Pages runtime at localhost14723. No review clock or injected game resources.",
+  "checks": [
+    {
+      "name": "1024 cancel staged plan spends nothing",
+      "value": true
+    },
+    {
+      "name": "1024 repeat build then Done, Undo and cancel remaining construction",
+      "value": {
+        "first": {
+          "x": -3,
+          "z": -5
+        },
+        "second": {
+          "x": -2,
+          "z": -5
+        }
+      }
+    },
+    {
+      "name": "Pinch-to-pan raw movement",
+      "value": {
+        "before": [
+          -5.4,
+          0,
+          -9
+        ],
+        "after": [
+          -5.4,
+          0,
+          -9
+        ],
+        "distance": 0
+      }
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(distance>0&&distance<1)\n\n    at file:///private/tmp/realm-browser-qa/wildhaven-release-regressions.mjs:20:813",
+  "finished": "2026-10-07T03:07:00.986Z"
+}

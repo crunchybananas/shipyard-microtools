@@ -1,0 +1,14 @@
+{
+  "started": "2026-10-07T03:05:01.311Z",
+  "method": "Installed Chrome touch emulation, actual controls, isolated saves, one browser, packaged Pages runtime at localhost14723. No review clock or injected game resources.",
+  "checks": [
+    {
+      "name": "1024 cancel staged plan spends nothing",
+      "value": true
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "error": "locator.tap: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#undo')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled id=\"undo\" title=\"Undo last construction (Ctrl or ⌘ Z)\">Undo</button>\u001b[22m\n\u001b[2m  - attempting tap action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying tap action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying tap action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    56 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying tap action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at /private/tmp/realm-browser-qa/wildhaven-release-regressions.mjs:17:614",
+  "finished": "2026-10-07T03:05:33.320Z"
+}

@@ -1,0 +1,390 @@
+{
+  "started": "2026-10-07T02:27:08.771Z",
+  "engine": "Installed Chrome, touch/isMobile viewport emulation. Not a physical iPad or native Safari run.",
+  "checks": [
+    {
+      "name": "768x1024 fresh layout",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          768,
+          1024
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "768x1024 touch preview/rotate/pan/pinch/confirm/undo",
+      "value": {
+        "placed": {
+          "id": "b1",
+          "type": "cottage",
+          "x": -3,
+          "z": -3,
+          "rotation": 1,
+          "builtDay": 1,
+          "level": 1,
+          "status": "building",
+          "constructionKind": "build",
+          "targetLevel": 1,
+          "progress": 0,
+          "workRequired": 36,
+          "escrow": {
+            "wood": 16,
+            "stone": 8
+          },
+          "investment": {
+            "wood": 0,
+            "stone": 0,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 1,
+          "desiredWorkers": 0,
+          "paused": false,
+          "priority": 10
+        },
+        "targets": [
+          {
+            "text": "Build here",
+            "width": 466.0625,
+            "height": 44
+          },
+          {
+            "text": "Rotate R",
+            "width": 70.9375,
+            "height": 44
+          },
+          {
+            "text": "Done esc",
+            "width": 71,
+            "height": 44
+          }
+        ]
+      }
+    },
+    {
+      "name": "768x1024 after return home",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          768,
+          1024
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1024x768 orientation change",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1024,
+          768
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1024x768 fresh layout",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1024,
+          768
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1024x768 unobstructed island fraction",
+      "value": 0.8286893704850361
+    },
+    {
+      "name": "1024x768 touch preview/rotate/pan/pinch/confirm/undo",
+      "value": {
+        "placed": {
+          "id": "b1",
+          "type": "cottage",
+          "x": -3,
+          "z": -3,
+          "rotation": 1,
+          "builtDay": 1,
+          "level": 1,
+          "status": "building",
+          "constructionKind": "build",
+          "targetLevel": 1,
+          "progress": 0,
+          "workRequired": 36,
+          "escrow": {
+            "wood": 16,
+            "stone": 8
+          },
+          "investment": {
+            "wood": 0,
+            "stone": 0,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 1,
+          "desiredWorkers": 0,
+          "paused": false,
+          "priority": 10
+        },
+        "targets": [
+          {
+            "text": "Build here",
+            "width": 466.0625,
+            "height": 44
+          },
+          {
+            "text": "Rotate R",
+            "width": 70.9375,
+            "height": 44
+          },
+          {
+            "text": "Done esc",
+            "width": 71,
+            "height": 44
+          }
+        ]
+      }
+    },
+    {
+      "name": "1024x768 after return home",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1024,
+          768
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "768x1024 orientation change",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          768,
+          1024
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "820x1180 fresh layout",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          820,
+          1180
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "820x1180 touch preview/rotate/pan/pinch/confirm/undo",
+      "value": {
+        "placed": {
+          "id": "b1",
+          "type": "cottage",
+          "x": -3,
+          "z": -3,
+          "rotation": 1,
+          "builtDay": 1,
+          "level": 1,
+          "status": "building",
+          "constructionKind": "build",
+          "targetLevel": 1,
+          "progress": 0,
+          "workRequired": 36,
+          "escrow": {
+            "wood": 16,
+            "stone": 8
+          },
+          "investment": {
+            "wood": 0,
+            "stone": 0,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 1,
+          "desiredWorkers": 0,
+          "paused": false,
+          "priority": 10
+        },
+        "targets": [
+          {
+            "text": "Build here",
+            "width": 466.0625,
+            "height": 44
+          },
+          {
+            "text": "Rotate R",
+            "width": 70.9375,
+            "height": 44
+          },
+          {
+            "text": "Done esc",
+            "width": 71,
+            "height": 44
+          }
+        ]
+      }
+    },
+    {
+      "name": "820x1180 after return home",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          820,
+          1180
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1180x820 orientation change",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1180,
+          820
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1180x820 fresh layout",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1180,
+          820
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "1180x820 unobstructed island fraction",
+      "value": 0.8710210830921868
+    },
+    {
+      "name": "1180x820 touch preview/rotate/pan/pinch/confirm/undo",
+      "value": {
+        "placed": {
+          "id": "b1",
+          "type": "cottage",
+          "x": -3,
+          "z": -3,
+          "rotation": 1,
+          "builtDay": 1,
+          "level": 1,
+          "status": "building",
+          "constructionKind": "build",
+          "targetLevel": 1,
+          "progress": 0,
+          "workRequired": 36,
+          "escrow": {
+            "wood": 16,
+            "stone": 8
+          },
+          "investment": {
+            "wood": 0,
+            "stone": 0,
+            "food": 0,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 0,
+            "knowledge": 0
+          },
+          "queueOrder": 1,
+          "desiredWorkers": 0,
+          "paused": false,
+          "priority": 10
+        },
+        "targets": [
+          {
+            "text": "Build here",
+            "width": 466.0625,
+            "height": 44
+          },
+          {
+            "text": "Rotate R",
+            "width": 70.9375,
+            "height": 44
+          },
+          {
+            "text": "Done esc",
+            "width": 71,
+            "height": 44
+          }
+        ]
+      }
+    },
+    {
+      "name": "1180x820 after return home",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          1180,
+          820
+        ],
+        "clipped": []
+      }
+    },
+    {
+      "name": "820x1180 orientation change",
+      "value": {
+        "overflow": false,
+        "viewport": [
+          820,
+          1180
+        ],
+        "clipped": []
+      }
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "passed": true,
+  "finished": "2026-10-07T02:27:23.073Z"
+}

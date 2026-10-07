@@ -1,0 +1,356 @@
+{
+  "scope": "Initial candidate captures only. Exact JSON-state comparison, no rendering or simulation advancement.",
+  "comparedAt": "2026-10-07T02:13:08.559Z",
+  "captureTimes": {
+    "before": "2026-10-07T02:00:17.622Z",
+    "after": "2026-10-07T02:02:03.701Z"
+  },
+  "method": "Strict structural/value equality of every state field except events and nextEventId. No numeric tolerance. The only mature-state differences are the expected journal preservation and journal sequence counter; retained journal text/day/type is checked against the original earned fixture.",
+  "result": "All seven pairs mechanically identical. The opening placement pair is also fully byte-identical. All paired viewports match and all reported snapshot hashes verify.",
+  "cameraEvidence": {
+    "harness": "/tmp/realm-browser-qa/wildhaven-clarity-capture.mjs",
+    "persistedCameraTransforms": false,
+    "persistedHarnessDigest": false,
+    "scriptedTargets": {
+      "placement": {
+        "x": 0,
+        "z": 0,
+        "zoom": 19
+      },
+      "well-selected": {
+        "x": -3,
+        "z": 4,
+        "zoom": 18
+      },
+      "well-placement": "inherits well-selected",
+      "windmill": {
+        "x": 1,
+        "z": 2,
+        "zoom": 18
+      },
+      "council": "inherits windmill",
+      "phone-trade": "inherits windmill with 390×667 aspect",
+      "watch": "home target after Continue, without an explicit settle call"
+    },
+    "limitation": "Harness inspection supports identical scripted procedures, not measured camera-matrix equivalence. Watch may differ while easing from attract view. Animation clocks/poses were not persisted."
+  },
+  "archiveLimits": [
+    "These are initial candidate captures, not evidence of the subsequently edited final source. Keep their hashes and capture dates if archiving; recompare final recaptures.",
+    "Mature fixtures were independently earned prior campaign saves; these images do not establish a new gameplay playthrough.",
+    "Render counters are per-shot diagnostics, not a sustained performance benchmark."
+  ],
+  "scenes": [
+    {
+      "id": "placement",
+      "fixture": null,
+      "day": 1,
+      "population": 6,
+      "buildings": 2,
+      "elapsed": 0.2333,
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "fullSnapshotsEqual": true,
+      "fullSnapshotBytesEqual": true,
+      "mechanicalSnapshotsExactlyEqual": true,
+      "numericLeavesComparedExcludingJournal": 214,
+      "mechanicalDifferencePaths": [],
+      "permittedDifferencePaths": [],
+      "journal": {
+        "beforeEntries": 1,
+        "afterEntries": 1,
+        "beforeNextEventId": 2,
+        "afterNextEventId": 2,
+        "afterTextDayTypeMatchesOriginalFixture": null
+      },
+      "mechanicalSHA256": "d382855334ab4d2520cc497d9b6410e24880beea7e28020bbb95a4733433783a",
+      "before": {
+        "stateFile": "review/clarity-companions/before-placement-state.json",
+        "stateFileSHA256": "c4c46e26c5dca083a68e1eadcf1b0bec51218029841141e23a0f96c8de58e133",
+        "reportedSnapshotSHA256": "c4c46e26c5dca083a68e1eadcf1b0bec51218029841141e23a0f96c8de58e133",
+        "screenshotFile": "review/clarity-companions/before-placement.png",
+        "screenshotSHA256": "480175af3e1d6c93868f8cf3a7e78fefd5ebde0f8424af3e9019398988d6ff7e"
+      },
+      "after": {
+        "stateFile": "review/clarity-companions/after-placement-state.json",
+        "stateFileSHA256": "c4c46e26c5dca083a68e1eadcf1b0bec51218029841141e23a0f96c8de58e133",
+        "reportedSnapshotSHA256": "c4c46e26c5dca083a68e1eadcf1b0bec51218029841141e23a0f96c8de58e133",
+        "screenshotFile": "review/clarity-companions/after-placement.png",
+        "screenshotSHA256": "b504875fff5f690bbbb462ecb81150a697f9e0472c0b56e53ad3be28a7248280"
+      },
+      "reportedSnapshotHashesVerified": true,
+      "cameraClaim": "Same scripted target/zoom and viewport; resolved camera transforms were not persisted, so exact matrix equivalence is unverified."
+    },
+    {
+      "id": "well-selected",
+      "fixture": "review/campaign-services-lanes-save.json",
+      "day": 61,
+      "population": 76,
+      "buildings": 59,
+      "elapsed": 5425,
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "fullSnapshotsEqual": false,
+      "fullSnapshotBytesEqual": false,
+      "mechanicalSnapshotsExactlyEqual": true,
+      "numericLeavesComparedExcludingJournal": 2271,
+      "mechanicalDifferencePaths": [],
+      "permittedDifferencePaths": [
+        "/events",
+        "/nextEventId"
+      ],
+      "journal": {
+        "beforeEntries": 1,
+        "afterEntries": 10,
+        "beforeNextEventId": 2,
+        "afterNextEventId": 11,
+        "afterTextDayTypeMatchesOriginalFixture": true
+      },
+      "mechanicalSHA256": "2488ca384fe1c7da414f91b727b469a5cbdb5626ec0fa0e258336e749b62e2a6",
+      "before": {
+        "stateFile": "review/clarity-companions/before-well-selected-state.json",
+        "stateFileSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "reportedSnapshotSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "screenshotFile": "review/clarity-companions/before-well-selected.png",
+        "screenshotSHA256": "64b9dd61468ebe881fadff4bef9169c3f00a4a7787f304b3a42010ae2d7e4f09"
+      },
+      "after": {
+        "stateFile": "review/clarity-companions/after-well-selected-state.json",
+        "stateFileSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "reportedSnapshotSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "screenshotFile": "review/clarity-companions/after-well-selected.png",
+        "screenshotSHA256": "377accb247027c335f291a9fbb2ad67b66a18e61c5355f1d1bf8e96f65ec0301"
+      },
+      "reportedSnapshotHashesVerified": true,
+      "cameraClaim": "Same scripted target/zoom and viewport; resolved camera transforms were not persisted, so exact matrix equivalence is unverified."
+    },
+    {
+      "id": "well-placement",
+      "fixture": "review/campaign-services-lanes-save.json",
+      "day": 61,
+      "population": 76,
+      "buildings": 59,
+      "elapsed": 5425,
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "fullSnapshotsEqual": false,
+      "fullSnapshotBytesEqual": false,
+      "mechanicalSnapshotsExactlyEqual": true,
+      "numericLeavesComparedExcludingJournal": 2271,
+      "mechanicalDifferencePaths": [],
+      "permittedDifferencePaths": [
+        "/events",
+        "/nextEventId"
+      ],
+      "journal": {
+        "beforeEntries": 1,
+        "afterEntries": 10,
+        "beforeNextEventId": 2,
+        "afterNextEventId": 11,
+        "afterTextDayTypeMatchesOriginalFixture": true
+      },
+      "mechanicalSHA256": "2488ca384fe1c7da414f91b727b469a5cbdb5626ec0fa0e258336e749b62e2a6",
+      "before": {
+        "stateFile": "review/clarity-companions/before-well-placement-state.json",
+        "stateFileSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "reportedSnapshotSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "screenshotFile": "review/clarity-companions/before-well-placement.png",
+        "screenshotSHA256": "217d2f3d0d7f0afd436c40fc390d6254e6fc613fffd6ce3342bcf24640f24a73"
+      },
+      "after": {
+        "stateFile": "review/clarity-companions/after-well-placement-state.json",
+        "stateFileSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "reportedSnapshotSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "screenshotFile": "review/clarity-companions/after-well-placement.png",
+        "screenshotSHA256": "30ad236f0bde204cbf1eab5b62bc93ebd96bd9392675629b9c1459837160b338"
+      },
+      "reportedSnapshotHashesVerified": true,
+      "cameraClaim": "Same scripted target/zoom and viewport; resolved camera transforms were not persisted, so exact matrix equivalence is unverified."
+    },
+    {
+      "id": "windmill",
+      "fixture": "review/campaign-services-lanes-save.json",
+      "day": 61,
+      "population": 76,
+      "buildings": 59,
+      "elapsed": 5425,
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "fullSnapshotsEqual": false,
+      "fullSnapshotBytesEqual": false,
+      "mechanicalSnapshotsExactlyEqual": true,
+      "numericLeavesComparedExcludingJournal": 2271,
+      "mechanicalDifferencePaths": [],
+      "permittedDifferencePaths": [
+        "/events",
+        "/nextEventId"
+      ],
+      "journal": {
+        "beforeEntries": 1,
+        "afterEntries": 10,
+        "beforeNextEventId": 2,
+        "afterNextEventId": 11,
+        "afterTextDayTypeMatchesOriginalFixture": true
+      },
+      "mechanicalSHA256": "2488ca384fe1c7da414f91b727b469a5cbdb5626ec0fa0e258336e749b62e2a6",
+      "before": {
+        "stateFile": "review/clarity-companions/before-windmill-state.json",
+        "stateFileSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "reportedSnapshotSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "screenshotFile": "review/clarity-companions/before-windmill.png",
+        "screenshotSHA256": "3fb966d504229dbd457ba8899b86e1cc0eb2bd4444b01f1487a388dc3baea422"
+      },
+      "after": {
+        "stateFile": "review/clarity-companions/after-windmill-state.json",
+        "stateFileSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "reportedSnapshotSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "screenshotFile": "review/clarity-companions/after-windmill.png",
+        "screenshotSHA256": "85f9be9ec059c155bf7931cc19d023da03ca7ce0576c3d66dae3222cfd0535df"
+      },
+      "reportedSnapshotHashesVerified": true,
+      "cameraClaim": "Same scripted target/zoom and viewport; resolved camera transforms were not persisted, so exact matrix equivalence is unverified."
+    },
+    {
+      "id": "council",
+      "fixture": "review/campaign-services-lanes-save.json",
+      "day": 61,
+      "population": 76,
+      "buildings": 59,
+      "elapsed": 5425,
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "fullSnapshotsEqual": false,
+      "fullSnapshotBytesEqual": false,
+      "mechanicalSnapshotsExactlyEqual": true,
+      "numericLeavesComparedExcludingJournal": 2271,
+      "mechanicalDifferencePaths": [],
+      "permittedDifferencePaths": [
+        "/events",
+        "/nextEventId"
+      ],
+      "journal": {
+        "beforeEntries": 1,
+        "afterEntries": 10,
+        "beforeNextEventId": 2,
+        "afterNextEventId": 11,
+        "afterTextDayTypeMatchesOriginalFixture": true
+      },
+      "mechanicalSHA256": "2488ca384fe1c7da414f91b727b469a5cbdb5626ec0fa0e258336e749b62e2a6",
+      "before": {
+        "stateFile": "review/clarity-companions/before-council-state.json",
+        "stateFileSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "reportedSnapshotSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "screenshotFile": "review/clarity-companions/before-council.png",
+        "screenshotSHA256": "82c58aafe6b7c832609c696ceca6662cfac280ccd076f4001dc0adeb38ad7c51"
+      },
+      "after": {
+        "stateFile": "review/clarity-companions/after-council-state.json",
+        "stateFileSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "reportedSnapshotSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "screenshotFile": "review/clarity-companions/after-council.png",
+        "screenshotSHA256": "dec967924e3181ce9eabd7098d7ab8b06f27cbc465711330ba8f82e6c001e263"
+      },
+      "reportedSnapshotHashesVerified": true,
+      "cameraClaim": "Same scripted target/zoom and viewport; resolved camera transforms were not persisted, so exact matrix equivalence is unverified."
+    },
+    {
+      "id": "phone-trade",
+      "fixture": "review/campaign-services-lanes-save.json",
+      "day": 61,
+      "population": 76,
+      "buildings": 59,
+      "elapsed": 5425,
+      "viewport": {
+        "width": 390,
+        "height": 667
+      },
+      "fullSnapshotsEqual": false,
+      "fullSnapshotBytesEqual": false,
+      "mechanicalSnapshotsExactlyEqual": true,
+      "numericLeavesComparedExcludingJournal": 2271,
+      "mechanicalDifferencePaths": [],
+      "permittedDifferencePaths": [
+        "/events",
+        "/nextEventId"
+      ],
+      "journal": {
+        "beforeEntries": 1,
+        "afterEntries": 10,
+        "beforeNextEventId": 2,
+        "afterNextEventId": 11,
+        "afterTextDayTypeMatchesOriginalFixture": true
+      },
+      "mechanicalSHA256": "2488ca384fe1c7da414f91b727b469a5cbdb5626ec0fa0e258336e749b62e2a6",
+      "before": {
+        "stateFile": "review/clarity-companions/before-phone-trade-state.json",
+        "stateFileSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "reportedSnapshotSHA256": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+        "screenshotFile": "review/clarity-companions/before-phone-trade.png",
+        "screenshotSHA256": "934ca0a1d1b68151c152d27f2827d869fce927d55b3542935b84779af25bbaa5"
+      },
+      "after": {
+        "stateFile": "review/clarity-companions/after-phone-trade-state.json",
+        "stateFileSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "reportedSnapshotSHA256": "cfa99037a81dd9be57b3ee736bca37e5611e838b99c1bd18e2778405ed281956",
+        "screenshotFile": "review/clarity-companions/after-phone-trade.png",
+        "screenshotSHA256": "f27d0737572a68715a322c319ff50a3604decc13ed6fe455494ec1585712e24b"
+      },
+      "reportedSnapshotHashesVerified": true,
+      "cameraClaim": "Same scripted target/zoom and viewport; resolved camera transforms were not persisted, so exact matrix equivalence is unverified."
+    },
+    {
+      "id": "watch",
+      "fixture": "review/campaign-pressure-save.json",
+      "day": 66,
+      "population": 87,
+      "buildings": 59,
+      "elapsed": 5850,
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "fullSnapshotsEqual": false,
+      "fullSnapshotBytesEqual": false,
+      "mechanicalSnapshotsExactlyEqual": true,
+      "numericLeavesComparedExcludingJournal": 2328,
+      "mechanicalDifferencePaths": [],
+      "permittedDifferencePaths": [
+        "/events",
+        "/nextEventId"
+      ],
+      "journal": {
+        "beforeEntries": 1,
+        "afterEntries": 32,
+        "beforeNextEventId": 2,
+        "afterNextEventId": 33,
+        "afterTextDayTypeMatchesOriginalFixture": true
+      },
+      "mechanicalSHA256": "8be382eb846e63f9e67dcf0873415d73a8f61fa6890220c3b7299a032d7f8b6e",
+      "before": {
+        "stateFile": "review/clarity-companions/before-watch-state.json",
+        "stateFileSHA256": "3ce7b24fe82fc829292fcfc37ad33d190131516470ade7546a1ecec28849007e",
+        "reportedSnapshotSHA256": "3ce7b24fe82fc829292fcfc37ad33d190131516470ade7546a1ecec28849007e",
+        "screenshotFile": "review/clarity-companions/before-watch.png",
+        "screenshotSHA256": "c526d9d295c415bfbefd4db27ab160c7ab52310fb493d6980fb8e945e44d06dc"
+      },
+      "after": {
+        "stateFile": "review/clarity-companions/after-watch-state.json",
+        "stateFileSHA256": "6b31aa4939d80e1ff4349d5f5e04f96c3e6911e9c422fcea710cd127af67c7a8",
+        "reportedSnapshotSHA256": "6b31aa4939d80e1ff4349d5f5e04f96c3e6911e9c422fcea710cd127af67c7a8",
+        "screenshotFile": "review/clarity-companions/after-watch.png",
+        "screenshotSHA256": "f72a6f405e0f4c175f790b8e96a2ebdb3aad2cfb8d3502a058df349f979cf500"
+      },
+      "reportedSnapshotHashesVerified": true,
+      "cameraClaim": "Same viewport and mechanically identical town; no explicit settling step or persisted camera state. Do not claim exact matched camera."
+    }
+  ]
+}

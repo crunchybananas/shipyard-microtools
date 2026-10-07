@@ -1,0 +1,150 @@
+{
+  "excludedFields": [
+    "events",
+    "nextEventId"
+  ],
+  "reason": "Deliberate journal restoration repair; no other gameplay fields excluded.",
+  "checks": [
+    {
+      "scene": "placement",
+      "equalGameplayState": false,
+      "equalViewport": true,
+      "equalCamera": true,
+      "gameplayHash": "2036c3d385e4ebcfe83126b5ff3706265dd40b48a1d4773e44aee7a47c1706ac",
+      "beforeRenderer": {
+        "calls": 53,
+        "triangles": 583098,
+        "geometries": 58,
+        "textures": 1
+      },
+      "afterRenderer": {
+        "calls": 55,
+        "triangles": 583121,
+        "geometries": 61,
+        "textures": 3
+      },
+      "changedKeys": [
+        "subsecond",
+        "elapsed",
+        "frontier"
+      ]
+    },
+    {
+      "scene": "well-selected",
+      "equalGameplayState": true,
+      "equalViewport": true,
+      "equalCamera": true,
+      "gameplayHash": "3c26ea8c1d3358a26a92dcb8f39f9efd204139434d9d3ab7c6b5f700b65d730f",
+      "beforeRenderer": {
+        "calls": 414,
+        "triangles": 1162998,
+        "geometries": 340,
+        "textures": 1
+      },
+      "afterRenderer": {
+        "calls": 414,
+        "triangles": 1169170,
+        "geometries": 350,
+        "textures": 19
+      }
+    },
+    {
+      "scene": "well-placement",
+      "equalGameplayState": true,
+      "equalViewport": true,
+      "equalCamera": true,
+      "gameplayHash": "3c26ea8c1d3358a26a92dcb8f39f9efd204139434d9d3ab7c6b5f700b65d730f",
+      "beforeRenderer": {
+        "calls": 418,
+        "triangles": 1174764,
+        "geometries": 342,
+        "textures": 1
+      },
+      "afterRenderer": {
+        "calls": 417,
+        "triangles": 1179789,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "scene": "windmill",
+      "equalGameplayState": true,
+      "equalViewport": true,
+      "equalCamera": true,
+      "gameplayHash": "3c26ea8c1d3358a26a92dcb8f39f9efd204139434d9d3ab7c6b5f700b65d730f",
+      "beforeRenderer": {
+        "calls": 542,
+        "triangles": 1295676,
+        "geometries": 342,
+        "textures": 1
+      },
+      "afterRenderer": {
+        "calls": 553,
+        "triangles": 1295807,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "scene": "council",
+      "equalGameplayState": true,
+      "equalViewport": true,
+      "equalCamera": true,
+      "gameplayHash": "3c26ea8c1d3358a26a92dcb8f39f9efd204139434d9d3ab7c6b5f700b65d730f",
+      "beforeRenderer": {
+        "calls": 541,
+        "triangles": 1295580,
+        "geometries": 342,
+        "textures": 1
+      },
+      "afterRenderer": {
+        "calls": 549,
+        "triangles": 1295692,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "scene": "phone-trade",
+      "equalGameplayState": true,
+      "equalViewport": true,
+      "equalCamera": true,
+      "gameplayHash": "3c26ea8c1d3358a26a92dcb8f39f9efd204139434d9d3ab7c6b5f700b65d730f",
+      "beforeRenderer": {
+        "calls": 302,
+        "triangles": 980001,
+        "geometries": 342,
+        "textures": 1
+      },
+      "afterRenderer": {
+        "calls": 303,
+        "triangles": 970639,
+        "geometries": 351,
+        "textures": 20
+      }
+    },
+    {
+      "scene": "watch",
+      "equalGameplayState": true,
+      "equalViewport": true,
+      "equalCamera": true,
+      "gameplayHash": "339d6d85a3d1bd16c2af1e353be5fe749b53a373f6a1c2c360dde8bcb4850d62",
+      "beforeRenderer": {
+        "calls": 602,
+        "triangles": 1349210,
+        "geometries": 369,
+        "textures": 1
+      },
+      "afterRenderer": {
+        "calls": 614,
+        "triangles": 1349322,
+        "geometries": 377,
+        "textures": 9
+      }
+    }
+  ],
+  "exactEarnedFixturePairs": 6,
+  "freshPlacementLimitation": "The independently started fresh games paused at slightly different real-time instants. elapsed/subsecond/frontier timing differ; this scene is excluded from exact state parity and is not used by the before/after story.",
+  "passedEarnedFixtureParity": true
+}

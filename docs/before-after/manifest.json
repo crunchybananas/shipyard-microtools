@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-06T13:16:00Z",
+  "updatedAt": "2026-10-06T23:23:41-04:00",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -8,6 +8,18 @@
     "repository": "https://github.com/crunchybananas/shipyard-microtools"
   },
   "stories": [
+    {
+      "slug": "wildhaven-clearer-living-towns",
+      "title": "Wildhaven makes the next move clear",
+      "appSlug": "realm",
+      "surfaceSlug": null,
+      "kind": "app",
+      "status": "published",
+      "publishedAt": "2026-10-06",
+      "data": "stories/wildhaven-clearer-living-towns.json",
+      "href": "./wildhaven-clearer-living-towns/",
+      "cover": "assets/wildhaven-clearer-living-towns/social.png"
+    },
     {
       "slug": "realm-first-neighborhood",
       "title": "Realm gives its first discovery a purpose",
@@ -94,7 +106,7 @@
     },
     {
       "slug": "demo-hub",
-      "title": "The demo hub \u2014 Useful little worlds",
+      "title": "The demo hub — Useful little worlds",
       "appSlug": null,
       "surfaceSlug": "demo-hub",
       "kind": "surface",
@@ -280,8 +292,8 @@
       "slug": "realm",
       "title": "Realm",
       "category": "Games",
-      "status": "in-revision",
-      "story": "realm-first-neighborhood"
+      "status": "published",
+      "story": "wildhaven-clearer-living-towns"
     },
     {
       "slug": "regex-tester",

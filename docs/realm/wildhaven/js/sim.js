@@ -6,12 +6,13 @@ import { createFrontierState, normalizeFrontier, frontierAssignments, tickFronti
 import { createPressureState, normalizePressure, tickPressure, dailyPressure, actOnPressure as pressureAction } from './pressure.js';
 export { pressureOptions } from './pressure.js';
 export { BUILDINGS, RESOURCE_NAMES } from './catalog.js';
-import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, islandShape, isLand, groundHeight, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
+import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, isLand, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, islandShape, isLand, groundHeight, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export const VERSION = 4;
 export const DAY_LENGTH = 90;
 const MAX_RESOURCE = 1000000000;
 const MAX_BUILDINGS = 1800;
+const JOURNAL_LIMIT = 60;
 const FIXED = { hearth: { x: 0, z: 2, id: 'hearth' }, bell: { x: 0, z: -5, id: 'bell' } };
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const round = value => Math.round(value * 1000000) / 1000000;
@@ -34,7 +35,26 @@ function citizen(id, day = 1) {
 }
 function addEvent(state, text, type = 'info') {
   state.events.unshift({ id: state.nextEventId++, day: state.day, text, type });
-  state.events.length = Math.min(60, state.events.length);
+  state.events.length = Math.min(JOURNAL_LIMIT, state.events.length);
+}
+// A journal is presentation history, not a source of rewards or simulation commands.
+// Preserve valid entries without letting malformed optional history reject a village.
+function restoreJournal(state, input) {
+  const ids = new Set(), entries = [];
+  for (const event of Array.isArray(input.events) ? input.events.slice(0, JOURNAL_LIMIT * 4) : []) {
+    if (!event || typeof event !== 'object' || Array.isArray(event)
+      || !validInteger(event.id, 1, Number.MAX_SAFE_INTEGER / 2) || ids.has(event.id)
+      || !validInteger(event.day, 1, state.day)
+      || typeof event.text !== 'string' || !event.text.trim() || event.text.length > 640
+      || /[\x00-\x1f\x7f]/.test(event.text)) continue;
+    ids.add(event.id);
+    entries.push({ id: event.id, day: event.day, text: event.text,
+      type: typeof event.type === 'string' && /^[a-z][a-z0-9-]{0,31}$/.test(event.type) ? event.type : 'info' });
+  }
+  state.events = entries.sort((a, b) => b.id - a.id).slice(0, JOURNAL_LIMIT);
+  const next = (state.events[0]?.id || 0) + 1;
+  state.nextEventId = validInteger(input.nextEventId, next, Number.MAX_SAFE_INTEGER / 2)
+    ? input.nextEventId : next;
 }
 function progressionEvents(state, result) { for (const event of result?.events || []) if (typeof event.text === 'string') addEvent(state, event.text, event.type || 'progress'); }
 function resourceCost(cost = {}) { return Object.fromEntries(RESOURCE_NAMES.filter(key => cost[key] > 0).map(key => [key, cost[key]])); }
@@ -669,7 +689,7 @@ function restoreV1(input) {
   if (state.won) state.wonDay = bell.restoredDay;
   state.lastTradeDay = input.lastTradeDay ?? 0; state.migratedFromVersion = 1;
   state.nextId = Math.max(0, ...state.buildings.filter(b => /^b\d/.test(b.id)).map(b => Number(b.id.slice(1)))) + 1;
-  state.events = []; state.nextEventId = 1;
+  restoreJournal(state, input);
   addEvent(state, 'Your original village is preserved. Its buildings are complete; citizens now choose real jobs and builders raise the next generation.', 'migration');
   normalizeProgression(state); reconcileWorkforce(state); refreshProduction(state); return state;
 }
@@ -742,6 +762,6 @@ export function restore(raw) {
   if (input.version !== VERSION) state.migratedFromVersion = input.version;
   if (input.version === VERSION) { if (!Object.hasOwn(input, 'discovery')) return null; state.discovery = structuredClone(input.discovery); }
   try { normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); } catch { return null; }
-  state.events = []; state.nextEventId = 1; addEvent(state, `Welcome back. Day ${state.day}, ${state.population} citizens, and work waiting for willing hands.`, 'welcome');
+  restoreJournal(state, input);
   reconcileWorkforce(state); refreshProduction(state); return state;
 }

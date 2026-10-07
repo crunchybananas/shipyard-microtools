@@ -1,0 +1,7 @@
+{
+  "method": "Real touch controls in Chrome iPad emulation; independently earned bell-town fixture. Map inspection must not spend resources or begin research.",
+  "checks": [],
+  "errors": [],
+  "failed": [],
+  "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at /private/tmp/realm-browser-qa/wildhaven-research-map-audit.mjs:6:593"
+}

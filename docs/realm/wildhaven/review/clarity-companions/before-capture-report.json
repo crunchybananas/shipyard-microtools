@@ -1,0 +1,115 @@
+{
+  "label": "before",
+  "base": "http://127.0.0.1:14721/realm/wildhaven/",
+  "at": "2026-10-07T02:00:17.622Z",
+  "scenes": [
+    {
+      "id": "placement",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "c4c46e26c5dca083a68e1eadcf1b0bec51218029841141e23a0f96c8de58e133",
+      "file": "before-placement.png",
+      "renderer": {
+        "calls": 53,
+        "triangles": 583098,
+        "geometries": 58,
+        "textures": 1
+      }
+    },
+    {
+      "id": "well-selected",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+      "file": "before-well-selected.png",
+      "renderer": {
+        "calls": 414,
+        "triangles": 1162998,
+        "geometries": 340,
+        "textures": 1
+      }
+    },
+    {
+      "id": "well-placement",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+      "file": "before-well-placement.png",
+      "renderer": {
+        "calls": 418,
+        "triangles": 1174764,
+        "geometries": 342,
+        "textures": 1
+      }
+    },
+    {
+      "id": "windmill",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+      "file": "before-windmill.png",
+      "renderer": {
+        "calls": 542,
+        "triangles": 1295676,
+        "geometries": 342,
+        "textures": 1
+      }
+    },
+    {
+      "id": "council",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+      "file": "before-council.png",
+      "renderer": {
+        "calls": 541,
+        "triangles": 1295580,
+        "geometries": 342,
+        "textures": 1
+      }
+    },
+    {
+      "id": "phone-trade",
+      "viewport": {
+        "width": 390,
+        "height": 667
+      },
+      "worldHash": "2936095023bab83485947bde598b11c075f8ec45cb41cd429ba5e4b19a9376fa",
+      "file": "before-phone-trade.png",
+      "renderer": {
+        "calls": 302,
+        "triangles": 980001,
+        "geometries": 342,
+        "textures": 1
+      }
+    },
+    {
+      "id": "watch",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "worldHash": "3ce7b24fe82fc829292fcfc37ad33d190131516470ade7546a1ecec28849007e",
+      "file": "before-watch.png",
+      "renderer": {
+        "calls": 603,
+        "triangles": 1349210,
+        "geometries": 369,
+        "textures": 1
+      }
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "fixture": "Existing independently earned campaign-services-lanes and campaign-pressure saves; paused presentation only, no generated resources or clock advances."
+}

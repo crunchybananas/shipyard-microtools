@@ -57,7 +57,7 @@ const row = (name, status) => {
  * preview receives null or {kind, type?, start?, end?, cells?, valid, target?}.
  * focus receives {kind, id, x, z}; no Three.js dependency enters the UI.
  */
-export function createFrontierUI({ getState, mutate, getContext = () => ({}), beforeOpen = () => {}, focus = () => {}, preview = () => {}, onSelection = () => {}, api = frontier, mount = document.getElementById('hud') }) {
+export function createFrontierUI({ getState, mutate, canMutate = () => true, getContext = () => ({}), beforeOpen = () => {}, focus = () => {}, preview = () => {}, onSelection = () => {}, api = frontier, mount = document.getElementById('hud') }) {
   if (!mount) throw new Error('Frontier controls need the game HUD.');
   let tab = null, selected = null, command = null, hovered = null, signature = '', confirmation = null;
   const draftResidents = new Map();
@@ -78,8 +78,9 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
   const toggle = button('Frontier', 'toggle', () => tab ? close() : open('neighbors')); toggle.id = 'frontier-toggle'; toggle.setAttribute('aria-controls', panel.id); toggle.setAttribute('aria-pressed', 'false');
   mount.append(panel, strip, toggle);
 
-  function action(result) {
-    mutate(result); signature = ''; confirmation = null; update(true); return result;
+  function action(fn) {
+    if (!canMutate()) return { ok: false, reason: 'This town is paused for viewing.' };
+    const result = fn(); mutate(result); signature = ''; confirmation = null; update(true); return result;
   }
   function open(next = 'neighbors') {
     beforeOpen(); cancelCommand(false); tab = next; selected = null; confirmation = null;
@@ -99,6 +100,7 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
     panel.hidden = false; toggle.setAttribute('aria-pressed', 'true'); document.body.classList.add('frontier-view-active'); content.scrollTop = 0; update(true);
   }
   function begin(next) {
+    if (!canMutate()) return;
     command = next; confirmation = null; hovered = null; panel.hidden = true; document.body.classList.remove('frontier-view-active');
     document.body.classList.add('frontier-command-active'); strip.hidden = false; updateCommand();
   }
@@ -124,7 +126,7 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
     if (!confirmation) return;
     const card = el('div', 'frontier-diplomacy'); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'Confirm consequences');
     card.append(el('strong', '', confirmation.name), el('p', '', confirmation.detail));
-    controls(card, [{ label: confirmation.name, id: `confirm-${confirmation.id}`, className: 'danger', run: () => action(confirmation.execute()) }, { label: confirmation.cancelLabel, id: 'cancel-confirm', run: () => { confirmation = null; update(true); } }]);
+    controls(card, [{ label: confirmation.name, id: `confirm-${confirmation.id}`, className: 'danger', run: () => action(confirmation.execute) }, { label: confirmation.cancelLabel, id: 'cancel-confirm', run: () => { confirmation = null; update(true); } }]);
     nodes.unshift(card);
   }
 
@@ -186,17 +188,17 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
       if (pending) card.append(el('p', '', `Under construction · ${Math.round(100 * Math.min(1, (fort.progress || 0) / (fort.work || fort.workRequired || 1)))}% complete${fort.engineerName ? ` · ${fort.engineerName} is building` : ''}`));
       const repair = api.repairOffer(state, fort.id);
       quote(card, repair, 'Repair');
-      const actions = [{ label: 'Repair', id: `repair-${fort.id}`, disabled: !repair.ok, reason: repair.reason, run: () => action(api.repairFortification(state, fort.id, getContext())) }];
-      if (fort.type === 'gate') actions.unshift({ label: fort.open ? 'Close gate' : 'Open gate', id: `gate-${fort.id}`, disabled: pending, run: () => action(api.setGateOpen(state, fort.id, !fort.open, getContext())) });
+      const actions = [{ label: 'Repair', id: `repair-${fort.id}`, disabled: !repair.ok, reason: repair.reason, run: () => action(() => api.repairFortification(state, fort.id, getContext())) }];
+      if (fort.type === 'gate') actions.unshift({ label: fort.open ? 'Close gate' : 'Open gate', id: `gate-${fort.id}`, disabled: pending, run: () => action(() => api.setGateOpen(state, fort.id, !fort.open, getContext())) });
       actions.push({ label: 'Find on island', id: `find-fort-${fort.id}`, run: () => focus({ ...fort, kind: 'fortification' }) });
-      if (pending) actions.push({ label: 'Cancel unfinished work', id: `cancel-fort-${fort.id}`, run: () => action(api.cancelFortification(state, fort.id)) });
+      if (pending) actions.push({ label: 'Cancel unfinished work', id: `cancel-fort-${fort.id}`, run: () => action(() => api.cancelFortification(state, fort.id)) });
       controls(card, actions); nodes.push(card);
       if (!pending) {
         const salvage = api.salvageOffer(state, fort.id, getContext());
         card.append(el('p', 'frontier-cost', `Salvage returns: ${goods(salvage.refund)}.`));
         if (!salvage.ok) card.append(el('p', 'frontier-reason', salvage.reason));
         if (salvage.regionId) card.append(el('p', '', 'Removing this outpost closes the region to new construction. Existing homes and workshops stay.'));
-        controls(card, [{ label: 'Salvage defense', id: `salvage-${fort.id}`, disabled: !salvage.ok, reason: salvage.reason, run: () => salvage.regionId ? ask(`salvage-${fort.id}`, 'Remove the outpost', `This land will need a new claiming outpost before more buildings can be placed. Existing homes and workshops stay. You recover ${goods(salvage.refund)}.`, () => api.salvageFortification(state, fort.id, getContext()), 'Keep the outpost') : action(api.salvageFortification(state, fort.id, getContext())) }]);
+        controls(card, [{ label: 'Salvage defense', id: `salvage-${fort.id}`, disabled: !salvage.ok, reason: salvage.reason, run: () => salvage.regionId ? ask(`salvage-${fort.id}`, 'Remove the outpost', `This land will need a new claiming outpost before more buildings can be placed. Existing homes and workshops stay. You recover ${goods(salvage.refund)}.`, () => api.salvageFortification(state, fort.id, getContext()), 'Keep the outpost') : action(() => api.salvageFortification(state, fort.id, getContext())) }]);
       }
     }
     for (const option of api.fortificationOptions(state)) {
@@ -238,16 +240,16 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
       controls(card, [
         { label: 'Move', id: 'move', disabled: unavailable, run: () => begin({ kind: 'move', ids }) },
         { label: 'Attack', id: 'attack', disabled: unavailable, run: () => begin({ kind: 'attack', ids }) },
-        { label: 'Hold ground', id: 'hold', disabled: unavailable, run: () => action(api.commandTroops(state, ids, { type: 'hold' }, getContext())) },
-        { label: 'Retreat home', id: 'retreat', disabled: unavailable, run: () => action(api.commandTroops(state, ids, { type: 'retreat' }, getContext())) },
+        { label: 'Hold ground', id: 'hold', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'hold' }, getContext())) },
+        { label: 'Retreat home', id: 'retreat', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'retreat' }, getContext())) },
         { label: 'Clear selection', id: 'clear-units', run: () => { selectedTroops.clear(); selected = null; update(true); } },
       ]);
       if (chosen.length === 1) {
         const unit = chosen[0], offer = api.healOffer(state, unit.id, getContext()); quote(card, offer, 'Recovery');
-        controls(card, [{ label: 'Tend wounds', id: `heal-${unit.id}`, disabled: !offer.ok, reason: offer.reason, run: () => action(api.healTroop(state, unit.id, getContext())) }]);
+        controls(card, [{ label: 'Tend wounds', id: `heal-${unit.id}`, disabled: !offer.ok, reason: offer.reason, run: () => action(() => api.healTroop(state, unit.id, getContext())) }]);
         const dismissal = api.dismissOffer(state, unit.id, getContext());
         card.append(el('p', dismissal.ok ? 'frontier-cost' : 'frontier-reason', dismissal.reason));
-        controls(card, [{ label: unit.status === 'training' ? 'Cancel training' : 'Return to civilian work', id: `dismiss-${unit.id}`, disabled: !dismissal.ok, reason: dismissal.reason, run: () => action(api.dismissTroop(state, unit.id, getContext())) }]);
+        controls(card, [{ label: unit.status === 'training' ? 'Cancel training' : 'Return to civilian work', id: `dismiss-${unit.id}`, disabled: !dismissal.ok, reason: dismissal.reason, run: () => action(() => api.dismissTroop(state, unit.id, getContext())) }]);
       }
       nodes.push(card);
     }
@@ -277,7 +279,7 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
       for (const candidate of candidates) { const choice = el('option', '', `${candidate.name} · ${candidate.job || 'Available'}`); choice.value = candidate.id; selectResident.append(choice); }
       selectResident.value = candidates.some(candidate => candidate.id === draftResidents.get(option.id)) ? draftResidents.get(option.id) : '';
       selectResident.onchange = event => draftResidents.set(option.id, event.currentTarget.value || null); label.append(selectResident); card.append(label);
-      controls(card, [{ label: 'Begin training', id: `recruit-${option.id}`, className: 'primary', disabled: !option.ok, reason: option.reason, run: () => action(api.recruitTroop(state, option.id, draftResidents.get(option.id) || null, getContext())) }]); nodes.push(card);
+      controls(card, [{ label: 'Begin training', id: `recruit-${option.id}`, className: 'primary', disabled: !option.ok, reason: option.reason, run: () => action(() => api.recruitTroop(state, option.id, draftResidents.get(option.id) || null, getContext())) }]); nodes.push(card);
     }
     nodes.push(...logContent(state)); return nodes;
   }
@@ -307,7 +309,7 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
           if (offer.reward) detail.append(el('p', 'frontier-cost', `Receive: ${goods(offer.reward)}`));
           if (id === 'envoy') detail.append(el('p', '', 'A resident walks there and back. Their town job waits while they travel.'));
           if (id === 'war') detail.append(el('p', '', 'Ends peaceful dealings and starts armed conflict. Enemy attacks can wound or kill residents and damage defenses.'));
-          controls(detail, [{ label, id: `${id}-${neighbor.id}`, disabled: !offer.ok, reason: offer.reason, className: id === 'war' ? 'danger' : '', run: () => id === 'war' ? ask(`war-${neighbor.id}`, `Declare war on ${neighbor.name}`, 'Trade and peaceful relations end. Prepare a route home and a defense before starting armed conflict.', execute) : action(execute()) }]); card.append(detail);
+          controls(detail, [{ label, id: `${id}-${neighbor.id}`, disabled: !offer.ok, reason: offer.reason, className: id === 'war' ? 'danger' : '', run: () => id === 'war' ? ask(`war-${neighbor.id}`, `Declare war on ${neighbor.name}`, 'Trade and peaceful relations end. Prepare a route home and a defense before starting armed conflict.', execute) : action(execute) }]); card.append(detail);
         }
       }
       nodes.push(card);
@@ -319,7 +321,7 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
       if (!claim.claimed) {
         quote(card, claim, 'Claim');
         if (Array.isArray(claim.requirements)) for (const requirement of claim.requirements) card.append(el('p', '', typeof requirement === 'string' ? requirement : requirement.description || requirement.reason || requirement.name));
-        controls(card, [{ label: 'Claim this land', id: `claim-${claim.id}`, disabled: !claim.ok, reason: claim.reason, run: () => action(api.claimRegion(state, claim.id, getContext())) }, { label: 'Find the boundary', id: `find-claim-${claim.id}`, run: () => { close(); focus({ ...claim, kind: 'region' }); } }]);
+        controls(card, [{ label: 'Claim this land', id: `claim-${claim.id}`, disabled: !claim.ok, reason: claim.reason, run: () => action(() => api.claimRegion(state, claim.id, getContext())) }, { label: 'Find the boundary', id: `find-claim-${claim.id}`, run: () => { close(); focus({ ...claim, kind: 'region' }); } }]);
       } else controls(card, [{ label: 'Find this land', id: `find-claim-${claim.id}`, run: () => { close(); focus({ ...claim, kind: 'region' }); } }]);
       nodes.push(card);
     }
@@ -401,6 +403,7 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
     preview({ kind: command.kind, type: command.type, rotation: command.rotation || 0, start: command.start, end: command.end || hovered, cells: quote.tiles, valid: quote.ok, target: command.end || hovered });
   }
   function commitWallLine() {
+    if (!canMutate()) return;
     if (command?.kind !== 'wall-line' || !command.end) return;
     const result = api.buildWallLine(getState(), command.type, command.start, command.end, getContext()); mutate(result);
     if (result.ok) { cancelCommand(true); update(true); }
@@ -412,6 +415,7 @@ export function createFrontierUI({ getState, mutate, getContext = () => ({}), be
   }
   function hover(tile) { if (!command) return false; hovered = tile; command.reason = null; updateCommand(); return true; }
   function handleTap(tile) {
+    if (!canMutate()) return false;
     if (!command) {
       for (const kind of ['enemy', 'troop', 'neighbor', 'fortification']) {
         const item = tile?.[kind]; if (item) { select(kind, typeof item === 'string' ? item : item.id); return true; }

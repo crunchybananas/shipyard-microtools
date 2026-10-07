@@ -1,0 +1,148 @@
+{
+  "at": "2026-10-07T02:58:33.715345+00:00",
+  "repository": "https://github.com/crunchybananas/shipyard-microtools.git",
+  "checkout": "/Users/coryloken/Documents/Codex/2026-10-04/task-2/wildhaven-implementation",
+  "branch": "codex/wildhaven-clearer-living-towns",
+  "baseCommit": "c3bbc7a03f86ca4de76d23b36d1dad1adc2a49a8",
+  "sourceCommit": "dbae8edaba34a0b6c8e0c470051dae4a20aa008a",
+  "publication": "Local only; no push, PR, merge or deployment in this pass.",
+  "sourceFilesSha256": {
+    "docs/realm/wildhaven/COMPANION_TOWNS.md": "909e609e24817f20cc3b184e42b4a553a7d869321f6d71f95602bf6a5cacf967",
+    "docs/realm/wildhaven/clarity.css": "b99415587e66089e92005f73c567ea04a3f532a4c35f21212fc093182587718c",
+    "docs/realm/wildhaven/companion.css": "17293a873eba4da410bb1cea9940216016f654034360ffea852d4facd201de36",
+    "docs/realm/wildhaven/index.html": "6f2cfd019683196336885a71c9c3074ed24cd470da81e86d342ec1697502306e",
+    "docs/realm/wildhaven/js/clarity-ui.js": "cdd7374fc2427bd14cc65d5ab4b07d59b8023c4adb973d4b7e6ce1333775df6b",
+    "docs/realm/wildhaven/js/clarity.js": "ef59fc298fe5348579e8f0880a157921f5818944bb4e2c984d2e721307826967",
+    "docs/realm/wildhaven/js/companion-store.js": "c0244952939235b497bec2ca6ddb713cb33a0a1b45b6015cc857c26700bc3b74",
+    "docs/realm/wildhaven/js/companion-ui.js": "c00a1e9defd317bc4ab47ff40ad928eeb5fc5ae7bd4da52b88481eac75e6f087",
+    "docs/realm/wildhaven/js/fieldbook-ui.js": "b50d8b17e6e9765063424feacdb01a797924e4baa9c38d9ef2890b5b6e468554",
+    "docs/realm/wildhaven/js/frontier-ui.js": "d90ceb12585e7a7489025022543c973f315a89be3ed92675b6c550b271694e08",
+    "docs/realm/wildhaven/js/main.js": "5e54e9edc448af16ff729edb90323438f65136697be2928bcc4a7bac6f1e5a35",
+    "docs/realm/wildhaven/js/path-choice.js": "9e35877d46301deea0805229ea4519d6f71d500da55dc1ab5dc71764471bbe63",
+    "docs/realm/wildhaven/js/progression.js": "3ea66650191cfd6fe26b0126e86e10cce74c18be9295b1f2bd78d1eecef95994",
+    "docs/realm/wildhaven/js/research-map.js": "f74cf77487d58c31d8c04f135be0d1b75de0f6f342a6ccc15f58cf6a26de2a54",
+    "docs/realm/wildhaven/js/sim.js": "d4645b745973779b779abf1e88f528559cfe8d878d580692ef3a54643e47155f",
+    "docs/realm/wildhaven/js/town-ui.js": "5d9012428e8fb78f17cae4bbc33604e365875deb9764ca65c8cb4906ff47552f",
+    "docs/realm/wildhaven/js/world-cues.js": "e9444937fca5792cc8c099d01d801314ef8f6a154dfba80c3bf28c5a8a99ed56",
+    "docs/realm/wildhaven/js/world.js": "2b38717bbb918c15499710615b92ac7acfef2588c56a9c6a4459ebf2a88adda7",
+    "docs/realm/wildhaven/path-choice.css": "6a3d777fcc78467006926ee7326865e17cb65f4886112f2d276e1616d59a0a80",
+    "docs/realm/wildhaven/research-map.css": "9b8afebfb83386996fc15834a1cb8127b9a02e0ecc8756cec87691b98c568640",
+    "docs/realm/wildhaven/tablet.css": "4b45cf052647d6c6943e8c6acccf69723be624c153147ad69a803012e48d0f0a",
+    "docs/realm/wildhaven/test/clarity.test.mjs": "7963b7fc926237e2733b87542db9452aedb407dfaa286d11c6b21b430e970e4b",
+    "docs/realm/wildhaven/test/companion.test.mjs": "a3fc8e236fe42d4ff96eef664b683e1167207c9439dd85615450431186b9b1cc",
+    "docs/realm/wildhaven/test/journal.test.mjs": "221ed01a53325ab7f49f0b9cf9f03e691f89f62ae1e3966a9cd541586a0957d4",
+    "docs/realm/wildhaven/test/path-choice.test.mjs": "100e62836c9e00fe1956570f2a545309942de3f06ebe8d346bc8e04bf625f045",
+    "docs/realm/wildhaven/test/research-map.test.mjs": "02b36e2ee8851d8cfacb533527b0425c347daaf28234f14c9c7c5470bb217869",
+    "docs/realm/wildhaven/test/world-cues.test.mjs": "7d76d73948ecc25d190c99251727e2a572a90af204e5a2d91af4b9eded7f53b1",
+    "docs/realm/wildhaven/test/world-input.test.mjs": "477accaf5576e9c09b2870fb5dc10f5a80aeeddf95ab95455e81632806ce40b7",
+    "docs/realm/wildhaven/test/world-presentation.test.mjs": "6fa989163f10546fd2629bfc5b857a818a000c2e54a94b5761952c7214a75a12"
+  },
+  "runtimeAssets": {
+    "docs/realm/wildhaven/assets/frontier-kit.glb": {
+      "bytes": 6435640,
+      "sha256": "a1f11b03deb10f8dd8d585bb7833777ef9e0ad03c15d5fbf32c6dc609561a39b"
+    },
+    "docs/realm/wildhaven/assets/frontier-kit.json": {
+      "bytes": 6524,
+      "sha256": "b8ea9a25e4e2f8513f985877c9f3369bd3014576d6c9c8d3b1b5467ec8b64e04"
+    },
+    "docs/realm/wildhaven/assets/living-kit.glb": {
+      "bytes": 1434160,
+      "sha256": "07ecd71e9e73852feeb66d1cd788ae3dd90e534920fc75710fa733a78a118f5c"
+    },
+    "docs/realm/wildhaven/assets/living-kit.json": {
+      "bytes": 7395,
+      "sha256": "c305b98c02a9129b2bba7bd24f83dbd021366bb20392b03d3b19362b4e225d7e"
+    },
+    "docs/realm/wildhaven/assets/town-kit.glb": {
+      "bytes": 6476180,
+      "sha256": "92d69afda39fdf9f67e8feff6c6faa376e027bf9c57d186c83dff72e5373e218"
+    },
+    "docs/realm/wildhaven/assets/town-kit.json": {
+      "bytes": 8862,
+      "sha256": "c055f1ff585e9dfcdd01a4436a44d7da836cbc6423fc515ac14ca4497e665794"
+    },
+    "docs/realm/wildhaven/assets/village-kit.glb": {
+      "bytes": 9004100,
+      "sha256": "3b8d3a40bbf1d4b9533794ccedf2999073f2c2e13fa2260b0e9452e9ae489527"
+    },
+    "docs/realm/wildhaven/assets/village-kit.json": {
+      "bytes": 5152,
+      "sha256": "01660a0a2362764f71b574c299902438a7943be92a715d842238147f9e105f1d"
+    }
+  },
+  "runtimeAssetsUnchanged": true,
+  "runtimeAssetLfsPointers": 0,
+  "gameTests": {
+    "passed": 193,
+    "failed": 0,
+    "log": "game-tests.log"
+  },
+  "archiveTests": {
+    "passedChecks": 2020,
+    "apps": 33,
+    "stories": 9,
+    "log": "archive-tests.log"
+  },
+  "browserReports": {
+    "browser-audit.json": {
+      "passed": true,
+      "sha256": "4f26708765a3d4c44fb01ef79f0cbe55c5eb465d524eb3b02a94a45ea682ba8c",
+      "checks": 14,
+      "errors": [],
+      "failed": []
+    },
+    "ipad-audit.json": {
+      "passed": true,
+      "sha256": "2ea9727e04caf2c5daa767d606b90a5c46709009032b982c0885492842693711",
+      "checks": 18,
+      "errors": [],
+      "failed": []
+    },
+    "ipad-mature-audit.json": {
+      "passed": true,
+      "sha256": "bbb952de74ea8d201b157e07bb19bd99766d1aa20f7b8a1180ec5fb7d7116de4",
+      "checks": 6,
+      "errors": [],
+      "failed": []
+    },
+    "research-map-browser-audit.json": {
+      "passed": true,
+      "sha256": "19545d9f22bdcf32ee2c2c30db874c447320b69832c2faa5e59943dc490e26d5",
+      "checks": 4,
+      "errors": [],
+      "failed": []
+    },
+    "archive-browser-audit.json": {
+      "passed": true,
+      "sha256": "b24b7832773659c7563c1950886e976e587b93dd0b41fa14c6df1955e571cd9f",
+      "checks": 0,
+      "errors": [],
+      "failed": []
+    }
+  },
+  "finalCapture": {
+    "scenes": 8,
+    "errors": [],
+    "failed": [],
+    "report": "after-final-capture-report.json"
+  },
+  "beforeAfter": {
+    "exactEarnedFixturePairs": 6,
+    "excludedGameplayFields": [
+      "events",
+      "nextEventId"
+    ],
+    "equalCameraAndViewport": true,
+    "freshSceneExcluded": "0.2166s versus 0.2s real startup timing; excluded from parity and comparison story.",
+    "report": "final-state-comparison.json"
+  },
+  "limits": [
+    "Native Safari on physical iPad not tested.",
+    "Hardware/on-screen keyboard integration and sustained physical iPad GPU performance unverified.",
+    "Companion towns are a local shared-device prototype; no network service, identity, invites, online multiplayer or human conflict.",
+    "Mature scenarios load independently earned fixtures; they are not represented as fresh campaign progression.",
+    "All gameplay browser contexts are isolated and do not access user browser profiles."
+  ],
+  "nextMilestone": "Physical iPad Safari portrait/landscape play, keyboard entry, research-map scroll, save/Continue and longer mature-town play; then unaided two-person clarity feedback."
+}
