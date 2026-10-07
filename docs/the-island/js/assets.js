@@ -48,6 +48,11 @@ export const MANIFEST = {
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/landfall.py',
     prompt: 'Authored lighthouse with open windows and 115 closed risers and supported treads, stone vault ribs, hinged archive tins and drying table, coastal basalt arch and wind pines.',
   },
+  boulders: {
+    kind: 'model', file: 'boulders.glb', bytes: 35680,
+    license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/boulders.py',
+    prompt: 'Three fractured glacial erratics: planar fracture faces with bevelled weathered edges, lump and grit displacement, baked vertex cavity shading, box UVs for the shared rock relief; instanced for every shore rock and inland erratic.',
+  },
   harbor_rooms: {
     kind: 'model', file: 'harbor-rooms.glb', bytes: 1714344,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/harbor_rooms.py',
@@ -60,7 +65,7 @@ export const MANIFEST = {
     kind: 'texture', file: 'rock-height.jpg', bytes: 161465,
     license: 'project-generated', source: 'OpenAI built-in imagegen; 2026-09-26; tools/blender/granite-height-prompt.txt',
     prompt: 'Isotropic grayscale granite height field: shallow mineral pits, tiny chipped facets, short fractures; restrained relief without layered bedding or directional streaks. Full prompt and original in tools/blender.',
-    wrap: 'repeat', colorSpace: 'srgb', anisotropy: 4,
+    wrap: 'repeat', colorSpace: 'linear', anisotropy: 4,
   },
   bark_height: {
     kind: 'texture', file: 'bark_height.png', bytes: 198290,

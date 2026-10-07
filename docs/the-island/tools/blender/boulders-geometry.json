@@ -1,0 +1,19 @@
+{
+  "blender": "5.2.1 LTS",
+  "targetTriangles": 180,
+  "parts": {
+    "boulderA": {
+      "triangles": 180,
+      "vertices": 92
+    },
+    "boulderB": {
+      "triangles": 180,
+      "vertices": 92
+    },
+    "boulderC": {
+      "triangles": 180,
+      "vertices": 92
+    }
+  },
+  "bytes": 35680
+}

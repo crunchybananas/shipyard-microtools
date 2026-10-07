@@ -95,9 +95,17 @@ export function attachWorkingStudy(core, library) {
       float lime=sin(dot(vPlaster,vec3(113.3,159.1,107.7)))*sin(dot(vPlaster,vec3(43.7,177.1,241.3)));
       float dry=1.0-smoothstep(.015,.055,length(fwidth(vPlaster)));
       float wash=.95+.04*sin(vPlaster.y*.82+vPlaster.x*.31);
-      diffuseColor.rgb *= wash+lime*.018*dry;`);
+      // (the wall was one flat beige from floor to joists — the biggest surface in the study
+      // with nothing on it: coats of limewash mottle at hand scale, and damp climbs from the floor)
+      vec2 pu=vec2(atan(vPlaster.x,vPlaster.z)*4.9,vPlaster.y);
+      float mottle=plasterNoise(pu*1.4)*.6+plasterNoise(pu*5.1+7.0)*.4;
+      float damp=1.0-smoothstep(.05,.9+plasterNoise(pu*.7)*.5,vPlaster.y);
+      diffuseColor.rgb *= (wash+lime*.018*dry)*(.91+mottle*.15)*(1.0-damp*.14);`);
+    shader.fragmentShader = ('float plasterHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}\n'
+      + 'float plasterNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(plasterHash(i),plasterHash(i+vec2(1,0)),f.x),mix(plasterHash(i+vec2(0,1)),plasterHash(i+vec2(1,1)),f.x),f.y);}\n'
+      + shader.fragmentShader);
   };
-  plaster.customProgramCacheKey = () => 'working-study-lime-v1';
+  plaster.customProgramCacheKey = () => 'working-study-lime-v2';
   for (const name of ['studyPlaster','studyTimber','studyFittings']) {
     const mesh = new THREE.Mesh(meshGeometry(library,name), name==='studyPlaster'?plaster:timber);
     mesh.name=name;mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);

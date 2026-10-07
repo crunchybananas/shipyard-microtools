@@ -4658,6 +4658,39 @@ test. Cheap, owner-validated, protects every future player.
 
 ---
 
+## 2026-10-06 — the player walk (owner: "walk through the entire game and really think about how a person would think about what they are seeing")
+
+**Shipped:** a first-person read of every stage (title → approach → landing → path →
+study → east room → gallery → shore → stones → drain → chest → causeway → bridge → hatch
+→ cellar → the three strata), written up in `loop/player-walk/2026-10-06/REPORT.md` with
+matched before/after frames, and the fixes it demanded: the horizon white bar (sky haze
+blend 0.6 → full at the horizon), the gallery white-out at night (iron rails and cage
+instead of gold, the 220-intensity spill faded out beside the lamp, the beam faded when
+the eye is at its apex), the drowned hall's black boxes (weathered stone + lichen + a tide
+stain), the drained bay painted as if still underwater (mud-sand floor), the ochre meadow
+(green/heather/peat patchwork), the marshmallow erratics (a Blender boulder kit: fractured,
+bevelled, cavity-baked), the cliff faces (mineral triplanar detail + the vertex-colour
+smear pulled to one rock base per fragment; the height map was being sRGB-decoded), the
+east room (plank ceiling, limewash, a closed roof valley, the throat gap narrowed from
+80° to 40°), the dawn grass (black twigs: blade root colour lifted), the pendant globe
+(clipped disc), the tower (rain streaks, damp foot), the study plaster (mottle + damp),
+and shadow normalBias 0.5 → 0.12.
+
+**Evidence:** the review folder; console clean on every capture; unit tests 116/116;
+asset contract 19 rows; release gate in `tools/harness/run.sh` (see the report's
+validation section).
+
+**Debt / rejected:** a 4× MSAA half-float composer target measured 84.8 ms vs 19.6 ms at
+the night bench on an M4 — rejected, the daylight direct path keeps native MSAA. Close
+pine crowns remain faceted; the tide-figure and watcher are unchanged; the title screen
+is unchanged.
+
+**Next tick suggestion:** the trees. Every frame that includes a close conifer shows the
+flat green sprays; a Blender needle-cluster card pass (alpha-tested, normal-aligned) on
+the four profiles is the next largest "basic" surface a player stares at.
+
+---
+
 ## 1 — 2026-06-11 — close-look jank
 
 **Shipped:** Vegetation scatter correctness — grass keep-out discs for the

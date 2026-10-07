@@ -347,6 +347,7 @@ const C = {
   wood: new THREE.Color(0x6b4a2f), woodDark: new THREE.Color(0x4a3018),
   stoneOld: new THREE.Color(0x9b9484), ink: new THREE.Color(0x20242c),
   cloth: new THREE.Color(0x355560),
+  ironPaint: new THREE.Color(0x2b3a36), ironPaintDark: new THREE.Color(0x171f1d),   // the lantern cage: dark green paint over iron
 };
 
 // ---- glyph atlas (canvas → texture) ----------------------------------------
@@ -506,7 +507,7 @@ function phialProp(name) {
 // =============================================================================
 // build the whole world. Returns { core, refs, modelRefs, hotspots, ... }
 // =============================================================================
-export function buildWorld(coastKit) {
+export function buildWorld(coastKit, boulderKit = null) {
   const r = mulberry32(SEED ^ 0xbeef);
   const core = new THREE.Group();
   core.name = 'islandCore';
@@ -788,14 +789,17 @@ export function buildWorld(coastKit) {
       const a = (i / 12) * TAU;
       if (i === 1) continue;
       const post = new THREE.BoxGeometry(0.085, 1.95, 0.11);
-      brass.add(post, place(LH.x + Math.sin(a) * 2.06, LH.y + 22.26, LH.z + Math.cos(a) * 2.06, a), grad(C.brassDark, C.brass));
+      // PAINTED IRON, not brass: real astragals are iron glazing bars under black or dark
+      // green paint — the brass belongs to the apparatus inside. Gold bars a metre from the eye
+      // on the gallery at night were also the bloom source that whited the whole frame out.
+      brass.add(post, place(LH.x + Math.sin(a) * 2.06, LH.y + 22.26, LH.z + Math.cos(a) * 2.06, a), grad(C.ironPaintDark, C.ironPaint));
       post.dispose();
     }
     // and the horizontal bars that make it a cage rather than a comb
     for (const gy of [21.55, 22.30, 23.02]) {
       const ring = new THREE.TorusGeometry(2.06, 0.045, 6, 36, Math.PI * 5 / 3);
       ring.rotateX(Math.PI / 2);
-      brass.add(ring, new THREE.Matrix4().makeTranslation(LH.x, LH.y + gy, LH.z), grad(C.brassDark, C.brass));
+      brass.add(ring, new THREE.Matrix4().makeTranslation(LH.x, LH.y + gy, LH.z), grad(C.ironPaintDark, C.ironPaint));
       ring.dispose();
     }
     // a true curved cupola (was a 12-gon cone that read as a paper hat): hemisphere squashed
@@ -1615,12 +1619,26 @@ export function buildWorld(coastKit) {
     // (gap centred az195° from the annex, thetaStart aa+220) so the inner door stands in a true
     // doorway and you look straight in at the keeper's room instead of obliquely past a solid wall.
     const ax = LH.x + Math.sin(aa) * (baseR + 2.9), az = LH.z + Math.cos(aa) * (baseR + 2.9);
-    const wall = new THREE.CylinderGeometry(2.7, 2.8, 3.4, 20, 1, true, aa + deg(220), deg(280));
+    // gap ±20° (was ±40°): the throat is 2 m wide, and the extra 40° either side of it was open
+    // air between the two buildings — from the bed, looking up, a sliver of sky over the door.
+    const wall = new THREE.CylinderGeometry(2.7, 2.8, 3.4, 24, 1, true, aa + deg(200), deg(320));
     stone.add(wall, new THREE.Matrix4().makeTranslation(ax, LH.y + 1.7, az), grad(C.boneDark, C.bone));
     wall.dispose();
     const roof = new THREE.ConeGeometry(3.0, 1.4, 18);
     stone.add(roof, new THREE.Matrix4().makeTranslation(ax, LH.y + 4.1, az), grad(C.copperDark, C.copper));
     roof.dispose();
+    // the eaves plate: a solid ring under the cone's rim, so the wall-top/roof junction is
+    // closed from inside (a sliver of sky showed over the doorway side when you looked up)
+    const eaves = new THREE.CylinderGeometry(3.05, 3.05, 0.12, 18);
+    stone.add(eaves, new THREE.Matrix4().makeTranslation(ax, LH.y + 3.38, az), grad(C.boneDark, C.boneDark));
+    eaves.dispose();
+    // the VALLEY: where the annex's round roof meets the drum there are two wedge-shaped gaps
+    // either side of the throat (the two circles cannot meet along an arc). A flat lead flat
+    // across the junction, at eaves height, closes them — looking up from the bed used to show
+    // a sliver of sky over the doorway. Mostly buried inside the cone and the drum wall.
+    const valley = new THREE.BoxGeometry(4.2, 0.14, 1.7);
+    stone.add(valley, place(LH.x + Math.sin(aa) * 5.9, LH.y + 3.38, LH.z + Math.cos(aa) * 5.9, aa), grad(C.boneDark, C.boneDark));
+    valley.dispose();
     const afloor = new THREE.CylinderGeometry(2.8, 2.8, 0.2, 16);
     stone.add(afloor, new THREE.Matrix4().makeTranslation(ax, LH.y - 0.03, az), grad(C.stoneOld, C.boneDark));
     afloor.dispose();
@@ -1638,6 +1656,12 @@ export function buildWorld(coastKit) {
       }
       const lintel = new THREE.BoxGeometry(2.0, 0.4, 0.95);   // a lintel across the top of the throat
       stone.add(lintel, place(LH.x + Math.sin(aa) * 5.3, LH.y + 3.5, LH.z + Math.cos(aa) * 5.3, aa), grad(C.bone, C.bone));
+      lintel.dispose();
+      // and the spandrel above it: between lintel and roof the throat was open to the sky
+      // (a blue sliver over the doorway whenever you looked up from the bed)
+      const spandrel = new THREE.BoxGeometry(2.0, 1.1, 0.95);
+      stone.add(spandrel, place(LH.x + Math.sin(aa) * 5.3, LH.y + 4.2, LH.z + Math.cos(aa) * 5.3, aa), grad(C.boneDark, C.bone));
+      spandrel.dispose();
       lintel.dispose();
     }
 
@@ -1790,9 +1814,47 @@ export function buildWorld(coastKit) {
     const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.9, 5), matBrassSolid); rod.position.y = 2.78; lamp.add(rod);
     const cap = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.16, 8), matBrassSolid); cap.position.y = 2.42; lamp.add(cap);
     const globe = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8),
-      new THREE.MeshStandardMaterial({ color: 0xffe6b0, emissive: 0xffb45a, emissiveIntensity: 2.4, flatShading: true }));
+      new THREE.MeshStandardMaterial({ color: 0xffe6b0, emissive: 0xffb45a, emissiveIntensity: 1.35, flatShading: true }));  // 2.4 read as a clipped white disc; 1.35 still clears the 1.05 bloom threshold and keeps the glass amber
     globe.position.y = 2.28; lamp.add(globe);
     q.add(lamp);
+
+    // LIMEWASH over the brick. A keeper's bedroom is plastered and whitewashed, not bare coursed
+    // masonry on every side like a cistern; the liner also gives the lamp something pale to
+    // bounce off, so the room stops reading as a cave. An open arc that leaves the doorway clear
+    // (the shell's gap is 80° toward the drum: local 222°..498°). BackSide: we stand inside it.
+    {
+      const limewash = new THREE.MeshStandardMaterial({ color: 0xd8cfbb, roughness: 0.96, metalness: 0, side: THREE.BackSide });
+      limewash.onBeforeCompile = (sh) => {
+        sh.vertexShader = 'varying vec3 vLime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvLime = position;');
+        sh.fragmentShader = ('varying vec3 vLime;\n'
+          + 'float limeHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}\n'
+          + 'float limeNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(limeHash(i),limeHash(i+vec2(1,0)),f.x),mix(limeHash(i+vec2(0,1)),limeHash(i+vec2(1,1)),f.x),f.y);}\n'
+          + sh.fragmentShader).replace('#include <color_fragment>', `#include <color_fragment>
+          vec2 lu = vec2(atan(vLime.x, vLime.z) * 2.62, vLime.y);
+          float mottle = limeNoise(lu * 3.4) * 0.55 + limeNoise(lu * 11.0 + 3.0) * 0.45;   // trowel marks, old coats (hand scale, not weather maps)
+          float damp = 1.0 - smoothstep(0.1, 1.1 + limeNoise(lu * 0.8) * 0.5, vLime.y);     // rising damp by the floor
+          float soot = smoothstep(2.4, 3.3, vLime.y) * 0.5;                                 // lamp smoke under the boards
+          float scuff = smoothstep(0.66, 0.92, limeNoise(lu * 2.9 + 11.0)) * smoothstep(1.1, 0.15, vLime.y);   // scuffed through to the brick behind the bed and chair
+          diffuseColor.rgb *= (0.91 + mottle * 0.13) * (1.0 - damp * 0.16) * (1.0 - soot * 0.18);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.35, 0.28), scuff * 0.4);`);
+      };
+      limewash.customProgramCacheKey = () => 'quarters-limewash-v1';
+      const liner = new THREE.Mesh(new THREE.CylinderGeometry(2.63, 2.63, 3.3, 28, 1, true, deg(204), deg(312)), limewash);
+      liner.position.y = 1.65; liner.name = 'quartersLimewash'; liner.receiveShadow = true; q.add(liner);
+    }
+
+    // A CEILING. The cone roof's unlit underside was this room's sky — a black pit over the
+    // bed in every frame that looked up. Boarded over at joist height, as a keeper's room is;
+    // the lamp rod meets it. Lives in `quarters`, so the 1:240 model prunes it with the rest.
+    {
+      const boards = new THREE.Mesh(new THREE.CylinderGeometry(2.9, 2.9, 0.07, 24), matWood);
+      boards.position.y = 3.26; boards.name = 'quartersCeiling'; q.add(boards);
+      for (const x of [-1.8, -0.9, 0, 0.9, 1.8]) {
+        const span = 2 * Math.sqrt(Math.max(0.1, 2.7 * 2.7 - x * x));
+        const joist = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.16, span), matWood);
+        joist.position.set(x, 3.15, 0); q.add(joist);
+      }
+    }
 
     // the keeper's PRIVATE journal, left on the cot by the pillow — the intimate counterpart to
     // the chart-table logbook (the reading surface). Found only here, behind the inner door, one
@@ -1834,7 +1896,31 @@ export function buildWorld(coastKit) {
   // change); the existing water hides it and draining reveals it.
   let galleryGlow = null;
   {
-    const drownedMat = new THREE.MeshStandardMaterial({ color: 0x39424a, flatShading: false, roughness: 0.55, metalness: 0.15 });
+    // Drowned STONE, not black plastic: the hall's capitals break the surface ten metres from
+    // where you wake, and the old flat 0x39424a boxes read as a concrete pier. Weathered
+    // limestone with the shared mineral relief, lichen on the dry tops, and an algae band at
+    // the hall's own waterline (instance-local y, so the stain rides up with the L3 breach).
+    const drownedMat = new THREE.MeshStandardMaterial({ color: 0x8a8678, flatShading: false, roughness: 0.86, metalness: 0.0 });
+    applyRelief(drownedMat, 'rock_height', { normalScale: 0.5, strength: 1.8, colorMap: false, repeat: [1.6, 1.6] });
+    applyRockCrust(drownedMat);
+    {
+      const crust = drownedMat.onBeforeCompile;
+      drownedMat.onBeforeCompile = (sh) => {
+        crust(sh);
+        sh.vertexShader = 'varying float vHallY;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+          #ifdef USE_INSTANCING
+            vHallY = (instanceMatrix * vec4(position, 1.0)).y;
+          #else
+            vHallY = position.y;
+          #endif`);
+        sh.fragmentShader = 'varying float vHallY;\n' + sh.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
+          float algae = (1.0 - smoothstep(0.15, 0.95, vHallY)) * smoothstep(-1.4, -0.3, vHallY);   // the tide's green band
+          float drowned = 1.0 - smoothstep(-1.6, -0.2, vHallY);                                   // below it: dark, wet, bare
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.46, 0.60, 0.42), algae * 0.85);
+          diffuseColor.rgb *= 1.0 - drowned * 0.35;`);
+      };
+      drownedMat.customProgramCacheKey = () => 'drowned-hall-stone-v1';
+    }
     const ROWS = [0, 8];                              // two colonnades flanking a seaward aisle
     const ZS = [-108, -111.5, -115, -118.5];
     const gallery = new THREE.Group(); gallery.name = 'drownedGallery';
@@ -2895,7 +2981,7 @@ export function buildWorld(coastKit) {
   }
 
   // =================== VEGETATION ===========================================
-  buildVegetation(core, r, coastKit);
+  buildVegetation(core, r, coastKit, boulderKit);
 
   // =================== LOWER HAND (on the model) ============================
   // A figure one stratum down, standing on the model's dry shore terrace. The group sits at
@@ -3453,7 +3539,7 @@ export function buildWorld(coastKit) {
 }
 
 // ---------------------------------------------------------------------------
-function buildVegetation(core, r, coastKit) {
+function buildVegetation(core, r, coastKit, boulderKit = null) {
   // keep-outs: floors the scatter must respect. Discs match the structures
   // built in buildWorld — lighthouse base (r 5.2 + wall + apron) and the
   // annex (attached at azimuth 15°, baseR + 2.2 from the tower, r 2.8).
@@ -3970,7 +4056,10 @@ function buildVegetation(core, r, coastKit) {
       const colors=[];
       for(let i=0;i<p.count;i++){
         const t=Math.max(0,Math.min(1,p.getY(i)/h));
-        const c=new THREE.Color(0x5a6650).lerp(new THREE.Color(0xd0c6a0),t*.8);
+        // (root 0x5a6650 → 0x8a9470: the dark root ran the whole lower blade, and under a low
+        // sun every tuft read as a black twig against the lit sand — the blades take the
+        // meadow-floor normal, so they must carry roughly the meadow's own value)
+        const c=new THREE.Color(0x8a9470).lerp(new THREE.Color(0xd0c6a0),t*.8);
         colors.push(c.r,c.g,c.b);
       }
       g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
@@ -4020,7 +4109,10 @@ function buildVegetation(core, r, coastKit) {
     // the terrain they grow from, from every side, and still dim correctly at night.
     sh.fragmentShader = sh.fragmentShader
       .replace('void main() {', 'varying vec3 vGUp;\nvoid main() {')
-      .replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\n  normal = normalize(normal*.35 + normalize(vGUp)*.65);');
+      // (.35/.65 → .15/.85: at dawn and dusk the blades' own sideways normals missed the low
+      // sun and every tuft read as a black twig against lit sand; taking the ground's light
+      // almost entirely keeps them the colour of the meadow they stand in)
+      .replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\n  normal = normalize(normal*.15 + normalize(vGUp)*.85);');
     // A SPRIG IS NOT A CARD. Scaled up big enough to read across the meadow, the heath's
     // flat tapered planes showed exactly what they are — hard straight edges against the
     // sky, the same folded-paper tell the canopy had. Fray the tips with the same
@@ -4208,7 +4300,7 @@ function buildVegetation(core, r, coastKit) {
   }
 
   // --- shore rocks: irregular weathered boulders, not regular faceted balls (loop #128) ---
-  // Fidelity pass (owner: "polygons are low"): detail-2 icosahedron (320 faces, was 80) with the
+  // Fidelity pass (owner: "polygons are low"): detail-2 icosahedron (180 faces, was 80) with the
   // duplicated verts WELDED so smooth normals flow over the whole boulder, displaced by two
   // octaves of triplanar-blended value noise — continuous everywhere (no seam, no shattering):
   // broad geologic lumps + small weathered knuckles. The derived crack relief rides on top.
@@ -4231,7 +4323,24 @@ function buildVegetation(core, r, coastKit) {
     g.computeVertexNormals();
     return g;
   };
-  const rockVariants = [makeRock(SEED ^ 0x2b91), makeRock(SEED ^ 0x5d17), makeRock(SEED ^ 0x8c3f)];
+  // The authored kit (tools/blender/boulders.py): fractured blocks with bevelled, weathered
+  // edges, baked vertex cavity shading and box UVs for the relief map. The displaced icosphere
+  // stays as the fallback only — every rock in the game was that one smooth egg at every size.
+  const kitRock = (name) => {
+    const src = boulderKit?.getObjectByName(name);
+    if (!src?.isMesh) return null;
+    src.updateWorldMatrix(true, false);
+    const g = src.geometry.clone().applyMatrix4(src.matrixWorld);
+    if (!g.attributes.color) g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3));
+    g.userData.authoring = 'Blender boulders.py';
+    g.computeBoundingSphere();
+    return g;
+  };
+  const rockVariants = [
+    kitRock('boulderA') || makeRock(SEED ^ 0x2b91),
+    kitRock('boulderB') || makeRock(SEED ^ 0x5d17),
+    kitRock('boulderC') || makeRock(SEED ^ 0x8c3f),
+  ];
   // Three stone types keep the shore from becoming 70 copies of one granite. Their
   // distinct geology lives in base colour and displaced geometry; one shared strata
   // heightmap supplies subtle relief without fetching three albedos that are never shown.
@@ -4241,7 +4350,9 @@ function buildVegetation(core, r, coastKit) {
     { color: 0xc7bda6 },       // pale eroded
   ];
   const rockMeshes = rockDefs.map((d, idx) => {
-    const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: false, roughness: 0.95 });
+    // vertexColors: the kit bakes cavity shading + a lighter tint on fracture faces; the fallback
+    // icosphere carries a flat white attribute so the base colour is unchanged there.
+    const mat = new THREE.MeshStandardMaterial({ color: d.color, vertexColors: !!rockVariants[idx].attributes.color, flatShading: false, roughness: 0.95 });
     // #48: RELIEF-ONLY stone — the tiled albedo pixelated at arm's length and read as
     // cracked mud (screenshot 08-dory-shore). The derived normal keeps every fracture
     // catching light; the colour is a quiet flat base; texels enlarged (repeat 0.6) so
@@ -4324,6 +4435,11 @@ function buildVegetation(core, r, coastKit) {
         em.compose(new THREE.Vector3(x, hh + sc * 0.16, z),
           eq.setFromEuler(ee.set(er() * TAU, er() * TAU, er() * TAU)),
           new THREE.Vector3(sc, sc * (0.55 + er() * 0.5), sc));
+        // a keeper clears his own doorstep: no erratic inside 16 m of the tower axis (the
+        // two landmark stones used to stand in the tower's lap and hide its door). Decided
+        // AFTER the draws above so the shared stream — every other stone's position, size
+        // and bucket — is byte-identical to the scatter before the keep-out existed.
+        if (Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 16) continue;
         errMesh[b].setMatrixAt(en[b]++, em);
         if (sc >= 1.0) addCollider(x, z, sc * 0.78);
       }
@@ -4397,6 +4513,12 @@ export function instantiateModel(core, modelAnchor) {
     // clips essentially the same nothing. Below ~200 m it would start slicing real
     // shoreline (20% of the ring at 200 m, 33% at 140 m) — that is the floor, not taste.
     const CROP = 0.90;                        // half-extent in metres: the model shows 1.8m
+    // The beam volumes carry a per-instance "eye at the lamp" fade (uApex/uFadeR, main.js):
+    // shared with the island they would be driven twice a frame and the clone's write wins.
+    for (const bn of ['beamCone', 'shaftBeam']) {
+      const bm = modelRoot.getObjectByName(bn);
+      if (bm?.material?.uniforms) bm.material = bm.material.clone();
+    }
     const mw = modelRoot.getObjectByName('water');
     if (mw) {
       // MEASURE IN THE MODEL'S OWN UNITS. Box3.setFromObject here returns ISLAND units,

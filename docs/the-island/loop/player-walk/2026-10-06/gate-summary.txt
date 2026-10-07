@@ -1,0 +1,75 @@
+# Release gate runs on the final code — 2026-10-06 (M4, headless Chrome, real GPU)
+
+## Full run (tools/harness/run.sh), last attempt
+== saves schema ==
+SAVES 24 / 24
+== coverage ==
+COVERAGE PASS 21 / 21
+== runtime reset ownership ==
+RUNTIME-RESET PASS 6 / 6
+== the upstream hand ==
+  power baseline 499 calls / 919774 tris · peak 513 calls / 921404 tris
+UPSTREAM-HAND 32 / 32
+== the writing in the sand ==
+WRITING 19 / 19
+== the finished terrain ==
+TERRAIN-FINISH 10 / 10
+== the living coastal assets ==
+ISLAND LIFE 21 / 21
+== the player-facing journey ==
+EXPERIENCE PASS 21 / 22
+FAILURES: {"fail":["UX.controls(readable)"],"chrome":{"hint":{"left":260,"right":1020,"bottom":696.96875,"height":19.484375,"size":13.44,"opacity":0},"role":"dialog","modal":"true","labelled":"journal-title"}}
+EXPERIENCE FAILED
+
+## Fresh-browser batches (tools/harness/one.sh), remaining scripts
+== experience.mjs ==
+EXPERIENCE PASS 22 / 22
+== doors.mjs ==
+DOORS 6 / 6
+== bloom.mjs ==
+BLOOM 3 / 3
+== shell.mjs ==
+SHELL 5 / 5
+    0 / 2640 sky-rays — up past the annex door (the reported frame)
+    0 / 228 sky-rays — past the beach door frame (the reported frame)
+    0 / 2640 sky-rays — the window wall lintel band
+    0 / 2640 sky-rays — the beach door lintel band
+   84 / 2640 sky-rays  (expected) — out through the beach door
+== relief.mjs ==
+RELIEF 8 / 8
+== gulls.mjs ==
+GULLS 11 / 11
+== vault-outcrop.mjs ==
+VAULT-OUTCROP 8 / 8
+=== BATCH A DONE rc=0 ===
+== trees.mjs ==
+TREES 13 / 13
+== tabletop.mjs ==
+TABLETOP 29 / 29
+== glare.mjs ==
+GLARE 8 / 8
+== spines.mjs ==
+SPINES 20 / 20
+== glint.mjs ==
+GLINT 25 / 25
+== harbor.mjs ==
+HARNESS-ERR Rendered state never arrived: the pointer on the spare chair {"position":[-82.6630133966664,13.5,-33.016913747071484],"locked":false,"enabled":true,"mouse":[-0.0004105567932128906,-0.37765413046217566]}
+== landfall.mjs ==
+LANDFALL 21 / 21
+=== BATCH B DONE rc=1 ===
+== working-coast.mjs ==
+WORKING COAST 10 / 10
+== shore-details.mjs ==
+SHORE DETAILS 18 / 18
+== cohesion.mjs ==
+COHESION 8 / 9
+== handwork.mjs ==
+HANDWORK 11 / 11
+== encounters.mjs ==
+ENCOUNTERS 7 / 8
+== walk.mjs ==
+WALK PASS 69 / 69
+=== BATCH C DONE rc=1 ===
+
+## Re-runs alone of every script that flaked in a long run
+harbor.mjs HARBOR 11 / 11 · cohesion.mjs COHESION 9 / 9 (maxEyeJump 0.083 / 0.120 vs the 0.16 limit) · island-life.mjs ISLAND LIFE 21 / 21 · encounters.mjs ENCOUNTERS 8 / 8 (after the shore-rock fixture rewrite) · experience.mjs EXPERIENCE 22 / 22 (two earlier runs this session)

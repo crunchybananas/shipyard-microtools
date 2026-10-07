@@ -128,6 +128,15 @@ encounter fixtures explicitly. The Blender source is
 with the Python generator beside it.
 
 
+## The player walk, October 2026
+
+[The player walk](loop/player-walk/2026-10-06/REPORT.md) plays the whole game as a first-time
+player would and records what each frame says. It replaced the headland's marshmallow
+erratics with a fractured Blender boulder kit, fused the sea into the sky at the horizon,
+gave the drowned hall weathered stone, the drained bay a mud floor, the cliffs a mineral
+face, the east room a plastered wall and a ceiling, and stopped the lantern gallery from
+blowing out to white at night. It also measured and rejected a multisampled post chain.
+
 ## Current visual and walking review
 
 [The cohesion pass](loop/cohesion/index.html) restores named library books, rebuilds

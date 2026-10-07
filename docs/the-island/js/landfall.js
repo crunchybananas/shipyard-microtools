@@ -28,10 +28,10 @@ export function attachLandfall(core, library) {
       vec3 mineral = texture2D(uMineral,vGrain.yz*.23).rgb*blend.x
                    + texture2D(uMineral,vGrain.xz*.23).rgb*blend.y
                    + texture2D(uMineral,vGrain.xy*.23).rgb*blend.z;
-      float detail = dot(mineral,vec3(.3,.59,.11));
-      diffuseColor.rgb *= .82 + detail*.4;`);
+      float detail = smoothstep(.33,.70,dot(mineral,vec3(.3,.59,.11)));   // the map's real range (p2..p98), stretched
+      diffuseColor.rgb *= .76 + detail*.42;`);
   };
-  mineral.customProgramCacheKey = () => 'landfall-mineral-v3';
+  mineral.customProgramCacheKey = () => 'landfall-mineral-v4';
   const shaftMaterial = material.clone();
   shaftMaterial.onBeforeCompile = shader => {
     material.onBeforeCompile(shader);
@@ -42,9 +42,19 @@ export function attachLandfall(core, library) {
       float mortar = 1.0-smoothstep(.012,.028,min(edge.x,edge.y));
       diffuseColor.rgb *= 1.0 - mortar*.22;
       float stain = sin(atan(vGrain.x,vGrain.z)*71.0)*.018 + sin(vGrain.y*.61)*.022;
-      diffuseColor.rgb *= 1.0 + stain;`);
+      diffuseColor.rgb *= 1.0 + stain;
+      // WEATHER. A rendered tower on a headland is not uniformly white: rain streaks run down
+      // from the gallery in the lee of each astragal, salt bloom lightens the windward band,
+      // and the bottom metre is dark with damp. Keyed on the shaft's own height (20.6 m rise).
+      float az = atan(vGrain.x, vGrain.z);
+      float streakK = sin(az * 23.0 + sin(az * 7.0) * 1.3) * 0.5 + 0.5;
+      float fromTop = clamp((20.3 - vGrain.y) / 20.6, 0.0, 1.0);
+      float streaks = smoothstep(0.55, 0.95, streakK) * exp(-fromTop * 3.2) * 0.22;
+      float damp = (1.0 - smoothstep(0.0, 1.4, vGrain.y)) * 0.18;
+      float bloom = sin(az * 0.9 + 0.6) * 0.5 + 0.5;
+      diffuseColor.rgb *= (1.0 - streaks) * (1.0 - damp) * (0.97 + 0.05 * bloom);`);
   };
-  shaftMaterial.customProgramCacheKey = () => 'landfall-masonry-v2';
+  shaftMaterial.customProgramCacheKey = () => 'landfall-masonry-v3';
   const geometry = new Map();
   function part(name) {
     if (!geometry.has(name)) {
@@ -58,7 +68,16 @@ export function attachLandfall(core, library) {
     return mesh;
   }
   for (const name of ['towerShaft', 'towerStair', 'towerRails']) {
-    const mesh = part(name); core.getObjectByName('lighthouse').add(mesh);
+    const mesh = part(name);
+    if (name === 'towerRails') {
+      // Painted iron, not polished brass. The kit authors the rails gold; under the lamp's
+      // spill at night a gold rail a metre from the eye is a bloom source the size of the
+      // frame — the gallery went white. Iron is also what a lantern gallery is actually made
+      // of (ART_DIRECTION: oxidised metal). Vertex colours only; the shared material stays.
+      const col = mesh.geometry.getAttribute('color');
+      if (col) { for (let i = 0; i < col.count; i++) col.setXYZ(i, 0.085, 0.092, 0.10); col.needsUpdate = true; }
+    }
+    core.getObjectByName('lighthouse').add(mesh);
   }
   const foot = core.getObjectByName('stairFoot'), top = core.getObjectByName('galleryHatch'), rope = core.getObjectByName('stairRope');
   const bottom = stairPose(0), end = stairPose(1);

@@ -401,7 +401,10 @@ export function makeSkyMaterial() {
         col = mix(col, uTop * 0.82, pow(up, 2.2));
         // horizon-haze fuse: the lowest sky band settles toward the FOG colour the far terrain
         // hazes into, so the seam where the untextured distance meets the sky dissolves
-        col = mix(col, uHorizonHaze, (1.0 - smoothstep(0.0, 0.085, up)) * 0.6);
+        // (was *0.6: the far sea fogs to 100% haze, so the sea read BRIGHTER than the sky
+        // just above it — a hard white bar along every horizon. Full haze at the horizon,
+        // feathered a little higher, puts sea and sky on one continuous value.)
+        col = mix(col, uHorizonHaze, 1.0 - smoothstep(0.0, 0.13, up));
         // below the horizon: deep sea haze
         col = mix(col, uHorizon * 0.55, smoothstep(0.0, -0.25, d.y));
 
@@ -512,6 +515,11 @@ export function makeBeamMaterial(color = 0xfff0c0) {
       uTime: { value: 0 },
       uFlip: { value: 0 }, // 0: source at uv.y=0 (beam apex); 1: source at uv.y=1 (shaft top)
       uMist: { value: 0 }, // #44: mist is scattering medium — the shaft brightens in fog (the lighthouse-in-fog image)
+      // the lamp's world position + a fade radius: standing on the gallery put the camera INSIDE
+      // the cone's source and the whole frame went white. Scaled by the fade radius so the 1:240
+      // clone keeps its tiny beam when the player leans over the table.
+      uApex: { value: new THREE.Vector3(0, -1e6, 0) },
+      uFadeR: { value: 4.5 },
     },
     vertexShader: /* glsl */`
       varying vec2 vUv;
@@ -530,6 +538,8 @@ export function makeBeamMaterial(color = 0xfff0c0) {
       uniform float uTime;
       uniform float uFlip;
       uniform float uMist;
+      uniform vec3 uApex;
+      uniform float uFadeR;
       varying vec2 vUv;
       varying vec3 vN;
       varying vec3 vW;
@@ -543,6 +553,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
         // reading as two hard streaks — face-on light fills the body
         float facing = smoothstep(0.02, 0.32, abs(dot(normalize(vN), normalize(cameraPosition - vW))));
         float a = along * uIntensity * shimmer * 0.5 * facing * (1.0 + uMist * 0.55);
+        a *= smoothstep(uFadeR * 0.25, uFadeR, distance(cameraPosition, uApex));   // eye at the lamp: no white-out
         a += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither the additive ramp: kills the beam's banded rings at night
         gl_FragColor = vec4(uColor, a);
         #include <tonemapping_fragment>

@@ -473,8 +473,13 @@ export function buildTerrain() {
   // rather than as a backdrop. Vertex colours, so it costs nothing at runtime.
   const cGrassGreen = new THREE.Color(0x6d7c40);
   const cHeather = new THREE.Color(0x9a7f57);
-  const cSeabed = new THREE.Color(0x33514e);
-  const cSeabedDeep = new THREE.Color(0x16313c);
+  const cPeat = new THREE.Color(0x5e5238);
+  // The DRAINED bay is the first thing the valve shows you, and it was painted as if it were
+  // still underwater: a dark teal shelf that read as a cliff face (the islet looked like a
+  // saucer hovering over the sea at low tide). The water owns the underwater look (its body
+  // colour + the submerged shift in the shader); the floor itself is wet mud-sand with weed.
+  const cSeabed = new THREE.Color(0x6a6b55);
+  const cSeabedDeep = new THREE.Color(0x3f4d45);
   const tmp = new THREE.Color();
   const tSand = new THREE.Color(), tGrass = new THREE.Color(), tRock = new THREE.Color();
 
@@ -516,8 +521,12 @@ export function buildTerrain() {
       // house rule that killed the old albedo grid applies to colour as much as texture.
       const nDamp = fbm(x * 0.017 - 61, z * 0.017 + 44, 3);
       const nPatch = fbm(x * 0.09 + 7, z * 0.09 - 23, 2);
-      tGrass.lerp(cGrassGreen, smoothstep(0.42, 0.86, nDamp) * 0.80);
-      tGrass.lerp(cHeather, smoothstep(0.60, 0.95, nPatch) * 0.40);
+      // (patch coverage raised: green landed only where nDamp > .86, which left the meadow the
+      // same ochre carpet it was before; a bare-earth/peat anchor joins at the ~25 m scale)
+      tGrass.lerp(cGrassGreen, smoothstep(0.30, 0.78, nDamp) * 0.85);
+      tGrass.lerp(cHeather, smoothstep(0.52, 0.92, nPatch) * 0.50);
+      const nPeat = fbm(x * 0.04 - 19, z * 0.04 + 71, 2);
+      tGrass.lerp(cPeat, smoothstep(0.58, 0.90, nPeat) * 0.45);
       tGrass.offsetHSL(0, 0, (slope - 0.2) * -0.12);
       // grass -> rock across the old slope 0.62 cut
       tmp.lerpColors(tGrass, tRock, smoothstep(0.54, 0.70, slope));
@@ -607,6 +616,7 @@ export function buildTerrain() {
     sh.uniforms.uLitterOn = { value: LITTER.tex ? 1 : 0 };
     sh.uniforms.uPathAmt = { value: 0.0 };   // driven by depth in main.js — see the paths block
     sh.uniforms.uLitterRect = { value: new THREE.Vector3(LITTER.cx, LITTER.cz, LITTER.size || 1) };
+    sh.uniforms.uMineral = { value: getTexture('rock_height') };   // the shared granite relief, as cliff-face albedo detail
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
     // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. The
     // 3-D world no longer fetches either texture; dunegrass was deleted, while sand.jpg remains solely
@@ -626,6 +636,7 @@ export function buildTerrain() {
         uniform sampler2D uCaustic;
         uniform sampler2D uLitter; uniform float uLitterOn; uniform vec3 uLitterRect;
         uniform float uPathAmt;
+        uniform sampler2D uMineral;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
         float gSandLee;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
@@ -754,6 +765,29 @@ export function buildTerrain() {
         // lightness bands land only on rock-coloured faces, never as mow-lines on grass
         float aRockW = smoothstep(0.50, 0.66, vSlope);
         diffuseColor.rgb *= mix(1.0, 0.88 + 0.18 * aStrata, aRockW * (1.0 - cMini));
+        // CLIFF FACES: the bluff and the chasm walls were vertex colour stretched over 2.4 m
+        // cells — bands smeared like a dragged photograph. A triplanar sample of the shared
+        // granite relief, in world metres, gives every steep face a mineral surface that holds
+        // at arm's length and at the 170 m study range alike. Rock pixels only (branch).
+        float mRockW = smoothstep(0.44, 0.62, vSlope);   // a touch earlier than the colour swap: the smeared faces sit at slope .5-.7
+        if (mRockW > 0.01 && cMini < 0.5) {
+          // VERTEX-COLOUR SMEAR: on a 20 m wall the 2.4 m grid's per-vertex hue jitter stretches
+          // into diagonal streaks — "a dragged photograph". Keep each vertex's VALUE (the AO bake
+          // and the warm/cool bedding live there) but pull the hue to one rock base per fragment.
+          float vLum = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+          vec3 rockBase = vec3(0.62, 0.585, 0.52) * (0.55 + 0.95 * vLum);
+          diffuseColor.rgb = mix(diffuseColor.rgb, rockBase, mRockW * 0.75);
+          vec3 gN = normalize(cross(dFdx(vWPos), dFdy(vWPos)));   // world-space face normal (the shading normal is declared later, in normal_fragment_begin)
+          vec3 bw = pow(abs(gN), vec3(4.0)); bw /= max(0.001, bw.x + bw.y + bw.z);
+          vec3 mn = texture2D(uMineral, vWPos.yz * 0.21).rgb * bw.x
+                  + texture2D(uMineral, vWPos.xz * 0.21).rgb * bw.y
+                  + texture2D(uMineral, vWPos.xy * 0.21).rgb * bw.z;
+          // the height map lives between ~0.35 and ~0.68 (p2/p98): stretch it to full range or
+          // the multiply lands within a few percent of 1.0 and nothing shows
+          float mineral = smoothstep(0.33, 0.70, dot(mn, vec3(0.3, 0.59, 0.11)));
+          float mFar = 1.0 - smoothstep(260.0, 520.0, length(vViewPosition));
+          diffuseColor.rgb *= mix(1.0, 0.74 + mineral * 0.46, mRockW * mFar);
+        }
         // WATERLINE PASS — keys off uWaterY in OBJECT space (vTerH is the baked local height,
         // the sea sits at local y = uWaterY), so the band RIDES the tide at every SEA-STRATA
         // level and the 1:240 chart-table clone inherits the same tide line for free.

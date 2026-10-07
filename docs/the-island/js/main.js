@@ -140,6 +140,10 @@ const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.08, 1
 // power policy: a graphics win must HOLD or cut load). setPixelRatio + setSize are called
 // BEFORE the passes are added, so the bloom keeps its half-res; resize re-asserts it.
 const BLOOM_RES = () => new THREE.Vector2(Math.max(1, innerWidth >> 1), Math.max(1, innerHeight >> 1));
+// NOT a multisampled target. Tried (2026-10-06): a 4× MSAA half-float composer target gives the
+// bloom hours (dawn/gold/dusk/night) the antialiasing clear daylight keeps, but the per-frame
+// resolve measured 84.8 ms vs 19.6 ms at the night bench on an M4 — a 4× frame cost, far past
+// the power policy. The daylight direct-render path below keeps native MSAA where it is cheap.
 const composer = new EffectComposer(renderer);
 composer.setPixelRatio(BASE_DPR);
 composer.setSize(innerWidth, innerHeight);
@@ -250,8 +254,8 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
-const [harborKit, landfallKit, coastKit, shoreKit, lifeKit] = await Promise.all([loadModel('harbor_rooms'), loadModel('landfall'), loadModel('working_coast'), loadModel('shore_details'), loadModel('island_life')]);
-const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, l3motes, vaultDrips } = buildWorld(coastKit);
+const [harborKit, landfallKit, coastKit, shoreKit, lifeKit, boulderKit] = await Promise.all([loadModel('harbor_rooms'), loadModel('landfall'), loadModel('working_coast'), loadModel('shore_details'), loadModel('island_life'), loadModel('boulders')]);
+const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, l3motes, vaultDrips } = buildWorld(coastKit, boulderKit);
 const harbor = attachHarborRooms(core, harborKit);
 const landfall = attachLandfall(core, landfallKit);
 const workingStudy = attachWorkingStudy(core, coastKit);
@@ -370,7 +374,7 @@ sun.shadow.camera.left = -60; sun.shadow.camera.right = 60;
 sun.shadow.camera.top = 60; sun.shadow.camera.bottom = -60;
 sun.shadow.camera.near = 20; sun.shadow.camera.far = 420;
 sun.shadow.bias = -0.0004;
-sun.shadow.normalBias = 0.5;
+sun.shadow.normalBias = 0.12;   // was 0.5: half a metre of normal offset detached every shadow from its caster — the dawn tree shadows read as smears sliding over the sand
 scene.add(sun, sun.target);
 
 const hemi = new THREE.HemisphereLight(0x9ec7e0, 0x6a6048, 0.55);
@@ -1487,7 +1491,12 @@ function applyAtmosphere(elapsed, dt) {
   // goes dark the deeper you descend (one prop change per level, #13)
   const windowFade = Math.max(1 - 0.42 * Math.max(0, W.level - 2), 0.12);
   studyLight.intensity = lerp(4, 16, night) * windowFade * (tableauLights?.study ?? 1);
-  lampSpill.intensity = (W.lampLit ? 220 : 0) * (tableauLights?.beacon ?? 1);
+  // The spill is the lit island seen from afar (range 700). Standing beside the lamp, the same
+  // 220-intensity point light a metre away blew every surface on the gallery past white and the
+  // bloom took the frame with it. Fade it out inside ~8 m: up there the lens glow and the beam
+  // itself carry the light, and nothing in the frame needs a second source.
+  lampSpill.intensity = (W.lampLit ? 220 : 0) * (tableauLights?.beacon ?? 1)
+    * (0.02 + 0.98 * smoothstep(2.5, 8.0, camera.position.distanceTo(lampSpill.position)));   // 2% floor: the lantern room is still lit from inside (10% blew the pale murette out)
   cellarLight.intensity = W.flags.hatchOpen ? 9 : 0;
   cellarFill.intensity = W.flags.hatchOpen ? 3.4 : 0;
   // the vault's cold lamp, with a slow drowned pulse — lit only with the cellar open
@@ -1576,10 +1585,12 @@ function applyAtmosphere(elapsed, dt) {
   mu.uGlobal.value = W.flags.hatchOpen ? 0.8 : 0;
 
   // beams + sway
-  for (const r of [refs.beamCone, refs.shaftBeam]) {
+  for (const [r, lens, fadeR] of [[refs.beamCone, refs.lampLens, 4.5], [refs.shaftBeam, refs.lampLens, 4.5],
+    [modelRefs.beamCone, modelRefs.lampLens, 4.5 * SCALE_MODEL], [modelRefs.shaftBeam, modelRefs.lampLens, 4.5 * SCALE_MODEL]]) {
     if (r?.material?.uniforms) {
       r.material.uniforms.uTime.value = elapsed;
       if (r.material.uniforms.uMist) r.material.uniforms.uMist.value = mistCur;   // #44: the shaft brightens in fog
+      if (r.material.uniforms.uApex && lens) { lens.getWorldPosition(r.material.uniforms.uApex.value); r.material.uniforms.uFadeR.value = fadeR; }
     }
   }
   for (const m of swayMats) {
@@ -1602,7 +1613,9 @@ function applyAtmosphere(elapsed, dt) {
     // or sheep, or nothing. Each rung inherits more of the ledger above it (STACK.md §3.1)
     // and the ground admits more of what it is. Never fully: 0.62 at the bottom, because a
     // path you can be certain about stops being evidence and starts being signage.
-    if (tu.uPathAmt) tu.uPathAmt.value = 0.22 + Math.min(W.level - 1, 3) * 0.19;
+    // (L1 was 0.22 — "deniable" to the point of invisible, while the first whisper promises
+    // "a path leads up from the beach". Legible from the first minute now; still deepens.)
+    if (tu.uPathAmt) tu.uPathAmt.value = 0.42 + Math.min(W.level - 1, 3) * 0.16;
   }
 
 
