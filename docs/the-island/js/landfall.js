@@ -123,11 +123,19 @@ export function attachLandfall(core, library) {
       float plaster=roomNoise(uv*3.1)*.65+roomNoise(uv*13.7)*.35;
       float floorY=vRoom.z< -100.0?4.0:17.5;
       float damp=1.0-smoothstep(floorY+.15,floorY+1.7+roomNoise(uv*.9)*.6,vRoom.y);
-      diffuseColor.rgb *= (.88+plaster*.18)*(1.0-seam*.21)*(1.0-damp*.20);
-      totalEmissiveRadiance *= .7+plaster*.3;
+      // (player walk, October 2026: the cellar read as one flat grey-green plane) — coats of
+      // limewash mottle at hand scale, water staining run down from the vault above in
+      // streaks that follow the courses, and a dark tide mark where the drowned years stood
+      float ceilY=floorY+4.4;
+      float streakK=roomNoise(vec2(uv.x*2.3,0.0))*.6+roomNoise(vec2(uv.x*9.0,0.3))*.4;
+      float streak=smoothstep(.55,.9,streakK)*smoothstep(floorY+1.2,ceilY-.2,vRoom.y);
+      float tideMark=smoothstep(.22,.0,abs(vRoom.y-(floorY+1.05)-roomNoise(uv*.6)*.18));
+      diffuseColor.rgb *= (.80+plaster*.32)*(1.0-seam*.24)*(1.0-damp*.26)*(1.0-streak*.22)*(1.0-tideMark*.18);
+      diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb*vec3(.86,.96,.90), streak*.6+damp*.4);
+      totalEmissiveRadiance *= (.6+plaster*.4)*(1.0-damp*.3);
     `);
   };
-  limewash.customProgramCacheKey = () => 'landfall-limewash-v1';
+  limewash.customProgramCacheKey = () => 'landfall-limewash-v2';
   for (const root of [core.getObjectByName('drain'), core.getObjectByName('cellar')]) {
     root?.traverse(o => { if(o.isMesh){
       o.receiveShadow=true;o.castShadow=true;

@@ -38,10 +38,10 @@ export default async function(h) {
   await shot('05-working-ledge',[-85,-42,Math.atan2(2.9,1.2),-.22],15);
   await shot('06-study-dusk',[-82,-37,Math.atan2(6,6),-.12],18.6);
   await shot('07-forest-dusk',[-58,-58,1.5,.12],18.6);
-  const crowns=await h.evaluate(`ABYME.core.children.find(o=>o.name==='canopies').children.map(m=>({source:m.geometry.userData.authoring,closed:m.geometry.userData.closedNeedleVolumes,triangles:m.geometry.index.count/3,weight:Math.max(...m.geometry.attributes.aRim.array)}))`);
-  ok('all four crowns have authored near and far geometry',crowns.length===8&&crowns.every(g=>g.closed&&g.source==='Blender working_coast.py'),crowns);
+  const crowns=await h.evaluate(`ABYME.core.children.find(o=>o.name==='canopies').children.map(m=>({source:m.geometry.userData.authoring,cards:m.geometry.userData.needleCards,uv:!!m.geometry.attributes.uv,triangles:m.geometry.index.count/3,weight:Math.max(...m.geometry.attributes.aRim.array)}))`);
+  ok('all four crowns have authored near and far needle-card geometry',crowns.length===8&&crowns.every(g=>g.cards&&g.uv&&g.source==='Blender working_coast.py'),crowns);
   ok('wind weights survive the Blender export',crowns.every(g=>g.weight>.9),crowns);
-  ok('far crowns are substantially lighter',crowns.slice(4).every((g,i)=>g.triangles<crowns[i].triangles*.25),crowns);
+  ok('far crowns are substantially lighter',crowns.slice(4).every((g,i)=>g.triangles<crowns[i].triangles*.45),crowns);
   const model=await h.evaluate(`({full:!!ABYME.core.getObjectByName('workingStudy'),mini:!!ABYME.core.getObjectByName('modelAnchor').getObjectByName('workingStudy')})`);
   ok('the fitted study is loaded without duplicating it in the miniature',model.full&&!model.mini,model);
   await shot('08-tide-high',[-85.5,-41.7,Math.atan2(-.16,2.14),-.14],11);

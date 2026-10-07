@@ -41,11 +41,33 @@ export function forestCrowns(library) {
   return FOREST_PROFILES.map((profile, index) => {
     const geometry = detail => {
       const g = meshGeometry(library, `forest${index}${detail}`);
-      if (!g.attributes.uv) throw new Error('Blender canopy lost its wind weights');
+      // Cards carry TWO uv sets: TEXCOORD_0 is the needle-card texture, TEXCOORD_1 (uv1) the
+      // wind weight. The opaque 1:240 lobes have only the wind weight, in uv as before.
+      const wind = g.attributes.uv1 || g.attributes.uv;
+      if (!wind) throw new Error('Blender canopy lost its wind weights');
+      const cards = detail !== 'Model';
+      if (cards && !g.attributes.uv1) throw new Error('Blender canopy cards lost their texture coordinates');
       g.setAttribute('aRim', new THREE.Float32BufferAttribute(
-        Array.from({length:g.attributes.uv.count}, (_,i) => g.attributes.uv.getX(i)), 1));
+        Array.from({length:wind.count}, (_,i) => wind.getX(i)), 1));
+      if (cards) {
+        // A card is a flat strip, and a strip's own normal would light the crown as a stack
+        // of paper. Shade the crown as the volume it stands for: every vertex normal points
+        // out from the trunk axis and a little up, so boughs facing the sun are lit and the
+        // far side is in shade, from whichever side a card happens to be seen.
+        const pos = g.attributes.position, nrm = g.attributes.normal, P = profile.p;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+          const ax = P.lean * Math.max(0, (y - P.baseY) / P.spacing);
+          const rx = x - ax, r = Math.hypot(rx, z);
+          if (r < 0.04) nrm.setXYZ(i, 0, 1, 0);
+          else { const l = Math.hypot(rx, 0.55 * r, z); nrm.setXYZ(i, rx / l, 0.55 * r / l, z / l); }
+        }
+        nrm.needsUpdate = true;
+        g.userData.needleCards = true;
+      } else {
+        g.userData.closedNeedleVolumes = true;
+      }
       g.userData.authoring = 'Blender working_coast.py';
-      g.userData.closedNeedleVolumes = true;
       g.computeBoundingSphere();
       return g;
     };

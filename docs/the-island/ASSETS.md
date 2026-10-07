@@ -89,14 +89,14 @@ live output into `assets/`; the runtime repository is not a candidate archive.
 |---|---:|---|---|
 | `harbor-rooms.glb` | 1,716,348 | 8 consolidated parts; 16,244 triangles | Original procedural Blender geometry, created for this project |
 | `landfall.glb` | 2,604,048 | 12 parts; 28,656 triangles including alternative LODs | Original procedural Blender geometry, created for this project |
-| `working-coast.glb` | 1,715,112 | 15 parts; 33,944 triangles including near, far and miniature crowns | Original Blender geometry for this project |
+| `working-coast.glb` | 1,585,772 | 15 parts; 21,608 triangles including near, far and miniature crowns | Original Blender geometry for this project |
 
 The kit contains the east-room floor, daybed, creased blanket, kettle, cups,
 spare chair, carved bird mobile, stitched boat, tide bench and source cradle.
 It adds no texture images, external models or external asset licenses. The original
 12 WebGL textures and two CSS-native textures retain their original ownership;
 the imagegen shore timber below is the thirteenth WebGL texture.
-The manifest owns 19 WebGL assets: 13 textures and six models.
+The manifest owns 21 WebGL assets: 15 textures and six models.
 
 Source: `tools/blender/harbor-rooms.blend`. Generator:
 `tools/blender/harbor_rooms.py`, Blender 5.2.1 LTS. `geometry.json` records per-part
@@ -273,3 +273,44 @@ crushed its 0.35–0.68 band to 0.10–0.42 before the cliff and vault shaders e
 
 The review of this pass, with the baseline and corrected views of every stage of the
 game, is in [loop/player-walk/2026-10-06/](loop/player-walk/2026-10-06/REPORT.md).
+
+
+## Needle-card crowns, the channel buoy and the cellar walls — October 7, 2026
+
+The four conifer crowns are textured needle cards now. `tools/blender/working_coast.py`
+keeps the same bough skeleton per profile (so every tree stands where it stood, with the
+same colliders, litter and wind habit) and lays three alpha-tested card strips along each
+bough: the flat fan a conifer bough is, and two narrower cards tilted ±62° so the bough
+keeps its mass seen edge-on. Near crowns carry the bough wood as well; far crowns are the
+cards alone. The 1:240 model crowns keep the opaque closed lobes on their own material —
+an alpha test at four pixels mips a tree into nothing. Near profiles are 2,488 / 2,400 / 1,872 / 1,608 triangles,
+far profiles 1,020 / 984 / 768 / 660; the kit is 1,585,772 bytes. TEXCOORD_0 is the card texture and TEXCOORD_1 the
+wind weight (0 at the trunk, 1 at the growing tips) that `js/working-coast.js` turns into
+the `aRim` attribute. Cards shade with crown-volume normals (out from the trunk axis and a
+little up), never flipped on the back face, so the crown lights as the volume it stands for.
+
+`needle-card.jpg` (42,491 bytes) and `needle-alpha.jpg` (104,580 bytes) are drawn by
+`tools/blender/needle_card.py` with PIL alone, deterministic (seed 20261006): one bough
+seen from above, a central twig, thirty alternating forward-swept twiglets, two ranks of
+short needles a side, dark blue-green inside to a lighter yellow-green at the tips, flat
+unlit colour over the body green so the alpha-tested edge never fringes black. The alpha
+is a separate greyscale JPEG so each file stays under the size contract; three.js reads
+the alpha map from its green channel. `needle-card-preview.png` composites the two.
+
+`js/encounter-sightline.js` now reads a card's coverage at the raycast hit, so a figure
+seen through the air between twigs counts as seen; any other solid still blocks outright.
+`tools/harness/trees.mjs` checks the card mechanism (16 assertions: both LODs, aRim at the
+tips, root-to-tip texture coordinates, map + alpha map + alpha test, decoded textures, the
+sway and new-growth patches, and the model's separate opaque dappled material).
+
+The L3 bell-buoy (`js/regions/l3_gallery.js`) is a real iron channel buoy: a flat-decked
+float with skirt and rubbing strake, a four-post lattice tower with cross-braces and
+diagonals, the bell hung under its cap with a clapper, a dead lamp in its cage, and a
+mooring chain down into the water. One merged geometry, one material, one draw; vertex
+colours carry the rust streaking down from the fittings and the weed below the waterline.
+It adds no asset file.
+
+The cellar and drain limewash (`js/landfall.js`) gained coats of trowel mottle at hand
+scale, water staining run down from the vault in streaks that follow the courses, and a
+dark tide mark where the drowned years stood. Frames for all three are in
+[loop/player-walk/2026-10-06/day2/](loop/player-walk/2026-10-06/REPORT.md).

@@ -1,22 +1,30 @@
 import {beginPlay} from './play-ready.mjs';
 // trees.mjs — the canopy's detail is carried by things that fail SILENTLY.
 //
-// The trees are the owner's standing example of the quality bar. Their first defence is
-// now structural — dozens of disconnected branch sprays instead of cone tiers — and their
-// fine read still depends on an attribute and shader patch that can die quietly:
+// The trees are the owner's standing example of the quality bar. Since the player walk of
+// October 2026 the crowns are alpha-tested NEEDLE CARDS: every bough is a few crossed strips
+// mapped to the needle card (assets/needle-card.jpg + needle-alpha.jpg), and what makes them
+// read as needles rather than paper can each die quietly:
 //
-//   aRim (0 at the trunk → 1 at the frond tips) is a CUSTOM attribute on the canopy
-//   geometry. mergeGeometries carries position/normal/color and, until it was told
-//   otherwise, dropped everything else on the floor. A missing attribute reads as 0 in
-//   GLSL, so vRim is 0 everywhere, so the fringe never frays and the tips never sway —
-//   and nothing anywhere reports a problem.
+//   aRim (0 at the trunk → 1 at the frond tips) is a CUSTOM attribute built from the kit's
+//   second UV set. A missing attribute reads as 0 in GLSL, so the tips never sway and the new
+//   growth never lightens — and nothing anywhere reports a problem.
 //
-//   The fray, the needle grain and the clump bump are string replacements into three.js's
-//   shader chunks. A replace that matches nothing is a no-op with no error (the same trap
-//   the bloom clamp carries a warning for).
+//   The card texture rides on TEXCOORD_0. Lose it in an export and every card samples texel
+//   (0,0): a solid green quad, the folded paper the cards replaced, with no error.
+//
+//   alphaTest, map and alphaMap on the material are what cut the air out of the quad. Any of
+//   them silently dropped turns the stand back into green slabs.
+//
+//   The sway and new-growth patches are string replacements into three.js's shader chunks.
+//   A replace that matches nothing is a no-op with no error.
+//
+// The 1:240 chart-table crowns are deliberately NOT cards (an alpha test at four pixels mips
+// a tree into nothing); they keep opaque closed lobes with the object-space foliage dapple
+// and needle grain, on their own material. That is checked too.
 //
 // So this checks the mechanism on all eight canopy geometries — near and far across four
-// silhouettes — and proves the branch-spray topology itself has not regressed to cones.
+// silhouettes — and proves the card topology has not regressed to cone tiers.
 
 export default async function (h) {
   const R = { pass: [], fail: [] };
@@ -43,13 +51,18 @@ export default async function (h) {
       // also describes the needle litter, which turned up as a ninth canopy the moment it
       // existed. The canopies live in one group now, so ask that.
       if (!o.parent || o.parent.name !== 'canopies') return;
-      // the 1:240 chart-table clone carries its OWN four, on the same material — filter by
+      // the 1:240 chart-table clone carries its OWN four, on their own material — filter by
       // world scale, the way every other probe in this harness does
       if (Math.hypot(o.matrixWorld.elements[0], o.matrixWorld.elements[1], o.matrixWorld.elements[2]) < 0.5) return;
+      const uv = o.geometry.attributes.uv;
+      let uvSpan = 0;
+      if (uv) { let mn = 9, mx = -9; for (let i = 0; i < uv.count; i++) { mn = Math.min(mn, uv.getY(i)); mx = Math.max(mx, uv.getY(i)); } uvSpan = mx - mn; }
       geos.push({ verts: o.geometry.attributes.position.count,
                   rim: !!o.geometry.attributes.aRim,
                   rimMax: o.geometry.attributes.aRim
                     ? Math.max(...Array.from(o.geometry.attributes.aRim.array)) : null,
+                  cards: !!o.geometry.userData.needleCards,
+                  uvSpan,
                   components: (() => {
                     const n=o.geometry.attributes.position.count, parent=Array.from({length:n},(_,i)=>i);
                     const find=(x)=>{while(parent[x]!==x){parent[x]=parent[parent[x]];x=parent[x];}return x;};
@@ -62,17 +75,26 @@ export default async function (h) {
     });
     const mat = [...mats][0];
     const sh = mat && mat.userData.shader;
+    // the model crowns: inside the chart-table clone, on their own opaque material
+    let modelMat = null, modelGeos = 0;
+    ABYME.scene.traverse((o) => {
+      if (!o.isInstancedMesh || !o.parent || o.parent.name !== 'canopies') return;
+      if (Math.hypot(o.matrixWorld.elements[0], o.matrixWorld.elements[1], o.matrixWorld.elements[2]) >= 0.5) return;
+      modelGeos++; modelMat = o.material;
+    });
+    const msh = modelMat && modelMat.userData.shader;
     return JSON.stringify({
       canopies: geos,
-      frag: sh ? {
-        fray: sh.fragmentShader.includes('float frayN'),
-        needle: sh.fragmentShader.includes('float ndl'),
-        bump: sh.fragmentShader.includes('float nH'),
-        newGrowth: sh.fragmentShader.includes('smoothstep(0.55, 1.0, vRim)'),
-      } : null,
+      material: mat ? { map: !!mat.map, alphaMap: !!mat.alphaMap, alphaTest: mat.alphaTest, doubleSided: mat.side === 2,
+                        mapLoaded: !!(mat.map && mat.map.image && mat.map.image.width),
+                        alphaLoaded: !!(mat.alphaMap && mat.alphaMap.image && mat.alphaMap.image.width) } : null,
+      frag: sh ? { newGrowth: sh.fragmentShader.includes('smoothstep(0.55, 1.0, vRim)'),
+                   volumeNormal: sh.fragmentShader.includes('normal = normalize(vNormal)'),
+                   haze: sh.fragmentShader.includes('uHaze') } : null,
       vert: sh ? { rimAttr: sh.vertexShader.includes('attribute float aRim'),
                    tipSway: sh.vertexShader.includes('(0.35 + aRim)') } : null,
-      fringe: sh && sh.uniforms.uFringe ? sh.uniforms.uFringe.value : null,
+      model: { geos: modelGeos, separate: !!modelMat && modelMat !== mat, opaque: !!modelMat && !modelMat.alphaMap && modelMat.alphaTest === 0,
+               foliage: !!(msh && msh.fragmentShader.includes('uFoliage')), needle: !!(msh && msh.fragmentShader.includes('float ndl')) },
       variants: ABYME.core.userData.canopyVariants,
       trunkVerts: (() => { let n = null; ABYME.scene.traverse((o) => {
         if (o.isInstancedMesh && o.name === 'trunks' && n === null) n = o.geometry.attributes.position.count; }); return n; })(),
@@ -87,14 +109,20 @@ export default async function (h) {
   ok('every canopy carries aRim', m.canopies.length > 0 && m.canopies.every((g) => g.rim), m.canopies);
   // a dropped attribute reads as 0 in GLSL, so "present but all zero" is the same failure
   ok('aRim actually reaches the frond tips', m.canopies.every((g) => g.rimMax > 0.9), m.canopies.map((g) => g.rimMax));
+  // the card texture: TEXCOORD_0 must run root→tip (v spans ~0..1), or every card is texel (0,0)
+  ok('every canopy is needle cards with a root-to-tip texture map', m.canopies.every((g) => g.cards && g.uvSpan > 0.9), m.canopies.map((g) => [g.cards, +g.uvSpan.toFixed(2)]));
   // A cone stack has one connected component per tier (4–6 total), however noisy its
-  // surface is. Real branch grammar leaves dozens of independently articulated sprays.
-  ok('every canopy is built from branch sprays, not circumferential cones',
+  // surface is. Cards leave dozens of independent strips.
+  ok('every canopy is built from independent bough cards, not circumferential cones',
     m.canopies.every((g) => g.components >= 35), m.canopies.map((g) => g.components));
+  ok('the card material cuts its air out (map + alphaMap + alphaTest, double-sided)',
+    !!m.material && m.material.map && m.material.alphaMap && m.material.alphaTest > 0.2 && m.material.alphaTest < 0.6 && m.material.doubleSided, m.material);
+  ok('both card textures decoded', !!m.material && m.material.mapLoaded && m.material.alphaLoaded, m.material);
   ok('the vertex patch landed (rim attribute + tip-weighted sway)', !!m.vert && m.vert.rimAttr && m.vert.tipSway, m.vert);
-  ok('the fragment patch landed (fray, needle grain, clump bump, new growth)',
-    !!m.frag && m.frag.fray && m.frag.needle && m.frag.bump && m.frag.newGrowth, m.frag);
-  ok('the fringe is actually turned on', m.fringe > 0.2, { uFringe: m.fringe });
+  ok('the fragment patch landed (new growth, crown-volume normal, haze melt)',
+    !!m.frag && m.frag.newGrowth && m.frag.volumeNormal && m.frag.haze, m.frag);
+  ok('the 1:240 crowns stay opaque lobes on their own dappled material',
+    m.model.geos === m.variants && m.model.separate && m.model.opaque && m.model.foliage && m.model.needle, m.model);
   ok('the trunk carries enough vertices for its root flare', m.trunkVerts >= 100, { trunkVerts: m.trunkVerts });
 
   // THE NEEDLE LITTER, which the terrain draws rather than an instanced disc — owner:
@@ -153,6 +181,6 @@ export default async function (h) {
 
   console.log(`TREES ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   console.log(`  litter mask ${lit.res || '?'}px · ${lit.onTrunk} at the trunk · ${lit.away} away`);
-  console.log(`  ${m.variants} silhouettes · ${m.canopies.length} geometries · ${m.canopies.map((g) => g.verts).join('/')} verts · trunk ${m.trunkVerts} · fringe ${m.fringe}`);
+  console.log(`  ${m.variants} silhouettes · ${m.canopies.length} geometries · ${m.canopies.map((g) => g.verts).join('/')} verts · trunk ${m.trunkVerts} · alphaTest ${m.material && m.material.alphaTest}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail)); process.exitCode = 1; }
 }

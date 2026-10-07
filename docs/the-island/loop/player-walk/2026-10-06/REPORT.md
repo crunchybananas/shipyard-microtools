@@ -158,3 +158,36 @@ boulder kit improved it twice over, since every stone appears at 1:240 too.
   old displaced icosphere was 180 faces, not the 320 its comment claimed, so the kit was
   regenerated at 180 — the same budget to the triangle — and the gate passes again. Nothing
   else in the pass adds a draw call or a light.
+
+
+## Day two — October 7, 2026
+
+The three things the walk left as "basic", in order, with frames in `day2/`.
+
+**The conifer crowns.** The closed sprays read as folded green paper from anywhere
+inside the stand, and the stand is on screen in half the frames of the game. Every bough
+is now three crossed, alpha-tested card strips mapped to a drawn needle bough
+(`day2/needle-card.png`), on the same skeleton: same positions, colliders, litter and
+wind. The first cut was too sparse (fishbones), the second too bright and dense (lime
+cabbages); the third darkens the card to the island's blue-green, thins the needles a
+little and narrows the tilted cards so the horizontal bough layering shows with shade
+between the whorls. Inside the stand a tree is now twig and needles with sky through it;
+from the beach the ridge is a conifer skyline; at golden hour the boughs catch the low
+sun in layers. Near crowns cost fewer triangles than the sprays did. The model crowns
+keep the opaque lobes. `day2/before/forest.jpg` → `day2/after/forest.jpg`,
+`day2/after/tree-close.jpg`, `day2/after/stand-golden.jpg`.
+
+**The bell-buoy.** The inspection stratum's one landmark on the water was a red block
+with a black fin. It is a channel buoy now: float, skirt and rubbing strake, a four-post
+lattice tower with its braces, the bell under its cap, a dead lamp in a cage, and the
+mooring chain going down into the dark, with rust bled down from every fitting. One draw.
+`day2/before/bell-buoy.jpg` → `day2/after/bell-buoy.jpg`.
+
+**The cellar and the drain.** One flat grey-green plane. The limewash now carries trowel
+mottle at hand scale, water staining run down from the vault in streaks along the
+courses, and a tide mark where the drowned years stood. `day2/before/drain-chamber.jpg`
+→ `day2/after/drain-chamber.jpg`.
+
+Also fixed on the way: the regard sightline treated a card's transparent texels as
+solid, so a figure seen through the gap between two twigs would not have counted as
+seen. It reads the card's coverage at the hit now.

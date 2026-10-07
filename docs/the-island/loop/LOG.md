@@ -4658,6 +4658,26 @@ test. Cheap, owner-validated, protects every future player.
 
 ---
 
+## 2026-10-07 — the player walk, day two: needle cards, the buoy, the cellar
+
+**Shipped:** the four conifer crowns as textured alpha-tested needle cards on the existing
+bough skeleton (tools/blender/working_coast.py + needle_card.py; model crowns stay opaque
+lobes on their own material; regard sightline reads card coverage); the L3 bell-buoy as a
+real iron channel buoy (one merged draw, rust in vertex colour); cellar/drain limewash
+mottle + streaks + tide mark. Trees gate rewritten for the mechanism (16/16); working-coast
+10/10; encounters 8/8; unit tests 116/116; asset contract 21 rows.
+
+**Evidence:** loop/player-walk/2026-10-06/day2/ (before/after), REPORT.md "Day two".
+
+**Debt:** the needle card is one drawn bough for all four profiles — a second card
+(a spruce's drooping twiglets) would separate the profiles further; the storm elder's bare
+trunk reads pale. Far crowns are now ~40% of near (was 25%) because the cards are the LOD.
+
+**Next tick suggestion:** the Tide-Figure and Watcher cloth at close range, and the
+title screen.
+
+---
+
 ## 2026-10-06 — the player walk (owner: "walk through the entire game and really think about how a person would think about what they are seeing")
 
 **Shipped:** a first-person read of every stage (title → approach → landing → path →

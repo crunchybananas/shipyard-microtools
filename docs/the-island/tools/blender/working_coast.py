@@ -1,8 +1,14 @@
 """Editable Blender source for the working study and four coastal conifers.
 
-Closed, slender needle sprays replace the old crossed cards. Near and far crowns use the
-same bough centres, wind habit and height; UV.x transports each tip's wind weight.
-Coordinates below are game Y-up and convert once on entry to Blender Z-up.
+Crowns are textured needle CARDS now (October 2026): every bough carries crossed,
+alpha-tested strips that follow its arc, mapped to assets/needle-card.jpg (drawn by
+tools/blender/needle_card.py), so at walking distance a bough is needles rather than a
+closed green polygon. Near crowns carry three cards per bough plus the bough's wood;
+far crowns two; the 1:240 model keeps its opaque closed lobes (an alpha test at four
+pixels would mip a tree into nothing). Near and far use the same bough skeleton.
+UV layer 'UVMap' is the card texture; layer 'Wind weight' (x) is each vertex's tip
+weight, 0 at the trunk and 1 at the growing tips. Coordinates below are game Y-up and
+convert once on entry to Blender Z-up.
 """
 import bpy, json, math, random, re
 from mathutils import Vector
@@ -20,14 +26,15 @@ PALETTE = {'wood':(.235,.153,.080,1), 'end':(.29,.207,.121,1),
            'copper':(.265,.32,.205,1), 'paper':(.49,.46,.34,1),
            'plaster':(.43,.43,.365,1), 'cloth':(.09,.185,.20,1)}
 
-def add(vertices, faces, color, rim=0):
-    d = PARTS.setdefault(ACTIVE, {'v':[], 'f':[], 'c':[], 'rim':[]})
+def add(vertices, faces, color, rim=0, uv=None):
+    d = PARTS.setdefault(ACTIVE, {'v':[], 'f':[], 'c':[], 'rim':[], 'uv':[]})
     start = len(d['v'])
     d['v'] += [(x,-z,y) for x,y,z in vertices]
     d['f'] += [tuple(start+i for i in f) for f in faces]
     col = PALETTE[color] if isinstance(color,str) else color
     d['c'] += [col for _ in vertices]
     d['rim'] += [rim for _ in vertices]
+    d['uv'] += list(uv) if uv else [(0.0,0.0) for _ in vertices]
 
 def box(p, size, color='wood', angle=0):
     x,y,z=p; w,h,d=[a/2 for a in size]
@@ -105,6 +112,37 @@ def needle_spray(p, direction, length, width, depth, tone, rim):
         part['c'][-len(v)+k]=tuple(c*gain for c in base[:3])+(1,)
         part['rim'][-len(v)+k]=min(1,rim+(.24 if k==7 else -.1 if k==0 else 0))
 
+
+def needle_card(root, middle, end, width, tilt, tone, shade):
+    """One bough card: a strip of three quads along the bough's arc, `width` across,
+    its plane rotated `tilt` about the bough axis (0 = the flat fan a conifer bough is).
+    UV u runs across the card, v along it from root (0) to growing tip (1); the texture's
+    alpha gives the bough its needled outline. Wind weight rises root -> tip."""
+    root,middle,end=Vector(root),Vector(middle),Vector(end)
+    ctrl=middle*2-(root+end)*.5                      # quadratic through the middle
+    def at(t):return root*(1-t)**2+ctrl*2*(1-t)*t+end*t*t
+    def tangent(t):return (ctrl-root)*2*(1-t)+(end-ctrl)*2*t
+    v=[];uv=[];rim=[]
+    for t in [0.0,.34,.67,1.0]:
+        p=at(t);d=tangent(t).normalized()
+        side=d.cross(Vector((0,1,0)))
+        if side.length<.01:side=d.cross(Vector((1,0,0)))
+        side.normalize();up=side.cross(d).normalized()
+        s=side*math.cos(tilt)+up*math.sin(tilt)
+        half=width*(.55+.45*math.sin(math.pi*min(1,t*1.08)))*.5    # slim at the root, full at mid-length, eased at the tip
+        for k,sgn in enumerate((-1,1)):
+            v.append(tuple(p+s*half*sgn));uv.append((float(k),t));rim.append(.08+.92*t)
+    f=[]
+    for i in range(3):
+        a=i*2;f.append((a,a+1,a+3,a+2))
+    base=(.62*shade*tone,.62*shade*tone,.62*shade*tone,1)
+    add(v,f,base,0,uv)
+    part=PARTS[ACTIVE]
+    for k in range(len(v)):
+        g=shade*tone*(.72+.28*(k//2)/3)                 # darker in at the trunk, brighter toward the tip
+        part['c'][-len(v)+k]=(g,g,g,1)
+        part['rim'][-len(v)+k]=rim[k]
+
 for variant,profile in enumerate(profiles):
     p=profile['p']
     # Generate the branch skeleton once. LOD cannot reroll missing boughs.
@@ -139,32 +177,22 @@ for variant,profile in enumerate(profiles):
         ACTIVE=f'forest{variant}{"Near" if near else "Far"}'
         for root,middle,end,reach,a,tone,t in branches:
             if near:tube([root,middle,end],[.033,.017,.003],(.16,.09,.037,1),5,.24)
-            direction=end-middle
-            def branch_point(u):return root.lerp(middle,u/.52) if u<.52 else middle.lerp(end,(u-.52)/.48)
-            if near:
-                # Two leaders and two paired forks: fine, feathered fans supported
-                # by the same branch skeleton used by the far silhouette.
-                for u0 in [.37,.80]:
-                    centre=branch_point(u0);centre.y+=.02
-                    needle_spray(centre,direction,reach*.62,reach*.125,p['tierH']*.041,tone,u0)
-                for k,u0 in enumerate([.39,.69]):
-                    for side in [-1,1]:
-                        off=Vector((-math.sin(a),0,math.cos(a)))*side
-                        centre=branch_point(u0)+off*reach*(.17 if k==0 else .13)
-                        centre.y+=.012+.012*side
-                        branch=direction.normalized()+off*(.78 if k==0 else .60)
-                        needle_spray(centre,branch,reach*(.53 if k==0 else .45),reach*.105,p['tierH']*.036,tone*(1+.04*side),u0+.14)
-            else:
-                for u0 in [.26,.56,.84]:
-                    centre=branch_point(u0);centre.y+=.02
-                    cushion(centre,direction,reach*.70,reach*(.22-u0*.04),p['tierH']*.062,False,tone,u0)
+            width=reach*1.0
+            # inner boughs sit in the crown's shade; the outer whorls read brighter
+            shade=.78+.22*t
+            # three cards a bough at both LODs: the flat fan a conifer bough is (full width, so
+            # the crown keeps its layered horizontal boughs with shade between them), and two
+            # narrower tilted cards so the bough still has mass seen edge-on from the ground.
+            # The far crown only loses the bough wood.
+            for tilt in (0.0,math.radians(62),math.radians(-62)):
+                needle_card(root,middle,end,width*(1.0 if tilt==0 else .62),tilt,tone,shade)
         top=p['baseY']+(p['n']-1)*p['spacing']
-        for k in range(4 if near else 3):
-            t=k/(3 if near else 2)
-            if near:
-                needle_spray((p['lean']*(p['n']-1)+.05*t,top+t*p['tierH']*.55,0),(.06,1,.02),p['tierH']*.63,p['baseR']*(.13-.085*t),p['baseR']*.027,1.13,.78+t*.15)
-            else:
-                cushion((p['lean']*(p['n']-1)+.05*t,top+t*p['tierH']*.55,0),(.06,1,.02),p['tierH']*.63,p['baseR']*(.13-.085*t),p['baseR']*.04,False,1.13,.78+t*.15)
+        # the leader: four short upright cards crossing at the spire
+        lead=Vector((p['lean']*(p['n']-1),top-p['tierH']*.08,0));spire=lead+Vector((.05,p['tierH']*1.05,.02))
+        for k in range(4 if near else 2):
+            ang=k*math.pi/(4 if near else 2)
+            side=Vector((math.cos(ang),0,math.sin(ang)))*p['baseR']*.12
+            needle_card(lead-side*.15,lead*.5+spire*.5+side*.5,spire+side*.2,p['baseR']*.42,0.0,1.1,1.0)
 
 # The room's masonry shell stays structural. These are its inner finish and timber.
 # Real openings preserve the beach door, study window, annex and tower course.
@@ -261,13 +289,18 @@ for name,d in PARTS.items():
     obj=bpy.data.objects.new(name,mesh);bpy.context.collection.objects.link(obj);mesh.materials.append(material)
     color=mesh.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
     for v,c in zip(color.data,d['c']):v.color=c
-    uv=mesh.uv_layers.new(name='Wind weight')
+    cards=name.startswith('forest') and not name.endswith('Model')
+    if cards:
+        tex=mesh.uv_layers.new(name='UVMap')          # TEXCOORD_0: the needle card
+        for face in mesh.polygons:
+            for li in face.loop_indices:tex.data[li].uv=d['uv'][mesh.loops[li].vertex_index]
+    uv=mesh.uv_layers.new(name='Wind weight')         # TEXCOORD_1 on cards, TEXCOORD_0 elsewhere
     for face in mesh.polygons:
         face.use_smooth=name.startswith('forest')
         for li in face.loop_indices:uv.data[li].uv=(d['rim'][mesh.loops[li].vertex_index],0)
     bpy.context.view_layer.objects.active=obj
     mod=obj.modifiers.new('Runtime triangles','TRIANGULATE');bpy.ops.object.modifier_apply(modifier=mod.name)
-    obj['authoring']='Blender working_coast.py';obj['closedNeedleVolumes']=name.startswith('forest')
+    obj['authoring']='Blender working_coast.py';obj['closedNeedleVolumes']=name.startswith('forest') and name.endswith('Model');obj['needleCards']=cards
     stats[name]={'triangles':len(mesh.polygons),'vertices':len(mesh.vertices)}
     objects.append(obj)
 bpy.ops.object.select_all(action='DESELECT')

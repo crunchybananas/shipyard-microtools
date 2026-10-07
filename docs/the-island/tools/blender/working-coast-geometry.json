@@ -5,48 +5,48 @@
       "vertices": 198
     },
     "forest0Near": {
-      "triangles": 5536,
-      "vertices": 3560
+      "triangles": 2488,
+      "vertices": 2216
     },
     "forest0Far": {
-      "triangles": 1368,
-      "vertices": 1026
+      "triangles": 1020,
+      "vertices": 1360
     },
     "forest1Model": {
       "triangles": 296,
       "vertices": 222
     },
     "forest1Near": {
-      "triangles": 5340,
-      "vertices": 3434
+      "triangles": 2400,
+      "vertices": 2138
     },
     "forest1Far": {
-      "triangles": 1320,
-      "vertices": 990
+      "triangles": 984,
+      "vertices": 1312
     },
     "forest2Model": {
       "triangles": 232,
       "vertices": 174
     },
     "forest2Near": {
-      "triangles": 4164,
-      "vertices": 2678
+      "triangles": 1872,
+      "vertices": 1670
     },
     "forest2Far": {
-      "triangles": 1032,
-      "vertices": 774
+      "triangles": 768,
+      "vertices": 1024
     },
     "forest3Model": {
       "triangles": 232,
       "vertices": 174
     },
     "forest3Near": {
-      "triangles": 3576,
-      "vertices": 2300
+      "triangles": 1608,
+      "vertices": 1436
     },
     "forest3Far": {
-      "triangles": 888,
-      "vertices": 666
+      "triangles": 660,
+      "vertices": 880
     },
     "studyPlaster": {
       "triangles": 1352,
@@ -61,6 +61,6 @@
       "vertices": 846
     }
   },
-  "bytes": 1705768,
-  "totalTriangles": 33032
+  "bytes": 1585772,
+  "totalTriangles": 21608
 }

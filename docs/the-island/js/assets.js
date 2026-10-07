@@ -39,9 +39,25 @@ export const MANIFEST = {
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
   },
   working_coast: {
-    kind: 'model', file: 'working-coast.glb', bytes: 1705768,
+    kind: 'model', file: 'working-coast.glb', bytes: 1585772,
     license: 'project-original', source: 'Blender 5.2.1 LTS; tools/blender/working_coast.py',
-    prompt: 'Four conifer crowns with slender closed branch sprays and paired LODs, fitted study floorboards, painted joinery, limewash and a tide wheel pipe run.',
+    prompt: 'Four conifer crowns as crossed needle cards on a shared bough skeleton with paired LODs and opaque 1:240 lobes, fitted study floorboards, painted joinery, limewash and a tide wheel pipe run.',
+  },
+  // the conifer bough card (tools/blender/needle_card.py, PIL): one bough from above, root at
+  // v=0 and growing tip at v=1 — a twig, alternating side twiglets, dense forward-fanned
+  // needles, flat colour. The alpha is a separate greyscale JPEG so each stays under the size
+  // contract; three.js reads alphaMap from the green channel.
+  needle_card: {
+    kind: 'texture', file: 'needle-card.jpg', bytes: 42491,
+    license: 'project-original', source: 'procedural; tools/blender/needle_card.py (PIL, deterministic seed 20261006)',
+    prompt: 'Conifer bough seen from above: central twig, 26 alternating forward-swept twiglets, short tapered needles fanned to both sides, dark blue-green inside to lighter yellow-green new growth at the tips, flat unlit colour over the body green.',
+    wrap: 'clamp', colorSpace: 'srgb', anisotropy: 4,
+  },
+  needle_alpha: {
+    kind: 'texture', file: 'needle-alpha.jpg', bytes: 104580,
+    license: 'project-original', source: 'procedural; tools/blender/needle_card.py (PIL, deterministic seed 20261006)',
+    prompt: 'Coverage mask of the needle card above: white where twig and needles are, black air between them.',
+    wrap: 'clamp', colorSpace: 'linear', anisotropy: 4,
   },
   landfall: {
     kind: 'model', file: 'landfall.glb', bytes: 2604048,

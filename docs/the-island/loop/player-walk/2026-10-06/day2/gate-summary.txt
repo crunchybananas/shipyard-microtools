@@ -1,0 +1,72 @@
+# Release gate on the day-two code — 2026-10-07 (M4, headless Chrome, real GPU)
+
+## Full run (tools/harness/run.sh)
+== saves schema ==
+SAVES 24 / 24
+== coverage ==
+COVERAGE PASS 21 / 21
+== runtime reset ownership ==
+RUNTIME-RESET PASS 6 / 6
+== the upstream hand ==
+  power baseline 499 calls / 820222 tris · peak 513 calls / 821852 tris
+UPSTREAM-HAND 32 / 32
+== the writing in the sand ==
+WRITING 19 / 19
+== the finished terrain ==
+TERRAIN-FINISH 10 / 10
+== the living coastal assets ==
+ISLAND LIFE 21 / 21
+== the player-facing journey ==
+EXPERIENCE PASS 22 / 22
+== the doors ==
+DOORS 6 / 6
+== bloom ==
+BLOOM 3 / 3
+== the shell ==
+SHELL 5 / 5
+    0 / 2640 sky-rays — up past the annex door (the reported frame)
+    0 / 228 sky-rays — past the beach door frame (the reported frame)
+    0 / 2640 sky-rays — the window wall lintel band
+    0 / 2640 sky-rays — the beach door lintel band
+   84 / 2640 sky-rays  (expected) — out through the beach door
+== relief ==
+RELIEF 8 / 8
+== the gulls ==
+GULLS 11 / 11
+== the lens-vault outcrop ==
+VAULT-OUTCROP 8 / 8
+== the trees ==
+TREES 16 / 16
+TREES FAILED
+(TREES FAILED above is run.sh's hard-coded 'TREES 13 / 13' string; the script itself reported 16 / 16 and run.sh now expects 16.)
+
+## The scripts after trees, in two fresh-browser batches (tools/harness/one.sh)
+== tabletop.mjs ==
+TABLETOP 29 / 29
+TABLETOP OK
+== glare.mjs ==
+GLARE 8 / 8
+== spines.mjs ==
+SPINES 20 / 20
+== glint.mjs ==
+GLINT 25 / 25
+== harbor.mjs ==
+HARBOR 11 / 11
+== landfall.mjs ==
+LANDFALL 21 / 21
+=== BATCH D rc=0 ===
+== working-coast.mjs ==
+WORKING COAST 10 / 10
+== shore-details.mjs ==
+SHORE DETAILS 18 / 18
+== cohesion.mjs ==
+COHESION 9 / 9
+== handwork.mjs ==
+HANDWORK 11 / 11
+== encounters.mjs ==
+ENCOUNTERS 8 / 8
+== walk.mjs ==
+WALK PASS 69 / 69
+=== BATCH E rc=0 ===
+
+Unit tests 116 / 116 · asset contract 21 rows · console clean on every capture.

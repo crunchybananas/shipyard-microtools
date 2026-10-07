@@ -24,8 +24,34 @@ export function makeEncounterSightline(core) {
     ray.set(eye,head.sub(eye).normalize());ray.far=Math.max(0,distance-.12);
     for(const mesh of solids){
       let shown=true;for(let p=mesh;p&&p!==core;p=p.parent)if(!p.visible){shown=false;break;}
-      if(shown&&ray.intersectObject(mesh,false).length)return false;
+      if(!shown)continue;
+      const hits=ray.intersectObject(mesh,false);
+      if(!hits.length)continue;
+      // The crowns are alpha-tested needle cards: a card quad is mostly air between twigs,
+      // and air does not hide a figure. Read the card's coverage at the hit, the way the
+      // GPU does, and count only hits that land on needles. (Any other solid blocks outright.)
+      if(!mesh.material.alphaMap)return false;
+      for(const hit of hits)if(hit.uv&&coverageAt(mesh.material,hit.uv)>=mesh.material.alphaTest)return false;
     }
     return true;
   };
+}
+
+// Coverage lookup on an alphaMap, cached per texture as 8-bit samples. Before the image has
+// decoded the card is treated as solid (the conservative answer for a regard test).
+const _coverage=new WeakMap();
+function coverageAt(material,uv){
+  const tex=material.alphaMap;
+  let c=_coverage.get(tex);
+  if(!c){
+    const img=tex.image;
+    if(!img||!img.width)return 1;
+    const cv=document.createElement('canvas');cv.width=img.width;cv.height=img.height;
+    const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0);
+    c={w:img.width,h:img.height,data:g.getImageData(0,0,img.width,img.height).data};
+    _coverage.set(tex,c);
+  }
+  const u=Math.min(1,Math.max(0,uv.x)),v=tex.flipY?1-Math.min(1,Math.max(0,uv.y)):Math.min(1,Math.max(0,uv.y));
+  const x=Math.min(c.w-1,Math.floor(u*c.w)),y=Math.min(c.h-1,Math.floor(v*c.h));
+  return c.data[(y*c.w+x)*4+1]/255;   // three.js reads alphaMap from the GREEN channel
 }

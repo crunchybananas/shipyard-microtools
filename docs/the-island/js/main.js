@@ -1594,10 +1594,12 @@ function applyAtmosphere(elapsed, dt) {
     }
   }
   for (const m of swayMats) {
-    const sh = m.userData.shader;
-    if (sh) {
-      sh.uniforms.uTime.value = elapsed;
-      if (sh.uniforms.uHaze) sh.uniforms.uHaze.value.copy(scene.fog.color);
+    for (const mat of [m, ...(m.userData.siblings || [])]) {   // the model crowns' material rides on the island's
+      const sh = mat.userData.shader;
+      if (sh) {
+        sh.uniforms.uTime.value = elapsed;
+        if (sh.uniforms.uHaze) sh.uniforms.uHaze.value.copy(scene.fog.color);
+      }
     }
   }
   // terrain aerial perspective (#5a): far land melts toward the grade's haze —

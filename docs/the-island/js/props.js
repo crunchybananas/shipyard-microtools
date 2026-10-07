@@ -3614,24 +3614,30 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
 
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6b48, flatShading: false, roughness: 0.9 }); // base lightened so the bark albedo multiplies to bark, not mud
   applyRelief(trunkMat, 'bark', { normalScale: 0.85, strength: 2.0, roughness: 0.95, normalFrom: 'bark_height' });   // #138: TRUE furrow relief (Bender heightmap), bark albedo unchanged
-  // smooth-shaded + vertexColors: the baked tier shading (dark core → bright frond tips)
-  // multiplies under the per-instance HSL tone and the foliage-texture dapple
-  const canopyMat = new THREE.MeshStandardMaterial({ flatShading: false, roughness: 0.85, vertexColors: true, side: THREE.DoubleSide });
-  // Nearly neutral: foliage and inner-branch hues now live in vertex colour, while the
-  // instance tint supplies only the subtle warm/cool difference between individual trees.
-  canopyMat.color = new THREE.Color(0xe1e6d6);
-  // wind sway via shader patch
+  // THE CROWN MATERIALS. Two, because the crown is two different things at two scales:
+  //
+  // canopyMat — the island's near and far crowns: alpha-tested NEEDLE CARDS (October 2026,
+  // the player walk). Every bough is a few crossed strips mapped to the needle card
+  // (assets/needle-card.jpg + needle-alpha.jpg, drawn by tools/blender/needle_card.py), so
+  // the thing you stand under is twig and needles with sky between them, not a closed
+  // green polygon. The card carries the fine detail now; the shader keeps only what a card
+  // cannot: the tip-weighted wind, the lighter new growth at the growing tips, the haze
+  // melt at distance, and crown-volume normals that must NOT flip on the back face.
+  //
+  // modelCanopyMat — the 1:240 chart-table crowns: opaque closed lobes with the object-space
+  // foliage dapple and needle grain the old crowns wore. An alpha test at four pixels mips a
+  // tree into nothing, so the model keeps its silhouette solid.
+  const canopyMat = new THREE.MeshStandardMaterial({
+    flatShading: false, roughness: 0.88, vertexColors: true, side: THREE.DoubleSide,
+    map: getTexture('needle_card'), alphaMap: getTexture('needle_alpha'), alphaTest: 0.34,
+  });
+  canopyMat.color = new THREE.Color(0xf4f6ee);
   canopyMat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = { value: 0 };
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
-    sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs → object-space sample)
-    sh.uniforms.uFolAmt = { value: 0.25 };   // was 0.5 — the asset is a painterly STARBURST motif and at half strength it read as fireworks up close; the procedural needle grain below carries the fine detail now
-    sh.uniforms.uFolScale = { value: 1.0 };
-    sh.uniforms.uFringe = { value: 0.26 };   // ragged silhouette without erasing the leader and every outer hand
     canopyMat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
-      vLPos = position;                       // object-space coords for the foliage sample (pre-wind)
       vRim = aRim;                            // 0 at the trunk -> 1 at the frond tips
       #ifdef USE_INSTANCING
         float windSeed = instanceMatrix[3].x * 0.13 + instanceMatrix[3].z * 0.17;
@@ -3642,87 +3648,69 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
         transformed.x += gust * 0.11 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
         transformed.z += sin(uTime * 1.1 + windSeed * 2.3) * 0.06 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
       #endif
+    `).replace('void main() {', 'uniform float uTime;\nattribute float aRim;\nvarying float vRim;\nvoid main() {');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('void main() {', `uniform vec3 uHaze;
+        varying float vRim;
+        void main() {`)
+      // crown-volume normals (working-coast.js forestCrowns): the same outward normal is the
+      // truth for both faces of a card, so undo the double-sided flip three.js just applied
+      .replace('#include <normal_fragment_begin>', `
+        #include <normal_fragment_begin>
+        normal = normalize(vNormal);   // needle cards: crown-volume normals, never flipped
+      `)
+      .replace('#include <color_fragment>', `
+        #include <color_fragment>
+        // the tips are NEW GROWTH: lighter, yellower, the year's candles. Real conifers are
+        // two greens — the card paints the bough's, the shader adds the season's.
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.22, 1.16, 0.74),
+                               smoothstep(0.55, 1.0, vRim) * 0.30);
+      `)
+      .replace('#include <fog_fragment>', `
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze,
+          smoothstep(120.0, 300.0, length(vViewPosition)) * 0.45);
+        #include <fog_fragment>
+      `);
+  };
+  canopyMat.customProgramCacheKey = () => 'needle-card-crown-v1';
+
+  const modelCanopyMat = new THREE.MeshStandardMaterial({ flatShading: false, roughness: 0.85, vertexColors: true, side: THREE.DoubleSide });
+  modelCanopyMat.color = new THREE.Color(0xe1e6d6);
+  modelCanopyMat.onBeforeCompile = (sh) => {
+    sh.uniforms.uTime = { value: 0 };
+    sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
+    sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs -> object-space sample)
+    sh.uniforms.uFolAmt = { value: 0.25 };
+    sh.uniforms.uFolScale = { value: 1.0 };
+    modelCanopyMat.userData.shader = sh;
+    sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
+      #include <begin_vertex>
+      vLPos = position;
+      vRim = aRim;
+      #ifdef USE_INSTANCING
+        float windSeed = instanceMatrix[3].x * 0.13 + instanceMatrix[3].z * 0.17;
+        float gust = sin(uTime * 1.4 + windSeed) + 0.35 * sin(uTime * 2.7 + windSeed * 1.9);
+        transformed.x += gust * 0.11 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
+        transformed.z += sin(uTime * 1.1 + windSeed * 2.3) * 0.06 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
+      #endif
     `).replace('void main() {', 'uniform float uTime;\nattribute float aRim;\nvarying vec3 vLPos;\nvarying float vRim;\nvoid main() {');
-    // (1) a STYLIZED foliage texture breaks the flat uniform green — sampled object-space (the
-    // cones have no UVs) as a LUMINANCE multiply so each canopy keeps its hue + low-poly silhouette
-    // but gains dappled value variation. (2) distant canopies melt toward the grade's haze before
-    // global fog reaches them — softens the hard low-poly pop at the tree line. Fragment-only.
     sh.fragmentShader = sh.fragmentShader
       .replace('void main() {', `uniform vec3 uHaze;
         uniform sampler2D uFoliage; uniform float uFolAmt; uniform float uFolScale;
-        uniform float uFringe;
         varying vec3 vLPos; varying float vRim;
         float chash(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float cnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);
           float a=chash(i),b=chash(i+vec2(1,0)),c=chash(i+vec2(0,1)),d=chash(i+vec2(1,1));
           return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
         void main() {`)
-      // THE RAGGED EDGE, and it is the whole reason a low-poly conifer reads as folded
-      // paper. A tier's outline is a POLYGON — straight segments between vertices — and no
-      // amount of shading hides a straight edge against the sky. A real conifer's outline
-      // is needles, so it has no edge at all, it has a fringe.
-      //
-      // So the outer band of every tier DISSOLVES: high-frequency object-space noise, and
-      // fragments below the cut are discarded. Gated hard on vRim (0 at the trunk, 1 at the
-      // frond tips) so only the last quarter of each arm frays — without that gate the
-      // whole canopy turns to lace and you can see the sky through the middle of the tree.
-      // Costs one noise per canopy fragment and no geometry at all.
-      .replace('#include <clipping_planes_fragment>', `
-        #include <clipping_planes_fragment>
-        // A GRADIENT, not a band. The first version cut on a fixed threshold across the
-        // outer quarter of the arm, which speckled holes through solid foliage and read as
-        // moth-eaten rather than needled. What an edge of needles actually does is DISSOLVE:
-        // nearly solid a little way in, almost nothing at the very tip. So the cut rises
-        // steeply with vRim and the fringe fades out instead of being punched through.
-        float frayN = cnoise(vec2(vLPos.x + vLPos.y * 0.41, vLPos.z - vLPos.y * 0.33) * 64.0)
-                    * 0.55 + cnoise(vec2(vLPos.z - vLPos.y * 0.2, vLPos.x) * 148.0) * 0.45;
-        float fray = smoothstep(0.80, 1.04, vRim);
-        if (frayN < fray * fray * uFringe) discard;
-      `)
-      // AND THE PANELS THEMSELVES. Fraying fixed the outline; the interior of each tier was
-      // still a large flat facet, and a flat facet has ONE normal, so it takes one value of
-      // light across its whole area however nicely it is tinted. That is the entire reason
-      // low-poly foliage reads as folded paper.
-      //
-      // So the same needle noise that grains the albedo also perturbs the NORMAL — a
-      // tangent-free derivative bump (Mikkelsen), the same trick the terrain uses for its
-      // sand ripples. The panels stop being planar to the lighting and start catching it in
-      // clumps. Faded out with distance so the far stand cannot shimmer, and skipped on the
-      // 1:240 chart-table clone where a tree is four pixels.
-      .replace('#include <normal_fragment_begin>', `
-        #include <normal_fragment_begin>
-        // CLUMP scale, not needle scale, and gently. At 11/27 cycles with amplitude 0.55
-        // this read as dark fur — the same failure the terrain's own comment warns about
-        // ("high-freq grain in the NORMAL reads as a harsh per-pixel dapple, looks scaly").
-        // The fine grain belongs in the albedo; the bump only has to stop the panel being
-        // ONE flat value, and a branch clump is a ~30 cm thing.
-        float nH = cnoise(vec2(vLPos.x * 1.3 + vLPos.y * 0.35, vLPos.z * 1.3 - vLPos.y * 0.3) * 3.4) * 0.66
-                 + cnoise(vec2(vLPos.z - vLPos.y * 0.2, vLPos.x) * 8.5) * 0.34;
-        float nAmt = 0.16 * (1.0 - smoothstep(18.0, 70.0, length(vViewPosition)));
-        vec2 nD = vec2(dFdx(nH), dFdy(nH)) * nAmt;
-        vec3 nSx = dFdx(-vViewPosition), nSy = dFdy(-vViewPosition);
-        vec3 nR1 = cross(nSy, normal), nR2 = cross(normal, nSx);
-        float nDet = dot(nSx, nR1);
-        vec3 nGrad = sign(nDet) * (nD.x * nR1 + nD.y * nR2);
-        normal = normalize(abs(nDet) * normal - nGrad);
-      `)
       .replace('#include <color_fragment>', `
         #include <color_fragment>
-        // oblique projection (#44): xz alone stretches to VERTICAL STREAKS on the cone's
-        // sides (height never varies the sample there) — shearing y into both axes at
-        // different rates tilts the projection so every face gets true 2D dapple
         vec2 folUv = vec2(vLPos.x + vLPos.y * 0.37, vLPos.z + vLPos.y * 0.61) * uFolScale;
         float folL = dot(texture2D(uFoliage, folUv).rgb, vec3(0.299, 0.587, 0.114));
         diffuseColor.rgb *= mix(1.0, folL * 1.9, uFolAmt);
-        // NEEDLE GRAIN. The dapple above is a soft painterly wash at ~1 m; needles are a
-        // centimetre thing, and without them a flat panel is still a flat panel however
-        // nicely it is tinted. Two octaves of fine object-space noise, sheared the same way,
-        // biased so the clusters read as sprays catching light rather than dirt.
         float ndl = cnoise(vec2(vLPos.x * 1.7 + vLPos.y, vLPos.z * 1.7 - vLPos.y) * 9.0) * 0.6
                   + cnoise(vec2(vLPos.z - vLPos.y * 0.6, vLPos.x + vLPos.y * 0.4) * 23.0) * 0.4;
         diffuseColor.rgb *= 0.80 + 0.42 * ndl;
-        // and the tips are NEW GROWTH: lighter, yellower, the year's candles. Real conifers
-        // are two greens — this one was one.
         diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.26, 1.20, 0.72),
                                smoothstep(0.55, 1.0, vRim) * 0.5 * (0.45 + 0.55 * ndl));
       `)
@@ -3732,6 +3720,9 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
         #include <fog_fragment>
       `);
   };
+  modelCanopyMat.customProgramCacheKey = () => 'model-crown-lobes-v1';
+  // main.js drives uTime/uHaze through the island's canopy material; the model's rides along
+  canopyMat.userData.siblings = [modelCanopyMat];
 
   const leanValues = new Float32Array(spots.length);
   trunkGeo.setAttribute('aTrunkLean', new THREE.InstancedBufferAttribute(leanValues, 1));
@@ -3949,7 +3940,7 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
   }
   core.userData.miniForest = () => {
     const group = new THREE.Group(); group.name = 'canopies';
-    const meshes = CANOPY.map((c, i) => new THREE.InstancedMesh(c.modelGeo, canopyMat, vCount[i]));
+    const meshes = CANOPY.map((c, i) => new THREE.InstancedMesh(c.modelGeo, modelCanopyMat, vCount[i]));
     const counts = CANOPY.map(() => 0);
     for (const t of TREES) {
       const mesh = meshes[t.v], i = counts[t.v]++;

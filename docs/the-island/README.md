@@ -106,7 +106,7 @@ complete mark, tombstone, outbox, and rules contract.
 | `js/content.js` | field-note copy, hint threads, readable artifacts, sketches |
 | `js/harbor.js` | Blender room assembly, spare chair and two-scale boat homecoming |
 | `js/landfall.js` | Blender tower, vaults, coast, pines and persistent drying-room tin |
-| `js/working-coast.js` | Blender conifers, fitted study and live tide instrument |
+| `js/working-coast.js` | Blender needle-card conifers, fitted study and live tide instrument |
 | `js/shore-details.js` | sparse working-shore kit, collision and distance detail |
 | `js/island-life.js` | Blender bird rigs, distance skins, expressive poses and open dory |
 | `js/tower-course.js` | Shared staircase layout, tread heights and movement course |
@@ -136,6 +136,8 @@ erratics with a fractured Blender boulder kit, fused the sea into the sky at the
 gave the drowned hall weathered stone, the drained bay a mud floor, the cliffs a mineral
 face, the east room a plastered wall and a ceiling, and stopped the lantern gallery from
 blowing out to white at night. It also measured and rejected a multisampled post chain.
+Its second day rebuilt the conifer crowns as textured needle cards, the drowned channel's
+bell-buoy as a real iron buoy, and gave the cellar walls their damp and their staining.
 
 ## Current visual and walking review
 

@@ -42,9 +42,11 @@ in the game or its review folder.
 
 ## The next visual work
 
-The working-coast revision replaces the original canopy cards and the main study
-finish. Trees now carry dense closed needle volumes, with smaller meshes for the
-distance and miniature. Floorboards, painted panelling and a stilling tube give
+The working-coast revision replaced the original canopy cards and the main study
+finish; the player walk of October 2026 replaced the closed needle volumes in turn with
+textured, alpha-tested needle cards on the same bough skeleton, so a bough at walking
+distance is twig and needles with sky between them. Far crowns are the cards alone; the
+miniature keeps opaque lobes. Floorboards, painted panelling and a stilling tube give
 the study a material scale and a visible connection to the water. Lichen follows
 the actual rock surface. The broader terrain, boulder silhouettes and character
 animation still need further authored work. This is not yet a AAA production
