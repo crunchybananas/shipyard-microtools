@@ -443,7 +443,7 @@ export function canBuild(state, type, x, z, rotation = 0) {
   } else {
     const terrain = terrainAt(x, z);
     if (getBuildingAt(state, x, z)) return fail('There is already a building or construction site here.');
-    if (state.frontier?.units.some(u => !['dead','released'].includes(u.status) && (Math.round(u.x) === x && Math.round(u.z) === z || ['move','retreat'].includes(u.order?.type) && Math.round(u.order.x) === x && Math.round(u.order.z) === z))) return fail('Wait for the company to clear this building site and its ordered destination.');
+    if (state.frontier?.units.some(u => !['dead','released'].includes(u.status) && (Math.round(u.x) === x && Math.round(u.z) === z || ['move','retreat','defend'].includes(u.order?.type) && Math.round(u.order.x) === x && Math.round(u.order.z) === z))) return fail('Wait for the company to clear this building site and its ordered destination.');
     if (terrain.kind === 'water') return fail('Build on dry land.');
     if (terrain.kind === 'path') return fail('Keep the village footpath open.');
     if (state.frontier?.fortifications.some(f => f.x === x && f.z === z)) return fail('A defense or its remains occupies this square.');

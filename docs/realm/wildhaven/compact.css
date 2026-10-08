@@ -134,3 +134,16 @@ body.companion-away #hud #town-book,body.companion-away #hud #fieldbook,body.com
  #island-safety-status{font-size:10px;padding:3px 7px}
  #hud .hud-notifications #toast,#hud .hud-notifications #reading-pause{font-size:10px;padding:5px 8px}
 }
+
+/* Landscape entry must keep Continue and Start reachable before a town opens. */
+@media(max-height:600px){
+ #intro .intro-copy{top:max(18px,env(safe-area-inset-top));bottom:64px;left:5%;max-width:90%;overflow:auto;padding-right:8px}
+ #intro .intro-note{font-size:11px}
+ #intro h1{font-size:clamp(32px,8vh,46px);margin:8px 0 12px}
+ #intro .intro-copy p{font-size:13px;line-height:1.4;margin:0 0 12px}
+ #intro .intro-actions{margin-bottom:10px;gap:8px}
+ #intro .intro-actions button{min-height:44px;padding:10px 15px;font-size:13px}
+ #intro .intro-copy small{font-size:10px}
+ #intro .intro-bottom{bottom:max(8px,env(safe-area-inset-bottom));left:5%;font-size:10px}
+ #intro .intro-bottom button{min-height:44px}
+}

@@ -1,0 +1,260 @@
+{
+  "fixture": "Existing campaign-forge-save restored through sim.restore; wood/food/iron/tools staged to at least 120. Three residents recruited through recruitTroop and trained by sim.tick(46). No player storage is used.",
+  "base": "http://127.0.0.1:14727/realm/wildhaven/?review=1",
+  "recruited": [
+    "unit-1",
+    "unit-2",
+    "unit-3"
+  ],
+  "viewports": [
+    {
+      "name": "ipad-landscape",
+      "width": 1024,
+      "height": 768,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation",
+        "reading hold survives selection; trusted drag/pinch/cancel consumes no click",
+        "reload persists named squad and Defend Town orders",
+        "companion/home selection isolation; squads remain per town",
+        "authored warning and simultaneous active troop round-trip; Safety lands Company; 6m at 1× and cargo distinction"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 478,
+          "y": 100,
+          "width": 470,
+          "height": 590,
+          "right": 948,
+          "bottom": 690
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 509,
+            "y": 301.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 620.359375,
+            "bottom": 345.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 626.359375,
+            "y": 301.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 728,
+            "bottom": 345.59375
+          },
+          {
+            "id": "defend",
+            "x": 509,
+            "y": 353.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 599.4375,
+            "bottom": 397.59375
+          },
+          {
+            "id": "hold",
+            "x": 605.4375,
+            "y": 353.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 678.703125,
+            "bottom": 397.59375
+          },
+          {
+            "id": "move",
+            "x": 684.703125,
+            "y": 353.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 733.796875,
+            "bottom": 397.59375
+          },
+          {
+            "id": "attack",
+            "x": 739.796875,
+            "y": 353.59375,
+            "width": 56,
+            "height": 44,
+            "right": 795.796875,
+            "bottom": 397.59375
+          },
+          {
+            "id": "retreat",
+            "x": 801.796875,
+            "y": 353.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 892.890625,
+            "bottom": 397.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 509,
+            "y": 448.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 587.28125,
+            "bottom": 492.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 593.28125,
+            "y": 448.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 691.03125,
+            "bottom": 492.59375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 497,
+          "y": 712.6875,
+          "width": 432,
+          "height": 80,
+          "right": 929,
+          "bottom": 792.6875
+        }
+      },
+      "watchText": "Coastal cargo watch\n\nCivilian watch-house guards handle coastal cargo demands. Recruited company soldiers, walls and towers handle physical enemies on the island; their orders do not add watch readiness.\n\nCommand soldiers in Company\n\nQuiet water. A chance to prepare.\n\nThe next cargo warning can begin in 6m 34s at 1×. Keep a reserve of food and building supplies, or establish a standing watch.\n\nHow to prepare a coastal patrol\nStaff the coastal watch\n\nGuards leave other jobs to protect coastal cargo and provide escorts.\n\nⅡ Time paused · work waits\nResume time\n3 guards assigned · 3 requested\nWatch house · level 2\n−\n3\n+\n\nOn the watch: Bram 2, Cora 2, Dev 2\n\n2.1 food/min for watch supplies · 2.7 at full staffing\n\n3/4 workers\n\nGive guards priority\nView watch house\n0 guards assigned · 0 requested\nWatch house · level 2\n−\n0\n+\n\nNo residents assigned here.\n\n0 food/min for watch supplies · 2.7 at full staffing\n\nNo workers requested\n\nGive guards priority\nView watch house\n0 guards assigned · 0 requested\nWatch house · level 2\n−\n0\n+\n\nNo residents assigned here.\n\n0 food/min for watch supplies · 2.7 at full staffing\n\nNo workers requested\n\nGive guards priority\nView watch house\n0 guards assigned · 0 requested\nWatch house · level 2\n−\n0\n+\n\nNo residents assigned here.\n\n0 food/min for watch supplies · 2.7 at full staffing\n\nNo workers requested\n\nGive guards priority\nView watch house\nCoastal record · 5 defenses · 4 paid · 0 raids",
+      "passed": true
+    },
+    {
+      "name": "ipad-portrait",
+      "width": 768,
+      "height": 1024,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 222,
+          "y": 115,
+          "width": 470,
+          "height": 831,
+          "right": 692,
+          "bottom": 946
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 253,
+            "y": 331.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 364.359375,
+            "bottom": 375.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 370.359375,
+            "y": 331.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 472,
+            "bottom": 375.59375
+          },
+          {
+            "id": "defend",
+            "x": 253,
+            "y": 383.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 343.4375,
+            "bottom": 427.59375
+          },
+          {
+            "id": "hold",
+            "x": 349.4375,
+            "y": 383.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 422.703125,
+            "bottom": 427.59375
+          },
+          {
+            "id": "move",
+            "x": 428.703125,
+            "y": 383.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 477.796875,
+            "bottom": 427.59375
+          },
+          {
+            "id": "attack",
+            "x": 483.796875,
+            "y": 383.59375,
+            "width": 56,
+            "height": 44,
+            "right": 539.796875,
+            "bottom": 427.59375
+          },
+          {
+            "id": "retreat",
+            "x": 545.796875,
+            "y": 383.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 636.890625,
+            "bottom": 427.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 253,
+            "y": 478.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 331.28125,
+            "bottom": 522.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 337.28125,
+            "y": 478.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 435.03125,
+            "bottom": 522.59375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 241,
+          "y": 742.6875,
+          "width": 432,
+          "height": 80,
+          "right": 673,
+          "bottom": 822.6875
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "short-landscape",
+      "width": 667,
+      "height": 375,
+      "touch": true,
+      "checks": []
+    }
+  ],
+  "errors": [],
+  "browser": "Headless Chrome, isolated temporary browser contexts; no physical iPad claim.",
+  "failure": "locator.tap: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#continue')\u001b[22m\n\u001b[2m    - locator resolved to <button id=\"continue\" class=\"primary\">Come back home</button>\u001b[22m\n\u001b[2m  - attempting tap action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying tap action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying tap action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    56 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying tap action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at click (/private/tmp/wildhaven-defense-review/check.mjs:89:150)\n    at async file:///private/tmp/wildhaven-defense-review/check.mjs:94:86"
+}

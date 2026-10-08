@@ -1,0 +1,6 @@
+PASS Held native touch survives a live update; canceled touch saves nothing; next tap saves exactly one squad
+PASS Reusable ImageGen illustration loads and stays within80px at tablet size
+PASS Actual hostile raycast accepts explicit Attack without changing diplomatic relations
+PASS Company intercepts a real simulated hostile, survives, returns to rally positions and restores from save
+PASS Unfilled coastal watch action opens canonical People & jobs instead of an invalid tab
+PASS Short landscape Start/Continue both reachable; Company has at least120px reading space

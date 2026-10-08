@@ -1,0 +1,367 @@
+{
+  "fixture": "Existing campaign-forge-save restored through sim.restore; wood/food/iron/tools staged to at least 120. Three residents recruited through recruitTroop and trained by sim.tick(46). No player storage is used.",
+  "base": "http://127.0.0.1:14727/realm/wildhaven/?review=1",
+  "recruited": [
+    "unit-1",
+    "unit-2",
+    "unit-3"
+  ],
+  "viewports": [
+    {
+      "name": "short-landscape",
+      "width": 667,
+      "height": 375,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 12,
+          "y": 8,
+          "width": 591,
+          "height": 289,
+          "right": 603,
+          "bottom": 297
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 36,
+            "y": 130.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 147.359375,
+            "bottom": 174.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 153.359375,
+            "y": 130.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 255,
+            "bottom": 174.59375
+          },
+          {
+            "id": "defend",
+            "x": 36,
+            "y": 182.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 126.4375,
+            "bottom": 226.59375
+          },
+          {
+            "id": "hold",
+            "x": 132.4375,
+            "y": 182.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 205.703125,
+            "bottom": 226.59375
+          },
+          {
+            "id": "move",
+            "x": 211.703125,
+            "y": 182.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 260.796875,
+            "bottom": 226.59375
+          },
+          {
+            "id": "attack",
+            "x": 266.796875,
+            "y": 182.59375,
+            "width": 56,
+            "height": 44,
+            "right": 322.796875,
+            "bottom": 226.59375
+          },
+          {
+            "id": "retreat",
+            "x": 328.796875,
+            "y": 182.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 419.890625,
+            "bottom": 226.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 36,
+            "y": 277.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 114.28125,
+            "bottom": 321.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 120.28125,
+            "y": 277.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 218.03125,
+            "bottom": 321.59375
+          }
+        ],
+        "art": {
+          "display": "none",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 12,
+          "y": 186,
+          "width": 366,
+          "height": 580,
+          "right": 378,
+          "bottom": 766
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 36,
+            "y": 383.59375,
+            "width": 160.859375,
+            "height": 44,
+            "right": 196.859375,
+            "bottom": 427.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 202.859375,
+            "y": 383.59375,
+            "width": 151.140625,
+            "height": 44,
+            "right": 354,
+            "bottom": 427.59375
+          },
+          {
+            "id": "defend",
+            "x": 36,
+            "y": 435.59375,
+            "width": 98.234375,
+            "height": 44,
+            "right": 134.234375,
+            "bottom": 479.59375
+          },
+          {
+            "id": "hold",
+            "x": 140.234375,
+            "y": 435.59375,
+            "width": 81.078125,
+            "height": 44,
+            "right": 221.3125,
+            "bottom": 479.59375
+          },
+          {
+            "id": "move",
+            "x": 227.3125,
+            "y": 435.59375,
+            "width": 56.890625,
+            "height": 44,
+            "right": 284.203125,
+            "bottom": 479.59375
+          },
+          {
+            "id": "attack",
+            "x": 290.203125,
+            "y": 435.59375,
+            "width": 63.796875,
+            "height": 44,
+            "right": 354,
+            "bottom": 479.59375
+          },
+          {
+            "id": "retreat",
+            "x": 36,
+            "y": 485.59375,
+            "width": 318,
+            "height": 44,
+            "right": 354,
+            "bottom": 529.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 36,
+            "y": 597.09375,
+            "width": 146.265625,
+            "height": 44,
+            "right": 182.265625,
+            "bottom": 641.09375
+          },
+          {
+            "id": "clear-units",
+            "x": 188.265625,
+            "y": 597.09375,
+            "width": 165.734375,
+            "height": 44,
+            "right": 354,
+            "bottom": 641.09375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 26,
+          "y": 859.1875,
+          "width": 338,
+          "height": 80,
+          "right": 364,
+          "bottom": 939.1875
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "touch": false,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation",
+        "reading hold survives selection; trusted drag/pinch/cancel consumes no click",
+        "desktop real Shift-click adds second troop"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 894,
+          "y": 100,
+          "width": 470,
+          "height": 722,
+          "right": 1364,
+          "bottom": 822
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 925,
+            "y": 304.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 1036.359375,
+            "bottom": 348.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 1042.359375,
+            "y": 304.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 1144,
+            "bottom": 348.59375
+          },
+          {
+            "id": "defend",
+            "x": 925,
+            "y": 356.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 1015.4375,
+            "bottom": 400.59375
+          },
+          {
+            "id": "hold",
+            "x": 1021.4375,
+            "y": 356.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 1094.703125,
+            "bottom": 400.59375
+          },
+          {
+            "id": "move",
+            "x": 1100.703125,
+            "y": 356.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 1149.796875,
+            "bottom": 400.59375
+          },
+          {
+            "id": "attack",
+            "x": 1155.796875,
+            "y": 356.59375,
+            "width": 56,
+            "height": 44,
+            "right": 1211.796875,
+            "bottom": 400.59375
+          },
+          {
+            "id": "retreat",
+            "x": 1217.796875,
+            "y": 356.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 1308.890625,
+            "bottom": 400.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 925,
+            "y": 451.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 1003.28125,
+            "bottom": 495.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 1009.28125,
+            "y": 451.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 1107.03125,
+            "bottom": 495.59375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 913,
+          "y": 715.6875,
+          "width": 432,
+          "height": 100,
+          "right": 1345,
+          "bottom": 815.6875
+        }
+      },
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "browser": "Headless Chrome, isolated temporary browser contexts; no physical iPad claim.",
+  "passed": true
+}

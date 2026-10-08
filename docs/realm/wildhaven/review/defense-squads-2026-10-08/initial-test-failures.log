@@ -1,0 +1,520 @@
+✔ authored axe keeps its handle in the grip and cutting edge in the vertical swing plane (36.959417ms)
+✔ the calendar takes six minutes while four economy cycles run at their original speed (56.373166ms)
+✔ old saves keep their displayed day and time, then advance at the slower calendar pace (33.483083ms)
+✔ calendar metadata cannot be negative, non-finite, or ahead of the saved work clock (0.535459ms)
+✔ rate and deadline presentation retain actual gameplay duration at normal speed (3.130625ms)
+✔ wheel normalizes pixels, lines and pages and scales proportionally (0.695541ms)
+✔ pinch follows finger span and reverses without a scale-dependent gain (0.070208ms)
+✔ placement card sits above the actual roof and clamps to screen edge (0.1565ms)
+✔ placement card clears roofs near top edge and other HUD controls (1.039958ms)
+✔ narrow touch screen uses clear lower space without overlaying the plan (0.191125ms)
+✔ an impossibly small clear area hides information rather than covering the plan (0.108333ms)
+✔ phone card can shift sideways below a roof to clear the camera toolbar (0.110917ms)
+✔ the broad name pool has unique, save-safe names and a varied opening town (8.58025ms)
+✔ one thousand residents receive distinct names without numeric suffixes (83.629958ms)
+✔ new names skip existing names with case, whitespace and Unicode-equivalent spelling (0.107584ms)
+✔ large arrival IDs wrap deterministically and search the full name pool before exhaustion (23.257708ms)
+✔ actual arrivals and replenishment avoid legacy residents and each other across reload (53.234834ms)
+✔ current saves preserve numbered, duplicate and Unicode resident identities exactly (0.623459ms)
+✔ v1 migration keeps its established identity assignment (0.453917ms)
+✔ building explanations distinguish flour from food and give the real labor chain (1.465625ms)
+✔ all catalog levels explain actual scaled recipes, staffing and capacity without edits (0.826791ms)
+✔ research choice exposes every prerequisite instead of only the first blocker (1.799292ms)
+✔ bell handoff chooses one actionable school/research step and preserves the town (0.553333ms)
+✔ trade puts deliverable active and available stocked orders first without altering offers (0.107416ms)
+✔ next action accounts for upgraded school upkeep and paused water service (0.479333ms)
+✔ tools milestone points to current stock without creating a storage action or changing goods (0.3005ms)
+✔ the companion store opens the existing v4 home without opting in or writing storage (40.612417ms)
+✔ companion switches and autosaves keep the original home snapshot in wildhaven.v4 (12.805416ms)
+✔ both town snapshots retain fieldwork, queue escrow, citizen identities, and fractional time across reload (29.266875ms)
+✔ offers move no goods until the receiving town explicitly accepts in management mode (7.494208ms)
+✔ a one-way gift still requires recipient consent and transfers its offered goods once (4.579708ms)
+✔ a trade commits both bags exactly once, survives reload, and cannot replay after switching (4.865541ms)
+✔ an offer sent by the companion updates the home mirror only after home accepts (17.641417ms)
+✔ closing an offer prevents later acceptance and never changes either stockpile (1.763084ms)
+✔ invalid resource bags cannot create offers or change either town (5.486417ms)
+✔ insufficient goods or either receiving capacity reject the entire exchange without partial debits (18.255875ms)
+✔ an exchange preserves unrelated overflow and resource precision while reducing offered overflow (2.114791ms)
+✔ malformed companion data is preserved and blocks writes while the original home still opens (20.7475ms)
+✔ invalid embedded towns and forged offer records cannot bypass companion save validation (16.416083ms)
+✔ a conflicting external home found at startup is preserved alongside the companion record (23.350083ms)
+✔ storage read failures return a usable fallback and block mutation without destroying data (2.621ms)
+✔ quota failure during opt-in leaves the original home and input state intact (3.426667ms)
+✔ quota failure during autosave or switching preserves the last durable snapshot and active town (7.982959ms)
+✔ quota failure cannot debit one town or consume an uncommitted offer (4.046917ms)
+✔ a failed home mirror after an atomic trade recovers from the registry and cannot duplicate goods (8.022917ms)
+✔ a stale second tab cannot overwrite a newer registry or switch using its old state (2.954042ms)
+✔ two tabs accepting one offer can commit only one transfer (19.955ms)
+✔ an external change to the original home key blocks stale companion autosaves (1.590959ms)
+✔ an exclusive browser writer lease blocks the second tab and release admits a fresh writer (5.166584ms)
+✔ missing required Web Locks block all mutations and preserve both stored records (3.382083ms)
+✔ a rejected Web Locks request settles ready as blocked without storage writes (4.783166ms)
+✔ pending lease acquisition cannot repair a mirror or write until ready resolves (2.740083ms)
+✔ releasing a store while its lease request is pending cannot leave a later writer locked out (0.622833ms)
+✔ company selection includes living resident soldiers, never town workers, allies or enemies (1.352958ms)
+✔ ordinary selection replaces, additive selection toggles, and no selection operation issues orders (0.111125ms)
+✔ Cancel restores the pre-mode selection while Done commits only the selected IDs (0.112375ms)
+✔ Cancel cannot resurrect members who died or left during group selection (0.076166ms)
+✔ live pruning and repeated begin preserve a valid cancellation boundary (0.075416ms)
+✔ a town replacement resets both selection and its pending cancellation snapshot (0.065709ms)
+✔ all four places replace natural obstacles with reachable adjacent approaches (30.7505ms)
+✖ v3 migration preserves its economy, frontier and original input while adding untouched places (21.518625ms)
+✔ survey uses a named citizen, costs provisions, physically travels and credits only at home (64.051459ms)
+✔ one person cannot do two jobs, one place cannot host two missions, and two civilians remain (5.297083ms)
+✔ recall retains survey progress and returns the worker without granting the report (19.955375ms)
+✔ restoration escrow survives recall and reload; resumed work is free and benefit arrives on return (21.967959ms)
+✔ restored mason lesson changes actual construction work (19.051166ms)
+✔ salvage credits capacity-limited goods once and never grants the restoration benefit (33.518875ms)
+✔ every phase reloads and a restored site cannot pay twice (105.672167ms)
+✔ blocked route never teleports a fieldworker or progresses remote work (0.723458ms)
+✔ hostile forces trigger a physical retreat; unfinished work remains resumable (34.647541ms)
+✔ strict save validation rejects corrupt site enums, rewards, duplicate places and orphan missions (15.257084ms)
+✔ v2 migration starts an untouched frontier, preserves the earned economy, and stays quiet without contact (1118.237291ms)
+✔ military training spends exact equipment, removes real civilian labor, and resumes deterministically (132.12375ms)
+✔ a paid engineer walks to a wall, builds with exclusive labor, and returns to civilian work (167.671667ms)
+✔ survey and a completed outpost actually unlock civilian building on the larger island (242.595209ms)
+✔ a named envoy makes physical contact, gains relations and releases labor only after returning (91.54825ms)
+✔ civilian construction and demolition invalidate troop paths and preserve move/retreat destinations (114.553708ms)
+✔ legacy absence initializes safely; old prosperous towns stay quiet and idle clock does not signal a visual change (3.519791ms)
+✔ recruitment spends exact stock, reserves named citizens, completes training and retains two civilian residents (22.674417ms)
+✔ exact final movement segment completes instead of stalling in the destination cell (4.682125ms)
+✔ more than seven selected troops receive unique reachable formation cells and keep spatial separation (20.405417ms)
+✔ defense construction escrows materials and requires actual named builder travel/work; cancel does not mint resources (2.719041ms)
+✔ wall-line placement is atomic and validates complete future layout before charging (0.569875ms)
+✔ open construction gates preserve a passage, completed closing blocks it and obeys civilian-access veto (8.301166ms)
+✔ envoy physically makes contact, improves relations and returns the resident; quoted trade is exact and bounded by storage (9.69125ms)
+✔ alliance needs earned diplomatic exchanges and creates real aid troops; war stops trade and truce withdraws enemies (15.956834ms)
+✔ physical survey plus a paid completed outpost is required for a claim; repair/cancel/load retains legitimate ownership (12.362666ms)
+✔ melee follows spatial range, damages actual HP and can wound; healing at home costs exact supplies (4.008667ms)
+✔ archer attacks create delayed saved projectiles, and a wall blocks line of sight (2.245417ms)
+✔ enemies actually choose and breach a blocking wall before reaching stores (21.032959ms)
+✖ raids require new frontier involvement, publish a two-day warning and inflict bounded visible cargo loss (22.763ms)
+✔ saved mid-training/mid-construction paths resume deterministically under different tick partitions (1.364917ms)
+✔ save validation rejects resource escrow exploits, duplicate citizens, invalid locations and orphan orders (1.14775ms)
+✔ dismissal cancels home training without refunds, returns named labor once, and requires distant troops to walk home (2.901167ms)
+✔ wounded residents need physical home recovery; casualties are real but cannot empty the settlement (25.141166ms)
+✔ defense research and staffed tower positions have measurable combat effects; an empty tower never fires (8.472125ms)
+✔ a stronghold must lose real HP before conquest; rewards happen once and surviving enemies withdraw (31.241208ms)
+✔ standalone open gates only permit travel along the rotated doorway axis, never through stone piers (0.656833ms)
+✔ completed defenses can be salvaged once for an exact damage and storage limited refund; ruins yield nothing (4.177583ms)
+✔ occupied defense cells cannot be built over, repaired or salvaged; removing an outpost revokes future construction claim (8.623875ms)
+✔ save enum keys cannot resolve Object prototypes; ID counters and duplicate neighbor records are rejected (0.972875ms)
+✔ raids with stolen cargo and escaping attackers are not victories, including a mid-raid save (33.706084ms)
+✔ empty-handed escape is still not a raid defeated; legacy unrecorded active raids never invent victories (22.562ms)
+✔ all raiders killed by actual projectiles count one victory, retained across a save during combat (6.4455ms)
+✔ the targeted stronghold compound is hittable, while unrelated blocking terrain still stops arrows (5.0295ms)
+✔ a fallen allied reinforcement never increments the defeated-enemy counter (1.049167ms)
+✔ an enemy breaching unfinished construction destroys escrow without corrupting the save (0.793917ms)
+✔ canceling repairs never erases damage received while the builder was working (1.580417ms)
+✔ a newly placed town building invalidates stale navigation cache without making the save unloadable (4.243208ms)
+✔ solid defense placement protects troop order destinations while an open gate can keep the destination usable (1.81925ms)
+✔ the full island has five connected regions and three clear settlement approaches (14.727208ms)
+✔ starter terrain, the landing and original earned villages survive island expansion (99.5295ms)
+✔ terrain bounds, dry building footprints and coast data agree throughout the map (11.017917ms)
+✔ earned construction history survives repeated returns without replaying rewards (39.39975ms)
+✔ optional malformed journal records do not discard an otherwise valid town (0.905083ms)
+✔ history is bounded, newest first, and cannot acquire duplicate IDs after return (1.466667ms)
+✔ older saves without journal fields still restore without invented milestones (3.463417ms)
+✔ opening cottage checklist follows actual construction and changes to food when finished (46.5045ms)
+✔ pre-bell building requirements stay separate from later staffing and population requirements (0.403791ms)
+✔ bell costs are itemized and queued restoration never asks to pay reserved materials again (0.263167ms)
+✔ every chapter and specialty exposes only satisfied rows when its actual requirements are fulfilled (1.266792ms)
+✔ each ordinary chapter blocker agrees with the authoritative selected objective (3.071875ms)
+✔ working service rows accept real partial work but reject no workers and blocked production (0.153417ms)
+✔ coastal trade and harvest alternatives never add incomplete routes together (0.159125ms)
+✔ coverage compares actual supplied shares before display rounding (0.125541ms)
+✔ food sustainability uses supplied potential at a full pantry and its documented fallback (0.120209ms)
+✔ Forge requires real defenses and upgraded open industry, but no invented staffing condition (0.209417ms)
+✔ specialty export, stock and named-research blockers match authoritative final ambitions (1.903292ms)
+✔ recorded milestones and current chapter selection survive later spending and demolition (0.351833ms)
+✔ post-bell population comes from named citizens and reads do not alter a frozen town (0.44625ms)
+✔ short guidance supplies a reason and existing action destination without extra state (0.2325ms)
+✔ guidance resumes an accepted garden and routes sole remaining well and path requirements (0.211833ms)
+✔ contextual guidance shows at most one relevant production chain while imports remain valid (0.148625ms)
+✔ path guidance follows unfinished prerequisite leaves through the charter (2.413083ms)
+✔ path guidance explains school construction, staffing, supply and ongoing research without mutations (1.010792ms)
+✔ path choice continues to use the actual charter gate and switch cost (0.451166ms)
+✔ a held control survives pointerup and normal capture loss through its one native click (0.8605ms)
+✔ pointer cancellation and unexpected capture loss release the hold without an action (0.111084ms)
+✔ scroll text, disabled controls and secondary mouse presses do not hold live updates (0.067584ms)
+✔ native touch scrolling cancels promptly and releasing one of two pointers keeps the other protected (0.062542ms)
+✔ an outside release without click has a bounded hold and never needs a second user action (0.075584ms)
+✔ blur, hiding the document, explicit reset and disposal cannot leave a stuck hold (0.110833ms)
+✔ coastal warnings require restored bell and twenty real citizens, then six minutes before warning and six to prepare (1.440792ms)
+✔ paying spends the published demand once, grants no defense reward, and guarantees twelve quiet minutes (0.381292ms)
+✔ an unaffordable demand and repeated shelter actions are inert (0.991375ms)
+✔ warehouses and temporary shelter measurably lower the maximum loss; people and buildings are untouched (0.224083ms)
+✔ actual supplied guards need patrol time; instant staffing cannot trigger a free defense reward (0.271292ms)
+✔ guard input shortages, vacancies and pauses reduce readiness and patrol work honestly (0.160417ms)
+✔ researched organization and actual skill change the required guard labor (0.175167ms)
+✔ partial defense lowers actual theft and zero stock cannot become negative (0.132292ms)
+✔ a prepared supplied watch automatically defends at the announced deadline (0.103958ms)
+✔ all four incidents rotate deterministically, scale within bounds and leave recovery time (0.441125ms)
+✔ canonical terms, patrol progress and one-time resolution survive normalization; malformed saves fail (0.712ms)
+✔ earned campaign integration preserves active incidents, actual labor and partial patrols through save/load (1341.153625ms)
+✔ catalog has meaningful complete chains, valid workforce, and immutable shared data (0.997459ms)
+✔ upgrades resolve complete staffing, housing and recipe changes without mutating base data (0.168125ms)
+✔ productive upgrades improve output per worker at every level, including the one-worker garden (0.22175ms)
+✔ service upgrades provide explicit larger capacity and radius, with useful upkeep efficiency (0.119208ms)
+✔ the complete bread chain rewards its added workers, fuel and dependence on inputs (0.060792ms)
+✔ every research dependency is reachable and every locked building has a real unlock (0.701584ms)
+✔ research charges once, requires prerequisites, and progresses only with staffed scholars (0.843917ms)
+✔ research rejects invalid clocks, preserves progress through restore, and applies measured rate once (0.202167ms)
+✔ actual supplied school efficiency supports partial input shortages and learned skill (0.135834ms)
+✔ charters are exclusive, genuinely change supply effects, and charge only for switching (0.437083ms)
+✔ contract acceptance reserves no resources; delivery atomically spends and rewards once (3.711875ms)
+✔ same-day offers cannot regenerate after completion or repeated dawn processing (0.668708ms)
+✔ contract deadlines are visible, inclusive, deterministic and harmless to stored supplies (0.232916ms)
+✔ routes require real staffing and cargo, return on their public date, and reward only once (0.597042ms)
+✔ distant routes need staffed guards, and departure terms survive a charter change and save (0.356333ms)
+✔ delivery choices build the named harbor relationship needed for profitable voyages (0.354709ms)
+✔ watch research changes actual escort readiness and distant dispatch eligibility (0.169667ms)
+✔ escorts use actual supplied fractional readiness and learned skill, never a token meal for a full watch (0.210375ms)
+✔ normalization rejects unknown records and restores canonical costs, rewards and dates (0.125917ms)
+✔ reading progression preserves large legacy stocks; physical rewards respect current storage (0.320792ms)
+✔ the restored bell starts a longer series of ambitions, and recorded chapters do not regress (0.15275ms)
+✔ harbor imports cost real coin, need a working market, and retain their daily quota through reload (0.461042ms)
+✔ full storage rejects an import before charging, and rounding never creates negative coin (0.095ms)
+✔ exports finance specialty imports and Free Port quotes cannot create a buy-resell profit loop (0.858084ms)
+✔ Free Port and Breadbasket final ambitions can finish without local metal or textile chains (0.135875ms)
+✔ the large-town ambition requires actual coverage and sustainable staffing, allowing paid coastal peace (0.35125ms)
+✔ opening books holds 1× and closing restores it (0.6345ms)
+✔ opening books holds 3× and closing restores it (0.053541ms)
+✔ a manually paused village stays paused after reading (0.048791ms)
+✔ explicit run while open overrides the reading hold and survives closing (0.050125ms)
+✔ explicit pause during a reading hold must not auto-resume (0.046125ms)
+✔ changing towns clears the old village reading speed (0.057333ms)
+✔ research map includes every named discovery and exactly its real prerequisite links (1.564458ms)
+✔ research columns follow prerequisite depth, including navigation after other tier-three research (0.151375ms)
+✔ research nodes fit the canvas without collisions and every prerequisite link travels right (0.16475ms)
+✔ research status distinguishes learned, studying, prerequisite-ready and locked regardless of cost (0.296375ms)
+✔ dependency lines remain inside the map and never cross an unrelated discovery card (0.342292ms)
+✔ selection marks transitive ancestors and direct next discoveries without unrelated branches (0.175166ms)
+✔ building and selecting a research map preserves frozen town state and the research catalog (0.266459ms)
+✔ resource snapshots are pure, reject unknown keys, and distinguish physical capacity (4.229542ms)
+✔ food separates real workplace consumption from averaged resident meals (50.441375ms)
+✔ the next meal uses the real 90-second work clock and current modified consumption (0.31325ms)
+✔ food never reports a starvation countdown when full storage stops a producer (23.276333ms)
+✔ material estimates appear only for negative current flow and use actual inputs (36.590209ms)
+✔ paused and unstaffed producers remain actionable with zero actual contribution (16.920583ms)
+✔ every authored forest vertex is either verified foliage or the unchanged brown trunk (1.382042ms)
+✔ all seasons recolor only cloned foliage, leaving original GLB colors and the shared material untouched (15.136917ms)
+✔ a full year restores identical spring colors without accumulated tint or geometry changes (2.497917ms)
+✔ seasonal grass changes while the sandy coastal band and water remain unchanged (2.179125ms)
+✔ winter keeps green cypress tones and restrained seed heads, then restores the spring flowers (1.534209ms)
+✔ unchanged seasons do not rebuild meshes or upload foliage and terrain colors again (1.291ms)
+✔ festival bunting appears only during the saved benefit, reuses geometry, and stays outside picking/navigation lists (2.238084ms)
+✔ three calendar days per season, twelve per year, with exact transitions (19.103ms)
+✔ old v1-v4 saves acquire empty optional history without changing their displayed date or supplies (36.256875ms)
+✔ pure date, status and quote reads do not create metadata, debit food, or advance paused time (0.505041ms)
+✔ an active festival in a migrated fractional calendar retains its date and timer after reload (23.239041ms)
+✔ the quote states scaling cost, modified two-meal reserve and exact affordability (2.090917ms)
+✔ spring, summer and winter cannot host even with surplus food (0.464042ms)
+✔ confirmation requotes changed food, population and season without spending (0.297375ms)
+✔ one charge and one journal event per town year, including reload; next autumn unlocks again (0.484459ms)
+✔ morale overlay changes migration immediately, caps at 100, and never writes the baseline (7.152333ms)
+✔ fractional duration expires exactly after 360 simulated seconds, including a winter crossing (20.385542ms)
+✔ fractional expiry immediately refreshes cached arrival guidance and signals a visual change (6.537791ms)
+✔ reading pause and reload preserve duration; the existing speed multiplier advances only simulation time (2.080708ms)
+✔ a large tick and fractional ticks agree on expiry and baseline morale; no bonus leaks into future morale (68.434166ms)
+✔ malformed optional festival data cannot grant a bonus or invalidate an otherwise valid town (2.911958ms)
+✔ towns keep independent seasons and festival history across save switching (11.497542ms)
+✔ rotated entrances reserve clear neighboring cells, and rejected placement spends nothing (21.641209ms)
+✔ the entrance must face navigable terrain, including deterministic scenery and shoreline (10.251917ms)
+✔ construction cannot isolate an otherwise open entrance behind neighboring buildings (2.315958ms)
+✔ old v2 densely packed neighborhoods remain loadable under new construction access rules (27.321791ms)
+✔ clinic access is finite and falls with actual staff or input supply instead of granting binary coverage (212.580042ms)
+✔ well upgrades serve denser housing, while overlapping wells cannot count the same demand twice (152.999958ms)
+✔ faith and leisure serve mixed neighborhoods jointly, with overlapping community access capped per home (0.431916ms)
+✔ overlapping catchments redirect scarce service capacity instead of stranding reachable homes (0.281125ms)
+✔ service upgrades raise actual access at the same staffing and close service during construction (143.21725ms)
+✔ existing upgraded v2 saves preserve citizens and stock when the new upgrade needs fewer posts (13.664792ms)
+✔ potential food balance ignores full shelves while retaining actual staff and input constraints (4.5355ms)
+✔ terrain stays deterministic and construction footprints fit the expanded island (14.817792ms)
+✔ construction escrows materials and creates neither housing nor output until completion (24.137ms)
+✔ queue priority switches builders; pause releases workers and resumes remaining work (4.430084ms)
+✔ cancellation returns only unused escrow and cannot duplicate refunds (3.291875ms)
+✔ finite labor is conserved through shortages, manual allocation and construction (15.701417ms)
+✔ input-starved workshops report the blocker, consume no phantom inputs, and stop when paused (4.71275ms)
+✔ wood-to-planks production is limited by labor and storage without destroying existing overflow (3.066583ms)
+✔ upgrades reserve inputs, close production, retain housing and require research for level three (10.465792ms)
+✔ actual job practice increases retained expertise; blocked and paused work earns none (5.464ms)
+✔ save/load mid-project preserves progress, escrow, identities and deterministic continuation (11.81425ms)
+✔ fixed-step integration produces identical economy for different render frame partitions (17.951792ms)
+✔ defensive saves reject forged escrow, duplicate labor, impossible sites and corrupted construction (2.471292ms)
+✔ v1 villages migrate to complete level-one buildings and named citizens without losing original stock (0.407666ms)
+✔ empty pantry and zero material stores retain a real-worker recovery route (21.57975ms)
+✔ housing, food and morale explain migration; employed buildings actually grow the settlement (8.976041ms)
+✔ landing exchanges preserve breakfast, persist the daily visit and cannot be refunded through construction (2.157959ms)
+✔ invalid mutations and invalid deltas are inert (0.290125ms)
+✔ supplied schools make real research progress; one scholar works at half strength (3.231958ms)
+✔ grain, flour and bread form a functioning staffed chain with no starting ingredients (22.162041ms)
+✔ service coverage depends on homes inside the actual neighborhood radius (4.314875ms)
+✔ ordinary construction and labor reach the first bell without ending the larger town game (37.474333ms)
+✔ a seeded management sequence conserves people and stock through repeated mid-work reloads (3332.875458ms)
+✔ fixture towns need water, supplied health and community coverage at meaningful growth thresholds (155.112875ms)
+✔ quiet, scheduled future raids and friendly troops do not invent an active warning (2.480333ms)
+✔ coastal incidents and arriving frontier raids both appear with their real clocks (0.792917ms)
+✔ an active raid outranks simultaneous incoming/coastal warnings and cannot report calm (1.224084ms)
+✔ hostility uses simulation relations and clears when enemies leave, die or make peace (0.255333ms)
+✔ timber production draws down real shared trees and exposes their next harvest (29.531583ms)
+✔ overlapping yards cannot duplicate timber or harvest a stump (10.955083ms)
+✔ felling, staffed replanting, independent growth and mature stock form a complete cycle (10.020791ms)
+✔ save reload preserves partial cutting and planting; older saves gain mature woodland (18.860458ms)
+✔ saplings mature after three full calendar days, across a save and pause (53.232083ms)
+✔ legacy woodland retains sapling size, mature stock and stump work through repeated saves (0.832417ms)
+✔ woodland validates growth against its saved clock before migration (0.217167ms)
+✔ sapling countdown uses calendar days and a normal-speed duration (0.073583ms)
+✔ untrusted saves cannot inject trees, negative growth or timber in a sapling (0.313792ms)
+✔ storage saturation does not fell trees and paused yards cannot harvest (12.671208ms)
+✔ yards only harvest visible woodland outside building, defense and discovery footprints (8.214917ms)
+✔ existing service cues preserve canonical capacity, allocations, and home access in overlapping catchments (3.920375ms)
+✔ upgraded service cues report the canonical provider for every service kind (1.491167ms)
+✔ paused and unfinished providers show zero actual capacity despite homes in reach (3.903084ms)
+✔ placement preview marks geometric reach without inventing service or changing the town (0.482417ms)
+✔ resident cues identify current work, named workplace, and cargo without changing actors or simulation (0.835333ms)
+✔ pausing retains a resident cue and an idle neighbor remains available for work (0.163875ms)
+✔ current production blocks override stale work and entrance explanations (0.793ms)
+✔ resident cues distinguish paused workplaces, blocked approaches, and active builders (0.259208ms)
+✖ stationary taps and hover expose the actual pointer type for staged touch placement (2.725334ms)
+✔ unexpected capture loss or pointer cancellation cannot turn a later release into a tap (0.222542ms)
+✔ pinch release keeps the remaining pointer tracked and never emits a placement tap (0.136875ms)
+✔ dragging pans but cannot tap, including capture loss during the drag (0.078791ms)
+✔ either finger can continue panning after a pinch without jumping or placing (0.133333ms)
+✔ a guard leaves an occupied starting tile without insisting on its center (21.862ms)
+✔ an already stalled route recovers through real routing and reaches the watch house (20.464584ms)
+✔ opposing guards pass on the real southern shoreline without entering water or overlapping (13.845875ms)
+✔ a changed gate cancels the first approach and isolated residents wait without teleporting (2.568583ms)
+✔ an open gate still blocks sideways station approaches and diagonal corner cutting (0.128542ms)
+✔ new construction and changed workstation models discard stale routes and return to work (20.032875ms)
+✔ an unreachable workplace reports a blocked approach and retries after the fence opens (13.012792ms)
+✔ two guards approaching a shore watch house reserve separate entrance ports (13.297834ms)
+✔ visible resident (2.429875ms)
+✔ visible roof wins over resident behind (0.74575ms)
+✔ visible resident in front of roof (0.370792ms)
+✔ invisible citizen root is ignored (0.332125ms)
+✔ invisible descendant cannot intercept (0.275584ms)
+✔ invisible intermediate ancestor cannot intercept (0.24325ms)
+✔ trees block residents behind them (0.211583ms)
+✔ rocks block houses behind them (0.193667ms)
+✔ transparent cues do not steal a click (0.220042ms)
+✔ non-depth-writing overlays do not steal a click (0.238292ms)
+✔ invisible materials do not steal a click (0.181333ms)
+✔ clipped construction geometry is ignored (0.187084ms)
+✔ terrain occludes underground residents (0.131792ms)
+✔ dead units do not steal a click (0.135667ms)
+✔ visible units still select (0.112375ms)
+✔ empty ground remains ground (0.09675ms)
+✔ instanced tree identity follows the exact visible tree rather than a hidden resident (0.476708ms)
+✔ entrance arrows point from the actual reserved lane to the door in all four rotations (5.508917ms)
+✔ replacing previews releases owned materials and keeps shared model geometry intact (0.94675ms)
+✔ touch placement leaves the entrance arrow clear and the footprint owns its visible stroke (0.779667ms)
+✔ service terrain geometry stays on land and refreshes actual capacity without rebuilding reach (20.641459ms)
+✔ removing cue sprites disposes their private texture and material (0.500708ms)
+✔ replacing batched markers releases the instanced matrix buffer as well as their geometry (0.518834ms)
+✔ switching independent town snapshots with reused IDs resets model positions and resident routes (58.635291ms)
+ℹ tests 315
+ℹ suites 0
+ℹ pass 312
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4114.728875
+
+✖ failing tests:
+
+test at docs/realm/wildhaven/test/discovery.test.mjs:13:1
+✖ v3 migration preserves its economy, frontier and original input while adding untouched places (21.518625ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+
+    {
+      builderTarget: 1,
+      claims: [
+        'home',
+        'highmeadow',
+  ...
+      nextRaidAt: 6831.25,
+  +   nextSquadId: 1,
+      projectiles: [],
+      raidActive: false,
+      raidOutcome: {
+        cargoLost: 0,
+        completed: true,
+  ...
+      },
+  +   squads: [],
+      stats: {
+        cargoLost: 0,
+        conquests: 1,
+        deaths: 1,
+        deathsThisWave: 0,
+
+      at TestContext.<anonymous> (file:///Users/coryloken/Documents/Codex/2026-10-04/task-2/wildhaven-ui-fixes/docs/realm/wildhaven/test/discovery.test.mjs:13:379)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: {
+      version: 1,
+      clock: 6622,
+      subsecond: 0,
+      nextId: 98,
+      nextLogId: 82,
+      units: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object]
+      ],
+      fortifications: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object]
+      ],
+      neighbors: [ [Object], [Object], [Object] ],
+      claims: [ 'home', 'highmeadow', 'reedmarch', 'pineward', 'crownhill' ],
+      discoveredRegions: [ 'home', 'highmeadow', 'reedmarch', 'pineward', 'crownhill' ],
+      projectiles: [],
+      log: [
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object]
+      ],
+      warning: null,
+      nextRaidAt: 6831.25,
+      raidActive: false,
+      raidOutcome: { spawned: 6, killed: 6, escaped: 0, cargoLost: 0, uncertain: false, completed: true },
+      builderTarget: 1,
+      stats: { recruited: 8, wounded: 1, deaths: 1, enemiesDefeated: 9, raidsDefeated: 1, cargoLost: 0, wallsBreached: 1, trades: 2, missions: 4, conquests: 1, deathsThisWave: 0 },
+      squads: [],
+      nextSquadId: 1
+    },
+    expected: {
+      version: 1,
+      clock: 6622,
+      subsecond: 0,
+      nextId: 98,
+      nextLogId: 82,
+      units: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object]
+      ],
+      fortifications: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object]
+      ],
+      neighbors: [ [Object], [Object], [Object] ],
+      claims: [ 'home', 'highmeadow', 'reedmarch', 'pineward', 'crownhill' ],
+      discoveredRegions: [ 'home', 'highmeadow', 'reedmarch', 'pineward', 'crownhill' ],
+      projectiles: [],
+      log: [
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object], [Object]
+      ],
+      warning: null,
+      nextRaidAt: 6831.25,
+      raidActive: false,
+      raidOutcome: { spawned: 6, killed: 6, escaped: 0, cargoLost: 0, uncertain: false, completed: true },
+      builderTarget: 1,
+      stats: { recruited: 8, wounded: 1, deaths: 1, enemiesDefeated: 9, raidsDefeated: 1, cargoLost: 0, wallsBreached: 1, trades: 2, missions: 4, conquests: 1, deathsThisWave: 0 }
+    },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at docs/realm/wildhaven/test/frontier.test.mjs:58:1
+✖ raids require new frontier involvement, publish a two-day warning and inflict bounded visible cargo loss (22.763ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(state.frontier.warning)
+
+      at TestContext.<anonymous> (file:///Users/coryloken/Documents/Codex/2026-10-04/task-2/wildhaven-ui-fixes/docs/realm/wildhaven/test/frontier.test.mjs:59:137)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at docs/realm/wildhaven/test/world-input.test.mjs:24:1
+✖ stationary taps and hover expose the actual pointer type for staged touch placement (2.725334ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+      {
+        x: 12,
+        z: 34
+      },
+      {
+        pointerType: 'mouse',
+  +     shiftKey: undefined
+      }
+    ]
+
+      at TestContext.<anonymous> (file:///Users/coryloken/Documents/Codex/2026-10-04/task-2/wildhaven-ui-fixes/docs/realm/wildhaven/test/world-input.test.mjs:29:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { x: 12, z: 34 }, { pointerType: 'mouse', shiftKey: undefined } ],
+    expected: [ { x: 12, z: 34 }, { pointerType: 'mouse' } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

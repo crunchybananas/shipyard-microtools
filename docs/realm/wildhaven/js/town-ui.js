@@ -3,6 +3,7 @@ import * as sim from './sim.js';
 import { BUILDINGS, RESOURCES, RESOURCE_NAMES, JOBS, getBuildingSpec } from './catalog.js';
 import * as progression from './progression.js';
 import { pressureOptions } from './pressure.js';
+import { coastalDefenseGuidance } from './defense-guidance.js';
 import { researchRequirements, rankContracts } from './clarity.js';
 import { resourceChips } from './clarity-ui.js';
 import { pathRequirement } from './path-choice.js';
@@ -41,7 +42,7 @@ function stepper(value, min, max, id, update) {
   node.append(btn('−', `${id}-less`, () => update(value - 1), { disabled: value <= min, title: 'Assign one fewer person' }), el('output', '', `${value}`), btn('+', `${id}-more`, () => update(value + 1), { disabled: value >= max, title: 'Assign one more person' })); return node;
 }
 
-export function createTownUI({ getState, mutate, canMutate = () => true, inspect, focusCitizen, getIcons, getPaused = () => false, resume = () => {}, build = () => {}, beforeOpen = () => {} }) {
+export function createTownUI({ getState, mutate, canMutate = () => true, inspect, focusCitizen, getIcons, getPaused = () => false, resume = () => {}, build = () => {}, openCompany = () => {}, beforeOpen = () => {} }) {
   let tab = null, lastSignature = '', previousFocus = null, researchMapOpen = false, mapSelection = null, mapGesture = false, mapScroll = null, mapScrollUntil = 0;
   let pendingInspector = null, selectedResource = null, storesScroll = 0, festivalPreview = null;
   const townPress = createPressGuard($('town-book-content'), { onRelease: () => update() });
@@ -373,7 +374,25 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     nodes.push(voyages); return nodes;
   }
   function watchContent(state) {
-    const coast = pressureOptions(state), incident = coast.active, nodes = [];
+    const coast = pressureOptions(state), incident = coast.active, guidance = coastalDefenseGuidance(state), nodes = [];
+    const context = el('div', 'watch-defense-context');
+    context.append(el('strong', '', 'Coastal cargo watch'), el('p', 'town-meta', guidance.distinction), btn('Command soldiers in Company', 'watch-company', openCompany, { className: 'text-button' })); nodes.push(context);
+    function takeWatchStep(step) {
+      if (step.kind === 'research') revealResearch(step.researchId);
+      else if (step.kind === 'build') build(step.type);
+      else if (step.kind === 'inspect') inspect(state.buildings.find(b => b.id === step.buildingId));
+      else if (step.kind === 'town') step.resource ? revealResource(step.resource) : open(step.tab);
+      else if (step.kind === 'pressure') action(() => sim.actOnPressure(state, step.action));
+    }
+    function watchPlan() {
+      const plan = disclosure('watch-preparation', 'How to prepare a coastal patrol');
+      for (const step of guidance.steps) {
+        const item = el('div', 'town-row'); item.append(el('strong', '', `${step.complete ? '✓' : '○'} ${step.label}`), el('p', 'town-meta', step.detail));
+        if (!step.complete && !['wait', 'pressure'].includes(step.kind)) item.append(btn(step.kind === 'research' ? 'View research' : step.kind === 'build' ? 'Plan watch house' : step.kind === 'inspect' ? 'Manage watch house' : step.tab === 'workforce' ? 'Manage people & jobs' : 'View food stores', `watch-plan-${step.id}`, () => takeWatchStep(step)));
+        plan.append(item);
+      }
+      return plan;
+    }
     function watchStaffing() {
       const box = el('section', 'watch-staffing'), houses = state.buildings.filter(b => b.type === 'barracks'), daily = sim.rates(state);
       box.append(el('h3', 'town-section', 'Staff the coastal watch'), el('p', 'town-meta', 'Guards leave other jobs to protect coastal cargo and provide escorts.'));
@@ -402,9 +421,10 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       return box;
     }
     if (!incident) {
-      nodes.push(el('p', 'town-empty', 'Quiet water. A chance to prepare.'), el('p', 'town-intro', coast.nextIncidentDay ? `Lookouts expect unfamiliar sails in ${until(state, coast.nextIncidentDay)} at 1×. Keep a reserve of food and building supplies, or establish a standing watch.` : 'After the bell and twenty residents, coastal crews begin demanding cargo. You can supply them, shelter stores or prepare guards.'), watchStaffing());
+      nodes.push(el('p', 'town-empty', 'Quiet water. A chance to prepare.'), el('p', 'town-intro', coast.announcementDeferred ? 'A new cargo warning is held while the island handles its current physical threat. Already announced deadlines still run.' : coast.nextIncidentDay ? `The next cargo warning can begin in ${duration(coast.nextWarningSeconds)} at 1×. Keep a reserve of food and building supplies, or establish a standing watch.` : 'After the bell and twenty residents, coastal crews begin demanding cargo. You can supply them, shelter stores or prepare guards.'), watchPlan(), watchStaffing());
     } else {
       const heading = el('div', 'coastal-warning'); heading.append(el('small', '', `Arrival in ${until(state, incident.deadline)} at 1×`), el('h3', '', incident.title), el('p', 'problem', `Cargo at risk: ${resourceText(incident.projectedLoss)}`)); nodes.push(heading);
+      if (!incident.canPrepareInTime) nodes.push(el('p', 'problem', 'At the current staffing and supplies, the watch cannot finish this defense before arrival. Paying ends the warning; sheltering reduces the loss if the crew takes cargo.'));
       const choices = el('div', 'watch-decisions');
       const pay = el('section'); pay.append(el('strong', '', 'Provision the crew'), el('p', '', `${resourceText(incident.demand)} → warning ends now`), btn('Pay the demand', 'pressure-pay', () => action(() => sim.actOnPressure(state, 'pay')), { disabled: !incident.canPay, className: 'primary' }));
       if (!incident.canPay) pay.append(el('small', '', incident.payReason)); choices.append(pay);
@@ -413,8 +433,8 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       shelter.append(el('small', '', 'The warning continues.')); if (!incident.canShelter && !incident.sheltered) shelter.append(el('small', '', incident.shelterReason)); choices.append(shelter);
       const defend = el('section'); defend.append(el('strong', '', 'Send the prepared watch'), el('p', '', `${incident.readiness.toFixed(1)} / ${incident.requiredReadiness} readiness · patrol ${Math.floor(incident.preparedness * 100)}%`), btn('Repel the crew', 'pressure-defend', () => action(() => sim.actOnPressure(state, 'defend')), { disabled: !incident.canDefend, className: 'primary' }));
       defend.append(el('small', '', `${resourceText(incident.reward)} + 1 ${incident.partner} trust. Automatic at the deadline if still ready.`)); choices.append(defend); nodes.push(choices);
-      const patrol = el('div', 'town-row'); patrol.append(el('strong', '', `${incident.guards} supplied guards · ${incident.readiness.toFixed(1)} / ${incident.requiredReadiness} readiness`), progressBar(incident.preparedness), el('p', '', `Patrol ${Math.floor(incident.preparedness * 100)}% prepared · 90 seconds at 1× with enough supplied guards.`), el('p', 'town-meta', incident.defendReason), watchStaffing()); nodes.push(patrol);
-      const risk = disclosure('coast-risk', 'Cargo exposure & recovery'); risk.append(el('p', 'town-meta', `Maximum loss: ${resourceText(incident.maximumLoss)}. Warehouses reduce exposure by ${Math.round(incident.warehouseProtection * 100)}%. A failed defense leaves people and buildings intact and grants a recovery interval of up to 7m 30s at 1×.`)); nodes.push(risk);
+      const patrol = el('div', 'town-row'); patrol.append(el('strong', '', `${incident.guards} supplied guards · ${incident.readiness.toFixed(1)} / ${incident.requiredReadiness} readiness`), progressBar(incident.preparedness), el('p', '', `Patrol ${Math.floor(incident.preparedness * 100)}% prepared · ${incident.patrolSecondsRemaining === null ? 'work waits for supplied guards' : `${duration(incident.patrolSecondsRemaining)} left at current staffing, at 1×`}.`), el('p', 'town-meta', incident.defendReason), watchPlan(), watchStaffing()); nodes.push(patrol);
+      const risk = disclosure('coast-risk', 'Cargo exposure & recovery'); risk.append(el('p', 'town-meta', `Maximum loss: ${resourceText(incident.maximumLoss)}. Warehouses reduce exposure by ${Math.round(incident.warehouseProtection * 100)}%. A failed coastal defense leaves people and buildings intact. Resolving this incident gives at least 12 minutes at 1× before a new cargo warning.`)); nodes.push(risk);
     }
     const history = disclosure('coastal-history', `Coastal record · ${coast.totals.defended} defenses · ${coast.totals.paid} paid · ${coast.totals.losses} raids`);
     for (const record of [...(state.pressure?.history || [])].reverse().slice(0, 8)) { const row = el('div', 'town-row'); row.append(el('strong', '', `Day ${calendarDay(state, record.day)} · ${record.outcome === 'defended' ? 'Shore secured' : record.outcome === 'paid' ? 'Crew provisioned' : 'Cargo taken'}`), el('p', 'town-meta', record.outcome === 'defended' ? `Earned ${resourceText(record.reward)}` : record.outcome === 'paid' ? 'Time to replenish stores before the next warning.' : `Lost ${resourceText(record.loss)}`)); history.append(row); }
@@ -434,7 +454,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     document.querySelectorAll('[data-town-tab]').forEach(button => button.setAttribute('aria-pressed', String(tab === button.dataset.townTab)));
     if (!tab || !force && townPress.held) return;
     if (researchMapOpen && (mapGesture || performance.now() < mapScrollUntil) && !force) return;
-    const signature = JSON.stringify([tab, selectedResource, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), effectiveMorale(state), state.seasons, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
+    const signature = JSON.stringify([tab, selectedResource, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), effectiveMorale(state), state.seasons, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, !!state.frontier?.warning, !!state.frontier?.raidActive, state.citizens.map(c => [c.id, c.job, c.workplace])]);
     if (!force && signature === lastSignature) return; lastSignature = signature;
     $('town-book-title').textContent = tab === 'council' && researchMapOpen ? 'Research map' : tab === 'stores' && selectedResource ? RESOURCES[selectedResource].name : titleFor[tab];
     $('town-book-kicker').textContent = `${seasonInfo(state).label} · ${state.population} residents · ${Math.round(effectiveMorale(state))}% morale`;

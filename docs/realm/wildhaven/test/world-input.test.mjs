@@ -14,9 +14,9 @@ function input() {
     onTap: (...args) => taps.push(args), onHover: (...args) => hovers.push(args),
     moveCamera: (...args) => pans.push(args), onCamera: () => zooms.push(world.targetZoom) });
   world.bindInput();
-  const send = (type, pointerId = 1, x = 10, y = 10, pointerType = 'touch') => {
+  const send = (type, pointerId = 1, x = 10, y = 10, pointerType = 'touch', shiftKey = false) => {
     const event = new Event(type, { cancelable: true });
-    Object.assign(event, { pointerId, clientX: x, clientY: y, pointerType, button: 0 }); canvas.dispatchEvent(event);
+    Object.assign(event, { pointerId, clientX: x, clientY: y, pointerType, shiftKey, button: 0 }); canvas.dispatchEvent(event);
   };
   return { world, taps, hovers, pans, zooms, send };
 }
@@ -26,9 +26,17 @@ test('stationary taps and hover expose the actual pointer type for staged touch 
   for (const [i, pointerType] of ['mouse', 'touch', 'pen'].entries()) {
     send('pointerdown', i, 12, 34, pointerType); send('pointermove', i, 12, 34, pointerType);
     send('pointerup', i, 12, 34, pointerType); send('lostpointercapture', i);
-    assert.deepEqual(taps[i], [{ x: 12, z: 34 }, { pointerType }]);
+    assert.deepEqual(taps[i], [{ x: 12, z: 34 }, { pointerType, shiftKey: false }]);
     assert.equal(hovers[i][1].pointerType, pointerType);
   }
+});
+
+test('Shift-click reaches troop selection while modified drags stay camera gestures', () => {
+  const { taps, send } = input();
+  send('pointerdown', 1, 10, 10, 'mouse', true); send('pointerup', 1, 10, 10, 'mouse', true);
+  assert.equal(taps[0][1].shiftKey, true);
+  send('pointerdown', 2, 10, 10, 'mouse', true); send('pointermove', 2, 55, 70, 'mouse', true); send('pointerup', 2, 55, 70, 'mouse', true);
+  assert.equal(taps.length, 1);
 });
 
 test('unexpected capture loss or pointer cancellation cannot turn a later release into a tap', () => {

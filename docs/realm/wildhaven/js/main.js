@@ -37,7 +37,7 @@ let soundEnabled = false, storageAvailable = true, victorySeen = false, world, t
 const keys = new Set();
 const readingClock = createReadingClock();
 function updateReadingPause() {
-  const reading = ['town-book','fieldbook','frontier-panel','journal','companion-panel'].some(id => { const panel = $(id); return panel && !panel.hidden; });
+  const reading = frontierUI?.selectionMode || ['town-book','fieldbook','frontier-panel','journal','companion-panel'].some(id => { const panel = $(id); return panel && !panel.hidden; });
   const before = speed; speed = readingClock.observe(!!reading);
   $('reading-pause').hidden = !playing || !readingClock.held;
   if (speed !== before) updateUI();
@@ -106,7 +106,7 @@ function mountTabletControls() {
   document.querySelector('.controls-hint>div').prepend(buildButton, townButton);
   const notifications = document.createElement('div'); notifications.className = 'hud-notifications';
   const safety = document.createElement('button'); safety.type = 'button'; safety.id = 'island-safety-status'; safety.textContent = 'Island calm';
-  safety.onclick = () => { if (!playing) return; townSafety(state).destination === 'frontier' ? frontierUI.open('neighbors') : town.open('watch'); };
+  safety.onclick = () => { if (!playing) return; townSafety(state).destination === 'frontier' ? frontierUI.open('company') : town.open('watch'); };
   notifications.append(safety, $('reading-pause'), $('toast')); document.querySelector('#hud header').append(notifications);
   const header = document.querySelector('#hud header');
   const headerClearance = () => { if (header.getClientRects().length) document.documentElement.style.setProperty('--tablet-panel-top', `${Math.ceil(header.getBoundingClientRect().bottom) + 12}px`); };
@@ -142,6 +142,7 @@ function mutate(result, cue='build') { if (!companions.canManage) return; if (re
 function newVillage() { if (!companions.canManage) return; saved = null; state = sim.createGame(); victorySeen = false; enter(); announce('Six neighbors, two builders. Give them a roof, then a living.'); }
 function enter(resuming = false) {
   playing = true; tool = null; selected = null; speed = resuming ? 0 : 1; previousSpeed = 1; readingClock.reset(speed);
+  frontierUI?.resetSelection();
   touchPlacement = false; touchSite = null; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); $('confirm-building').hidden = true;
   $('intro').hidden = true; $('hud').hidden = false;
   document.querySelectorAll('dialog').forEach(d => d.close());
@@ -186,9 +187,12 @@ function commitBuilding(tile) {
 }
 function tap(tile, pointer = {}) {
   if (!playing || !companions.canManage || document.querySelector('dialog[open]')) return;
+  // Aiming and group selection own the complete tap, including scenery and
+  // fieldworkers. They must never accidentally open another book mid-command.
+  if (frontierUI?.command && frontierUI.handleTap(tile, pointer)) return;
   if(!tool&&tile?.discovery&&!frontierUI?.activeTab){fieldbook.open(tile.discovery.id);return;}
   if(!tool&&tile?.unit&&isFieldworker(tile.unit)){fieldbook.open(tile.unit.missionSiteId);return;}
-  if (frontierUI?.handleTap(tile)) return;
+  if (frontierUI?.handleTap(tile, pointer)) return;
   if (!tile) { if (!tool) closeInspector(); return; }
   if (tool) {
     if (['touch','pen'].includes(pointer.pointerType)) {
@@ -503,8 +507,8 @@ async function boot() {
     }
     requestAnimationFrame(frame);
     icons = await world.load();
-    town = createTownUI({ getState: () => state, canMutate: () => companions.canManage, getPaused: () => speed === 0, resume: () => setSpeed(previousSpeed), build: useTool, beforeOpen: () => preparePanel('town'), mutate, inspect: b => { inspect(b); world.focus(b); }, focusCitizen, getIcons: () => icons });
-    frontierUI = createFrontierUI({ getState: () => state, canMutate: () => companions.canManage, mutate, getContext: () => sim.frontierContext(state), beforeOpen: () => preparePanel('frontier'), focus: item => item.kind === 'region' ? world.focusRegion?.(item.id) : world.focusWorld?.(item.x, item.z, item.kind === 'neighbor' ? 23 : 14), preview: value => world.showFrontierCommand?.(value), onSelection: value => world.selectFrontier?.(value) });
+    town = createTownUI({ getState: () => state, canMutate: () => companions.canManage, getPaused: () => speed === 0, resume: () => setSpeed(previousSpeed), build: useTool, openCompany: () => frontierUI.open('company'), beforeOpen: () => preparePanel('town'), mutate, inspect: b => { inspect(b); world.focus(b); }, focusCitizen, getIcons: () => icons });
+    frontierUI = createFrontierUI({ getState: () => state, canMutate: () => companions.canManage, mutate, getContext: () => sim.frontierContext(state), beforeOpen: () => preparePanel('frontier'), openWatch: () => town.open('watch'), focus: item => item.kind === 'region' ? world.focusRegion?.(item.id) : world.focusWorld?.(item.x, item.z, item.kind === 'neighbor' ? 23 : 14), preview: value => world.showFrontierCommand?.(value), onSelection: value => world.selectFrontier?.(value) });
     document.querySelector('.controls-hint>div').append($('frontier-toggle'));
     fieldbook=createFieldbook({getState:()=>state,canMutate:()=>companions.canManage,getPaused:()=>speed===0,resume:()=>setSpeed(previousSpeed),getContext:()=>sim.frontierContext(state),getIcons:()=>icons,mutate,beforeOpen:()=>preparePanel('fieldbook'),focus:item=>item.mark?world.focusDiscovery(item.id):world.focusWorld(item.x,item.z,12)});
     companionUI=createCompanionUI({store:companions,getState:()=>state,beforeOpen:()=>preparePanel('companion'),onStateChange:next=>{state=next;victorySeen=state.won;keys.clear();enter(true);},announce});

@@ -1,11 +1,14 @@
-import { until } from './calendar.js';
+import { until, duration, WORK_CYCLE_SECONDS, secondsUntil } from './calendar.js';
 /** Coastal pressure: announced cargo risks, real patrol labor and bounded recovery. */
 import { getBuildingSpec, RESOURCE_NAMES } from './catalog.js';
 import { supplyModifiers } from './progression.js';
 
-const DAY_SECONDS = 90;
-const WARNING_DAYS = 3;
-const QUIET_DAYS = 5;
+export const COASTAL_PACING = Object.freeze({ firstWarningSeconds: 360, warningSeconds: 360, recoverySeconds: 720 });
+const PRESSURE_VERSION = 2;
+const DAY_SECONDS = WORK_CYCLE_SECONDS;
+const WARNING_DAYS = COASTAL_PACING.warningSeconds / DAY_SECONDS;
+const QUIET_DAYS = COASTAL_PACING.recoverySeconds / DAY_SECONDS;
+const LEGACY_WARNING_DAYS = 3, LEGACY_QUIET_DAYS = 5;
 const SHELTER_COST = Object.freeze({ wood: 8, planks: 6 });
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const round = value => Math.round(value * 1e6) / 1e6;
@@ -13,6 +16,10 @@ const integer = (value, min, max) => Number.isInteger(value) && value >= min && 
 const finite = value => typeof value === 'number' && Number.isFinite(value);
 const enough = (state, bag) => Object.entries(bag).every(([key, amount]) => (state.resources[key] || 0) + 1e-6 >= amount);
 const text = bag => Object.entries(bag).filter(([, amount]) => amount > 0).map(([key, amount]) => `${Math.ceil(amount)} ${key === 'gold' ? 'coin' : key}`).join(', ') || 'no goods';
+// Incidents resolve on economy boundaries. Round upward so an action taken late
+// in a cycle still receives the full promised preparation/recovery interval.
+const scheduleAfter = (state, cycles) => state.day + cycles + (((state.time || 0) + (state.subsecond || 0)) > 0 ? 1 : 0);
+const frontierThreat = state => !!(state.frontier?.warning || state.frontier?.raidActive);
 
 const INCIDENTS = [
   { id: 'hungry_sails', title: 'Hungry sails', description: 'A scavenger crew is watching the pantry boats. They will take provisions unless you provision them or secure the shore.', demand: { food: 14 }, risk: { food: 26, wood: 10 }, strength: 3, reward: 12, partner: 'reedbank', partnerName: 'Reedbank' },
@@ -30,7 +37,7 @@ function terms(active) {
 }
 
 export function createPressureState() {
-  return { version: 1, sequence: 0, nextIncidentDay: null, active: null, history: [], defended: 0, paid: 0, losses: 0, graceUntilDay: 0 };
+  return { version: PRESSURE_VERSION, sequence: 0, nextIncidentDay: null, active: null, history: [], defended: 0, paid: 0, losses: 0, graceUntilDay: 0 };
 }
 
 /** Strict persisted terms. Costs/rewards are regenerated from the canonical incident. */
@@ -38,15 +45,20 @@ export function normalizePressure(state) {
   if (state.pressure === undefined) { state.pressure = createPressureState(); return state.pressure; }
   const value = state.pressure, day = state.day;
   const fail = () => { throw new Error('Invalid coastal pressure save'); };
-  if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || !integer(value.sequence, 0, 1000000)) fail();
+  if (!value || typeof value !== 'object' || Array.isArray(value) || ![1, PRESSURE_VERSION].includes(value.version) || !integer(value.sequence, 0, 1000000)) fail();
+  const maxScheduledDay = day + (value.version === 1 ? LEGACY_QUIET_DAYS : QUIET_DAYS + 1);
   if (![value.defended, value.paid, value.losses].every(n => integer(n, 0, value.sequence))) fail();
-  if (!integer(value.graceUntilDay, 0, day + QUIET_DAYS)) fail();
-  if (value.nextIncidentDay !== null && !integer(value.nextIncidentDay, day, day + QUIET_DAYS)) fail();
+  if (!integer(value.graceUntilDay, 0, maxScheduledDay)) fail();
+  // A scheduled warning can remain dormant below the population threshold or
+  // during a physical raid. Preserve that date; neither situation corrupts a save.
+  if (value.nextIncidentDay !== null && !integer(value.nextIncidentDay, 1, maxScheduledDay)) fail();
   if (!Array.isArray(value.history) || value.history.length > 20) fail();
   let active = null;
   if (value.active !== null) {
     const a = value.active;
-    if (!a || typeof a !== 'object' || value.sequence < 1 || a.id !== `coast-${value.sequence}` || a.templateId !== INCIDENTS[(value.sequence - 1) % INCIDENTS.length].id || !integer(a.tier, 0, 2) || !integer(a.announcedDay, 1, day) || a.deadline !== a.announcedDay + WARNING_DAYS || a.deadline < day || typeof a.sheltered !== 'boolean') fail();
+    const warningDays = a?.deadline - a?.announcedDay;
+    const validWarning = value.version === 1 ? warningDays === LEGACY_WARNING_DAYS : [LEGACY_WARNING_DAYS, WARNING_DAYS].includes(warningDays);
+    if (!a || typeof a !== 'object' || Array.isArray(a) || value.sequence < 1 || a.id !== `coast-${value.sequence}` || a.templateId !== INCIDENTS[(value.sequence - 1) % INCIDENTS.length].id || !integer(a.tier, 0, 2) || !integer(a.announcedDay, 1, day) || !validWarning || !integer(a.deadline, day, day + WARNING_DAYS) || typeof a.sheltered !== 'boolean') fail();
     if (!finite(a.watchProgress) || a.watchProgress < 0 || a.watchProgress > terms(a).watchRequired) fail();
     if (value.nextIncidentDay !== null) fail();
     active = { id: a.id, templateId: a.templateId, tier: a.tier, announcedDay: a.announcedDay, deadline: a.deadline, watchProgress: a.watchProgress, sheltered: a.sheltered };
@@ -60,7 +72,7 @@ export function normalizePressure(state) {
     previous = sequence;
     return { id: h.id, day: h.day, outcome: h.outcome, loss: { ...h.loss }, reward: { ...h.reward } };
   });
-  state.pressure = { version: 1, sequence: value.sequence, nextIncidentDay: value.nextIncidentDay, active, history, defended: value.defended, paid: value.paid, losses: value.losses, graceUntilDay: value.graceUntilDay };
+  state.pressure = { version: PRESSURE_VERSION, sequence: value.sequence, nextIncidentDay: value.nextIncidentDay, active, history, defended: value.defended, paid: value.paid, losses: value.losses, graceUntilDay: value.graceUntilDay };
   return state.pressure;
 }
 
@@ -87,7 +99,8 @@ function warehouseProtection(state) {
 
 export function pressureOptions(state) {
   const pressure = state.pressure || createPressureState();
-  const result = { active: null, nextIncidentDay: pressure.nextIncidentDay, graceUntilDay: pressure.graceUntilDay, totals: { defended: pressure.defended, paid: pressure.paid, losses: pressure.losses } };
+  const nextWarningSeconds = pressure.nextIncidentDay === null ? null : round(secondsUntil(state, pressure.nextIncidentDay));
+  const result = { active: null, nextIncidentDay: pressure.nextIncidentDay, nextWarningSeconds, announcementDeferred: !pressure.active && nextWarningSeconds === 0 && frontierThreat(state), graceUntilDay: pressure.graceUntilDay, totals: { defended: pressure.defended, paid: pressure.paid, losses: pressure.losses } };
   if (!pressure.active) return result;
   const active = pressure.active, spec = terms(active), watch = coastalReadiness(state);
   const preparedness = clamp(active.watchProgress / spec.watchRequired, 0, 1), warehouses = warehouseProtection(state);
@@ -97,12 +110,16 @@ export function pressureOptions(state) {
   const projectedLoss = Object.fromEntries(Object.entries(maximumLoss).map(([key, amount]) => [key, Math.min(state.resources[key] || 0, Math.ceil(amount * (1 - defense) - 1e-8))]));
   const canPay = enough(state, spec.demand), canShelter = !active.sheltered && enough(state, SHELTER_COST);
   const canDefend = watch.readiness + 1e-6 >= spec.strength && preparedness + 1e-8 >= 1;
-  const defendReason = canDefend ? 'The watch is supplied and prepared. Repel the raiders now.' : watch.readiness + 1e-6 < spec.strength ? `Need ${spec.strength} supplied watch readiness; ${watch.readiness.toFixed(1)} ready. Staff watch houses and keep food supplied.` : `Complete the patrol rotation: ${Math.floor(preparedness * 100)}% prepared. Guards must actually patrol for 90 seconds at 1×.`;
+  const remainingPatrol = Math.max(0, spec.watchRequired - active.watchProgress), patrolRate = Math.min(spec.strength, watch.readiness);
+  const patrolSecondsRemaining = remainingPatrol === 0 ? 0 : patrolRate > 0 ? round(remainingPatrol / patrolRate) : null;
+  const secondsLeft = round(secondsUntil(state, active.deadline));
+  const defendReason = canDefend ? 'The supplied watch is ready to end this cargo incident.' : watch.readiness + 1e-6 < spec.strength ? `Need ${spec.strength} supplied watch readiness; ${watch.readiness.toFixed(1)} ready. Assign civilian guards to watch houses and keep food supplied. Recruited company troops have a separate job.` : `Patrol ${Math.floor(preparedness * 100)}% complete; ${duration(patrolSecondsRemaining)} of supplied watch work remains at 1×. Keep the guards at their posts.`;
   result.active = {
     id: active.id, title: spec.title, description: spec.description, announcedDay: active.announcedDay, deadline: active.deadline,
-    daysLeft: round(Math.max(0, active.deadline - state.day - (state.time || 0) / DAY_SECONDS)),
+    daysLeft: round(secondsLeft / DAY_SECONDS), secondsLeft, patrolSecondsRemaining,
     demand: spec.demand, maximumLoss, projectedLoss, reward: spec.reward, partner: spec.partnerName, partnerId: spec.partner,
     guardsNeeded: Math.ceil(spec.strength / watch.modifier), requiredReadiness: spec.strength, readiness: watch.readiness, guards: watch.guards,
+    readinessShortfall: round(Math.max(0, spec.strength - watch.readiness)), canPrepareInTime: watch.readiness + 1e-6 >= spec.strength && patrolSecondsRemaining !== null && patrolSecondsRemaining <= secondsLeft,
     watchProgress: active.watchProgress, watchRequired: spec.watchRequired, preparedness, sheltered: active.sheltered, warehouseProtection: warehouses,
     shelterCost: { ...SHELTER_COST }, canPay, canShelter, canDefend,
     payReason: canPay ? `Give ${text(spec.demand)} to end this incident.` : `The demand is ${text(spec.demand)}; the stores cannot cover it yet.`,
@@ -132,8 +149,9 @@ function finish(state, outcome, option) {
     pressure.losses++;
   }
   pressure.history.push({ id, day: state.day, outcome, loss, reward }); pressure.history = pressure.history.slice(-20);
-  pressure.active = null; pressure.graceUntilDay = state.day + QUIET_DAYS; pressure.nextIncidentDay = pressure.graceUntilDay;
-  const reason = outcome === 'paid' ? `${option.title}: the crew accepted ${text(option.demand)} and sailed away.` : outcome === 'defended' ? `${option.title}: the prepared watch secured the shore. Earned ${text(reward)} and 1 trust with ${option.partner}.` : `${option.title}: the raiders took ${text(loss)}. Everyone is safe; the town has a recovery interval of up to 7m 30s at 1× to replenish its stores.`;
+  pressure.active = null; pressure.graceUntilDay = scheduleAfter(state, QUIET_DAYS); pressure.nextIncidentDay = pressure.graceUntilDay;
+  const recovery = `There are at least ${duration(COASTAL_PACING.recoverySeconds)} at 1× to recover before another coastal cargo warning.`;
+  const reason = outcome === 'paid' ? `${option.title}: the crew accepted ${text(option.demand)} and sailed away. ${recovery}` : outcome === 'defended' ? `${option.title}: the prepared watch protected the cargo. Earned ${text(reward)} and 1 trust with ${option.partner}. ${recovery}` : `${option.title}: the crew took ${text(loss)}. This cargo incident harmed no residents or buildings. ${recovery}`;
   return { ok: true, outcome, reason, loss, reward, changed: true, events: [{ type: outcome === 'raided' ? 'pressure' : 'defense', text: reason }] };
 }
 
@@ -168,14 +186,17 @@ export function dailyPressure(state) {
   }
   if (!state.won || (state.citizens?.length ?? state.population) < 20) return { changed: false, events: [] };
   if (pressure.nextIncidentDay === null) {
-    pressure.nextIncidentDay = state.day + 2;
-    return { changed: true, events: [{ type: 'coast', text: 'A growing town draws eyes from the coast. Lookouts expect unfamiliar sails in three minutes at 1×; build reserves and plan a watch.' }] };
+    pressure.nextIncidentDay = scheduleAfter(state, COASTAL_PACING.firstWarningSeconds / DAY_SECONDS);
+    return { changed: true, events: [{ type: 'coast', text: `A growing town draws eyes from the coast. The first cargo warning is expected in ${until(state, pressure.nextIncidentDay)} at 1×. Build reserves and plan civilian watch-house guards; recruited company troops answer physical raids separately.` }] };
   }
   if (state.day < pressure.nextIncidentDay) return { changed: false, events: [] };
+  // Only new announcements wait. An already announced cargo deadline retains
+  // its exact terms, including when loaded alongside a legacy physical warning.
+  if (frontierThreat(state)) return { changed: false, events: [] };
   const tier = (state.citizens?.length ?? state.population) >= 60 ? 2 : (state.citizens?.length ?? state.population) >= 35 ? 1 : 0;
   const spec = INCIDENTS[pressure.sequence % INCIDENTS.length]; pressure.sequence++;
   pressure.active = { id: `coast-${pressure.sequence}`, templateId: spec.id, tier, announcedDay: state.day, deadline: state.day + WARNING_DAYS, watchProgress: 0, sheltered: false };
   pressure.nextIncidentDay = null;
   const option = pressureOptions(state).active;
-  return { changed: true, events: [{ type: 'pressure', text: `${option.title}. The crew arrives in ${until(state, option.deadline)} at 1×. Give ${text(option.demand)}, or prepare ${option.requiredReadiness} watch readiness. At most ${text(option.maximumLoss)} is at risk; people and buildings are safe.` }] };
+  return { changed: true, events: [{ type: 'pressure', text: `${option.title}: a coastal cargo demand, due in ${until(state, option.deadline)} at 1×. Give ${text(option.demand)}, or prepare ${option.requiredReadiness} supplied watch readiness. At most ${text(option.maximumLoss)} is at risk. This incident cannot harm residents or buildings; company troops and walls answer physical raids separately.` }] };
 }
