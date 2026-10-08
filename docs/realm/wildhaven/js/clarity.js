@@ -31,6 +31,11 @@ const PURPOSE = Object.freeze({
   manor: ['Beds · knowledge', 'A civic home adds beds and earns knowledge from coin.'],
 });
 const SERVICE_NAMES = { water: 'Water', health: 'Health', faith: 'Community', leisure: 'Community', security: 'Watch', civic: 'Civic service' };
+const PRODUCTION_CHAINS = [
+  { types: ['farm','windmill','bakery'], text: 'Grain farm → Windmill → Bakery → Food' },
+  { types: ['flaxfield','weaver'], text: 'Flax field → Weaver → Cloth' },
+  { types: ['mine','smith','toolmaker'], text: 'Iron mine → Smithy → Toolmaker → Tools' },
+];
 const quantities = bag => Object.entries(bag || {}).filter(([, n]) => n > 0).map(([id, amount]) => ({ id, amount, name: RESOURCES[id].name, icon: RESOURCES[id].icon }));
 export function buildingFacts(type, level = 1) {
   const spec = getBuildingSpec(type, level);
@@ -43,7 +48,7 @@ export function buildingFacts(type, level = 1) {
     jobs: spec.workers, job: spec.workers ? (spec.workers === 1 ? JOBS[spec.job].name : JOBS[spec.job].plural).toLowerCase() : '',
     staffing: spec.workers ? `${spec.workers} ${(spec.workers === 1 ? JOBS[spec.job].name : JOBS[spec.job].plural).toLowerCase()}` : 'No permanent staff',
     shortFlow: `${input.length ? `${input.map(r => r.name).join(' + ')} → ` : ''}${result}`,
-    next: PURPOSE[type][0], payoff: PURPOSE[type][1],
+    next: PURPOSE[type][0], payoff: PURPOSE[type][1], chain: PRODUCTION_CHAINS.find(chain => chain.types.includes(type))?.text || '',
   };
 }
 

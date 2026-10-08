@@ -30,7 +30,11 @@ export function createCompanionUI({ store, getState, onStateChange, beforeOpen, 
 
   function layout() {
     layoutFrame = null;
-    if (!banner.hidden) panel.style.setProperty('--companion-away-top', `${Math.ceil(banner.getBoundingClientRect().bottom) + 8}px`);
+    if (!banner.hidden) {
+      const top = `${Math.ceil(banner.getBoundingClientRect().bottom) + 8}px`;
+      panel.style.setProperty('--companion-away-top', top);
+      document.getElementById('hud').style.setProperty('--companion-reading-top', top);
+    } else document.getElementById('hud').style.removeProperty('--companion-reading-top');
     const viewport = window.visualViewport, focused = document.activeElement;
     const editing = !panel.hidden && panel.contains(focused) && focused.matches('input:not([type="checkbox"]),select');
     const keyboard = editing && viewport && viewport.scale === 1 && window.innerHeight - viewport.height > 120;
@@ -182,7 +186,10 @@ export function createCompanionUI({ store, getState, onStateChange, beforeOpen, 
     document.body.classList.toggle('companion-visit', info.readOnly);
     document.body.classList.toggle('companion-away', !banner.hidden);
     if (info.readOnly && !inertNodes.length) {
-      inertNodes = [...document.getElementById('hud').children].filter(node => node !== panel && node !== banner && !['toast','save-warning'].includes(node.id) && !node.inert);
+      // Visits permit reading and changing books. Each action still checks
+      // canMutate before touching the simulation, and Build stays disabled.
+      const readable = new Set(['town-book','frontier-panel','fieldbook','journal','inspector','toast','save-warning']);
+      inertNodes = [...document.getElementById('hud').children].filter(node => node !== panel && node !== banner && !['HEADER','FOOTER'].includes(node.tagName) && !readable.has(node.id) && !node.inert);
       for (const node of inertNodes) node.inert = true;
     } else if (!info.readOnly && inertNodes.length) { for (const node of inertNodes) node.inert = false; inertNodes = []; }
   }

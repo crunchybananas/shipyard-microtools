@@ -7,11 +7,12 @@ import { researchRequirements, rankContracts } from './clarity.js';
 import { resourceChips, buildingPurpose } from './clarity-ui.js';
 import { pathRequirement } from './path-choice.js';
 import { createResearchMap } from './research-map.js';
+import { createPressGuard } from './press-guard.js';
 
 const $ = id => document.getElementById(id);
 const format = n => Math.floor(n || 0).toLocaleString();
 export const resourceText = resources => Object.entries(resources || {}).filter(([, n]) => n > 0).map(([key, value]) => `${Math.round(value * 10) / 10} ${RESOURCES[key]?.name.toLowerCase() || key}`).join(' · ') || 'No materials';
-const titleFor = { workforce: 'People & their work', construction: 'The works in progress', stores: 'The town stores', council: 'A direction for the town', trade: 'Beyond the landing', watch: 'Keep a watch on the coast' };
+const titleFor = { workforce: 'People & their work', construction: 'The works in progress', stores: 'The town stores', council: 'Research & town paths', trade: 'Beyond the landing', watch: 'Keep a watch on the coast' };
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -40,12 +41,18 @@ function stepper(value, min, max, id, update) {
 
 export function createTownUI({ getState, mutate, canMutate = () => true, inspect, focusCitizen, getIcons, getPaused = () => false, resume = () => {}, build = () => {}, beforeOpen = () => {} }) {
   let tab = null, lastSignature = '', previousFocus = null, researchMapOpen = false, mapSelection = null, mapGesture = false, mapScroll = null, mapScrollUntil = 0;
+  let pendingInspector = null;
+  const townPress = createPressGuard($('town-book-content'), { onRelease: () => update() });
+  const inspectorPress = createPressGuard($('inspect-management'), { onRelease: () => {
+    const building = pendingInspector; pendingInspector = null;
+    if (building && !$('inspector').hidden) inspectorControls(building);
+  } });
   function action(fn) { if (!canMutate()) return; mutate(fn()); lastSignature = ''; update(true); }
   function open(next) {
     beforeOpen(); previousFocus = document.activeElement; tab = next; $('town-book').hidden = false; document.body.classList.add('town-view-active');
     $('town-book-title').textContent = titleFor[tab]; $('town-book-content').scrollTop = 0; update(true);
   }
-  function close() { const focused = $('town-book').contains(document.activeElement); tab = null; researchMapOpen = false; mapGesture = false; $('town-book').hidden = true; document.body.classList.remove('town-view-active'); if (focused) previousFocus?.focus({ preventScroll: true }); update(); }
+  function close() { townPress.reset(); const focused = $('town-book').contains(document.activeElement); tab = null; researchMapOpen = false; mapGesture = false; $('town-book').hidden = true; document.body.classList.remove('town-view-active'); if (focused) previousFocus?.focus({ preventScroll: true }); update(); }
   $('close-town-book').onclick = close;
   $('town-book-content').addEventListener('pointerdown', event => { if (event.target.closest('[data-scroll-region="research-map"]')) mapGesture = true; });
   document.addEventListener('pointerup', () => { mapGesture = false; }); document.addEventListener('pointercancel', () => { mapGesture = false; });
@@ -100,6 +107,15 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
   }
   function storesContent(state) {
     const daily = sim.rates(state), needs = sim.villageNeeds(state), nodes = [el('p', 'town-intro', 'Made or imported goods enter these stores automatically. Rates are per minute at 1× and reflect workers and supplies. A warehouse increases capacity.')];
+    function quote(resource) {
+      open('trade'); const button = $('town-book-content').querySelector(`[data-action-id="import-import_${resource}"]`);
+      const section = button?.closest('details'); if (section) section.open = true;
+      button?.closest('.market-quote')?.scrollIntoView({ block: 'start' });
+    }
+    function workplace(type, actionId) {
+      const existing = state.buildings.find(building => building.type === type);
+      return btn(`${existing ? 'View' : 'Plan'} ${BUILDINGS[type].name.toLowerCase()}`, actionId, () => existing ? inspect(existing) : build(type));
+    }
     for (const key of RESOURCE_NAMES) {
       const row = el('div', 'stock-row'), label = el('div'), amount = el('span', 'stock-amount'), rate = perMinute(daily[key] || 0);
       row.dataset.resource = key;
@@ -107,15 +123,23 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       if (key === 'food') label.append(el('small', 'stock-note', `${Math.round(perMinute(daily.foodConsumed) * 10) / 10} eaten per minute`));
       amount.append(document.createTextNode(format(state.resources[key]))); if (RESOURCES[key].physical) amount.append(el('em', '', ` / ${format(daily.storage[key])}`));
       row.append(label, amount, el('span', `stock-rate${rate < 0 ? ' negative' : ''}`, `${rate >= 0 ? '+' : ''}${Math.round(rate * 10) / 10} / min`)); nodes.push(row);
+      if (key === 'food' || key === 'cloth') {
+        const help = el('div', 'stock-tools-help'), controls = el('div', 'town-row-actions');
+        if (key === 'food') {
+          help.append(el('p', 'town-meta', 'Orchards and kitchen gardens make food directly. For bread: Grain farm → Windmill → Bakery → Food. The bakery also burns timber; staff every workplace.'));
+          controls.append(workplace('garden', 'food-garden'), workplace('bakery', 'food-bakery'));
+        } else {
+          help.append(el('p', 'town-meta', 'Flax field → Weaver → Cloth. Staff both workplaces; the weaver needs flax. Finished cloth enters stores automatically for homes, clinics and trade.'));
+          controls.append(workplace('flaxfield', 'cloth-flax'), workplace('weaver', 'cloth-weaver'));
+        }
+        controls.append(btn(`Buy ${key} · view quote`, `${key}-buy`, () => quote(key)));
+        help.append(controls); row.append(help);
+      }
       if (key === 'tools') {
         label.append(el('small', 'stock-note', 'Made by a toolmaker · or bought at market'));
         const help = el('div', 'stock-tools-help'), controls = el('div', 'town-row-actions'), chain = disclosure('tools-chain', 'Make tools locally');
         chain.append(el('p', 'town-meta', 'Iron mine → Smithy → Toolmaker · planks from a Sawmill'), buildingPurpose('toolmaker'), btn('Plan a toolmaker', 'tools-build', () => build('toolmaker')));
-        controls.append(btn('Buy tools · view quote', 'tools-buy', () => {
-          open('trade'); const quote = $('town-book-content').querySelector('[data-action-id="import-import_tools"]');
-          const section = quote?.closest('details'); if (section) section.open = true;
-          quote?.closest('.market-quote')?.scrollIntoView({ block: 'start' });
-        }));
+        controls.append(btn('Buy tools · view quote', 'tools-buy', () => quote('tools')));
         help.append(controls, chain); row.append(help);
       }
     }
@@ -132,7 +156,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
   }
   function councilContent(state) {
     const nodes = [], research = progression.researchOptions(state), active = research.find(item => item.active);
-    const jumps = el('nav', 'council-jumps'); jumps.setAttribute('aria-label', 'Council sections');
+    const jumps = el('nav', 'council-jumps'); jumps.setAttribute('aria-label', 'Research and town paths');
     for (const [id, name] of [['paths', 'Paths'], ['research', 'Research'], ['map', 'Research map']]) jumps.append(btn(name, `council-jump-${id}`, () => {
       if (id === 'map') { showResearchMap(); return; }
       researchMapOpen = false; update(true); $('town-book-content').querySelector(`[data-council-section="${id}"]`)?.scrollIntoView({ block: 'start' });
@@ -308,7 +332,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     $('watch-summary').textContent = coast.active ? `${until(state, coast.active.deadline)} · ${narrow ? 'Sails' : 'Sails offshore'}` : 'Quiet coast';
     $('watch-button').classList.toggle('threatened', !!coast.active);
     document.querySelectorAll('[data-town-tab]').forEach(button => button.setAttribute('aria-pressed', String(tab === button.dataset.townTab)));
-    if (!tab) return;
+    if (!tab || !force && townPress.held) return;
     if (researchMapOpen && (mapGesture || performance.now() < mapScrollUntil) && !force) return;
     const signature = JSON.stringify([tab, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), state.morale, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
     if (!force && signature === lastSignature) return; lastSignature = signature;
@@ -318,6 +342,8 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     preserveReplace($('town-book-content'), render(state));
   }
   function inspectorControls(building) {
+    if (inspectorPress.held) { pendingInspector = building; return; }
+    pendingInspector = null;
     const state = getState(), status = sim.buildingStatus(state, building), nodes = [];
     if (building.status !== 'ready') {
       if (getPaused()) nodes.push(pauseCue());

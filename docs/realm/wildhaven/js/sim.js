@@ -1,6 +1,7 @@
 import { createWoodland, restoreWoodland, woodlandStatus, harvestWood, tickWoodland } from './woodland.js';
 export { woodlandStatus } from './woodland.js';
 import { WORK_CYCLE_SECONDS, workPosition } from './calendar.js';
+import { newCitizenName } from './citizen-names.js';
 import { createDiscoveryState, normalizeDiscovery, discoveryModifier } from './discovery.js';
 /** Wildhaven v2: named labor, escrowed construction, continuous production and town needs. */
 import { BUILDINGS, RESOURCE_NAMES, getBuildingSpec, getUpgrade } from './catalog.js';
@@ -32,10 +33,14 @@ const modifier = (state, type, key) => {
   const value = supplyModifiers(state, type)?.[key];
   return isFiniteNumber(value) ? value : ['arrival', 'happiness'].includes(key) ? 0 : 1;
 };
-const citizenNames = ['Ada', 'Bram', 'Cora', 'Dev', 'Elin', 'Finn', 'Greta', 'Hollis', 'Ida', 'Jory', 'Kit', 'Lina', 'Milo', 'Nell', 'Orin', 'Pia', 'Quinn', 'Remy', 'Sage', 'Tess', 'Una', 'Vale', 'Wren', 'Yara'];
-function citizen(id, day = 1) {
-  const index = id - 1, suffix = Math.floor(index / citizenNames.length);
-  return { id: `c${id}`, name: citizenNames[index % citizenNames.length] + (suffix ? ` ${suffix + 1}` : ''), arrivalDay: day, job: 'idle', workplace: null };
+function citizen(id, day = 1, residents = []) {
+  return { id: `c${id}`, name: newCitizenName(id, residents.map(person => person.name)), arrivalDay: day, job: 'idle', workplace: null };
+}
+// Keep the original identity assignment when importing the unnamed v1 population.
+const legacyCitizenNames = ['Ada', 'Bram', 'Cora', 'Dev', 'Elin', 'Finn', 'Greta', 'Hollis', 'Ida', 'Jory', 'Kit', 'Lina', 'Milo', 'Nell', 'Orin', 'Pia', 'Quinn', 'Remy', 'Sage', 'Tess', 'Una', 'Vale', 'Wren', 'Yara'];
+function legacyCitizen(id) {
+  const index = id - 1, suffix = Math.floor(index / legacyCitizenNames.length);
+  return { ...citizen(id), name: legacyCitizenNames[index % legacyCitizenNames.length] + (suffix ? ` ${suffix + 1}` : '') };
 }
 function addEvent(state, text, type = 'info') {
   state.events.unshift({ id: state.nextEventId++, day: state.day, text, type });
@@ -584,7 +589,7 @@ function dawn(state) {
   state.morale = round(clamp(state.morale + (target - state.morale) * 0.35, 10, 100));
   const needs = villageNeeds(state), arrivals = needs.migration.expected;
   if (arrivals > 0) {
-    for (let i = 0; i < arrivals; i++) state.citizens.push({ ...citizen(state.nextCitizenId++, state.day), experience: {} });
+    for (let i = 0; i < arrivals; i++) state.citizens.push({ ...citizen(state.nextCitizenId++, state.day, state.citizens), experience: {} });
     state.resources.food = round(state.resources.food - arrivals * 4); state.stats.arrivals += arrivals;
     addEvent(state, `${arrivals} ${arrivals === 1 ? 'new citizen has' : 'new citizens have'} arrived. Assign their skills to the town’s next task.`, 'arrival');
   } else addEvent(state, `${!fed ? 'The pantry could not feed everyone. Gardens need workers.' : needs.migration.reason}`, fed ? 'dawn' : 'food');
@@ -696,7 +701,7 @@ function restoreV1(input) {
   if (!ids.has('hearth') || !ids.has('bell') || input.population > housing(state)) return null;
   const bell = state.buildings.find(b => b.id === 'bell'); if (typeof input.won !== 'boolean' || input.won !== bell.restored) return null;
   state.resources = emptyResources(); Object.assign(state.resources, { wood: input.resources.wood, stone: input.resources.stone, food: input.resources.food });
-  state.citizens = Array.from({ length: input.population }, (_, i) => ({ ...citizen(i + 1, 1), experience: {} })); state.nextCitizenId = input.population + 1;
+  state.citizens = Array.from({ length: input.population }, (_, i) => ({ ...legacyCitizen(i + 1), experience: {} })); state.nextCitizenId = input.population + 1;
   state.day = input.day; state.time = Math.floor(input.time); state.subsecond = input.time % 1; state.elapsed = input.elapsed; state.won = bell.restored;
   if (state.won) state.wonDay = bell.restoredDay;
   state.lastTradeDay = input.lastTradeDay ?? 0; state.migratedFromVersion = 1; state.calendarEpoch = workPosition(state);

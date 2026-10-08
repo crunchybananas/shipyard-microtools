@@ -1,4 +1,5 @@
 import { visibleSurfaceHit } from './world-picking.js';
+import { wheelZoom, pinchZoom } from './camera-input.js';
 import { TREE_SITES, treeState, SAPLING_SECONDS, woodlandOccupancy } from './woodland.js';
 import { DISCOVERIES, isFieldworker } from './discovery.js';
 import * as THREE from 'three';
@@ -228,6 +229,7 @@ export class VillageWorld {
     if(!type||!tile){this.highlight.visible=false;this.showEntrance(this.selectedBuilding);return;}
     if(this.previewType!==type){if(this.previewMesh)this.disposePresentation(this.previewMesh);this.previewType=type;this.previewMesh=this.clone(type);this.previewMesh.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.userData.ownsMaterial=true;o.material.transparent=true;o.material.opacity=.58;o.material.depthWrite=false;o.castShadow=false;}});this.highlight.add(this.previewMesh);}
     this.highlight.visible=true;this.highlight.position.set(tile.x*CELL,groundHeight(tile.x,tile.z)+.04,tile.z*CELL);this.previewMesh.rotation.y=rotation*Math.PI/2;
+    this.previewBounds ||= new THREE.Box3(); this.previewBounds.setFromObject(this.previewMesh);
     const color=valid?'#e9f5b2':'#ed8c76';this.previewBorder.material.color.set(color);this.previewMesh.traverse(o=>{if(o.isMesh)o.material.emissive?.set(valid?'#173b13':'#642018');});
     this.showEntrance({...tile,type,rotation},valid,entranceLabel);
   }
@@ -605,17 +607,17 @@ export class VillageWorld {
   }
   walkable(x,z) { if(!isLand(x,z)||!isLand(x+.2,z+.2)||!isLand(x-.2,z-.2))return false;return !hasNaturalObstacle(x,z)&&!isNeighborCompoundCell(x,z)&&!this.state?.buildings.some(b=>b.x===x&&b.z===z)&&!(this.state?.frontier?.fortifications||[]).some(f=>f.x===x&&f.z===z&&blocksFortification(f)); }
   walkableEdge(ax,az,bx,bz){if(!this.state?.frontier)return true;return gateTransition(this.state,{x:ax,z:az},{x:bx,z:bz});}
-  nearestWalkable(x,z){
-    x=Math.round(x);z=Math.round(z);const valid=(a,b)=>this.walkable(a,b)&&(!this.reachable||this.reachable.has(`${a},${b}`));
+  nearestWalkable(x,z,connected=true){
+    x=Math.round(x);z=Math.round(z);const valid=(a,b)=>this.walkable(a,b)&&(!connected||!this.reachable||this.reachable.has(`${a},${b}`));
     if(valid(x,z))return{x,z};
     let best=null,score=Infinity;
     for(let tx=ISLAND_BOUNDS.minX;tx<=ISLAND_BOUNDS.maxX;tx++)for(let tz=ISLAND_BOUNDS.minZ;tz<=ISLAND_BOUNDS.maxZ;tz++){const d=(tx-x)**2+(tz-z)**2;if(d<score&&valid(tx,tz)){best={x:tx,z:tz};score=d;}}
     return best||{x:0,z:3};
   }
-  findPath(start,end){
+  findPath(start,end,avoid=null){
     const key=p=>`${p.x},${p.z}`,q=[start],from=new Map([[key(start),null]]);let head=0;
     while(head<q.length){const p=q[head++];if(p.x===end.x&&p.z===end.z){const out=[];let current=p;while(current){out.unshift(current);current=from.get(key(current));}return out.slice(1);}
-      for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){const n={x:p.x+dx,z:p.z+dz};if(!from.has(key(n))&&this.walkable(n.x,n.z)&&this.walkableEdge(p.x,p.z,n.x,n.z)){from.set(key(n),p);q.push(n);}}
+      for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){const n={x:p.x+dx,z:p.z+dz};if(avoid&&n.x===avoid.x&&n.z===avoid.z&&(n.x!==end.x||n.z!==end.z))continue;if(!from.has(key(n))&&this.walkable(n.x,n.z)&&this.walkableEdge(p.x,p.z,n.x,n.z)){from.set(key(n),p);q.push(n);}}
     }return[];
   }
   updatePaths(){
@@ -623,11 +625,14 @@ export class VillageWorld {
     const queue=[{x:0,z:3}];this.reachable=new Set(['0,3']);
     for(let i=0;i<queue.length;i++)for(const [dx,dz]of[[1,0],[-1,0],[0,1],[0,-1]]){const x=queue[i].x+dx,z=queue[i].z+dz,key=`${x},${z}`;if(!this.reachable.has(key)&&this.walkable(x,z)&&this.walkableEdge(queue[i].x,queue[i].z,x,z)){this.reachable.add(key);queue.push({x,z});}}
     for(const a of this.actors){
-      if(a.path.some((p,i)=>!this.actorWaypointValid(p)||(i>0&&!p.stationBuilding&&!a.path[i-1].stationBuilding&&!this.walkableEdge(Math.round(a.path[i-1].x),Math.round(a.path[i-1].z),Math.round(p.x),Math.round(p.z))))){a.path=[];a.wait=0;}
       const cx=Math.round(a.root.position.x/CELL),cz=Math.round(a.root.position.z/CELL);
       const approachId=a.path[0]?.stationBuilding,atStation=this.state.buildings.some(b=>(b.id===approachId||b.id===a.station?.buildingId)&&b.x===cx&&b.z===cz)&&(approachId||this.walkable(a.station.exit.x,a.station.exit.z));
-      if(!this.reachable.has(`${cx},${cz}`)&&!atStation){
-        const p=this.nearestWalkable(cx,cz);a.root.position.set(p.x*CELL,groundHeight(p.x,p.z),p.z*CELL);a.path=[];a.wait=0;a.station=null;
+      // A changed entrance, gate or neighboring footprint also invalidates
+      // the approach to the *first* waypoint. Replan from the actual position.
+      // A closed gate may isolate a valid tile; it must not teleport its people.
+      this.resetActorRoute(a);a.blockedWaypoint=null;
+      if(!this.walkable(cx,cz)&&!atStation){
+        const p=this.nearestWalkable(cx,cz,false);a.root.position.set(p.x*CELL,groundHeight(p.x,p.z),p.z*CELL);a.station=null;
       }
     }
   }
@@ -652,6 +657,25 @@ export class VillageWorld {
     if(point.stationBuilding){const owner=this.state.buildings.find(b=>b.id===point.stationBuilding);if(owner&&owner.x===x&&owner.z===z)return isLand(point.x,point.z);}
     return this.walkable(x,z);
   }
+  resetActorRoute(a,blocked=null){
+    if(blocked)a.blockedWaypoint={...blocked,expires:this.clock+8};
+    a.path=[];a.routeProgress=null;a.wait=0;a.workTime=0;a.activity=null;a.publicSpot=null;a.yieldUntil=0;
+    a.parcel.visible=false;a.root.userData.workState='waiting';
+    if(blocked)a.root.userData.workReason='Finding a clear approach to the workplace.';
+  }
+  actorStepClear(a,x,z,waypoint){
+    const p=a.root.position,steps=Math.max(1,Math.ceil(Math.hypot(x-p.x,z-p.z)/.12));
+    const allowed=(cx,cz)=>this.walkable(cx,cz)||(waypoint.stationBuilding&&this.state.buildings.some(b=>b.id===waypoint.stationBuilding&&b.x===cx&&b.z===cz));
+    let previous={x:Math.round(p.x/CELL),z:Math.round(p.z/CELL)};
+    for(let i=1;i<=steps;i++){
+      const px=p.x+(x-p.x)*i/steps,pz=p.z+(z-p.z)*i/steps,next={x:Math.round(px/CELL),z:Math.round(pz/CELL)};
+      if(!allowed(next.x,next.z)||!this.walkableEdge(previous.x,previous.z,next.x,next.z))return false;
+      if(previous.x!==next.x&&previous.z!==next.z&&(!allowed(previous.x,next.z)||!allowed(next.x,previous.z)||!this.walkableEdge(previous.x,previous.z,previous.x,next.z)||!this.walkableEdge(previous.x,next.z,next.x,next.z)||!this.walkableEdge(previous.x,previous.z,next.x,previous.z)||!this.walkableEdge(next.x,previous.z,next.x,next.z)))return false;
+      if(!waypoint.stationBuilding&&!this.crowdPositionClear(px,pz))return false;
+      previous=next;
+    }
+    return true;
+  }
   publicDestination(a,center,radius=3){
     if(!this.publicSpots){
       const cells=this.reachable?[...this.reachable].map(key=>{const[x,z]=key.split(',').map(Number);return{x,z};}):listTiles().filter(p=>this.walkable(p.x,p.z));
@@ -667,6 +691,7 @@ export class VillageWorld {
     for(let i=0;i<this.publicSpots.length;i++){
       const spot=this.publicSpots[i],distance=Math.hypot(spot.point.x-center.x,spot.point.z-center.z);
       if(distance>radius)continue;
+      if(a.blockedWaypoint?.expires>this.clock&&Math.hypot(spot.point.x-a.blockedWaypoint.x,spot.point.z-a.blockedWaypoint.z)*CELL<.5)continue;
       const x=spot.point.x*CELL,z=spot.point.z*CELL;
       let density=0,reserved=false;
       for(const other of this.actors){if(other===a)continue;const target=other.publicSpot||other.station?.point;
@@ -713,13 +738,13 @@ export class VillageWorld {
   crowdStep(a,dx,dz,step,waypoint){
     const p=a.root.position,d=Math.hypot(dx,dz);if(d<.0001||step<=0)return{x:0,z:0};
     let ux=dx/d,uz=dz/d;const near=this.actors.filter(other=>other!==a&&Math.abs(other.root.position.x-p.x)<1&&Math.abs(other.root.position.z-p.z)<1);
-    if(waypoint.stationBuilding)return{x:ux*step,z:uz*step};
-    if(!near.length&&this.crowdPositionClear(p.x+ux*step,p.z+uz*step))return{x:ux*step,z:uz*step};
+    if(waypoint.stationBuilding)return this.actorStepClear(a,p.x+ux*step,p.z+uz*step,waypoint)?{x:ux*step,z:uz*step}:{x:0,z:0};
+    if(!near.length&&this.actorStepClear(a,p.x+ux*step,p.z+uz*step,waypoint))return{x:ux*step,z:uz*step};
     if(a.yieldUntil>this.clock){ux=a.yieldX;uz=a.yieldZ;}
     let best=null,bestScore=Infinity;
     for(const angle of[0,.78,-.78,1.35,-1.35,2.1,-2.1,Math.PI]){
       const vx=(ux*Math.cos(angle)-uz*Math.sin(angle))*step,vz=(ux*Math.sin(angle)+uz*Math.cos(angle))*step,x=p.x+vx,z=p.z+vz;
-      if(!this.crowdPositionClear(x,z))continue;
+      if(!this.actorStepClear(a,x,z,waypoint))continue;
       let penalty=0,blocked=false;
       for(const other of near){const q=other.root.position,before=Math.hypot(p.x-q.x,p.z-q.z),after=Math.hypot(x-q.x,z-q.z);if(after<.43&&after<before-.001){blocked=true;break;}penalty+=Math.max(0,.50-after)*1.5;}
       if(blocked)continue;const score=Math.hypot(ux*step-vx,uz*step-vz)+penalty+(angle<0?.002:0);
@@ -785,9 +810,15 @@ export class VillageWorld {
       const lane=THREE.MathUtils.clamp((location.x-building.x*CELL)*side.z-(location.z-building.z*CELL)*side.x,-.75,.75);
       const approach={x:entry.x+(-side.x*.15+side.z*lane)/CELL,z:entry.z+(-side.z*.15-side.x*lane)/CELL,exact:true,stationBuilding:building.id,stationEntry:true};
       approach.y=groundHeight(approach.x,approach.z);
+      if(a.blockedWaypoint?.expires>this.clock&&a.blockedWaypoint.stationBuilding===building.id&&Math.hypot(approach.x-a.blockedWaypoint.x,approach.z-a.blockedWaypoint.z)*CELL<.445)continue;
+      // Different guard stances can clamp to almost the same entrance port.
+      // Reserve the port until its walker passes it, as well as reserving the
+      // final work position, so two arrivals cannot pin each other in place.
+      if(this.actors.some(other=>other!==a&&other.station?.approach&&other.path.some(p=>p.stationEntry)&&Math.hypot(other.station.approach.x-approach.x,other.station.approach.z-approach.z)*CELL<.445))continue;
       if(this.actors.some(other=>other!==a&&other.station&&other.activity==='work'&&other.station.buildingId===building.id&&Math.hypot(other.station.point.x*CELL-location.x,other.station.point.z*CELL-location.z)<.445))continue;
       if(this.actors.some(other=>other!==a&&((other.publicSpot&&Math.hypot(other.publicSpot.x*CELL-location.x,other.publicSpot.z*CELL-location.z)<.445)||(!other.path.length&&Math.hypot(other.root.position.x-location.x,other.root.position.z-location.z)<.445))))continue;
       const point={x:location.x/CELL,z:location.z/CELL,y:location.y,exact:true,stationBuilding:building.id};
+      if(a.blockedWaypoint?.expires>this.clock&&a.blockedWaypoint.stationBuilding===building.id&&Math.hypot(point.x-a.blockedWaypoint.x,point.z-a.blockedWaypoint.z)*CELL<.5)continue;
       if(!this.clearStationApproach(building,approach,point))continue;
       const target=model.localToWorld(new THREE.Vector3(...candidate.target));
       return{buildingId:building.id,point,target,approach,exit:{...entry,y:groundHeight(entry.x,entry.z),stationBuilding:building.id},signature:shown.userData.signature,smithSurface:candidate.surface,access:candidate.alternate||entrance[0]||entrance[1]<0?'side':'front',yaw:a.citizen.job==='guard'&&!candidate.outward?shown.rotation.y:Math.atan2(target.x-location.x,target.z-location.z)-(modelName==='smith'?Math.PI/2:0)};
@@ -843,16 +874,19 @@ export class VillageWorld {
     // when the actor actually reached that station, never across the map.
     const nearPrevious=previousBuilding&&((cx===previousBuilding.x&&cz===previousBuilding.z)||(cx===previous.exit.x&&cz===previous.exit.z&&Math.hypot(a.root.position.x-previous.point.x*CELL,a.root.position.z-previous.point.z*CELL)<1.35));
     const canExit=nearPrevious&&this.walkable(previous.exit.x,previous.exit.z);
-    const start=canExit?previous.exit:this.nearestWalkable(a.root.position.x/CELL,a.root.position.z/CELL),path=[];
+    const start=canExit?previous.exit:this.nearestWalkable(a.root.position.x/CELL,a.root.position.z/CELL,false),path=[];
     const departure=canExit?(previous.approach||start):start;
-    if(Math.hypot(a.root.position.x-departure.x*CELL,a.root.position.z-departure.z*CELL)>.03)path.push({...departure,exact:true});
-    const gridPath=this.findPath(start,goal);
-    if((start.x!==goal.x||start.z!==goal.z)&&!gridPath.length){a.wait=2;a.activity='waiting';a.parcel.visible=false;return;}
+    // Open ground does not need a trip back to its tile center. Another
+    // resident can occupy that center while the onward route is perfectly free.
+    if(canExit&&Math.hypot(a.root.position.x-departure.x*CELL,a.root.position.z-departure.z*CELL)>.03)path.push({...departure,exact:true});
+    const avoided=a.blockedWaypoint?.expires>this.clock&&!a.blockedWaypoint.stationBuilding?{x:Math.round(a.blockedWaypoint.x),z:Math.round(a.blockedWaypoint.z)}:null;
+    const gridPath=this.findPath(start,goal,avoided);
+    if((start.x!==goal.x||start.z!==goal.z)&&!gridPath.length){a.path=[];a.routeProgress=null;a.wait=2;a.activity='waiting';a.parcel.visible=false;a.root.userData.workReason='The workplace needs a clear, connected approach.';return;}
     if(station&&gridPath.length)gridPath.pop();
     path.push(...gridPath);
     if(station){path.push({...station.approach});path.push({...station.point});}
     else if(publicSpot)path.push(publicSpot);
-    a.path=path;a.station=station;a.publicSpot=publicSpot;a.goal=choose;a.activity=activity;a.wait=dwell;a.workTime=0;
+    a.path=path;a.routeProgress=null;a.station=station;a.publicSpot=publicSpot;a.goal=choose;a.activity=activity;a.wait=dwell;a.workTime=0;
     a.parcel.visible=activity==='deliver'&&DELIVERY_JOBS.has(job);
     if(a.tool)a.tool.visible=!a.parcel.visible;
   }
@@ -930,9 +964,9 @@ export class VillageWorld {
   }
   updateActors(dt){
     for(const a of this.actors){const p=a.root.position;
-      if(a.station&&a.station.signature!==this.buildings.get(a.station.buildingId)?.userData.signature){a.path=[];a.wait=0;a.workTime=0;}
+      if(a.station&&!a.station.invalidated&&a.station.signature!==this.buildings.get(a.station.buildingId)?.userData.signature){this.resetActorRoute(a);a.station.invalidated=true;}
       if(a.path.length){
-        const n=a.path[0];if(!this.actorWaypointValid(n)){a.path=[];a.wait=0;continue;}
+        const n=a.path[0];if(!this.actorWaypointValid(n)){this.resetActorRoute(a);continue;}
         if(!n.exact&&n.laneX===undefined){const vx=n.x*CELL-p.x,vz=n.z*CELL-p.z;n.laneX=Math.abs(vz)>Math.abs(vx)?-Math.sign(vz)*.235:0;n.laneZ=Math.abs(vx)>=Math.abs(vz)?Math.sign(vx)*.235:0;}
         const tx=n.x*CELL+(n.exact?0:n.laneX),tz=n.z*CELL+(n.exact?0:n.laneZ),dx=tx-p.x,dz=tz-p.z,d=Math.hypot(dx,dz),step=Math.min(d,dt*(.95+(a.index%4)*.05));
         if(n.stationBuilding){n.startY??=p.y;n.startDistance??=Math.max(.001,d);}
@@ -962,6 +996,15 @@ export class VillageWorld {
       }
     }
     this.separateCrowd();
+    // Measure net progress after crowd separation, not attempted foot motion.
+    // Repeated yielding or an occupied port must eventually release the old
+    // reservation and try a different route/station, even without a map edit.
+    for(const a of this.actors){
+      const n=a.path[0];if(!n){a.routeProgress=null;continue;}
+      const distance=Math.hypot(n.x*CELL+(n.exact?0:n.laneX||0)-a.root.position.x,n.z*CELL+(n.exact?0:n.laneZ||0)-a.root.position.z);
+      if(a.routeProgress?.waypoint!==n||distance<a.routeProgress.best-.10)a.routeProgress={waypoint:n,best:distance,stalled:0};
+      else if((a.routeProgress.stalled+=dt)>=3)this.resetActorRoute(a,n);
+    }
   }
   icons(){
     const result={};const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});renderer.setSize(160,144);renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
@@ -971,7 +1014,7 @@ export class VillageWorld {
     renderer.dispose();return result;
   }
   resize(){const w=this.canvas.clientWidth,h=this.canvas.clientHeight;if(!w||!h)return;this.renderer.setSize(w,h,false);this.width=w;this.height=h;this.updateCamera(1);}
-  updateCamera(dt){const a=1-Math.exp(-dt*9);this.azimuth+=(this.targetAzimuth-this.azimuth)*a;this.zoom+=(this.targetZoom-this.zoom)*a;this.target.lerp(new THREE.Vector3(this.pan.x,Math.max(.65,groundHeight(this.pan.x/CELL,this.pan.z/CELL)),this.pan.z),a);const radius=Math.max(43,this.zoom*1.1);this.camera.position.set(this.target.x+Math.sin(this.azimuth)*radius,this.target.y+radius*36/43,this.target.z+Math.cos(this.azimuth)*radius);this.sun.position.set(this.target.x-23,this.target.y+34,this.target.z+15);this.sun.target.position.copy(this.target);const shadowSpan=Math.max(29,Math.min(78,this.zoom*.72));Object.assign(this.sun.shadow.camera,{left:-shadowSpan,right:shadowSpan,top:shadowSpan,bottom:-shadowSpan,far:180});this.sun.shadow.camera.updateProjectionMatrix();this.camera.lookAt(this.target);const aspect=this.width/this.height;this.camera.left=-this.zoom*aspect/2;this.camera.right=this.zoom*aspect/2;this.camera.top=this.zoom/2;this.camera.bottom=-this.zoom/2;this.camera.updateProjectionMatrix();}
+  updateCamera(dt){const a=1-Math.exp(-dt*9);this.azimuth+=(this.targetAzimuth-this.azimuth)*a;this.zoom+=(this.targetZoom-this.zoom)*(1-Math.exp(-dt*14));this.target.lerp(new THREE.Vector3(this.pan.x,Math.max(.65,groundHeight(this.pan.x/CELL,this.pan.z/CELL)),this.pan.z),a);const radius=Math.max(43,this.zoom*1.1);this.camera.position.set(this.target.x+Math.sin(this.azimuth)*radius,this.target.y+radius*36/43,this.target.z+Math.cos(this.azimuth)*radius);this.sun.position.set(this.target.x-23,this.target.y+34,this.target.z+15);this.sun.target.position.copy(this.target);const shadowSpan=Math.max(29,Math.min(78,this.zoom*.72));Object.assign(this.sun.shadow.camera,{left:-shadowSpan,right:shadowSpan,top:shadowSpan,bottom:-shadowSpan,far:180});this.sun.shadow.camera.updateProjectionMatrix();this.camera.lookAt(this.target);const aspect=this.width/this.height;this.camera.left=-this.zoom*aspect/2;this.camera.right=this.zoom*aspect/2;this.camera.top=this.zoom/2;this.camera.bottom=-this.zoom/2;this.camera.updateProjectionMatrix();}
   rotate(amount){this.targetAzimuth+=amount*Math.PI/4;this.onCamera?.();}
   zoomBy(amount){this.targetZoom=THREE.MathUtils.clamp(this.targetZoom+amount,10,MAP_ZOOM);this.onCamera?.();}
   home(){this.pan.set(0,0,0);this.targetZoom=this.width<700?43:32;this.targetAzimuth=Math.PI/4;}
@@ -1003,13 +1046,22 @@ export class VillageWorld {
     return{x,z,point,regionId:terrainAt(x,z).regionId};
   }
 
+  previewScreenBounds(){
+    if(!this.highlight.visible||!this.previewBounds)return null;
+    const box=this.previewBounds,point=new THREE.Vector3(),bounds={left:Infinity,top:Infinity,right:-Infinity,bottom:-Infinity};
+    for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
+      point.set(x,y,z).project(this.camera);const sx=(point.x+1)*this.width/2,sy=(1-point.y)*this.height/2;
+      bounds.left=Math.min(bounds.left,sx);bounds.right=Math.max(bounds.right,sx);bounds.top=Math.min(bounds.top,sy);bounds.bottom=Math.max(bounds.bottom,sy);
+    }
+    return bounds;
+  }
   project(x,z){const p=new THREE.Vector3(x*CELL,groundHeight(x,z)+.2,z*CELL).project(this.camera);return{x:(p.x+1)*this.width/2,y:(1-p.y)*this.height/2};}
   bindInput(){
     const c=this.canvas;this.pointers=new Map();let drag=null,pinch=0;
     c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(this.pointers.size===2){const [a,b]=[...this.pointers.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y);if(drag)drag.moved=true;return;}drag={x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,button:e.button,moved:false};});
     c.addEventListener('pointermove',e=>{
       if(this.pointers.has(e.pointerId))this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-      if(this.pointers.size===2){const [a,b]=[...this.pointers.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);this.zoomBy((pinch-distance)*.045);pinch=distance;return;}
+      if(this.pointers.size===2){const [a,b]=[...this.pointers.values()],distance=Math.hypot(a.x-b.x,a.y-b.y);this.targetZoom=pinchZoom(this.targetZoom,pinch,distance,10,MAP_ZOOM);this.onCamera?.();pinch=distance;return;}
       if(drag){const dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5)drag.moved=true;if(drag.moved){if(drag.button===2)this.targetAzimuth-=dx*.008;else this.moveCamera(-dx*this.zoom/this.height,-dy*this.zoom/this.height*1.4);this.onCamera?.();}drag.lastX=e.clientX;drag.lastY=e.clientY;}
       if(!drag?.moved)this.onHover?.(this.pick(e.clientX,e.clientY),{x:e.clientX,y:e.clientY,pointerType:e.pointerType});
     });
@@ -1030,7 +1082,7 @@ export class VillageWorld {
     // cancels the entire gesture, so a later release cannot become a build tap.
     c.addEventListener('lostpointercapture',e=>{if(this.pointers.has(e.pointerId))endGesture();});
     c.addEventListener('pointerleave',e=>{if(!drag)this.onHover?.(null,{pointerType:e.pointerType});});c.addEventListener('contextmenu',e=>e.preventDefault());
-    c.addEventListener('wheel',e=>{e.preventDefault();this.zoomBy(e.deltaY*.015);},{passive:false});
+    c.addEventListener('wheel',e=>{e.preventDefault();this.targetZoom=wheelZoom(this.targetZoom,e.deltaY,e.deltaMode,this.height,10,MAP_ZOOM);this.onCamera?.();},{passive:false});
   }
   render(dt,{speed=1,playing=true,dayTime=.25,won=false}={}){
     this.soundEnabled=playing&&speed>0;this.cuesPaused=!playing||speed<=0;this.clock+=dt;this.updateCamera(dt);
