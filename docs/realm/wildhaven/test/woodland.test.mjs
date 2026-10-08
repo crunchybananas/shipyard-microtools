@@ -30,7 +30,7 @@ test('overlapping yards cannot duplicate timber or harvest a stump', () => {
   assert.match(rates(s).buildings[b.id].blockedReason,/woodland/);
 });
 test('felling, staffed replanting, independent growth and mature stock form a complete cycle', () => {
-  const [s,b]=town(), site=groveFor(b)[0], remaining=treeState(s,site.id).wood;
+  const [s,b]=town(), site=groveFor(s,b)[0], remaining=treeState(s,site.id).wood;
   harvestWood(s,b,remaining); assert.equal(treeState(s,site.id).growth,-1);
   b.paused=true;tickWoodland(s,30);assert.equal(treeState(s,site.id).growth,-1);
   b.paused=false;b.workerIds=[];tickWoodland(s,30);assert.equal(treeState(s,site.id).growth,-1);
@@ -55,4 +55,15 @@ test('storage saturation does not fell trees and paused yards cannot harvest', (
   const [s,b]=town();s.resources.wood=200;
   const before=woodlandStatus(s,b).available;tick(s,20);assert.equal(woodlandStatus(s,b).available,before);
   s.resources.wood=0;pauseBuilding(s,b.id,true);tick(s,20);assert.equal(s.resources.wood,0);
+});
+
+test('yards only harvest visible woodland outside building, defense and discovery footprints',()=>{
+  const [s,b]=town(), original=groveFor(s,b), blocked=original[0].tile, initialWood=treeState(s,original[0].id).wood;
+  assert.ok(original.every(t=>t.tile.x!==b.x||t.tile.z!==b.z),'The yard cannot harvest beneath itself');
+  s.buildings.push({id:'planned',type:'cottage',x:blocked.x,z:blocked.z});
+  const next=groveFor(s,b);assert.equal(next.length,12);assert.ok(next.every(t=>t.tile.x!==blocked.x||t.tile.z!==blocked.z));
+  const defense=next[0].tile;s.frontier.fortifications.push({id:'wall',type:'wall',x:defense.x,z:defense.z});
+  assert.ok(groveFor(s,b).every(t=>t.tile.x!==defense.x||t.tile.z!==defense.z));
+  harvestWood(s,b,1000);assert.equal(treeState(s,original[0].id).wood,initialWood,'Hidden trees were not consumed');
+  assert.ok(woodlandStatus(s,b).youngTarget,'A depleted grove has a visible tree to follow through regrowth');
 });

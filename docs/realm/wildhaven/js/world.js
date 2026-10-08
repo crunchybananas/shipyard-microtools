@@ -1,5 +1,5 @@
 import { visibleSurfaceHit } from './world-picking.js';
-import { TREE_SITES, treeState, SAPLING_SECONDS } from './woodland.js';
+import { TREE_SITES, treeState, SAPLING_SECONDS, woodlandOccupancy } from './woodland.js';
 import { DISCOVERIES, isFieldworker } from './discovery.js';
 import * as THREE from 'three';
 import { GLTFLoader } from '../../vendor/three/GLTFLoader.js';
@@ -552,7 +552,7 @@ export class VillageWorld {
       o.userData.building=b;
     }
     if(changed){
-      const occupied=new Set([...state.buildings,...(state.frontier?.fortifications||[]),...DISCOVERIES].map(b=>`${b.x},${b.z}`));
+      const occupied=woodlandOccupancy(state);
       this.occupiedDecor=occupied; this.woodlandSignature=null;
       for(const [key,pieces]of this.decor)for(const p of pieces)if(!p.treeId){const m=occupied.has(key)?new THREE.Matrix4().makeScale(0,0,0):p.matrix;for(const mesh of p.meshes){mesh.setMatrixAt(p.index,m);mesh.instanceMatrix.needsUpdate=true;}}
       this.updatePaths();

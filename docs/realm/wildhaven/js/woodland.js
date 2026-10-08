@@ -1,3 +1,4 @@
+import { DISCOVERIES } from './discovery.js';
 import { listTiles, hasNaturalObstacle, isLand } from './island.js';
 
 export const TREE_TIMBER = 8;
@@ -14,7 +15,7 @@ export const TREE_SITES = Object.freeze(listTiles().flatMap(tile => {
   }).filter(t => isLand(t.x + .5, t.z + .5) && isLand(t.x - .5, t.z - .5));
 }));
 const byId = new Map(TREE_SITES.map(t => [t.id, t]));
-const groves = new Map();
+const groves = new WeakMap();
 export const createWoodland = () => ({ trees: {}, felled: 0, planted: 0 });
 export function restoreWoodland(input) {
   if (input === undefined) return createWoodland();
@@ -30,21 +31,32 @@ export function restoreWoodland(input) {
   }
   return result;
 }
-export function groveFor(building) {
-  const key = `${building.x},${building.z}`;
-  if (!groves.has(key)) groves.set(key, [...TREE_SITES].sort((a, b) => Math.hypot(a.x-building.x,a.z-building.z)-Math.hypot(b.x-building.x,b.z-building.z) || a.id.localeCompare(b.id)).slice(0, 12));
-  return groves.get(key);
+function woodlandCache(state) {
+  const sites = [...state.buildings, ...(state.frontier?.fortifications || []), ...DISCOVERIES];
+  const signature = sites.map(t=>`${t.x},${t.z}`).join('|');
+  let cache = groves.get(state);
+  if (cache?.signature !== signature) {
+    cache = { signature, occupied: new Set(sites.map(t=>`${t.x},${t.z}`)), yards: new Map() };
+    groves.set(state, cache);
+  }
+  return cache;
+}
+export function woodlandOccupancy(state) { return woodlandCache(state).occupied; }
+export function groveFor(state, building) {
+  const cache = woodlandCache(state), key = `${building.x},${building.z}`;
+  if (!cache.yards.has(key)) cache.yards.set(key, TREE_SITES.filter(t=>!cache.occupied.has(`${t.tile.x},${t.tile.z}`)).sort((a, b) => Math.hypot(a.x-building.x,a.z-building.z)-Math.hypot(b.x-building.x,b.z-building.z) || a.id.localeCompare(b.id)).slice(0, 12));
+  return cache.yards.get(key);
 }
 export function treeState(state, id) { return state.woodland?.trees[id] || { wood: TREE_TIMBER, growth: SAPLING_SECONDS, planting: 0 }; }
 export function woodlandStatus(state, building) {
-  const grove = groveFor(building), trees = grove.map(t => treeState(state, t.id));
+  const grove = groveFor(state, building), trees = grove.map(t => treeState(state, t.id));
   const ready = trees.filter(t => t.growth === SAPLING_SECONDS), saplings = trees.filter(t => t.growth >= 0 && t.growth < SAPLING_SECONDS);
-  return { mature: ready.length, saplings: saplings.length, stumps: trees.length-ready.length-saplings.length, available: ready.reduce((sum,t) => sum+t.wood,0), nextGrowth: saplings.length ? Math.ceil(Math.min(...saplings.map(t=>SAPLING_SECONDS-t.growth))) : null, target: grove.find(t=>treeState(state,t.id).wood>0) || grove[0] };
+  return { mature: ready.length, saplings: saplings.length, stumps: trees.length-ready.length-saplings.length, available: ready.reduce((sum,t) => sum+t.wood,0), youngTarget: grove.find(t=>treeState(state,t.id).growth < SAPLING_SECONDS) || null, nextGrowth: saplings.length ? Math.ceil(Math.min(...saplings.map(t=>SAPLING_SECONDS-t.growth))) : null, target: grove.find(t=>treeState(state,t.id).wood>0) || grove[0] };
 }
 export function harvestWood(state, building, requested) {
   state.woodland ||= createWoodland();
   let left = requested;
-  for (const site of groveFor(building)) {
+  for (const site of groveFor(state, building)) {
     const prior = treeState(state, site.id);
     if (!prior.wood || left <= 1e-8) continue;
     const taken = Math.min(left, prior.wood), wood = Math.max(0, Math.round((prior.wood-taken)*1e6)/1e6);
@@ -65,7 +77,7 @@ export function tickWoodland(state, dt) {
   // One shared stock prevents overlapping yards from duplicating a tree.
   for (const yard of state.buildings) if (yard.type === 'lumber' && yard.status === 'ready' && !yard.paused && yard.workerIds.length) {
     let work = yard.workerIds.length * dt;
-    for (const site of groveFor(yard)) {
+    for (const site of groveFor(state, yard)) {
       const tree = state.woodland.trees[site.id];
       if (!tree || tree.growth !== -1 || work <= 0) continue;
       const used = Math.min(work, PLANTING_WORK-tree.planting); tree.planting += used; work -= used;
