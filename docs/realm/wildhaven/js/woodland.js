@@ -1,9 +1,11 @@
 import { DISCOVERIES } from './discovery.js';
 import { listTiles, hasNaturalObstacle, isLand } from './island.js';
+import { CALENDAR_DAY_SECONDS, duration } from './calendar.js';
 
 export const TREE_TIMBER = 8;
-export const SAPLING_SECONDS = 180;
+export const SAPLING_SECONDS = 3 * CALENDAR_DAY_SECONDS;
 export const PLANTING_WORK = 12;
+const GROWTH_VERSION = 2, LEGACY_SAPLING_SECONDS = 180;
 const random = (x, z, seed = 1) => { const v = Math.sin(x * 127.1 + z * 311.7 + seed * 74.7) * 43758.5453; return v - Math.floor(v); };
 // Stable IDs and positions are shared by the save, resource budget and renderer.
 export const TREE_SITES = Object.freeze(listTiles().flatMap(tile => {
@@ -16,18 +18,23 @@ export const TREE_SITES = Object.freeze(listTiles().flatMap(tile => {
 }));
 const byId = new Map(TREE_SITES.map(t => [t.id, t]));
 const groves = new WeakMap();
-export const createWoodland = () => ({ trees: {}, felled: 0, planted: 0 });
+export const createWoodland = () => ({ growthVersion: GROWTH_VERSION, trees: {}, felled: 0, planted: 0 });
 export function restoreWoodland(input) {
   if (input === undefined) return createWoodland();
   if (!input || typeof input !== 'object' || !input.trees || Array.isArray(input.trees) || typeof input.trees !== 'object' || Object.keys(input.trees).length > TREE_SITES.length) throw new Error('Invalid woodland');
+  if (input.growthVersion !== undefined && input.growthVersion !== GROWTH_VERSION) throw new Error('Invalid woodland growth version');
+  const savedDuration = input.growthVersion === undefined ? LEGACY_SAPLING_SECONDS : SAPLING_SECONDS;
   const result = createWoodland();
   for (const key of ['felled', 'planted']) {
     if (!Number.isSafeInteger(input[key]) || input[key] < 0) throw new Error('Invalid woodland history');
     result[key] = input[key];
   }
   for (const [id, tree] of Object.entries(input.trees)) {
-    if (!byId.has(id) || !tree || !Number.isFinite(tree.wood) || tree.wood < 0 || tree.wood > TREE_TIMBER || !Number.isFinite(tree.growth) || tree.growth < -1 || tree.growth > SAPLING_SECONDS || (tree.growth < 0 && tree.growth !== -1) || !Number.isFinite(tree.planting) || tree.planting < 0 || tree.planting >= PLANTING_WORK || (tree.growth < SAPLING_SECONDS && tree.wood !== 0) || (tree.growth >= 0 && tree.planting !== 0) || (tree.growth === SAPLING_SECONDS && tree.wood === 0)) throw new Error('Invalid tree');
-    result.trees[id] = { wood: tree.wood, growth: tree.growth, planting: tree.planting };
+    if (!byId.has(id) || !tree || !Number.isFinite(tree.wood) || tree.wood < 0 || tree.wood > TREE_TIMBER || !Number.isFinite(tree.growth) || tree.growth < -1 || tree.growth > savedDuration || (tree.growth < 0 && tree.growth !== -1) || !Number.isFinite(tree.planting) || tree.planting < 0 || tree.planting >= PLANTING_WORK || (tree.growth < savedDuration && tree.wood !== 0) || (tree.growth >= 0 && tree.planting !== 0) || (tree.growth === savedDuration && tree.wood === 0)) throw new Error('Invalid tree');
+    // Validate in the saved clock first, then preserve size and earned growth.
+    // Mature trees stay mature without replenishing their remaining timber.
+    const growth = tree.growth < 0 || savedDuration === SAPLING_SECONDS ? tree.growth : tree.growth / savedDuration * SAPLING_SECONDS;
+    result.trees[id] = { wood: tree.wood, growth, planting: tree.planting };
   }
   return result;
 }
@@ -48,6 +55,11 @@ export function groveFor(state, building) {
   return cache.yards.get(key);
 }
 export function treeState(state, id) { return state.woodland?.trees[id] || { wood: TREE_TIMBER, growth: SAPLING_SECONDS, planting: 0 }; }
+export function saplingTimeRemaining(growth) {
+  const seconds = Math.max(0, SAPLING_SECONDS - growth);
+  const days = Math.ceil(seconds / CALENDAR_DAY_SECONDS * 10) / 10;
+  return `${days} in-game ${days === 1 ? 'day' : 'days'} (${duration(seconds)} at 1×)`;
+}
 export function woodlandStatus(state, building) {
   const grove = groveFor(state, building), trees = grove.map(t => treeState(state, t.id));
   const ready = trees.filter(t => t.growth === SAPLING_SECONDS), saplings = trees.filter(t => t.growth >= 0 && t.growth < SAPLING_SECONDS);
