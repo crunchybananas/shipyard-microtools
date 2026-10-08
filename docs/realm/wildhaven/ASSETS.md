@@ -1,6 +1,6 @@
 # Original art and runtime ownership
 
-The game uses an original Blender-authored village kit, not the existing Realm sprite atlases. `tools/create_assets.py` generates the editable `assets/village-kit.blend` and runtime `assets/village-kit.glb`. Geometry, colors, models, character, and procedural audio were created for this game. No external textures, fonts, model downloads, or image generation are used.
+The game uses an original Blender-authored village kit, not the existing Realm sprite atlases. `tools/create_assets.py` generates the editable `assets/village-kit.blend` and runtime `assets/village-kit.glb`. Geometry, colors, models, character, and procedural audio were created for this game. The world models need no external textures, fonts, or model downloads. Interface illustrations have separate provenance below.
 
 The GLB exports twelve named roots at the origin: cottage, lumber, quarry, orchard, garden, windmill, bell, hearth, villager, boat, broadleaf, cypress. The world loads and uses every root. The building shelf images are rendered from those same runtime models.
 
@@ -58,3 +58,11 @@ The pack contains 14,868 triangles and exports to 1,434,160 bytes. Each root is 
 ```
 
 The Web Audio instrument set is original code in `js/audio.js`. `review/living-sound-reel.wav` is a generated review artifact, not a runtime dependency. Its cue order and measured levels are recorded in `review/living-browser-report.json`.
+
+## Interface illustration library
+
+`assets/resource-icons.webp` is the existing four-resource interface sheet. This pass preserves its bytes and use in the compact HUD.
+
+`assets/resource-pantry.jpg` was generated in one ImageGen request on October 8, 2026 for Stores and resource details: a warm, playful painterly pantry shelf with bread, fruit, timber, stone, tools, folded cloth, books and foliage, on a pale cream background, without lettering. The 2172 × 724 source was packaged as a quality-82 JPEG with the existing macOS image utility, without cropping, resizing or redrawing. The 311,740-byte runtime file has SHA-256 `dfb8ca765741cd87d40b5ba93f9ad34f61cfa17ddf895101ed2d980fd796d27c`. The original generated PNG remains preserved in the task workspace. This decorative image is reused by the resource panels, with empty alternative text and reduced height on compact screens; it carries no controls or essential information.
+
+Seasonal scenery reuses the original terrain and forest geometry. Only authored foliage colors, terrain, flowers and lighting change; tree trunks, buildings, navigation and production rules retain their original roles. Temporary harvest bunting is procedural presentation tied to the saved festival timer.

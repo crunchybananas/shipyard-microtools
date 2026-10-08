@@ -1,0 +1,9 @@
+{
+  "fixture": "Isolated engineering fixtures for affordability, input cancellation, and read-only visits.",
+  "errors": [],
+  "stalePressRefused": true,
+  "cancelledPress": true,
+  "confirmFocus": true,
+  "orientationPreserved": true,
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///private/tmp/wildhaven-season-review/edge-check.mjs:18:100"
+}

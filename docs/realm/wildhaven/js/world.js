@@ -10,6 +10,8 @@ import { groundHeight, terrainAt, isLand, listTiles, hasNaturalObstacle, isNeigh
 import { blocksFortification, frontierPath, gateTransition } from './frontier.js';
 import { BUILDINGS, JOBS, getBuildingSpec } from './catalog.js';
 import { serviceReach, residentCue } from './world-cues.js';
+import { seasonInfo, festivalStatus } from './seasons.js';
+import { seasonPalette, foliageTone } from './season-palette.js';
 
 export const CELL = 1.8;
 const TAU = Math.PI * 2;
@@ -79,7 +81,7 @@ export class VillageWorld {
     this.buildings = new Map(); this.templates = new Map(); this.actors = []; this.decor = new Map();
     this.fortifications=new Map();this.troops=new Map();this.neighborModels=new Map();this.projectileModels=new Map();this.frontierSelection={unitIds:[]};
     this.clock = 0; this.wind = []; this.birds = []; this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    this.scene.add(new THREE.HemisphereLight('#dbe9d4', '#7a8060', 2.35));
+    this.skyLight=new THREE.HemisphereLight('#dbe9d4', '#7a8060', 2.35);this.scene.add(this.skyLight);
     this.sun = new THREE.DirectionalLight('#fff0cf', 3.7);
     this.sun.position.set(-23, 34, 15); this.sun.castShadow = true;
     Object.assign(this.sun.shadow.camera, { left: -29, right: 29, top: 29, bottom: -29, near: 1, far: 85 });
@@ -175,7 +177,7 @@ export class VillageWorld {
     for(let i=0;i<3200;i++) { const x=ISLAND_BOUNDS.minX+rand(i,0)*(ISLAND_BOUNDS.maxX-ISLAND_BOUNDS.minX),z=ISLAND_BOUNDS.minZ+rand(i,1)*(ISLAND_BOUNDS.maxZ-ISLAND_BOUNDS.minZ); if(terrainAt(x,z).kind==='grass'&&Math.abs(x)>.9&&isLand(x+.7,z+.7)&&isLand(x-.7,z-.7)) flowerSites.push({x,z}); }
     const flowerGeo=new THREE.ConeGeometry(.045,.14,4); flowerGeo.rotateX(.12);
     const flowers=new THREE.InstancedMesh(flowerGeo,material('#d8d99b'),flowerSites.length);
-    flowerSites.forEach((p,i)=>{this.setInstance(flowers,i,p.x*CELL,groundHeight(p.x,p.z)+.06,p.z*CELL,1,1,1,rand(i,5)*6);flowers.setColorAt(i,new THREE.Color(['#e8d89b','#c5cc7a','#d6bca4','#749558'][i%4]));}); this.scene.add(flowers);
+    flowerSites.forEach((p,i)=>{this.setInstance(flowers,i,p.x*CELL,groundHeight(p.x,p.z)+.06,p.z*CELL,1,1,1,rand(i,5)*6);flowers.setColorAt(i,new THREE.Color(['#e8d89b','#c5cc7a','#d6bca4','#749558'][i%4]));}); this.scene.add(flowers);this.flowers=flowers;this.flowerCount=flowerSites.length;
     // A few distant birds belong to the world; nothing floats over the interface.
     const wingGeo = new THREE.BufferGeometry(); wingGeo.setAttribute('position',new THREE.Float32BufferAttribute([-.24,0,.02,0,.04,0,0,.04,0,.24,0,.02],3));
     for(let i=0;i<3;i++) { const bird=new THREE.LineSegments(wingGeo,new THREE.LineBasicMaterial({color:'#f2e7ce'})); this.scene.add(bird);this.birds.push(bird); }
@@ -185,6 +187,7 @@ export class VillageWorld {
     for(const [key,pieces]of this.decor){const keep=pieces.filter(p=>!p.meshes.some(m=>this.oldTreeMeshes.includes(m)));if(keep.length)this.decor.set(key,keep);else this.decor.delete(key);}
     this.stumps=new THREE.InstancedMesh(new THREE.CylinderGeometry(.12,.17,.22,7),material('#9a744a'),this.treeSites.length);
     this.stumps.userData.treeSites=this.treeSites; this.stumps.castShadow=true;this.stumps.receiveShadow=true;this.scene.add(this.stumps);
+    this.seasonalTrees=[];this.seasonSignature=null;
     for(const type of ['broadleaf','cypress']){
       const template=this.templates.get(type);template.updateWorldMatrix(true,true);let source;template.traverse(n=>{if(n.isMesh)source=n;});
       const geo=source.geometry.clone().applyMatrix4(source.matrixWorld);
@@ -192,7 +195,51 @@ export class VillageWorld {
       const trees=new THREE.InstancedMesh(geo,source.material,sites.length);
       sites.forEach((t,i)=>{const size=t.s*(type==='broadleaf'?.83:.92);this.setInstance(trees,i,t.x*CELL,groundHeight(t.x,t.z),t.z*CELL,size,size,size,rand(t.x,t.z)*6);trees.setColorAt(i,new THREE.Color().setRGB(.90+rand(t.x,t.z,2)*.1,.92+rand(t.x,t.z,7)*.08,.87+rand(t.x,t.z,8)*.13));const key=`${t.tile.x},${t.tile.z}`;if(!this.decor.has(key))this.decor.set(key,[]);this.decor.get(key).push({meshes:[trees],index:i,matrix:matrix.clone(),treeId:t.id});});
       trees.userData.treeSites=sites; trees.castShadow=true;trees.receiveShadow=true;this.scene.add(trees);
+      this.seasonalTrees.push({type,mesh:trees,originalColors:geo.attributes.color.array.slice()});
     }
+  }
+  syncSeasonVisuals(){
+    if(!this.state||!this.land?.geometry?.attributes.color)return;
+    const season=seasonInfo(this.state),festival=festivalStatus(this.state),hearth=this.state.buildings.find(b=>b.type==='hearth');
+    if(this.seasonSignature!==season.id){
+      this.seasonSignature=season.id;this.seasonColors=seasonPalette(season.id);
+      const palette=this.seasonColors,grass=new THREE.Color(palette.grass),shade=new THREE.Color(palette.shade),sand=new THREE.Color('#d4c291'),color=new THREE.Color();
+      const {position, color:colors}=this.land.geometry.attributes;
+      for(let i=0;i<position.count;i++){
+        const x=position.getX(i)/CELL,z=position.getZ(i)/CELL;
+        color.copy(grass).lerp(shade,Math.max(0,Math.sin(x*.4+z*.7))*.35);
+        color.lerp(sand,THREE.MathUtils.clamp((1.02-coastDistance(x,z))/.78,0,1)).multiplyScalar(.97+rand(x,z)*.055);
+        colors.setXYZ(i,color.r,color.g,color.b);
+      }
+      colors.needsUpdate=true;
+      for(const {type,mesh,originalColors}of this.seasonalTrees||[]){
+        const colors=mesh.geometry.attributes.color,tones=(type==='cypress'?palette.evergreen:palette.foliage).map(hex=>new THREE.Color(hex));
+        for(let i=0;i<colors.count;i++){
+          const offset=i*3,r=originalColors[offset],g=originalColors[offset+1],b=originalColors[offset+2],tone=foliageTone(r,g,b);
+          if(tone<0)colors.setXYZ(i,r,g,b);else colors.setXYZ(i,tones[tone].r,tones[tone].g,tones[tone].b);
+        }
+        colors.needsUpdate=true;
+      }
+      if(this.flowers){const tones=palette.flowers.map(hex=>new THREE.Color(hex));for(let i=0;i<this.flowerCount;i++)this.flowers.setColorAt(i,tones[i%tones.length]);this.flowers.count=Math.floor(this.flowerCount*palette.flowerDensity);this.flowers.instanceColor.needsUpdate=true;}
+      this.skyLight?.color.set(palette.skyLight);this.skyLight?.groundColor.set(palette.groundLight);
+    }
+    if(festival.active&&hearth){
+      if(!this.festivalBunting)this.createFestivalBunting();
+      this.festivalBunting.visible=true;this.festivalBunting.position.set(hearth.x*CELL,groundHeight(hearth.x,hearth.z),hearth.z*CELL);
+    }else if(this.festivalBunting)this.festivalBunting.visible=false;
+  }
+  createFestivalBunting(){
+    // A small, reusable piece of scenery behind the hearth's work apron. It
+    // belongs to neither collision/navigation nor the selectable-object lists.
+    const group=new THREE.Group(),timber=[];
+    for(const x of[-1.38,1.38]){const post=new THREE.CylinderGeometry(.025,.035,1.48,5);post.translate(x,.74,-.75);timber.push(post);}
+    const points=Array.from({length:9},(_,i)=>{const t=i/8;return new THREE.Vector3(-1.38+t*2.76,1.46-Math.sin(t*Math.PI)*.17,-.75);});
+    for(let i=1;i<points.length;i++){const from=points[i-1],to=points[i],direction=to.clone().sub(from),rope=new THREE.CylinderGeometry(.009,.009,direction.length(),4);rope.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),direction.clone().normalize()));rope.translate(...from.clone().add(to).multiplyScalar(.5).toArray());timber.push(rope);}
+    const frame=new THREE.Mesh(mergeGeometries(timber),material('#a68b64'));timber.forEach(geometry=>geometry.dispose());group.add(frame);
+    const vertices=[],colors=[],tones=['#d99765','#b66650','#e3c681','#789b83'].map(hex=>new THREE.Color(hex));
+    for(let i=0;i<8;i++){const x=-1.2+i*(2.4/7),y=1.46-Math.sin((x+1.38)/2.76*Math.PI)*.17,color=tones[i%tones.length];vertices.push(x-.105,y,-.75,x+.105,y,-.75,x,y-.24,-.75);for(let j=0;j<3;j++)colors.push(color.r,color.g,color.b);}
+    const cloth=new THREE.BufferGeometry();cloth.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));cloth.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));cloth.computeVertexNormals();
+    group.add(new THREE.Mesh(cloth,material('#ffffff',{vertexColors:true,side:THREE.DoubleSide})));group.name='harvest-festival-bunting';this.festivalBunting=group;this.scene.add(group);
   }
   syncWoodland(){
     if(!this.stumps||!this.state)return;
@@ -559,7 +606,7 @@ export class VillageWorld {
       for(const [key,pieces]of this.decor)for(const p of pieces)if(!p.treeId){const m=occupied.has(key)?new THREE.Matrix4().makeScale(0,0,0):p.matrix;for(const mesh of p.meshes){mesh.setMatrixAt(p.index,m);mesh.instanceMatrix.needsUpdate=true;}}
       this.updatePaths();
     }
-    this.syncWoodland();
+    this.syncWoodland();this.syncSeasonVisuals();
     const reserved=new Set((state.frontier?.units||[]).filter(u=>!['dead','released'].includes(u.status)&&u.citizenId).map(u=>u.citizenId));
     const citizens=(state.citizens||Array.from({length:state.population},(_,i)=>({id:`preview-${i}`,name:`Islander ${i+1}`,job:'idle',workplace:null}))).filter(c=>!reserved.has(c.id));
     const ids=new Set(citizens.map(c=>c.id));
@@ -1104,8 +1151,8 @@ export class VillageWorld {
     this.updatePressure();
     if(this.boat){const gx=won?5.45:17,gz=won?17.3:22;this.boat.position.x+=(gx-this.boat.position.x)*Math.min(1,dt*.18);this.boat.position.z+=(gz-this.boat.position.z)*Math.min(1,dt*.18);this.boat.position.y=-.10+(this.reduced?0:Math.sin(this.clock*1.2)*.045);this.boat.rotation.z=this.reduced?0:Math.sin(this.clock*.9)*.025;}
     // Daylight stays readable; a gentle late-afternoon warmth replaces a black night.
-    const warmth=Math.max(0,Math.sin(dayTime*Math.PI));this.sun.color.setRGB(1,.91-warmth*.05,.76-warmth*.12);
-    if(this.state && Math.floor(this.clock*2)!==this.lastWoodlandFrame){this.lastWoodlandFrame=Math.floor(this.clock*2);this.syncWoodland();}
+    const warmth=Math.max(0,Math.sin(dayTime*Math.PI)),sun=this.seasonColors?.sun||[1,.94,.85];this.sun.color.setRGB(sun[0],sun[1]-warmth*.035,sun[2]-warmth*.065);
+    if(this.state && Math.floor(this.clock*2)!==this.lastWoodlandFrame){this.lastWoodlandFrame=Math.floor(this.clock*2);this.syncWoodland();this.syncSeasonVisuals();}
     this.renderer.render(this.scene,this.camera);
   }
   diagnostics(){return{drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,actors:this.actors.length,buildings:this.buildings.size,troops:this.troops.size,fortifications:this.fortifications.size,neighbors:this.neighborModels.size,pixelRatio:this.renderer.getPixelRatio(),webgl:this.renderer.capabilities.isWebGL2};}

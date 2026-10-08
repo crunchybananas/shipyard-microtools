@@ -1,13 +1,15 @@
-import { calendarDay, perMinute, perMinuteGoods, until } from './calendar.js';
+import { calendarDay, perMinute, perMinuteGoods, until, duration } from './calendar.js';
 import * as sim from './sim.js';
 import { BUILDINGS, RESOURCES, RESOURCE_NAMES, JOBS, getBuildingSpec } from './catalog.js';
 import * as progression from './progression.js';
 import { pressureOptions } from './pressure.js';
 import { researchRequirements, rankContracts } from './clarity.js';
-import { resourceChips, buildingPurpose } from './clarity-ui.js';
+import { resourceChips } from './clarity-ui.js';
 import { pathRequirement } from './path-choice.js';
 import { createResearchMap } from './research-map.js';
 import { createPressGuard } from './press-guard.js';
+import { resourceDetails } from './resource-details.js';
+import { seasonInfo, festivalQuote, festivalStatus, effectiveMorale } from './seasons.js';
 
 const $ = id => document.getElementById(id);
 const format = n => Math.floor(n || 0).toLocaleString();
@@ -41,18 +43,19 @@ function stepper(value, min, max, id, update) {
 
 export function createTownUI({ getState, mutate, canMutate = () => true, inspect, focusCitizen, getIcons, getPaused = () => false, resume = () => {}, build = () => {}, beforeOpen = () => {} }) {
   let tab = null, lastSignature = '', previousFocus = null, researchMapOpen = false, mapSelection = null, mapGesture = false, mapScroll = null, mapScrollUntil = 0;
-  let pendingInspector = null;
+  let pendingInspector = null, selectedResource = null, storesScroll = 0, festivalPreview = null;
   const townPress = createPressGuard($('town-book-content'), { onRelease: () => update() });
   const inspectorPress = createPressGuard($('inspect-management'), { onRelease: () => {
     const building = pendingInspector; pendingInspector = null;
     if (building && !$('inspector').hidden) inspectorControls(building);
   } });
   function action(fn) { if (!canMutate()) return; mutate(fn()); lastSignature = ''; update(true); }
-  function open(next) {
+  function open(next, resource = null) {
+    selectedResource = next === 'stores' && RESOURCE_NAMES.includes(resource) ? resource : null; festivalPreview = null;
     beforeOpen(); previousFocus = document.activeElement; tab = next; $('town-book').hidden = false; document.body.classList.add('town-view-active');
     $('town-book-title').textContent = titleFor[tab]; $('town-book-content').scrollTop = 0; update(true);
   }
-  function close() { townPress.reset(); const focused = $('town-book').contains(document.activeElement); tab = null; researchMapOpen = false; mapGesture = false; $('town-book').hidden = true; document.body.classList.remove('town-view-active'); if (focused) previousFocus?.focus({ preventScroll: true }); update(); }
+  function close() { townPress.reset(); const focused = $('town-book').contains(document.activeElement); tab = null; selectedResource = null; festivalPreview = null; researchMapOpen = false; mapGesture = false; $('town-book').hidden = true; document.body.classList.remove('town-view-active'); if (focused) previousFocus?.focus({ preventScroll: true }); update(); }
   $('close-town-book').onclick = close;
   $('town-book-content').addEventListener('pointerdown', event => { if (event.target.closest('[data-scroll-region="research-map"]')) mapGesture = true; });
   document.addEventListener('pointerup', () => { mapGesture = false; }); document.addEventListener('pointercancel', () => { mapGesture = false; });
@@ -60,12 +63,12 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
   document.querySelectorAll('[data-town-tab]').forEach(button => button.onclick = () => tab === button.dataset.townTab && button.closest('#town-tools') ? close() : open(button.dataset.townTab));
   function image(type) { const img = el('img'); img.src = getIcons()[type] || getIcons().cottage; img.alt = ''; return img; }
   function pauseCue() { const row = el('div', 'paused-work'); row.append(el('span', '', 'Ⅱ Time paused · work waits'), btn('Resume time', 'resume-time', resume)); return row; }
-  function disclosure(id, label, open = false) { const node = el('details', 'town-disclosure'); node.dataset.disclosure = id; node.open = open; node.append(el('summary', '', label)); return node; }
+  function disclosure(id, label, open = false) { const node = el('details', 'town-disclosure'), summary = el('summary', '', label); node.dataset.disclosure = id; node.open = open; summary.dataset.actionId = `disclosure-${id}`; node.append(summary); return node; }
   function workforceContent(state) {
     const work = sim.workforce(state), needs = sim.villageNeeds(state), nodes = [];
     const totals = el('div', 'town-summary');
     for (const [value, label] of [[work.employed, 'at work'], [work.builders, 'building'], [work.idle, 'available']]) { const cell = el('div'); cell.append(el('strong', '', value), document.createTextNode(label)); totals.append(cell); }
-    nodes.push(totals, el('p', 'town-intro', `Morale ${Math.round(state.morale)}%. ${needs.migration.reason} Every job shares the same residents.`));
+    nodes.push(totals, el('p', 'town-intro', `Morale ${Math.round(effectiveMorale(state))}%. ${needs.migration.reason} Every job shares the same residents.`));
     if (getPaused()) nodes.push(pauseCue());
     const builders = el('div', 'town-control'), intro = el('div'); intro.append(el('strong', '', 'Construction crew'), el('small', '', 'Builders take priority while work is queued, then return to the other jobs.'));
     builders.append(intro, stepper(work.builderTarget, 0, state.population, 'builders', value => action(() => sim.setBuilderTarget(state, value)))); nodes.push(builders);
@@ -106,42 +109,17 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     }); return nodes;
   }
   function storesContent(state) {
-    const daily = sim.rates(state), needs = sim.villageNeeds(state), nodes = [el('p', 'town-intro', 'Made or imported goods enter these stores automatically. Rates are per minute at 1× and reflect workers and supplies. A warehouse increases capacity.')];
-    function quote(resource) {
-      open('trade'); const button = $('town-book-content').querySelector(`[data-action-id="import-import_${resource}"]`);
-      const section = button?.closest('details'); if (section) section.open = true;
-      button?.closest('.market-quote')?.scrollIntoView({ block: 'start' });
-    }
-    function workplace(type, actionId) {
-      const existing = state.buildings.find(building => building.type === type);
-      return btn(`${existing ? 'View' : 'Plan'} ${BUILDINGS[type].name.toLowerCase()}`, actionId, () => existing ? inspect(existing) : build(type));
-    }
+    if (selectedResource) return resourceContent(state, selectedResource);
+    const daily = sim.rates(state), needs = sim.villageNeeds(state), nodes = [el('p', 'town-intro', 'Goods enter these stores automatically. Choose a resource to see where it comes from, what uses it, and how to get more.')];
+    const art = el('img', 'resource-panel-art'); art.src = './assets/resource-pantry.jpg'; art.alt = ''; art.loading = 'lazy'; art.width = 2172; art.height = 724; nodes.unshift(art);
     for (const key of RESOURCE_NAMES) {
-      const row = el('div', 'stock-row'), label = el('div'), amount = el('span', 'stock-amount'), rate = perMinute(daily[key] || 0);
-      row.dataset.resource = key;
+      const rate = perMinute(daily[key] || 0), row = btn('', `resource-${key}`, () => revealResource(key), { className: 'stock-row resource-row' });
+      const label = el('span'), amount = el('span', 'stock-amount'); row.type = 'button'; row.dataset.resource = key;
       label.append(el('strong', '', RESOURCES[key].name));
-      if (key === 'food') label.append(el('small', 'stock-note', `${Math.round(perMinute(daily.foodConsumed) * 10) / 10} eaten per minute`));
-      amount.append(document.createTextNode(format(state.resources[key]))); if (RESOURCES[key].physical) amount.append(el('em', '', ` / ${format(daily.storage[key])}`));
-      row.append(label, amount, el('span', `stock-rate${rate < 0 ? ' negative' : ''}`, `${rate >= 0 ? '+' : ''}${Math.round(rate * 10) / 10} / min`)); nodes.push(row);
-      if (key === 'food' || key === 'cloth') {
-        const help = el('div', 'stock-tools-help'), controls = el('div', 'town-row-actions');
-        if (key === 'food') {
-          help.append(el('p', 'town-meta', 'Orchards and kitchen gardens make food directly. For bread: Grain farm → Windmill → Bakery → Food. The bakery also burns timber; staff every workplace.'));
-          controls.append(workplace('garden', 'food-garden'), workplace('bakery', 'food-bakery'));
-        } else {
-          help.append(el('p', 'town-meta', 'Flax field → Weaver → Cloth. Staff both workplaces; the weaver needs flax. Finished cloth enters stores automatically for homes, clinics and trade.'));
-          controls.append(workplace('flaxfield', 'cloth-flax'), workplace('weaver', 'cloth-weaver'));
-        }
-        controls.append(btn(`Buy ${key} · view quote`, `${key}-buy`, () => quote(key)));
-        help.append(controls); row.append(help);
-      }
-      if (key === 'tools') {
-        label.append(el('small', 'stock-note', 'Made by a toolmaker · or bought at market'));
-        const help = el('div', 'stock-tools-help'), controls = el('div', 'town-row-actions'), chain = disclosure('tools-chain', 'Make tools locally');
-        chain.append(el('p', 'town-meta', 'Iron mine → Smithy → Toolmaker · planks from a Sawmill'), buildingPurpose('toolmaker'), btn('Plan a toolmaker', 'tools-build', () => build('toolmaker')));
-        controls.append(btn('Buy tools · view quote', 'tools-buy', () => quote('tools')));
-        help.append(controls, chain); row.append(help);
-      }
+      amount.append(document.createTextNode(format(state.resources[key])));
+      if (RESOURCES[key].physical) amount.append(el('em', '', ` / ${format(daily.storage[key])}`));
+      row.append(label, amount, el('span', `stock-rate${rate < 0 ? ' negative' : ''}`, `${rate >= 0 ? '+' : ''}${rateNumber(rate)} / min`), el('span', 'resource-chevron', '›'));
+      row.setAttribute('aria-label', `${RESOURCES[key].name}, ${rateNumber(state.resources[key])} stored. View details`); nodes.push(row);
     }
     nodes.push(el('h3', 'town-section', 'A place to stay'), el('p', 'town-intro', `${needs.housing.required} residents / ${needs.housing.have} beds. ${needs.migration.reason}`));
     for (const [key, service] of Object.entries(needs.services || {})) {
@@ -149,10 +127,132 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       label.append(el('small', 'stock-note', `${Math.round(service.served || 0)} / ${Math.round(service.demand || 0)} beds served`));
       row.append(label, el('span', 'stock-amount', `${Math.round(service.coverage * 100)}%`), el('span', 'stock-rate', `Capacity ${Math.round(service.capacity || 0)}`)); nodes.push(row);
     }
-    const chains = [['Bread', 'Grain farm → Windmill → Bakery → Food'], ['Timber craft', 'Woodcutter → Sawmill → Planks → Better buildings'], ['Metal craft', 'Iron mine → Smithy → Toolmaker → Tools and upgrades'], ['Cloth', 'Flax field → Weaver → Cloth → Homes and trade']];
-    nodes.push(el('h3', 'town-section', 'How the stores connect'));
-    for (const [name, line] of chains) { const row = el('div', 'town-row'); row.append(el('strong', 'town-meta', name), el('p', '', line)); nodes.push(row); }
     return nodes;
+  }
+  const rateNumber = value => Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  function allResources() {
+    const prior = selectedResource; selectedResource = null; festivalPreview = null; update(true);
+    $('town-book-content').scrollTop = storesScroll;
+    $('town-book-content').querySelector(`[data-action-id="resource-${prior}"]`)?.focus({ preventScroll: true });
+  }
+  function resourceQuote(resource) {
+    open('trade'); const button = $('town-book-content').querySelector(`[data-action-id="import-import_${resource}"]`);
+    const section = button?.closest('details'); if (section) section.open = true;
+    button?.closest('.market-quote')?.scrollIntoView({ block: 'start' });
+    if (button && !button.disabled) button.focus({ preventScroll: true });
+  }
+  function manageResourceWorkplace(id) {
+    open('workforce'); const row = $('town-book-content').querySelector(`[data-workplace="${CSS.escape(id)}"]`);
+    row?.scrollIntoView({ block: 'start' }); row?.querySelector('button:not(:disabled)')?.focus({ preventScroll: true });
+  }
+  function resourceWorkplaces(entries, label, direction) {
+    const section = el('section', 'resource-workplaces'); section.append(el('h3', 'town-section', label));
+    if (!entries.length) section.append(el('p', 'town-meta', direction === '+' ? 'No local workplace produces this yet.' : 'No local workplace uses this yet.'));
+    for (const item of entries) {
+      const row = el('div', 'resource-workplace'), top = el('div', 'resource-workplace-top'), controls = el('div', 'town-row-actions');
+      top.append(el('strong', '', item.name), el('span', 'resource-contribution', `${direction}${rateNumber(item.rate)} / min`));
+      row.append(top, el('p', 'town-meta', `${item.maxWorkers ? `${item.workers} / ${item.wanted} assigned · ` : ''}${item.reason || item.status}`));
+      controls.append(btn('Inspect', `resource-${direction === '+' ? 'source' : 'sink'}-inspect-${item.id}`, () => { const building = getState().buildings.find(b => b.id === item.id); if (building) { close(); inspect(building); } }));
+      if (item.maxWorkers) controls.append(btn('Manage jobs', `resource-${direction === '+' ? 'source' : 'sink'}-manage-${item.id}`, () => manageResourceWorkplace(item.id)));
+      row.append(controls); section.append(row);
+    }
+    return section;
+  }
+  function resourceContent(state, key) {
+    const data = resourceDetails(state, key), section = el('section', 'resource-detail'); section.dataset.resourceDetail = key;
+    const quote = progression.importOptions(state).find(option => option.id === `import_${key}`);
+    const back = btn('‹ All resources', 'all-resources', allResources, { className: 'resource-back small-button' });
+    const stock = el('div', 'resource-stock'), quantity = el('strong', '', rateNumber(data.stock));
+    stock.append(quantity, el('span', '', data.capacity === null ? `${data.name.toLowerCase()} stored · no storage limit` : `${data.name.toLowerCase()} stored / ${format(data.capacity)} capacity`));
+    section.append(back, stock);
+    const rates = el('dl', 'resource-rates');
+    for (const [label, value, sign] of [['Produced', data.rates.produced, '+'], ['Used by workplaces', data.rates.workplaceUsed, '−'], ['Used by residents', data.rates.residentUsed, '−'], ['Net change', data.rates.net, data.rates.net < 0 ? '−' : '+']]) {
+      const row = el('div'); row.append(el('dt', '', label), el('dd', value < 0 ? 'negative' : '', `${sign}${rateNumber(Math.abs(value))}`)); rates.append(row);
+    }
+    section.append(rates, el('p', 'resource-rate-note', `${getPaused() ? 'Time paused. ' : ''}Per minute at 1×, with current workers and supplies. Imports, construction, trade and other one-time spending are excluded.`));
+    if (data.meal) {
+      const forecast = el('div', 'resource-forecast');
+      forecast.append(el('p', '', data.meal.pantryMeals === null ? 'No resident meals are currently required.' : `Pantry alone covers ${data.meal.pantryMeals} town ${data.meal.pantryMeals === 1 ? 'meal' : 'meals'}, before production or other spending.`));
+      forecast.append(el('p', 'town-meta', `Next meal: ${rateNumber(data.meal.amount)} food in ${duration(data.meal.secondsUntil)} at 1×, for the current population. Resident use above is averaged across meals; newcomers also use food.`)); section.append(forecast);
+    } else if (data.decline) {
+      section.append(el('p', 'resource-forecast', `At current rates, this stock would last about ${duration(data.decline.seconds)} at 1× if rates stay the same and there is no other spending. Workers, supplies and storage can change that estimate.`));
+    }
+    const quick = el('div', 'town-row-actions resource-quick-actions');
+    const source = data.sources.find(item => item.maxWorkers && !['Construction', 'Upgrading'].includes(item.status));
+    quick.append(btn('Manage jobs', `resource-manage-${key}`, () => source ? manageResourceWorkplace(source.id) : open('workforce')));
+    if (data.producerTypes.length || quote) quick.append(btn(`Get more ${data.name.toLowerCase()}`, `resource-more-${key}`, () => {
+      if (!data.producerTypes.length) { resourceQuote(key); return; }
+      const plans = $('town-book-content').querySelector(`[data-disclosure="resource-${key}-plans"]`);
+      if (plans) { plans.open = true; plans.scrollIntoView({ block: 'start' }); plans.querySelector('summary')?.focus({ preventScroll: true }); }
+    }, { className: 'primary' }));
+    section.append(quick);
+    if (data.full || data.storageLimited) section.append(el('p', 'resource-storage-note', `${data.full ? 'Storage is full. ' : ''}Full shelves can throttle production; output can resume when space opens. The net rate above is a current snapshot.${key === 'food' ? ' A negative rate at full storage does not by itself mean the town lacks food production.' : ''}`));
+    else if (data.capacity !== null) section.append(el('p', 'resource-rate-note', 'A warehouse adds capacity for every physical good.'));
+    if (key === 'food') {
+      const art = el('img', 'resource-panel-art resource-detail-art'); art.src = './assets/resource-pantry.jpg'; art.alt = ''; art.loading = 'lazy'; art.width = 2172; art.height = 724;
+      section.append(art, seasonContent(state));
+    }
+    section.append(resourceWorkplaces(data.sources, 'Where it comes from', '+'), resourceWorkplaces(data.sinks, 'Where it goes', '−'));
+    const chains = {
+      food: 'Orchards and kitchen gardens make food directly. Bread: Grain farm → Windmill → Bakery → Food. The bakery also burns timber; staff and supply every workplace.',
+      grain: 'Grain farm → Windmill → Flour → Bakery → Food. A brewery also uses grain to make ale.',
+      flour: 'Grain farm → Windmill → Flour. A staffed bakery turns flour and timber into food.',
+      wood: 'Woodcutters harvest and replant woodland. Timber supplies construction, sawmills and bakeries.',
+      planks: 'Woodcutter → Sawmill → Planks → Better buildings and tools.',
+      ore: 'Iron mine → Iron ore → Smithy → Iron.',
+      iron: 'Iron mine → Smithy → Iron → Toolmaker and better buildings.',
+      tools: 'Iron mine → Smithy → Toolmaker → Tools. The toolmaker also needs planks from a sawmill. Finished tools enter these stores automatically for upgrades and trade.',
+      flax: 'Flax field → Flax → Weaver → Cloth.',
+      cloth: 'Flax field → Weaver → Cloth. Staff both workplaces; finished cloth enters these stores automatically for homes, clinics and trade.',
+      ale: 'Grain farm → Brewery → Ale → Community supply and trade.',
+    };
+    if (chains[key]) section.append(el('p', 'resource-chain', chains[key]));
+    if (data.producerTypes.length) {
+      const plans = disclosure(`resource-${key}-plans`, 'Add a producing workplace');
+      plans.append(el('p', 'town-meta', 'Review costs here. Materials are spent only when you confirm a valid building site.'));
+      for (const type of data.producerTypes) {
+        const spec = BUILDINGS[type], gate = progression.canUnlockBuilding(state, type), row = el('div', 'resource-plan');
+        const missing = Object.entries(spec.cost).filter(([resource, amount]) => (state.resources[resource] || 0) + 1e-6 < amount);
+        row.append(el('strong', '', spec.name), resourceChips(spec.cost, { state, cost: true }));
+        row.append(el('p', 'town-meta', !gate.ok ? gate.reason : missing.length ? `Still needed: ${resourceText(Object.fromEntries(missing.map(([resource, amount]) => [resource, amount - (state.resources[resource] || 0)])))}.` : 'Materials available. Choose a site to check space and entrance access.'));
+        row.append(btn(gate.ok ? `Plan ${spec.name.toLowerCase()}` : 'View required research', `resource-plan-${type}`, () => gate.ok ? build(type) : revealResearch(spec.unlock), { disabled: gate.ok && !canMutate() })); plans.append(row);
+      }
+      section.append(plans);
+    }
+    if (quote) {
+      const trade = el('section', 'resource-import'); trade.append(el('h3', 'town-section', 'Import from the coast'), el('p', '', `${resourceText(quote.cost)} → ${resourceText(quote.reward)}`), el('p', 'town-meta', quote.reason), btn('View import quote', `resource-import-${key}`, () => resourceQuote(key))); section.append(trade);
+    }
+    return [section];
+  }
+  function seasonContent(state) {
+    const season = seasonInfo(state), status = festivalStatus(state), quote = festivalQuote(state);
+    const section = disclosure('season-calendar', 'Seasons & harvest festival'); section.id = 'season-calendar';
+    section.append(el('h3', 'town-section', season.label));
+    const months = el('ol', 'season-progression'); months.setAttribute('aria-label', 'Season progression');
+    for (const name of ['Spring', 'Summer', 'Autumn', 'Winter']) { const item = el('li', name === season.name ? 'current' : '', name); if (name === season.name) item.setAttribute('aria-current', 'date'); months.append(item); }
+    section.append(months, el('p', 'town-meta', 'Each season lasts 3 days · 18 minutes at 1×. Seasons mark the calendar; they do not change workplace output.'));
+    section.append(el('h3', 'town-section', 'Harvest festival'), el('p', '', '+8 morale, capped at 100, for one day (6m at 1×). Once per year, in autumn.'));
+    if (status.active) section.append(el('p', 'resource-festival-active', `Celebrating · ${duration(status.remainingSeconds)} left at 1× · current morale ${Math.round(effectiveMorale(state))}%.`));
+    section.append(el('p', '', `Cost: ${quote.cost.food} food. Keep at least ${quote.reserveFood} food for two town meals.`), el('p', 'town-meta', `After this cost: ${rateNumber(Math.max(0, quote.foodAvailable - quote.cost.food))} food${quote.foodAvailable < quote.cost.food ? ' · not enough food to pay' : ''}. ${quote.reason}`));
+    if (festivalPreview) {
+      const review = el('div', 'resource-festival-confirm');
+      review.append(el('strong', '', `Confirm ${festivalPreview.cost.food} food for the festival?`), el('p', 'town-meta', 'This spends food now. Two meals must remain when you pay; that food stays available for ordinary town use.'));
+      const controls = el('div', 'town-row-actions');
+      controls.append(btn('Confirm festival', 'festival-confirm', () => {
+        action(() => {
+          const live = getState(), fresh = festivalQuote(live), reviewed = festivalPreview; festivalPreview = null;
+          if (!reviewed || fresh.cost.food !== reviewed.cost.food || fresh.reserveFood !== reviewed.reserveFood || fresh.year !== reviewed.year) return { ok: false, reason: 'The festival quote changed. Review the current cost before confirming.' };
+          return sim.celebrateHarvest(live);
+        });
+        $('season-calendar')?.querySelector('summary')?.focus({ preventScroll: true });
+      }, { disabled: !quote.ok || !canMutate(), className: 'primary' }), btn('Cancel', 'festival-cancel', () => {
+        festivalPreview = null; update(true);
+        const preview = $('town-book-content').querySelector('[data-action-id="festival-preview"]');
+        (preview && !preview.disabled ? preview : $('season-calendar')?.querySelector('summary'))?.focus({ preventScroll: true });
+      }));
+      review.append(controls); section.append(review);
+    } else section.append(btn('Review festival', 'festival-preview', () => { festivalPreview = festivalQuote(getState()); update(true); $('town-book-content').querySelector('[data-action-id="festival-confirm"]')?.focus({ preventScroll: true }); }, { disabled: !quote.ok || !canMutate() }));
+    return section;
   }
   function councilContent(state) {
     const nodes = [], research = progression.researchOptions(state), active = research.find(item => item.active);
@@ -334,10 +434,10 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     document.querySelectorAll('[data-town-tab]').forEach(button => button.setAttribute('aria-pressed', String(tab === button.dataset.townTab)));
     if (!tab || !force && townPress.held) return;
     if (researchMapOpen && (mapGesture || performance.now() < mapScrollUntil) && !force) return;
-    const signature = JSON.stringify([tab, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), state.morale, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
+    const signature = JSON.stringify([tab, selectedResource, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), effectiveMorale(state), state.seasons, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.contracts, state.routes, state.imports, state.pressure, state.citizens.map(c => [c.id, c.job, c.workplace])]);
     if (!force && signature === lastSignature) return; lastSignature = signature;
-    $('town-book-title').textContent = tab === 'council' && researchMapOpen ? 'Research map' : titleFor[tab];
-    $('town-book-kicker').textContent = `Day ${calendarDay(state)} · ${state.population} residents · ${Math.round(state.morale)}% morale`;
+    $('town-book-title').textContent = tab === 'council' && researchMapOpen ? 'Research map' : tab === 'stores' && selectedResource ? RESOURCES[selectedResource].name : titleFor[tab];
+    $('town-book-kicker').textContent = `${seasonInfo(state).label} · ${state.population} residents · ${Math.round(effectiveMorale(state))}% morale`;
     const render = { workforce: workforceContent, construction: queueContent, stores: storesContent, council: councilContent, trade: tradeContent, watch: watchContent }[tab];
     preserveReplace($('town-book-content'), render(state));
   }
@@ -393,6 +493,17 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     const viewport = $('town-book-content').querySelector('[data-scroll-region="research-map"]');
     if (viewport && mapScroll) { viewport.scrollLeft = mapScroll.left; viewport.scrollTop = mapScroll.top; }
   }
-  function revealResource(id) { open('stores'); $('town-book-content').querySelector(`[data-resource="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'start' }); }
-  return { open, close, update, inspectorControls, revealResearch, revealPaths, revealResource, get activeTab() { return tab; } };
+  function revealResource(id) {
+    if (!RESOURCE_NAMES.includes(id)) return;
+    if (tab === 'stores') {
+      if (!selectedResource) storesScroll = $('town-book-content').scrollTop;
+      selectedResource = id; festivalPreview = null; update(true); $('town-book-content').scrollTop = 0;
+    } else { storesScroll = 0; open('stores', id); }
+    $('town-book-content').querySelector('[data-action-id="all-resources"]')?.focus({ preventScroll: true });
+  }
+  function revealSeason() {
+    revealResource('food'); const section = $('season-calendar');
+    if (section) { section.open = true; section.scrollIntoView({ block: 'start' }); section.querySelector('summary')?.focus({ preventScroll: true }); }
+  }
+  return { open, close, update, inspectorControls, revealResearch, revealPaths, revealResource, revealSeason, get selectedResource() { return selectedResource; }, get activeTab() { return tab; } };
 }

@@ -4,6 +4,7 @@ import { createReadingClock } from './reading-clock.js';
 import { townSafety } from './town-safety.js';
 import { treeState, SAPLING_SECONDS, saplingTimeRemaining } from './woodland.js';
 import { calendarDay, calendarFraction, perMinute, perMinuteGoods, until } from './calendar.js';
+import { seasonInfo, festivalStatus } from './seasons.js';
 import { createFieldbook } from './fieldbook-ui.js';
 import { isFieldworker } from './discovery.js';
 import { VillageWorld } from './world.js';
@@ -87,6 +88,8 @@ function updateDock() {
   $('landing-button').setAttribute('aria-expanded', String(town?.activeTab === 'trade'));
   $('journal-button').setAttribute('aria-expanded', String(!$('journal').hidden));
   $('stores-toggle')?.setAttribute('aria-expanded', String(town?.activeTab === 'stores'));
+  for (const button of document.querySelectorAll('[data-hud-resource]')) button.setAttribute('aria-expanded', String(town?.activeTab === 'stores' && town.selectedResource === button.dataset.hudResource));
+  $('people-details')?.setAttribute('aria-expanded', String(town?.activeTab === 'workforce'));
 }
 function setObjectiveExpanded(expanded) {
   $('ambition-body').hidden = !expanded; $('collapse-objective').textContent = expanded ? '−' : '+';
@@ -111,6 +114,9 @@ function mountTabletControls() {
   const stores = document.createElement('button'); stores.id = 'stores-toggle'; stores.type = 'button'; stores.textContent = 'Stores';
   stores.setAttribute('aria-label', 'Open Stores: all resources, supplies and production chains'); stores.setAttribute('aria-controls', 'town-book'); stores.setAttribute('aria-expanded', 'false');
   stores.onclick = () => { if (playing) { town.open('stores'); updateDock(); } }; document.querySelector('#hud .supplies').append(stores);
+  for (const button of document.querySelectorAll('[data-hud-resource]')) button.onclick = () => { if (playing) { town.revealResource(button.dataset.hudResource); updateDock(); } };
+  $('people-details').onclick = () => { if (playing) { town.open('workforce'); updateDock(); } };
+  $('calendar-toggle').onclick = () => { if (playing) { town.revealSeason(); updateDock(); } };
   const controls = [['tablet-build-toggle','build'],['tablet-town-toggle','town'],['landing-button','landing'],['journal-button','journal'],['frontier-toggle','frontier'],['fieldbook-toggle','fieldbook'],['companion-toggle','companion']];
   for (const [id, destination] of controls) { const button = $(id); button.type = 'button'; button.onclick = () => activateDock(destination); }
   $('landing-button').setAttribute('aria-controls', 'town-book'); $('journal-button').setAttribute('aria-controls', 'journal');
@@ -333,10 +339,14 @@ function updateUI() {
   for (const key of ['wood','stone','food']) { $(key).textContent = format(state.resources[key]); $(`${key}-rate`).textContent = `${rateFormat(perMinute(daily[key]))}/min`; $(`${key}-rate`).classList.toggle('negative', daily[key] < 0); }
   $('people').innerHTML = `${state.population} <em>/ ${daily.capacity}</em>`;
   $('arrival-status').textContent = needs.migration.eligible ? 'Welcoming arrivals' : daily.capacity <= state.population ? 'Homes are full' : 'Check town needs';
-  $('arrival-status').parentElement.title = needs.migration.reason; $('day').textContent = `Day ${calendarDay(state)}`;
+  $('arrival-status').parentElement.title = needs.migration.reason;
   const portion = calendarFraction(state);
-  $('season').textContent = speed === 0 ? 'Taking a breath' : portion < .3 ? 'Early morning' : portion < .65 ? 'A good afternoon' : 'Almost tomorrow';
-  $('day-progress').style.width = `${portion * 100}%`; $('village-mood').textContent = `${Math.round(state.morale)}% morale · ${state.population >= 40 ? 'A growing town' : state.population >= 20 ? 'Finding its purpose' : 'Putting down roots'}`;
+  const season = seasonInfo(state), celebration = festivalStatus(state);
+  $('day').textContent = `${season.name} ${season.day} · Y${season.year}`;
+  $('season').textContent = `Day ${calendarDay(state)} · ${speed === 0 ? 'Paused' : celebration.active ? 'Celebrating' : portion < .3 ? 'Morning' : portion < .65 ? 'Afternoon' : 'Evening'}`;
+  $('calendar-toggle').dataset.season = season.id;
+  $('calendar-toggle').setAttribute('aria-label', `${season.name}, day ${season.day}, year ${season.year}. Open the seasonal calendar and harvest festival.`);
+  $('day-progress').style.width = `${portion * 100}%`; $('village-mood').textContent = `${Math.round(daily.morale)}% morale · ${state.population >= 40 ? 'A growing town' : state.population >= 20 ? 'Finding its purpose' : 'Putting down roots'}`;
   const guidance = objectiveGuidance(state, ambition), rows = objectiveChecklist(state, ambition);
   currentNextStep = nextTownStep(state, ambition, needs) || guidance;
   $('objective-title').textContent = ambition.title;
@@ -380,10 +390,15 @@ function win() {
 }
 function advance(dt) {
   if (!companions.canManage) return { changed: false, newDay: false, completed: 0 };
-  const priorIncident = state.pressure?.active?.id, priorDay = calendarDay(state);
+  const priorIncident = state.pressure?.active?.id, priorDay = calendarDay(state), priorSeason = seasonInfo(state).id;
   const result = sim.tick(state, dt); if (result.changed) world.sync(state);
   if (result.newDay || result.completed) { updateUI(); save(); }
-  if (calendarDay(state) !== priorDay) { audio.play('day'); announce(`Day ${calendarDay(state)}. A new morning on the island.`); }
+  if (calendarDay(state) !== priorDay) {
+    audio.play('day'); const season = seasonInfo(state);
+    announce(priorSeason !== season.id
+      ? `${season.name} arrives.${season.id === 'autumn' ? ' Tap Food to plan a harvest festival from your surplus.' : season.id === 'winter' ? ' Frost brightens the island; your crops and jobs keep their usual pace.' : ' A new color settles over the island.'}`
+      : `Day ${calendarDay(state)}. A new morning on the island.`);
+  }
   if (result.arrivals) { announce(`${result.arrivals} new ${result.arrivals === 1 ? 'neighbor has' : 'neighbors have'} arrived. ${state.migration.reason}`); }
   else if (result.completed) { audio.play('build'); announce(`${result.completed} ${result.completed === 1 ? 'project is' : 'projects are'} finished. Your builders are finding their next job.`); }
   if (state.pressure?.active?.id !== priorIncident) {

@@ -2,6 +2,8 @@ import { createWoodland, restoreWoodland, woodlandStatus, harvestWood, tickWoodl
 export { woodlandStatus } from './woodland.js';
 import { WORK_CYCLE_SECONDS, workPosition } from './calendar.js';
 import { newCitizenName } from './citizen-names.js';
+import { createSeasonState, normalizeSeasons, householdMeal, effectiveMorale, festivalStatus, celebrateHarvest as harvestAction } from './seasons.js';
+export { seasonInfo, festivalQuote, festivalStatus, effectiveMorale } from './seasons.js';
 import { createDiscoveryState, normalizeDiscovery, discoveryModifier } from './discovery.js';
 /** Wildhaven v2: named labor, escrowed construction, continuous production and town needs. */
 import { BUILDINGS, RESOURCE_NAMES, getBuildingSpec, getUpgrade } from './catalog.js';
@@ -167,7 +169,7 @@ export function createGame() {
   const state = {
     version: VERSION, resources, population: 6, citizens: Array.from({ length: 6 }, (_, i) => ({ ...citizen(i + 1), experience: {} })),
     nextCitizenId: 7, calendarEpoch: 0, day: 1, time: 0, subsecond: 0, elapsed: 0, nextId: 1, nextEventId: 1, nextQueueOrder: 1,
-    won: false, undo: null, lastTradeDay: 0, builderTarget: 2, morale: 78, buildings: [hearth, bell], events: [],
+    won: false, undo: null, lastTradeDay: 0, builderTarget: 2, morale: 78, seasons: createSeasonState(), buildings: [hearth, bell], events: [],
     woodland: createWoodland(), stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
   };
   addEvent(state, 'Six founders share a hearth. Give builders a cottage to raise, then choose who will grow food and gather materials.', 'welcome');
@@ -313,7 +315,7 @@ export function buildingYield(state, type, x, z) {
   for (const [key, value] of Object.entries(recipe.input)) values[key] -= value;
   return { ...values, ...recipe, workers: specFor(fake).workers || 0, required: specFor(fake).workers || 0, efficiency: 1, blockedReason: '' };
 }
-function foodUpkeep(state) { return round(state.population * 0.8 * modifier(state, 'hearth', 'foodConsumption')); }
+function foodUpkeep(state) { return householdMeal(state); }
 const SERVICE_KINDS = ['water', 'health', 'faith', 'security', 'leisure', 'civic', 'community'];
 const SERVICE_CAPACITY = { water: 35, health: 30, faith: 24, security: 30, leisure: 24, civic: 40 };
 
@@ -386,7 +388,7 @@ export function villageNeeds(state) {
   const food = foodUpkeep(state), beds = housing(state), spare = Math.max(0, beds - state.population), extra = modifier(state, 'cottage', 'arrival');
   let expected = Math.min(Math.max(0, 2 + Math.floor(extra)), spare, Math.max(0, Math.floor((state.resources.food - food) / 4))), reason = 'New settlers can arrive with the next supply boat.';
   if (!spare) { expected = 0; reason = 'More completed housing is needed.'; }
-  else if (state.morale < 45) { expected = 0; reason = 'Raise morale to 45 before new settlers arrive.'; }
+  else if (effectiveMorale(state) < 45) { expected = 0; reason = 'Raise morale to 45 before new settlers arrive.'; }
   else if (state.resources.food < food + 4) { expected = 0; reason = 'Keep the next meal and 4 extra food per newcomer in the pantry.'; }
   const { homes, services } = serviceAccess(state);
   const civicNeeds = [
@@ -398,7 +400,7 @@ export function villageNeeds(state) {
     if (state.population >= need.population) { expected = 0; reason = need.reason; }
     else expected = Math.min(expected, need.population - state.population);
   }
-  return { food: { have: state.resources.food, required: food, satisfied: state.resources.food >= food }, housing: { have: beds, required: state.population, satisfied: beds >= state.population }, services, homes, migration: { eligible: expected > 0, reason, expected }, morale: state.morale };
+  return { food: { have: state.resources.food, required: food, satisfied: state.resources.food >= food }, housing: { have: beds, required: state.population, satisfied: beds >= state.population }, services, homes, migration: { eligible: expected > 0, reason, expected }, morale: effectiveMorale(state) };
 }
 function updateNeeds(state) {
   state.storage = storageCapacity(state); const needs = villageNeeds(state); state.migration = needs.migration;
@@ -415,7 +417,8 @@ export function rates(state) {
   }
   const foodConsumed = foodUpkeep(state); result.food -= foodConsumed;
   for (const key of RESOURCE_NAMES) result[key] = round(result[key]);
-  return { ...result, foodProduced, foodConsumed, capacity: housing(state), happiness: state.morale, morale: state.morale, storage: storageCapacity(state), buildings };
+  const morale = effectiveMorale(state);
+  return { ...result, foodProduced, foodConsumed, capacity: housing(state), happiness: morale, morale, storage: storageCapacity(state), buildings };
 }
 function refreshProduction(state) { for (const b of state.buildings) b.production = throughput(state, b); updateNeeds(state); }
 export function buildingStatus(state, idOrBuilding) {
@@ -600,6 +603,7 @@ function dawn(state) {
 export function tick(state, dt) {
   const result = { newDay: false, days: 0, arrivals: 0, completed: 0, changed: false, won: state.won, frontierEvents: [] };
   if (!isFiniteNumber(dt) || dt <= 0) return result;
+  const festivalWasActive = festivalStatus(state).active;
   let remaining = Math.min(dt, DAY_LENGTH * 30);
   state.elapsed = round(state.elapsed + remaining);
   // Combat advances at its authoritative quarter-second boundary. Economy remains
@@ -631,6 +635,9 @@ export function tick(state, dt) {
     if (state.citizens.map(c => `${c.id}:${c.workplace}:${c.job}`).join('|') !== oldJobs) result.changed = true;
     updateNeeds(state);
   }
+  // A festival can end between economy seconds. Refresh cached guidance and
+  // notify the world immediately, without advancing meals or baseline morale.
+  if (festivalWasActive && !festivalStatus(state).active) { updateNeeds(state); result.changed = true; }
   result.changed ||= result.completed > 0 || result.newDay; result.won = state.won; return result;
 }
 export function tradeOffer(state, resource) {
@@ -648,6 +655,11 @@ export function trade(state, resource) {
   const offer = tradeOffer(state, resource); if (!offer.ok) return offer;
   state.resources.food = round(state.resources.food - offer.cost); state.resources[resource] += offer.amount; state.lastTradeDay = state.day;
   addEvent(state, `The landing exchanged 12 food for ${offer.amount} ${resource === 'wood' ? 'timber' : 'stone'}.`, 'trade'); updateNeeds(state); return { ...offer, resource };
+}
+export function celebrateHarvest(state) {
+  const result = harvestAction(state);
+  if (result.ok) { addEvent(state, result.reason, 'festival'); refreshProduction(state); }
+  return result;
 }
 export function actOnPressure(state, action) {
   refreshProduction(state);
@@ -705,6 +717,7 @@ function restoreV1(input) {
   state.day = input.day; state.time = Math.floor(input.time); state.subsecond = input.time % 1; state.elapsed = input.elapsed; state.won = bell.restored;
   if (state.won) state.wonDay = bell.restoredDay;
   state.lastTradeDay = input.lastTradeDay ?? 0; state.migratedFromVersion = 1; state.calendarEpoch = workPosition(state);
+  state.seasons = input.seasons; normalizeSeasons(state);
   state.nextId = Math.max(0, ...state.buildings.filter(b => /^b\d/.test(b.id)).map(b => Number(b.id.slice(1)))) + 1;
   restoreJournal(state, input);
   addEvent(state, 'Your original village is preserved. Its buildings are complete; citizens now choose real jobs and builders raise the next generation.', 'migration');
@@ -773,6 +786,7 @@ export function restore(raw) {
     nextCitizenId: Math.max(...citizens.map(c => Number(c.id.slice(1)))) + 1,
     nextQueueOrder: Math.max(0, ...orders) + 1,
   });
+  state.seasons = input.seasons; normalizeSeasons(state);
   if (bell.restored) state.wonDay = bell.restoredDay;
   state.stats = Object.fromEntries(['built', 'arrivals', 'harvests', 'upgrades'].map(key => [key, validInteger(input.stats?.[key], 0, 1000000) ? input.stats[key] : 0]));
   for (const key of Object.keys(createProgressionState())) if (Object.hasOwn(input, key)) state[key] = structuredClone(input[key]);
