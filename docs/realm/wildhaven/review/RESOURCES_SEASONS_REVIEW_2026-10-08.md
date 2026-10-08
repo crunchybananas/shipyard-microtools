@@ -39,3 +39,7 @@ Evidence: [browser receipt](resource-seasons-2026-10-08/receipt.json), [edge rec
 No push, PR, merge, or deployment occurred. The first-bread draft remains separate. No desktop UI, CNC/controller/Makera files, moth design, MyStory, local memories, settings, or installed applications were changed.
 
 The next seasonal design step should be a small, clearly forecast seasonal trade or preparation choice with a visible payoff. Crop penalties or survival winters should wait until players can understand and prepare for them; this first slice establishes the calendar and a voluntary celebration.
+
+## Authorized release integration
+
+Cory authorized publication after this review. Preserved upstream PR160 (`688de95`), which extends sapling growth to three in-game days and migrates saved progress. Only the overlapping index cache-version block required resolution; the seasons import map remains complete, and all upstream growth code/copy/tests are retained. The combined tree passes **309 tests** and the unchanged 2,020 archive checks. Updated runtime hashes and `release-unit-tests.log` record this exact release candidate.
