@@ -2,7 +2,7 @@ import { objectiveChecklist, objectiveGuidance } from './objective-checklist.js'
 import { placementInfoPosition } from './placement-layout.js';
 import { createReadingClock } from './reading-clock.js';
 import { townSafety } from './town-safety.js';
-import { treeState, SAPLING_SECONDS } from './woodland.js';
+import { treeState, SAPLING_SECONDS, saplingTimeRemaining } from './woodland.js';
 import { calendarDay, calendarFraction, perMinute, perMinuteGoods, until } from './calendar.js';
 import { seasonInfo, festivalStatus } from './seasons.js';
 import { createFieldbook } from './fieldbook-ui.js';
@@ -238,8 +238,8 @@ function updateInspector() {
     const tree = treeState(state, selected.id);
     $('inspect-title').textContent = tree.growth < 0 ? 'A cut stump' : tree.growth < SAPLING_SECONDS ? 'A young sapling' : 'Island woodland';
     $('inspect-kind').textContent = 'A living timber reserve'; $('inspect-image').hidden = true; $('inspect-focus').hidden = true; $('inspect-management').replaceChildren();
-    $('inspect-description').textContent = tree.growth < 0 ? 'A woodcutter harvested this tree. A staffed yard tending this grove will plant its replacement.' : tree.growth < SAPLING_SECONDS ? `Planted for the next harvest. Mature in ${Math.ceil(SAPLING_SECONDS-tree.growth)} seconds at 1×.` : `${Math.ceil(tree.wood)} timber remains in this tree. Nearby woodcutters share its stock.`;
-    $('inspect-detail').textContent = 'Woodcutters tend their nearest 12 trees, replanting every stump. Saplings take 3 minutes to mature. Watch each replacement grow before the next harvest.';
+    $('inspect-description').textContent = tree.growth < 0 ? 'A woodcutter harvested this tree. A staffed yard tending this grove will plant its replacement.' : tree.growth < SAPLING_SECONDS ? `Planted for the next harvest. Mature in ${saplingTimeRemaining(tree.growth)}.` : `${Math.ceil(tree.wood)} timber remains in this tree. Nearby woodcutters share its stock.`;
+    $('inspect-detail').textContent = 'Woodcutters tend their nearest 12 trees, replanting every stump. Saplings take 3 in-game days to mature. Watch each replacement grow before the next harvest.';
     $('inspect-action').textContent = 'Plan a woodcutter'; return;
   }
   if (selected.type === 'landing') {
@@ -285,7 +285,7 @@ function updateInspector() {
     if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
     if (selected.type === 'lumber') {
       const grove = sim.woodlandStatus(state, selected);
-      details.push(`${grove.mature} mature trees · ${grove.saplings} ${grove.saplings === 1 ? 'sapling' : 'saplings'} · ${grove.stumps} ${grove.stumps === 1 ? 'stump' : 'stumps'}. Workers replant automatically; saplings mature in 3 minutes at 1×.`);
+      details.push(`${grove.mature} mature trees · ${grove.saplings} ${grove.saplings === 1 ? 'sapling' : 'saplings'} · ${grove.stumps} ${grove.stumps === 1 ? 'stump' : 'stumps'}. Workers replant automatically; saplings mature in 3 in-game days (18 minutes at 1×).`);
       $('inspect-secondary').hidden = false; $('inspect-secondary').textContent = grove.youngTarget ? 'Find young woodland' : 'Find the working grove';
     }
     if (spec.service) {
