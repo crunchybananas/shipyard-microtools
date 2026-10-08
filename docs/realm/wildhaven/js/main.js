@@ -137,8 +137,7 @@ function tap(tile, pointer = {}) {
     commitBuilding(tile);
   } else {
     if (tile.tree) {
-      companionUI?.close(); frontierUI?.close(); fieldbook?.close(); town.close(); cancelTool(); closeInspector();
-      selected = { id: tile.tree.id, type: 'tree', tree: tile.tree }; $('inspector').hidden = false; updateInspector(); return;
+      inspectTree(tile.tree); return;
     }
     if (tile.scenery) { closeInspector(); return; }
     if (tile.citizen) { focusCitizen(tile.citizen); return; }
@@ -148,6 +147,10 @@ function tap(tile, pointer = {}) {
   }
 }
 function closeInspector() { lastInspectorSignature = ''; selected = null; $('inspector').hidden = true; world.select(null); world.selectCitizen?.(null); world.showServiceArea(null, null); }
+function inspectTree(tree) {
+  companionUI?.close(); frontierUI?.close(); fieldbook?.close(); town.close(); cancelTool(); closeInspector();
+  selected = { id: tree.id, type: 'tree', tree }; $('inspector').hidden = false; updateInspector();
+}
 function inspect(building) {
   if (!building) return;
   companionUI?.close(); frontierUI?.close(); fieldbook?.close(); selected = building; cancelTool(); town.close(); world.selectCitizen?.(null); world.select(building); world.showServiceArea(building.type, building, building.level, { label: !matchMedia('(pointer: coarse)').matches }); $('inspector').hidden = false; $('journal').hidden = true; audio.play('select'); updateInspector();
@@ -176,7 +179,7 @@ function updateInspector() {
     $('inspect-title').textContent = tree.growth < 0 ? 'A cut stump' : tree.growth < SAPLING_SECONDS ? 'A young sapling' : 'Island woodland';
     $('inspect-kind').textContent = 'A living timber reserve'; $('inspect-image').hidden = true; $('inspect-focus').hidden = true; $('inspect-management').replaceChildren();
     $('inspect-description').textContent = tree.growth < 0 ? 'A woodcutter harvested this tree. A staffed yard tending this grove will plant its replacement.' : tree.growth < SAPLING_SECONDS ? `Planted for the next harvest. Mature in ${Math.ceil(SAPLING_SECONDS-tree.growth)} seconds at 1×.` : `${Math.ceil(tree.wood)} timber remains in this tree. Nearby woodcutters share its stock.`;
-    $('inspect-detail').textContent = 'Woodcutters tend their nearest 12 trees, replanting every stump. Saplings take 3 minutes to mature. Forest ground stays reserved for woodland.';
+    $('inspect-detail').textContent = 'Woodcutters tend their nearest 12 trees, replanting every stump. Saplings take 3 minutes to mature. Watch each replacement grow before the next harvest.';
     $('inspect-action').textContent = 'Plan a woodcutter'; return;
   }
   if (selected.type === 'landing') {
@@ -222,8 +225,8 @@ function updateInspector() {
     if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
     if (selected.type === 'lumber') {
       const grove = sim.woodlandStatus(state, selected);
-      details.push(`${grove.mature} mature trees · ${grove.saplings} saplings · ${grove.stumps} stumps. Workers replant automatically; saplings mature in 3 minutes at 1×.`);
-      $('inspect-secondary').hidden = false; $('inspect-secondary').textContent = 'Find the working grove';
+      details.push(`${grove.mature} mature trees · ${grove.saplings} ${grove.saplings === 1 ? 'sapling' : 'saplings'} · ${grove.stumps} ${grove.stumps === 1 ? 'stump' : 'stumps'}. Workers replant automatically; saplings mature in 3 minutes at 1×.`);
+      $('inspect-secondary').hidden = false; $('inspect-secondary').textContent = grove.youngTarget ? 'Find young woodland' : 'Find the working grove';
     }
     if (spec.service) {
       const reach = world.showServiceArea(selected.type, selected, selected.level, { label: !matchMedia('(pointer: coarse)').matches });
@@ -344,7 +347,7 @@ function bind() {
     if (selected.type === 'bell') { if (selected.restored) { audio.play('bell'); announce('The bell carries all the way across the water.'); } else mutate(sim.build(state, 'bell', 0, -5)); return; }
     const result = sim.demolish(state, selected.id); if (result.ok) closeInspector(); mutate(result);
   };
-  $('inspect-secondary').onclick = () => { if (selected?.type === 'lumber') { const site = sim.woodlandStatus(state, selected).target; if (site) { closeInspector(); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
+  $('inspect-secondary').onclick = () => { if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
   $('landing-button').onclick = () => { cancelTool(); town.open('trade'); };
   $('undo').onclick = () => { if (companions.canManage) mutate(sim.undo(state)); };
   $('find-bell').onclick = () => { const b = state.buildings.find(b => b.type === 'bell'); inspect(b); world.focus(b); };
