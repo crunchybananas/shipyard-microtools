@@ -1,0 +1,37 @@
+[
+  {
+    "path": ".events",
+    "before": 17,
+    "after": 1
+  },
+  {
+    "path": ".buildings[1].queueOrder",
+    "before": 4,
+    "after": 0
+  },
+  {
+    "path": ".buildings[6].queueOrder",
+    "before": 1,
+    "after": 0
+  },
+  {
+    "path": ".buildings[7].queueOrder",
+    "before": 2,
+    "after": 0
+  },
+  {
+    "path": ".buildings[8].queueOrder",
+    "before": 3,
+    "after": 0
+  },
+  {
+    "path": ".nextEventId",
+    "before": 18,
+    "after": 2
+  },
+  {
+    "path": ".nextQueueOrder",
+    "before": 5,
+    "after": 1
+  }
+]

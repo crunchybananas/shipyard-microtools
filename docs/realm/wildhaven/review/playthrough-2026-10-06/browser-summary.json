@@ -1,0 +1,72 @@
+{
+  "at": "2026-10-07T00:30:17.307Z",
+  "url": "https://crunchybananas.github.io/shipyard-microtools/realm/wildhaven/",
+  "errors": [],
+  "failed": [],
+  "day": 5,
+  "population": 14,
+  "elapsed": 384.0512,
+  "won": true,
+  "restored": [
+    {
+      "id": "waystone",
+      "status": "restored",
+      "surveyProgress": 22,
+      "project": "restore",
+      "progress": 38,
+      "reportedBy": "Finn",
+      "reportedDay": 2,
+      "finishedBy": "Finn",
+      "finishedDay": 2,
+      "received": {}
+    }
+  ],
+  "buildings": [
+    {
+      "id": "hearth",
+      "type": "hearth",
+      "status": "ready"
+    },
+    {
+      "id": "bell",
+      "type": "bell",
+      "status": "ready"
+    },
+    {
+      "id": "b1",
+      "type": "cottage",
+      "status": "ready"
+    },
+    {
+      "id": "b2",
+      "type": "orchard",
+      "status": "ready"
+    },
+    {
+      "id": "b3",
+      "type": "quarry",
+      "status": "ready"
+    },
+    {
+      "id": "b4",
+      "type": "lumber",
+      "status": "ready"
+    },
+    {
+      "id": "b5",
+      "type": "cottage",
+      "status": "ready"
+    },
+    {
+      "id": "b6",
+      "type": "cottage",
+      "status": "ready"
+    },
+    {
+      "id": "b7",
+      "type": "garden",
+      "status": "ready"
+    }
+  ],
+  "fpsSample": "60"
+}
