@@ -1,7 +1,9 @@
+import { calendarDay } from './calendar.js';
 import { DISCOVERIES, discoverySpec, fieldworkerFor, fieldworkDuration } from './discovery.js';
 import { fieldworkOffer, sendFieldworker, recallFieldworker } from './frontier.js';
 import { JOBS } from './catalog.js';
 import { resourceText } from './town-ui.js';
+import { createPressGuard } from './press-guard.js';
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const button=(text,id,run,cls='')=>{const b=el('button',cls,text);b.dataset.fieldAction=id;b.onclick=run;return b;};
 export function createFieldbook({getState,getContext,getIcons,mutate,beforeOpen,focus,canMutate=()=>true,getPaused=()=>false,resume=()=>{}}){
@@ -12,32 +14,33 @@ export function createFieldbook({getState,getContext,getIcons,mutate,beforeOpen,
   const content=el('div','field-content');content.tabIndex=0;panel.append(head,tabs,content);document.getElementById('hud').append(panel);
   const toggle=button('Fieldbook','toggle',()=>panel.hidden?open():close());toggle.id='fieldbook-toggle';toggle.setAttribute('aria-controls','fieldbook');toggle.title='Island fieldbook (B)';document.querySelector('.controls-hint>div').append(toggle);
   let active='waystone',signature='',resident='',previousFocus=null;
-  function close(){document.body.classList.remove('fieldbook-active');panel.hidden=true;toggle.setAttribute('aria-expanded','false');if(panel.contains(document.activeElement))previousFocus?.focus();}
-  function open(id=active){beforeOpen();document.body.classList.add('fieldbook-active');previousFocus=document.activeElement;active=discoverySpec(id)?id:active;panel.hidden=false;toggle.setAttribute('aria-expanded','true');signature='';update();panel.querySelector(`[data-field-action="place-${active}"]`)?.focus({preventScroll:true});}
-  function action(mode){if(!canMutate())return;const result=sendFieldworker(getState(),active,mode,resident||null,getContext());mutate(result,'depart');signature='';update();}
-  function update(){
+  const press = createPressGuard(panel, { onRelease: () => update() });
+  function close(){press.reset();document.body.classList.remove('fieldbook-active');panel.hidden=true;toggle.setAttribute('aria-expanded','false');if(panel.contains(document.activeElement))previousFocus?.focus();}
+  function open(id=active){beforeOpen();document.body.classList.add('fieldbook-active');previousFocus=document.activeElement;active=discoverySpec(id)?id:active;panel.hidden=false;toggle.setAttribute('aria-expanded','true');signature='';update(true);panel.querySelector(`[data-field-action="place-${active}"]`)?.focus({preventScroll:true});}
+  function action(mode){if(!canMutate())return;const result=sendFieldworker(getState(),active,mode,resident||null,getContext());mutate(result,'depart');signature='';update(true);}
+  function update(force=false){
     const state=getState(),done=state.discovery.sites.filter(s=>s.status==='restored'||s.status==='salvaged').length,busy=state.frontier.units.filter(u=>u.missionSiteId&&!['released','dead'].includes(u.status)).length;
     toggle.textContent=busy?`Fieldbook · ${busy} away`:done?`Fieldbook · ${done}/4`:'Fieldbook';
-    if(panel.hidden)return;
+    if(panel.hidden||!force&&press.held)return;
     const site=state.discovery.sites.find(s=>s.id===active),spec=discoverySpec(active),worker=fieldworkerFor(state,active);
     const next=JSON.stringify([active,getPaused(),site,worker&&[worker.id,worker.missionStage,worker.status,worker.missionComplete,worker.path.length===0,worker.fieldBlocked],Object.values(state.resources).map(Math.floor),state.citizens.map(c=>[c.id,c.job]),busy]);
     if(next===signature||document.activeElement?.tagName==='SELECT'&&panel.contains(document.activeElement))return;signature=next;
     const scroll=content.scrollTop,focused=document.activeElement?.dataset?.fieldAction;
-    tabs.replaceChildren(...DISCOVERIES.map(d=>{const s=state.discovery.sites.find(s=>s.id===d.id),b=button(d.mark,`place-${d.id}`,()=>{active=d.id;signature='';content.scrollTop=0;update();});b.setAttribute('aria-label',d.name);b.setAttribute('aria-pressed',String(active===d.id));b.title=d.name;b.classList.toggle('field-finished',['restored','salvaged'].includes(s.status));return b;}));
+    tabs.replaceChildren(...DISCOVERIES.map(d=>{const s=state.discovery.sites.find(s=>s.id===d.id),b=button(d.mark,`place-${d.id}`,()=>{active=d.id;signature='';content.scrollTop=0;update(true);});b.setAttribute('aria-label',d.name);b.setAttribute('aria-pressed',String(active===d.id));b.title=d.name;b.classList.toggle('field-finished',['restored','salvaged'].includes(s.status));return b;}));
     content.replaceChildren();const illustration=el('div','field-illustration'),img=el('img');img.src=getIcons()['discovery_'+active+(site.status==='restored'?'_restored':'')];img.alt='';illustration.style.setProperty('--place-ink',spec.tint);illustration.append(el('span','field-plate',spec.mark),img,el('span','field-region',spec.region));
     const title=el('h3','',spec.name);content.append(illustration,title,el('p','field-story',site.status==='rumor'?spec.rumor:spec.story));
     content.append(button('Find this place ↗','find',()=>{close();focus(spec);},'field-link'));
-    if(site.reportedBy)content.append(el('p','field-byline',`Recorded by ${site.reportedBy} · Day ${site.reportedDay}`));
+    if(site.reportedBy)content.append(el('p','field-byline',`Recorded by ${site.reportedBy} · Day ${calendarDay(state, site.reportedDay)}`));
     if(worker){
       const card=el('section','field-assignment'),phase=worker.status==='wounded'?(Math.hypot(worker.x,worker.z-3)<1.5?'Recovering at home':'Wounded · making for home'):worker.fieldBlocked?'Route blocked · check gates and the approach':worker.missionStage==='outbound'?'Walking to the site':worker.missionStage==='working'?(worker.missionMode==='survey'?'Reading the place':worker.missionMode==='restore'?'Restoring the place':'Gathering the materials'):worker.missionComplete?'Bringing the findings home':'Returning home';
       card.append(el('small','','In the field'),el('h4','',`${worker.name} · ${JOBS[worker.kind].name}`),el('p','',phase));
       if(getPaused()){const cue=el('div','paused-work');cue.append(el('span','','Ⅱ Time paused · assignment waits'),button('Resume time','resume-time',resume));card.append(cue);}
       const progress=worker.missionMode==='survey'?site.surveyProgress:site.progress,total=fieldworkDuration(site,worker.missionMode),bar=el('progress');bar.max=total;bar.value=progress;bar.setAttribute('aria-label','Work at the site');card.append(bar,el('small','',`${Math.floor(progress)} / ${total} seconds of site work`));
       card.append(button('Find this resident ↗','follow',()=>{close();focus(worker);},'field-link'));
-      if(worker.missionStage!=='returning')card.append(button('Call them home','recall',()=>{if(!canMutate())return;mutate(recallFieldworker(getState(),worker.id),'depart');signature='';update();}));
+      if(worker.missionStage!=='returning')card.append(button('Call them home','recall',()=>{if(!canMutate())return;mutate(recallFieldworker(getState(),worker.id),'depart');signature='';update(true);}));
       card.append(el('p','field-fine','Their village job is reserved while they travel. Reports and recovered goods arrive at the hearth.'));content.append(card);
     }else if(['restored','salvaged'].includes(site.status)){
-      const result=el('section','field-keepsake');result.append(el('small','',site.status==='restored'?'A place in village life':'Recovered for the village'),el('h4','',site.status==='restored'?spec.benefit:resourceText(site.received)),el('p','',site.status==='restored'?spec.note:'The useful materials have found another life. This place’s story remains in the fieldbook.'),el('small','',`${site.finishedBy} · Day ${site.finishedDay}`));content.append(result);
+      const result=el('section','field-keepsake');result.append(el('small','',site.status==='restored'?'A place in village life':'Recovered for the village'),el('h4','',site.status==='restored'?spec.benefit:resourceText(site.received)),el('p','',site.status==='restored'?spec.note:'The useful materials have found another life. This place’s story remains in the fieldbook.'),el('small','',`${site.finishedBy} · Day ${calendarDay(state, site.finishedDay)}`));content.append(result);
     }else{
       const mode=site.status==='rumor'?'survey':site.project||'restore',offer=fieldworkOffer(state,active,mode,getContext());
       const label=el('label','field-resident','Send a resident'),select=el('select');select.dataset.fieldAction='resident';select.setAttribute('aria-label','Resident for fieldwork');

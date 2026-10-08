@@ -1,0 +1,727 @@
+{
+  "baseCommit": "775605ca6d67fe311e18102bff7d135b67531e6c",
+  "branch": "codex/wildhaven-defense-squads",
+  "runtimeVersion": "20261008-defense-1",
+  "deployed": false,
+  "fixture": "Existing campaign-forge-save restored through sim.restore; wood/food/iron/tools staged to at least 120. Three residents recruited through recruitTroop and trained by sim.tick(46). No player storage is used.",
+  "viewports": [
+    {
+      "name": "ipad-landscape",
+      "width": 1024,
+      "height": 768,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation",
+        "reading hold survives selection; trusted drag/pinch/cancel consumes no click",
+        "reload persists named squad and Defend Town orders",
+        "companion/home selection isolation; squads remain per town",
+        "authored warning and simultaneous active troop round-trip; Safety lands Company; 6m at 1\u00d7 and cargo distinction"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 478,
+          "y": 100,
+          "width": 470,
+          "height": 590,
+          "right": 948,
+          "bottom": 690
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 509,
+            "y": 301.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 620.359375,
+            "bottom": 345.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 626.359375,
+            "y": 301.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 728,
+            "bottom": 345.59375
+          },
+          {
+            "id": "defend",
+            "x": 509,
+            "y": 353.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 599.4375,
+            "bottom": 397.59375
+          },
+          {
+            "id": "hold",
+            "x": 605.4375,
+            "y": 353.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 678.703125,
+            "bottom": 397.59375
+          },
+          {
+            "id": "move",
+            "x": 684.703125,
+            "y": 353.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 733.796875,
+            "bottom": 397.59375
+          },
+          {
+            "id": "attack",
+            "x": 739.796875,
+            "y": 353.59375,
+            "width": 56,
+            "height": 44,
+            "right": 795.796875,
+            "bottom": 397.59375
+          },
+          {
+            "id": "retreat",
+            "x": 801.796875,
+            "y": 353.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 892.890625,
+            "bottom": 397.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 509,
+            "y": 448.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 587.28125,
+            "bottom": 492.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 593.28125,
+            "y": 448.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 691.03125,
+            "bottom": 492.59375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 497,
+          "y": 712.6875,
+          "width": 432,
+          "height": 80,
+          "right": 929,
+          "bottom": 792.6875
+        }
+      },
+      "watchText": "Coastal cargo watch\n\nCivilian watch-house guards handle coastal cargo demands. Recruited company soldiers, walls and towers handle physical enemies on the island; their orders do not add watch readiness.\n\nCommand soldiers in Company\n\nQuiet water. A chance to prepare.\n\nThe next cargo warning can begin in 6m 34s at 1\u00d7. Keep a reserve of food and building supplies, or establish a standing watch.\n\nHow to prepare a coastal patrol\nStaff the coastal watch\n\nGuards leave other jobs to protect coastal cargo and provide escorts.\n\n\u2161 Time paused \u00b7 work waits\nResume time\n3 guards assigned \u00b7 3 requested\nWatch house \u00b7 level 2\n\u2212\n3\n+\n\nOn the watch: Bram 2, Cora 2, Dev 2\n\n2.1 food/min for watch supplies \u00b7 2.7 at full staffing\n\n3/4 workers\n\nGive guards priority\nView watch house\n0 guards assigned \u00b7 0 requested\nWatch house \u00b7 level 2\n\u2212\n0\n+\n\nNo residents assigned here.\n\n0 food/min for watch supplies \u00b7 2.7 at full staffing\n\nNo workers requested\n\nGive guards priority\nView watch house\n0 guards assigned \u00b7 0 requested\nWatch house \u00b7 level 2\n\u2212\n0\n+\n\nNo residents assigned here.\n\n0 food/min for watch supplies \u00b7 2.7 at full staffing\n\nNo workers requested\n\nGive guards priority\nView watch house\n0 guards assigned \u00b7 0 requested\nWatch house \u00b7 level 2\n\u2212\n0\n+\n\nNo residents assigned here.\n\n0 food/min for watch supplies \u00b7 2.7 at full staffing\n\nNo workers requested\n\nGive guards priority\nView watch house\nCoastal record \u00b7 5 defenses \u00b7 4 paid \u00b7 0 raids",
+      "passed": true
+    },
+    {
+      "name": "ipad-portrait",
+      "width": 768,
+      "height": 1024,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 222,
+          "y": 115,
+          "width": 470,
+          "height": 831,
+          "right": 692,
+          "bottom": 946
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 253,
+            "y": 331.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 364.359375,
+            "bottom": 375.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 370.359375,
+            "y": 331.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 472,
+            "bottom": 375.59375
+          },
+          {
+            "id": "defend",
+            "x": 253,
+            "y": 383.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 343.4375,
+            "bottom": 427.59375
+          },
+          {
+            "id": "hold",
+            "x": 349.4375,
+            "y": 383.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 422.703125,
+            "bottom": 427.59375
+          },
+          {
+            "id": "move",
+            "x": 428.703125,
+            "y": 383.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 477.796875,
+            "bottom": 427.59375
+          },
+          {
+            "id": "attack",
+            "x": 483.796875,
+            "y": 383.59375,
+            "width": 56,
+            "height": 44,
+            "right": 539.796875,
+            "bottom": 427.59375
+          },
+          {
+            "id": "retreat",
+            "x": 545.796875,
+            "y": 383.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 636.890625,
+            "bottom": 427.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 253,
+            "y": 478.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 331.28125,
+            "bottom": 522.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 337.28125,
+            "y": 478.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 435.03125,
+            "bottom": 522.59375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 241,
+          "y": 742.6875,
+          "width": 432,
+          "height": 80,
+          "right": 673,
+          "bottom": 822.6875
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "short-landscape",
+      "width": 667,
+      "height": 375,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 12,
+          "y": 8,
+          "width": 591,
+          "height": 289,
+          "right": 603,
+          "bottom": 297
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 36,
+            "y": 130.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 147.359375,
+            "bottom": 174.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 153.359375,
+            "y": 130.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 255,
+            "bottom": 174.59375
+          },
+          {
+            "id": "defend",
+            "x": 36,
+            "y": 182.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 126.4375,
+            "bottom": 226.59375
+          },
+          {
+            "id": "hold",
+            "x": 132.4375,
+            "y": 182.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 205.703125,
+            "bottom": 226.59375
+          },
+          {
+            "id": "move",
+            "x": 211.703125,
+            "y": 182.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 260.796875,
+            "bottom": 226.59375
+          },
+          {
+            "id": "attack",
+            "x": 266.796875,
+            "y": 182.59375,
+            "width": 56,
+            "height": 44,
+            "right": 322.796875,
+            "bottom": 226.59375
+          },
+          {
+            "id": "retreat",
+            "x": 328.796875,
+            "y": 182.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 419.890625,
+            "bottom": 226.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 36,
+            "y": 277.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 114.28125,
+            "bottom": 321.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 120.28125,
+            "y": 277.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 218.03125,
+            "bottom": 321.59375
+          }
+        ],
+        "art": {
+          "display": "none",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "touch": true,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 12,
+          "y": 186,
+          "width": 366,
+          "height": 580,
+          "right": 378,
+          "bottom": 766
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 36,
+            "y": 383.59375,
+            "width": 160.859375,
+            "height": 44,
+            "right": 196.859375,
+            "bottom": 427.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 202.859375,
+            "y": 383.59375,
+            "width": 151.140625,
+            "height": 44,
+            "right": 354,
+            "bottom": 427.59375
+          },
+          {
+            "id": "defend",
+            "x": 36,
+            "y": 435.59375,
+            "width": 98.234375,
+            "height": 44,
+            "right": 134.234375,
+            "bottom": 479.59375
+          },
+          {
+            "id": "hold",
+            "x": 140.234375,
+            "y": 435.59375,
+            "width": 81.078125,
+            "height": 44,
+            "right": 221.3125,
+            "bottom": 479.59375
+          },
+          {
+            "id": "move",
+            "x": 227.3125,
+            "y": 435.59375,
+            "width": 56.890625,
+            "height": 44,
+            "right": 284.203125,
+            "bottom": 479.59375
+          },
+          {
+            "id": "attack",
+            "x": 290.203125,
+            "y": 435.59375,
+            "width": 63.796875,
+            "height": 44,
+            "right": 354,
+            "bottom": 479.59375
+          },
+          {
+            "id": "retreat",
+            "x": 36,
+            "y": 485.59375,
+            "width": 318,
+            "height": 44,
+            "right": 354,
+            "bottom": 529.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 36,
+            "y": 597.09375,
+            "width": 146.265625,
+            "height": 44,
+            "right": 182.265625,
+            "bottom": 641.09375
+          },
+          {
+            "id": "clear-units",
+            "x": 188.265625,
+            "y": 597.09375,
+            "width": 165.734375,
+            "height": 44,
+            "right": 354,
+            "bottom": 641.09375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 26,
+          "y": 859.1875,
+          "width": 338,
+          "height": 80,
+          "right": 364,
+          "bottom": 939.1875
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "touch": false,
+      "checks": [
+        "ready selection, Defend Town, 8-tile anchor cues, no cost",
+        "save/recall squad without orders or spending; Hold Here",
+        "building tap consumed in selection",
+        "actual projected troop tap; empty/object taps; Done/Cancel without orders or spending",
+        "Move/cancel/valid ground; Attack rejects ordinary ground without mutation",
+        "reading hold survives selection; trusted drag/pinch/cancel consumes no click",
+        "desktop real Shift-click adds second troop"
+      ],
+      "layout": {
+        "overflow": false,
+        "panel": {
+          "x": 894,
+          "y": 100,
+          "width": 470,
+          "height": 722,
+          "right": 1364,
+          "bottom": 822
+        },
+        "targets": [
+          {
+            "id": "select-ready",
+            "x": 925,
+            "y": 304.59375,
+            "width": 111.359375,
+            "height": 44,
+            "right": 1036.359375,
+            "bottom": 348.59375
+          },
+          {
+            "id": "select-on-island",
+            "x": 1042.359375,
+            "y": 304.59375,
+            "width": 101.640625,
+            "height": 44,
+            "right": 1144,
+            "bottom": 348.59375
+          },
+          {
+            "id": "defend",
+            "x": 925,
+            "y": 356.59375,
+            "width": 90.4375,
+            "height": 44,
+            "right": 1015.4375,
+            "bottom": 400.59375
+          },
+          {
+            "id": "hold",
+            "x": 1021.4375,
+            "y": 356.59375,
+            "width": 73.265625,
+            "height": 44,
+            "right": 1094.703125,
+            "bottom": 400.59375
+          },
+          {
+            "id": "move",
+            "x": 1100.703125,
+            "y": 356.59375,
+            "width": 49.09375,
+            "height": 44,
+            "right": 1149.796875,
+            "bottom": 400.59375
+          },
+          {
+            "id": "attack",
+            "x": 1155.796875,
+            "y": 356.59375,
+            "width": 56,
+            "height": 44,
+            "right": 1211.796875,
+            "bottom": 400.59375
+          },
+          {
+            "id": "retreat",
+            "x": 1217.796875,
+            "y": 356.59375,
+            "width": 91.09375,
+            "height": 44,
+            "right": 1308.890625,
+            "bottom": 400.59375
+          },
+          {
+            "id": "save-squad",
+            "x": 925,
+            "y": 451.59375,
+            "width": 78.28125,
+            "height": 44,
+            "right": 1003.28125,
+            "bottom": 495.59375
+          },
+          {
+            "id": "clear-units",
+            "x": 1009.28125,
+            "y": 451.59375,
+            "width": 97.75,
+            "height": 44,
+            "right": 1107.03125,
+            "bottom": 495.59375
+          }
+        ],
+        "art": {
+          "display": "block",
+          "x": 913,
+          "y": 715.6875,
+          "width": 432,
+          "height": 100,
+          "right": 1345,
+          "bottom": 815.6875
+        }
+      },
+      "passed": true
+    }
+  ],
+  "edge": {
+    "fixture": "Same authored interaction fixture as check.mjs; one additional staged hostile soldier for command/combat checks.",
+    "checks": [
+      "Held native touch survives a live update; canceled touch saves nothing; next tap saves exactly one squad",
+      "Reusable ImageGen illustration loads and stays within80px at tablet size",
+      "Actual hostile raycast accepts explicit Attack without changing diplomatic relations",
+      "Company intercepts a real simulated hostile, survives, returns to rally positions and restores from save",
+      "Unfilled coastal watch action opens canonical People & jobs instead of an invalid tab",
+      "Short landscape Start/Continue both reachable; Company has at least120px reading space"
+    ],
+    "errors": [],
+    "art": {
+      "source": "./assets/defense-company.jpg",
+      "alt": "",
+      "loading": "lazy",
+      "height": 80,
+      "naturalWidth": 2172
+    },
+    "combat": {
+      "before": [
+        {
+          "id": "unit-1",
+          "hp": 70,
+          "x": 0,
+          "z": 3
+        },
+        {
+          "id": "unit-2",
+          "hp": 70,
+          "x": -1,
+          "z": 3
+        },
+        {
+          "id": "unit-3",
+          "hp": 42,
+          "x": 1,
+          "z": 3
+        },
+        {
+          "id": "unit-4",
+          "hp": 46,
+          "x": 0,
+          "z": -2
+        }
+      ],
+      "company": [
+        {
+          "id": "unit-1",
+          "hp": 59.565218,
+          "status": "active",
+          "x": 0,
+          "z": 3,
+          "order": {
+            "type": "defend",
+            "x": 0,
+            "z": 3,
+            "anchor": {
+              "x": 0,
+              "z": 3
+            }
+          }
+        },
+        {
+          "id": "unit-2",
+          "hp": 70,
+          "status": "active",
+          "x": -1,
+          "z": 3,
+          "order": {
+            "type": "defend",
+            "x": -1,
+            "z": 3,
+            "anchor": {
+              "x": 0,
+              "z": 3
+            }
+          }
+        },
+        {
+          "id": "unit-3",
+          "hp": 42,
+          "status": "active",
+          "x": 1,
+          "z": 3,
+          "order": {
+            "type": "defend",
+            "x": 1,
+            "z": 3,
+            "anchor": {
+              "x": 0,
+              "z": 3
+            }
+          }
+        }
+      ],
+      "outcome": {
+        "spawned": 1,
+        "killed": 1,
+        "escaped": 0,
+        "cargoLost": 0,
+        "uncertain": false,
+        "completed": true
+      },
+      "valid": true
+    },
+    "shortReadingHeight": 185,
+    "passed": true
+  },
+  "visual": {
+    "errors": [],
+    "label": {
+      "width": 192,
+      "height": 48,
+      "text": "[[\"DEFEND TOWN\",\"8-tile home area\"],\"#9cd3be\"]"
+    },
+    "passed": true
+  },
+  "applicationErrors": [],
+  "notes": [
+    "Serial isolated headless Chrome; no desktop or real player profile.",
+    "First two tablet views passed before the independently found short-landscape entry fix; remaining three layouts passed after the fix.",
+    "Final edge check verifies compact entry, Company reading space, 44px action targets, actual combat/save restoration, native cancellation, new art and corrected Watch routing.",
+    "Physical iPad/Safari and native device sustained performance remain unverified.",
+    "Earlier failed attempts and their reasons are preserved; see review report."
+  ],
+  "passed": true
+}

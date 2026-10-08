@@ -57,3 +57,16 @@ test('resource counters never round an unaffordable stock up to the full cost',(
  const step=firstBreadStep(state,{daily:{wood:10}});assert.equal(step.type,undefined);assert.match(step.count,/17.9 \/ 18/);assert.match(step.count,/First bread/);
  state.resources.wood=17.999995;assert.equal(firstBreadStep(state,{daily:{wood:10}}).type,undefined);
 });
+
+test('bread guidance uses displayed calendar dates and real-minute rates',()=>{
+ const state=town();state.resources.wood=14;
+ const wait=firstBreadStep(state,{daily:{wood:18}});
+ assert.match(wait.description,/12 per minute at 1×/);
+ assert.doesNotMatch(wait.description,/per day/);
+ state.day=13;state.guidance.firstBread={day:9,buildingId:'b1'};
+ assert.match(firstBreadStep(state).description,/On day 3,/);
+ state.calendarEpoch=5;
+ assert.match(firstBreadStep(state).description,/On day 6,/);
+ state.guidance.firstBread.day=3;
+ assert.match(firstBreadStep(state).description,/On day 3,/);
+});

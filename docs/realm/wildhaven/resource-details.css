@@ -1,0 +1,53 @@
+/* Resource detail stays in the existing Town book and its single scroll area. */
+#town-book .resource-panel-art{display:block;width:100%;height:auto;max-height:96px;object-fit:contain;margin:0 0 10px;border-radius:5px}
+#town-book .resource-detail-art{max-height:64px}
+#town-book button.resource-row{width:100%;min-height:48px;grid-template-columns:minmax(0,1fr) auto auto 10px;gap:10px;text-align:left;background:transparent;border-radius:0;color:inherit;font:inherit;padding:10px 2px}
+#town-book button.resource-row:hover{background:#e3e7d599}
+#town-book .resource-row .stock-amount{min-width:0}
+#town-book .resource-chevron{color:#617759;font-size:21px}
+#town-book .resource-detail{min-width:0;font-size:12px;line-height:1.5}
+#town-book .resource-detail button,#town-book .resource-detail summary{min-height:44px;min-width:44px;touch-action:manipulation}
+#town-book .resource-detail button{padding:10px 12px;font-size:11px;border-radius:5px}
+#town-book .resource-detail .resource-back{padding-left:0;background:none;color:#3d614c;text-decoration:underline;text-underline-offset:3px}
+#town-book .resource-stock{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 12px}
+#town-book .resource-stock strong{font:32px/1 Georgia,serif;color:#365d43;font-variant-numeric:tabular-nums}
+#town-book .resource-stock>span{font-size:11px;color:#64755a}
+#town-book .resource-rates{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;margin:0;padding:8px 12px;background:#e4e7d5;border-radius:6px}
+#town-book .resource-rates>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0}
+#town-book .resource-rates dt{font-size:11px}
+#town-book .resource-rates dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+#town-book .resource-rates>div:last-child{font-weight:600}
+#town-book .resource-rates .negative{color:#93583c}
+#town-book .resource-rate-note{font-size:10px;line-height:1.5;color:#66765b;margin:8px 0 12px}
+#town-book .resource-forecast,#town-book .resource-storage-note{padding:10px 12px;margin:12px 0;background:#e8e3ce;border-radius:5px;font-size:11px}
+#town-book .resource-forecast p{margin:0}
+#town-book .resource-forecast p+p{margin-top:6px}
+#town-book .resource-detail .town-section{font-size:18px;margin:18px 0 9px}
+#town-book .resource-workplace{padding:10px 0;border-bottom:1px solid var(--line)}
+#town-book .resource-workplace-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+#town-book .resource-workplace-top strong{font-size:12px}
+#town-book .resource-contribution{white-space:nowrap;font-size:11px;font-variant-numeric:tabular-nums}
+#town-book .resource-workplace p{margin:5px 0}
+#town-book .resource-workplace .town-row-actions{margin-top:4px}
+#town-book .resource-chain{font-size:11px;padding:12px 0;border-bottom:1px solid var(--line)}
+#town-book .resource-plan{display:grid;gap:7px;padding:12px 0;border-top:1px solid var(--line)}
+#town-book .resource-plan>button{justify-self:start}
+#town-book .resource-plan p{margin:0}
+#town-book .resource-import{padding-bottom:5px}
+#town-book .resource-import>p{margin:7px 0}
+#town-book .resource-detail summary{display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer}
+#town-book .resource-detail summary:before{content:'›';font-size:19px;font-weight:400}
+#town-book .resource-detail details[open]>summary:before{transform:rotate(90deg)}
+#town-book .season-progression{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:0;margin:10px 0;list-style:none}
+#town-book .season-progression li{padding:7px 2px;border-radius:4px;background:#e4e7d5;text-align:center;font-size:10px}
+#town-book .season-progression .current{background:#365d43;color:#fff5df;font-weight:600}
+#town-book .resource-festival-confirm{padding:10px 12px;border:1px solid #94a07b;border-radius:5px}
+#town-book .resource-festival-active{color:#365d43;font-weight:600}
+#town-book .resource-detail :focus-visible,#town-book .resource-row:focus-visible{outline:2px solid #376846;outline-offset:2px}
+@media(max-width:480px){
+  #town-book .resource-rates{grid-template-columns:1fr;gap:0;padding:7px 10px}
+  #town-book .resource-rates>div{padding:4px 0}
+  #town-book button.resource-row{gap:7px}
+  #town-book .resource-panel-art{max-height:56px}
+}
+@media(max-height:600px){#town-book .resource-panel-art{display:none}}

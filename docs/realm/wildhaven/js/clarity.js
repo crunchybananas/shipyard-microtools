@@ -1,3 +1,4 @@
+import { perMinute } from './calendar.js';
 /** Presentation facts derived from the economy. Never changes town state. */
 import { BUILDINGS, JOBS, RESOURCES, getBuildingSpec } from './catalog.js';
 import { RESEARCH } from './progression.js';
@@ -30,6 +31,11 @@ const PURPOSE = Object.freeze({
   manor: ['Beds · knowledge', 'A civic home adds beds and earns knowledge from coin.'],
 });
 const SERVICE_NAMES = { water: 'Water', health: 'Health', faith: 'Community', leisure: 'Community', security: 'Watch', civic: 'Civic service' };
+const PRODUCTION_CHAINS = [
+  { types: ['farm','windmill','bakery'], text: 'Grain farm → Windmill → Bakery → Food' },
+  { types: ['flaxfield','weaver'], text: 'Flax field → Weaver → Cloth' },
+  { types: ['mine','smith','toolmaker'], text: 'Iron mine → Smithy → Toolmaker → Tools' },
+];
 const quantities = bag => Object.entries(bag || {}).filter(([, n]) => n > 0).map(([id, amount]) => ({ id, amount, name: RESOURCES[id].name, icon: RESOURCES[id].icon }));
 export function buildingFacts(type, level = 1) {
   const spec = getBuildingSpec(type, level);
@@ -42,7 +48,7 @@ export function buildingFacts(type, level = 1) {
     jobs: spec.workers, job: spec.workers ? (spec.workers === 1 ? JOBS[spec.job].name : JOBS[spec.job].plural).toLowerCase() : '',
     staffing: spec.workers ? `${spec.workers} ${(spec.workers === 1 ? JOBS[spec.job].name : JOBS[spec.job].plural).toLowerCase()}` : 'No permanent staff',
     shortFlow: `${input.length ? `${input.map(r => r.name).join(' + ')} → ` : ''}${result}`,
-    next: PURPOSE[type][0], payoff: PURPOSE[type][1],
+    next: PURPOSE[type][0], payoff: PURPOSE[type][1], chain: PRODUCTION_CHAINS.find(chain => chain.types.includes(type))?.text || '',
   };
 }
 
@@ -59,9 +65,9 @@ export function nextTownStep(state, ambition, needs) {
   const school = schools.find(b => b.status === 'ready');
   if (!school) return schools.length
     ? { title: 'Finish the schoolhouse', description: 'Your builders are opening a place to earn knowledge and study new crafts.', label: 'View the project', tab: 'construction', count: 'School construction in progress' }
-    : { title: 'Open a schoolhouse', description: 'Two scholars turn 2 food into 7 knowledge each day and study new crafts.', label: 'Build a schoolhouse', type: 'school', count: 'Build: 18 timber · 12 stone' };
+    : { title: 'Open a schoolhouse', description: 'Two scholars turn food into knowledge and study new crafts.', label: 'Build a schoolhouse', type: 'school', count: 'Build: 18 timber · 12 stone' };
   const productiveSchool = schools.some(b => b.status === 'ready' && !b.paused && b.production?.efficiency > 0);
-  if (!productiveSchool) return { title: 'Give the school its scholars', description: school.production?.blockedReason || 'Assign residents and keep food supplied to earn knowledge and move research forward.', label: 'Staff the schoolhouse', buildingId: school.id, count: `${school.workerIds?.length || 0} scholars assigned · ${Math.round(getBuildingSpec('school', school.level).recipe.input.food * 10) / 10} food/day at full staffing` };
+  if (!productiveSchool) return { title: 'Give the school its scholars', description: school.production?.blockedReason || 'Assign residents and keep food supplied to earn knowledge and move research forward.', label: 'Staff the schoolhouse', buildingId: school.id, count: `${school.workerIds?.length || 0} scholars assigned · ${Math.round(perMinute(getBuildingSpec('school', school.level).recipe.input.food) * 10) / 10} food/min at full staffing` };
   if (state.research.completed.length < 3) {
     if (state.research.active) {
       const research = RESEARCH[state.research.active.id];

@@ -1,0 +1,862 @@
+{
+  "fixture": "Engineering fixture, not an earned town: authored shore watch house; guard worker slots 0 and 2; 20 seconds of actual presentation movement.",
+  "url": "http://127.0.0.1:14725/candidate/realm/wildhaven/?review",
+  "errors": [],
+  "samples": [
+    {
+      "stage": "entry",
+      "elapsed": 2.000000000000001,
+      "actors": [
+        {
+          "id": "c1",
+          "x": -3.512854103681501,
+          "z": 14.603714200977237,
+          "activity": "work",
+          "workState": "walking",
+          "pathLength": 3,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 3.312906679057879,
+          "z": 14.192432227484844,
+          "activity": "work",
+          "workState": "walking",
+          "pathLength": 3,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.5666666666666667,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.9166666666666666,
+              "z": 7.416666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.5702608397607031
+            },
+            "access": "side"
+          }
+        }
+      ],
+      "minSeparation": 6.8381403264997935,
+      "maxStep": 0.05250000000000034,
+      "firstWatching": {},
+      "distanceTravelled": [
+        1.900000000000008,
+        2.099999999999998
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "entry",
+      "elapsed": 3.999999999999994,
+      "actors": [
+        {
+          "id": "c1",
+          "x": -1.6181695783175833,
+          "z": 14.556146705953026,
+          "activity": "work",
+          "workState": "walking",
+          "pathLength": 2,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 1.6723513141016164,
+          "z": 13.390254541973539,
+          "activity": "work",
+          "workState": "walking",
+          "pathLength": 2,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.5666666666666667,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.9166666666666666,
+              "z": 7.416666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.5702608397607031
+            },
+            "access": "side"
+          }
+        }
+      ],
+      "minSeparation": 3.4909643769990004,
+      "maxStep": 0.05250000000000034,
+      "firstWatching": {},
+      "distanceTravelled": [
+        3.800000000000007,
+        4.199999999999997
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "entry",
+      "elapsed": 5.999999999999987,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.26333678367623714,
+          "z": 14.29169669219469,
+          "activity": "work",
+          "workState": "walking",
+          "pathLength": 2,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 1.02,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 1.3000000000000005,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.5666666666666667,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.9166666666666666,
+              "z": 7.416666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.5702608397607031
+            },
+            "access": "side"
+          }
+        }
+      ],
+      "minSeparation": 0.9921259333930492,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991
+      },
+      "distanceTravelled": [
+        5.70000000000002,
+        4.943825760695464
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "entry",
+      "elapsed": 7.99999999999998,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.56,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 1.0500000000000003,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 1.02,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 3.2999999999999963,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.5666666666666667,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.9166666666666666,
+              "z": 7.416666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.5702608397607031
+            },
+            "access": "side"
+          }
+        }
+      ],
+      "minSeparation": 0.45999999999999996,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991,
+        "c1": 6.999999999999983
+      },
+      "distanceTravelled": [
+        6.599579168267006,
+        4.943825760695464
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "entry",
+      "elapsed": 10.000000000000007,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.56,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 3.049999999999997,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 1.02,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 5.299999999999989,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.5666666666666667,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.9166666666666666,
+              "z": 7.416666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.5702608397607031
+            },
+            "access": "side"
+          }
+        }
+      ],
+      "minSeparation": 0.45999999999999996,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991,
+        "c1": 6.999999999999983
+      },
+      "distanceTravelled": [
+        6.599579168267006,
+        4.943825760695464
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "entry",
+      "elapsed": 12.000000000000036,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.56,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 5.04999999999999,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 1.02,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 7.299999999999982,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.5666666666666667,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.9166666666666666,
+              "z": 7.416666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.5702608397607031
+            },
+            "access": "side"
+          }
+        }
+      ],
+      "minSeparation": 0.45999999999999996,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991,
+        "c1": 6.999999999999983
+      },
+      "distanceTravelled": [
+        6.599579168267006,
+        4.943825760695464
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "entry",
+      "elapsed": 14.000000000000064,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.56,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 7.049999999999983,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 1.02,
+          "z": 13.65,
+          "activity": "work",
+          "workState": "watching",
+          "pathLength": 0,
+          "workTime": 9.299999999999997,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.5666666666666667,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.9166666666666666,
+              "z": 7.416666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.5702608397607031
+            },
+            "access": "side"
+          }
+        }
+      ],
+      "minSeparation": 0.45999999999999996,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991,
+        "c1": 6.999999999999983
+      },
+      "distanceTravelled": [
+        6.599579168267006,
+        4.943825760695464
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "patrol",
+      "elapsed": 16.000000000000092,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.56,
+          "z": 14.25,
+          "activity": "patrol",
+          "workState": "waiting",
+          "pathLength": 0,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": null
+        },
+        {
+          "id": "c2",
+          "x": 1.9160353431737167,
+          "z": 11.93195691598561,
+          "activity": "patrol",
+          "workState": "walking",
+          "pathLength": 3,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": null
+        }
+      ],
+      "minSeparation": 0.45999999999999996,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991,
+        "c1": 6.999999999999983
+      },
+      "distanceTravelled": [
+        7.199579168267006,
+        6.991325760695473
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "patrol",
+      "elapsed": 18.00000000000012,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.56,
+          "z": 14.25,
+          "activity": "patrol",
+          "workState": "waiting",
+          "pathLength": 0,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": null
+        },
+        {
+          "id": "c2",
+          "x": 0.7859545238050162,
+          "z": 10.77349059399712,
+          "activity": "patrol",
+          "workState": "walking",
+          "pathLength": 2,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": null
+        }
+      ],
+      "minSeparation": 0.45999999999999996,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991,
+        "c1": 6.999999999999983
+      },
+      "distanceTravelled": [
+        7.199579168267006,
+        9.09132576069548
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    },
+    {
+      "stage": "patrol",
+      "elapsed": 20.00000000000015,
+      "actors": [
+        {
+          "id": "c1",
+          "x": 0.56,
+          "z": 14.060000000000002,
+          "activity": "work",
+          "workState": "walking",
+          "pathLength": 1,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": {
+            "point": {
+              "x": 0.3111111111111111,
+              "z": 7.583333333333333,
+              "y": 0.8324954252123313,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch"
+            },
+            "approach": {
+              "x": 0.3111111111111111,
+              "z": 7.916666666666667,
+              "exact": true,
+              "stationBuilding": "fixture-shore-watch",
+              "stationEntry": true,
+              "y": 0.35134082408409933
+            },
+            "access": "front"
+          }
+        },
+        {
+          "id": "c2",
+          "x": 0.24367624197064056,
+          "z": 9.326841437086745,
+          "activity": "patrol",
+          "workState": "waiting",
+          "pathLength": 0,
+          "workTime": 0,
+          "blockedWaypoint": null,
+          "station": null
+        }
+      ],
+      "minSeparation": 0.45999999999999996,
+      "maxStep": 0.06778220097677819,
+      "firstWatching": {
+        "c2": 4.749999999999991,
+        "c1": 6.999999999999983
+      },
+      "distanceTravelled": [
+        7.389579168267003,
+        10.928825760695487
+      ],
+      "dryViolations": [],
+      "blockedTileViolations": []
+    }
+  ],
+  "setup": {
+    "site": {
+      "x": 0,
+      "z": 7
+    },
+    "terrain": {
+      "kind": "grass",
+      "height": 0.731610836138415,
+      "buildable": true,
+      "coastDistance": 1.6973204000973068,
+      "regionId": "home"
+    },
+    "portSeparation": 1.4135416513141732,
+    "ports": [
+      {
+        "x": 0.3111111111111111,
+        "z": 7.916666666666667,
+        "exact": true,
+        "stationBuilding": "fixture-shore-watch",
+        "stationEntry": true,
+        "y": 0.35134082408409933
+      },
+      {
+        "x": 0.9166666666666666,
+        "z": 7.416666666666667,
+        "exact": true,
+        "stationBuilding": "fixture-shore-watch",
+        "stationEntry": true,
+        "y": 0.5702608397607031
+      }
+    ],
+    "meshCount": 1,
+    "vertices": 9631,
+    "worldSourceSHA256": "0e43b27973d97f973ff96f42817cd8fa6dafdb1d17158490c80c7a255cdbd695",
+    "sourceURL": "http://127.0.0.1:14725/candidate/realm/wildhaven/js/world.js?v=20261008-clear-island-1",
+    "actors": [
+      {
+        "id": "c1",
+        "x": -5.4,
+        "z": 14.4,
+        "activity": "work",
+        "workState": "waiting",
+        "pathLength": 4,
+        "workTime": 0,
+        "blockedWaypoint": null,
+        "station": {
+          "point": {
+            "x": 0.3111111111111111,
+            "z": 7.583333333333333,
+            "y": 0.8324954252123313,
+            "exact": true,
+            "stationBuilding": "fixture-shore-watch"
+          },
+          "approach": {
+            "x": 0.3111111111111111,
+            "z": 7.916666666666667,
+            "exact": true,
+            "stationBuilding": "fixture-shore-watch",
+            "stationEntry": true,
+            "y": 0.35134082408409933
+          },
+          "access": "front"
+        }
+      },
+      {
+        "id": "c2",
+        "x": 5.4,
+        "z": 14.4,
+        "activity": "work",
+        "workState": "waiting",
+        "pathLength": 4,
+        "workTime": 0,
+        "blockedWaypoint": null,
+        "station": {
+          "point": {
+            "x": 0.5666666666666667,
+            "z": 7.583333333333333,
+            "y": 0.8324954252123313,
+            "exact": true,
+            "stationBuilding": "fixture-shore-watch"
+          },
+          "approach": {
+            "x": 0.9166666666666666,
+            "z": 7.416666666666667,
+            "exact": true,
+            "stationBuilding": "fixture-shore-watch",
+            "stationEntry": true,
+            "y": 0.5702608397607031
+          },
+          "access": "side"
+        }
+      }
+    ]
+  },
+  "patrolStart": [
+    {
+      "id": "c1",
+      "x": 0.56,
+      "z": 13.65,
+      "activity": "work",
+      "workState": "watching",
+      "pathLength": 0,
+      "workTime": 7.049999999999983,
+      "blockedWaypoint": null,
+      "station": {
+        "point": {
+          "x": 0.3111111111111111,
+          "z": 7.583333333333333,
+          "y": 0.8324954252123313,
+          "exact": true,
+          "stationBuilding": "fixture-shore-watch"
+        },
+        "approach": {
+          "x": 0.3111111111111111,
+          "z": 7.916666666666667,
+          "exact": true,
+          "stationBuilding": "fixture-shore-watch",
+          "stationEntry": true,
+          "y": 0.35134082408409933
+        },
+        "access": "front"
+      }
+    },
+    {
+      "id": "c2",
+      "x": 1.02,
+      "z": 13.65,
+      "activity": "work",
+      "workState": "watching",
+      "pathLength": 0,
+      "workTime": 9.299999999999997,
+      "blockedWaypoint": null,
+      "station": {
+        "point": {
+          "x": 0.5666666666666667,
+          "z": 7.583333333333333,
+          "y": 0.8324954252123313,
+          "exact": true,
+          "stationBuilding": "fixture-shore-watch"
+        },
+        "approach": {
+          "x": 0.9166666666666666,
+          "z": 7.416666666666667,
+          "exact": true,
+          "stationBuilding": "fixture-shore-watch",
+          "stationEntry": true,
+          "y": 0.5702608397607031
+        },
+        "access": "side"
+      }
+    }
+  ],
+  "final": {
+    "actors": [
+      {
+        "id": "c1",
+        "x": 0.56,
+        "z": 14.060000000000002,
+        "activity": "work",
+        "workState": "walking",
+        "pathLength": 1,
+        "workTime": 0,
+        "blockedWaypoint": null,
+        "station": {
+          "point": {
+            "x": 0.3111111111111111,
+            "z": 7.583333333333333,
+            "y": 0.8324954252123313,
+            "exact": true,
+            "stationBuilding": "fixture-shore-watch"
+          },
+          "approach": {
+            "x": 0.3111111111111111,
+            "z": 7.916666666666667,
+            "exact": true,
+            "stationBuilding": "fixture-shore-watch",
+            "stationEntry": true,
+            "y": 0.35134082408409933
+          },
+          "access": "front"
+        }
+      },
+      {
+        "id": "c2",
+        "x": 0.24367624197064056,
+        "z": 9.326841437086745,
+        "activity": "patrol",
+        "workState": "waiting",
+        "pathLength": 0,
+        "workTime": 0,
+        "blockedWaypoint": null,
+        "station": null
+      }
+    ],
+    "minSeparation": 0.45999999999999996,
+    "maxStep": 0.06778220097677819,
+    "firstWatching": {
+      "c2": 4.749999999999991,
+      "c1": 6.999999999999983
+    },
+    "patrolDisplacement": [
+      0.4100000000000019,
+      4.392309021160855
+    ],
+    "economyUnchanged": true
+  },
+  "passed": true
+}

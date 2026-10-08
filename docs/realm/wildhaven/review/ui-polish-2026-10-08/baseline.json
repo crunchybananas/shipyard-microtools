@@ -1,0 +1,25 @@
+{
+  "journal": {
+    "townHidden": false,
+    "journalHidden": false,
+    "townZ": "4",
+    "journalZ": "auto"
+  },
+  "zoomBefore": 32,
+  "zoomAfter": {
+    "target": 30.5,
+    "actual": 30.554847171278535
+  },
+  "site": {
+    "x": 795.2092088773749,
+    "z": -4,
+    "y": 351.5274794024403
+  },
+  "placement": {
+    "x": 275,
+    "y": 615.0625,
+    "width": 630,
+    "height": 126.9375
+  },
+  "errors": []
+}

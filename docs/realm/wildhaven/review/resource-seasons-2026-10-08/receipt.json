@@ -1,0 +1,260 @@
+{
+  "fixture": "Isolated new towns. Seasonal dates/stocks are explicitly staged for boundary and interaction checks, not claimed as earned play.",
+  "viewports": [
+    {
+      "name": "ipad-landscape",
+      "width": 1180,
+      "height": 820,
+      "resources": [
+        "wood",
+        "stone",
+        "food"
+      ],
+      "layout": {
+        "overflow": false,
+        "boxes": {
+          "calendar-toggle": {
+            "x": 922,
+            "y": 14,
+            "width": 100,
+            "height": 44,
+            "right": 1022,
+            "bottom": 58
+          },
+          "stores-toggle": {
+            "x": 356.484375,
+            "y": 21,
+            "width": 44,
+            "height": 44,
+            "right": 400.484375,
+            "bottom": 65
+          },
+          "people-details": {
+            "x": 274.40625,
+            "y": 20,
+            "width": 74.078125,
+            "height": 46,
+            "right": 348.484375,
+            "bottom": 66
+          },
+          "town-book": {
+            "x": 634,
+            "y": 100,
+            "width": 470,
+            "height": 642,
+            "right": 1104,
+            "bottom": 742
+          }
+        },
+        "headerBottom": 87.84375
+      },
+      "allResources": [
+        "wood",
+        "stone",
+        "food",
+        "grain",
+        "flour",
+        "planks",
+        "ore",
+        "iron",
+        "tools",
+        "flax",
+        "cloth",
+        "ale",
+        "gold",
+        "knowledge"
+      ],
+      "festival": {
+        "food": 88,
+        "baseline": 70,
+        "status": {
+          "active": true,
+          "remainingSeconds": 360,
+          "moraleBonus": 8,
+          "celebratedThisYear": true,
+          "year": 1,
+          "startedAt": 2160,
+          "endsAt": 2520
+        },
+        "morale": 78,
+        "events": [
+          {
+            "id": 2,
+            "day": 25,
+            "text": "The harvest festival uses 12 food. Morale +8, capped at 100, for one day (6m at 1×).",
+            "type": "festival"
+          }
+        ]
+      },
+      "reloadPreserved": true,
+      "calendarFocus": true,
+      "pausePreserved": true,
+      "expired": {
+        "status": {
+          "active": false,
+          "remainingSeconds": 0,
+          "moraleBonus": 0,
+          "celebratedThisYear": true,
+          "year": 1,
+          "startedAt": 2160,
+          "endsAt": 2520
+        },
+        "baseline": 74.107469,
+        "morale": 74.107469
+      },
+      "seasons": [
+        "spring",
+        "summer",
+        "autumn",
+        "winter"
+      ]
+    },
+    {
+      "name": "ipad-portrait",
+      "width": 820,
+      "height": 1180,
+      "resources": [
+        "wood",
+        "stone",
+        "food"
+      ],
+      "layout": {
+        "overflow": false,
+        "boxes": {
+          "calendar-toggle": {
+            "x": 565,
+            "y": 14,
+            "width": 100,
+            "height": 44,
+            "right": 665,
+            "bottom": 58
+          },
+          "stores-toggle": {
+            "x": 289.84375,
+            "y": 16.296875,
+            "width": 44,
+            "height": 44,
+            "right": 333.84375,
+            "bottom": 60.296875
+          },
+          "people-details": {
+            "x": 224.40625,
+            "y": 16.296875,
+            "width": 62.4375,
+            "height": 44,
+            "right": 286.84375,
+            "bottom": 60.296875
+          },
+          "town-book": {
+            "x": 274,
+            "y": 115,
+            "width": 470,
+            "height": 987,
+            "right": 744,
+            "bottom": 1102
+          }
+        },
+        "headerBottom": 102.6875
+      }
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "resources": [
+        "wood",
+        "stone",
+        "food"
+      ],
+      "layout": {
+        "overflow": false,
+        "boxes": {
+          "calendar-toggle": {
+            "x": 18,
+            "y": 78.390625,
+            "width": 220,
+            "height": 44,
+            "right": 238,
+            "bottom": 122.390625
+          },
+          "stores-toggle": {
+            "x": 328,
+            "y": 18.6875,
+            "width": 44,
+            "height": 44,
+            "right": 372,
+            "bottom": 62.6875
+          },
+          "people-details": {
+            "x": 253.4375,
+            "y": 18.6875,
+            "width": 60.5625,
+            "height": 44,
+            "right": 314,
+            "bottom": 62.6875
+          },
+          "town-book": {
+            "x": 12,
+            "y": 186,
+            "width": 366,
+            "height": 580,
+            "right": 378,
+            "bottom": 766
+          }
+        },
+        "headerBottom": 173.390625
+      }
+    },
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "resources": [
+        "wood",
+        "stone",
+        "food"
+      ],
+      "layout": {
+        "overflow": false,
+        "boxes": {
+          "calendar-toggle": {
+            "x": 1182,
+            "y": 14,
+            "width": 100,
+            "height": 44,
+            "right": 1282,
+            "bottom": 58
+          },
+          "stores-toggle": {
+            "x": 356.484375,
+            "y": 21,
+            "width": 44,
+            "height": 44,
+            "right": 400.484375,
+            "bottom": 65
+          },
+          "people-details": {
+            "x": 274.40625,
+            "y": 20,
+            "width": 74.078125,
+            "height": 46,
+            "right": 348.484375,
+            "bottom": 66
+          },
+          "town-book": {
+            "x": 894,
+            "y": 100,
+            "width": 470,
+            "height": 722,
+            "right": 1364,
+            "bottom": 822
+          }
+        },
+        "headerBottom": 87.84375
+      },
+      "keyboardReturn": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

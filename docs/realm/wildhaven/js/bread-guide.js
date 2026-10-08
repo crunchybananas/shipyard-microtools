@@ -1,4 +1,5 @@
 import { BUILDINGS, RESOURCES } from './catalog.js';
+import { calendarDay, perMinute } from './calendar.js';
 import { RESEARCH } from './progression.js';
 
 export const BREAD_RESEARCH = Object.freeze(['joinery', 'cultivation', 'milling']);
@@ -11,7 +12,7 @@ export function firstBreadStep(state, { paused = false, daily = {} } = {}) {
   const base = { count: 'Food town · first bread' };
   const step = value => ({ ...base, ...value, count: value.count && !value.finishGoal ? `First bread · ${value.count}` : value.count || base.count });
   const wait = value => step(paused ? { ...value, description: `${value.description} Time is paused.`, label: 'Resume time', resume: true } : value);
-  if (state.guidance.firstBread) return step({ title: 'Your bakery made its first bread', description: `On day ${state.guidance.firstBread.day}, your bakers put food into town stores. Grain → flour → bread now has a real payoff. The Food town charter is a later choice.`, label: 'Return to town goals', finishGoal: true, count: 'First bread made', progress: 1 });
+  if (state.guidance.firstBread) return step({ title: 'Your bakery made its first bread', description: `On day ${calendarDay(state, state.guidance.firstBread.day)}, your bakers put food into town stores. Grain → flour → bread now has a real payoff. The Food town charter is a later choice.`, label: 'Return to town goals', finishGoal: true, count: 'First bread made', progress: 1 });
 
   const find = type => {
     const matches = state.buildings.filter(b => b.type === type);
@@ -21,7 +22,7 @@ export function firstBreadStep(state, { paused = false, daily = {} } = {}) {
   function supply(key, amount, purpose) {
     const missing = quantity(amount - (state.resources[key] || 0)), name = RESOURCES[key].name.toLowerCase();
     const rate = daily[key] || 0;
-    if (rate > 0) return wait({ title: `${RESOURCES[key].name} for ${purpose}`, description: `${missing} more ${name} needed. Your town adds ${quantity(rate)} per day; keep the supply running.`, label: 'View town stores', resource: key, count: `${stock(state.resources[key])} / ${amount} ${name}`, progress: state.resources[key] / amount });
+    if (rate > 0) return wait({ title: `${RESOURCES[key].name} for ${purpose}`, description: `${missing} more ${name} needed. Your town adds ${quantity(perMinute(rate))} per minute at 1×; keep the supply running.`, label: 'View town stores', resource: key, count: `${stock(state.resources[key])} / ${amount} ${name}`, progress: state.resources[key] / amount });
     const producerType = { wood: 'lumber', stone: 'quarry', planks: 'sawmill', grain: 'farm', flour: 'windmill', knowledge: 'school' }[key];
     const producer = producerType && find(producerType);
     return step({ title: `Supply ${name} for ${purpose}`, description: `${missing} more ${name} needed. ${key === 'gold' ? 'Complete a coastal order to earn coin.' : 'Production is not building a surplus. Check workers and inputs; resting a competing workplace can free people and supplies.'}`, label: key === 'gold' ? 'View coastal orders' : producer ? `Check ${BUILDINGS[producerType].name.toLowerCase()}` : 'Review people & supplies', ...(key === 'gold' ? { tab: 'trade' } : producer ? { buildingId: producer.id } : { tab: 'workforce' }), count: `${stock(state.resources[key])} / ${amount} ${name}` });

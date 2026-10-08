@@ -1,0 +1,149 @@
+/* The island is the main surface. A six-minute sky above a pocket-sized dock. */
+#hud header{grid-template-columns:minmax(0,1fr) 156px;gap:12px;max-width:920px;margin:0 auto;pointer-events:none}
+#hud header>*{pointer-events:auto}
+#hud header .supplies{padding:7px 12px;gap:12px;border:0}
+#hud header .supply{flex:1;gap:5px;min-width:0}
+#hud header .supply>div>span{font-size:20px}
+#hud header .supply small{font-size:10px}
+#hud header .supply small b{display:block;padding:0;font-size:9px}
+#hud header .day-controls{background:#f5efdcf2;padding:5px 6px;border-radius:7px}
+#hud header .day-title{font-size:11px;line-height:16px}
+#hud header .time-buttons{margin:0}
+#hud header .time-buttons button{min-height:32px;height:32px;min-width:40px}
+#hud header .day-track{display:block;margin-top:3px;height:2px}
+#hud .resource{display:block;flex:0 0 30px;width:30px;height:40px;margin:0;border:0;border-radius:0;transform:none;box-shadow:none;clip-path:none;background:transparent url('./assets/resource-icons.webp') 0 50% / 400% 100% no-repeat}
+#hud .resource::before{content:none}
+#hud .resource.stone{background-position-x:33.333333%}
+#hud .resource.food{background-position-x:66.666667%}
+#hud .resource.people-icon{background-position-x:100%}
+#hud #home{font-size:10px;min-width:44px;min-height:44px}
+#hud .camera-tools{gap:4px}
+#hud .camera-tools button{width:44px;height:44px}
+#hud .camera-tools #zoom-in,#hud .camera-tools #zoom-out,#hud .camera-tools>span{display:none}
+#hud .ambition{width:236px}
+#hud .ambition h2{font-size:16px}
+#hud footer .shelf-heading{font-size:11px}
+body.tablet-build-open #hud #build-shelf .build-choice{flex-basis:106px;min-width:106px;max-width:106px;padding:2px 5px 6px}
+#hud #build-shelf .build-choice img{height:40px;width:65px}
+#hud #build-shelf .build-choice .build-use{display:none}
+#hud #build-shelf .build-choice .build-flow{min-height:16px;font-size:10px}
+#hud #build-shelf .build-choice .cost{font-size:9px}
+#hud #placement{min-width:0;width:min(630px,calc(100% - 24px));max-height:30dvh;padding:8px 12px;gap:8px;align-items:center}
+#hud #placement>div{min-width:0}
+#hud #placement-purpose .building-purpose{padding:2px 0;margin:0}
+#hud #placement .purpose-flow,#hud #placement .purpose-staff{display:inline-flex;font-size:10px;margin-right:6px}
+#hud #placement .purpose-next,#hud #placement .purpose-short-use{display:none}
+#hud #placement-detail{font-size:11px;line-height:1.4}
+#hud #placement-title{font-size:12px!important}
+#hud #placement button{min-height:44px;padding:8px 12px;font-size:11px}
+#hud #inspector{padding:12px 16px;text-align:left}
+#hud #inspect-image{float:left;width:62px;height:55px;margin:0 10px 5px 0}
+#hud #inspector h2{font-size:22px}#hud #inspect-description{clear:both}
+#hud #toast{top:var(--tablet-panel-top);max-width:min(420px,calc(100% - 24px));padding:10px 14px;pointer-events:none}
+#hud footer .controls-hint>div>button[aria-expanded=true]{background:#dce5cb!important}
+/* The dock remains a stable, reachable target while any book is open. */
+#hud footer .controls-hint>div>button{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#hud footer .controls-hint>div>button::after{pointer-events:none}
+body.companion-active #hud footer,body.companion-visit #hud footer{visibility:visible;pointer-events:auto}
+body.companion-active #hud #companion-panel,body.companion-away #hud #companion-panel{bottom:var(--tablet-dock-clearance,80px)}
+body.companion-active #hud footer>.shelf-heading,body.companion-active #hud #build-categories,body.companion-active #hud #build-shelf{display:none}
+body.companion-away #hud #town-book,body.companion-away #hud #fieldbook,body.companion-away #hud #frontier-panel,body.companion-away #hud #journal{top:var(--companion-reading-top,var(--tablet-panel-top))}
+@media(max-width:760px){
+ #hud header{left:12px;right:12px;top:10px;grid-template-columns:minmax(0,1fr) 144px;gap:8px}
+ #hud header .supplies{padding:6px;gap:4px}
+ #hud header .supply{gap:3px}
+ #hud header .supply>div>span{font-size:17px}
+ #hud header .supply small{font-size:9px}
+ #hud header .resource{flex-basis:24px;width:24px;height:32px}
+ #hud footer{width:calc(100% - 24px)}
+ #hud #town-book,#hud #fieldbook,#hud #frontier-panel,#hud #companion-panel{left:12px;right:64px;width:auto;top:var(--tablet-panel-top);bottom:var(--tablet-dock-clearance);min-height:0}
+ #hud #inspector{right:64px;width:min(290px,calc(100% - 84px));min-height:0}
+ #hud .camera-tools{right:12px}
+ #hud .ambition{left:12px;width:220px}
+ #hud footer .controls-hint>div>button{font-size:11px!important;padding:6px 4px!important}
+ #hud footer .controls-hint>div>button::after{font-size:11px}
+}
+@media(max-width:520px){
+ :root{--tablet-panel-top:132px}
+ #hud header{grid-template-columns:1fr;gap:5px}
+ #hud header .supplies{padding:5px 9px}
+ #hud header .supply>div>span{font-size:19px}
+ #hud header .day-controls{display:flex;justify-content:space-between;align-items:center;padding:2px 6px;gap:10px}
+ #hud header .day-title{font-size:12px;padding-left:6px}
+ #hud header .day-track{display:none}
+ #hud header .time-buttons button{height:44px}
+ #hud footer .controls-hint>div{display:flex;overflow-x:auto;scrollbar-width:none;gap:3px}
+ #hud footer .controls-hint>div>button{flex:0 0 68px}
+ #hud #town-book,#hud #fieldbook,#hud #frontier-panel,#hud #companion-panel{right:12px}
+ body.town-view-active #hud .camera-tools,body.fieldbook-active #hud .camera-tools,body.frontier-view-active #hud .camera-tools{display:none}
+ #hud #placement{display:grid;grid-template-columns:1fr auto auto}
+ #hud #placement>div{grid-column:1/-1}
+ .intro-copy{top:20%}h1{font-size:55px}
+}
+@media(any-pointer:coarse){#hud header .time-buttons button{height:44px}}
+
+/* Keep active work and warnings visible when the management row is folded. */
+#hud footer #fieldbook-toggle,#hud footer #frontier-toggle{font-size:11px!important;white-space:normal}
+#hud footer #fieldbook-toggle::after,#hud footer #frontier-toggle::after{content:none}
+#hud footer #tablet-town-toggle{white-space:normal}
+#hud footer #tablet-town-toggle.threatened{background:#a95e38!important;color:#fff4de!important}
+@media(min-width:521px) and (max-width:760px){
+ #hud #inspector{left:12px;right:auto;width:min(260px,calc(50% - 24px))}
+}
+@media(max-width:520px){
+ #hud #inspector{left:12px;right:12px;top:auto;bottom:var(--tablet-dock-clearance);width:auto;max-height:36dvh}
+}
+
+/* Reading never silently consumes village time. Explicit speed choices win. */
+#reading-pause{position:fixed;z-index:75;bottom:calc(env(safe-area-inset-bottom) + 80px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);width:max-content;padding:7px 10px;border-radius:10px;background:#f8f0dceF;box-shadow:0 3px 16px #263e3829;font-size:11px;color:#304c40}
+#reading-pause[hidden]{display:none}#reading-pause button{padding:7px 10px;white-space:nowrap;border-radius:7px;background:#3b6051;color:#fff9e9;font-size:11px}
+@media(max-width:520px){#reading-pause{bottom:calc(env(safe-area-inset-bottom) + 74px);font-size:10px;gap:6px}}
+
+/* Resources left, clock right, and one central place for village notices. */
+#hud header{grid-template-columns:auto minmax(120px,1fr) auto;max-width:none;align-items:start;gap:12px}
+#hud header .supplies{grid-column:1;grid-row:1;width:max-content;padding:6px 9px;gap:8px}
+#hud header .supply{flex:0 1 auto;gap:4px}
+#hud #stores-toggle{flex:0 0 auto;min-width:44px;min-height:44px;padding:5px 7px;border-radius:5px;background:#dae4c9;color:#315843;font-size:10px;line-height:1.2;touch-action:manipulation}
+#hud #stores-toggle[aria-expanded=true]{background:#315f4c;color:#fff4dd}
+#hud header .day-controls{grid-column:3;grid-row:1;min-width:144px;padding:4px 6px}
+#hud header .hud-notifications{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;pointer-events:none}
+#island-safety-status{margin:0;max-width:100%;padding:5px 10px;border-radius:7px;background:#eef1dbeb;color:#345b46;font-size:11px;line-height:1.3;text-align:center}
+#island-safety-status[data-safety=approaching]{background:#f6e4bbeF;color:#774c27}
+#island-safety-status[data-safety=active]{background:#8c4035;color:#fff5df;font-weight:700}
+#hud .hud-notifications #toast,#hud .hud-notifications #reading-pause{position:static;inset:auto;transform:none;max-width:100%;width:auto;margin:0;padding:7px 10px;font-size:11px;line-height:1.35;text-align:center}
+#hud .hud-notifications #reading-pause{flex-wrap:wrap;justify-content:center;gap:5px}
+#hud .hud-notifications #reading-pause button{min-height:32px;padding:5px 8px}
+@media(min-width:521px) and (max-width:900px){
+ #hud header{gap:8px;grid-template-columns:auto minmax(100px,1fr) auto}
+ #hud header .supplies{gap:5px;padding:6px}
+ #hud header .resource{flex-basis:24px;width:24px;height:32px}
+ #hud header .supply>div>span{font-size:18px}
+ #hud header .supply small,#hud header .supply small b{font-size:9px}
+}
+@media(min-width:521px) and (max-width:760px){
+ #hud header{grid-template-columns:minmax(0,1fr) auto}
+ #hud header .supplies{width:auto;min-width:0;justify-content:space-between}
+ #hud header .day-controls{grid-column:2}
+ #hud header .hud-notifications{grid-column:1/-1;grid-row:2;flex-direction:row;flex-wrap:wrap;justify-content:center}
+}
+@media(max-width:520px){
+ #hud header{grid-template-columns:1fr;gap:5px}
+ #hud header .supplies{grid-column:1;grid-row:1;width:auto;justify-content:space-between}
+ #hud header .day-controls{grid-column:1;grid-row:2;min-width:0}
+ #hud header .hud-notifications{grid-column:1;grid-row:3;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px}
+ #island-safety-status{font-size:10px;padding:3px 7px}
+ #hud .hud-notifications #toast,#hud .hud-notifications #reading-pause{font-size:10px;padding:5px 8px}
+}
+
+/* Landscape entry must keep Continue and Start reachable before a town opens. */
+@media(max-height:600px){
+ #intro .intro-copy{top:max(18px,env(safe-area-inset-top));bottom:64px;left:5%;max-width:90%;overflow:auto;padding-right:8px}
+ #intro .intro-note{font-size:11px}
+ #intro h1{font-size:clamp(32px,8vh,46px);margin:8px 0 12px}
+ #intro .intro-copy p{font-size:13px;line-height:1.4;margin:0 0 12px}
+ #intro .intro-actions{margin-bottom:10px;gap:8px}
+ #intro .intro-actions button{min-height:44px;padding:10px 15px;font-size:13px}
+ #intro .intro-copy small{font-size:10px}
+ #intro .intro-bottom{bottom:max(8px,env(safe-area-inset-bottom));left:5%;font-size:10px}
+ #intro .intro-bottom button{min-height:44px}
+}

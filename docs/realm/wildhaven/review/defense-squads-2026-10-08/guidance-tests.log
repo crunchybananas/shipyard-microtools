@@ -1,0 +1,35 @@
+✔ coastal warnings require restored bell and twenty real citizens, then six minutes before warning and six to prepare (1.213125ms)
+✔ paying spends the published demand once, grants no defense reward, and guarantees twelve quiet minutes (0.334708ms)
+✔ an unaffordable demand and repeated shelter actions are inert (0.91ms)
+✔ warehouses and temporary shelter measurably lower the maximum loss; people and buildings are untouched (0.189917ms)
+✔ actual supplied guards need patrol time; instant staffing cannot trigger a free defense reward (0.26975ms)
+✔ guard input shortages, vacancies and pauses reduce readiness and patrol work honestly (0.141959ms)
+✔ researched organization and actual skill change the required guard labor (0.172375ms)
+✔ partial defense lowers actual theft and zero stock cannot become negative (0.124167ms)
+✔ a prepared supplied watch automatically defends at the announced deadline (0.086208ms)
+✔ all four incidents rotate deterministically, scale within bounds and leave recovery time (0.378416ms)
+✔ canonical terms, patrol progress and one-time resolution survive normalization; malformed saves fail (0.704209ms)
+✔ legacy active warnings migrate without changing deadlines, patrols, shelter or rewards (0.257458ms)
+✔ legacy pending and recovery dates survive unchanged, including overdue dormant schedules (0.66075ms)
+✔ partial-cycle resolutions always grant at least twelve minutes and remain reloadable (0.317875ms)
+✔ new cargo warnings wait through physical warnings and raids without resetting a due schedule (0.092167ms)
+✔ an already announced cargo deadline resolves on time even alongside a saved physical threat (0.063792ms)
+✔ patrol estimates include fractions, shortages and the minimum real patrol work (0.359708ms)
+✔ cargo guidance is pure, routes real blockers, and never counts company troops or walls as guards (0.398208ms)
+✔ guidance finds usable watch capacity instead of pointing at an already full house (0.311958ms)
+✔ an unprepared town gets an honest deadline warning and an available cargo response (0.090625ms)
+✔ a real saved town with an overdue dormant legacy schedule restores without losing its date (26.777625ms)
+✔ real simulation pause freezes cargo time; three-times speed advances the same deterministic deadline (247.620834ms)
+✔ earned campaign integration preserves active incidents, actual labor and partial patrols through save/load (1111.309583ms)
+✔ quiet, scheduled future raids and friendly troops do not invent an active warning (2.198166ms)
+✔ coastal incidents and arriving frontier raids both appear with their real clocks (0.693209ms)
+✔ an active raid outranks simultaneous incoming/coastal warnings and cannot report calm (1.118875ms)
+✔ hostility uses simulation relations and clears when enemies leave, die or make peace (0.2545ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1477.856291

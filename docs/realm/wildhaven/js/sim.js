@@ -1,3 +1,9 @@
+import { createWoodland, restoreWoodland, woodlandStatus, harvestWood, tickWoodland } from './woodland.js';
+export { woodlandStatus } from './woodland.js';
+import { WORK_CYCLE_SECONDS, workPosition } from './calendar.js';
+import { newCitizenName } from './citizen-names.js';
+import { createSeasonState, normalizeSeasons, householdMeal, effectiveMorale, festivalStatus, celebrateHarvest as harvestAction } from './seasons.js';
+export { seasonInfo, festivalQuote, festivalStatus, effectiveMorale } from './seasons.js';
 import { createDiscoveryState, normalizeDiscovery, discoveryModifier } from './discovery.js';
 /** Wildhaven v2: named labor, escrowed construction, continuous production and town needs. */
 import { BUILDINGS, RESOURCE_NAMES, getBuildingSpec, getUpgrade } from './catalog.js';
@@ -9,7 +15,8 @@ export { BUILDINGS, RESOURCE_NAMES } from './catalog.js';
 import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, isLand, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, islandShape, isLand, groundHeight, terrainAt, listTiles, hasNaturalObstacle, regionAt, neighborAt, isNeighborCompoundCell } from './island.js';
 export const VERSION = 4;
-export const DAY_LENGTH = 90;
+// Legacy save/API name: this is the work cycle, not the displayed calendar day.
+export const DAY_LENGTH = WORK_CYCLE_SECONDS;
 const MAX_RESOURCE = 1000000000;
 const MAX_BUILDINGS = 1800;
 const JOURNAL_LIMIT = 60;
@@ -28,10 +35,14 @@ const modifier = (state, type, key) => {
   const value = supplyModifiers(state, type)?.[key];
   return isFiniteNumber(value) ? value : ['arrival', 'happiness'].includes(key) ? 0 : 1;
 };
-const citizenNames = ['Ada', 'Bram', 'Cora', 'Dev', 'Elin', 'Finn', 'Greta', 'Hollis', 'Ida', 'Jory', 'Kit', 'Lina', 'Milo', 'Nell', 'Orin', 'Pia', 'Quinn', 'Remy', 'Sage', 'Tess', 'Una', 'Vale', 'Wren', 'Yara'];
-function citizen(id, day = 1) {
-  const index = id - 1, suffix = Math.floor(index / citizenNames.length);
-  return { id: `c${id}`, name: citizenNames[index % citizenNames.length] + (suffix ? ` ${suffix + 1}` : ''), arrivalDay: day, job: 'idle', workplace: null };
+function citizen(id, day = 1, residents = []) {
+  return { id: `c${id}`, name: newCitizenName(id, residents.map(person => person.name)), arrivalDay: day, job: 'idle', workplace: null };
+}
+// Keep the original identity assignment when importing the unnamed v1 population.
+const legacyCitizenNames = ['Ada', 'Bram', 'Cora', 'Dev', 'Elin', 'Finn', 'Greta', 'Hollis', 'Ida', 'Jory', 'Kit', 'Lina', 'Milo', 'Nell', 'Orin', 'Pia', 'Quinn', 'Remy', 'Sage', 'Tess', 'Una', 'Vale', 'Wren', 'Yara'];
+function legacyCitizen(id) {
+  const index = id - 1, suffix = Math.floor(index / legacyCitizenNames.length);
+  return { ...citizen(id), name: legacyCitizenNames[index % legacyCitizenNames.length] + (suffix ? ` ${suffix + 1}` : '') };
 }
 function addEvent(state, text, type = 'info') {
   state.events.unshift({ id: state.nextEventId++, day: state.day, text, type });
@@ -157,9 +168,9 @@ export function createGame() {
   const hearth = baseBuilding('hearth', 'hearth', 0, 2), bell = baseBuilding('bell', 'bell', 0, -5); bell.restored = false;
   const state = {
     version: VERSION, resources, population: 6, citizens: Array.from({ length: 6 }, (_, i) => ({ ...citizen(i + 1), experience: {} })),
-    nextCitizenId: 7, day: 1, time: 0, subsecond: 0, elapsed: 0, nextId: 1, nextEventId: 1, nextQueueOrder: 1,
-    won: false, undo: null, lastTradeDay: 0, builderTarget: 2, morale: 78, buildings: [hearth, bell], events: [],
-    stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
+    nextCitizenId: 7, calendarEpoch: 0, day: 1, time: 0, subsecond: 0, elapsed: 0, nextId: 1, nextEventId: 1, nextQueueOrder: 1,
+    won: false, undo: null, lastTradeDay: 0, builderTarget: 2, morale: 78, seasons: createSeasonState(), buildings: [hearth, bell], events: [],
+    woodland: createWoodland(), stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
   };
   addEvent(state, 'Six founders share a hearth. Give builders a cottage to raise, then choose who will grow food and gather materials.', 'welcome');
   normalizeProgression(state); reconcileWorkforce(state); refreshProduction(state);
@@ -272,6 +283,10 @@ function throughput(state, building, dt = 1, mutate = false) {
     const room = Math.max(...outputs.map(([key, value]) => Math.max(0, storage[key] - state.resources[key]) / (value * factor)));
     if (room < efficiency) { efficiency = room; reason = 'Storage full'; }
   }
+  if (building.type === 'lumber' && potential.output.wood > 0 && efficiency > 0) {
+    const available = woodlandStatus(state, building).available / (potential.output.wood * factor);
+    if (available < efficiency) { efficiency = available; reason = 'Young woodland growing · workers replant automatically'; }
+  }
   const result = { ...potential, input: {}, output: {}, efficiency, potentialFood: round(potentialFood), blockedReason: reason };
   for (const [key, value] of Object.entries(potential.input)) {
     const amount = value * efficiency * factor; result.input[key] = round(amount / factor); result[key] -= result.input[key];
@@ -280,7 +295,10 @@ function throughput(state, building, dt = 1, mutate = false) {
   for (const [key, value] of outputs) {
     const amount = Math.min(Math.max(0, storage[key] - state.resources[key]), value * efficiency * factor);
     result.output[key] = round(amount / factor); result[key] += result.output[key];
-    if (mutate) state.resources[key] = round(state.resources[key] + amount);
+    if (mutate) {
+      const received = building.type === 'lumber' && key === 'wood' ? harvestWood(state, building, amount) : amount;
+      state.resources[key] = round(state.resources[key] + received);
+    }
   }
   if (mutate && efficiency > 0 && (outputs.length || specFor(building).service)) {
     const worked = Math.min(1, efficiency / Math.max(0.00001, potential.efficiency));
@@ -297,7 +315,7 @@ export function buildingYield(state, type, x, z) {
   for (const [key, value] of Object.entries(recipe.input)) values[key] -= value;
   return { ...values, ...recipe, workers: specFor(fake).workers || 0, required: specFor(fake).workers || 0, efficiency: 1, blockedReason: '' };
 }
-function foodUpkeep(state) { return round(state.population * 0.8 * modifier(state, 'hearth', 'foodConsumption')); }
+function foodUpkeep(state) { return householdMeal(state); }
 const SERVICE_KINDS = ['water', 'health', 'faith', 'security', 'leisure', 'civic', 'community'];
 const SERVICE_CAPACITY = { water: 35, health: 30, faith: 24, security: 30, leisure: 24, civic: 40 };
 
@@ -368,10 +386,10 @@ function serviceAccess(state) {
 }
 export function villageNeeds(state) {
   const food = foodUpkeep(state), beds = housing(state), spare = Math.max(0, beds - state.population), extra = modifier(state, 'cottage', 'arrival');
-  let expected = Math.min(Math.max(0, 2 + Math.floor(extra)), spare, Math.max(0, Math.floor((state.resources.food - food) / 4))), reason = 'New settlers can arrive at dawn.';
+  let expected = Math.min(Math.max(0, 2 + Math.floor(extra)), spare, Math.max(0, Math.floor((state.resources.food - food) / 4))), reason = 'New settlers can arrive with the next supply boat.';
   if (!spare) { expected = 0; reason = 'More completed housing is needed.'; }
-  else if (state.morale < 45) { expected = 0; reason = 'Raise morale to 45 before new settlers arrive.'; }
-  else if (state.resources.food < food + 4) { expected = 0; reason = 'Keep breakfast and 4 extra food per newcomer in the pantry.'; }
+  else if (effectiveMorale(state) < 45) { expected = 0; reason = 'Raise morale to 45 before new settlers arrive.'; }
+  else if (state.resources.food < food + 4) { expected = 0; reason = 'Keep the next meal and 4 extra food per newcomer in the pantry.'; }
   const { homes, services } = serviceAccess(state);
   const civicNeeds = [
     { population: 20, coverage: services.water.coverage, target: .5, reason: 'A growing town needs wells covering at least half its housing.' },
@@ -382,7 +400,7 @@ export function villageNeeds(state) {
     if (state.population >= need.population) { expected = 0; reason = need.reason; }
     else expected = Math.min(expected, need.population - state.population);
   }
-  return { food: { have: state.resources.food, required: food, satisfied: state.resources.food >= food }, housing: { have: beds, required: state.population, satisfied: beds >= state.population }, services, homes, migration: { eligible: expected > 0, reason, expected }, morale: state.morale };
+  return { food: { have: state.resources.food, required: food, satisfied: state.resources.food >= food }, housing: { have: beds, required: state.population, satisfied: beds >= state.population }, services, homes, migration: { eligible: expected > 0, reason, expected }, morale: effectiveMorale(state) };
 }
 function updateNeeds(state) {
   state.storage = storageCapacity(state); const needs = villageNeeds(state); state.migration = needs.migration;
@@ -399,7 +417,8 @@ export function rates(state) {
   }
   const foodConsumed = foodUpkeep(state); result.food -= foodConsumed;
   for (const key of RESOURCE_NAMES) result[key] = round(result[key]);
-  return { ...result, foodProduced, foodConsumed, capacity: housing(state), happiness: state.morale, morale: state.morale, storage: storageCapacity(state), buildings };
+  const morale = effectiveMorale(state);
+  return { ...result, foodProduced, foodConsumed, capacity: housing(state), happiness: morale, morale, storage: storageCapacity(state), buildings };
 }
 function refreshProduction(state) { for (const b of state.buildings) b.production = throughput(state, b); updateNeeds(state); }
 export function buildingStatus(state, idOrBuilding) {
@@ -424,7 +443,7 @@ export function canBuild(state, type, x, z, rotation = 0) {
   } else {
     const terrain = terrainAt(x, z);
     if (getBuildingAt(state, x, z)) return fail('There is already a building or construction site here.');
-    if (state.frontier?.units.some(u => !['dead','released'].includes(u.status) && (Math.round(u.x) === x && Math.round(u.z) === z || ['move','retreat'].includes(u.order?.type) && Math.round(u.order.x) === x && Math.round(u.order.z) === z))) return fail('Wait for the company to clear this building site and its ordered destination.');
+    if (state.frontier?.units.some(u => !['dead','released'].includes(u.status) && (Math.round(u.x) === x && Math.round(u.z) === z || ['move','retreat','defend'].includes(u.order?.type) && Math.round(u.order.x) === x && Math.round(u.order.z) === z))) return fail('Wait for the company to clear this building site and its ordered destination.');
     if (terrain.kind === 'water') return fail('Build on dry land.');
     if (terrain.kind === 'path') return fail('Keep the village footpath open.');
     if (state.frontier?.fortifications.some(f => f.x === x && f.z === z)) return fail('A defense or its remains occupies this square.');
@@ -542,7 +561,7 @@ function completeConstruction(state, b) {
   if (state.undo?.id === b.id) state.undo = null;
   if (b.type === 'bell' && !b.restored) {
     b.restored = true; b.restoredDay = state.day; state.won = true; state.wonDay = state.day;
-    addEvent(state, 'The bell rings again. Wildhaven is on the map; now choose what kind of town it will become.', 'milestone');
+    addEvent(state, 'The bell rings again. Your village is on the map; now choose what kind of town it will become.', 'milestone');
   } else addEvent(state, `${BUILDINGS[b.type].name} ${upgrading ? `reopens at level ${b.level}` : 'is complete'}. ${specFor(b).workers ? 'Its workplace is ready for citizens.' : 'The neighborhood has grown.'}`, upgrading ? 'upgrade' : 'complete');
   state.stats[upgrading ? 'upgrades' : 'built']++;
 }
@@ -573,10 +592,10 @@ function dawn(state) {
   state.morale = round(clamp(state.morale + (target - state.morale) * 0.35, 10, 100));
   const needs = villageNeeds(state), arrivals = needs.migration.expected;
   if (arrivals > 0) {
-    for (let i = 0; i < arrivals; i++) state.citizens.push({ ...citizen(state.nextCitizenId++, state.day), experience: {} });
+    for (let i = 0; i < arrivals; i++) state.citizens.push({ ...citizen(state.nextCitizenId++, state.day, state.citizens), experience: {} });
     state.resources.food = round(state.resources.food - arrivals * 4); state.stats.arrivals += arrivals;
     addEvent(state, `${arrivals} ${arrivals === 1 ? 'new citizen has' : 'new citizens have'} arrived. Assign their skills to the town’s next task.`, 'arrival');
-  } else addEvent(state, `Day ${state.day}. ${!fed ? 'The pantry could not feed everyone. Gardens need workers.' : needs.migration.reason}`, fed ? 'dawn' : 'food');
+  } else addEvent(state, `${!fed ? 'The pantry could not feed everyone. Gardens need workers.' : needs.migration.reason}`, fed ? 'dawn' : 'food');
   reconcileWorkforce(state); refreshProduction(state); progressionEvents(state, dailyProgression(state)); reconcileWorkforce(state); refreshProduction(state);
   progressionEvents(state, dailyPressure(state)); updateNeeds(state);
   return arrivals;
@@ -584,6 +603,7 @@ function dawn(state) {
 export function tick(state, dt) {
   const result = { newDay: false, days: 0, arrivals: 0, completed: 0, changed: false, won: state.won, frontierEvents: [] };
   if (!isFiniteNumber(dt) || dt <= 0) return result;
+  const festivalWasActive = festivalStatus(state).active;
   let remaining = Math.min(dt, DAY_LENGTH * 30);
   state.elapsed = round(state.elapsed + remaining);
   // Combat advances at its authoritative quarter-second boundary. Economy remains
@@ -606,6 +626,7 @@ export function tick(state, dt) {
     state.subsecond = round(Math.max(0, state.subsecond - 1));
     const oldJobs = state.citizens.map(c => `${c.id}:${c.workplace}:${c.job}`).join('|');
     result.completed += construct(state, 1); reconcileWorkforce(state);
+    result.changed = tickWoodland(state, 1) || result.changed;
     for (const b of state.buildings) {
       const foodBefore = state.resources.food;
       b.production = throughput(state, b, 1, true);
@@ -622,6 +643,9 @@ export function tick(state, dt) {
     if (state.citizens.map(c => `${c.id}:${c.workplace}:${c.job}`).join('|') !== oldJobs) result.changed = true;
     updateNeeds(state);
   }
+  // A festival can end between economy seconds. Refresh cached guidance and
+  // notify the world immediately, without advancing meals or baseline morale.
+  if (festivalWasActive && !festivalStatus(state).active) { updateNeeds(state); result.changed = true; }
   result.changed ||= result.completed > 0 || result.newDay; result.won = state.won; return result;
 }
 export function tradeOffer(state, resource) {
@@ -629,9 +653,9 @@ export function tradeOffer(state, resource) {
   const amount = Math.floor(baseAmount * modifier(state, 'market', 'tradeReward')), reserve = Math.ceil(foodUpkeep(state)), offer = { cost: 12, amount, reserve };
   const fail = reason => ({ ...offer, ok: false, reason });
   if (!baseAmount) return fail('The landing exchanges food for timber or stone.');
-  if (state.population < 6) return fail('Supply skiffs stop when 6 citizens call Wildhaven home.');
-  if (state.lastTradeDay === state.day) return fail('Today’s exchange is complete. Another skiff passes tomorrow.');
-  if (state.resources.food < offer.cost + reserve) return fail(`Keep ${reserve} food for breakfast. The pantry needs ${offer.cost + reserve} food.`);
+  if (state.population < 6) return fail('Supply skiffs stop when 6 citizens call the village home.');
+  if (state.lastTradeDay === state.day) return fail('This skiff’s exchange is complete. Another passes every 90 seconds at 1×.');
+  if (state.resources.food < offer.cost + reserve) return fail(`Keep ${reserve} food for the next meal. The pantry needs ${offer.cost + reserve} food.`);
   if (state.resources[resource] + amount > storageCapacity(state)[resource]) return fail(`There is no storage room for this ${resource} delivery.`);
   return { ...offer, ok: true, reason: `Exchange 12 food for ${amount} ${resource === 'wood' ? 'timber' : 'stone'}.` };
 }
@@ -639,6 +663,11 @@ export function trade(state, resource) {
   const offer = tradeOffer(state, resource); if (!offer.ok) return offer;
   state.resources.food = round(state.resources.food - offer.cost); state.resources[resource] += offer.amount; state.lastTradeDay = state.day;
   addEvent(state, `The landing exchanged 12 food for ${offer.amount} ${resource === 'wood' ? 'timber' : 'stone'}.`, 'trade'); updateNeeds(state); return { ...offer, resource };
+}
+export function celebrateHarvest(state) {
+  const result = harvestAction(state);
+  if (result.ok) { addEvent(state, result.reason, 'festival'); refreshProduction(state); }
+  return result;
 }
 export function actOnPressure(state, action) {
   refreshProduction(state);
@@ -658,9 +687,9 @@ export function objective(state) {
   if (cottages < 3 || food < 2) return { title: 'Make room for the next neighbors', description: `${Math.min(cottages, 3)}/3 finished cottages · ${Math.min(food, 2)}/2 food gardens. Construction and production share the same workers.`, current: Math.min(cottages, 3) + Math.min(food, 2), total: 5, complete: false, step: 3, type: cottages < 3 ? 'cottage' : 'garden' };
   if (state.population < 10) return { title: 'A town needs people', description: `${state.migration?.reason || 'Keep spare housing and food for newcomers.'} Welcome 10 citizens.`, current: state.population, total: 10, complete: false, step: 4 };
   const bell = state.buildings.find(b => b.type === 'bell');
-  if (bell.status !== 'ready') return { title: 'Raise a sound across the water', description: 'Finish restoring the bell. This first milestone opens Wildhaven’s wider future.', current: bell.progress, total: bell.workRequired, complete: false, step: 5, type: 'bell' };
+  if (bell.status !== 'ready') return { title: 'Raise a sound across the water', description: 'Finish restoring the bell. This first milestone opens the village’s wider future.', current: bell.progress, total: bell.workRequired, complete: false, step: 5, type: 'bell' };
   const cost = resourceCost(BUILDINGS.bell.cost);
-  return { title: 'Put Wildhaven on the map', description: 'Restore the bell, then develop workshops, research, services and trade. The town’s story is just beginning.', current: Object.entries(cost).reduce((sum, [key, value]) => sum + Math.min(value, state.resources[key]), 0), total: Object.values(cost).reduce((sum, value) => sum + value, 0), complete: false, step: 5, type: 'bell' };
+  return { title: 'Put your village on the map', description: 'Restore the bell, then develop workshops, research, services and trade. The town’s story is just beginning.', current: Object.entries(cost).reduce((sum, [key, value]) => sum + Math.min(value, state.resources[key]), 0), total: Object.values(cost).reduce((sum, value) => sum + value, 0), complete: false, step: 5, type: 'bell' };
 }
 /** The v3 envelope is self-contained; ephemeral assignments/rates are reconciled on load. */
 export function serialize(state) {
@@ -692,10 +721,11 @@ function restoreV1(input) {
   if (!ids.has('hearth') || !ids.has('bell') || input.population > housing(state)) return null;
   const bell = state.buildings.find(b => b.id === 'bell'); if (typeof input.won !== 'boolean' || input.won !== bell.restored) return null;
   state.resources = emptyResources(); Object.assign(state.resources, { wood: input.resources.wood, stone: input.resources.stone, food: input.resources.food });
-  state.citizens = Array.from({ length: input.population }, (_, i) => ({ ...citizen(i + 1, 1), experience: {} })); state.nextCitizenId = input.population + 1;
+  state.citizens = Array.from({ length: input.population }, (_, i) => ({ ...legacyCitizen(i + 1), experience: {} })); state.nextCitizenId = input.population + 1;
   state.day = input.day; state.time = Math.floor(input.time); state.subsecond = input.time % 1; state.elapsed = input.elapsed; state.won = bell.restored;
   if (state.won) state.wonDay = bell.restoredDay;
-  state.lastTradeDay = input.lastTradeDay ?? 0; state.migratedFromVersion = 1;
+  state.lastTradeDay = input.lastTradeDay ?? 0; state.migratedFromVersion = 1; state.calendarEpoch = workPosition(state);
+  state.seasons = input.seasons; normalizeSeasons(state);
   state.nextId = Math.max(0, ...state.buildings.filter(b => /^b\d/.test(b.id)).map(b => Number(b.id.slice(1)))) + 1;
   restoreJournal(state, input);
   addEvent(state, 'Your original village is preserved. Its buildings are complete; citizens now choose real jobs and builders raise the next generation.', 'migration');
@@ -706,6 +736,7 @@ export function restore(raw) {
   let input; try { input = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { return null; }
   if (!input || typeof input !== 'object' || Array.isArray(input) || ![1, 2, 3, VERSION].includes(input.version)) return null;
   if (!validInteger(input.day, 1, 1000000) || !isFiniteNumber(input.time) || input.time < 0 || input.time >= DAY_LENGTH || !isFiniteNumber(input.elapsed) || input.elapsed < 0 || input.elapsed > DAY_LENGTH * 1000000) return null;
+  if (input.calendarEpoch !== undefined && (!isFiniteNumber(input.calendarEpoch) || input.calendarEpoch < 0 || input.calendarEpoch > workPosition(input))) return null;
   if (input.lastTradeDay !== undefined && !validInteger(input.lastTradeDay, 0, input.day)) return null;
   if (input.version === 1) { try { return restoreV1(input); } catch { return null; } }
   if (!validBag(input.resources, { complete: true }) || !Array.isArray(input.buildings) || input.buildings.length < 2 || input.buildings.length > MAX_BUILDINGS) return null;
@@ -757,11 +788,13 @@ export function restore(raw) {
   Object.assign(state, {
     resources: { ...input.resources }, citizens, population: citizens.length, builderTarget: input.builderTarget,
     day: input.day, time: input.time, subsecond: input.subsecond, elapsed: input.elapsed, morale: input.morale,
+    calendarEpoch: input.calendarEpoch ?? workPosition(input),
     won: bell.restored, lastTradeDay: input.lastTradeDay ?? 0, undo: null,
     nextId: Math.max(0, ...state.buildings.filter(b => /^b\d/.test(b.id)).map(b => Number(b.id.slice(1)))) + 1,
     nextCitizenId: Math.max(...citizens.map(c => Number(c.id.slice(1)))) + 1,
     nextQueueOrder: Math.max(0, ...orders) + 1,
   });
+  state.seasons = input.seasons; normalizeSeasons(state);
   if (bell.restored) state.wonDay = bell.restoredDay;
   state.stats = Object.fromEntries(['built', 'arrivals', 'harvests', 'upgrades'].map(key => [key, validInteger(input.stats?.[key], 0, 1000000) ? input.stats[key] : 0]));
   for (const key of Object.keys(createProgressionState())) if (Object.hasOwn(input, key)) state[key] = structuredClone(input[key]);
@@ -769,7 +802,7 @@ export function restore(raw) {
   if (input.version >= 3) { if (!Object.hasOwn(input, 'frontier')) return null; state.frontier = structuredClone(input.frontier); }
   if (input.version !== VERSION) state.migratedFromVersion = input.version;
   if (input.version === VERSION) { if (!Object.hasOwn(input, 'discovery')) return null; state.discovery = structuredClone(input.discovery); }
-  try { normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); } catch { return null; }
+  try { state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); } catch { return null; }
   restoreJournal(state, input);
   reconcileWorkforce(state); refreshProduction(state); return state;
 }

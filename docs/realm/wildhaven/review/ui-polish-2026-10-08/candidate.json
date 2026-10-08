@@ -1,0 +1,150 @@
+{
+  "viewports": [
+    {
+      "name": "ipad-landscape",
+      "width": 1180,
+      "height": 820,
+      "transitions": 49,
+      "refreshClicks": 8,
+      "researchNodes": 15,
+      "zoom": {
+        "before": 32,
+        "target": 24.921625058284956,
+        "actual": 24.963404301079763
+      },
+      "placement": {
+        "card": {
+          "left": 609.734375,
+          "right": 905.734375,
+          "top": 145.734375,
+          "bottom": 256.859375
+        },
+        "roof": {
+          "left": 719.9186898785138,
+          "top": 268.7451485772987,
+          "right": 795.5737459527597,
+          "bottom": 368.2854534161433
+        },
+        "side": "above",
+        "visible": "visible",
+        "rotation": 1.5707963267948966,
+        "keyboardHint": "inline-block",
+        "actions": {
+          "top": 684,
+          "bottom": 742
+        },
+        "confirmVisible": true
+      },
+      "readingPause": true
+    },
+    {
+      "name": "ipad-portrait",
+      "width": 820,
+      "height": 1180,
+      "transitions": 7,
+      "refreshClicks": 0,
+      "researchNodes": 15,
+      "zoom": {
+        "before": 32,
+        "target": 24.921625058284956,
+        "actual": 24.963404301079763
+      },
+      "placement": {
+        "card": {
+          "left": 262.328125,
+          "right": 558.328125,
+          "top": 277.515625,
+          "bottom": 388.640625
+        },
+        "roof": {
+          "left": 355.8978634711377,
+          "top": 400.5168690997874,
+          "right": 464.7673340356029,
+          "bottom": 543.7577950862202
+        },
+        "side": "above",
+        "visible": "visible",
+        "rotation": 1.5707963267948966,
+        "keyboardHint": "inline-block",
+        "actions": {
+          "top": 1044,
+          "bottom": 1102
+        },
+        "confirmVisible": true
+      }
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "transitions": 7,
+      "refreshClicks": 0,
+      "researchNodes": 15,
+      "zoom": {
+        "before": 43,
+        "target": 43,
+        "actual": 42.999999999999986
+      },
+      "placement": {
+        "card": {
+          "left": 62,
+          "right": 322,
+          "top": 376.984375,
+          "bottom": 500.90625
+        },
+        "roof": {
+          "left": 222.53684160251285,
+          "top": 305.6117375613537,
+          "right": 267.66789934144384,
+          "bottom": 364.99123548445357
+        },
+        "side": "below",
+        "visible": "visible",
+        "rotation": 1.5707963267948966,
+        "keyboardHint": "inline-block",
+        "actions": {
+          "top": 708,
+          "bottom": 766
+        },
+        "confirmVisible": true
+      }
+    },
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "transitions": 49,
+      "refreshClicks": 0,
+      "researchNodes": 15,
+      "zoom": {
+        "before": 32,
+        "target": 24.921625058284956,
+        "actual": 24.963345851064407
+      },
+      "placement": {
+        "card": {
+          "left": 848.03125,
+          "right": 1144.03125,
+          "top": 153.40625,
+          "bottom": 281.328125
+        },
+        "roof": {
+          "left": 954.5209476866439,
+          "top": 293.4149618870081,
+          "right": 1037.5563655432502,
+          "bottom": 402.6657011602167
+        },
+        "side": "above",
+        "visible": "visible",
+        "rotation": 1.5707963267948966,
+        "keyboardHint": "inline-block",
+        "actions": {
+          "top": 764,
+          "bottom": 822
+        },
+        "confirmVisible": false
+      }
+    }
+  ],
+  "errors": []
+}

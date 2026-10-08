@@ -2,7 +2,7 @@
 #tablet-build-toggle,
 #tablet-town-toggle { display: none; }
 
-@media (any-pointer: coarse) and (min-width: 761px) and (orientation: landscape) {
+@media (min-width: 0px) {
   :root {
     --tablet-panel-top: 92px;
     --tablet-dock-bottom: max(10px, env(safe-area-inset-bottom));

@@ -1,0 +1,18 @@
+{
+  "fixture": "Isolated engineering fixtures for affordability, input cancellation, and read-only visits.",
+  "errors": [],
+  "stalePressRefused": true,
+  "cancelledPress": true,
+  "confirmFocus": true,
+  "orientationPreserved": true,
+  "shortLandscape": {
+    "x": 12,
+    "y": 10,
+    "right": 655,
+    "bottom": 297,
+    "overflow": false
+  },
+  "readingClock": true,
+  "readonlyVisitPreserved": true,
+  "passed": true
+}

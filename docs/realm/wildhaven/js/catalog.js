@@ -91,7 +91,7 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   lumber: {
     name: 'Woodcutter', category: 'materials', model: 'lumber', cost: { wood: 14, stone: 5 }, work: 32, workers: 2, job: 'lumberjack', shortcut: '3', recipe: recipe({}, { wood: 10 }),
-    description: 'Tends the island woodland. Nearby forest improves the timber harvest; a distant yard still works, but slowly.', production: '2 woodcutters · 10 timber / day before siting bonus', upgrades: productionUpgrades(2),
+    description: 'Harvests a shared grove of 12 nearby trees and automatically replants every stump. Saplings mature in 3 in-game days (18 minutes at 1×). Nearby forest improves the timber harvest.', production: '2 woodcutters · 10 timber / day before siting bonus', upgrades: productionUpgrades(2),
   },
   quarry: {
     name: 'Stoneworks', category: 'materials', model: 'quarry', cost: { wood: 12, stone: 8 }, work: 38, workers: 2, job: 'quarryworker', shortcut: '4', recipe: recipe({}, { stone: 8 }),
