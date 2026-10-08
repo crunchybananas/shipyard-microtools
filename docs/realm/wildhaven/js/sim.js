@@ -425,7 +425,7 @@ export function buildingStatus(state, idOrBuilding) {
   const b = typeof idOrBuilding === 'object' ? idOrBuilding : state.buildings.find(item => item.id === idOrBuilding);
   if (!b) return null;
   const spec = specFor(b), production = b.production || throughput(state, b), queued = b.status !== 'ready';
-  const reason = queued ? (b.paused ? 'Construction paused' : b.workerIds.length ? `${b.workerIds.length} builders at work` : state.builderTarget ? 'Waiting for builders ahead in the queue' : 'Assign builders to begin work') : (production.blockedReason || production.staffingReason);
+  const reason = queued ? (b.paused ? 'Construction paused' : b.workerIds.length ? `${b.workerIds.length} builders assigned` : state.builderTarget ? (activeSite(state)?.id === b.id ? 'No civilian builders available; Company and fieldwork assignments continue' : 'Waiting for the active project to finish') : 'Assign builders in People; the construction crew is set to zero') : (production.blockedReason || production.staffingReason);
   return { label: queued ? (b.constructionKind === 'upgrade' ? 'Upgrading' : 'Construction') : b.paused ? 'Paused' : production.efficiency ? 'Working' : 'Ready', reason, blockedReason: reason, level: b.level, status: b.status, paused: b.paused, workers: b.workerIds.length, desiredWorkers: b.desiredWorkers, maxWorkers: spec.workers || 0, efficiency: production.efficiency, progress: b.progress, workRequired: b.workRequired, ratio: b.workRequired ? b.progress / b.workRequired : 1, recipe: { input: production.input, output: production.output }, housing: spec.housing || 0 };
 }
 export function canBuild(state, type, x, z, rotation = 0) {
@@ -543,7 +543,7 @@ export function setWorkers(state, id, requested) {
 }
 export function setBuilderTarget(state, requested) {
   if (!validInteger(requested, 0, state.population)) return { ok: false, reason: 'Builder target must fit the available population.' };
-  state.builderTarget = requested; reconcileWorkforce(state); refreshProduction(state); return { ok: true, reason: `${requested} citizens available for construction.` };
+  state.builderTarget = requested; reconcileWorkforce(state); refreshProduction(state); return { ok: true, reason: `${requested} builders requested. ${workforce(state).builders} assigned to current construction.` };
 }
 export function pauseBuilding(state, id, value) {
   const b = state.buildings.find(item => item.id === id); if (!b) return { ok: false, reason: 'Choose a building.' };

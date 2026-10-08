@@ -86,3 +86,15 @@ export function rankContracts(contracts, resources) {
   const score = c => c.status === 'active' && c.canComplete ? 0 : c.status === 'active' ? 1 : c.canAccept && Object.entries(c.requirements).every(([key, n]) => resources[key] >= n) ? 2 : 3;
   return [...contracts].sort((a, b) => score(a) - score(b));
 }
+
+
+/** Explain the actual crew/queue without assigning people or advancing time. */
+export function constructionFeedback(state, queue, { paused = false } = {}) {
+  const active = queue.find(site => !site.paused), count = queue.length;
+  const prefix = `${count} ${count === 1 ? 'project' : 'projects'}`;
+  if (!count) return { summary: 'Tools at rest', reason: 'Choose a building to begin a project.', ready: 0 };
+  if (!active) return { summary: `${prefix} · sites paused`, reason: 'Every project is paused. Resume a site in Projects when you want its crew to return.', ready: 0 };
+  if (!state.builderTarget) return { summary: `${prefix} · no crew requested`, reason: 'The construction crew is set to zero. Choose its size in People; idle residents are not assigned automatically.', ready: 0, activeId: active.id };
+  if (!active.workers) return { summary: `${prefix} · crew unavailable`, reason: 'No civilian builders can take this project yet. Residents serving in the Company or on fieldwork keep their assignments.', ready: 0, activeId: active.id };
+  return { summary: `${prefix} · ${paused ? 'time paused' : `${Math.round(active.ratio * 100)}%`}`, reason: paused ? `Time is paused. ${active.workers} ${active.workers === 1 ? 'builder is' : 'builders are'} assigned to ${active.name.toLowerCase()} and will move when time resumes.` : `${active.workers} ${active.workers === 1 ? 'builder is' : 'builders are'} assigned to ${active.name.toLowerCase()}. Later projects wait for this crew.`, ready: active.workers, activeId: active.id };
+}

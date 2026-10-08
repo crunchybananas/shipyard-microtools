@@ -1,0 +1,453 @@
+{
+  "url": "http://127.0.0.1:14729/realm/wildhaven/",
+  "expectedVersion": "20261008-construction-1",
+  "method": "Actual touch controls on production; isolated browser storage. New game plus earlier earned bell save, labeled separately. No review hooks or simulation/state mutations.",
+  "cases": [
+    {
+      "name": "new-game",
+      "builders": [
+        "c1",
+        "c2"
+      ],
+      "progress": 8.000666,
+      "reserved": {
+        "wood": 16,
+        "stone": 8
+      },
+      "reason": "Two builders automatically start with ordinary new-game jobs competing."
+    },
+    {
+      "name": "reload-and-cancel",
+      "savedProgress": 12.001666,
+      "refund": {
+        "wood": 7,
+        "stone": 3
+      },
+      "reason": "Progress and automatic crew survive reload; resumed time advances; cancellation returns only unused materials."
+    },
+    {
+      "name": "earned-existing-town",
+      "population": 14,
+      "ordinaryJobs": 9,
+      "builders": [
+        "c1",
+        "c2"
+      ],
+      "progress": 0,
+      "pauseBannerVisible": true,
+      "reason": "Reproduces stationary construction after Continue: crew is assigned but saved-game time stays explicitly paused."
+    },
+    {
+      "name": "reading-and-resume",
+      "reason": "Reading pause is visible; actual Resume time runs construction without changing crew requests."
+    },
+    {
+      "name": "paused-first-project",
+      "pausedProject": {
+        "id": "b1",
+        "type": "cottage",
+        "x": -1,
+        "z": 0,
+        "rotation": 0,
+        "builtDay": 1,
+        "level": 1,
+        "status": "queued",
+        "constructionKind": "build",
+        "targetLevel": 1,
+        "progress": 0,
+        "workRequired": 36,
+        "escrow": {
+          "wood": 16,
+          "stone": 8
+        },
+        "investment": {
+          "wood": 0,
+          "stone": 0,
+          "food": 0,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 0,
+          "knowledge": 0
+        },
+        "queueOrder": 1,
+        "desiredWorkers": 0,
+        "paused": true,
+        "priority": 10
+      },
+      "activeProject": {
+        "id": "b2",
+        "type": "garden",
+        "x": 1,
+        "z": -1,
+        "rotation": 0,
+        "builtDay": 1,
+        "level": 1,
+        "status": "building",
+        "constructionKind": "build",
+        "targetLevel": 1,
+        "progress": 8.000666,
+        "workRequired": 20,
+        "escrow": {
+          "wood": 6,
+          "stone": 3
+        },
+        "investment": {
+          "wood": 0,
+          "stone": 0,
+          "food": 0,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 0,
+          "knowledge": 0
+        },
+        "queueOrder": 2,
+        "desiredWorkers": 1,
+        "paused": false,
+        "priority": 10
+      },
+      "header": "2 projects · time paused",
+      "reason": "First site paused; later site receives crew and real progress. Header must describe actual activity, not paused queue[0]."
+    },
+    {
+      "name": "melissa-access",
+      "reason": "Real touch opens tools storage details and the 15-node research graph; short landscape and phone controls stay reachable."
+    }
+  ],
+  "actions": [
+    {
+      "case": "new-game",
+      "selector": "#start",
+      "at": "2026-10-08T19:41:14.948Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#home",
+      "at": "2026-10-08T19:41:15.064Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#tablet-build-toggle",
+      "at": "2026-10-08T19:41:15.884Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "[data-build=\"cottage\"]",
+      "at": "2026-10-08T19:41:15.998Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#confirm-building",
+      "at": "2026-10-08T19:41:16.221Z"
+    },
+    {
+      "case": "new-game",
+      "placement": {
+        "type": "cottage",
+        "id": "b1",
+        "x": -1,
+        "z": 0,
+        "screen": {
+          "x": 482,
+          "y": 362
+        }
+      },
+      "reserved": {
+        "wood": 16,
+        "stone": 8
+      }
+    },
+    {
+      "case": "new-game",
+      "selector": "#cancel-building",
+      "at": "2026-10-08T19:41:16.315Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#tablet-town-toggle",
+      "at": "2026-10-08T19:41:20.442Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#town-tabs [data-town-tab=\"construction\"]",
+      "at": "2026-10-08T19:41:20.552Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "[data-action-id=\"project-b1\"]",
+      "at": "2026-10-08T19:41:20.653Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#continue",
+      "at": "2026-10-08T19:41:23.466Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "[data-speed=\"1\"]",
+      "at": "2026-10-08T19:41:24.901Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#tablet-town-toggle",
+      "at": "2026-10-08T19:41:27.022Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "#town-tabs [data-town-tab=\"construction\"]",
+      "at": "2026-10-08T19:41:27.203Z"
+    },
+    {
+      "case": "new-game",
+      "selector": "[data-action-id=\"cancel-b1\"]",
+      "at": "2026-10-08T19:41:27.358Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#continue",
+      "at": "2026-10-08T19:41:28.034Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#home",
+      "at": "2026-10-08T19:41:28.124Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#tablet-build-toggle",
+      "at": "2026-10-08T19:41:28.966Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "[data-build=\"lumber\"]",
+      "at": "2026-10-08T19:41:29.061Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#confirm-building",
+      "at": "2026-10-08T19:41:29.271Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "placement": {
+        "type": "lumber",
+        "id": "b8",
+        "x": -1,
+        "z": 0,
+        "screen": {
+          "x": 482,
+          "y": 362
+        }
+      },
+      "reserved": {
+        "wood": 14,
+        "stone": 5
+      }
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#cancel-building",
+      "at": "2026-10-08T19:41:29.375Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#keep-running",
+      "at": "2026-10-08T19:41:30.808Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#tablet-town-toggle",
+      "at": "2026-10-08T19:41:33.518Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "#town-tabs [data-town-tab=\"construction\"]",
+      "at": "2026-10-08T19:41:33.644Z"
+    },
+    {
+      "case": "earned-existing-town",
+      "selector": "[data-action-id=\"resume-time\"]",
+      "at": "2026-10-08T19:41:34.960Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#start",
+      "at": "2026-10-08T19:41:37.532Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#home",
+      "at": "2026-10-08T19:41:37.648Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#tablet-build-toggle",
+      "at": "2026-10-08T19:41:38.477Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-build=\"cottage\"]",
+      "at": "2026-10-08T19:41:38.602Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#confirm-building",
+      "at": "2026-10-08T19:41:38.848Z"
+    },
+    {
+      "case": "paused-first-project",
+      "placement": {
+        "type": "cottage",
+        "id": "b1",
+        "x": -1,
+        "z": 0,
+        "screen": {
+          "x": 482,
+          "y": 362
+        }
+      },
+      "reserved": {
+        "wood": 16,
+        "stone": 8
+      }
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#cancel-building",
+      "at": "2026-10-08T19:41:38.949Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#tablet-town-toggle",
+      "at": "2026-10-08T19:41:39.052Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#town-tabs [data-town-tab=\"construction\"]",
+      "at": "2026-10-08T19:41:39.182Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-action-id=\"pause-b1\"]",
+      "at": "2026-10-08T19:41:39.293Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#close-town-book",
+      "at": "2026-10-08T19:41:39.400Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#tablet-build-toggle",
+      "at": "2026-10-08T19:41:39.501Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-build=\"garden\"]",
+      "at": "2026-10-08T19:41:39.601Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#confirm-building",
+      "at": "2026-10-08T19:41:39.849Z"
+    },
+    {
+      "case": "paused-first-project",
+      "placement": {
+        "type": "garden",
+        "id": "b2",
+        "x": 1,
+        "z": -1,
+        "screen": {
+          "x": 578,
+          "y": 368
+        }
+      },
+      "reserved": {
+        "wood": 6,
+        "stone": 3
+      }
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#cancel-building",
+      "at": "2026-10-08T19:41:39.948Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#tablet-town-toggle",
+      "at": "2026-10-08T19:41:43.250Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#town-tabs [data-town-tab=\"construction\"]",
+      "at": "2026-10-08T19:41:43.387Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-action-id=\"resume-time\"]",
+      "at": "2026-10-08T19:41:43.598Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#close-town-book",
+      "at": "2026-10-08T19:41:44.001Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#pause",
+      "at": "2026-10-08T19:41:44.100Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#stores-toggle",
+      "at": "2026-10-08T19:41:44.218Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-action-id=\"resource-tools\"]",
+      "at": "2026-10-08T19:41:44.303Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#town-tabs [data-town-tab=\"council\"]",
+      "at": "2026-10-08T19:41:44.424Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-action-id=\"council-jump-map\"]",
+      "at": "2026-10-08T19:41:44.503Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-research-node=\"joinery\"]",
+      "at": "2026-10-08T19:41:44.584Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "#stores-toggle",
+      "at": "2026-10-08T19:41:44.717Z"
+    },
+    {
+      "case": "paused-first-project",
+      "selector": "[data-action-id=\"resource-tools\"]",
+      "at": "2026-10-08T19:41:44.798Z"
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "passed": true
+}
