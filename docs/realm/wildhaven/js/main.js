@@ -23,6 +23,7 @@ import { createCompanionUI } from './companion-ui.js';
 
 const $ = id => document.getElementById(id);
 const compactTablet = matchMedia('(min-width:0px)');
+const shortReadingLayout = matchMedia('(min-width:521px) and (max-height:600px)');
 const SAVE_KEY = 'wildhaven.v4', SETTINGS_KEY = 'wildhaven.preferences.v1';
 const CATEGORIES = {
   beginnings: { name: 'Foundations', types: ['cottage','orchard','lumber','quarry','garden','well','school','bell'] },
@@ -38,6 +39,16 @@ let soundEnabled = false, storageAvailable = true, victorySeen = false, world, t
 const keys = new Set();
 const readingClock = createReadingClock();
 function updateReadingPause() {
+  // The short landscape book covers the HUD. Keep its pause action in the
+  // book's flow so the notice cannot cover tabs or intercept their taps.
+  const pauseNotice = $('reading-pause'), book = $('town-book');
+  const inlinePause = shortReadingLayout.matches && !book.hidden;
+  const pauseHost = inlinePause ? book : document.querySelector('.hud-notifications');
+  if (pauseHost && pauseNotice.parentElement !== pauseHost) {
+    const focused = pauseNotice.contains(document.activeElement);
+    pauseHost.insertBefore(pauseNotice, inlinePause ? $('town-tabs') : $('toast'));
+    if (focused) $('keep-running').focus({ preventScroll: true });
+  }
   const reading = frontierUI?.selectionMode || ['town-book','fieldbook','frontier-panel','journal','companion-panel'].some(id => { const panel = $(id); return panel && !panel.hidden; });
   const before = speed; speed = readingClock.observe(!!reading);
   const crew = playing && companions.canManage && speed === 0 ? state.buildings.find(site => site.status !== 'ready' && !site.paused && site.workerIds?.length) : null;
