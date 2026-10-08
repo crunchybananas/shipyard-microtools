@@ -4,7 +4,7 @@ import { BUILDINGS, RESOURCES, RESOURCE_NAMES, JOBS, getBuildingSpec } from './c
 import * as progression from './progression.js';
 import { pressureOptions } from './pressure.js';
 import { coastalDefenseGuidance } from './defense-guidance.js';
-import { researchRequirements, rankContracts } from './clarity.js';
+import { researchRequirements, rankContracts, constructionFeedback } from './clarity.js';
 import { resourceChips } from './clarity-ui.js';
 import { pathRequirement } from './path-choice.js';
 import { createResearchMap } from './research-map.js';
@@ -71,7 +71,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     for (const [value, label] of [[work.employed, 'at work'], [work.builders, 'building'], [work.idle, 'available']]) { const cell = el('div'); cell.append(el('strong', '', value), document.createTextNode(label)); totals.append(cell); }
     nodes.push(totals, el('p', 'town-intro', `Morale ${Math.round(effectiveMorale(state))}%. ${needs.migration.reason} Every job shares the same residents.`));
     if (getPaused()) nodes.push(pauseCue());
-    const builders = el('div', 'town-control'), intro = el('div'); intro.append(el('strong', '', 'Construction crew'), el('small', '', 'Builders take priority while work is queued, then return to the other jobs.'));
+    const builders = el('div', 'town-control'), intro = el('div'); intro.append(el('strong', '', 'Builders requested'), el('small', '', `${work.builders} assigned / ${work.builderTarget} requested. Builders take priority while work is queued, then return to other jobs.`));
     builders.append(intro, stepper(work.builderTarget, 0, state.population, 'builders', value => action(() => sim.setBuilderTarget(state, value)))); nodes.push(builders);
     nodes.push(el('h3', 'town-section', 'Put hands where they matter'));
     for (const job of work.jobs) {
@@ -97,11 +97,12 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
   }
   function queueContent(state) {
     const queue = sim.constructionQueue(state), nodes = [el('p', 'town-intro', 'The crew works on one project at a time. Move an urgent home or workshop forward, or rest a site to free your builders. Materials are reserved when you place the plan.')];
+    if (queue.length) nodes.push(el('p', 'town-meta', constructionFeedback(state, queue, { paused: getPaused() }).reason));
     if (getPaused() && queue.length) nodes.push(pauseCue());
     if (!queue.length) nodes.push(el('p', 'town-empty', 'The tools are put away. Choose a building to begin another project.'));
     queue.forEach((site, index) => {
       const row = el('div', 'town-row'), top = el('div', 'town-row-top'), main = el('div', 'town-row-main');
-      main.append(el('strong', '', `${index + 1}. ${site.name}${site.kind === 'upgrade' ? ` → level ${site.targetLevel}` : ''}`), el('small', '', site.paused ? 'Project paused' : site.workers ? `${site.workers} builders on site` : 'Waiting for the crew'));
+      main.append(el('strong', '', `${index + 1}. ${site.name}${site.kind === 'upgrade' ? ` → level ${site.targetLevel}` : ''}`), el('small', '', site.paused ? 'Project paused' : site.workers ? `${site.workers} builders assigned` : 'Waiting for the crew'));
       top.append(image(site.type), main, el('span', 'job-tag', `${Math.round(site.ratio * 100)}%`)); row.append(top, progressBar(site.ratio, site.paused));
       row.append(el('div', 'town-meta', `${Math.ceil(site.workRequired - site.progress)} person-seconds of work left${site.workers ? ` · roughly ${Math.ceil((site.workRequired - site.progress) / site.workers)} seconds with this crew` : ''}`));
       const controls = el('div', 'town-row-actions');
@@ -452,7 +453,9 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
   function update(force = false) {
     const state = canMutate() ? getState() : structuredClone(getState()), work = sim.workforce(state), queue = sim.constructionQueue(state), narrow = matchMedia('(max-width: 760px)').matches;
     $('workforce-summary').textContent = narrow ? `${work.idle} free` : `${work.idle} free / ${state.population} hands`;
-    $('queue-summary').textContent = queue.length ? `${queue.length} ${queue.length === 1 ? 'project' : 'projects'}${narrow ? '' : ` · ${Math.round(queue[0].ratio * 100)}%`}` : narrow ? 'No projects' : 'Tools at rest';
+    const construction = constructionFeedback(state, queue, { paused: getPaused() });
+    $('queue-summary').textContent = narrow ? (queue.length ? `${queue.length} ${queue.length === 1 ? 'project' : 'projects'}` : 'No projects') : construction.summary;
+    $('queue-summary').parentElement.title = construction.reason;
     $('treasury-summary').textContent = `${format(state.resources.gold)} ${narrow ? 'coin' : 'gold'}`;
     $('council-summary').textContent = state.research.active ? 'Researching' : state.policies.charter ? progression.POLICIES[state.policies.charter].name : `${format(state.resources.knowledge)} knowledge`;
     $('trade-summary').textContent = state.contracts.active.length ? `${state.contracts.active.length} ${narrow ? 'orders' : 'active orders'}` : narrow ? 'Requests' : 'Coastal requests';
@@ -475,7 +478,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     const state = getState(), status = sim.buildingStatus(state, building), nodes = [];
     if (building.status !== 'ready') {
       if (getPaused()) nodes.push(pauseCue());
-      const stage = building.paused ? 'Work paused' : building.workerIds.length ? `The crew is ${building.constructionKind === 'upgrade' ? 'improving' : 'raising'} this building` : 'Waiting for builders';
+      const stage = building.paused ? 'This project is paused' : getPaused() && building.workerIds.length ? `${building.workerIds.length} builders assigned · time paused` : status.reason;
       nodes.push(el('div', 'construction-stage', stage), progressBar(status.ratio, building.paused), el('p', 'town-meta', `${Math.round(status.ratio * 100)}% complete · ${Math.ceil(status.workRequired - status.progress)} person-seconds left`));
       const actions = el('div', 'town-row-actions'); actions.append(btn('Manage projects', `inspect-queue-${building.id}`, () => open('construction')), btn(building.paused ? 'Resume' : 'Pause', `inspect-project-pause-${building.id}`, () => action(() => sim.pauseBuilding(state, building.id, !building.paused)))); nodes.push(actions);
     } else {

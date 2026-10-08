@@ -1,0 +1,2263 @@
+{
+  "cases": [
+    {
+      "mode": "new-running",
+      "before": {
+        "speed": "Pause",
+        "reading": false,
+        "day": 1,
+        "time": 0,
+        "subsecond": 0.2,
+        "target": 2,
+        "resources": {
+          "wood": 100,
+          "stone": 70,
+          "food": 65,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 30,
+          "knowledge": 0
+        },
+        "projects": [],
+        "jobs": [
+          {
+            "id": "c1",
+            "job": "forager",
+            "workplace": "hearth"
+          },
+          {
+            "id": "c2",
+            "job": "forager",
+            "workplace": "hearth"
+          },
+          {
+            "id": "c3",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c4",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c5",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c6",
+            "job": "idle",
+            "workplace": null
+          }
+        ],
+        "actors": [
+          {
+            "id": "c1",
+            "job": "forager",
+            "workplace": "hearth",
+            "position": [
+              1.0573317846350396,
+              0.84238476300382,
+              6.035688091469177
+            ],
+            "path": 4,
+            "activity": "gather",
+            "workState": "walking"
+          },
+          {
+            "id": "c2",
+            "job": "forager",
+            "workplace": "hearth",
+            "position": [
+              1.116,
+              0.8341911639386714,
+              4.716
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c3",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              2.484,
+              0.8357591231882431,
+              4.716
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c4",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              -0.684,
+              0.8331575720985744,
+              6.084
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c5",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              2.484,
+              0.8228837455244016,
+              6.084
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c6",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              -1.116,
+              0.829908245997188,
+              4.284
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          }
+        ]
+      },
+      "point": {
+        "x": 489.6318587857303,
+        "y": 366.3031650812023,
+        "cell": {
+          "x": -1,
+          "z": 0
+        }
+      },
+      "samples": [
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 3,
+          "subsecond": 0.5499,
+          "target": 2,
+          "resources": {
+            "wood": 84.13334,
+            "stone": 62.100005,
+            "food": 65.333351,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 6.000333,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.5066695374736472,
+                0.8504835502700958,
+                4.7612291599954135
+              ],
+              "path": 3,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.8555266625439677,
+                0.8868915559889202,
+                2.085084411233737
+              ],
+              "path": 3,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -0.735591997110527,
+                0.8517708541764909,
+                5.135075650045897
+              ],
+              "path": 7,
+              "activity": "gather",
+              "workState": "walking"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -1.9788240439914464,
+                0.8607323116796883,
+                7.61127968826422
+              ],
+              "path": 1,
+              "activity": "gather",
+              "workState": "walking"
+            }
+          ]
+        },
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 6,
+          "subsecond": 0.5497,
+          "target": 2,
+          "resources": {
+            "wood": 84.266703,
+            "stone": 62.200028,
+            "food": 65.666759,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 12.001666,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.7697621501516085,
+                0.8557368692721256,
+                1.924629105201667
+              ],
+              "path": 2,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -0.06402681025410051,
+                0.895997877993204,
+                0.30567687601903826
+              ],
+              "path": 2,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -3.8850745304487733,
+                0.8508189067406525,
+                5.163985056239052
+              ],
+              "path": 5,
+              "activity": "gather",
+              "workState": "walking"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -2.0217994636015515,
+                0.8506315699807192,
+                8.673670831351041
+              ],
+              "path": 0,
+              "activity": "gather",
+              "workState": "foraging"
+            }
+          ]
+        },
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 9,
+          "subsecond": 0.5497,
+          "target": 2,
+          "resources": {
+            "wood": 84.400088,
+            "stone": 62.300066,
+            "food": 66.000221,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 18.004,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.8,
+                0.9186404695263155,
+                1.03
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -0.77,
+                0.9186404695263155,
+                0
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -5.152650652279327,
+                0.8348685852920352,
+                3.206823157171628
+              ],
+              "path": 3,
+              "activity": "gather",
+              "workState": "walking"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -2.0217994636015515,
+                0.8506315699807192,
+                8.673670831351041
+              ],
+              "path": 0,
+              "activity": "gather",
+              "workState": "foraging"
+            }
+          ]
+        },
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 12,
+          "subsecond": 0.5662,
+          "target": 2,
+          "resources": {
+            "wood": 84.533496,
+            "stone": 62.400122,
+            "food": 66.33374,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 24.007333,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.8,
+                0.9186404695263155,
+                1.03
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -0.77,
+                0.9186404695263155,
+                0
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -6.896197857773929,
+                0.8385338684663589,
+                1.3406122325623269
+              ],
+              "path": 1,
+              "activity": "gather",
+              "workState": "walking"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -1.226868622902245,
+                0.8635403393254578,
+                8.894374158251868
+              ],
+              "path": 6,
+              "activity": "deliver",
+              "workState": "walking"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "after-reading",
+      "before": {
+        "speed": "Resume",
+        "reading": true,
+        "day": 1,
+        "time": 0,
+        "subsecond": 0.15,
+        "target": 2,
+        "resources": {
+          "wood": 100,
+          "stone": 70,
+          "food": 65,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 30,
+          "knowledge": 0
+        },
+        "projects": [],
+        "jobs": [
+          {
+            "id": "c1",
+            "job": "forager",
+            "workplace": "hearth"
+          },
+          {
+            "id": "c2",
+            "job": "forager",
+            "workplace": "hearth"
+          },
+          {
+            "id": "c3",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c4",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c5",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c6",
+            "job": "idle",
+            "workplace": null
+          }
+        ],
+        "actors": [
+          {
+            "id": "c1",
+            "job": "forager",
+            "workplace": "hearth",
+            "position": [
+              1.2407090629701543,
+              0.8475125219428149,
+              6.06145798338422
+            ],
+            "path": 3,
+            "activity": "gather",
+            "workState": "walking"
+          },
+          {
+            "id": "c2",
+            "job": "forager",
+            "workplace": "hearth",
+            "position": [
+              1.116,
+              0.8341911639386714,
+              4.716
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c3",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              2.484,
+              0.8357591231882431,
+              4.716
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c4",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              -0.684,
+              0.8331575720985744,
+              6.084
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c5",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              2.484,
+              0.8228837455244016,
+              6.084
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          },
+          {
+            "id": "c6",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              -1.116,
+              0.829908245997188,
+              4.284
+            ],
+            "path": 0,
+            "activity": null,
+            "workState": "waiting"
+          }
+        ]
+      },
+      "point": {
+        "x": 482.1018436110671,
+        "y": 361.5752475198208,
+        "cell": {
+          "x": -1,
+          "z": 0
+        }
+      },
+      "samples": [
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 3,
+          "subsecond": 0.4832,
+          "target": 2,
+          "resources": {
+            "wood": 84.13334,
+            "stone": 62.100005,
+            "food": 65.333351,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 6.000333,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.9160000000000004,
+                0.8219879620036095,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.3067194385884362,
+                0.8521821182737928,
+                5.205424854207264
+              ],
+              "path": 4,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                2.0053635792027857,
+                0.8800512505271555,
+                2.6163229923199545
+              ],
+              "path": 4,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.0484932799346094,
+                0.8961006976955727,
+                1.527375258449403
+              ],
+              "path": 4,
+              "activity": "gather",
+              "workState": "walking"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.634538269019203,
+                0.8411956559888414,
+                5.673098775671005
+              ],
+              "path": 6,
+              "activity": "gather",
+              "workState": "walking"
+            }
+          ]
+        },
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 6,
+          "subsecond": 0.4831,
+          "target": 2,
+          "resources": {
+            "wood": 84.266703,
+            "stone": 62.200028,
+            "food": 65.666759,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 12.001666,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.9160000000000004,
+                0.8219879620036095,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.7032160250502655,
+                0.8562086589441977,
+                2.5123527383397644
+              ],
+              "path": 2,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                0.11645122688608289,
+                0.8887939993946341,
+                0.9342674545286359
+              ],
+              "path": 2,
+              "activity": "work",
+              "workState": "walking",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.035432805981091,
+                1.0122780047095359,
+                -1.6224715521257245
+              ],
+              "path": 2,
+              "activity": "gather",
+              "workState": "walking"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                5.896506375526214,
+                0.842561589483724,
+                5.632958447355626
+              ],
+              "path": 4,
+              "activity": "gather",
+              "workState": "walking"
+            }
+          ]
+        },
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 9,
+          "subsecond": 0.483,
+          "target": 2,
+          "resources": {
+            "wood": 84.400088,
+            "stone": 62.300066,
+            "food": 66.000221,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 18.004,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.9160000000000004,
+                0.8219879620036095,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.8,
+                0.9186404695263155,
+                1.03
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -0.77,
+                0.9186404695263155,
+                0
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.0350214233703072,
+                1.2909077842157444,
+                -4.772366511852418
+              ],
+              "path": 1,
+              "activity": "gather",
+              "workState": "walking"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                8.808160612306972,
+                0.844916512672031,
+                5.122908860165714
+              ],
+              "path": 2,
+              "activity": "gather",
+              "workState": "walking"
+            }
+          ]
+        },
+        {
+          "speed": "Pause",
+          "reading": false,
+          "day": 1,
+          "time": 12,
+          "subsecond": 0.4828,
+          "target": 2,
+          "resources": {
+            "wood": 84.533496,
+            "stone": 62.400122,
+            "food": 66.33374,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 24.007333,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.9160000000000004,
+                0.8219879620036095,
+                6.084
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.8314004571238658,
+                2.9160000000000004
+              ],
+              "path": 0,
+              "activity": "rest",
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -1.8,
+                0.9186404695263155,
+                1.03
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                -0.77,
+                0.9186404695263155,
+                0
+              ],
+              "path": 0,
+              "activity": "work",
+              "workState": "working",
+              "reason": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.035011269828527,
+                1.3046757502149053,
+                -5.069831511679127
+              ],
+              "path": 0,
+              "activity": "gather",
+              "workState": "foraging"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                9.221045479650861,
+                0.8289638192446396,
+                2.1276432167509416
+              ],
+              "path": 0,
+              "activity": "gather",
+              "workState": "foraging"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "continued-paused",
+      "before": {
+        "speed": "Resume",
+        "reading": false,
+        "day": 1,
+        "time": 0,
+        "subsecond": 0.0666,
+        "target": 2,
+        "resources": {
+          "wood": 100,
+          "stone": 70,
+          "food": 65,
+          "grain": 0,
+          "flour": 0,
+          "planks": 0,
+          "ore": 0,
+          "iron": 0,
+          "tools": 0,
+          "flax": 0,
+          "cloth": 0,
+          "ale": 0,
+          "gold": 30,
+          "knowledge": 0
+        },
+        "projects": [],
+        "jobs": [
+          {
+            "id": "c1",
+            "job": "forager",
+            "workplace": "hearth"
+          },
+          {
+            "id": "c2",
+            "job": "forager",
+            "workplace": "hearth"
+          },
+          {
+            "id": "c3",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c4",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c5",
+            "job": "idle",
+            "workplace": null
+          },
+          {
+            "id": "c6",
+            "job": "idle",
+            "workplace": null
+          }
+        ],
+        "actors": [
+          {
+            "id": "c1",
+            "job": "forager",
+            "workplace": "hearth",
+            "position": [
+              1.116,
+              0.8268142720679355,
+              6.084
+            ],
+            "path": 0,
+            "activity": null
+          },
+          {
+            "id": "c2",
+            "job": "forager",
+            "workplace": "hearth",
+            "position": [
+              1.116,
+              0.8341911639386714,
+              4.716
+            ],
+            "path": 0,
+            "activity": null
+          },
+          {
+            "id": "c3",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              2.484,
+              0.8357591231882431,
+              4.716
+            ],
+            "path": 0,
+            "activity": null
+          },
+          {
+            "id": "c4",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              -0.684,
+              0.8331575720985744,
+              6.084
+            ],
+            "path": 0,
+            "activity": null
+          },
+          {
+            "id": "c5",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              2.484,
+              0.8228837455244016,
+              6.084
+            ],
+            "path": 0,
+            "activity": null
+          },
+          {
+            "id": "c6",
+            "job": "idle",
+            "workplace": null,
+            "position": [
+              -1.116,
+              0.829908245997188,
+              4.284
+            ],
+            "path": 0,
+            "activity": null
+          }
+        ]
+      },
+      "point": {
+        "x": 496.5053240649334,
+        "y": 370.611588986189,
+        "cell": {
+          "x": -1,
+          "z": 0
+        }
+      },
+      "samples": [
+        {
+          "speed": "Resume",
+          "reading": false,
+          "day": 1,
+          "time": 0,
+          "subsecond": 0.0666,
+          "target": 2,
+          "resources": {
+            "wood": 84,
+            "stone": 62,
+            "food": 65,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 0,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.829908245997188,
+                4.284
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8268142720679355,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8341911639386714,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.484,
+                0.8357591231882431,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -0.684,
+                0.8331575720985744,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            }
+          ]
+        },
+        {
+          "speed": "Resume",
+          "reading": false,
+          "day": 1,
+          "time": 0,
+          "subsecond": 0.0666,
+          "target": 2,
+          "resources": {
+            "wood": 84,
+            "stone": 62,
+            "food": 65,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 0,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.829908245997188,
+                4.284
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8268142720679355,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8341911639386714,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.484,
+                0.8357591231882431,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -0.684,
+                0.8331575720985744,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            }
+          ]
+        },
+        {
+          "speed": "Resume",
+          "reading": false,
+          "day": 1,
+          "time": 0,
+          "subsecond": 0.0666,
+          "target": 2,
+          "resources": {
+            "wood": 84,
+            "stone": 62,
+            "food": 65,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 0,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.829908245997188,
+                4.284
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8268142720679355,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8341911639386714,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.484,
+                0.8357591231882431,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -0.684,
+                0.8331575720985744,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            }
+          ]
+        },
+        {
+          "speed": "Resume",
+          "reading": false,
+          "day": 1,
+          "time": 0,
+          "subsecond": 0.0666,
+          "target": 2,
+          "resources": {
+            "wood": 84,
+            "stone": 62,
+            "food": 65,
+            "grain": 0,
+            "flour": 0,
+            "planks": 0,
+            "ore": 0,
+            "iron": 0,
+            "tools": 0,
+            "flax": 0,
+            "cloth": 0,
+            "ale": 0,
+            "gold": 30,
+            "knowledge": 0
+          },
+          "projects": [
+            {
+              "id": "b1",
+              "status": "building",
+              "progress": 0,
+              "total": 36,
+              "paused": false,
+              "workers": [
+                "c1",
+                "c2"
+              ],
+              "x": -1,
+              "z": 0
+            }
+          ],
+          "jobs": [
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1"
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth"
+            },
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null
+            }
+          ],
+          "actors": [
+            {
+              "id": "c5",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                2.484,
+                0.8228837455244016,
+                6.084
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c6",
+              "job": "idle",
+              "workplace": null,
+              "position": [
+                -1.116,
+                0.829908245997188,
+                4.284
+              ],
+              "path": 0,
+              "activity": null,
+              "workState": "waiting"
+            },
+            {
+              "id": "c1",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8268142720679355,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c2",
+              "job": "builder",
+              "workplace": "b1",
+              "position": [
+                1.116,
+                0.8341911639386714,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c3",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                2.484,
+                0.8357591231882431,
+                4.716
+              ],
+              "path": 0,
+              "activity": null
+            },
+            {
+              "id": "c4",
+              "job": "forager",
+              "workplace": "hearth",
+              "position": [
+                -0.684,
+                0.8331575720985744,
+                6.084
+              ],
+              "path": 0,
+              "activity": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "source": "7ea91f3",
+  "method": "Isolated Chrome touch; actual new game and construction controls. Presentation-only projection helper; no injected resources, labor or simulation ticks."
+}

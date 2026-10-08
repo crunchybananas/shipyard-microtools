@@ -15,7 +15,7 @@ import { createTownUI, resourceText } from './town-ui.js';
 import { createAudio } from './audio.js';
 import { pressureOptions } from './pressure.js';
 import { createFrontierUI } from './frontier-ui.js';
-import { buildingFacts, nextTownStep } from './clarity.js';
+import { buildingFacts, nextTownStep, constructionFeedback } from './clarity.js';
 import { firstBreadStep } from './bread-guide.js';
 import { buildingPurpose } from './clarity-ui.js';
 import { createCompanionStore } from './companion-store.js';
@@ -40,7 +40,13 @@ const readingClock = createReadingClock();
 function updateReadingPause() {
   const reading = frontierUI?.selectionMode || ['town-book','fieldbook','frontier-panel','journal','companion-panel'].some(id => { const panel = $(id); return panel && !panel.hidden; });
   const before = speed; speed = readingClock.observe(!!reading);
-  $('reading-pause').hidden = !playing || !readingClock.held;
+  const crew = playing && companions.canManage && speed === 0 ? state.buildings.find(site => site.status !== 'ready' && !site.paused && site.workerIds?.length) : null;
+  $('reading-pause').hidden = !playing || (!readingClock.held && !crew);
+  const pauseText = readingClock.held ? 'Paused while reading · close to resume' : `Time paused · ${crew?.workerIds.length || 0} ${crew?.workerIds.length === 1 ? 'builder' : 'builders'} ready`;
+  if ($('reading-pause').querySelector('span').textContent !== pauseText) $('reading-pause').querySelector('span').textContent = pauseText;
+  const resumeLabel = readingClock.held ? 'Run while open' : 'Resume construction';
+  if ($('keep-running').textContent !== resumeLabel) $('keep-running').textContent = resumeLabel;
+  $('keep-running').title = readingClock.held ? 'Keep time running while reading' : 'Resume time so the assigned builders can work';
   if (speed !== before) updateUI();
 }
 let lastInspectorSignature = '', currentNextStep = null, soundMix={effects:.8,ambience:.55};
@@ -184,7 +190,7 @@ function commitBuilding(tile) {
   if (!tool || !tile || !companions.canManage) return;
   const result = sim.build(state, tool, tile.x, tile.z, rotation);
   if (!result.ok) { announce(result.reason, true); audio.play('error'); hover(tile); return; }
-  audio.play('build'); sync(); world.showPreview(null); hovered = null; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); $('placement-detail').textContent = 'Queued. Choose another site, or Done to watch it grow.'; announce(`${BUILDINGS[tool].name} added to the construction queue.`);
+  audio.play('build'); sync(); world.showPreview(null); hovered = null; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); const feedback = constructionFeedback(state, sim.constructionQueue(state), { paused: speed === 0 }); $('placement-detail').textContent = `Queued. ${feedback.reason}`; announce(`${BUILDINGS[tool].name} queued.${feedback.ready ? '' : ` ${feedback.reason}`}`);
 }
 function tap(tile, pointer = {}) {
   if (!playing || !companions.canManage || document.querySelector('dialog[open]')) return;

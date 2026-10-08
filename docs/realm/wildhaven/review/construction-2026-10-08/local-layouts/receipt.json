@@ -1,0 +1,63 @@
+{
+  "method": "Authored fresh-town construction fixture using normal build API and costs; real touch controls, no injected advancement. Isolated storage.",
+  "layouts": [
+    {
+      "name": "ipad",
+      "width": 1024,
+      "height": 768,
+      "button": {
+        "x": 604.171875,
+        "y": 66,
+        "width": 118.1875,
+        "height": 44
+      },
+      "progress": 2
+    },
+    {
+      "name": "short-landscape",
+      "width": 667,
+      "height": 375,
+      "button": {
+        "x": 393.234375,
+        "y": 85.1875,
+        "width": 118.1875,
+        "height": 44
+      },
+      "progress": 2
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "button": {
+        "x": 241.796875,
+        "y": 134.390625,
+        "width": 118.1875,
+        "height": 44
+      },
+      "progress": 2
+    },
+    {
+      "name": "portrait",
+      "width": 768,
+      "height": 1024,
+      "button": {
+        "x": 363.328125,
+        "y": 100.6875,
+        "width": 118.1875,
+        "height": 44
+      },
+      "progress": 2
+    },
+    {
+      "name": "zero-crew",
+      "reason": "The crew works on one project at a time. Move an urgent home or workshop forward, or rest a site to free your builders. Materials are reserved when you place the plan.\n\nThe construction crew is set to zero. Choose its size in People; idle residents are not assigned automatically.\n\nⅡ Time paused · work waits\nResume time\n1. Cottage\nWaiting for the crew\n0%\n36 person-seconds of work left\nEarlier\nLater\nPause\nView\nCancel work\n\nIf cancelled: 16 timber · 8 stone returned. Work already done uses its share of materials."
+    },
+    {
+      "name": "site-paused",
+      "reason": "The crew works on one project at a time. Move an urgent home or workshop forward, or rest a site to free your builders. Materials are reserved when you place the plan.\n\nEvery project is paused. Resume a site in Projects when you want its crew to return.\n\nⅡ Time paused · work waits\nResume time\n1. Cottage\nProject paused\n0%\n36 person-seconds of work left\nEarlier\nLater\nResume\nView\nCancel work\n\nIf cancelled: 16 timber · 8 stone returned. Work already done uses its share of materials."
+    }
+  ],
+  "errors": [],
+  "passed": true
+}
