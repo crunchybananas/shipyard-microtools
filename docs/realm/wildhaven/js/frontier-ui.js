@@ -1,7 +1,33 @@
-import { calendarDay } from './calendar.js';
+import { calendarDay, duration } from './calendar.js';
 import * as frontier from './frontier.js';
 import { RESOURCES } from './catalog.js';
 import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, terrainAt, regionAt, isLand } from './island.js';
+import { createPressGuard } from './press-guard.js';
+
+export const companySoldiers = units => units.filter(unit => unit.faction === 'player' && unit.citizenId && !unit.allyFrom && ['spearman', 'archer'].includes(unit.kind) && !['dead', 'released'].includes(unit.status));
+
+/** Selection is local UI state. Cancel restores the previous living members;
+ * neither changing a selection nor recalling it issues a field order. */
+export function createCompanySelection(getUnits) {
+  const ids = new Set(); let prior = null;
+  function livingIds() { return new Set(companySoldiers(getUnits()).map(unit => unit.id)); }
+  function prune() { const living = livingIds(); for (const id of ids) if (!living.has(id)) ids.delete(id); }
+  function replace(next) { const living = livingIds(); ids.clear(); for (const id of next) if (living.has(id)) ids.add(id); }
+  return {
+    get ids() { prune(); return [...ids]; },
+    get active() { return prior !== null; },
+    has: id => ids.has(id), clear: () => ids.clear(), reset: () => { ids.clear(); prior = null; }, replace,
+    toggle(id, additive = true) {
+      if (!livingIds().has(id)) return false;
+      if (!additive) { ids.clear(); ids.add(id); }
+      else if (ids.has(id)) ids.delete(id); else ids.add(id);
+      return true;
+    },
+    begin() { prune(); if (prior === null) prior = [...ids]; },
+    finish() { prune(); prior = null; return [...ids]; },
+    cancel() { if (prior === null) return false; replace(prior); prior = null; return true; },
+  };
+}
 
 const el = (tag, className = '', text) => {
   const node = document.createElement(tag);
@@ -58,11 +84,11 @@ const row = (name, status) => {
  * preview receives null or {kind, type?, start?, end?, cells?, valid, target?}.
  * focus receives {kind, id, x, z}; no Three.js dependency enters the UI.
  */
-export function createFrontierUI({ getState, mutate, canMutate = () => true, getContext = () => ({}), beforeOpen = () => {}, focus = () => {}, preview = () => {}, onSelection = () => {}, api = frontier, mount = document.getElementById('hud') }) {
+export function createFrontierUI({ getState, mutate, canMutate = () => true, getContext = () => ({}), beforeOpen = () => {}, openWatch = null, focus = () => {}, preview = () => {}, onSelection = () => {}, api = frontier, mount = document.getElementById('hud') }) {
   if (!mount) throw new Error('Frontier controls need the game HUD.');
-  let tab = null, selected = null, command = null, hovered = null, signature = '', confirmation = null;
+  let tab = null, selected = null, command = null, hovered = null, signature = '', confirmation = null, selectionNotice = '';
   const draftResidents = new Map();
-  const selectedTroops = new Set();
+  const selection = createCompanySelection(() => api.frontierOptions(getState(), getContext()).units);
   const panel = el('aside'); panel.id = 'frontier-panel'; panel.hidden = true; panel.setAttribute('aria-label', 'Frontier');
   const heading = el('div', 'frontier-heading'), title = el('h2', '', 'Beyond the village'); title.id = 'frontier-title';
   const closeButton = button('×', 'close', () => close()); closeButton.setAttribute('aria-label', 'Close frontier');
@@ -70,18 +96,20 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
   const tabs = el('nav', 'frontier-tabs'); tabs.setAttribute('aria-label', 'Frontier sections');
   for (const [key, label] of [['defenses', 'Defenses'], ['company', 'Company'], ['neighbors', 'Neighbors']]) tabs.append(button(label, `tab-${key}`, () => open(key)));
   const content = el('div'); content.id = 'frontier-content'; content.tabIndex = 0; content.setAttribute('role', 'region'); content.setAttribute('aria-labelledby', title.id);
+  const contentPress = createPressGuard(content, { onRelease: () => update() });
   panel.append(heading, tabs, content);
   const strip = el('div'); strip.id = 'frontier-command'; strip.hidden = true;
   const prompt = el('div'), promptTitle = el('strong'), promptDetail = el('p'); promptDetail.setAttribute('role', 'status');
   prompt.append(promptTitle, promptDetail); const rotateButton = button('Rotate', 'rotate-command', () => rotateCommand());
   const buildLineButton = button('Build line', 'commit-wall-line', () => commitWallLine());
-  rotateButton.hidden = true; buildLineButton.hidden = true; strip.append(prompt, rotateButton, buildLineButton, button('Cancel', 'cancel-command', () => cancelCommand()));
+  const doneSelectionButton = button('Done', 'finish-selection', () => finishSelection(), { className: 'primary' });
+  rotateButton.hidden = true; buildLineButton.hidden = true; doneSelectionButton.hidden = true; strip.append(prompt, rotateButton, buildLineButton, doneSelectionButton, button('Cancel', 'cancel-command', () => cancelCommand()));
   const toggle = button('Frontier', 'toggle', () => tab ? close() : open('neighbors')); toggle.id = 'frontier-toggle'; toggle.setAttribute('aria-controls', panel.id); toggle.setAttribute('aria-pressed', 'false');
   mount.append(panel, strip, toggle);
 
   function action(fn) {
     if (!canMutate()) return { ok: false, reason: 'This town is paused for viewing.' };
-    const result = fn(); mutate(result); signature = ''; confirmation = null; update(true); return result;
+    const result = fn(); mutate(result); signature = ''; confirmation = null; selectionNotice = ''; update(true); return result;
   }
   function open(next = 'neighbors') {
     beforeOpen(); cancelCommand(false); tab = next; selected = null; confirmation = null;
@@ -89,6 +117,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     content.scrollTop = 0; signature = ''; update(true);
   }
   function close() {
+    contentPress.reset();
     tab = null; selected = null; confirmation = null; panel.hidden = true; toggle.setAttribute('aria-pressed', 'false');
     document.body.classList.remove('frontier-view-active'); cancelCommand(false); syncSelection();
   }
@@ -97,7 +126,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     const picked = kind === 'troop' ? api.frontierOptions(getState(), getContext()).units.find(unit => unit.id === id) : null;
     if (picked && picked.faction !== 'player') kind = 'enemy';
     selected = { kind, id }; tab = ['troop', 'enemy'].includes(kind) ? 'company' : kind === 'fortification' ? 'defenses' : 'neighbors';
-    if (kind === 'troop') { if (!additive) selectedTroops.clear(); if (additive && selectedTroops.has(id)) selectedTroops.delete(id); else selectedTroops.add(id); }
+    if (kind === 'troop') selection.toggle(id, additive);
     panel.hidden = false; toggle.setAttribute('aria-pressed', 'true'); document.body.classList.add('frontier-view-active'); content.scrollTop = 0; update(true);
   }
   function begin(next) {
@@ -105,10 +134,32 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     command = next; confirmation = null; hovered = null; panel.hidden = true; document.body.classList.remove('frontier-view-active');
     document.body.classList.add('frontier-command-active'); strip.hidden = false; updateCommand();
   }
+  function beginSelection() {
+    beforeOpen(); cancelCommand(false); tab = 'company'; selected = null;
+    selection.begin(); command = { kind: 'select' }; confirmation = null; hovered = null;
+    panel.hidden = true; toggle.setAttribute('aria-pressed', 'true'); document.body.classList.remove('frontier-view-active');
+    document.body.classList.add('frontier-command-active', 'frontier-selection-mode'); strip.hidden = false; updateCommand(); syncSelection();
+    doneSelectionButton.focus({ preventScroll: true });
+  }
+  function finishSelection() {
+    if (command?.kind !== 'select') return false;
+    selection.finish(); cancelCommand(true);
+    content.querySelector('[data-frontier-action="selection-summary"]')?.focus({ preventScroll: true }); return true;
+  }
+  function toggleSelection(id) {
+    if (command?.kind !== 'select' || !selection.toggle(id)) return false;
+    selected = null; update(true); return true;
+  }
+  function resetSelection() {
+    cancelCommand(false); selection.reset(); draftResidents.clear(); selected = null; selectionNotice = ''; signature = ''; syncSelection();
+    if (!panel.hidden) update(true);
+  }
   function cancelCommand(reopen = true) {
     if (!command) return false;
-    command = null; hovered = null; strip.hidden = true; document.body.classList.remove('frontier-command-active'); preview(null);
+    const selecting = command.kind === 'select'; if (selecting) selection.cancel();
+    command = null; hovered = null; strip.hidden = true; document.body.classList.remove('frontier-command-active', 'frontier-selection-mode'); preview(null); syncSelection();
     if (reopen && tab) { panel.hidden = false; document.body.classList.add('frontier-view-active'); update(true); }
+    if (selecting && reopen) content.querySelector('[data-frontier-action="select-on-island"]')?.focus({ preventScroll: true });
     return true;
   }
   function controls(node, items) {
@@ -142,9 +193,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
   }
 
   function syncSelection() {
-    const alive = new Set(api.frontierOptions(getState(), getContext()).units.filter(unit => unit.faction === 'player' && !['dead', 'released'].includes(unit.status)).map(unit => unit.id));
-    for (const id of selectedTroops) if (!alive.has(id)) selectedTroops.delete(id);
-    onSelection({ unitIds: [...selectedTroops], fortId: selected?.kind === 'fortification' ? selected.id : null, neighborId: selected?.kind === 'neighbor' ? selected.id : null, regionId: selected?.kind === 'region' ? selected.id : null });
+    onSelection({ unitIds: selection.ids, selectionMode: selection.active, fortId: selected?.kind === 'fortification' ? selected.id : null, neighborId: selected?.kind === 'neighbor' ? selected.id : null, regionId: selected?.kind === 'region' ? selected.id : null });
   }
   function update(force = false) {
     syncSelection();
@@ -153,17 +202,19 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     toggle.textContent = overview.activeBattles > 0 ? 'Frontier !' : 'Frontier';
     toggle.setAttribute('aria-label', overview.activeBattles > 0 ? `Frontier, ${overview.activeBattles} hostile troops` : overview.warning ? 'Frontier, approaching raid' : 'Open frontier');
     if (command) updateCommand();
-    if (!tab || panel.hidden) return;
+    if (!tab || panel.hidden || !force && contentPress.held) return;
     const state = getState();
-    const next = JSON.stringify([tab, selected, [...selectedTroops], confirmation?.id, state.frontier, state.resources, state.research, state.day, state.population]);
+    const next = JSON.stringify([tab, selected, selection.ids, confirmation?.id, state.frontier, state.resources, state.research, state.day, state.population]);
     if (!force && next === signature) return;
     signature = next;
     const active = content.contains(document.activeElement) ? document.activeElement.dataset.frontierAction : null, scroll = content.scrollTop;
+    const disclosures = new Map([...content.querySelectorAll('details[data-frontier-disclosure]')].map(node => [node.dataset.frontierDisclosure, node.open]));
     title.textContent = selected?.kind === 'troop' ? 'The field company' : selected?.kind === 'fortification' ? 'At the town boundary' : { defenses: 'Keep a way home', company: 'The field company', neighbors: 'Along the island' }[tab];
     tabs.querySelectorAll('button').forEach(node => node.setAttribute('aria-pressed', String(node.dataset.frontierAction === `tab-${tab}`)));
     const nodes = tab === 'defenses' ? defensesContent(state) : tab === 'company' ? companyContent(state) : neighborsContent(state);
     const alert = warningContent(overview); if (alert) nodes.unshift(alert);
     confirmContent(nodes); reconcile(content, nodes); content.scrollTop = scroll;
+    for (const node of content.querySelectorAll('details[data-frontier-disclosure]')) if (disclosures.has(node.dataset.frontierDisclosure)) node.open = disclosures.get(node.dataset.frontierDisclosure);
     if (tab === 'neighbors') paintChart(content.querySelector('.frontier-chart'), state);
     if (active) content.querySelector(`[data-frontier-action="${CSS.escape(active)}"]`)?.focus({ preventScroll: true });
   }
@@ -171,12 +222,17 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
   function warningContent(overview) {
     if (!overview.warning && !overview.activeBattles) return null;
     const card = el('div', 'frontier-warning');
-    card.append(el('strong', '', overview.warning ? 'Sails on the northern shore' : 'Fighting on the island'));
+    card.append(el('strong', '', overview.activeBattles ? 'Hostile troops on the island' : 'Raid approaching'));
+    if (overview.activeBattles) card.append(el('p', '', `${overview.activeBattles} hostile troops are on the island. Movement and damage continue while time runs.`));
+    const actions = [];
     if (overview.warning) {
       const seconds = Math.max(0, overview.warning.attackAt - overview.clock);
-      card.append(el('p', '', `${overview.warning.amount} raiders are expected in ${Math.ceil(seconds)} seconds. Train defenders and keep a route home.`));
-      controls(card, [{ label: 'Find their landing', id: 'find-raider-landing', run: () => { close(); focus({ ...overview.warning.entry, kind: 'region-point' }); } }]);
-    } else card.append(el('p', '', `${overview.activeBattles} hostile troops are on the island. Orders and damage continue while time runs.`));
+      card.append(el('p', '', `${overview.warning.amount} raiders arrive in ${duration(seconds)} at 1×. The 3× speed also speeds this countdown.`));
+      actions.push({ label: 'Find their landing', id: 'find-raider-landing', run: () => { close(); focus({ ...overview.warning.entry, kind: 'region-point' }); } });
+    }
+    card.append(el('p', 'frontier-reason', 'These are physical troops. Coastal cargo demands are handled separately in Town → Watch.'));
+    if (tab !== 'company') actions.unshift({ label: 'Prepare company', id: 'prepare-company', className: 'primary', run: () => open('company') });
+    if (actions.length) controls(card, actions);
     return card;
   }
   function defensesContent(state) {
@@ -222,48 +278,85 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     return nodes;
   }
   function companyContent(state) {
-    const overview = api.frontierOptions(state, getContext()), units = overview.units.filter(item => item.faction === 'player' && ['spearman', 'archer'].includes(item.kind) && !['dead', 'released'].includes(item.status));
-    const nodes = [intro('Recruit residents into the company. Training, duty and recovery take them away from town jobs. Move near unfamiliar ground to scout it; keep wounded people out of a fight.')];
-    for (const id of [...selectedTroops]) if (!units.some(item => item.id === id)) selectedTroops.delete(id);
+    const overview = api.frontierOptions(state, getContext()), units = companySoldiers(overview.units);
+    const chosen = units.filter(unit => selection.has(unit.id)), ready = units.filter(unit => unit.status === 'active');
+    const defenders = ready.filter(unit => unit.order?.type === 'defend'), squads = api.squadOptions(state);
+    const nodes = [], card = el('section', 'frontier-selection company-selection');
+    const summary = el('h3', '', `${chosen.length} selected`); summary.tabIndex = -1; summary.dataset.frontierAction = 'selection-summary';
+    card.append(summary);
+    const statusName = unit => unit.status === 'training' ? 'Training' : unit.status === 'wounded' ? 'Recovering' : ({ defend: 'Defending town', hold: 'Holding here', move: 'Moving', attack: 'Attacking', retreat: 'Returning home' }[unit.order?.type] || unit.status || 'Ready');
+    const stances = [...new Set(chosen.map(statusName))], readyChosen = chosen.filter(unit => unit.status === 'active').length;
+    card.append(el('p', 'company-stance', chosen.length ? `${readyChosen} ready · ${stances.join(' / ')}` : 'Select ready soldiers, then give the group an order.'));
+    controls(card, [
+      { label: `Ready soldiers (${ready.length})`, id: 'select-ready', disabled: !ready.length, run: () => { selection.replace(ready.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); } },
+      { label: 'Select on island', id: 'select-on-island', disabled: !units.length, run: beginSelection },
+    ]);
+    const ids = chosen.map(unit => unit.id), unavailable = !chosen.length || readyChosen !== chosen.length || !canMutate();
+    controls(card, [
+      { label: 'Defend Town', id: 'defend', className: 'primary', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'defend' }, getContext())) },
+      { label: 'Hold Here', id: 'hold', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'hold' }, getContext())) },
+      { label: 'Move', id: 'move', disabled: unavailable, run: () => begin({ kind: 'move', ids }) },
+      { label: 'Attack', id: 'attack', disabled: unavailable, run: () => begin({ kind: 'attack', ids }) },
+      { label: 'Retreat home', id: 'retreat', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'retreat' }, getContext())) },
+    ]);
+    card.append(el('p', 'company-order-help', `Defend Town rallies near home and responds within ${api.DEFEND_RADIUS} tiles. Hold Here keeps each soldier in place, fighting only within weapon range.`));
+    if (chosen.length && readyChosen !== chosen.length) card.append(el('p', 'frontier-reason', 'Training or recovering recruits are selected. Choose Ready soldiers to give orders now.'));
+    if (selectionNotice) { const notice = el('p', 'frontier-reason', selectionNotice); notice.setAttribute('role', 'status'); card.append(notice); }
+    const saveUnavailable = !chosen.length || chosen.length > api.MAX_SQUAD_MEMBERS || squads.length >= api.MAX_SQUADS || !canMutate();
+    controls(card, [
+      { label: 'Save squad', id: 'save-squad', disabled: saveUnavailable, reason: chosen.length > api.MAX_SQUAD_MEMBERS ? `Each squad can contain up to ${api.MAX_SQUAD_MEMBERS} soldiers.` : squads.length >= api.MAX_SQUADS ? `Keep up to ${api.MAX_SQUADS} saved squads.` : '', run: () => {
+        let number = 1; while (api.squadOptions(getState()).some(squad => squad.name === `Squad ${number}`)) number++;
+        action(() => api.saveSquad(getState(), { name: `Squad ${number}`, unitIds: selection.ids }));
+      } },
+      { label: 'Clear selection', id: 'clear-units', disabled: !chosen.length, run: () => { selection.clear(); selected = null; selectionNotice = ''; update(true); } },
+    ]);
+    nodes.push(card);
+    if (squads.length) {
+      const saved = el('details', 'company-squads'); saved.dataset.frontierDisclosure = 'squads'; saved.open = true;
+      const heading = el('summary', '', `Saved squads · ${squads.length}`); heading.dataset.frontierAction = 'squads-summary'; saved.append(heading);
+      saved.append(intro('Recall selects ready members. Training and recovering members stay saved; recalling a squad gives no movement order.'));
+      for (const squad of squads) {
+        const squadRow = row(squad.name, `${squad.readyIds.length} ready / ${squad.unitIds.length} members`);
+        if (squad.unavailableIds.length) squadRow.append(el('p', 'frontier-reason', `${squad.unavailableIds.length} still training or recovering.`));
+        controls(squadRow, [
+          { label: 'Recall', id: `recall-squad-${squad.id}`, disabled: !squad.readyIds.length, run: () => {
+            const result = api.recallSquad(getState(), squad.id); selectionNotice = result.reason || '';
+            if (result.ok) { selection.replace(result.unitIds); selected = null; } update(true);
+            content.querySelector('[data-frontier-action="selection-summary"]')?.focus({ preventScroll: true });
+          } },
+          { label: 'Delete squad', id: `delete-squad-${squad.id}`, disabled: !canMutate(), run: () => {
+            const result = action(() => api.deleteSquad(getState(), squad.id));
+            if (result.ok) (content.querySelector('[data-frontier-action="squads-summary"]') || content.querySelector('[data-frontier-action="selection-summary"]'))?.focus({ preventScroll: true });
+          } },
+        ]); saved.append(squadRow);
+      }
+      nodes.push(saved);
+    }
+    const art = el('img', 'company-art'); art.src = './assets/defense-company.jpg'; art.alt = ''; art.loading = 'lazy'; art.decoding = 'async'; art.width = 2172; art.height = 724;
+    nodes.push(art, intro('Company recruits are named soldiers. Watch-house workers provide town security and coastal patrol readiness; they are separate from this field company.'));
+    if (openWatch) nodes.push(button('Coastal patrol & Watch', 'open-town-watch', () => { close(); openWatch(); }));
     const enemy = selected?.kind === 'enemy' ? overview.units.find(unit => unit.id === selected.id) : null;
     if (enemy) {
-      const card = el('div', 'frontier-selection'); card.append(el('h3', '', enemy.name), meter(enemy.hp, enemy.maxHp), el('p', '', `${enemy.kind} · ${Math.round(enemy.hp)} / ${enemy.maxHp} health · ${enemy.status}`), el('p', '', 'Select your company, choose Attack, then choose this target on the island.')); nodes.push(card);
-    }
-    const chosen = units.filter(item => selectedTroops.has(item.id));
-    if (chosen.length) {
-      const card = el('div', 'frontier-selection');
-      card.append(el('h3', '', chosen.length === 1 ? chosen[0].name || 'Selected resident' : `${chosen.length} selected`));
-      const health = chosen.reduce((n, unit) => n + unit.hp, 0), max = chosen.reduce((n, unit) => n + unit.maxHp, 0);
-      card.append(meter(health, max), el('p', '', `${amount(health)} / ${amount(max)} health · ${chosen.map(unit => unit.status || unit.order?.type || 'Ready').join(', ')}`));
-      const ids = chosen.map(unit => unit.id), unavailable = chosen.some(unit => unit.status !== 'active');
-      if (unavailable) card.append(el('p', 'frontier-reason', 'Only trained, healthy residents can take field orders. Deselect anyone still training or recovering.'));
-      for (const unit of chosen.filter(unit => unit.status === 'training')) card.append(el('p', '', `${unit.name}: ${Math.ceil(unit.trainingRemaining)} seconds of training remain.`));
-      controls(card, [
-        { label: 'Move', id: 'move', disabled: unavailable, run: () => begin({ kind: 'move', ids }) },
-        { label: 'Attack', id: 'attack', disabled: unavailable, run: () => begin({ kind: 'attack', ids }) },
-        { label: 'Hold ground', id: 'hold', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'hold' }, getContext())) },
-        { label: 'Retreat home', id: 'retreat', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'retreat' }, getContext())) },
-        { label: 'Clear selection', id: 'clear-units', run: () => { selectedTroops.clear(); selected = null; update(true); } },
-      ]);
-      if (chosen.length === 1) {
-        const unit = chosen[0], offer = api.healOffer(state, unit.id, getContext()); quote(card, offer, 'Recovery');
-        controls(card, [{ label: 'Tend wounds', id: `heal-${unit.id}`, disabled: !offer.ok, reason: offer.reason, run: () => action(() => api.healTroop(state, unit.id, getContext())) }]);
-        const dismissal = api.dismissOffer(state, unit.id, getContext());
-        card.append(el('p', dismissal.ok ? 'frontier-cost' : 'frontier-reason', dismissal.reason));
-        controls(card, [{ label: unit.status === 'training' ? 'Cancel training' : 'Return to civilian work', id: `dismiss-${unit.id}`, disabled: !dismissal.ok, reason: dismissal.reason, run: () => action(() => api.dismissTroop(state, unit.id, getContext())) }]);
-      }
-      nodes.push(card);
+      const target = el('div', 'frontier-selection'); target.append(el('h3', '', enemy.name), meter(enemy.hp, enemy.maxHp), el('p', '', `${enemy.kind} · ${Math.round(enemy.hp)} / ${enemy.maxHp} health · ${enemy.status}`), el('p', '', 'Select your soldiers, choose Attack, then choose this target on the island.')); nodes.push(target);
     }
     if (units.length) {
-      nodes.push(section('People in the company'));
-      const all = el('div'); controls(all, [{ label: 'Select company', id: 'select-company', run: () => { selectedTroops.clear(); units.filter(unit => unit.status === 'active').forEach(unit => selectedTroops.add(unit.id)); update(true); } }]); nodes.push(all);
+      nodes.push(section('Soldier roster'));
+      const all = el('div'); const picks = [{ label: `All soldiers (${units.length})`, id: 'select-company', run: () => { selection.replace(units.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); content.scrollTop = 0; } }];
+      if (defenders.length) picks.push({ label: `All defenders (${defenders.length})`, id: 'select-defenders', run: () => { selection.replace(defenders.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); content.scrollTop = 0; } });
+      controls(all, picks); nodes.push(all, intro('Tap names to add or remove soldiers. Shift-click soldiers on the island for the same selection.'));
       for (const unit of units) {
         const item = el('div', 'frontier-unit');
-        const pick = button('', `unit-${unit.id}`, () => { selectedTroops.has(unit.id) ? selectedTroops.delete(unit.id) : selectedTroops.add(unit.id); selected = { kind: 'troop', id: unit.id }; update(true); }, { pressed: selectedTroops.has(unit.id) });
-        pick.append(el('strong', '', unit.name || unit.citizenName || unit.kind), el('small', '', `${unit.kind} · ${Math.round(unit.hp)} / ${unit.maxHp} health · ${unit.status || unit.order?.type || 'Holding'}`));
+        const pick = button('', `unit-${unit.id}`, () => { selection.toggle(unit.id); selected = { kind: 'troop', id: unit.id }; selectionNotice = ''; update(true); }, { pressed: selection.has(unit.id) });
+        pick.append(el('strong', '', unit.name || unit.citizenName || unit.kind), el('small', '', `${unit.kind} · ${Math.round(unit.hp)} / ${unit.maxHp} health · ${statusName(unit)}${unit.status === 'training' ? ` · ${Math.ceil(unit.trainingRemaining)}s left` : ''}`));
         item.append(pick, button('Find', `find-unit-${unit.id}`, () => { close(); focus({ ...unit, kind: 'troop' }); }, { className: 'frontier-locate' })); nodes.push(item);
       }
-    } else nodes.push(intro('The company has no recruits yet. A supplied watch-house is where training begins.'));
+    } else nodes.push(intro('The company has no recruits yet. Complete and unpause a watch-house, then recruit a resident below. Each training quote shows the supplies and other requirements.'));
+    if (chosen.length === 1) {
+      const unit = chosen[0], care = row(`${unit.name} · care & civilian work`), offer = api.healOffer(state, unit.id, getContext()); quote(care, offer, 'Recovery');
+      controls(care, [{ label: 'Tend wounds', id: `heal-${unit.id}`, disabled: !offer.ok || !canMutate(), reason: offer.reason, run: () => action(() => api.healTroop(state, unit.id, getContext())) }]);
+      const dismissal = api.dismissOffer(state, unit.id, getContext()); care.append(el('p', dismissal.ok ? 'frontier-cost' : 'frontier-reason', dismissal.reason));
+      controls(care, [{ label: unit.status === 'training' ? 'Cancel training' : 'Return to civilian work', id: `dismiss-${unit.id}`, disabled: !dismissal.ok || !canMutate(), reason: dismissal.reason, run: () => action(() => api.dismissTroop(state, unit.id, getContext())) }]); nodes.push(care);
+    }
     const travelers = overview.units.filter(unit => unit.faction === 'player' && ['engineer', 'envoy'].includes(unit.kind) && !['dead', 'released'].includes(unit.status));
     if (travelers.length) {
       nodes.push(section('On a town assignment'));
@@ -395,6 +488,13 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
   }
   function updateCommand() {
     if (!command) return;
+    doneSelectionButton.hidden = command.kind !== 'select';
+    if (command.kind === 'select') {
+      rotateButton.hidden = true; buildLineButton.hidden = true;
+      promptTitle.textContent = `${selection.ids.length} selected · choose your squad`;
+      promptDetail.textContent = 'Tap friendly soldiers to add or remove them. Drag to look around. Done keeps this selection; Cancel restores the previous one. No orders are issued.';
+      strip.classList.remove('invalid'); preview(null); return;
+    }
     const quote = commandQuote(); rotateButton.hidden = command.kind !== 'fortification';
     buildLineButton.hidden = command.kind !== 'wall-line' || !command.end;
     buildLineButton.disabled = !quote.ok; buildLineButton.textContent = `Build ${quote.tiles?.length || ''} sections`.replace('  ', ' ');
@@ -414,12 +514,17 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     if (command?.kind !== 'fortification') return false;
     command.rotation = ((command.rotation || 0) + 1) % 4; command.reason = null; updateCommand(); return true;
   }
-  function hover(tile) { if (!command) return false; hovered = tile; command.reason = null; updateCommand(); return true; }
-  function handleTap(tile) {
+  function hover(tile) { if (!command) return false; if (command.kind === 'select') return true; hovered = tile; command.reason = null; updateCommand(); return true; }
+  function handleTap(tile, pointer = {}) {
+    if (command?.kind === 'select') {
+      const troop = tile?.troop || tile?.unit;
+      if (troop) toggleSelection(typeof troop === 'string' ? troop : troop.id);
+      return true; // Empty ground, civilians and enemies never clear the group or issue orders.
+    }
     if (!canMutate()) return false;
     if (!command) {
       for (const kind of ['enemy', 'troop', 'neighbor', 'fortification']) {
-        const item = tile?.[kind]; if (item) { select(kind, typeof item === 'string' ? item : item.id); return true; }
+        const item = tile?.[kind]; if (item) { select(kind, typeof item === 'string' ? item : item.id, { additive: !!(pointer.additive || pointer.shiftKey) }); return true; }
       }
       return false;
     }
@@ -449,9 +554,9 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
   window.addEventListener('resize', resizeChart);
 
   return {
-    open, close, select, update, hover, handleTap, cancelCommand, rotateCommand,
+    open, close, select, update, hover, handleTap, cancelCommand, rotateCommand, beginSelection, finishSelection, toggleSelection, resetSelection,
     get activeTab() { return tab; }, get command() { return command; },
-    get selectedTroops() { return [...selectedTroops]; },
-    dispose() { close(); window.removeEventListener('resize', resizeChart); toggle.remove(); panel.remove(); strip.remove(); },
+    get selectedTroops() { return selection.ids; }, get selectionMode() { return selection.active; },
+    dispose() { close(); contentPress.dispose(); window.removeEventListener('resize', resizeChart); toggle.remove(); panel.remove(); strip.remove(); },
   };
 }

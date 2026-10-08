@@ -1,0 +1,17 @@
+{
+  "fixture": "Same authored interaction fixture as check.mjs; one additional staged hostile soldier for command/combat checks.",
+  "checks": [
+    "Held native touch survives a live update; canceled touch saves nothing; next tap saves exactly one squad",
+    "Reusable ImageGen illustration loads and stays within80px at tablet size",
+    "Actual hostile raycast accepts explicit Attack without changing diplomatic relations"
+  ],
+  "errors": [],
+  "art": {
+    "source": "./assets/defense-company.jpg",
+    "alt": "",
+    "loading": "lazy",
+    "height": 80,
+    "naturalWidth": 2172
+  },
+  "failure": "TypeError: Cannot read properties of undefined (reading 'hp')\n    at file:///private/tmp/wildhaven-defense-review/edge-check.mjs:42:25"
+}

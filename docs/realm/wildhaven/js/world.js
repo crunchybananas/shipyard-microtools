@@ -7,7 +7,7 @@ import { GLTFLoader } from '../../vendor/three/GLTFLoader.js';
 import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js';
 import { buildingEntrance } from './sim.js';
 import { groundHeight, terrainAt, isLand, listTiles, hasNaturalObstacle, isNeighborCompoundCell, coastDistance, ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS } from './island.js';
-import { blocksFortification, frontierPath, gateTransition } from './frontier.js';
+import { blocksFortification, frontierPath, gateTransition, DEFEND_RADIUS } from './frontier.js';
 import { BUILDINGS, JOBS, getBuildingSpec } from './catalog.js';
 import { serviceReach, residentCue } from './world-cues.js';
 import { seasonInfo, festivalStatus } from './seasons.js';
@@ -398,7 +398,7 @@ export class VillageWorld {
   }
   updateWorldCues(){
     const unitsPerPixel=this.zoom/this.height;
-    for(const label of[this.entranceLabel,this.serviceArea?.userData.label,this.workerLabel])if(label?.visible){const[w,h]=label.userData.cuePixels;label.scale.set(w*unitsPerPixel,h*unitsPerPixel,1);}
+    for(const label of[this.entranceLabel,this.serviceArea?.userData.label,this.workerLabel,...(this.frontierSelectionGroup?.children.filter(child=>child.userData.cuePixels)||[])])if(label?.visible){const[w,h]=label.userData.cuePixels;label.scale.set(w*unitsPerPixel,h*unitsPerPixel,1);}
     if(this.serviceArea?.visible)for(const mesh of this.serviceArea.userData.markerGroups){mesh.userData.homes.forEach((home,i)=>{const height=this.buildings.get(home.id)?.userData.height||1.6;position.set(home.x*CELL,groundHeight(home.x,home.z)+height+.23,home.z*CELL);matrix.compose(position,this.camera.quaternion,scale.setScalar(24*unitsPerPixel));mesh.setMatrixAt(i,matrix);});mesh.instanceMatrix.needsUpdate=true;}
   }
   createPressureBoat(){
@@ -508,10 +508,24 @@ export class VillageWorld {
   }
   selectFrontier(selection={}){
     this.frontierSelection={unitIds:[...(selection.unitIds||[])],fortId:selection.fortId||null,neighborId:selection.neighborId||null,regionId:selection.regionId||null};
-    const signature=JSON.stringify(this.frontierSelection);if(this.frontierSelectionGroup?.userData.signature===signature)return;
+    const chosen=new Set(this.frontierSelection.unitIds),units=(this.state?.frontier?.units||[]).filter(u=>chosen.has(u.id)&&!['dead','released'].includes(u.status));
+    const signature=JSON.stringify([this.frontierSelection,units.map(u=>[u.id,u.order])]);if(this.frontierSelectionGroup?.userData.signature===signature)return;
     if(this.frontierSelectionGroup)this.disposePresentation(this.frontierSelectionGroup);
     const group=new THREE.Group();group.userData.signature=signature;
     for(const id of this.frontierSelection.unitIds){const ring=this.frontierGroundRing(.40,'#efda95',.045);ring.userData.unitId=id;group.add(ring);}
+    const defended=new Set();
+    for(const unit of units){
+      const order=unit.order;
+      if(!['move','retreat','defend'].includes(order?.type)||!Number.isFinite(order.x)||!Number.isFinite(order.z))continue;
+      const ring=this.frontierGroundRing(.30,order.type==='defend'?'#9cd3be':'#efda95',.04);
+      ring.position.set(order.x*CELL,groundHeight(order.x,order.z)+.055,order.z*CELL);group.add(ring);
+      if(order.type!=='defend'||!order.anchor)continue;
+      const anchor=order.anchor,key=`${anchor.x},${anchor.z}`;if(defended.has(key))continue;defended.add(key);
+      const points=Array.from({length:65},(_,i)=>{const angle=i/64*TAU,x=anchor.x+Math.cos(angle)*DEFEND_RADIUS,z=anchor.z+Math.sin(angle)*DEFEND_RADIUS;return new THREE.Vector3(x*CELL,groundHeight(x,z)+.07,z*CELL);});
+      const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:'#9cd3be',transparent:true,opacity:.75,depthWrite:false}));
+      line.userData.ownsGeometry=line.userData.ownsMaterial=true;group.add(line);
+      const label=this.makeCueLabel(192,48);if(label){this.setCueLabel(label,['DEFEND TOWN',`${DEFEND_RADIUS}-tile home area`],'#9cd3be');label.position.set(anchor.x*CELL,groundHeight(anchor.x,anchor.z)+.8,anchor.z*CELL);group.add(label);}
+    }
     const fort=(this.state?.frontier?.fortifications||[]).find(f=>f.id===selection.fortId),neighbor=ISLAND_NEIGHBORS.find(n=>n.id===selection.neighborId),region=ISLAND_REGIONS.find(r=>r.id===selection.regionId);
     for(const[item,radius,color]of[[fort,1.15,'#eadba7'],[neighbor,2.10,'#e0c184']])if(item){const ring=this.frontierGroundRing(radius,color);ring.position.set(item.x*CELL,groundHeight(item.x,item.z)+.055,item.z*CELL);group.add(ring);}
     if(region){const points=[];for(let i=0;i<150;i++){const angle=i/150*TAU,x=region.x+Math.cos(angle)*region.radius,z=region.z+Math.sin(angle)*region.radius;if(!isLand(x,z)||terrainAt(x,z).regionId!==region.id)continue;const g=new THREE.CylinderGeometry(.07,.095,.035,5);g.translate(x*CELL,groundHeight(x,z)+.025,z*CELL);points.push(g);}if(points.length){const mesh=new THREE.Mesh(mergeGeometries(points),material('#dbc593'));mesh.userData.ownsGeometry=true;mesh.userData.ownsMaterial=true;group.add(mesh);points.forEach(g=>g.dispose());}}
@@ -1120,7 +1134,7 @@ export class VillageWorld {
         const remaining=this.pointers.values().next().value;
         drag={...drag,x:remaining.x,y:remaining.y,lastX:remaining.x,lastY:remaining.y,moved:true};pinch=0;
       }
-      if(drag&&!drag.moved&&e.button===0&&this.pointers.size===0)this.onTap?.(this.pick(e.clientX,e.clientY),{pointerType:e.pointerType});
+      if(drag&&!drag.moved&&e.button===0&&this.pointers.size===0)this.onTap?.(this.pick(e.clientX,e.clientY),{pointerType:e.pointerType,shiftKey:e.shiftKey});
       if(!this.pointers.size)drag=null;
     });
     const endGesture=()=>{this.pointers.clear();drag=null;pinch=0;};

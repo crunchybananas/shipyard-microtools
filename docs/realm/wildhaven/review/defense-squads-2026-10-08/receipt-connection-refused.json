@@ -1,0 +1,23 @@
+{
+  "fixture": "Existing campaign-forge-save restored through sim.restore; wood/food/iron/tools staged to at least 120. Three residents recruited through recruitTroop and trained by sim.tick(46). No player storage is used.",
+  "base": "http://127.0.0.1:14727/realm/wildhaven/?review=1",
+  "recruited": [
+    "unit-1",
+    "unit-2",
+    "unit-3"
+  ],
+  "viewports": [
+    {
+      "name": "ipad-landscape",
+      "width": 1024,
+      "height": 768,
+      "touch": true,
+      "checks": []
+    }
+  ],
+  "errors": [
+    "ipad-landscape: Failed to read the 'sessionStorage' property from 'Window': Access is denied for this document."
+  ],
+  "browser": "Headless Chrome, isolated temporary browser contexts; no physical iPad claim.",
+  "failure": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:14727/realm/wildhaven/?review=1\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:14727/realm/wildhaven/?review=1\", waiting until \"load\"\u001b[22m\n\n    at /private/tmp/wildhaven-defense-review/check.mjs:93:18"
+}

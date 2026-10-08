@@ -7,7 +7,7 @@ import { townSafety } from '../js/town-safety.js';
 function coastalTown() {
   const state = createGame(); state.won = true; state.population = 20;
   state.citizens = Array.from({ length: 20 }, (_, i) => ({ id: `c${i}`, job: 'idle' }));
-  dailyPressure(state); state.day += 2; dailyPressure(state);
+  dailyPressure(state); state.day = state.pressure.nextIncidentDay; dailyPressure(state);
   return state;
 }
 test('quiet, scheduled future raids and friendly troops do not invent an active warning', () => {
@@ -21,7 +21,7 @@ test('coastal incidents and arriving frontier raids both appear with their real 
   assert.match(townSafety(state).label, /^Sails/);
   state.frontier.clock = 40; state.frontier.warning = { amount: 3, attackAt: 130 };
   const status = townSafety(state);
-  assert.equal(status.label, 'Raid in 1m 30s');
+  assert.equal(status.label, 'Raid in 1m 30s at 1×');
   assert.match(status.secondary, /^Sails in /); assert.equal(status.destination, 'frontier');
   assert.match(status.description, /3 raiders arrive in 1m 30s/);
   assert.match(status.description, /Town → Watch/);

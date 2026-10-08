@@ -1,0 +1,108 @@
+{
+  "fixture": "Same authored interaction fixture as check.mjs; one additional staged hostile soldier for command/combat checks.",
+  "checks": [
+    "Held native touch survives a live update; canceled touch saves nothing; next tap saves exactly one squad",
+    "Reusable ImageGen illustration loads and stays within80px at tablet size",
+    "Actual hostile raycast accepts explicit Attack without changing diplomatic relations",
+    "Company intercepts a real simulated hostile, survives, returns to rally positions and restores from save",
+    "Unfilled coastal watch action opens canonical People & jobs instead of an invalid tab",
+    "Short landscape Start/Continue both reachable; Company has at least120px reading space"
+  ],
+  "errors": [],
+  "art": {
+    "source": "./assets/defense-company.jpg",
+    "alt": "",
+    "loading": "lazy",
+    "height": 80,
+    "naturalWidth": 2172
+  },
+  "combat": {
+    "before": [
+      {
+        "id": "unit-1",
+        "hp": 70,
+        "x": 0,
+        "z": 3
+      },
+      {
+        "id": "unit-2",
+        "hp": 70,
+        "x": -1,
+        "z": 3
+      },
+      {
+        "id": "unit-3",
+        "hp": 42,
+        "x": 1,
+        "z": 3
+      },
+      {
+        "id": "unit-4",
+        "hp": 46,
+        "x": 0,
+        "z": -2
+      }
+    ],
+    "company": [
+      {
+        "id": "unit-1",
+        "hp": 59.565218,
+        "status": "active",
+        "x": 0,
+        "z": 3,
+        "order": {
+          "type": "defend",
+          "x": 0,
+          "z": 3,
+          "anchor": {
+            "x": 0,
+            "z": 3
+          }
+        }
+      },
+      {
+        "id": "unit-2",
+        "hp": 70,
+        "status": "active",
+        "x": -1,
+        "z": 3,
+        "order": {
+          "type": "defend",
+          "x": -1,
+          "z": 3,
+          "anchor": {
+            "x": 0,
+            "z": 3
+          }
+        }
+      },
+      {
+        "id": "unit-3",
+        "hp": 42,
+        "status": "active",
+        "x": 1,
+        "z": 3,
+        "order": {
+          "type": "defend",
+          "x": 1,
+          "z": 3,
+          "anchor": {
+            "x": 0,
+            "z": 3
+          }
+        }
+      }
+    ],
+    "outcome": {
+      "spawned": 1,
+      "killed": 1,
+      "escaped": 0,
+      "cargoLost": 0,
+      "uncertain": false,
+      "completed": true
+    },
+    "valid": true
+  },
+  "shortReadingHeight": 185,
+  "passed": true
+}

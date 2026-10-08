@@ -1,0 +1,41 @@
+/* Company commands share one selection across the roster, squads and island. */
+#frontier-content .company-selection{padding:12px;margin-bottom:12px}
+#frontier-content .company-selection h3{font-size:24px;margin:0 0 5px}
+#frontier-content .company-stance{font-size:12px;font-weight:600;color:#365d43;margin:0 0 10px}
+#frontier-content .company-order-help{font-size:11px;line-height:1.5;margin:10px 0 0}
+#frontier-content .company-selection .frontier-actions{gap:6px;margin-top:8px}
+#frontier-panel .frontier-actions button,#frontier-panel .frontier-unit>button,#frontier-panel .frontier-choice select,#frontier-panel summary,#frontier-command button{min-height:44px;min-width:44px;touch-action:manipulation}
+#frontier-panel .frontier-heading button,#frontier-panel .frontier-tabs button{min-height:44px;min-width:44px}
+#frontier-panel .frontier-unit>button:first-child{min-height:56px;padding:10px 12px;border:1px solid transparent}
+#frontier-panel .frontier-unit>button[aria-pressed=true]{border-color:#779269;box-shadow:inset 3px 0 #4d754d}
+#frontier-panel .frontier-unit>button:first-child strong{font-size:13px}
+#frontier-panel .frontier-unit>button:first-child small{font-size:11px}
+#frontier-panel .company-squads{margin:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#frontier-panel .company-squads>summary{cursor:pointer;align-content:center;padding:10px 0;font-size:13px;font-weight:600}
+#frontier-panel .company-squads .frontier-row{padding:10px 0}
+#frontier-panel .company-squads .frontier-intro{font-size:11px;margin:0 0 10px}
+#frontier-panel .company-art{display:block;width:100%;height:auto;max-height:100px;object-fit:contain;margin:10px 0;border-radius:5px}
+#frontier-panel :focus-visible,#frontier-command :focus-visible{outline:2px solid #376846;outline-offset:2px}
+#frontier-command [data-frontier-action=finish-selection]{background:#365d43;color:#fff5df}
+#frontier-panel [data-frontier-action=open-town-watch]{min-height:44px;padding:9px 12px;background:#dbe2c7;border-radius:4px;font-size:11px}
+#town-book .watch-defense-context{padding:10px 12px;margin-bottom:12px;background:#e4e7d5;border-radius:5px;font-size:11px;line-height:1.5}
+#town-book .watch-defense-context button{min-height:44px;min-width:44px;padding:9px 12px;font-size:11px}
+.frontier-selection-mode #world{cursor:cell!important}
+@media(max-width:1200px){#frontier-panel .company-art{max-height:80px}}
+@media(max-width:520px){
+ #frontier-content .company-selection{padding:10px}
+ #frontier-content .company-selection .frontier-actions button{flex:1 1 auto}
+ #frontier-command{flex-wrap:wrap}
+ #frontier-command>div{flex:1 0 100%}
+}
+@media(max-height:600px){
+ #hud #frontier-panel{top:max(8px,env(safe-area-inset-top));z-index:85;background:#f5eedd}
+ #frontier-panel .frontier-heading{padding:4px 12px}
+ #frontier-panel .frontier-heading h2{font-size:20px}
+ #frontier-panel .frontier-heading button{width:44px;height:44px}
+ #frontier-panel .frontier-tabs{padding:3px 8px}
+ #frontier-panel .frontier-tabs button{min-height:44px}
+ #frontier-content{padding:8px 12px 16px}
+ #frontier-panel .company-art{display:none}
+ #frontier-command p{font-size:10px}
+}
