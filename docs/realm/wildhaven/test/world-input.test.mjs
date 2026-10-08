@@ -10,9 +10,9 @@ function input() {
   const canvas = new EventTarget(); canvas.setPointerCapture = () => {};
   const taps = [], hovers = [], pans = [], zooms = [];
   const world = Object.create(VillageWorld.prototype);
-  Object.assign(world, { canvas, zoom: 20, height: 800, pick: (x, z) => ({ x, z }),
+  Object.assign(world, { canvas, zoom: 20, targetZoom: 20, height: 800, pick: (x, z) => ({ x, z }),
     onTap: (...args) => taps.push(args), onHover: (...args) => hovers.push(args),
-    moveCamera: (...args) => pans.push(args), zoomBy: value => zooms.push(value) });
+    moveCamera: (...args) => pans.push(args), onCamera: () => zooms.push(world.targetZoom) });
   world.bindInput();
   const send = (type, pointerId = 1, x = 10, y = 10, pointerType = 'touch') => {
     const event = new Event(type, { cancelable: true });

@@ -26,5 +26,6 @@ export function buildingPurpose(type, level = 1) {
     flow.append(el('span', 'purpose-benefit', output));
   }
   card.append(flow, el('small', 'purpose-staff', `${facts.staffing}${facts.input.length || facts.output.length ? ' · base / minute when supplied' : ''}`), el('span', 'purpose-short-use', facts.next), el('span', 'purpose-next', facts.payoff));
+  if (facts.chain) card.append(el('span', 'purpose-chain', facts.chain));
   return card;
 }

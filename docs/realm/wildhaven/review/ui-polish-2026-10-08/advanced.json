@@ -1,0 +1,15 @@
+{
+  "fixture": "Engineering UI fixtures based on the historical earned campaign-foundation save: tools/cloth removed and later milestones cleared to expose requirements; synthetic overlapping threat clocks.",
+  "errors": [],
+  "objective": "−\nCare for a growing town\n\nMade or imported tools enter town stores automatically. A toolmaker produces them; a supplied market can import them.\n\n✓\nWelcome residents\n76 / 40 residents\n○\nKeep tools in stock\n0 / 12 tools\n○\nKeep cloth in stock\n0 / 12 cloth\n✓\nStaff and supply a market hall\n2 / 1 buildings\n○\nStaff and supply a clinic\n0 / 1 buildings\n✓\nWater reaches housing\n81 / 50%\n○\nHealthcare reaches housing\n0 / 40%\n\nProduction idea: Iron mine → Smithy → Toolmaker → Tools\n\n3 of 7 requirements complete\nFind tools",
+  "cloth": "Cloth\n0 / 700\n+7 / min\n\nFlax field → Weaver → Cloth. Staff both workplaces; the weaver needs flax. Finished cloth enters stores automatically for homes, clinics and trade.\n\nView flax field\nView weaver\nBuy cloth · view quote",
+  "clothAction": {
+    "inspector": true,
+    "research": "The town stores"
+  },
+  "inspectorPress": {
+    "before": 2,
+    "after": 1
+  },
+  "threat": "Raid in 1m · Sails in 4m 29s"
+}

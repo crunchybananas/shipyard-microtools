@@ -1,0 +1,14 @@
+{
+  "heldPress": {
+    "connected": true,
+    "before": 2,
+    "after": 3
+  },
+  "cancelledPress": true,
+  "fieldbookPress": true,
+  "mapNodes": 15,
+  "researchDetails": "Research & town paths",
+  "safetyLink": true,
+  "visitNavigation": 6,
+  "errors": []
+}
