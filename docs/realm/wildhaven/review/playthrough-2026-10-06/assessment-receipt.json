@@ -1,0 +1,243 @@
+{
+  "sourceCommit": "c3bbc7a03f86ca4de76d23b36d1dad1adc2a49a8",
+  "url": "https://crunchybananas.github.io/shipyard-microtools/realm/wildhaven/",
+  "method": "Real clicks, normal 1x/3x wall-clock controls, isolated Chrome. LocalStorage read for observations. No review API, injected resources/positions/population or accelerated review clock. Phone context reused this session's own earned storage state.",
+  "outcome": {
+    "at": "2026-10-07T00:30:17.307Z",
+    "url": "https://crunchybananas.github.io/shipyard-microtools/realm/wildhaven/",
+    "errors": [],
+    "failed": [],
+    "day": 5,
+    "population": 14,
+    "elapsed": 384.0512,
+    "won": true,
+    "restored": [
+      {
+        "id": "waystone",
+        "status": "restored",
+        "surveyProgress": 22,
+        "project": "restore",
+        "progress": 38,
+        "reportedBy": "Finn",
+        "reportedDay": 2,
+        "finishedBy": "Finn",
+        "finishedDay": 2,
+        "received": {}
+      }
+    ],
+    "buildings": [
+      {
+        "id": "hearth",
+        "type": "hearth",
+        "status": "ready"
+      },
+      {
+        "id": "bell",
+        "type": "bell",
+        "status": "ready"
+      },
+      {
+        "id": "b1",
+        "type": "cottage",
+        "status": "ready"
+      },
+      {
+        "id": "b2",
+        "type": "orchard",
+        "status": "ready"
+      },
+      {
+        "id": "b3",
+        "type": "quarry",
+        "status": "ready"
+      },
+      {
+        "id": "b4",
+        "type": "lumber",
+        "status": "ready"
+      },
+      {
+        "id": "b5",
+        "type": "cottage",
+        "status": "ready"
+      },
+      {
+        "id": "b6",
+        "type": "cottage",
+        "status": "ready"
+      },
+      {
+        "id": "b7",
+        "type": "garden",
+        "status": "ready"
+      }
+    ],
+    "fpsSample": "60"
+  },
+  "simulationTests": {
+    "passed": 126,
+    "failed": 0
+  },
+  "saveReturn": {
+    "equalCoreFields": {
+      "resources": true,
+      "citizens": true,
+      "population": true,
+      "day": true,
+      "time": true,
+      "subsecond": true,
+      "elapsed": true,
+      "morale": true,
+      "won": true,
+      "research": true,
+      "policies": true,
+      "contracts": true,
+      "routes": true,
+      "imports": true,
+      "milestones": true,
+      "discovery": true,
+      "pressure": true,
+      "frontier": true
+    },
+    "journalBefore": 17,
+    "journalAfter": 1,
+    "queueMetadataReset": true
+  },
+  "screenshots": [
+    {
+      "file": "01-fresh-desktop.png",
+      "sha256": "2fc0784521b3bb0ba10ffb814b5506886c688239158c838fcd94d782234e264e"
+    },
+    {
+      "file": "02-cottage-preview.png",
+      "sha256": "a798b6943c632730b24ff11bb98a725597e1569b21253c34a1c8c79e243cfd7f"
+    },
+    {
+      "file": "03-paused-construction.png",
+      "sha256": "8955777a29963a03eadb5c2150df63ef5d7a26915452a2ebb5e9aa33968f006b"
+    },
+    {
+      "file": "04-building-in-progress.png",
+      "sha256": "9b23d60304b27c1ac405a2695be88caf403b0380230d4ddc11d40159e21bced6"
+    },
+    {
+      "file": "05-first-jobs.png",
+      "sha256": "67755c14911f6966dfaf3a97901b8b6c8991109bc7ab377bc408f7e6adac8527"
+    },
+    {
+      "file": "06-first-economy.png",
+      "sha256": "f8d91a69000f1cd4f5c42ba4e3f167e1551c4adbd8a92ee90a1b64c068e8c9a2"
+    },
+    {
+      "file": "07-workforce-choice.png",
+      "sha256": "e0646201d8f4302c86e03bfabef37722de0d69c556d833342a094e22bb1830c2"
+    },
+    {
+      "file": "08-first-fieldbook.png",
+      "sha256": "370cba3c4c5b31ec54b6af00df14e0a0ee91abb7558152e6468fbf74b7cce65e"
+    },
+    {
+      "file": "09-surveyor-assigned-paused.png",
+      "sha256": "ab33d9a409f1ea58403bd8a019ba2711d5aa3f8a349afc520597886127f23d83"
+    },
+    {
+      "file": "10-surveyor-moving.png",
+      "sha256": "bfb6a752d0fd5ba3b0507c64a9852729049e0320c24745d34f92cbb548f9affb"
+    },
+    {
+      "file": "11-first-survey-report.png",
+      "sha256": "d496d1f39c2d1632566e1a328284623717b2c1f294b56a471c6455ef7a16fbe8"
+    },
+    {
+      "file": "12-restoration-in-progress.png",
+      "sha256": "ff61157437cc29533f3fda48ea1dafccdd6a7238cb31d5e17f4023d2aa4cfda2"
+    },
+    {
+      "file": "13-restoration-resumed.png",
+      "sha256": "f706a5f98fa3c725826fdb28916b902fd54caa4adf4c71e9011c4e8f309fc1ac"
+    },
+    {
+      "file": "14-restored-waystone.png",
+      "sha256": "05c36f28d25d01779c6819d28f88423d187c707e76597f7ac1536d9af7ec62da"
+    },
+    {
+      "file": "15-neighborhood-grown.png",
+      "sha256": "67c93353840b1ba9b83020d6bc079c2a86b5528c75def732cde56e25cbd7b9ea"
+    },
+    {
+      "file": "16-trade-first-screen.png",
+      "sha256": "3b20adb8d0ea2f565bc1871cf3583c36539a6ce2478f35a25a806b9a5fc95aa6"
+    },
+    {
+      "file": "17-bell-ready.png",
+      "sha256": "86732a38213eeabc3ff71c99c854351695e1c67f7ac5f58b582a9d779a775f0f"
+    },
+    {
+      "file": "18-bell-milestone.png",
+      "sha256": "6d4bc8dd932a800f08cc85551a50c808181d3373ff4ed03bbaad23c7ae5218db"
+    },
+    {
+      "file": "19-journal-before-return.png",
+      "sha256": "8af0db835cb971a96762e15e3b4deb3ef88088d7124e7bd3e9add827670d1a3b"
+    },
+    {
+      "file": "20-journal-after-return.png",
+      "sha256": "00de379bbe0f774b3c81c06a13ad290b379df71c6dd1be41c65e2a47275faa62"
+    },
+    {
+      "file": "21-phone-earned-village.png",
+      "sha256": "5b26c14c5ac992fc887599814dfe0d1ed99c7110cc67e883a7e0edc22de192f3"
+    },
+    {
+      "file": "22-phone-fieldbook.png",
+      "sha256": "da40e42f7c615b2de9f4605b78095643675a33f209394f5da491d3d70ed0af9b"
+    },
+    {
+      "file": "23-phone-build-mode.png",
+      "sha256": "b98941e1884700fee986073eff29cf47f7d6adc8854a4f6a0fe401e39050a83d"
+    },
+    {
+      "file": "24-phone-after-gestures.png",
+      "sha256": "5e028bc19bf1b8bf8c7309818c63ef97d2853cea85988074be8b2d95afcc7ec5"
+    },
+    {
+      "file": "25-phone-placement.png",
+      "sha256": "9e620f846d44110f16469c5f0f4b1b7a38c660fc658413a0bb0283270023c977"
+    },
+    {
+      "file": "26-phone-trade.png",
+      "sha256": "8470e52c52b3d374fd7237c2d269e277968ac65bd2603ef9e04ab1668c421878"
+    },
+    {
+      "file": "27-short-phone-trade.png",
+      "sha256": "4768b9944a653b525e890aa275e03a45c90ec9cfcf4456365e3209d31b3d12cc"
+    },
+    {
+      "file": "28-short-phone-fieldbook.png",
+      "sha256": "a5e49bbc7a7746a9775e101648aa9a92ffbf0ef0e24a99f50071ce14b5277347"
+    },
+    {
+      "file": "29-short-phone-fieldbook-scrolled.png",
+      "sha256": "4756c9ca8ce6b1c1332a8805c2cbdfb8d2a08d6c5259d7da2eb9ef980e863274"
+    },
+    {
+      "file": "30-worker-motion-0.png",
+      "sha256": "1304e65770f003f4b02b43e9758135bbc7fafad8aa08d1cea080b36be7ca67c0"
+    },
+    {
+      "file": "30-worker-motion-1.png",
+      "sha256": "a5c8f3f0055e78f62c21a268da2290e77f1a427812bf45c5ac1ad24c9bd29b4b"
+    },
+    {
+      "file": "30-worker-motion-2.png",
+      "sha256": "ef3bf1dcc10a68e2cafc0f994e86685734b430e9a03068ab2f660967d30d98d1"
+    },
+    {
+      "file": "30-worker-motion-3.png",
+      "sha256": "854aa499cf8eb130311e6577072f8e1e4b0e07f0fb2f3a201710e5ee6773dedf"
+    }
+  ],
+  "runtimeEdits": false,
+  "deployed": false,
+  "ownership": "No open PRs at start. Publishing PR151 complete. No supported active local session lookup available; no runtime source edits attempted. Separate pinned checkout preserves other work."
+}
