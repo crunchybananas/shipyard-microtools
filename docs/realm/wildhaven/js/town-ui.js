@@ -69,6 +69,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       main.append(el('strong', '', `${job.name} · level ${b.level}`), el('small', '', `${job.workers} working / ${job.desired} wanted · ${JOBS[BUILDINGS[b.type].job]?.plural || 'Workers'}`));
       top.append(image(job.type), main, stepper(job.desired, 0, job.max, `staff-${job.id}`, count => action(() => sim.setWorkers(state, job.id, count))));
       row.append(top, el('p', '', job.names.join(', ') || 'No residents assigned'));
+      if (b.type === 'lumber') { const grove = sim.woodlandStatus(state, b); row.append(el('p', 'town-meta', `${grove.mature} mature trees · ${grove.saplings} saplings · ${grove.stumps} stumps. Automatic replanting · 3-minute growth at 1×.`)); }
       if (status.blockedReason) row.append(el('p', 'problem', status.blockedReason));
       const controls = el('div', 'town-row-actions'); controls.append(btn(b.paused ? 'Resume work' : 'Rest workers', `rest-${b.id}`, () => action(() => sim.pauseBuilding(state, b.id, !b.paused))), btn(b.type === 'hearth' ? 'Reserve gatherers' : b.priority < 10 ? 'Priority: high' : 'Raise priority', `priority-${b.id}`, () => action(() => sim.setPriority(state, b.id, b.priority < 10 ? 10 : 0)), { disabled: b.type === 'hearth' }), btn('Find workplace', `find-${b.id}`, () => { close(); inspect(b); }, { className: 'small-button quiet' }));
       row.append(controls); nodes.push(row);
@@ -267,7 +268,8 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
         control.append(label, step); row.append(control);
         const names = state.citizens.filter(c => c.workplace === b.id && c.job === 'guard').map(c => c.name);
         row.append(el('p', 'guard-names', names.length ? `On the watch: ${names.join(', ')}` : 'No residents assigned here.'), el('p', 'town-meta', `${Math.round(perMinute(daily.buildings[b.id]?.input.food || 0) * 10) / 10} food/min for watch supplies · ${Math.round(perMinute(spec.recipe.input.food) * 10) / 10} at full staffing`));
-        if (status.blockedReason) row.append(el('p', 'problem', status.blockedReason));
+        if (b.type === 'lumber') { const grove = sim.woodlandStatus(state, b); row.append(el('p', 'town-meta', `${grove.mature} mature trees · ${grove.saplings} saplings · ${grove.stumps} stumps. Automatic replanting · 3-minute growth at 1×.`)); }
+      if (status.blockedReason) row.append(el('p', 'problem', status.blockedReason));
         if (status.workers < status.desiredWorkers) row.append(el('p', 'problem', 'Requested posts are unfilled. Free residents from other work or raise this workplace’s priority.'));
         const controls = el('div', 'town-row-actions');
         if (b.paused) controls.append(btn('Resume this watch house', `watch-resume-${b.id}`, () => action(() => sim.pauseBuilding(state, b.id, false))));
