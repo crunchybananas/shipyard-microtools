@@ -1,3 +1,5 @@
+import { createReadingClock } from './reading-clock.js';
+import { treeState, SAPLING_SECONDS } from './woodland.js';
 import { calendarDay, calendarFraction, perMinute, perMinuteGoods, until } from './calendar.js';
 import { createFieldbook } from './fieldbook-ui.js';
 import { isFieldworker } from './discovery.js';
@@ -29,6 +31,13 @@ let tool = null, hovered = null, rotation = 0, selected = null, icons = {}, uiCl
 let touchPlacement = false, touchSite = null;
 let soundEnabled = false, storageAvailable = true, victorySeen = false, world, town, frontierUI, fieldbook, companionUI, category = 'beginnings';
 const keys = new Set();
+const readingClock = createReadingClock();
+function updateReadingPause() {
+  const reading = ['town-book','fieldbook','frontier-panel','journal','companion-panel'].some(id => { const panel = $(id); return panel && !panel.hidden; });
+  const before = speed; speed = readingClock.observe(!!reading);
+  $('reading-pause').hidden = !playing || !readingClock.held;
+  if (speed !== before) updateUI();
+}
 let lastInspectorSignature = '', currentNextStep = null, soundMix={effects:.8,ambience:.55};
 let objectiveBeforeTablet = !matchMedia('(max-width:760px)').matches;
 function closeBuildDrawer() { document.body.classList.remove('tablet-build-open'); $('tablet-build-toggle')?.setAttribute('aria-expanded', 'false'); }
@@ -73,7 +82,7 @@ function sync() { sim.refreshTown(state); world.sync(state); updateUI(); save();
 function mutate(result, cue='build') { if (!companions.canManage) return; if (result?.ok) { sync(); audio.play(cue); } else audio.play('error'); announce(result?.reason, !result?.ok); }
 function newVillage() { if (!companions.canManage) return; saved = null; state = sim.createGame(); victorySeen = false; enter(); announce('Six neighbors, two builders. Give them a roof, then a living.'); }
 function enter(resuming = false) {
-  playing = true; tool = null; selected = null; speed = resuming ? 0 : 1; previousSpeed = 1;
+  playing = true; tool = null; selected = null; speed = resuming ? 0 : 1; previousSpeed = 1; readingClock.reset(speed);
   touchPlacement = false; touchSite = null; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); $('confirm-building').hidden = true;
   $('intro').hidden = true; $('hud').hidden = false;
   document.querySelectorAll('dialog').forEach(d => d.close());
@@ -127,6 +136,11 @@ function tap(tile, pointer = {}) {
     }
     commitBuilding(tile);
   } else {
+    if (tile.tree) {
+      companionUI?.close(); frontierUI?.close(); fieldbook?.close(); town.close(); cancelTool(); closeInspector();
+      selected = { id: tile.tree.id, type: 'tree', tree: tile.tree }; $('inspector').hidden = false; updateInspector(); return;
+    }
+    if (tile.scenery) { closeInspector(); return; }
     if (tile.citizen) { focusCitizen(tile.citizen); return; }
     if (tile.landmark === 'landing' || (tile.x === 2 && tile.z >= 7)) { inspectLanding(); return; }
     const building = sim.getBuildingAt(state, tile.x, tile.z);
@@ -150,13 +164,21 @@ function focusCitizen(citizen) {
 }
 function updateInspector() {
   if (!selected) return;
-  const signature = JSON.stringify([selected.id, selected.type, state.day, state.population, speed === 0,
+  const signature = JSON.stringify([selected.id, selected.type, state.day, state.population, speed === 0, state.woodland,
     state.buildings.map(b => [b.id, b.level, b.status, b.progress, b.workerIds, b.desiredWorkers, b.paused, b.restored, Math.round((b.production?.efficiency || 0) * 100), b.production?.blockedReason]),
     Object.values(state.resources).map(Math.floor), state.research.completed,
     selected.type === 'citizen' ? [state.citizens.find(c => c.id === selected.id),world.actors.find(a=>a.citizen.id===selected.id)?.root.userData.workState,world.actors.find(a=>a.citizen.id===selected.id)?.parcel.visible] : null]);
   if (signature === lastInspectorSignature) return;
   lastInspectorSignature = signature;
   $('inspect-secondary').hidden = true; $('inspect-action').disabled = false; $('inspect-focus').hidden = false; $('inspect-purpose').replaceChildren();
+  if (selected.type === 'tree') {
+    const tree = treeState(state, selected.id);
+    $('inspect-title').textContent = tree.growth < 0 ? 'A cut stump' : tree.growth < SAPLING_SECONDS ? 'A young sapling' : 'Island woodland';
+    $('inspect-kind').textContent = 'A living timber reserve'; $('inspect-image').hidden = true; $('inspect-focus').hidden = true; $('inspect-management').replaceChildren();
+    $('inspect-description').textContent = tree.growth < 0 ? 'A woodcutter harvested this tree. A staffed yard tending this grove will plant its replacement.' : tree.growth < SAPLING_SECONDS ? `Planted for the next harvest. Mature in ${Math.ceil(SAPLING_SECONDS-tree.growth)} seconds at 1×.` : `${Math.ceil(tree.wood)} timber remains in this tree. Nearby woodcutters share its stock.`;
+    $('inspect-detail').textContent = 'Woodcutters tend their nearest 12 trees, replanting every stump. Saplings take 3 minutes to mature. Forest ground stays reserved for woodland.';
+    $('inspect-action').textContent = 'Plan a woodcutter'; return;
+  }
   if (selected.type === 'landing') {
     $('inspect-title').textContent = 'The landing'; $('inspect-kind').textContent = 'A town beyond the horizon';
     $('inspect-description').textContent = 'Supply skiffs bring materials. Coastal neighbors place orders. Research navigation to send cargo along the coast.';
@@ -198,6 +220,11 @@ function updateInspector() {
       if (home) details.push(['water', 'health', 'community'].map(k => `${k}: ${Math.round((home.coverage[k] || 0) * 100)}%`).join(' · ') + '.');
     }
     if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
+    if (selected.type === 'lumber') {
+      const grove = sim.woodlandStatus(state, selected);
+      details.push(`${grove.mature} mature trees · ${grove.saplings} saplings · ${grove.stumps} stumps. Workers replant automatically; saplings mature in 3 minutes at 1×.`);
+      $('inspect-secondary').hidden = false; $('inspect-secondary').textContent = 'Find the working grove';
+    }
     if (spec.service) {
       const reach = world.showServiceArea(selected.type, selected, selected.level, { label: !matchMedia('(pointer: coarse)').matches });
       if (reach) details.push(`✓ ${reach.inRangeHomes} homes in reach · − ${reach.outsideHomes} outside. ${Math.round(reach.allocatedBeds || 0)} beds served / ${Math.round(reach.capacity || 0)} supplied capacity. Radius ${reach.radius}.`);
@@ -218,7 +245,7 @@ function updateShelf() {
   }
 }
 function updateUI() {
-  if (!companions.canManage) speed = 0;
+  if (!companions.canManage) speed = readingClock.choose(0);
   const daily = sim.rates(state), ambition = sim.objective(state), needs = sim.villageNeeds(state);
   for (const key of ['wood','stone','food']) { $(key).textContent = format(state.resources[key]); $(`${key}-rate`).textContent = `${rateFormat(perMinute(daily[key]))}/min`; $(`${key}-rate`).classList.toggle('negative', daily[key] < 0); }
   $('people').innerHTML = `${state.population} <em>/ ${daily.capacity}</em>`;
@@ -250,7 +277,7 @@ function updateUI() {
   $('journal-entries').replaceChildren(...state.events.map(event => { const item = document.createElement('li'), label = document.createElement('small'); label.textContent = `Day ${calendarDay(state, event.day)}`; item.append(label, document.createTextNode(event.text)); return item; }));
   updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); if (tool && hovered) hover(hovered);
 }
-function setSpeed(value) { if (value > 0 && !companions.canManage) { announce(companions.readOnly ? 'This is a paused visit. Take the chair to manage this local town.' : companions.reason, true); return; } speed = value; if (value > 0) previousSpeed = value; updateUI(); audio.play('select'); }
+function setSpeed(value) { if (value > 0 && !companions.canManage) { announce(companions.readOnly ? 'This is a paused visit. Take the chair to manage this local town.' : companions.reason, true); return; } speed = readingClock.choose(value); $('reading-pause').hidden = true; if (value > 0) previousSpeed = value; updateUI(); audio.play('select'); }
 function togglePause() { setSpeed(speed === 0 ? previousSpeed : 0); }
 function toggleAudio() { soundEnabled = !soundEnabled; audio.mute(!soundEnabled); if (soundEnabled) audio.start(); updateAudio(); try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ sound: soundEnabled, effects:audio.effectsLevel,ambience:audio.ambienceLevel })); } catch {} }
 function updateAudio() { $('sound').setAttribute('aria-pressed', String(soundEnabled)); $('sound').setAttribute('aria-label', soundEnabled ? 'Mute sound' : 'Enable sound'); $('sound').title = soundEnabled ? 'Mute sound' : 'Enable sound'; $('intro-sound').textContent = soundEnabled ? 'Sound is on' : 'Sound is off';$('mixer-toggle').textContent=soundEnabled?'Mute the island':'Enable sound';$('mixer-toggle').setAttribute('aria-pressed',String(soundEnabled)); }
@@ -303,6 +330,7 @@ function bind() {
   for(const key of ['effects','ambience']){const input=$('mix-'+key);input.value=audio[key+'Level']*100;input.oninput=()=>{audio.setMix({[key]:Number(input.value)/100});try{localStorage.setItem(SETTINGS_KEY,JSON.stringify({sound:soundEnabled,effects:audio.effectsLevel,ambience:audio.ambienceLevel}));}catch{}};}
   $('sound-preview').onclick=async()=>{if(!soundEnabled)toggleAudio();await audio.start();audio.effect('anvil',{gain:.7,pan:-.3});};
   $('sound').onclick = toggleAudio; $('intro-sound').onclick = toggleAudio;
+  $('keep-running').onclick = () => setSpeed(previousSpeed);
   $('pause').onclick = togglePause; for (const b of document.querySelectorAll('[data-speed]')) b.onclick = () => setSpeed(Number(b.dataset.speed));
   $('home').onclick = () => world.home(); $('turn-left').onclick = () => world.rotate(-1); $('turn-right').onclick = () => world.rotate(1); $('zoom-in').onclick = () => world.zoomBy(-3); $('zoom-out').onclick = () => world.zoomBy(3);
   $('cancel-building').onclick = cancelTool; $('rotate-building').onclick = () => { rotation = (rotation + 1) % 4; if (hovered) hover(hovered); };
@@ -310,12 +338,13 @@ function bind() {
   $('close-inspector').onclick = closeInspector; $('inspect-focus').onclick = () => selected && world.focus(selected);
   $('inspect-action').onclick = () => {
     if (!selected || !companions.canManage) return;
+    if (selected.type === 'tree') { useTool('lumber'); return; }
     if (selected.type === 'landing' || selected.type === 'citizen') { town.open(selected.type === 'landing' ? 'trade' : 'workforce'); return; }
     if (selected.status !== 'ready') { mutate(sim.cancelConstruction(state, selected.id)); return; }
     if (selected.type === 'bell') { if (selected.restored) { audio.play('bell'); announce('The bell carries all the way across the water.'); } else mutate(sim.build(state, 'bell', 0, -5)); return; }
     const result = sim.demolish(state, selected.id); if (result.ok) closeInspector(); mutate(result);
   };
-  $('inspect-secondary').onclick = () => { const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
+  $('inspect-secondary').onclick = () => { if (selected?.type === 'lumber') { const site = sim.woodlandStatus(state, selected).target; if (site) { closeInspector(); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
   $('landing-button').onclick = () => { cancelTool(); town.open('trade'); };
   $('undo').onclick = () => { if (companions.canManage) mutate(sim.undo(state)); };
   $('find-bell').onclick = () => { const b = state.buildings.find(b => b.type === 'bell'); inspect(b); world.focus(b); };
@@ -355,6 +384,7 @@ async function boot() {
     world = new VillageWorld($('world'), { onHover: hover, onTap: tap, onSound:(kind,options)=>{if(playing&&speed>0)audio.effect(kind,options);}, onCamera: () => { if (tool && hovered) hover(hovered); } });
     let last = performance.now(), frames = 0, total = 0;
     function frame(now) { requestAnimationFrame(frame); const wallDt = (now - last) / 1000, dt = Math.min(wallDt, .08); last = now; if (document.hidden) return;
+      if (playing) updateReadingPause();
       const modal = !!document.querySelector('dialog[open]');
       if (playing && !modal) {
         let dx = 0, dz = 0; if (keys.has('KeyA') || keys.has('ArrowLeft')) dx -= 1; if (keys.has('KeyD') || keys.has('ArrowRight')) dx += 1; if (keys.has('KeyW') || keys.has('ArrowUp')) dz -= 1; if (keys.has('KeyS') || keys.has('ArrowDown')) dz += 1;

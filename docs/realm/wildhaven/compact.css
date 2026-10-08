@@ -86,3 +86,8 @@ body.tablet-build-open #hud #build-shelf .build-choice{flex-basis:106px;min-widt
 @media(max-width:520px){
  #hud #inspector{left:12px;right:12px;top:auto;bottom:var(--tablet-dock-clearance);width:auto;max-height:36dvh}
 }
+
+/* Reading never silently consumes village time. Explicit speed choices win. */
+#reading-pause{position:fixed;z-index:75;bottom:calc(env(safe-area-inset-bottom) + 80px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);width:max-content;padding:7px 10px;border-radius:10px;background:#f8f0dceF;box-shadow:0 3px 16px #263e3829;font-size:11px;color:#304c40}
+#reading-pause[hidden]{display:none}#reading-pause button{padding:7px 10px;white-space:nowrap;border-radius:7px;background:#3b6051;color:#fff9e9;font-size:11px}
+@media(max-width:520px){#reading-pause{bottom:calc(env(safe-area-inset-bottom) + 74px);font-size:10px;gap:6px}}

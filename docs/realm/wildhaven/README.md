@@ -28,7 +28,7 @@ Open [Wildhaven](http://127.0.0.1:4751/wildhaven/). No install, build step, CDN 
 4. Staff a school or deliver coastal orders to earn knowledge. Research branches unlock farming, joinery, metalwork, textiles, navigation, public services and the watch. A town charter favors harvests, industry or trade, with stated costs and disadvantages.
 5. Upgrade homes and workplaces using crafted goods. Upgrades enter the same construction queue and close production until finished. Existing residents retain their beds during a home upgrade. Cottages provide 4, 7, then 10 beds; upgraded cottages have a new two-story model.
 
-A day is 90 seconds at 1×. Pause freely or use 3×. Building placement explains siting, cost and work; inspection shows staff, inputs, output, shortages and upgrades. The construction book supports reorder, pause and proportional unused-material refunds. Completed buildings salvage 75% of invested materials; occupied housing is protected.
+A calendar day is six minutes at 1×; the existing 90-second economy cycle is unchanged. Pause freely or use 3×. Building placement explains siting, cost and work; inspection shows staff, inputs, output, shortages and upgrades. The construction book supports reorder, pause and proportional unused-material refunds. Completed buildings salvage 75% of invested materials; occupied housing is protected.
 
 ## Production, neighborhoods and the coast
 
@@ -112,3 +112,16 @@ V4 saves remain compatible. A validated calendar epoch preserves the current day
 Build and Town are now available in the bottom dock on all devices. The building catalogue opens on request and closes during placement. Home camera control lives beside the camera buttons; the large title is removed from the HUD. Generated transparent painted resource icons replace the CSS resource shapes. Their source prompt is in `assets/resource-icons-prompt.txt`; model-derived building and landmark thumbnails remain actual views of the 3D assets.
 
 The entry document versions its styles and native import-map module URLs together. Bump the shared `v` token in `index.html` for runtime releases so cached modules cannot mix old and new interface behavior. The 3D vendor library remains unchanged.
+
+
+## Living woodland and deliberate controls (October 7, 2026)
+
+Woodcutters draw timber from the nearest twelve original island trees. Those trees have shared stock (8 timber each): overlapping yards cannot harvest the same stock twice. Exhausting a tree leaves a visible stump. A staffed, ready yard automatically replants its stumps (12 person-seconds per sapling); a planted sapling grows independently for 180 seconds at 1× before it can yield timber again. A yard can still work at a distance, retaining the previous forest adjacency bonus. Hearth gatherers retain their small recovery supply of loose wood. Forest ground remains reserved; felling does not open a construction shortcut through the existing navigation mesh. This pass visualizes harvesting and regrowth; resident routes still use the yard's chopping stations rather than individual tree visits.
+
+Woodland history is optional, validated data in the existing v4 envelope. Older saves receive mature woodland without changing resources, dates or assignments. Inspection of a tree shows stock or growth; woodcutter inspection and the workforce book show mature trees, saplings and stumps. The axe attachment turns the blade about the shaft, preserving the grip and vertical cutting plane.
+
+Opening Town, Fieldbook, Frontier, Journal or Companion pauses simulation while reading and restores the previous speed when all reading screens close. A visible notice offers Run while open. Explicit speed choices override that automatic hold; a manually paused village stays paused. Construction placement and ordinary inspection continue at the chosen speed.
+
+World selection uses the nearest rendered physical surface, including tree and rock instances and terrain. Invisible ancestors, hidden carried props, zero-opacity materials, non-depth-writing cues, dead units and clipped construction geometry cannot intercept a click. Trees expose their own inspection instead of selecting a resident hidden behind them.
+
+Validation: 228 Node tests, including shared forest stock, depletion/regrowth, save migration, explicit/manual reading-clock choices, 17 real Three.js picking cases and the authored GLB axe across a swing. Runtime import-map and CSS tokens use 20261007-living-woodland.
