@@ -33,5 +33,7 @@
  #hud #town-book .town-book-heading h2{font-size:21px;margin:0}
  #hud #town-book #close-town-book{width:44px;height:44px;min-height:44px}
  #hud #town-book #town-tabs{padding:0 12px 4px}
+ #hud #town-book>#reading-pause{position:static;inset:auto;transform:none;flex:0 0 auto;justify-content:space-between;max-width:none;width:auto;margin:0 12px 4px;padding:4px 8px;border-radius:5px;box-shadow:none;background:#e4e8d3;font-size:11px;line-height:1.3}
+ #hud #town-book>#reading-pause button{min-height:44px}
  #hud #town-book #town-book-content{padding:8px 12px}
 }
