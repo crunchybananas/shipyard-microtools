@@ -47,7 +47,7 @@ export const RESEARCH = Object.freeze({
   public_health: { name: 'Clean linen', branch: 'civic', tier: 3, cost: { knowledge: 45, gold: 20, tools: 6 }, duration: 180, prerequisites: ['civic_order', 'logistics'], unlocks: ['clinic'], description: 'Open supplied clinics using local or imported linen. Better household practice reduces food consumption by 5%.', effects: { foodConsumption: 0.95 } },
   coastal_routes: { name: 'Coastal partnerships', branch: 'mercantile', tier: 3, cost: { knowledge: 40, gold: 20, tools: 4 }, duration: 180, prerequisites: ['logistics'], unlocks: [], description: 'Send cargo to harbors that trust your deliveries. Improve landing terms and contract or voyage coin by another 10%.', effects: { tradeReward: 1.1 } },
   mastercraft: { name: 'Master workshops', branch: 'industry', tier: 3, cost: { knowledge: 60, gold: 30, tools: 8 }, duration: 240, prerequisites: ['metallurgy', 'textiles'], unlocks: [], description: 'Unlock level-three upgrades. Industry workshops produce 12% more from the same materials.', effects: { industryProduction: 1.12 } },
-  town_charter: { name: 'The island charter', branch: 'civic', tier: 3, cost: { knowledge: 70, gold: 40, tools: 10 }, duration: 240, prerequisites: ['civic_order', 'logistics'], unlocks: ['manor'], description: 'Build a town hall and choose one binding charter: Breadbasket, Free Port, or Forge Town. Each has a cost as well as an advantage.', effects: {} },
+  town_charter: { name: 'The island charter', branch: 'civic', tier: 3, cost: { knowledge: 70, gold: 40, tools: 10 }, duration: 240, prerequisites: ['civic_order', 'logistics'], unlocks: ['manor'], description: 'Unlock the town hall and choose one binding charter: Breadbasket, Free Port, or Forge Town. You can choose a charter before building the hall. Each has a cost as well as an advantage.', effects: {} },
   navigation: { name: 'Beyond the headland', branch: 'defense', tier: 3, cost: { knowledge: 70, gold: 50, tools: 12 }, duration: 270, prerequisites: ['coastal_routes', 'watchkeeping'], unlocks: [], description: 'Open distant routes that require trusted partners and staffed guards. Prepared escorts raise readiness by another 15%.', effects: { defense: 1.15 } },
 });
 
@@ -103,8 +103,27 @@ export function createProgressionState() {
     contracts: { offers: [], active: [], completed: 0, failed: 0, nextId: 1, offerDay: 0 },
     routes: { active: [], completed: 0, nextId: 1, reputation: {} },
     imports: { day: 1, used: {}, completed: 0, exportsCompleted: 0, byResource: {}, exported: {} },
-    milestones: [], progressionDay: 0,
+    milestones: [], progressionDay: 0, guidance: { goal: null, firstBread: null },
   };
+}
+
+/** Optional guidance never manufactures a production milestone from current stock. */
+function normalizeGuidance(state) {
+  const input = state.guidance && typeof state.guidance === 'object' && !Array.isArray(state.guidance) ? state.guidance : {};
+  const bread = input.firstBread;
+  const validBread = bread && typeof bread === 'object' && !Array.isArray(bread)
+    && Number.isInteger(bread.day) && bread.day >= 1 && bread.day <= dayOf(state)
+    && typeof bread.buildingId === 'string' && /^b[1-9][0-9]{0,8}$/.test(bread.buildingId);
+  state.guidance = { goal: input.goal === 'first_bread' ? input.goal : null,
+    firstBread: validBread ? { day: bread.day, buildingId: bread.buildingId } : null };
+}
+
+/** A reversible plan. Charter decisions and all resources remain unchanged. */
+export function setTownGoal(state, goal) {
+  if (goal !== null && goal !== 'first_bread') return failure('Choose the first-bread goal or clear the current plan.');
+  normalizeGuidance(state);
+  state.guidance.goal = goal;
+  return { ok: true, reason: goal ? 'Work toward the town’s first bread.' : 'The town plan is cleared.' };
 }
 
 /** Normalize only owned progression fields; never replace citizens or buildings. */
@@ -113,6 +132,7 @@ export function normalizeProgression(state) {
   // UI option reads must never truncate the simulation's authoritative stock.
   for (const resource of RESOURCE_NAMES) state.resources[resource] = Math.max(0, number(state.resources[resource]));
   const defaults = createProgressionState();
+  normalizeGuidance(state);
   state.research = state.research && typeof state.research === 'object' ? state.research : defaults.research;
   state.research.completed = [...new Set((Array.isArray(state.research.completed) ? state.research.completed : []).filter(id => typeof id === 'string' && own(RESEARCH, id)))];
   const active = state.research.active;

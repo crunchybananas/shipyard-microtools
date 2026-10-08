@@ -2,6 +2,7 @@ import { RESEARCH } from './progression.js';
 
 /** The next unfinished prerequisite that can actually be studied. Reads only. */
 export function nextPathResearch(state) {
+  if (!state.research?.completed?.includes('town_charter') && RESEARCH[state.research?.active?.id]) return state.research.active.id;
   const completed = new Set(state.research?.completed || []), available = [];
   function visit(id) {
     if (completed.has(id)) return;

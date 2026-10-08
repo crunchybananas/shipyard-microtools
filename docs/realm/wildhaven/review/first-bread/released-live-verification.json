@@ -1,0 +1,19 @@
+{
+  "sha": "5e15c48c503fa06d191323fc8eced89902a8d127",
+  "run": 37566857248,
+  "checks": [
+    "Live bytes match merged source: js/main.js",
+    "Live bytes match merged source: js/world.js",
+    "Live bytes match merged source: js/town-ui.js",
+    "Live bytes match merged source: js/research-map.js",
+    "Live bytes match merged source: js/companion-store.js",
+    "Live bytes match merged source: tablet.css",
+    "Live bytes match merged source: research-map.css",
+    "Live 15-node/19-edge research map opens on tablet landscape",
+    "Tools storage explanation links to the actual import quote"
+  ],
+  "errors": [],
+  "failed": [],
+  "passed": true,
+  "at": "2026-10-07T03:31:03.132Z"
+}

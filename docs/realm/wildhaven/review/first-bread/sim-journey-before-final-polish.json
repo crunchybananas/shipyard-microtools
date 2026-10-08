@@ -1,0 +1,847 @@
+{
+  "method": "In-memory simulation from an authentic browser-earned Day 5 bell-town save. This journey was not browser played. Every construction and research action uses normal game APIs and pays full costs; no resources, discoveries, citizens or buildings are injected.",
+  "input": {
+    "file": "sim-authentic-day5-save.json",
+    "sha256": "baa2dbd53b23eb980e4ae992d389f59ee64d3a0e43fe7237c7b63197a07e5faf",
+    "originalPath": "Wildhaven-playthrough/earned-final-save.json",
+    "day": 5,
+    "population": 14
+  },
+  "sourceHashes": {
+    "sim.js": "b77f4027231e52544c2a248aaf126a1de853577c39924b519af2962e140f9569",
+    "catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "progression.js": "9d5d87cfe5aa4850213ef13bd6e49095bd5280bcaca902a650b8a3ca38eb89aa",
+    "bread-guide.js": "20f38fca72f47ad9ba2f3ab978c4a4478dae73ca6704b22e51b8209a081d5011"
+  },
+  "result": {
+    "passed": true,
+    "simulatedSeconds": 781,
+    "day": 13,
+    "population": 18,
+    "minimumFood": 40.905931,
+    "firstBread": {
+      "day": 13,
+      "buildingId": "b12"
+    },
+    "resources": {
+      "wood": 15.501878,
+      "stone": 81.812612,
+      "food": 175.479327,
+      "grain": 109.874933,
+      "flour": 5.003333,
+      "planks": 34.816358,
+      "ore": 0,
+      "iron": 0,
+      "tools": 0,
+      "flax": 0,
+      "cloth": 0,
+      "ale": 0,
+      "gold": 30,
+      "knowledge": 13.62564
+    },
+    "researchCompleted": [
+      "joinery",
+      "cultivation",
+      "milling"
+    ],
+    "staffingInterventions": 0,
+    "foodStayedPositive": true
+  },
+  "actions": [
+    {
+      "second": 0,
+      "action": "setTownGoal",
+      "goal": "first_bread",
+      "cost": {}
+    },
+    {
+      "second": 17,
+      "action": "build",
+      "type": "school",
+      "buildingId": "b8",
+      "site": {
+        "x": -3,
+        "z": -9,
+        "rotation": 0
+      },
+      "cost": {
+        "wood": 18,
+        "stone": 12
+      }
+    },
+    {
+      "second": 140,
+      "action": "startResearch",
+      "id": "joinery",
+      "cost": {
+        "knowledge": 12
+      }
+    },
+    {
+      "second": 215,
+      "action": "build",
+      "type": "sawmill",
+      "buildingId": "b9",
+      "site": {
+        "x": -2,
+        "z": -9,
+        "rotation": 0
+      },
+      "cost": {
+        "wood": 24,
+        "stone": 12
+      }
+    },
+    {
+      "second": 294,
+      "action": "startResearch",
+      "id": "cultivation",
+      "cost": {
+        "knowledge": 12
+      }
+    },
+    {
+      "second": 369,
+      "action": "build",
+      "type": "farm",
+      "buildingId": "b10",
+      "site": {
+        "x": -1,
+        "z": -9,
+        "rotation": 0
+      },
+      "cost": {
+        "wood": 18,
+        "stone": 6
+      }
+    },
+    {
+      "second": 611,
+      "action": "startResearch",
+      "id": "milling",
+      "cost": {
+        "gold": 8,
+        "knowledge": 25
+      }
+    },
+    {
+      "second": 729,
+      "action": "build",
+      "type": "windmill",
+      "buildingId": "b11",
+      "site": {
+        "x": 0,
+        "z": -9,
+        "rotation": 0
+      },
+      "cost": {
+        "wood": 22,
+        "stone": 18,
+        "planks": 6
+      }
+    },
+    {
+      "second": 756,
+      "action": "build",
+      "type": "bakery",
+      "buildingId": "b12",
+      "site": {
+        "x": 1,
+        "z": -9,
+        "rotation": 0
+      },
+      "cost": {
+        "wood": 12,
+        "stone": 20,
+        "planks": 8
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "second": 0,
+      "day": 5,
+      "population": 14,
+      "step": {
+        "count": "14.6 / 18 timber",
+        "title": "Timber for schoolhouse",
+        "description": "3.5 more timber needed. Your town adds 19.2 per day; keep the supply running.",
+        "label": "View town stores",
+        "resource": "wood",
+        "progress": 0.8097508888888889
+      },
+      "resources": {
+        "wood": 14.575516,
+        "stone": 16.450896,
+        "food": 40.905931,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 4
+      },
+      "foodRate": 20.156834,
+      "idle": 5
+    },
+    {
+      "second": 17,
+      "day": 5,
+      "population": 14,
+      "step": {
+        "count": "18 timber · 12 stone · 0 food · 0 grain · 0 flour · 0 planks · 0 iron ore · 0 iron · 0 tools · 0 flax · 0 cloth · 0 ale · 0 coin · 0 knowledge",
+        "title": "Build a schoolhouse",
+        "description": "Scholars need food and available residents. They earn knowledge and advance the one project you choose.",
+        "label": "Plan schoolhouse",
+        "type": "school"
+      },
+      "resources": {
+        "wood": 18.199297,
+        "stone": 19.322777,
+        "food": 46.831489,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 4
+      },
+      "foodRate": 20.184389,
+      "idle": 5
+    },
+    {
+      "second": 18,
+      "day": 5,
+      "population": 14,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Finish the schoolhouse",
+        "description": "The crew shares your residents with other jobs. Projects shows its queue position and progress.",
+        "label": "View projects",
+        "tab": "construction",
+        "progress": 0.04929388888888889
+      },
+      "resources": {
+        "wood": 0.412566,
+        "stone": 7.491795,
+        "food": 47.180224,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 4
+      },
+      "foodRate": 20.186112,
+      "idle": 3
+    },
+    {
+      "second": 38,
+      "day": 5,
+      "population": 14,
+      "step": {
+        "count": "4.1 / 12 knowledge",
+        "title": "Knowledge for timber framing",
+        "description": "8 more knowledge needed. Your town adds 7 per day; keep the supply running.",
+        "label": "View town stores",
+        "resource": "knowledge",
+        "progress": 0.33981483333333334
+      },
+      "resources": {
+        "wood": 4.680413,
+        "stone": 10.874091,
+        "food": 54.136712,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 4.077778
+      },
+      "foodRate": 18.220556,
+      "idle": 3
+    },
+    {
+      "second": 140,
+      "day": 6,
+      "population": 16,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Learn timber framing",
+        "description": "Season timber into planks. Builders complete their work 10% faster. Open the quote to choose whether to pay and begin.",
+        "label": "View Timber framing",
+        "researchId": "joinery"
+      },
+      "resources": {
+        "wood": 26.519399,
+        "stone": 28.181414,
+        "food": 68.374044,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 12.03381
+      },
+      "foodRate": 16.784889,
+      "idle": 5
+    },
+    {
+      "second": 141,
+      "day": 6,
+      "population": 16,
+      "step": {
+        "count": "1% learned",
+        "title": "Learning timber framing",
+        "description": "This discovery moves your bread chain forward. Supplied scholars advance it.",
+        "label": "View current research",
+        "researchId": "joinery",
+        "progress": 0.013409629629629629
+      },
+      "resources": {
+        "wood": 26.734111,
+        "stone": 28.351571,
+        "food": 68.702783,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 0.112033
+      },
+      "foodRate": 16.7865,
+      "idle": 5
+    },
+    {
+      "second": 215,
+      "day": 7,
+      "population": 18,
+      "step": {
+        "count": "24 timber · 12 stone · 0 food · 0 grain · 0 flour · 0 planks · 0 iron ore · 0 iron · 0 tools · 0 flax · 0 cloth · 0 ale · 0 coin · 0 knowledge",
+        "title": "Build a sawmill",
+        "description": "Timber becomes planks for your windmill and bakery. Keep the woodcutters supplied with workers.",
+        "label": "Plan sawmill",
+        "type": "sawmill"
+      },
+      "resources": {
+        "wood": 42.655326,
+        "stone": 40.968845,
+        "food": 72.279137,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 5.912513
+      },
+      "foodRate": 15.305722,
+      "idle": 7
+    },
+    {
+      "second": 216,
+      "day": 7,
+      "population": 18,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Finish the sawmill",
+        "description": "The crew shares your residents with other jobs. Projects shows its queue position and progress.",
+        "label": "View projects",
+        "tab": "construction",
+        "progress": 0.044414054545454544
+      },
+      "resources": {
+        "wood": 18.870103,
+        "stone": 29.139085,
+        "food": 72.607404,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 5.990291
+      },
+      "foodRate": 15.144056,
+      "idle": 5
+    },
+    {
+      "second": 238,
+      "day": 7,
+      "population": 18,
+      "step": {
+        "count": "7.8 / 12 knowledge",
+        "title": "Knowledge for fieldcraft",
+        "description": "4.3 more knowledge needed. Your town adds 7.1 per day; keep the supply running.",
+        "label": "View town stores",
+        "resource": "knowledge",
+        "progress": 0.6418746666666667
+      },
+      "resources": {
+        "wood": 23.464848,
+        "stone": 32.886724,
+        "food": 79.833812,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0.088889,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 7.702496
+      },
+      "foodRate": 15.1795,
+      "idle": 5
+    },
+    {
+      "second": 294,
+      "day": 8,
+      "population": 18,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Learn fieldcraft",
+        "description": "Grow grain, and improve the yield of grain farms and kitchen gardens by 10%. Open the quote to choose whether to pay and begin.",
+        "label": "View Fieldcraft",
+        "researchId": "cultivation"
+      },
+      "resources": {
+        "wood": 28.047083,
+        "stone": 42.446391,
+        "food": 83.867405,
+        "grain": 0,
+        "flour": 0,
+        "planks": 5.074549,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 12.070271
+      },
+      "foodRate": 15.269721,
+      "idle": 5
+    },
+    {
+      "second": 295,
+      "day": 8,
+      "population": 18,
+      "step": {
+        "count": "1% learned",
+        "title": "Learning fieldcraft",
+        "description": "This discovery moves your bread chain forward. Supplied scholars advance it.",
+        "label": "View current research",
+        "researchId": "cultivation",
+        "progress": 0.013391851851851853
+      },
+      "resources": {
+        "wood": 28.129032,
+        "stone": 42.617364,
+        "food": 84.197087,
+        "grain": 0,
+        "flour": 0,
+        "planks": 5.163719,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 0.14839
+      },
+      "foodRate": 15.271333,
+      "idle": 5
+    },
+    {
+      "second": 369,
+      "day": 9,
+      "population": 18,
+      "step": {
+        "count": "18 timber · 6 stone · 0 food · 0 grain · 0 flour · 0 planks · 0 iron ore · 0 iron · 0 tools · 0 flax · 0 cloth · 0 ale · 0 coin · 0 knowledge",
+        "title": "Build a grain farm",
+        "description": "Grain feeds a windmill, not residents directly. Keep your orchard or garden working until bread is ready.",
+        "label": "Plan grain farm",
+        "type": "farm"
+      },
+      "resources": {
+        "wood": 34.20523,
+        "stone": 55.295002,
+        "food": 94.243192,
+        "grain": 0,
+        "flour": 0,
+        "planks": 11.77603,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 5.941197
+      },
+      "foodRate": 15.390556,
+      "idle": 5
+    },
+    {
+      "second": 370,
+      "day": 9,
+      "population": 18,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Finish the grain farm",
+        "description": "The crew shares your residents with other jobs. Projects shows its queue position and progress.",
+        "label": "View projects",
+        "tab": "construction",
+        "progress": 0.05435108888888889
+      },
+      "resources": {
+        "wood": 16.2881,
+        "stone": 49.466383,
+        "food": 94.581224,
+        "grain": 0,
+        "flour": 0,
+        "planks": 11.864919,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 6.01964
+      },
+      "foodRate": 16.022828,
+      "idle": 3
+    },
+    {
+      "second": 388,
+      "day": 9,
+      "population": 18,
+      "step": {
+        "count": "7.5 / 25 knowledge",
+        "title": "Knowledge for flour and fire",
+        "description": "17.6 more knowledge needed. Your town adds 7.1 per day; keep the supply running.",
+        "label": "View town stores",
+        "resource": "knowledge",
+        "progress": 0.29729424000000004
+      },
+      "resources": {
+        "wood": 17.780484,
+        "stone": 52.552816,
+        "food": 100.668868,
+        "grain": 0.293833,
+        "flour": 0,
+        "planks": 13.465764,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 7.432356
+      },
+      "foodRate": 16.047528,
+      "idle": 2
+    },
+    {
+      "second": 611,
+      "day": 12,
+      "population": 18,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Learn flour and fire",
+        "description": "Connect grain fields, a windmill, and bakery ovens for a substantial food surplus. Open the quote to choose whether to pay and begin.",
+        "label": "View Flour and fire",
+        "researchId": "milling"
+      },
+      "resources": {
+        "wood": 36.380885,
+        "stone": 91.035596,
+        "food": 133.36897,
+        "grain": 66.225625,
+        "flour": 0,
+        "planks": 33.431146,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 38,
+        "knowledge": 25.050458
+      },
+      "foodRate": 16.415478,
+      "idle": 2
+    },
+    {
+      "second": 612,
+      "day": 12,
+      "population": 18,
+      "step": {
+        "count": "0% learned",
+        "title": "Learning flour and fire",
+        "description": "This discovery moves your bread chain forward. Supplied scholars advance it.",
+        "label": "View current research",
+        "researchId": "milling",
+        "progress": 0.008516666666666667
+      },
+      "resources": {
+        "wood": 36.464779,
+        "stone": 91.209202,
+        "food": 133.711382,
+        "grain": 66.523108,
+        "flour": 0,
+        "planks": 33.52123,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 0.129947
+      },
+      "foodRate": 16.417128,
+      "idle": 2
+    },
+    {
+      "second": 729,
+      "day": 13,
+      "population": 18,
+      "step": {
+        "count": "22 timber · 18 stone · 0 food · 0 grain · 0 flour · 6 planks · 0 iron ore · 0 iron · 0 tools · 0 flax · 0 cloth · 0 ale · 0 coin · 0 knowledge",
+        "title": "Build a windmill",
+        "description": "Your grain farm supplies the mill. Flour then feeds the bakery.",
+        "label": "Plan windmill",
+        "type": "windmill"
+      },
+      "resources": {
+        "wood": 46.310185,
+        "stone": 111.584969,
+        "food": 159.500202,
+        "grain": 101.441165,
+        "flour": 0,
+        "planks": 44.095142,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 9.459974
+      },
+      "foodRate": 16.610178,
+      "idle": 2
+    },
+    {
+      "second": 730,
+      "day": 13,
+      "population": 18,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Finish the windmill",
+        "description": "The crew shares your residents with other jobs. Projects shows its queue position and progress.",
+        "label": "View projects",
+        "tab": "construction",
+        "progress": 0.0376657076923077
+      },
+      "resources": {
+        "wood": 24.393722,
+        "stone": 93.759017,
+        "food": 159.842611,
+        "grain": 101.736356,
+        "flour": 0,
+        "planks": 38.185809,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 9.539973
+      },
+      "foodRate": 16.416828,
+      "idle": 0
+    },
+    {
+      "second": 756,
+      "day": 13,
+      "population": 18,
+      "step": {
+        "count": "12 timber · 20 stone · 0 food · 0 grain · 0 flour · 8 planks · 0 iron ore · 0 iron · 0 tools · 0 flax · 0 cloth · 0 ale · 0 coin · 0 knowledge",
+        "title": "Build a bakery",
+        "description": "Bakers use flour from the windmill and timber for their ovens. Bread enters the food store automatically.",
+        "label": "Plan bakery",
+        "type": "bakery"
+      },
+      "resources": {
+        "wood": 26.567201,
+        "stone": 98.287519,
+        "food": 168.751685,
+        "grain": 109.150378,
+        "flour": 0.2,
+        "planks": 40.544874,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 11.621458
+      },
+      "foodRate": 16.459728,
+      "idle": 0
+    },
+    {
+      "second": 757,
+      "day": 13,
+      "population": 18,
+      "step": {
+        "count": "Food town · first bread",
+        "title": "Finish the bakery",
+        "description": "The crew shares your residents with other jobs. Projects shows its queue position and progress.",
+        "label": "View projects",
+        "tab": "construction",
+        "progress": 0.04086396666666667
+      },
+      "resources": {
+        "wood": 14.606344,
+        "stone": 78.428434,
+        "food": 168.983312,
+        "grain": 109.179342,
+        "flour": 0.4,
+        "planks": 32.635674,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 11.701573
+      },
+      "foodRate": 6.446378,
+      "idle": 0
+    },
+    {
+      "second": 781,
+      "day": 13,
+      "population": 18,
+      "step": {
+        "count": "First bread made",
+        "title": "Your bakery made its first bread",
+        "description": "On day 13, your bakers put food into town stores. Grain → flour → bread now has a real payoff. The Food town charter is a later choice.",
+        "label": "Return to town goals",
+        "finishGoal": true,
+        "progress": 1
+      },
+      "resources": {
+        "wood": 15.501878,
+        "stone": 81.812612,
+        "food": 175.479327,
+        "grain": 109.874933,
+        "flour": 5.003333,
+        "planks": 34.816358,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 13.62564
+      },
+      "foodRate": 90.472644,
+      "idle": 0
+    }
+  ],
+  "checkpoints": {
+    "preBakery": {
+      "file": "sim-pre-bakery-save.json",
+      "sha256": "32dbdae9ab3bbff77e5aa47ca3f0a6d79f89b7a76343ba94062c1301dceee597",
+      "day": 13,
+      "population": 18
+    },
+    "firstBread": {
+      "file": "sim-first-bread-save.json",
+      "sha256": "d0d8be57f9eae9acfa6c78d0e67b8145913d8e94c43e4e4011f69255004c8469",
+      "day": 13,
+      "population": 18
+    },
+    "readyUnproduced": {
+      "file": "sim-bakery-ready-unproduced-save.json",
+      "sha256": "a8fe5e1f3be0e15306a02a4db55ff354d421c984a1232f4e10a612b73af98853",
+      "day": 13,
+      "population": 18
+    }
+  },
+  "readyUnproducedBranch": {
+    "method": "Restore the pre-bakery checkpoint, build the bakery normally at the recorded site, set priority to 100 through the supported setPriority API, and let builders finish. Priority 100 puts it behind occupied workplaces. This is a staging branch, not the uninterrupted successful journey; the UI exposes Raise priority rather than setting the numeric value to 100.",
+    "bakeryId": "b12",
+    "site": {
+      "x": 1,
+      "z": -9,
+      "rotation": 0
+    },
+    "additionalSeconds": 25,
+    "requestedBakers": 2,
+    "actualBakers": 0,
+    "priority": 100,
+    "firstBread": null,
+    "nextStep": {
+      "count": "Food town · first bread",
+      "title": "Give the bakery its workers",
+      "description": "Workers are requested, but everyone is busy. In People, rest another workplace or raise this one’s priority. Nothing is reassigned automatically.",
+      "label": "Find available workers",
+      "workforceId": "b12"
+    },
+    "browserFinish": "Follow Find available workers, then Raise priority for the bakery, and resume time. Check that actual production earns firstBread; reload to confirm persistence."
+  }
+}

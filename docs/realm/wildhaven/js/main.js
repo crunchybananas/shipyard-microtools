@@ -10,12 +10,13 @@ import { isFieldworker } from './discovery.js';
 import { VillageWorld } from './world.js';
 import * as sim from './sim.js';
 import { BUILDINGS, JOBS, RESOURCES, RESOURCE_NAMES, getBuildingSpec } from './catalog.js';
-import { canUnlockBuilding } from './progression.js';
+import { canUnlockBuilding, setTownGoal } from './progression.js';
 import { createTownUI, resourceText } from './town-ui.js';
 import { createAudio } from './audio.js';
 import { pressureOptions } from './pressure.js';
 import { createFrontierUI } from './frontier-ui.js';
 import { buildingFacts, nextTownStep } from './clarity.js';
+import { firstBreadStep } from './bread-guide.js';
 import { buildingPurpose } from './clarity-ui.js';
 import { createCompanionStore } from './companion-store.js';
 import { createCompanionUI } from './companion-ui.js';
@@ -352,21 +353,27 @@ function updateUI() {
   $('calendar-toggle').setAttribute('aria-label', `${season.name}, day ${season.day}, year ${season.year}. Open the seasonal calendar and harvest festival.`);
   $('day-progress').style.width = `${portion * 100}%`; $('village-mood').textContent = `${Math.round(daily.morale)}% morale · ${state.population >= 40 ? 'A growing town' : state.population >= 20 ? 'Finding its purpose' : 'Putting down roots'}`;
   const guidance = objectiveGuidance(state, ambition), rows = objectiveChecklist(state, ambition);
-  currentNextStep = nextTownStep(state, ambition, needs) || guidance;
-  $('objective-title').textContent = ambition.title;
+  const breadStep = firstBreadStep(state, { paused: speed === 0, daily });
+  currentNextStep = breadStep || nextTownStep(state, ambition, needs) || guidance;
+  $('objective-title').textContent = breadStep?.title || ambition.title;
   $('objective-description').textContent = currentNextStep?.description || guidance?.why || ambition.description;
   renderObjectiveChecklist(rows);
+  const checklist = $('objective-checklist'), checklistParent = breadStep ? $('objective-bigger') : $('ambition-body');
+  if (checklist.parentElement !== checklistParent) {
+    if (breadStep) checklistParent.append(checklist); else $('objective-chain').before(checklist);
+  }
   const completed = rows.filter(row => row.complete).length;
-  $('objective-bar').parentElement.hidden = !rows.length;
-  $('objective-bar').style.width = `${rows.length ? completed / rows.length * 100 : 100}%`;
-  $('objective-count').textContent = rows.length ? `${completed} of ${rows.length} requirements complete` : 'The town is yours to grow.';
+  $('objective-bar').parentElement.hidden = breadStep ? breadStep.progress === undefined : !rows.length;
+  $('objective-bar').style.width = `${Math.max(0, Math.min(1, breadStep ? breadStep.progress || 0 : rows.length ? completed / rows.length : 1)) * 100}%`;
+  $('objective-count').textContent = breadStep?.count || (rows.length ? `${completed} of ${rows.length} requirements complete` : 'The town is yours to grow.');
   $('objective-action').hidden = !currentNextStep;
   const actionLabel = currentNextStep?.label || '';
   if ($('objective-action').textContent !== actionLabel) $('objective-action').textContent = actionLabel;
-  $('objective-chain').hidden = !guidance?.chain;
+  $('objective-chain').hidden = !!breadStep || !guidance?.chain;
   $('objective-chain').textContent = guidance?.chain ? `Production idea: ${guidance.chain.join(' → ')}` : '';
-  $('objective-bigger').hidden = true;
-  $('choose-town-path').hidden = !state.won || !!state.policies.charter;
+  $('objective-bigger').hidden = !breadStep;
+  $('objective-bigger-text').textContent = `${ambition.title}: ${ambition.description}`;
+  $('choose-town-path').hidden = !state.won || !!state.policies.charter || !!state.guidance?.goal;
   const townToggle = $('tablet-town-toggle'), safety = townSafety(state);
   updateDock();
   if (townToggle) {
@@ -459,7 +466,7 @@ function bind() {
   $('landing-button').onclick = () => activateDock('landing');
   $('undo').onclick = () => { if (companions.canManage) mutate(sim.undo(state)); };
   $('find-bell').onclick = () => { const b = state.buildings.find(b => b.type === 'bell'); inspect(b); world.focus(b); };
-  $('objective-action').onclick = () => { const next = currentNextStep; if (!next) return; if (next.resource) town.revealResource(next.resource); else if (next.type) useTool(next.type); else if (next.buildingId) { const b = state.buildings.find(b => b.id === next.buildingId); inspect(b); world.focus(b); } else town.open(next.tab); };
+  $('objective-action').onclick = () => { const next = currentNextStep; if (!next) return; if (next.finishGoal) { if (companions.canManage) mutate(setTownGoal(state, null), 'select'); } else if (next.resume) setSpeed(previousSpeed); else if (next.researchId) town.revealResearch(next.researchId); else if (next.workforceId) town.revealWorkplace(next.workforceId); else if (next.resource) town.revealResource(next.resource); else if (next.type) useTool(next.type); else if (next.buildingId) { const b = state.buildings.find(b => b.id === next.buildingId); inspect(b); world.focus(b); } else town.open(next.tab); };
   $('collapse-objective').onclick = () => setObjectiveExpanded($('ambition-body').hidden);
   $('choose-town-path').onclick = () => town.revealPaths();
   $('journal-button').onclick = () => activateDock('journal'); $('close-journal').onclick = closeJournal;
@@ -507,7 +514,7 @@ async function boot() {
     }
     requestAnimationFrame(frame);
     icons = await world.load();
-    town = createTownUI({ getState: () => state, canMutate: () => companions.canManage, getPaused: () => speed === 0, resume: () => setSpeed(previousSpeed), build: useTool, openCompany: () => frontierUI.open('company'), beforeOpen: () => preparePanel('town'), mutate, inspect: b => { inspect(b); world.focus(b); }, focusCitizen, getIcons: () => icons });
+    town = createTownUI({ getState: () => state, canMutate: () => companions.canManage, getPaused: () => speed === 0, resume: () => setSpeed(previousSpeed), build: useTool, onGoalSelected: () => { setObjectiveExpanded(true); $('objective-action').focus({ preventScroll: true }); }, openCompany: () => frontierUI.open('company'), beforeOpen: () => preparePanel('town'), mutate, inspect: b => { inspect(b); world.focus(b); }, focusCitizen, getIcons: () => icons });
     frontierUI = createFrontierUI({ getState: () => state, canMutate: () => companions.canManage, mutate, getContext: () => sim.frontierContext(state), beforeOpen: () => preparePanel('frontier'), openWatch: () => town.open('watch'), focus: item => item.kind === 'region' ? world.focusRegion?.(item.id) : world.focusWorld?.(item.x, item.z, item.kind === 'neighbor' ? 23 : 14), preview: value => world.showFrontierCommand?.(value), onSelection: value => world.selectFrontier?.(value) });
     document.querySelector('.controls-hint>div').append($('frontier-toggle'));
     fieldbook=createFieldbook({getState:()=>state,canMutate:()=>companions.canManage,getPaused:()=>speed===0,resume:()=>setSpeed(previousSpeed),getContext:()=>sim.frontierContext(state),getIcons:()=>icons,mutate,beforeOpen:()=>preparePanel('fieldbook'),focus:item=>item.mark?world.focusDiscovery(item.id):world.focusWorld(item.x,item.z,12)});

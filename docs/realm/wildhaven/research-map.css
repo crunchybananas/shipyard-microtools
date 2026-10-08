@@ -14,3 +14,6 @@
 #town-book .research-map-heading h3{display:none}
 #town-book .research-map-viewport{flex:1;height:auto;min-height:100px}
 #town-book .research-map-note{margin:7px 0 0}
+
+#town-book .research-node.bread-route{border:2px solid #ac7d35;box-shadow:0 0 0 2px #ac7d351c}#town-book .bread-route-note{color:#765320;font-weight:600}
+#town-book .research-node.selected .research-node-relation{color:#f2e5bd}

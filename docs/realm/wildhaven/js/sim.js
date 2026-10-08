@@ -627,7 +627,15 @@ export function tick(state, dt) {
     const oldJobs = state.citizens.map(c => `${c.id}:${c.workplace}:${c.job}`).join('|');
     result.completed += construct(state, 1); reconcileWorkforce(state);
     result.changed = tickWoodland(state, 1) || result.changed;
-    for (const b of state.buildings) b.production = throughput(state, b, 1, true);
+    for (const b of state.buildings) {
+      const foodBefore = state.resources.food;
+      b.production = throughput(state, b, 1, true);
+      if (b.type === 'bakery' && !state.guidance.firstBread && state.resources.food > foodBefore) {
+        state.guidance.firstBread = { day: state.day, buildingId: b.id };
+        if (state.guidance.goal === 'first_bread') addEvent(state, 'The bakery has made its first bread. Fresh food is entering the town pantry.', 'milestone');
+        result.changed = true;
+      }
+    }
     const pressureResult = tickPressure(state, 1); progressionEvents(state, pressureResult); result.changed ||= pressureResult.changed;
     const beforeResearch = JSON.stringify(state.research); progressionEvents(state, tickProgression(state, 1));
     state.time++; if (state.time >= DAY_LENGTH) { result.arrivals += dawn(state); result.days++; result.newDay = true; }

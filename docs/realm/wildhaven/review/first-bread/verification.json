@@ -1,0 +1,54 @@
+{
+  "baseRelease": "5e15c48c503fa06d191323fc8eced89902a8d127",
+  "releasePullRequest": "https://github.com/crunchybananas/shipyard-microtools/pull/152",
+  "deployment": "https://github.com/crunchybananas/shipyard-microtools/actions/runs/37566857248",
+  "branch": "codex/wildhaven-first-bread",
+  "tests": {
+    "passed": 211,
+    "failed": 0,
+    "skipped": 0,
+    "command": "node --test docs/realm/wildhaven/test/*.test.mjs"
+  },
+  "lint": {
+    "passed": true,
+    "modules": 21
+  },
+  "archive": {
+    "passed": true,
+    "checks": 2020,
+    "apps": 33,
+    "stories": 9
+  },
+  "fullBrowserJourney": "browser-play.json",
+  "finalSourceBrowserChecks": "final-browser-checks.json",
+  "simulationJourney": "sim-journey-trace.json",
+  "scope": "Optional first-bread goal. No new charter effects, balance changes, network multiplayer, art, installed applications or desktop interaction.",
+  "limits": [
+    "Tablet checks emulate touch in installed Chrome; physical iPad Safari and sustained device performance remain unverified.",
+    "Full normal-clock browser journey preceded the final count/contrast/path-prompt polish; final-source targeted checks followed.",
+    "A completed legacy bakery earns proof on its next actual positive production tick; old stock or journal text cannot establish proof."
+  ],
+  "runtimeHashes": {
+    "js/audio.js": "8eaa22d36094c8aaba97412bbd1bd107267ebe4b2a646d997ef6937ef0383475",
+    "js/bread-guide.js": "bae24299dd158dc62278c0922dac8a95087de4c93758f0e4eb0fb3863d6aeeaa",
+    "js/catalog.js": "56a56c871c7c28520eec85ec92403f9ad4f25c6f157778b032d9c0f7897a4e77",
+    "js/clarity-ui.js": "cdd7374fc2427bd14cc65d5ab4b07d59b8023c4adb973d4b7e6ce1333775df6b",
+    "js/clarity.js": "ef59fc298fe5348579e8f0880a157921f5818944bb4e2c984d2e721307826967",
+    "js/companion-store.js": "c0244952939235b497bec2ca6ddb713cb33a0a1b45b6015cc857c26700bc3b74",
+    "js/companion-ui.js": "c00a1e9defd317bc4ab47ff40ad928eeb5fc5ae7bd4da52b88481eac75e6f087",
+    "js/discovery.js": "cb30c6d5ea6fb2fa9568b091ad969cb0ef030c9c6d2132748104fbe418b1826e",
+    "js/fieldbook-ui.js": "b50d8b17e6e9765063424feacdb01a797924e4baa9c38d9ef2890b5b6e468554",
+    "js/frontier-ui.js": "d90ceb12585e7a7489025022543c973f315a89be3ed92675b6c550b271694e08",
+    "js/frontier.js": "910e01edc0eb74c91c7da1c84cbeec3bd0e938c1c4451e5586340f931658a006",
+    "js/island.js": "90b1207fb8bb66de874e044f7a3e33f29d91158b36c2c34a65025ad8fde1f243",
+    "js/main.js": "117430c73bfa59c4b9e1a7e6d405098e16a00f646c6f0eb80e24f865627d3216",
+    "js/path-choice.js": "0ff37bcfd892abf1f7f3240edc80ae62f4d127e7a5aef714dd42a70279959025",
+    "js/pressure.js": "c93f4c84faa41f66c57bfb33bb4ddfd802c6c562736b6949130a430d1fd03f20",
+    "js/progression.js": "9d5d87cfe5aa4850213ef13bd6e49095bd5280bcaca902a650b8a3ca38eb89aa",
+    "js/research-map.js": "025da7a86b79cf8106109fb1c28814f4366b3d160974c6955171bd0401cdf3f5",
+    "js/sim.js": "b77f4027231e52544c2a248aaf126a1de853577c39924b519af2962e140f9569",
+    "js/town-ui.js": "149fd7e82aae4d8579246743d4d29e86834197a3372a647c998382211bf28be4",
+    "js/world-cues.js": "e9444937fca5792cc8c099d01d801314ef8f6a154dfba80c3bf28c5a8a99ed56",
+    "js/world.js": "daba9ca0f2aaa2055aca3d22de17c48daee1371d494472729e4f53a0f72d5d28"
+  }
+}

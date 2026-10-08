@@ -1,0 +1,18 @@
+{
+  "method": "Actual touch controls and normal 3x clock in installed Chrome, isolated browser storage. Started at the genuine earned Day5 bell save. Read-only snapshot, guide and projection helpers; no simulation advance, resource injection or simulator mutations.",
+  "started": "2026-10-07T03:33:53.390Z",
+  "actions": [],
+  "checks": [
+    "Free goal closes Council, expands tablet objective, focuses next action, spends nothing and grants no charter",
+    "Goal survives actual browser reload"
+  ],
+  "errors": [],
+  "failed": [],
+  "initial": {
+    "day": 5,
+    "elapsed": 384.0512,
+    "population": 14
+  },
+  "error": "locator.tap: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#objective-toggle')\u001b[22m\n\n    at /private/tmp/realm-browser-qa/wildhaven-first-bread-play.mjs:28:98",
+  "finished": "2026-10-07T03:34:25.182Z"
+}

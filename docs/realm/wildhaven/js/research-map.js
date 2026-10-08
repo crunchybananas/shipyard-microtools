@@ -1,4 +1,5 @@
 import { RESEARCH } from './progression.js';
+import { BREAD_RESEARCH } from './bread-guide.js';
 
 /** A presentation-only DAG. Columns are prerequisite depth, not the catalog tier. */
 export function researchGraph(state = {}, { selectedId = null } = {}) {
@@ -18,7 +19,7 @@ export function researchGraph(state = {}, { selectedId = null } = {}) {
     const spec = RESEARCH[id], column = depth(id), row = columns[column].indexOf(id);
     const status = completed.has(id) ? 'learned' : state.research?.active?.id === id ? 'studying' : spec.prerequisites.every(p => completed.has(p)) ? 'ready' : 'locked';
     return { id, name: spec.name, column, row, x: inset + column * (width + gapX), y: top + row * (height + gapY), width, height, status,
-      selected: id === selectedId, ancestor: ancestors.has(id), next: next.has(id) };
+      route: state.guidance?.goal === 'first_bread' && BREAD_RESEARCH.includes(id), selected: id === selectedId, ancestor: ancestors.has(id), next: next.has(id) };
   });
   const edges = ids.flatMap(to => RESEARCH[to].prerequisites.map(from => ({ from, to,
     highlighted: !!selectedId && ((ancestors.has(to) || to === selectedId) && ancestors.has(from) || from === selectedId && next.has(to)),
@@ -50,6 +51,7 @@ export function createResearchMap({ state, selectedId = null, onSelect }) {
   const graph = researchGraph(state, { selectedId }), section = el('section', 'research-map');
   section.setAttribute('aria-label', 'Research map');
   const header = el('div', 'research-map-heading'); header.append(el('h3', '', 'See where a discovery leads'), el('p', '', 'Tap a discovery for its costs and unlocks. All incoming lines are required.'));
+  if (state.guidance?.goal === 'first_bread') header.append(el('p', 'bread-route-note', 'Your bread route: Timber framing + Fieldcraft → Flour and fire. Then build and supply a grain farm, windmill and bakery.'));
   section.append(header);
   const legend = el('div', 'research-map-legend');
   for (const key of Object.keys(STATUS)) legend.append(el('span', `map-status-${key}`, STATUS[key]));
@@ -71,12 +73,13 @@ export function createResearchMap({ state, selectedId = null, onSelect }) {
     label.style.left = `${16 + column * 210}px`; canvas.append(label);
   });
   for (const node of graph.nodes) {
-    const button = el('button', `research-node map-status-${node.status}${node.selected ? ' selected' : ''}${node.ancestor ? ' ancestor' : ''}${node.next ? ' next' : ''}`);
+    const button = el('button', `research-node map-status-${node.status}${node.route ? ' bread-route' : ''}${node.selected ? ' selected' : ''}${node.ancestor ? ' ancestor' : ''}${node.next ? ' next' : ''}`);
     button.type = 'button'; button.dataset.researchNode = node.id; button.dataset.actionId = `map-node-${node.id}`;
     Object.assign(button.style, { left: `${node.x}px`, top: `${node.y}px`, width: `${node.width}px`, height: `${node.height}px` });
-    button.setAttribute('aria-label', `View ${node.name}. ${STATUS[node.status]}.`); button.setAttribute('aria-pressed', String(node.selected));
+    button.setAttribute('aria-label', `View ${node.name}. ${STATUS[node.status]}.${node.route ? ' On your first bread route.' : ''}`); button.setAttribute('aria-pressed', String(node.selected));
     button.append(el('strong', '', node.name), el('small', '', STATUS[node.status]));
-    if (node.ancestor || node.next) button.append(el('span', 'research-node-relation', node.ancestor ? 'Required before this choice' : 'Leads on from this choice'));
+    if (node.route) button.append(el('span', 'research-node-relation', 'Your bread route'));
+    else if (node.ancestor || node.next) button.append(el('span', 'research-node-relation', node.ancestor ? 'Required before this choice' : 'Leads on from this choice'));
     button.onclick = () => onSelect?.(node.id); canvas.append(button);
   }
   viewport.append(canvas); section.append(viewport);

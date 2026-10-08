@@ -132,3 +132,10 @@ test('building and selecting a research map preserves frozen town state and the 
   assert.equal(JSON.stringify(RESEARCH), catalogBefore);
   assert.deepEqual(researchGraph(state), researchGraph(state));
 });
+
+test('a remembered bread goal marks only its actual research route without filtering other discoveries', () => {
+  const graph = researchGraph({ guidance: { goal: 'first_bread' }, research: { completed: [] } });
+  assert.deepEqual(graph.nodes.filter(node => node.route).map(node => node.id).sort(), ['cultivation', 'joinery', 'milling']);
+  assert.equal(graph.nodes.length, Object.keys(RESEARCH).length);
+  assert.equal(researchGraph({ guidance: { goal: null } }).nodes.some(node => node.route), false);
+});

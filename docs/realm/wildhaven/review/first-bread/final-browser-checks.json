@@ -1,0 +1,25 @@
+{
+  "method": "Final-source focused touch checks in installed Chrome. Independent disposable browser contexts: authentic Day5 and a separately labeled normal-simulation earned, priority-staged bakery checkpoint. Real controls; no injected game resources or simulation advance.",
+  "checks": [
+    "Goal selection reveals one clear action, hides redundant path prompt and retains goal context with zero cost",
+    "Selected route label uses readable light text; all 15 discoveries remain available",
+    "Goal opens and focuses the exact People row; a 44px priority action assigns actual workers without charging resources or falsely completing the goal",
+    "Resumed staffed bakery makes real bread; portrait completion has no page overflow",
+    "Return to town goals keeps the earned first-bread record",
+    "Learned discovery directly opens its new building plan without spending until placement"
+  ],
+  "errors": [],
+  "failed": [],
+  "sourceHashes": {
+    "js/main.js": "117430c73bfa59c4b9e1a7e6d405098e16a00f646c6f0eb80e24f865627d3216",
+    "js/town-ui.js": "149fd7e82aae4d8579246743d4d29e86834197a3372a647c998382211bf28be4",
+    "js/bread-guide.js": "bae24299dd158dc62278c0922dac8a95087de4c93758f0e4eb0fb3863d6aeeaa",
+    "js/path-choice.js": "0ff37bcfd892abf1f7f3240edc80ae62f4d127e7a5aef714dd42a70279959025",
+    "js/progression.js": "9d5d87cfe5aa4850213ef13bd6e49095bd5280bcaca902a650b8a3ca38eb89aa",
+    "js/sim.js": "b77f4027231e52544c2a248aaf126a1de853577c39924b519af2962e140f9569",
+    "js/research-map.js": "025da7a86b79cf8106109fb1c28814f4366b3d160974c6955171bd0401cdf3f5",
+    "research-map.css": "cc88bc6af663d17fcf051e1ebefbe6090787590d9554c3cc1240c6bc21f3946d"
+  },
+  "passed": true,
+  "at": "2026-10-07T03:40:31.965Z"
+}

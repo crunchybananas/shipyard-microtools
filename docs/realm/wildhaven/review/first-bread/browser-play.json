@@ -1,0 +1,231 @@
+{
+  "method": "Actual touch controls and normal 3x clock in installed Chrome, isolated browser storage. Started at the genuine earned Day5 bell save. Read-only snapshot, guide and projection helpers; no simulation advance, resource injection or simulator mutations.",
+  "started": "2026-10-07T03:34:49.055Z",
+  "actions": [
+    {
+      "action": "guide",
+      "title": "Timber for schoolhouse",
+      "label": "Resume time",
+      "day": 5,
+      "elapsed": 384.0512
+    },
+    {
+      "action": "guide",
+      "title": "Build a schoolhouse",
+      "label": "Plan schoolhouse",
+      "day": 5,
+      "elapsed": 402.3171
+    },
+    {
+      "action": "place",
+      "type": "school",
+      "cell": {
+        "x": -1,
+        "z": 0
+      },
+      "day": 5
+    },
+    {
+      "action": "guide",
+      "title": "Finish the schoolhouse",
+      "label": "View projects",
+      "day": 5,
+      "elapsed": 402.6171
+    },
+    {
+      "action": "guide",
+      "title": "Knowledge for timber framing",
+      "label": "View town stores",
+      "day": 5,
+      "elapsed": 423.8664
+    },
+    {
+      "action": "guide",
+      "title": "Learn timber framing",
+      "label": "View Timber framing",
+      "day": 6,
+      "elapsed": 527.3622
+    },
+    {
+      "action": "study",
+      "id": "joinery",
+      "day": 6
+    },
+    {
+      "action": "guide",
+      "title": "Learning timber framing",
+      "label": "View current research",
+      "day": 6,
+      "elapsed": 527.8122
+    },
+    {
+      "action": "guide",
+      "title": "Build a sawmill",
+      "label": "Plan sawmill",
+      "day": 7,
+      "elapsed": 604.3593
+    },
+    {
+      "action": "place",
+      "type": "sawmill",
+      "cell": {
+        "x": -2,
+        "z": 0
+      },
+      "day": 7
+    },
+    {
+      "action": "guide",
+      "title": "Finish the sawmill",
+      "label": "View projects",
+      "day": 7,
+      "elapsed": 604.659
+    },
+    {
+      "action": "guide",
+      "title": "Knowledge for fieldcraft",
+      "label": "View town stores",
+      "day": 7,
+      "elapsed": 629.0079
+    },
+    {
+      "action": "guide",
+      "title": "Learn fieldcraft",
+      "label": "View Fieldcraft",
+      "day": 8,
+      "elapsed": 680.8059
+    },
+    {
+      "action": "study",
+      "id": "cultivation",
+      "day": 8
+    },
+    {
+      "action": "guide",
+      "title": "Learning fieldcraft",
+      "label": "View current research",
+      "day": 8,
+      "elapsed": 681.0558
+    },
+    {
+      "action": "guide",
+      "title": "Build a grain farm",
+      "label": "Plan grain farm",
+      "day": 9,
+      "elapsed": 757.7529
+    },
+    {
+      "action": "place",
+      "type": "farm",
+      "cell": {
+        "x": 2,
+        "z": 0
+      },
+      "day": 9
+    },
+    {
+      "action": "guide",
+      "title": "Finish the grain farm",
+      "label": "View projects",
+      "day": 9,
+      "elapsed": 758.103
+    },
+    {
+      "action": "guide",
+      "title": "Knowledge for flour and fire",
+      "label": "View town stores",
+      "day": 9,
+      "elapsed": 779.4021
+    },
+    {
+      "action": "guide",
+      "title": "Learn flour and fire",
+      "label": "View Flour and fire",
+      "day": 12,
+      "elapsed": 998.7429
+    },
+    {
+      "action": "study",
+      "id": "milling",
+      "day": 12
+    },
+    {
+      "action": "guide",
+      "title": "Learning flour and fire",
+      "label": "View current research",
+      "day": 12,
+      "elapsed": 999.0432
+    },
+    {
+      "action": "guide",
+      "title": "Build a windmill",
+      "label": "Plan windmill",
+      "day": 13,
+      "elapsed": 1118.6385
+    },
+    {
+      "action": "place",
+      "type": "windmill",
+      "cell": {
+        "x": -1,
+        "z": -2
+      },
+      "day": 13
+    },
+    {
+      "action": "guide",
+      "title": "Finish the windmill",
+      "label": "View projects",
+      "day": 13,
+      "elapsed": 1118.9385
+    },
+    {
+      "action": "guide",
+      "title": "Build a bakery",
+      "label": "Plan bakery",
+      "day": 13,
+      "elapsed": 1146.3873
+    },
+    {
+      "action": "place",
+      "type": "bakery",
+      "cell": {
+        "x": -1,
+        "z": 2
+      },
+      "day": 13
+    },
+    {
+      "action": "guide",
+      "title": "Finish the bakery",
+      "label": "View projects",
+      "day": 13,
+      "elapsed": 1146.6372
+    }
+  ],
+  "checks": [
+    "Free goal closes Council, expands tablet objective, focuses next action, spends nothing and grants no charter",
+    "Goal survives actual browser reload",
+    "Three bread discoveries marked in landscape and portrait research map",
+    "Actual bakery production earns one milestone; reload preserves it; return to town goals keeps proof"
+  ],
+  "errors": [],
+  "failed": [],
+  "initial": {
+    "day": 5,
+    "elapsed": 384.0512,
+    "population": 14
+  },
+  "final": {
+    "day": 14,
+    "elapsed": 1171.3365,
+    "population": 18,
+    "firstBread": {
+      "day": 14,
+      "buildingId": "b12"
+    },
+    "realSeconds": 265.332
+  },
+  "passed": true,
+  "finished": "2026-10-07T03:39:16.833Z"
+}
