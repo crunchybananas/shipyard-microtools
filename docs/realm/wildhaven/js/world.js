@@ -1,3 +1,5 @@
+import { CROPS, gardenState } from './hinterland.js';
+import { CALENDAR_DAY_SECONDS } from './calendar.js';
 import { visibleSurfaceHit } from './world-picking.js';
 import { wheelZoom, pinchZoom } from './camera-input.js';
 import { TREE_SITES, treeState, SAPLING_SECONDS, woodlandOccupancy } from './woodland.js';
@@ -105,9 +107,35 @@ export class VillageWorld {
     for(const root of frontier.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
     const living=await new GLTFLoader().loadAsync('./assets/living-kit.glb');
     for(const root of living.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
+    this.templates.set('garden', this.makeCropGarden());
     this.replaceTrees();
     this.boat = this.clone('boat'); this.boat.position.set(17, -0.1, 22); this.boat.rotation.y = -0.15; this.scene.add(this.boat);
     return this.icons();
+  }
+  makeCropGarden(){
+    const root=new THREE.Group();root.name='garden';
+    const combine=(pieces,color,name,parent=root)=>{const mesh=new THREE.Mesh(mergeGeometries(pieces),material(color));mesh.name=name;mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);for(const g of pieces)g.dispose();};
+    const wood=[];for(const x of[-.64,.64]){const g=new THREE.BoxGeometry(.09,.18,1.3);g.translate(x,.09,0);wood.push(g);}for(const z of[-.64,.64]){const g=new THREE.BoxGeometry(1.35,.18,.09);g.translate(0,.09,z);wood.push(g);}combine(wood,'#9a7850','bed_frame');
+    const soil=new THREE.BoxGeometry(1.2,.13,1.2);soil.translate(0,.065,0);combine([soil],'#685940','garden_soil');
+    for(const crop of Object.keys(CROPS)){
+      const group=new THREE.Group();group.name=`crop_${crop}`;group.position.y=.13;root.add(group);const leaves=[],fruit=[],stakes=[];
+      for(let row=0;row<3;row++)for(let col=0;col<4;col++){
+        const x=(col-1.5)*.27,z=(row-1)*.35;
+        if(crop==='beans'){const pole=new THREE.CylinderGeometry(.012,.018,.64,4);pole.translate(x,.32,z);stakes.push(pole);}
+        const height=crop==='beans'?.45:crop==='herbs'?.25:.15;
+        for(let k=0;k<3;k++){const g=new THREE.IcosahedronGeometry(crop==='herbs'?.10:.085,0);g.scale(.75,1.5,.6);g.rotateZ((k-1)*.65);g.translate(x+(k-1)*.047,height*(k+1)/3,z);leaves.push(g);}
+        const g=crop==='roots'?new THREE.ConeGeometry(.052,.15,6):new THREE.IcosahedronGeometry(.038,0);if(crop==='roots')g.rotateZ(Math.PI);g.translate(x,crop==='beans'?.34:crop==='herbs'?.27:.035,z);fruit.push(g);
+      }
+      combine(leaves,crop==='herbs'?'#759c84':crop==='beans'?'#5e895c':'#719251','leaves',group);combine(fruit,crop==='roots'?'#d2944c':crop==='beans'?'#a3b765':'#baa3c5','harvest',group);if(stakes.length)combine(stakes,'#b39264','bean_stakes',group);group.visible=crop==='roots';
+    }
+    return root;
+  }
+  updateGardenCrops(){
+    if(!this.state?.hinterland)return;
+    for(const b of this.state.buildings)if(b.type==='garden'){
+      const model=this.buildings.get(b.id);if(!model)continue;const bed=gardenState(this.state,b.id),ratio=Math.min(1,bed.progress/(CROPS[bed.crop].days*CALENDAR_DAY_SECONDS));
+      for(const crop of Object.keys(CROPS)){const rows=model.getObjectByName(`crop_${crop}`);if(rows){rows.visible=crop===bed.crop;rows.scale.y=.15+.85*ratio;}}
+    }
   }
   clone(type,level=1) { const name=type==='cottage'&&level>1?'upgrade_cottage':BUILDINGS[type]?.model||type;const template=this.templates.get(name);if(!template)throw new Error(`Missing runtime model: ${name}`);return template.clone(true); }
   terrain() {
@@ -476,10 +504,10 @@ export class VillageWorld {
     root.position.set(f.x*CELL,top,f.z*CELL);root.userData={fortification:f,model,plane,height,scaffold};this.scene.add(root);return root;
   }
   makeTroop(unit){
-    const civil=['engineer','envoy','explorer','restorer'].includes(unit.kind),type=civil?'villager':unit.kind==='archer'&&unit.faction!=='player'?'enemy_archer':['spearman','archer','raider'].includes(unit.kind)?unit.kind:'raider';
+    const civil=['engineer','envoy','explorer','restorer','ranger'].includes(unit.kind),type=civil?'villager':unit.kind==='archer'&&unit.faction!=='player'?'enemy_archer':['spearman','archer','raider'].includes(unit.kind)?unit.kind:'raider';
     const root=this.clone(type),limbs={},weapons={};root.rotation.order='YXZ';root.position.set(unit.x*CELL,groundHeight(unit.x,unit.z),unit.z*CELL);root.rotation.y=unit.yaw||0;
     root.traverse(o=>{for(const name of['left_arm','right_arm','left_leg','right_leg'])if(o.name===name||o.name.endsWith('_'+name))limbs[name]=o;for(const side of['left','right'])if(o.name.endsWith('_'+side+'_weapon'))weapons[side]=o;if(o.isMesh){o.material=o.material.clone();o.userData.ownsMaterial=true;}});
-    if(civil){this.colorCitizen(root,unit.kind);if(unit.kind==='explorer'){const pack=this.clone('cargo_grain');pack.scale.setScalar(.60);pack.position.set(0,.26,-.16);root.add(pack);}const prop=this.clone(['engineer','restorer'].includes(unit.kind)?'tool_hammer':'tool_book');prop.position.set(.04,-.17,.04);prop.rotation.x=['engineer','restorer'].includes(unit.kind)?Math.PI/2:0;limbs[['engineer','restorer'].includes(unit.kind)?'right_arm':'left_arm']?.add(prop);}
+    if(civil){this.colorCitizen(root,unit.kind);if(unit.kind==='explorer'||unit.kind==='ranger'){const pack=this.clone('cargo_grain');pack.scale.setScalar(.60);pack.position.set(0,.26,-.16);root.add(pack);}const prop=this.clone(['engineer','restorer'].includes(unit.kind)?'tool_hammer':'tool_book');prop.position.set(.04,-.17,.04);prop.rotation.x=['engineer','restorer'].includes(unit.kind)?Math.PI/2:0;limbs[['engineer','restorer'].includes(unit.kind)?'right_arm':'left_arm']?.add(prop);}
     root.userData.unit=unit;this.scene.add(root);return{root,limbs,weapons,unit,phase:0,lastX:root.position.x,lastZ:root.position.z};
   }
   syncFrontier(){
@@ -497,7 +525,7 @@ export class VillageWorld {
         root.add(model);root.position.set(spec.x*CELL,top,spec.z*CELL);const foundation=new THREE.Mesh(new THREE.BoxGeometry(4.98,top-bottom,4.98),material('#9eaa89'));foundation.position.y=-(top-bottom)/2;foundation.userData.ownsGeometry=true;root.add(foundation);
         root.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.userData.ownsMaterial=true;o.receiveShadow=true;}});this.scene.add(root);this.neighborModels.set(spec.id,root);
       }
-      root.userData={neighbor,fortification:fort,ruined};
+      root.userData={neighbor,fortification:fort,ruined};root.visible=neighbor.discovered;
     }
     const live=new Set(units.filter(u=>u.status!=='released').map(u=>u.id));for(const[id,a]of this.troops)if(!live.has(id)){this.disposePresentation(a.root);this.troops.delete(id);}
     for(const unit of units){if(unit.status==='released')continue;let actor=this.troops.get(unit.id);if(actor&&actor.unit.kind!==unit.kind){this.disposePresentation(actor.root);actor=null;}if(!actor){actor=this.makeTroop(unit);this.troops.set(unit.id,actor);}actor.unit=unit;actor.root.userData.unit=unit;}
@@ -573,8 +601,8 @@ export class VillageWorld {
       const gait=moved>.0004?Math.sin(actor.phase)*.51:0,attackAge=u.attackAt==null?Infinity:time-u.attackAt,attacking=!dead&&attackAge>=0&&attackAge<.62,archer=u.kind==='archer',wave=Math.sin(Math.min(1,attackAge/.5)*Math.PI);
       let right=-gait*.7,left=gait*.7;if(attacking){if(archer){left=-Math.PI/2;right=-1.05+wave*.6;}else if(u.kind==='spearman'){right=-Math.PI/2+wave*.24;left=-.20;}else{right=-2.15+wave*2.1;left=-.23;}}
       if(u.kind==='engineer'&&u.order?.type==='build'&&!u.path?.length){right=-1.1+Math.sin(time*4.5)*.65;left=-.25;}
-      if(u.kind==='envoy'||u.kind==='explorer')left=-.7;
-      if(isFieldworker(u)&&u.missionStage==='working'&&u.status==='active'){right=u.kind==='restorer'?-1.1+Math.sin(time*4.5)*.65:-.9+Math.sin(time*2)*.12;root.rotation.x=.05;}
+      if(u.kind==='envoy'||u.kind==='explorer'||u.kind==='ranger')left=-.7;
+      if((isFieldworker(u)||u.kind==='ranger')&&u.missionStage==='working'&&u.status==='active'){right=u.kind==='restorer'?-1.1+Math.sin(time*4.5)*.65:-.9+Math.sin(time*2)*.12;root.rotation.x=.05;}
       if(playing){if(u.attackAt!==null&&u.attackAt!==actor.lastAttack&&time-u.attackAt<.7)this.emitSound(archer?'bow':'impact',p,.9);if(u.damageAt!==null&&u.damageAt!==actor.lastDamage&&time-u.damageAt<.7)this.emitSound('impact',p,.6);const strike=Math.floor((time*4.5-Math.PI/2)/TAU);if(strike!==actor.lastStrike&&((u.kind==='engineer'&&u.order?.type==='build'&&!u.path.length)||(u.kind==='restorer'&&u.missionStage==='working')))this.emitSound('hammer',p,.7);actor.lastStrike=strike;}actor.lastAttack=u.attackAt;actor.lastDamage=u.damageAt;
       if(limbs.right_arm){limbs.right_arm.rotation.x=right;limbs.right_arm.rotation.z=attacking&&archer?-.72:0;}if(limbs.left_arm)limbs.left_arm.rotation.x=left;if(limbs.left_leg)limbs.left_leg.rotation.x=gait;if(limbs.right_leg)limbs.right_leg.rotation.x=-gait;
       if(actor.weapons.left)actor.weapons.left.rotation.x=attacking?-left:0;
@@ -1160,7 +1188,7 @@ export class VillageWorld {
       if(b.type==='bell'&&b.restored&&!this.reduced){o.traverse(n=>{if(n.name==='bell_body')n.rotation.x=Math.sin(this.clock*2)*.1;});}
     }
     if(playing&&speed>0)this.updateActors(Math.min(.1,dt)*Math.min(speed,2));
-    this.updateWorkerCues();this.updateWorldCues();
+    this.updateGardenCrops();this.updateWorkerCues();this.updateWorldCues();
     this.updateFrontier(dt,playing&&speed>0);
     this.updatePressure();
     if(this.boat){const gx=won?5.45:17,gz=won?17.3:22;this.boat.position.x+=(gx-this.boat.position.x)*Math.min(1,dt*.18);this.boat.position.z+=(gz-this.boat.position.z)*Math.min(1,dt*.18);this.boat.position.y=-.10+(this.reduced?0:Math.sin(this.clock*1.2)*.045);this.boat.rotation.z=this.reduced?0:Math.sin(this.clock*.9)*.025;}

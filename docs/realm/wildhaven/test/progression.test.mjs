@@ -438,13 +438,13 @@ test('Free Port and Breadbasket final ambitions can finish without local metal o
   const state = village(); state.milestones = Array.from({ length: 9 }, (_, index) => `chapter_${index}`);
   state.policies.charter = 'freeport'; state.research.completed = ['barter', 'logistics', 'coastal_routes'];
   state.routes.completed = 12; state.routes.reputation = { reedbank: 4, stonehaven: 4 }; state.resources.gold = 1000; state.imports.completed = 20;
-  assert.equal(progressionObjective(state).complete, true);
+  assert.equal(progressionObjective(state).step, 10);
   assert.equal(state.buildings.length, 0, 'isolated objective fixture has no forced industrial buildings');
   state.policies.charter = 'breadbasket'; state.research.completed = ['cultivation', 'milling'];
   state.imports.exported = { food: 800, grain: 240 }; state.resources.food = 300; state.resources.gold = 600;
-  assert.equal(progressionObjective(state).complete, true);
+  assert.equal(progressionObjective(state).step, 10);
   state.imports.exported.grain = 0; state.imports.exported.ale = 80;
-  assert.equal(progressionObjective(state).complete, true, 'grain and ale are alternative specialties');
+  assert.equal(progressionObjective(state).step, 10, 'grain and ale are alternative specialties; island chapters follow');
   state.imports.exported.food = 760;
   assert.equal(progressionObjective(state).specialty, 'breadbasket'); assert.equal(progressionObjective(state).complete, false);
 });

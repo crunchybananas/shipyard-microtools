@@ -27,6 +27,7 @@ export const JOBS = freeze({
   archer: { name: 'Archer', plural: 'Archers', color: '#7b9661' },
   engineer: { name: 'Frontier builder', plural: 'Frontier builders', color: '#bd9858' },
   explorer: { name: 'Surveyor', plural: 'Surveyors', color: '#598d87' },
+  ranger: { name: 'Wayfarer', plural: 'Wayfarers', color: '#658d86' },
   restorer: { name: 'Restorer', plural: 'Restorers', color: '#ba8b56' },
   envoy: { name: 'Envoy', plural: 'Envoys', color: '#b58d6b' },
   builder: { name: 'Builder', plural: 'Builders', color: '#bd9858' },
@@ -99,7 +100,7 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   garden: {
     name: 'Kitchen garden', category: 'food', model: 'garden', cost: { wood: 6, stone: 3 }, work: 20, workers: 1, job: 'farmer', shortcut: '5', recipe: recipe({}, { food: 7 }),
-    description: 'The founders brought seeds. An inexpensive food source that can rescue an empty pantry. Nearby homes lend a hand.', production: '1 gardener · 7 food / day before neighbors', upgrades: productionUpgrades(1),
+    description: 'Grow carrots, climbing beans or herbs for neighbor projects. Choose the next crop in Explore → Gardens. Everyday food production continues while the named harvest ripens. Nearby homes lend a hand.', production: '1 gardener · 7 food / day before neighbors', upgrades: productionUpgrades(1),
   },
   windmill: {
     name: 'Windmill', category: 'food', model: 'windmill', cost: { wood: 22, stone: 18, planks: 6 }, work: 65, workers: 2, job: 'miller', unlock: 'milling', shortcut: '6', recipe: recipe({ grain: 24 }, { flour: 18 }),

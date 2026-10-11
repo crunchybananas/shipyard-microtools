@@ -17,21 +17,18 @@ function fixture(guards = 0) {
     buildings: [{ id: 'watch', type: 'barracks', status: 'ready', level: 1, paused: false, production: { efficiency: guards / 3 } }],
     citizens: Array.from({ length: 20 }, (_, i) => ({ id: `c${i + 1}`, job: i < guards ? 'guard' : 'idle', workplace: i < guards ? 'watch' : null })),
   };
+  state.imports.exportsCompleted = 6;
   return state;
 }
-function warning(state) { dailyPressure(state); state.day = state.pressure.nextIncidentDay; const result = dailyPressure(state); assert.ok(pressureOptions(state).active); return result; }
+function warning(state) { state.imports.exportsCompleted += 6; state.day = Math.max(state.day,state.pressure.graceUntilDay); const result = dailyPressure(state); assert.ok(pressureOptions(state).active); return result; }
 
-test('coastal warnings require restored bell and twenty real citizens, then six minutes before warning and six to prepare', () => {
-  const state = fixture(); state.won = false; dailyPressure(state); assert.equal(state.pressure.nextIncidentDay, null);
-  state.won = true; state.citizens.pop(); dailyPressure(state); assert.equal(state.pressure.nextIncidentDay, null);
-  state.citizens.push({ id: 'c20', job: 'idle', workplace: null });
-  dailyPressure(state); assert.equal(state.pressure.nextIncidentDay, 5); assert.equal(state.pressure.active, null);
-  assert.equal(pressureOptions(state).nextWarningSeconds, COASTAL_PACING.firstWarningSeconds);
-  state.day = 4; dailyPressure(state); assert.equal(state.pressure.active, null);
-  state.day = 5; assert.match(dailyPressure(state).events[0].text, /At most/);
-  const option = pressureOptions(state).active; assert.equal(option.deadline, 9); assert.equal(option.daysLeft, 4); assert.equal(option.secondsLeft, COASTAL_PACING.warningSeconds);
-  state.time = 45; assert.equal(pressureOptions(state).active.daysLeft, 3.5);
-  state.day = 8; state.time = 0; dailyPressure(state); assert.ok(state.pressure.active);
+test('coastal trouble requires exposed trade, a restored bell and twenty people; waiting alone is safe', () => {
+  const state=fixture();state.imports.exportsCompleted=0;
+  for(let i=0;i<50;i++){state.day++;dailyPressure(state);}assert.equal(state.pressure.active,null);
+  state.imports.exportsCompleted=6;state.won=false;dailyPressure(state);assert.equal(state.pressure.active,null);
+  state.won=true;state.citizens.pop();dailyPressure(state);assert.equal(state.pressure.active,null);
+  state.citizens.push({id:'c20',job:'idle'});assert.match(dailyPressure(state).events[0].text,/6 exposed export orders/);
+  assert.equal(pressureOptions(state).active.secondsLeft,360);
 });
 
 test('paying spends the published demand once, grants no defense reward, and guarantees twelve quiet minutes', () => {
@@ -41,7 +38,7 @@ test('paying spends the published demand once, grants no defense reward, and gua
   assert.equal(actOnPressure(state, 'pay').ok, false); assert.equal(state.resources.food, before.food - option.demand.food);
   const next = state.pressure.nextIncidentDay; assert.equal(next, state.day + 8);
   for (state.day++; state.day < next; state.day++) { dailyPressure(state); assert.equal(state.pressure.active, null); }
-  dailyPressure(state); assert.equal(state.pressure.active.templateId, 'timber_runners');
+  dailyPressure(state); assert.equal(state.pressure.active,null,'Recovery time alone never causes a new demand'); state.imports.exportsCompleted+=6; dailyPressure(state); assert.equal(state.pressure.active.templateId, 'timber_runners');
 });
 
 test('an unaffordable demand and repeated shelter actions are inert', () => {
@@ -90,7 +87,7 @@ test('guard input shortages, vacancies and pauses reduce readiness and patrol wo
 });
 
 test('researched organization and actual skill change the required guard labor', () => {
-  const state = fixture(3); warning(state); actOnPressure(state, 'pay'); state.day = state.pressure.nextIncidentDay; dailyPressure(state);
+  const state = fixture(3); warning(state); actOnPressure(state, 'pay'); state.day = state.pressure.nextIncidentDay; state.imports.exportsCompleted+=6; dailyPressure(state);
   assert.equal(pressureOptions(state).active.requiredReadiness, 4);
   assert.equal(pressureOptions(state).active.canDefend, false);
   state.research.completed.push('watchkeeping', 'navigation'); state.buildings[0].production.efficiency = 1.1;
@@ -120,7 +117,7 @@ test('all four incidents rotate deterministically, scale within bounds and leave
     types.push(state.pressure.active.templateId); const option = pressureOptions(state).active;
     assert.equal(option.deadline - option.announcedDay, 4); assert.ok(option.requiredReadiness >= 3 && option.requiredReadiness <= 10);
     state.day = option.deadline; dailyPressure(state); const quiet = state.pressure.nextIncidentDay;
-    assert.equal(quiet, state.day + 8); state.day = quiet; dailyPressure(state);
+    assert.equal(quiet, state.day + 8); state.day = quiet; state.imports.exportsCompleted+=6; dailyPressure(state);
   }
   assert.deepEqual(types.slice(0, 4), types.slice(4)); assert.equal(new Set(types).size, 4);
   const large = fixture(); large.citizens = Array.from({ length: 75 }, (_, i) => ({ id: `c${i + 1}`, job: 'idle' })); warning(large);
@@ -136,7 +133,7 @@ test('canonical terms, patrol progress and one-time resolution survive normaliza
   for (const corrupt of corruptions) { const invalid = structuredClone(state); corrupt(invalid.pressure); assert.throws(() => normalizePressure(invalid)); }
   const tampered = structuredClone(state); tampered.pressure.active.reward = { gold: 100000 }; normalizePressure(tampered);
   assert.deepEqual(pressureOptions(tampered).active.reward, { gold: 12 });
-  const legacy = fixture(); delete legacy.pressure; normalizePressure(legacy); assert.deepEqual(legacy.pressure, createPressureState());
+  const legacy = fixture(); delete legacy.pressure; normalizePressure(legacy); assert.deepEqual(legacy.pressure, {...createPressureState(),tradeAnchor:legacy.imports.exportsCompleted});
 });
 
 test('legacy active warnings migrate without changing deadlines, patrols, shelter or rewards', () => {
@@ -162,7 +159,7 @@ test('legacy pending and recovery dates survive unchanged, including overdue dor
   assert.equal(dailyPressure(pending).changed, false); normalizePressure(pending);
   assert.equal(pending.pressure.nextIncidentDay, 3); assert.equal(pending.pressure.active, null);
   pending.citizens.push({ id: 'c20', job: 'idle' }); pending.population = 20;
-  dailyPressure(pending); assert.equal(pending.pressure.active.announcedDay, 8); assert.equal(pending.pressure.active.deadline, 12);
+  pending.imports.exportsCompleted+=6; dailyPressure(pending); assert.equal(pending.pressure.active.announcedDay, 8); assert.equal(pending.pressure.active.deadline, 12);
   const recovered = fixture(); warning(recovered); actOnPressure(recovered, 'pay');
   recovered.pressure.version = 1; recovered.pressure.graceUntilDay = recovered.day + 5;
   recovered.pressure.nextIncidentDay = recovered.pressure.graceUntilDay;
@@ -180,16 +177,14 @@ test('partial-cycle resolutions always grant at least twelve minutes and remain 
     const before = structuredClone(state.pressure); normalizePressure(state); assert.deepEqual(state.pressure, before);
     state.day = state.pressure.nextIncidentDay - 1; state.time = 89; state.subsecond = .75;
     dailyPressure(state); assert.equal(state.pressure.active, null);
-    state.day++; state.time = 0; state.subsecond = 0;
+    state.day++; state.time = 0; state.subsecond = 0;state.imports.exportsCompleted+=6;
     dailyPressure(state); assert.equal(pressureOptions(state).active.secondsLeft, 360);
   }
-  const initial = fixture(); initial.time = 89; initial.subsecond = .75; dailyPressure(initial);
-  assert.ok(pressureOptions(initial).nextWarningSeconds >= 360);
+  const initial=fixture();initial.imports.exportsCompleted=0;initial.time=89;initial.subsecond=.75;dailyPressure(initial);assert.equal(initial.pressure.active,null);
 });
 
 test('new cargo warnings wait through physical warnings and raids without resetting a due schedule', () => {
-  const state = fixture(); dailyPressure(state); state.day = state.pressure.nextIncidentDay;
-  const scheduled = state.pressure.nextIncidentDay;
+  const state = fixture(); const scheduled = null;
   state.frontier = { warning: { id: 'physical-warning' }, raidActive: false };
   assert.equal(dailyPressure(state).changed, false); assert.equal(pressureOptions(state).announcementDeferred, true);
   state.day += 5; normalizePressure(state);
@@ -253,7 +248,7 @@ test('cargo guidance is pure, routes real blockers, and never counts company tro
 });
 
 test('guidance finds usable watch capacity instead of pointing at an already full house', () => {
-  const state = fixture(3); warning(state); actOnPressure(state, 'pay'); state.day = state.pressure.nextIncidentDay; dailyPressure(state);
+  const state = fixture(3); warning(state); actOnPressure(state, 'pay'); state.day = state.pressure.nextIncidentDay; state.imports.exportsCompleted+=6; dailyPressure(state);
   assert.equal(pressureOptions(state).active.requiredReadiness, 4);
   assert.equal(coastalDefenseGuidance(state).nextStep.kind, 'build');
   assert.equal(coastalDefenseGuidance(state).nextStep.type, 'barracks');
@@ -292,15 +287,15 @@ test('a real saved town with an overdue dormant legacy schedule restores without
 test('real simulation pause freezes cargo time; three-times speed advances the same deterministic deadline', async () => {
   const raw = await readFile(new URL('../review/campaign-foundation-save.json', import.meta.url), 'utf8');
   const original = sim.restore(raw); assert.ok(original);
-  original.pressure = createPressureState();
+  original.pressure = createPressureState();original.imports.exportsCompleted+=6;
   dailyPressure(original);
   const normal = sim.restore(sim.serialize(original)), fast = sim.restore(sim.serialize(original));
   const clock = createReadingClock(3), before = sim.serialize(fast);
   sim.tick(fast, 30 * clock.observe(true)); assert.equal(sim.serialize(fast), before);
   sim.tick(normal, 30); sim.tick(fast, 30 * clock.observe(false));
-  const initialSeconds = pressureOptions(original).nextWarningSeconds;
-  assert.equal(pressureOptions(normal).nextWarningSeconds, initialSeconds - 30);
-  assert.equal(pressureOptions(fast).nextWarningSeconds, initialSeconds - 90);
+  const initialSeconds = pressureOptions(original).active.secondsLeft;
+  assert.equal(pressureOptions(normal).active.secondsLeft, initialSeconds - 30);
+  assert.equal(pressureOptions(fast).active.secondsLeft, initialSeconds - 90);
   const loaded = sim.restore(sim.serialize(fast)); assert.ok(loaded);
   assert.equal(loaded.pressure.nextIncidentDay, fast.pressure.nextIncidentDay);
 });
@@ -311,7 +306,10 @@ test('earned campaign integration preserves active incidents, actual labor and p
   let state = sim.restore(raw); assert.ok(state); assert.equal(state.pressure.sequence, 0);
   // The stock-target bot had released harvesters at its checkpoint; ongoing patrols need meals.
   for (const b of state.buildings.filter(b => ['barracks', 'orchard', 'garden'].includes(b.type))) sim.setWorkers(state, b.id, getBuildingSpec(b.type, b.level).workers);
-  while (!state.pressure.active) sim.tick(state, 1);
+  // Earn fresh exposure through the actual export command, without injecting goods.
+  const {exportOptions,exportGoods}=await import('../js/progression.js');
+  for(let i=0;i<40&&!state.pressure.active;i++){for(const o of exportOptions(state).filter(o=>o.ok))exportGoods(state,o.id);sim.tick(state,90);}
+  assert.ok(state.pressure.active,'Earned exports drew a coastal warning');
   sim.tick(state, 37); assert.ok(state.pressure.active.watchProgress > 0);
   const saved = sim.serialize(state), restored = sim.restore(saved); assert.ok(restored); assert.deepEqual(restored.pressure, state.pressure);
   for (let i = 0; i < 60; i++) { sim.tick(state, 1); sim.tick(restored, 1); }

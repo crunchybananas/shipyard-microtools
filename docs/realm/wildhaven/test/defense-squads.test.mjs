@@ -130,15 +130,9 @@ test('civilian and frontier construction protect the saved defensive rally cell'
   const fort=f.canPlaceFortification(state,'wall',2,2,0,ctx);assert.equal(fort.ok,false);assert.match(fort.reason,/ordered destination/);
 });
 
-test('new automatic raids use exact 540/360/900 timing from frontier involvement, without changing intentional wars',()=>{
-  const{state,ctx}=fixture();soldiers(state,ctx);state.frontier.neighbors[0].envoys=1;const unlockedAt=state.frontier.clock;advance(state,.25,ctx);
-  assert.equal(state.frontier.nextRaidAt,unlockedAt+.25+f.FRONTIER_RAID_PACING.firstWarningSeconds);
-  advance(state,539.75,ctx);assert.equal(state.frontier.warning,null);advance(state,.25,ctx);
-  const warning=copy(state.frontier.warning);assert.equal(warning.announcedAt,unlockedAt+.25+540);assert.equal(warning.attackAt-warning.announcedAt,360);
-  advance(state,359.75,ctx);assert.equal(state.frontier.raidActive,false);advance(state,.25,ctx);assert.ok(state.frontier.raidActive);
-  for(const unit of state.frontier.units.filter(u=>u.faction==='raiders')){unit.status='dead';unit.hp=0;unit.deathAt=state.frontier.clock;}state.frontier.raidOutcome.killed=state.frontier.raidOutcome.spawned;
-  advance(state,.25,ctx);assert.equal(state.frontier.nextRaidAt,state.frontier.clock+900);
-  const neighbor=state.frontier.neighbors[1];neighbor.discovered=true;assert.ok(f.declareWar(state,neighbor.id,ctx).ok);assert.equal(neighbor.nextAttackAt,state.frontier.clock+90);advance(state,90,ctx);assert.equal(neighbor.nextAttackAt,state.frontier.clock+270);
+test('peaceful contact never schedules raids, while a declared war still mobilizes an army',()=>{
+ const{state,ctx}=fixture();soldiers(state,ctx);state.frontier.neighbors[0].envoys=1;advance(state,1200,ctx);assert.equal(state.frontier.nextRaidAt,null);assert.equal(state.frontier.warning,null);
+ const n=state.frontier.neighbors[1];n.discovered=true;assert.ok(f.declareWar(state,n.id,ctx).ok);assert.equal(n.nextAttackAt,state.frontier.clock+90);advance(state,90,ctx);assert.equal(n.nextAttackAt,state.frontier.clock+270);
 });
 
 test('legacy pending warnings and scheduled dates survive reload exactly; new warning durations also validate',()=>{
@@ -149,12 +143,9 @@ test('legacy pending warnings and scheduled dates survive reload exactly; new wa
   }
 });
 
-test('only new physical announcements wait for an active coastal incident; promised landings keep their deadline',()=>{
-  const{state,ctx}=fixture();state.frontier.nextRaidAt=.25;state.pressure={active:{id:'coast'}};advance(state,4,ctx);assert.equal(state.frontier.warning,null);assert.equal(state.frontier.nextRaidAt,.25);
-  f.normalizeFrontier(copy(state),ctx);state.pressure.active=null;advance(state,.25,ctx);assert.ok(state.frontier.warning);const deadline=state.frontier.warning.attackAt;
-  state.pressure.active={id:'already-promised-coast'};advance(state,deadline-state.frontier.clock,ctx);assert.equal(state.frontier.warning,null);assert.equal(state.frontier.raidActive,true);
+test('old unannounced raid schedules stop without spawning troops',()=>{
+ const{state,ctx}=fixture();state.frontier.nextRaidAt=.25;advance(state,500,ctx);assert.equal(state.frontier.warning,null);assert.equal(state.frontier.nextRaidAt,null);assert.equal(state.frontier.raidActive,false);
 });
-
 
 test('default-context defenders route around buildings instead of bypassing normal occupancy',()=>{
   const{state,ctx}=fixture(),[unit]=soldiers(state,ctx);state.buildings.push({id:'test-cottage',type:'cottage',status:'ready',x:1,z:3});Object.assign(unit,{x:3,z:3});

@@ -26,7 +26,7 @@ function conserve(state) {
 }
 
 test('terrain stays deterministic and construction footprints fit the expanded island', () => {
-  assert.equal(listTiles().length, 57 * 47); assert.equal(terrainAt(-6, -3).kind, 'forest'); assert.equal(terrainAt(6, -4).kind, 'rock');
+  assert.equal(listTiles().length, 89 * 77); assert.equal(terrainAt(-6, -3).kind, 'forest'); assert.equal(terrainAt(6, -4).kind, 'rock');
   assert.equal(terrainAt(0, 0).kind, 'path'); assert.equal(terrainAt(0, -5).buildable, false); assert.equal(terrainAt(2, 8).buildable, false);
   assert.ok(groundHeight(0, -5) > 1.5); assert.ok(Math.abs(groundHeight(1, -3) - groundHeight(1.01, -3)) < 0.02);
   for (const tile of listTiles().filter(t => t.buildable)) for (const dx of [-.5, .5]) for (const dz of [-.5, .5]) assert.ok(isLand(tile.x + dx, tile.z + dz));
