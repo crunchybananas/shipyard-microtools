@@ -1,3 +1,4 @@
+import { explorationContent, gardensContent, neighborProjectCard, paintIslandMap } from './island-book.js';
 import { calendarDay, duration } from './calendar.js';
 import * as frontier from './frontier.js';
 import { RESOURCES } from './catalog.js';
@@ -94,7 +95,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
   const closeButton = button('×', 'close', () => close()); closeButton.setAttribute('aria-label', 'Close frontier');
   heading.append(title, closeButton);
   const tabs = el('nav', 'frontier-tabs'); tabs.setAttribute('aria-label', 'Frontier sections');
-  for (const [key, label] of [['defenses', 'Defenses'], ['company', 'Company'], ['neighbors', 'Neighbors']]) tabs.append(button(label, `tab-${key}`, () => open(key)));
+  for (const [key, label] of [['explore','Map'], ['gardens','Gardens'], ['neighbors','Neighbors'], ['company','Company'], ['defenses','Defenses']]) tabs.append(button(label, `tab-${key}`, () => open(key)));
   const content = el('div'); content.id = 'frontier-content'; content.tabIndex = 0; content.setAttribute('role', 'region'); content.setAttribute('aria-labelledby', title.id);
   const contentPress = createPressGuard(content, { onRelease: () => update() });
   panel.append(heading, tabs, content);
@@ -104,14 +105,14 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
   const buildLineButton = button('Build line', 'commit-wall-line', () => commitWallLine());
   const doneSelectionButton = button('Done', 'finish-selection', () => finishSelection(), { className: 'primary' });
   rotateButton.hidden = true; buildLineButton.hidden = true; doneSelectionButton.hidden = true; strip.append(prompt, rotateButton, buildLineButton, doneSelectionButton, button('Cancel', 'cancel-command', () => cancelCommand()));
-  const toggle = button('Frontier', 'toggle', () => tab ? close() : open('neighbors')); toggle.id = 'frontier-toggle'; toggle.setAttribute('aria-controls', panel.id); toggle.setAttribute('aria-pressed', 'false');
+  const toggle = button('Explore', 'toggle', () => tab ? close() : open('explore')); toggle.id = 'frontier-toggle'; toggle.setAttribute('aria-controls', panel.id); toggle.setAttribute('aria-pressed', 'false');
   mount.append(panel, strip, toggle);
 
   function action(fn) {
     if (!canMutate()) return { ok: false, reason: 'This town is paused for viewing.' };
     const result = fn(); mutate(result); signature = ''; confirmation = null; selectionNotice = ''; update(true); return result;
   }
-  function open(next = 'neighbors') {
+  function open(next = 'explore') {
     beforeOpen(); cancelCommand(false); tab = next; selected = null; confirmation = null;
     panel.hidden = false; toggle.setAttribute('aria-pressed', 'true'); document.body.classList.add('frontier-view-active');
     content.scrollTop = 0; signature = ''; update(true);
@@ -199,23 +200,24 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     syncSelection();
     const overview = api.frontierOptions(getState(), getContext());
     toggle.classList.toggle('threatened', !!overview.warning || overview.activeBattles > 0);
-    toggle.textContent = overview.activeBattles > 0 ? 'Frontier !' : 'Frontier';
-    toggle.setAttribute('aria-label', overview.activeBattles > 0 ? `Frontier, ${overview.activeBattles} hostile troops` : overview.warning ? 'Frontier, approaching raid' : 'Open frontier');
+    toggle.textContent = overview.activeBattles > 0 ? 'Explore !' : 'Explore';
+    toggle.setAttribute('aria-label', overview.activeBattles > 0 ? `Frontier, ${overview.activeBattles} hostile troops` : overview.warning ? 'Frontier, approaching raid' : 'Explore the island');
     if (command) updateCommand();
     if (!tab || panel.hidden || !force && contentPress.held) return;
     const state = getState();
-    const next = JSON.stringify([tab, selected, selection.ids, confirmation?.id, state.frontier, state.resources, state.research, state.day, state.population]);
+    const next = JSON.stringify([tab, selected, selection.ids, confirmation?.id, state.frontier, state.hinterland, state.resources, state.research, state.day, state.population]);
     if (!force && next === signature) return;
     signature = next;
     const active = content.contains(document.activeElement) ? document.activeElement.dataset.frontierAction : null, scroll = content.scrollTop;
     const disclosures = new Map([...content.querySelectorAll('details[data-frontier-disclosure]')].map(node => [node.dataset.frontierDisclosure, node.open]));
-    title.textContent = selected?.kind === 'troop' ? 'The field company' : selected?.kind === 'fortification' ? 'At the town boundary' : { defenses: 'Keep a way home', company: 'The field company', neighbors: 'Along the island' }[tab];
+    title.textContent = selected?.kind === 'troop' ? 'The field company' : selected?.kind === 'fortification' ? 'At the town boundary' : { explore: 'Beyond familiar paths', gardens: 'Seeds & gathering stores', defenses: 'Keep a way home', company: 'The field company', neighbors: 'Along the island' }[tab];
     tabs.querySelectorAll('button').forEach(node => node.setAttribute('aria-pressed', String(node.dataset.frontierAction === `tab-${tab}`)));
-    const nodes = tab === 'defenses' ? defensesContent(state) : tab === 'company' ? companyContent(state) : neighborsContent(state);
+    const context = {action,getContext,focus:item=>{close();focus(item);},selectRegion:id=>{selected={kind:'region',id};signature='';update(true);}};
+    const nodes = tab === 'explore' ? explorationContent(state,context,selected?.kind==='region'?selected.id:'home') : tab === 'gardens' ? gardensContent(state,context) : tab === 'defenses' ? defensesContent(state) : tab === 'company' ? companyContent(state) : neighborsContent(state);
     const alert = warningContent(overview); if (alert) nodes.unshift(alert);
     confirmContent(nodes); reconcile(content, nodes); content.scrollTop = scroll;
     for (const node of content.querySelectorAll('details[data-frontier-disclosure]')) if (disclosures.has(node.dataset.frontierDisclosure)) node.open = disclosures.get(node.dataset.frontierDisclosure);
-    if (tab === 'neighbors') paintChart(content.querySelector('.frontier-chart'), state);
+    if (tab === 'explore') paintIslandMap(content.querySelector('.island-map'), state);
     if (active) content.querySelector(`[data-frontier-action="${CSS.escape(active)}"]`)?.focus({ preventScroll: true });
   }
 
@@ -378,15 +380,16 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     nodes.push(...logContent(state)); return nodes;
   }
   function neighborsContent(state) {
-    const nodes = [islandChart(), intro('Send a resident to meet a settlement, or scout it with the company. Contact opens trade and diplomacy. Expansion needs a claim; marching across land does not make it yours.')];
+    const nodes = [intro('Meet the people who live beyond your village. Their shared projects teach new crops, improve gathering and establish coastal patrols. Requests have no deadline.')];
     for (const neighbor of api.neighborOptions(state)) {
       const chosen = selected?.kind === 'neighbor' && selected.id === neighbor.id;
       const card = row(neighbor.name, neighbor.status === 'war' || neighbor.status === 'hostile' ? 'At war' : neighbor.discovered ? neighbor.status || 'Known' : 'Uncontacted');
       card.append(el('p', '', neighbor.discovered ? `Relations ${amount(neighbor.relation)}${neighbor.nextAttackIn !== undefined && neighbor.nextAttackIn !== null ? ` · next attack in ${Math.ceil(neighbor.nextAttackIn)} seconds` : ''}` : 'Their banners are beyond the familiar paths.'));
       const envoy = neighbor.envoy;
+      card.append(neighborProjectCard(state,neighbor.id,{action,getContext,focus:item=>{close();focus(item);}}));
       if (!chosen) {
         if (!neighbor.discovered && envoy) quote(card, envoy, 'Envoy provisions');
-        controls(card, [{ label: 'Meet & negotiate', id: `neighbor-${neighbor.id}`, run: () => { selected = { kind: 'neighbor', id: neighbor.id }; update(true); } }, { label: 'Find settlement', id: `find-neighbor-${neighbor.id}`, run: () => { close(); focus({ ...neighbor, kind: 'neighbor' }); } }]);
+        controls(card, [{ label: 'Meet & negotiate', id: `neighbor-${neighbor.id}`, run: () => { selected = { kind: 'neighbor', id: neighbor.id }; update(true); } }, { label: 'Find settlement', id: `find-neighbor-${neighbor.id}`, disabled: !neighbor.discovered, run: () => { close(); focus({ ...neighbor, kind: 'neighbor' }); } }]);
       } else {
         if (neighbor.maxHp) card.append(meter(neighbor.hp, neighbor.maxHp), el('p', '', `${Math.round(neighbor.hp)} / ${neighbor.maxHp} stronghold health`));
         const choices = [
@@ -420,64 +423,6 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
       nodes.push(card);
     }
     nodes.push(...logContent(state)); return nodes;
-  }
-  function chartFrame(canvas) {
-    const width = canvas.clientWidth, height = canvas.clientHeight;
-    const spanX = ISLAND_BOUNDS.maxX - ISLAND_BOUNDS.minX + 1, spanZ = ISLAND_BOUNDS.maxZ - ISLAND_BOUNDS.minZ + 1;
-    const scale = Math.min((width - 22) / spanX, (height - 18) / spanZ);
-    return { width, height, scale, left: (width - spanX * scale) / 2, top: (height - spanZ * scale) / 2 };
-  }
-  function islandChart() {
-    const figure = el('figure', 'frontier-chart-wrap'), canvas = el('canvas', 'frontier-chart');
-    canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', 'Island chart. Tap land to look there, or use the Find settlement and Find boundary buttons below.');
-    canvas.onclick = event => {
-      const node = event.currentTarget, rect = node.getBoundingClientRect(), frame = chartFrame(node);
-      const x = (event.clientX - rect.left - frame.left) / frame.scale + ISLAND_BOUNDS.minX;
-      const z = (event.clientY - rect.top - frame.top) / frame.scale + ISLAND_BOUNDS.minZ;
-      if (isLand(x, z)) { close(); focus({ kind: 'region-point', x, z }); }
-    };
-    const caption = el('figcaption', '', 'Tap the chart to look across the island.');
-    const legend = el('div', 'frontier-chart-legend');
-    for (const [color, name] of [['#c6d092', 'Your land'], ['#92ad88', 'Unclaimed'], ['#fff0a4', 'Your company'], ['#af5946', 'Hostile']]) {
-      const label = el('span'), swatch = el('i'); swatch.style.background = color; label.append(swatch, document.createTextNode(name)); legend.append(label);
-    }
-    figure.append(canvas, caption, legend); return figure;
-  }
-  function paintChart(canvas, state) {
-    if (!canvas) return;
-    const frame = chartFrame(canvas); if (!frame.width || !frame.height) return;
-    const dpr = Math.min(2, window.devicePixelRatio || 1), width = Math.round(frame.width * dpr), height = Math.round(frame.height * dpr);
-    if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
-    const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#84aaa3'; ctx.fillRect(0, 0, frame.width, frame.height);
-    const project = (x, z) => ({ x: frame.left + (x - ISLAND_BOUNDS.minX + .5) * frame.scale, y: frame.top + (z - ISLAND_BOUNDS.minZ + .5) * frame.scale });
-    const claimed = new Set(['home', ...(state.frontier?.claims || [])]);
-    for (let z = ISLAND_BOUNDS.minZ; z <= ISLAND_BOUNDS.maxZ; z++) for (let x = ISLAND_BOUNDS.minX; x <= ISLAND_BOUNDS.maxX; x++) {
-      const tile = terrainAt(x, z); if (tile.kind === 'water') continue;
-      const point = project(x, z), ours = claimed.has(tile.regionId);
-      ctx.fillStyle = tile.kind === 'path' ? '#c8bd8d' : tile.kind === 'rock' ? '#9da69a' : tile.kind === 'forest' ? ours ? '#91a277' : '#6e8e72' : ours ? '#c6d092' : '#92ad88';
-      ctx.fillRect(point.x - frame.scale / 2, point.y - frame.scale / 2, frame.scale + .3, frame.scale + .3);
-      const neighborRegion = regionAt(x + 1, z)?.id;
-      if (neighborRegion && neighborRegion !== tile.regionId) { ctx.fillStyle = '#42665565'; ctx.fillRect(point.x + frame.scale / 2 - .5, point.y - frame.scale / 2, 1, frame.scale); }
-    }
-    ctx.font = '10px Trebuchet MS, sans-serif'; ctx.textAlign = 'center';
-    for (const region of ISLAND_REGIONS) {
-      const point = project(region.x, region.z + (region.id === 'crownhill' ? 3 : 1));
-      ctx.fillStyle = '#35594ce0'; ctx.fillText(region.name, point.x, point.y);
-    }
-    const neighbors = api.neighborOptions(state);
-    for (const site of ISLAND_NEIGHBORS) {
-      const point = project(site.x, site.z), status = neighbors.find(item => item.id === site.id)?.status;
-      ctx.fillStyle = ['war', 'hostile'].includes(status) ? '#af5946' : '#f4e8bd'; ctx.strokeStyle = '#375b4d'; ctx.lineWidth = 1.4;
-      ctx.beginPath(); ctx.arc(point.x, point.y, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.font = 'bold 10px Trebuchet MS, sans-serif'; ctx.textAlign = site.x < -8 ? 'left' : site.x > 8 ? 'right' : 'center';
-      ctx.lineWidth = 3; ctx.strokeStyle = '#d9dfb8'; ctx.strokeText(site.name, point.x, point.y - 7); ctx.fillStyle = '#315442'; ctx.fillText(site.name, point.x, point.y - 7);
-    }
-    for (const unit of api.frontierOptions(state, getContext()).units) {
-      if (['dead', 'released'].includes(unit.status)) continue;
-      const point = project(unit.x, unit.z); ctx.fillStyle = unit.faction === 'player' ? '#fff0a4' : '#af5946'; ctx.strokeStyle = '#375347'; ctx.lineWidth = .8;
-      ctx.beginPath(); ctx.arc(point.x, point.y, unit.faction === 'player' ? 2.5 : 2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    }
   }
   function commandQuote() {
     if (!command || !(command.end || hovered)) return { ok: false, reason: 'Choose a point on the island.' };
@@ -550,7 +495,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     return true;
   }
 
-  const resizeChart = () => { if (tab === 'neighbors' && !panel.hidden) paintChart(content.querySelector('.frontier-chart'), getState()); };
+  const resizeChart = () => { if(tab==='explore'&&!panel.hidden)paintIslandMap(content.querySelector('.island-map'),getState()); };
   window.addEventListener('resize', resizeChart);
 
   return {

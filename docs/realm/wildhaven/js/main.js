@@ -1,3 +1,4 @@
+import { CROPS, gardenState } from './hinterland.js';
 import { objectiveChecklist, objectiveGuidance } from './objective-checklist.js';
 import { placementInfoPosition } from './placement-layout.js';
 import { createReadingClock } from './reading-clock.js';
@@ -92,7 +93,7 @@ function activateDock(destination) {
     if (!$('journal').hidden) closeJournal();
     else { preparePanel('journal'); $('journal').hidden = false; $('journal-button').setAttribute('aria-expanded', 'true'); }
   } else if (destination === 'frontier') {
-    if (frontierUI.activeTab && !frontierUI.command) frontierUI.close(); else frontierUI.open('neighbors');
+    if (frontierUI.activeTab && !frontierUI.command) frontierUI.close(); else frontierUI.open('explore');
   } else if (destination === 'fieldbook') {
     if (fieldbook.active) fieldbook.close(); else fieldbook.open();
   } else if (destination === 'companion') {
@@ -210,6 +211,7 @@ function tap(tile, pointer = {}) {
   if (frontierUI?.command && frontierUI.handleTap(tile, pointer)) return;
   if(!tool&&tile?.discovery&&!frontierUI?.activeTab){fieldbook.open(tile.discovery.id);return;}
   if(!tool&&tile?.unit&&isFieldworker(tile.unit)){fieldbook.open(tile.unit.missionSiteId);return;}
+  if(!tool&&tile?.unit?.kind==='ranger'){frontierUI.open('explore');return;}
   if (frontierUI?.handleTap(tile, pointer)) return;
   if (!tile) { if (!tool) closeInspector(); return; }
   if (tool) {
@@ -241,6 +243,7 @@ function inspectLanding() { frontierUI?.close(); fieldbook?.close(); selected = 
 function focusCitizen(citizen) {
   const unit = state.frontier?.units.find(u => u.citizenId === citizen.id && !['dead','released'].includes(u.status));
   if(unit&&isFieldworker(unit)){fieldbook.open(unit.missionSiteId);world.focusWorld(unit.x,unit.z,14);return;}
+  if(unit?.kind==='ranger'){frontierUI.open('explore');world.focusWorld(unit.x,unit.z,14);return;}
   if (unit) { frontierUI.select('troop', unit.id); world.focusWorld?.(unit.x, unit.z, 14); return; }
   frontierUI?.close(); fieldbook?.close(); selected = { id: citizen.id, type: 'citizen' }; cancelTool(); town.close(); world.select(null); world.selectCitizen?.(citizen.id);
   const actor = world.actors.find(a => a.citizen.id === citizen.id);
@@ -305,6 +308,7 @@ function updateInspector() {
       if (home) details.push(['water', 'health', 'community'].map(k => `${k}: ${Math.round((home.coverage[k] || 0) * 100)}%`).join(' · ') + '.');
     }
     if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
+    if (selected.type === 'garden') {const bed=gardenState(state,selected.id),crop=CROPS[bed.crop];details.push(`${crop.name} growing for neighbor projects. Choose the next crop in Explore → Gardens.`);$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Choose garden crops';}
     if (selected.type === 'lumber') {
       const grove = sim.woodlandStatus(state, selected);
       details.push(`${grove.mature} mature trees · ${grove.saplings} ${grove.saplings === 1 ? 'sapling' : 'saplings'} · ${grove.stumps} ${grove.stumps === 1 ? 'stump' : 'stumps'}. Workers replant automatically; saplings mature in 3 in-game days (18 minutes at 1×).`);
@@ -479,11 +483,11 @@ function bind() {
     if (selected.type === 'bell') { if (selected.restored) { audio.play('bell'); announce('The bell carries all the way across the water.'); } else mutate(sim.build(state, 'bell', 0, -5)); return; }
     const result = sim.demolish(state, selected.id); if (result.ok) closeInspector(); mutate(result);
   };
-  $('inspect-secondary').onclick = () => { if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
+  $('inspect-secondary').onclick = () => { if(selected?.type==='garden'){frontierUI.open('gardens');return;} if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
   $('landing-button').onclick = () => activateDock('landing');
   $('undo').onclick = () => { if (companions.canManage) mutate(sim.undo(state)); };
   $('find-bell').onclick = () => { const b = state.buildings.find(b => b.type === 'bell'); inspect(b); world.focus(b); };
-  $('objective-action').onclick = () => { const next = currentNextStep; if (!next) return; if (next.finishGoal) { if (companions.canManage) mutate(setTownGoal(state, null), 'select'); } else if (next.resume) setSpeed(previousSpeed); else if (next.researchId) town.revealResearch(next.researchId); else if (next.workforceId) town.revealWorkplace(next.workforceId); else if (next.resource) town.revealResource(next.resource); else if (next.type) useTool(next.type); else if (next.buildingId) { const b = state.buildings.find(b => b.id === next.buildingId); inspect(b); world.focus(b); } else town.open(next.tab); };
+  $('objective-action').onclick = () => { const next = currentNextStep; if (!next) return; if (next.finishGoal) { if (companions.canManage) mutate(setTownGoal(state, null), 'select'); } else if (next.frontierTab) frontierUI.open(next.frontierTab); else if (next.resume) setSpeed(previousSpeed); else if (next.researchId) town.revealResearch(next.researchId); else if (next.workforceId) town.revealWorkplace(next.workforceId); else if (next.resource) town.revealResource(next.resource); else if (next.type) useTool(next.type); else if (next.buildingId) { const b = state.buildings.find(b => b.id === next.buildingId); inspect(b); world.focus(b); } else town.open(next.tab); };
   $('collapse-objective').onclick = () => setObjectiveExpanded($('ambition-body').hidden);
   $('choose-town-path').onclick = () => town.revealPaths();
   $('journal-button').onclick = () => activateDock('journal'); $('close-journal').onclick = closeJournal;
@@ -504,7 +508,7 @@ function bind() {
     if (e.code === 'KeyT') { cancelTool(); town.activeTab ? town.close() : town.open('workforce'); }
     if (e.code === 'KeyQ') world.rotate(-1); if (e.code === 'KeyE') world.rotate(1);
     if(e.code==='KeyB'){fieldbook.active?fieldbook.close():fieldbook.open();}
-    if (e.code === 'KeyF') frontierUI?.activeTab ? frontierUI.close() : frontierUI?.open('neighbors');
+    if (e.code === 'KeyF') frontierUI?.activeTab ? frontierUI.close() : frontierUI?.open('explore');
     if (e.code === 'KeyR' && !frontierUI?.rotateCommand()) $('rotate-building').click(); if (e.code === 'Home') world.home();
     if (e.key === '?' || e.code === 'KeyH') $('help').click();
     if (e.code === 'Enter' && tool && (e.target === $('world') || e.target === document.body)) tap(hovered || { x: Math.round(world.pan.x / 1.8), z: Math.round(world.pan.z / 1.8) });

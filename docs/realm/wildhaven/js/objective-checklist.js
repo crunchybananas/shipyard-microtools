@@ -1,3 +1,4 @@
+import { peacefulProjects, coastalPacts } from './hinterland.js';
 /** Read-only presentation of the existing objective rules. No progress is awarded here. */
 import { BUILDINGS, RESOURCES, getBuildingSpec } from './catalog.js';
 import { RESEARCH } from './progression.js';
@@ -56,6 +57,10 @@ function openingChecklist(state, ambition) {
       return [...Object.entries(BUILDINGS.bell.cost).map(([resource, target]) => stock(state, resource, target)),
         condition('restore-bell', 'Restore the old bell', !!bell?.restored, 'When the supplies are ready, select the bell and queue its restoration.')];
     }
+    case 10: return [row('charted-regions','Chart regions',state.frontier?.discoveredRegions.length,5,'regions'),row('gathering-trips','Bring gathering trips home',state.hinterland?.returned,3,'trips')];
+    case 11: return [row('garden-seeds','Learn garden crops',state.hinterland?.seeds.length,3,'crops'),row('helped-neighbors','Help distinct neighbors',Object.values(state.hinterland?.projects||{}).filter(p=>p.step>0).length,3,'neighbors')];
+    case 12: return [row('charted-regions','Chart regions',state.frontier?.discoveredRegions.length,9,'regions'),row('shared-projects','Complete shared projects',peacefulProjects(state),9,'projects'),row('coastal-pacts','Establish shared patrols',coastalPacts(state),3,'pacts')];
+    case 13: return [row('neighbor-deliveries','Deliver neighbor requests',Object.values(state.hinterland?.projects||{}).reduce((n,p)=>n+p.deliveries,0),12,'deliveries')];
     default: return [];
   }
 }
@@ -84,18 +89,22 @@ export function objectiveChecklist(state, ambition = objective(state)) {
       stock(state, 'gold', 200), completedBuilding(state, 'manor'), condition('town-path', 'Choose a town path', !!state.policies?.charter)];
     case 8: return [people(75), stock(state, 'food', 150), condition('sustainable-food', 'Food production covers meals', finite(state.foodPotentialBalance, finite(state.foodBalance, -1)) >= 0, 'Staffed, supplied workplaces cover food needs even when a full pantry slows production.'),
       coverage(state, 'water', .6, 'Water'), coverage(state, 'health', .6, 'Healthcare'), coverage(state, 'community', .5, 'Community care'),
-      row('coastal-incidents', 'Resolve coastal incidents', (state.pressure?.defended || 0) + (state.pressure?.paid || 0), 3, 'incidents', 'Paying supplies or completing a prepared defense counts. Sheltering cargo alone does not.')];
+      row('coastal-incidents', 'Complete neighbor projects or resolve coastal incidents', (state.pressure?.defended || 0) + (state.pressure?.paid || 0) + peacefulProjects(state), 3, 'incidents', 'Neighbor projects, paid cargo demands and completed defenses count.')];
     case 9: {
       if (state.policies?.charter === 'breadbasket') return [row('export-food', 'Export food', sold.food, 800, 'food'),
         either('export-harvest', 'Export grain or ale', [row('export-grain', 'Grain', sold.grain, 240, 'grain'), row('export-ale', 'Ale', sold.ale, 80, 'ale')]),
         stock(state, 'food', 300), stock(state, 'gold', 600), research(state, 'cultivation'), research(state, 'milling')];
       if (state.policies?.charter === 'forge') return [row('export-iron', 'Export iron', sold.iron, 120, 'iron'), row('export-tools', 'Export tools', sold.tools, 90, 'tools'),
         row('improved-industry', 'Improve industry workshops', (state.buildings || []).filter(building => ready(building) && BUILDINGS[building.type]?.category === 'industry' && building.level >= 2).length, 3, 'buildings', 'Finished, open industry workshops at level 2 or higher.'),
-        row('prepared-defenses', 'Repel coastal incidents with the watch', state.pressure?.defended, 3, 'defenses', 'Completed prepared defenses count; payments do not.'), stock(state, 'gold', 600), research(state, 'joinery'), research(state, 'metallurgy'), research(state, 'mastercraft')];
+        row('prepared-defenses', 'Complete neighbor projects or defend the coast', (state.pressure?.defended || 0) + peacefulProjects(state), 3, 'defenses', 'Shared projects and prepared defenses count; cargo payments do not.'), stock(state, 'gold', 600), research(state, 'joinery'), research(state, 'metallurgy'), research(state, 'mastercraft')];
       if (state.policies?.charter === 'freeport') return [row('voyages', 'Complete voyages', state.routes?.completed, 12, 'voyages'), row('imported-shipments', 'Receive imported shipments', ledger.completed, 20, 'shipments'),
         row('trusted-harbors', 'Earn trust with distinct harbors', Object.values(state.routes?.reputation || {}).filter(trust => trust >= 4).length, 2, 'harbors', 'Each harbor needs at least 4 trust.'), stock(state, 'gold', 1000), research(state, 'barter'), research(state, 'logistics'), research(state, 'coastal_routes')];
       return [condition('town-path', 'Choose a town path', !!state.policies?.charter)];
     }
+    case 10: return [row('charted-regions','Chart regions',state.frontier?.discoveredRegions.length,5,'regions'),row('gathering-trips','Bring gathering trips home',state.hinterland?.returned,3,'trips')];
+    case 11: return [row('garden-seeds','Learn garden crops',state.hinterland?.seeds.length,3,'crops'),row('helped-neighbors','Help distinct neighbors',Object.values(state.hinterland?.projects||{}).filter(p=>p.step>0).length,3,'neighbors')];
+    case 12: return [row('charted-regions','Chart regions',state.frontier?.discoveredRegions.length,9,'regions'),row('shared-projects','Complete shared projects',peacefulProjects(state),9,'projects'),row('coastal-pacts','Establish shared patrols',coastalPacts(state),3,'pacts')];
+    case 13: return [row('neighbor-deliveries','Deliver neighbor requests',Object.values(state.hinterland?.projects||{}).reduce((n,p)=>n+p.deliveries,0),12,'deliveries')];
     default: return [];
   }
 }
@@ -103,6 +112,7 @@ export function objectiveChecklist(state, ambition = objective(state)) {
 /** One short reason and a real existing destination; this never performs an action. */
 export function objectiveGuidance(state, ambition = objective(state)) {
   if (!ambition || ambition.complete) return null;
+  if(ambition.frontierTab)return {title:ambition.title,why:ambition.description,label:'Open the wider island',frontierTab:ambition.frontierTab};
   const foodChain = ['Grain farm', 'Windmill', 'Bakery', 'Food'];
   const toolsChain = ['Iron mine', 'Smithy', 'Toolmaker', 'Tools'];
   const clothChain = ['Flax field', 'Weaver', 'Cloth'];

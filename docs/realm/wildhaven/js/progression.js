@@ -1,3 +1,4 @@
+import { peacefulProjects, coastalPacts } from './hinterland.js';
 import { until } from './calendar.js';
 /** Research, charters, orders and voyages. Pure game data; no simulation cycle. */
 import { BUILDINGS, RESOURCE_NAMES, RESOURCES, getBuildingSpec } from './catalog.js';
@@ -444,7 +445,7 @@ function chapters(state) {
   const foodPlaces = count(state, 'orchard') + count(state, 'garden');
   const bell = (state.buildings || []).some(building => building.type === 'bell' && building.restored && ready(building));
   const coverage = state.serviceCoverage || {}, ledger = state.imports || {}, sold = ledger.exported || {};
-  const peacefulCoasts = (state.pressure?.defended || 0) + (state.pressure?.paid || 0);
+  const peacefulCoasts = (state.pressure?.defended || 0) + (state.pressure?.paid || 0) + peacefulProjects(state);
   const sustainableFood = number(state.foodPotentialBalance, number(state.foodBalance, -1)) >= 0 ? 1 : 0;
   const learned = ids => ids.filter(id => researched(state, id)).length;
   let specialty;
@@ -452,7 +453,7 @@ function chapters(state) {
     specialty = goal('chapter_9', 'The coast’s table', 'Become a Breadbasket: export 800 food, plus either 240 grain or 80 ale. Keep 300 food and 600 coin in reserve, and study Fieldcraft and Flour and fire. Imported linen and tools can replace local workshops.', [[sold.food, 800], [Math.max(number(sold.grain) / 240, number(sold.ale) / 80), 1], [stock.food, 300], [stock.gold, 600], [learned(['cultivation', 'milling']), 2]], { specialty: 'breadbasket' });
   } else if (state.policies?.charter === 'forge') {
     const workshops = (state.buildings || []).filter(building => ready(building) && BUILDINGS[building.type]?.category === 'industry' && building.level >= 2).length;
-    specialty = goal('chapter_9', 'The island that makes', 'Build a Forge Town: export 120 iron and 90 tools, improve three industry workshops, repel three coastal incidents with a prepared watch, and keep 600 coin. Study Timber framing, Ironworking and Master workshops; imports can supply food and linen.', [[sold.iron, 120], [sold.tools, 90], [workshops, 3], [state.pressure?.defended, 3], [stock.gold, 600], [learned(['joinery', 'metallurgy', 'mastercraft']), 3]], { specialty: 'forge' });
+    specialty = goal('chapter_9', 'The island that makes', 'Build a Forge Town: export 120 iron and 90 tools, improve three industry workshops, complete three neighbor projects or repel three coastal incidents, and keep 600 coin. Study Timber framing, Ironworking and Master workshops; imports can supply food and linen.', [[sold.iron, 120], [sold.tools, 90], [workshops, 3], [(state.pressure?.defended || 0) + peacefulProjects(state), 3], [stock.gold, 600], [learned(['joinery', 'metallurgy', 'mastercraft']), 3]], { specialty: 'forge' });
   } else if (state.policies?.charter === 'freeport') {
     const partnerships = Object.values(state.routes?.reputation || {}).filter(trust => trust >= 4).length;
     specialty = goal('chapter_9', 'An open harbor', 'Build a Free Port: complete twelve voyages and twenty imported shipments, earn four trust with two harbors, and keep 1,000 coin. Study Fair measures, Dry stores and Coastal partnerships. Local mines, smithies, looms and breweries are optional.', [[state.routes?.completed, 12], [ledger.completed, 20], [partnerships, 2], [stock.gold, 1000], [learned(['barter', 'logistics', 'coastal_routes']), 3]], { specialty: 'freeport' });
@@ -468,8 +469,12 @@ function chapters(state) {
     goal('chapter_5', 'A village that can teach', 'Welcome twenty people, keep forty food in reserve, staff a school, build a well, and complete three fields of research.', [[residents, 20], [stock.food, 40], [staffedService(state, 'school'), 1], [count(state, 'well'), 1], [state.research?.completed.length, 3]], { type: 'school' }),
     goal('chapter_6', 'Care for a growing town', 'Grow to forty people. Have twelve tools and twelve cloth in stock; made or imported goods enter stores automatically. Staff a market and clinic, and provide water to half the town’s housing and healthcare to 40%.', [[residents, 40], [stock.tools, 12], [stock.cloth, 12], [staffedService(state, 'market'), 1], [staffedService(state, 'clinic'), 1], [coverage.water, .5], [coverage.health, .4]], { type: 'clinic' }),
     goal('chapter_7', 'A place on the coast', 'Complete six delivery orders and either three voyages or twelve harbor-counter exports. Have 200 coin in stock, finish a town hall, and choose a town path.', [[state.contracts?.completed, 6], [Math.max(number(state.routes?.completed), number(ledger.exportsCompleted) / 4), 3], [stock.gold, 200], [count(state, 'manor'), 1], [state.policies?.charter ? 1 : 0, 1]], { type: 'manor' }),
-    goal('chapter_8', 'Seventy-five lives', 'Welcome 75 residents with 150 food reserved and enough staffed, supplied food production to cover daily needs. Serve 60% of housing with water and healthcare, and 50% with chapel or brewhouse community access. Resolve three coastal incidents by supplies or prepared defense.', [[residents, 75], [stock.food, 150], [sustainableFood, 1], [coverage.water, .6], [coverage.health, .6], [coverage.community, .5], [peacefulCoasts, 3]], { type: 'cottage' }),
+    goal('chapter_8', 'Seventy-five lives', 'Welcome 75 residents with 150 food reserved and enough staffed, supplied food production to cover daily needs. Serve 60% of housing with water and healthcare, and 50% with chapel or brewhouse community access. Complete three neighbor projects or resolve three coastal incidents.', [[residents, 75], [stock.food, 150], [sustainableFood, 1], [coverage.water, .6], [coverage.health, .6], [coverage.community, .5], [peacefulCoasts, 3]], { type: 'cottage' }),
     specialty,
+    goal('chapter_10', 'Beyond familiar paths', 'Chart five regions and bring home three gathering trips. Send residents from Explore; no army is needed.', [[state.frontier?.discoveredRegions.length,5],[state.hinterland?.returned,3]], {frontierTab:'explore'}),
+    goal('chapter_11', 'Seeds worth sharing', 'Learn all three garden crops and finish a first shared project with each neighbor.', [[state.hinterland?.seeds.length,3],[Object.values(state.hinterland?.projects||{}).filter(p=>p.step>0).length,3]], {frontierTab:'neighbors'}),
+    goal('chapter_12', 'An island of neighbors', 'Chart all nine regions and complete all nine shared projects. The three coastal pacts make peaceful trade safe.', [[state.frontier?.discoveredRegions.length,9],[peacefulProjects(state),9],[coastalPacts(state),3]], {frontierTab:'neighbors'}),
+    goal('chapter_13', 'A living exchange', 'Complete twelve neighbor deliveries. Standing requests continue after their town projects, with no deadlines.', [[Object.values(state.hinterland?.projects||{}).reduce((n,p)=>n+p.deliveries,0),12]], {frontierTab:'neighbors'}),
   ];
 }
 

@@ -7,7 +7,7 @@ import { townSafety } from '../js/town-safety.js';
 function coastalTown() {
   const state = createGame(); state.won = true; state.population = 20;
   state.citizens = Array.from({ length: 20 }, (_, i) => ({ id: `c${i}`, job: 'idle' }));
-  dailyPressure(state); state.day = state.pressure.nextIncidentDay; dailyPressure(state);
+  state.imports.exportsCompleted=6;dailyPressure(state);
   return state;
 }
 test('quiet, scheduled future raids and friendly troops do not invent an active warning', () => {

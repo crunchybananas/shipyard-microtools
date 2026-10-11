@@ -1,3 +1,4 @@
+import { createHinterland, normalizeHinterland, tickGardens } from './hinterland.js';
 import { createWoodland, restoreWoodland, woodlandStatus, harvestWood, tickWoodland } from './woodland.js';
 export { woodlandStatus } from './woodland.js';
 import { WORK_CYCLE_SECONDS, workPosition } from './calendar.js';
@@ -170,7 +171,7 @@ export function createGame() {
     version: VERSION, resources, population: 6, citizens: Array.from({ length: 6 }, (_, i) => ({ ...citizen(i + 1), experience: {} })),
     nextCitizenId: 7, calendarEpoch: 0, day: 1, time: 0, subsecond: 0, elapsed: 0, nextId: 1, nextEventId: 1, nextQueueOrder: 1,
     won: false, undo: null, lastTradeDay: 0, builderTarget: 2, morale: 78, seasons: createSeasonState(), buildings: [hearth, bell], events: [],
-    woodland: createWoodland(), stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
+    hinterland: createHinterland(), woodland: createWoodland(), stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
   };
   addEvent(state, 'Six founders share a hearth. Give builders a cottage to raise, then choose who will grow food and gather materials.', 'welcome');
   normalizeProgression(state); reconcileWorkforce(state); refreshProduction(state);
@@ -636,6 +637,7 @@ export function tick(state, dt) {
         result.changed = true;
       }
     }
+    result.changed = tickGardens(state, 1) || result.changed;
     const pressureResult = tickPressure(state, 1); progressionEvents(state, pressureResult); result.changed ||= pressureResult.changed;
     const beforeResearch = JSON.stringify(state.research); progressionEvents(state, tickProgression(state, 1));
     state.time++; if (state.time >= DAY_LENGTH) { result.arrivals += dawn(state); result.days++; result.newDay = true; }
@@ -798,11 +800,11 @@ export function restore(raw) {
   if (bell.restored) state.wonDay = bell.restoredDay;
   state.stats = Object.fromEntries(['built', 'arrivals', 'harvests', 'upgrades'].map(key => [key, validInteger(input.stats?.[key], 0, 1000000) ? input.stats[key] : 0]));
   for (const key of Object.keys(createProgressionState())) if (Object.hasOwn(input, key)) state[key] = structuredClone(input[key]);
-  if (Object.hasOwn(input, 'pressure')) state.pressure = structuredClone(input.pressure);
+  state.pressure = Object.hasOwn(input, 'pressure') ? structuredClone(input.pressure) : undefined;
   if (input.version >= 3) { if (!Object.hasOwn(input, 'frontier')) return null; state.frontier = structuredClone(input.frontier); }
   if (input.version !== VERSION) state.migratedFromVersion = input.version;
   if (input.version === VERSION) { if (!Object.hasOwn(input, 'discovery')) return null; state.discovery = structuredClone(input.discovery); }
-  try { state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); } catch { return null; }
+  try { state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); normalizeHinterland(state, input.hinterland); } catch { return null; }
   restoreJournal(state, input);
   reconcileWorkforce(state); refreshProduction(state); return state;
 }

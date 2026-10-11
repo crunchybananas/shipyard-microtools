@@ -87,7 +87,7 @@ test('bell costs are itemized and queued restoration never asks to pay reserved 
 test('every chapter and specialty exposes only satisfied rows when its actual requirements are fulfilled', () => {
   for (const charter of ['breadbasket', 'forge', 'freeport']) {
     const state = fulfilledTown(charter);
-    assert.equal(progressionObjective(state).complete, true);
+    assert.equal(progressionObjective(state).step,10,'Established towns continue into exploration');
     for (let step = 0; step <= 9; step++) {
       const rows = at(state, step);
       assert.ok(rows.length > 0, `${charter} chapter ${step}`);
@@ -243,8 +243,8 @@ test('recorded milestones and current chapter selection survive later spending a
   assert.equal(get(objectiveChecklist(state), 'stock-tools').complete, false);
   assert.equal(objectiveChecklist(state).some(row => row.id === 'built-cottage' || row.id === 'working-school'), false);
   state.milestones = Array.from({ length: 10 }, (_, i) => `chapter_${i}`);
-  assert.deepEqual(objectiveChecklist(state), []);
-  assert.equal(objectiveGuidance(state), null);
+  assert.equal(objective(state).step,10);assert.equal(objectiveGuidance(state).frontierTab,'explore');
+  state.milestones=Array.from({length:14},(_,i)=>`chapter_${i}`);assert.deepEqual(objectiveChecklist(state),[]);assert.equal(objectiveGuidance(state),null);
 });
 
 test('post-bell population comes from named citizens and reads do not alter a frozen town', () => {
