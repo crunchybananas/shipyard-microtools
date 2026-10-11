@@ -87,3 +87,9 @@ test('saves without coastal metadata never count historic trade as new exposure'
  const s=sim.createGame();s.imports.exportsCompleted=12;const raw=JSON.parse(sim.serialize(s));delete raw.pressure;
  const restored=sim.restore(raw);assert.ok(restored);assert.equal(restored.pressure.tradeAnchor,12);
 });
+test('new journey logs preserve the displayed calendar date across migration epochs',async()=>{
+ const {calendarDay,workPosition}=await import('../js/calendar.js'),s=sim.createGame();s.day=4;s.time=89;s.calendarEpoch=3.7;
+ sim.tick(s,12);const shown=calendarDay(s);send(s,'survey','pineward');assert.equal(s.frontier.log[0].calendarDate,shown);
+ const restored=sim.restore(sim.serialize(s));assert.ok(restored);assert.equal(restored.frontier.log[0].calendarDate,shown);
+ const raw=JSON.parse(sim.serialize(s));raw.frontier.log[0].calendarDate=-1;assert.equal(sim.restore(raw),null);
+});

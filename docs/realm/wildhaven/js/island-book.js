@@ -48,7 +48,7 @@ export function explorationContent(state,ctx,chosen='home'){
   if(!known&&!journeyFor(state,'survey',region.id))card.append(sendControl(state,'survey',region.id,'Send a scout',ctx));
   if(known)card.append(button('Look at this region',`look-region-${region.id}`,()=>ctx.focus({...region,kind:'region'})));
   for(const site of GATHERING.filter(s=>known&&s.region===region.id)){
-   const patch=el('div','island-patch');patch.append(el('h4','',site.name),el('p','',site.story),note(`Bring home ${site.amount} ${PRODUCE[site.good].name.toLowerCase()}. Replenishes in ${site.days} game days after each trip.`));
+   const patch=el('div','island-patch');patch.append(el('h4','',site.name),el('p','',site.story),note(`Bring home ${site.amount} ${PRODUCE[site.good].name.toLowerCase()}. Replenishes in ${site.days} game ${site.days===1?'day':'days'} after each trip.`));
    if((h.gathered[site.id]||0)>state.frontier.clock)patch.append(note(`Ready again in ${duration(h.gathered[site.id]-state.frontier.clock)} at 1×.`));
    if(!journeyFor(state,'gather',site.id))patch.append(sendControl(state,'gather',site.id,'Send a gatherer',ctx));card.append(patch);
   }
