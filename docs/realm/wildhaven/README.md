@@ -128,7 +128,7 @@ Validation: 281 Node tests, including shared forest stock, exact three-calendar-
 
 ## The wider island and shared projects (October 11, 2026)
 
-The island now has nine regions and 3,947 land cells, compared with the original five regions and 1,427 land cells. Original land, compounds, landmarks and saved building footprints retain their coordinates. Four outer regions introduce gathering grounds and longer journeys. Explore opens a coastal chart: uncharted regions remain covered on this map until a named resident brings a survey home. The 3D landscape remains visible when panning; this release does not apply fog to the world renderer.
+The island now has nine regions and 3,947 land cells, compared with the original five regions and 1,427 land cells. Original land, compounds, landmarks and saved building footprints retain their coordinates. Four outer regions introduce gathering grounds and longer journeys. Explore opens a coastal chart: scouts uncover regions on this map when they bring their reports home. Envoys and troops also reveal the land they visit. The 3D landscape remains visible when panning; this release does not apply fog to the world renderer.
 
 Scouting, gathering and neighbor deliveries reserve a real resident, consume six food in provisions and use physical outbound/work/return journeys. Reports, cargo and project rewards arrive at home. Recall returns undelivered project goods and materials when the resident gets home; travel provisions are spent. A full gathering store holds a returned traveler and their cargo until space is available. Berries, clay, wool and wild herbs replenish after gathering trips. No delivery has a deadline.
 
@@ -140,4 +140,4 @@ Elapsed time and exploration no longer schedule anonymous physical raids. Neighb
 
 The optional `hinterland` record stays in the v4 save envelope. Existing towns receive empty produce stores, carrot seeds and unstarted neighbor projects; their earned resources, calendars, woodland and frontier history remain intact. No new runtime dependencies or external services were added.
 
-Validation for this increment: 382 Node tests pass, including physical routes to all gathering grounds, all nine shared projects and repeat requests, exact crop clocks, save reloads, cargo retention/refunds, old geography preservation, and trade-driven threat scheduling. Runtime cache token: `20261011-living-neighbors-1`. Browser/deployment evidence is recorded separately after publication.
+Validation for this increment: 383 Node tests pass, including physical routes to all gathering grounds, all nine shared projects and repeat requests, exact crop clocks, save reloads, cargo retention/refunds, old geography preservation, and trade-driven threat scheduling. Runtime cache token: `20261011-living-neighbors-2`. Browser/deployment evidence is recorded separately after publication.
