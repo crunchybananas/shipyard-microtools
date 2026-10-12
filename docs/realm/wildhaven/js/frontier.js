@@ -4,12 +4,15 @@ import { journeyQuote, completeJourney, GATHERING, projectSpec } from './hinterl
 import { discoverySpec, fieldworkerFor, fieldworkDuration, isFieldworker } from './discovery.js';
 /** Deterministic island frontier: named labor, physical armies, defenses and neighbors. */
 export const FRONTIER_VERSION = 1;
+export const COMPANY_KINDS = Object.freeze(['spearman', 'archer', 'medic']);
+export const MEDIC_KIT = Object.freeze({ capacity: 6, heal: 14, interval: 4, range: 1.15, cost: Object.freeze({food: 6, cloth: 2}) });
 export const MAX_SQUADS = 6, MAX_SQUAD_MEMBERS = 160, DEFEND_RADIUS = 8;
 export const FRONTIER_RAID_PACING = Object.freeze({ firstWarningSeconds: 540, warningSeconds: 360, recoverySeconds: 900 });
 export { ISLAND_BOUNDS as FRONTIER_BOUNDS, ISLAND_REGIONS as FRONTIER_REGIONS, ISLAND_NEIGHBORS as FRONTIER_NEIGHBORS } from './island.js';
 export const TROOPS = Object.freeze({
   spearman: { name: 'Spearman', description: 'A named resident trains to hold a lane and fight at close range.', cost: { wood: 10, iron: 2, food: 8 }, trainingSeconds: 36, maxHp: 70, damage: 9, range: .62, interval: 1.15, speed: 1.12 },
   archer: { name: 'Archer', description: 'A named resident attacks at range. Arrows need a clear line of sight and take time to land.', cost: { wood: 14, tools: 2, food: 8 }, trainingSeconds: 45, maxHp: 42, damage: 7, range: 4.3, interval: 1.6, speed: 1.05 },
+  medic: { name: 'Field medic', description: 'Carries six dressings. Select with soldiers to follow them and treat nearby injuries after they stop taking damage. Refill at barracks.', cost: { food: 12, cloth: 4, tools: 2 }, trainingSeconds: 40, maxHp: 40, damage: 0, range: 0, interval: 1, speed: 1.15 },
   engineer: { name: 'Frontier builder', cost: {}, trainingSeconds: 0, maxHp: 45, damage: 0, range: 0, interval: 1, speed: .95 },
   envoy: { name: 'Envoy', cost: { food: 8, gold: 15 }, trainingSeconds: 0, maxHp: 35, damage: 0, range: 0, interval: 1, speed: 1.25 },
   explorer: { name: 'Surveyor', cost: { food: 6 }, trainingSeconds: 0, maxHp: 40, damage: 0, range: 0, interval: 1, speed: 1.18 },
@@ -34,8 +37,8 @@ function spend(state, cost) { for (const [r, n] of Object.entries(cost)) state.r
 function reward(state, bag) { const actual = {}; for (const [r, n] of Object.entries(bag)) { const amount = Math.min(n, Math.max(0, (state.storage?.[r] ?? 100000) - (state.resources[r] || 0))); state.resources[r] = round((state.resources[r] || 0) + amount); actual[r] = amount; } return actual; }
 function log(state, text, type = 'frontier') { const f = state.frontier, event = { id: `frontier-log-${f.nextLogId++}`, time: f.clock, day: state.day || 1, calendarDate: calendarDay(state), type, text }; f.log.unshift(event); f.log.length = Math.min(80, f.log.length); return event; }
 const alive = unit => !['dead', 'released'].includes(unit.status);
-const residentSoldier = unit => unit.faction === 'player' && !!unit.citizenId && !unit.allyFrom && ['spearman', 'archer'].includes(unit.kind) && alive(unit);
-const battleReady = unit => unit.status === 'active' && TROOPS[unit.kind].damage > 0;
+const residentSoldier = unit => unit.faction === 'player' && !!unit.citizenId && !unit.allyFrom && COMPANY_KINDS.includes(unit.kind) && alive(unit);
+const battleReady = unit => unit.status === 'active' && COMPANY_KINDS.includes(unit.kind);
 export const blocksFortification = fort => fort.status !== 'ruined' && !(fort.type === 'gate' && fort.open);
 const blocking = blocksFortification;
 function fortAt(state, x, z) { return state.frontier.fortifications.find(f => f.x === x && f.z === z && blocking(f)); }
@@ -63,9 +66,47 @@ function nearestOpen(state, point, ctx, radius = 8, used = false) {
   const candidates = [];
   for (let dx = -radius; dx <= radius; dx++) for (let dz = -radius; dz <= radius; dz++) {
     const p = { x: Math.round(point.x) + dx, z: Math.round(point.z) + dz };
-    if (open(state, p.x, p.z, ctx) && (!used || !state.frontier.units.some(u => alive(u) && distance(u, p) < .4))) candidates.push(p);
+    if (open(state, p.x, p.z, ctx) && (!used || !state.frontier.units.some(u => alive(u) && !u.garrisoned && distance(u, p) < .4))) candidates.push(p);
   }
   return candidates.sort((a, b) => distance(a, point) - distance(b, point) || a.z - b.z || a.x - b.x)[0] || null;
+}
+
+/** Quarters use the same rotated doorway as civilian navigation. */
+export function barracksEntrance(building) {
+  const [dx,dz]=[[0,1],[1,0],[0,-1],[-1,0]][building.rotation||0];
+  return {x:building.x+dx,z:building.z+dz};
+}
+function barracks(state) {return (state.buildings||[]).filter(b=>b.type==='barracks'&&b.status==='ready'&&!b.paused);}
+function quarters(state,u,ctx) {
+  if(!residentSoldier(u))return null;
+  const choices=barracks(state).sort((a,b)=>Number(b.id===u.quartersId)-Number(a.id===u.quartersId)||distance(u,a)-distance(u,b)||a.id.localeCompare(b.id));
+  for(const building of choices){const point=barracksEntrance(building);if(open(state,point.x,point.z,ctx)&&(key(u)===key(point)||frontierPath(state,u,point,ctx).length))return{building,point};}
+  return null;
+}
+function recoveryHome(state,u,ctx) {return quarters(state,u,ctx)?.point||home(ctx);}
+function atTreatment(state,u,ctx) {const q=quarters(state,u,ctx);return distance(u,q?.point||home(ctx))<=(q?1.2:2);}
+function dock(state,u,q) {
+  u.quartersId=q.building.id;u.garrisoned=true;u.x=q.point.x;u.z=q.point.z;u.path=[];u.targetId=null;u.breachId=null;
+  if(u.order.type==='defend')u.order={type:'defend',...q.point,anchor:{...q.point}};
+}
+function leaveBarracks(state,u,ctx) {
+  const point=nearestOpen(state,u,ctx,4,true);if(!point||(key(u)!==key(point)&&!frontierPath(state,u,point,ctx).length))return false;
+  u.x=point.x;u.z=point.z;u.garrisoned=false;u.path=[];u.routeAt=-10;return true;
+}
+export function barracksRoster(state) {
+  return barracks(state).map(b=>({id:b.id,x:b.x,z:b.z,level:b.level||1,unitIds:state.frontier.units.filter(u=>residentSoldier(u)&&u.quartersId===b.id).map(u=>u.id),inside:state.frontier.units.filter(u=>residentSoldier(u)&&u.quartersId===b.id&&u.garrisoned).length}));
+}
+export function resupplyMedicOffer(state,id,ctx={}) {
+  const u=state.frontier.units.find(u=>u.id===id),cost={...MEDIC_KIT.cost};
+  if(!u||u.kind!=='medic'||!residentSoldier(u))return quote(false,'Choose a field medic.',cost);
+  if(!quarters(state,u,ctx)||!atTreatment(state,u,ctx))return quote(false,'Return to barracks to refill the medical kit.',cost);
+  if(u.medicalCharges>=MEDIC_KIT.capacity)return quote(false,'The medical kit is full.',cost);
+  return quote(enough(state,cost),enough(state,cost)?'Refill to six dressings. Each dressing restores up to 14 health.':`Needs ${costText(cost)}.`,cost);
+}
+export function resupplyMedic(state,id,ctx={}) {
+  const offer=resupplyMedicOffer(state,id,ctx);if(!offer.ok)return offer;
+  spend(state,offer.cost);state.frontier.units.find(u=>u.id===id).medicalCharges=MEDIC_KIT.capacity;
+  return {...offer,reason:'Medical kit refilled: six dressings.'};
 }
 
 /** A* paths use actual terrain/buildings/fort cells; enemies can choose to breach costly walls. */
@@ -103,29 +144,31 @@ function availableCitizens(state) { const reserved = new Set(reservedCitizenIds(
 function newUnit(state, kind, faction, point, citizen = null) {
   const spec = TROOPS[kind], f = state.frontier;
   const unit = { id: `unit-${f.nextId++}`, citizenId: citizen?.id || null, name: citizen?.name || (faction === 'player' ? 'Allied ' : '') + spec.name, kind, faction, x: point.x, z: point.z, yaw: 0, hp: spec.maxHp, maxHp: spec.maxHp, status: citizen && spec.trainingSeconds ? 'training' : 'active', trainingRemaining: citizen ? spec.trainingSeconds : 0, trainingSeconds: citizen ? spec.trainingSeconds : 0, recoveryRemaining: 0, order: { type: faction === 'player' ? 'hold' : 'raid' }, path: [], routeAt: -10, routeGoal: null, cooldown: 0, attackAt: null, damageAt: null, deathAt: null, targetId: null, missionNeighborId: null, missionStage: null, wounds: 0 };
-  f.units.push(unit); return unit;
+  unit.quartersId=null;unit.garrisoned=false;f.units.push(unit); return unit;
 }
 function troopPermission(state, kind) {
-  const spec = TROOPS[kind]; if (!['spearman', 'archer'].includes(kind)) return quote(false, 'Choose spearmen or archers.');
-  if (!(state.buildings || []).some(b => b.type === 'barracks' && b.status === 'ready' && !b.paused)) return quote(false, 'Complete a watch house before training troops.', spec.cost);
+  const spec = TROOPS[kind]; if (!COMPANY_KINDS.includes(kind)) return quote(false, 'Choose spearmen, archers or field medics.');
+  if (!(state.buildings || []).some(b => b.type === 'barracks' && b.status === 'ready' && !b.paused)) return quote(false, 'Complete a barracks before training troops.', spec.cost);
   if (state.frontier.units.length >= MAX_UNITS) return quote(false, 'The company is at its limit.', spec.cost);
   if (availableCitizens(state).length <= 2) return quote(false, 'Keep at least two residents available for civilian work.', spec.cost);
   return quote(enough(state, spec.cost), enough(state, spec.cost) ? 'Training reserves one named resident from civilian work.' : `Needs ${costText(spec.cost)}.`, spec.cost);
 }
-export function troopOptions(state) { return ['spearman', 'archer'].map(id => ({ id, ...TROOPS[id], ...troopPermission(state, id), availableCitizens: availableCitizens(state).map(({ id, name, job }) => ({ id, name, job })) })); }
+export function troopOptions(state) { return COMPANY_KINDS.map(id => ({ id, ...TROOPS[id], ...troopPermission(state, id), availableCitizens: availableCitizens(state).map(({ id, name, job }) => ({ id, name, job })) })); }
 export function recruitTroop(state, kind, citizenId = null, ctx = {}) {
   const offer = troopPermission(state, kind); if (!offer.ok) return offer;
   const person = availableCitizens(state).find(c => !citizenId || c.id === citizenId); if (!person) return quote(false, 'That resident is unavailable.', offer.cost);
-  const point = nearestOpen(state, home(ctx), ctx, 6, true); if (!point) return quote(false, 'Leave clear ground beside the village footpath.', offer.cost);
-  spend(state, offer.cost); const unit = newUnit(state, kind, 'player', point, person); state.frontier.stats.recruited++; log(state, `${person.name} begins ${TROOPS[kind].name.toLowerCase()} training; their civilian job is vacant.`, 'recruit');
+  const building=barracks(state).find(b=>{const p=barracksEntrance(b);return open(state,p.x,p.z,ctx);});
+  if(!building)return quote(false,'Leave the barracks doorway clear before training.',offer.cost);
+  const point=barracksEntrance(building);
+  spend(state, offer.cost); const unit = newUnit(state, kind, 'player', point, person); unit.quartersId=building.id;unit.garrisoned=true;if(kind==='medic'){unit.medicalCharges=MEDIC_KIT.capacity;unit.careCooldown=0;unit.escortIds=[];unit.treatedAt=null;}state.frontier.stats.recruited++; log(state, `${person.name} begins ${TROOPS[kind].name.toLowerCase()} training; their civilian job is vacant.`, 'recruit');
   return { ...offer, unit, reason: `${person.name} is training for ${unit.trainingSeconds} seconds.` };
 }
 export function fortificationOptions(state) { return Object.entries(FORTIFICATIONS).map(([id, spec]) => ({ id, ...spec, ...quote(enough(state, spec.cost), enough(state, spec.cost) ? 'A resident must walk here and complete the work.' : `Needs ${costText(spec.cost)}.`, spec.cost) })); }
 function placePermission(state, type, x, z, rotation, ctx, { ignoreCost = false, regionId = null } = {}) {
   const spec = Object.hasOwn(FORTIFICATIONS,type) ? FORTIFICATIONS[type] : null; if (!spec || !int(rotation, 0, 3)) return quote(false, 'Choose a valid defense and orientation.');
   if (!int(x, -256, 256) || !int(z, -256, 256) || !baseOpen(state, x, z, ctx)) return quote(false, 'Defenses need clear, dry, walkable ground.', spec.cost);
-  if (state.frontier.units.some(u => alive(u) && Math.round(u.x) === x && Math.round(u.z) === z)) return quote(false, 'Let frontier troops clear this cell before building.', spec.cost);
-  if (type !== 'gate' && state.frontier.units.some(u => alive(u) && ['move','retreat','defend'].includes(u.order.type) && u.order.x === x && u.order.z === z)) return quote(false, 'This is a troop’s ordered destination. Give it another destination before placing a solid defense.', spec.cost);
+  if (state.frontier.units.some(u => alive(u) && !u.garrisoned && Math.round(u.x) === x && Math.round(u.z) === z)) return quote(false, 'Let frontier troops clear this cell before building.', spec.cost);
+  if (type !== 'gate' && state.frontier.units.some(u => alive(u) && !u.garrisoned && ['move','retreat','defend'].includes(u.order.type) && u.order.x === x && u.order.z === z)) return quote(false, 'This is a troop’s ordered destination. Give it another destination before placing a solid defense.', spec.cost);
   if (state.frontier.fortifications.some(f => f.x === x && f.z === z && f.status !== 'ruined')) return quote(false, 'A defense already occupies this cell.', spec.cost);
   if (distance({ x, z }, home(ctx)) < 1 || definitions(ctx).some(n => distance({ x, z }, n) < 2.3)) return quote(false, 'Keep the village footpath and settlement approaches clear.', spec.cost);
   if (!regionId && !state.frontier.claims.includes(regionFor(x, z, ctx))) return quote(false, 'Claim this region with an outpost first.', spec.cost);
@@ -171,14 +214,14 @@ export function repairOffer(state,id,_ctx={}) {
   const fraction=1-f.hp/f.maxHp,cost=Object.fromEntries(Object.entries(FORTIFICATIONS[f.type].cost).map(([r,n])=>[r,Math.ceil(n*fraction*.6)]).filter(([,n])=>n));
   if(fraction<EPS)return quote(false,'This defense is intact.',cost);
   if(state.frontier.fortifications.some(v=>v!==f&&v.status!=='ruined'&&v.x===f.x&&v.z===f.z))return quote(false,'Another defense now occupies this ruined site.',cost);
-  if(state.frontier.units.some(u=>alive(u)&&Math.round(u.x)===f.x&&Math.round(u.z)===f.z))return quote(false,'Let troops clear the ruined defense before repairs begin.',cost);
+  if(state.frontier.units.some(u=>alive(u)&&!u.garrisoned&&Math.round(u.x)===f.x&&Math.round(u.z)===f.z))return quote(false,'Let troops clear the ruined defense before repairs begin.',cost);
   return quote(enough(state,cost),enough(state,cost)?'Repair costs materials and takes a builder back to the site.':`Needs ${costText(cost)}.`,cost,{work:Math.max(4,Math.ceil(FORTIFICATIONS[f.type].work*fraction*.6))});
 }
 export function repairFortification(state,id,ctx={}) {const offer=repairOffer(state,id,ctx);if(!offer.ok)return offer;if(availableCitizens(state).length<=2&&!state.frontier.units.some(u=>u.kind==='engineer'&&alive(u)))return quote(false,'A builder and two available civilians are needed for repairs.',offer.cost);spend(state,offer.cost);const f=state.frontier.fortifications.find(v=>v.id===id);f.repairing=true;f.repairStartHp=f.hp;f.status='building';f.progress=0;f.work=offer.work;f.escrow={...offer.cost};ensureEngineer(state,ctx);return{...offer,fortification:f};}
 export function salvageOffer(state,id,_ctx={}) {
   const fort=state.frontier.fortifications.find(v=>v.id===id);
   if(!fort||fort.faction!=='player'||!['ready','ruined'].includes(fort.status))return quote(false,'Choose a completed or ruined player defense. Cancel unfinished work instead.');
-  if(state.frontier.units.some(u=>alive(u)&&Math.round(u.x)===fort.x&&Math.round(u.z)===fort.z))return quote(false,'Let troops clear this defense before dismantling it.');
+  if(state.frontier.units.some(u=>alive(u)&&!u.garrisoned&&Math.round(u.x)===fort.x&&Math.round(u.z)===fort.z))return quote(false,'Let troops clear this defense before dismantling it.');
   const original={...FORTIFICATIONS[fort.type].cost};if(fort.regionId==='crownhill'){original.stone+=20;original.gold+=25;}
   const nominalRefund=fort.status==='ready'?Object.fromEntries(Object.entries(original).map(([r,n])=>[r,Math.floor(n*.5*fort.hp/fort.maxHp)]).filter(([,n])=>n)):{};
   const refund=Object.fromEntries(Object.entries(nominalRefund).map(([r,n])=>[r,Math.min(n,Math.max(0,(state.storage?.[r]??100000)-(state.resources[r]||0)))]).filter(([,n])=>n));
@@ -241,23 +284,31 @@ function pruneSquads(state) {
 
 export function commandTroops(state,ids,order,ctx={}) {
   if(!Array.isArray(ids)||!ids.length||!order||!['move','attack','hold','retreat','defend'].includes(order.type))return quote(false,'Choose troops and a valid order.');
-  const units=state.frontier.units.filter(u=>ids.includes(u.id)&&u.faction==='player'&&['spearman','archer'].includes(u.kind)&&u.status==='active');if(units.length!==new Set(ids).size)return quote(false,'Only ready player troops accept orders.');
+  const units=state.frontier.units.filter(u=>ids.includes(u.id)&&u.faction==='player'&&COMPANY_KINDS.includes(u.kind)&&u.status==='active');if(units.length!==new Set(ids).size)return quote(false,'Only ready player troops accept orders.');
+  if(order.type==='attack'&&units.every(u=>u.kind==='medic'))return quote(false,'Medics do not attack. Select them with soldiers to accompany an attack.');
   if(order.type==='defend'&&units.some(u=>!residentSoldier(u)))return quote(false,'Choose your ready recruited residents to defend this town.');
-  let target=['retreat','defend'].includes(order.type)?{...home(ctx)}:null;
+  const rally=['retreat','defend'].includes(order.type)?quarters(state,units[0],ctx):null;
+  let target=['retreat','defend'].includes(order.type)?{...(rally?.point||home(ctx))}:null;
   if(order.type==='move'||(order.type==='attack'&&!order.targetId)){if(!finite(order.x)||!finite(order.z)||!open(state,Math.round(order.x),Math.round(order.z),ctx))return quote(false,'Choose reachable dry ground outside a defense.');target={x:Math.round(order.x),z:Math.round(order.z)};for(const u of units)if(key(u)!==key(target)&&!frontierPath(state,u,target,ctx).length)return quote(false,'A wall, closed gate or terrain blocks that route.');}
   if(order.type==='attack'&&order.targetId){const enemy=state.frontier.units.find(u=>u.id===order.targetId&&alive(u))||state.frontier.fortifications.find(f=>f.id===order.targetId&&f.status!=='ruined');if(!enemy||!hostile(state,'player',enemy.faction))return quote(false,'Choose an enemy; declare war before attacking a settlement.');}
   const formation=[];
-  if(target){for(let radius=0;radius<=14&&formation.length<units.length;radius++)for(let dz=-radius;dz<=radius;dz++)for(let dx=-radius;dx<=radius;dx++){if(Math.max(Math.abs(dx),Math.abs(dz))!==radius)continue;const p={x:target.x+dx,z:target.z+dz};if(order.type==='defend'&&distance(p,target)>DEFEND_RADIUS)continue;if(open(state,p.x,p.z,ctx)&&!state.frontier.units.some(t=>!units.includes(t)&&alive(t)&&distance(t,p)<.4)&&units.every(u=>key(u)===key(p)||frontierPath(state,u,p,ctx).length))formation.push(p);if(formation.length>=units.length)break;}if(formation.length<units.length)return quote(false,'There is not enough reachable clear ground for this company formation.');}
-  for(const[index,u]of units.entries()){u.order={type:order.type,...(formation[index]||target||{}),...(order.type==='defend'?{anchor:{...home(ctx)}}:{}),...(order.type==='attack'&&order.targetId?{targetId:order.targetId}:{})};u.path=[];u.targetId=null;u.breachId=null;u.routeAt=-10;}
-  return quote(true,order.type==='defend'?`${units.length} defender${units.length===1?'':'s'}: protect the ${DEFEND_RADIUS}-tile area around the village footpath, then return to the home position.`:`${units.length} troop${units.length===1?'':'s'}: ${order.type==='hold'?'hold here':order.type}.`);
+  if(target){for(let radius=0;radius<=14&&formation.length<units.length;radius++)for(let dz=-radius;dz<=radius;dz++)for(let dx=-radius;dx<=radius;dx++){if(Math.max(Math.abs(dx),Math.abs(dz))!==radius)continue;const p={x:target.x+dx,z:target.z+dz};if(order.type==='defend'&&distance(p,target)>DEFEND_RADIUS)continue;if(open(state,p.x,p.z,ctx)&&!state.frontier.units.some(t=>!units.includes(t)&&alive(t)&&!t.garrisoned&&distance(t,p)<.4)&&units.every(u=>key(u)===key(p)||frontierPath(state,u,p,ctx).length))formation.push(p);if(formation.length>=units.length)break;}if(formation.length<units.length)return quote(false,'There is not enough reachable clear ground for this company formation.');}
+  const exits=new Map();
+  for(const u of units.filter(u=>u.garrisoned&&!['hold','defend','retreat'].includes(order.type))){
+    const points=[];for(let dz=-4;dz<=4;dz++)for(let dx=-4;dx<=4;dx++){const p={x:Math.round(u.x)+dx,z:Math.round(u.z)+dz};if(open(state,p.x,p.z,ctx)&&![...state.frontier.units.filter(t=>alive(t)&&!t.garrisoned),...exits.values()].some(t=>distance(t,p)<.4)&&(key(u)===key(p)||frontierPath(state,u,p,ctx).length))points.push(p);}
+    points.sort((a,b)=>distance(a,u)-distance(b,u)||a.z-b.z||a.x-b.x);if(!points.length)return quote(false,'The barracks exit is crowded. Wait for departing troops to clear it.');exits.set(u.id,points[0]);
+  }
+  const escorts=units.filter(u=>u.kind!=='medic').map(u=>u.id);
+  for(const[index,u]of units.entries()){if(exits.has(u.id)){Object.assign(u,exits.get(u.id));u.garrisoned=false;}if(rally)u.quartersId=rally.building.id;if(u.kind==='medic')u.escortIds=['move','attack'].includes(order.type)?escorts:[];u.order={type:order.type,...(formation[index]||target||{}),...(order.type==='defend'?{anchor:{...target}}:{}),...(order.type==='attack'&&order.targetId?{targetId:order.targetId}:{})};u.path=[];u.targetId=null;u.breachId=null;u.routeAt=-10;}
+  return quote(true,order.type==='defend'?`${units.length} defender${units.length===1?'':'s'}: guard within ${DEFEND_RADIUS} tiles of the barracks and rest inside when the area is clear.`:`${units.length} troop${units.length===1?'':'s'}: ${order.type==='hold'?'hold here':order.type==='retreat'?'return to barracks':order.type}.`);
 }
-export function healOffer(state,id,ctx={}) {const u=state.frontier.units.find(u=>u.id===id),cost={food:8,cloth:1};if(!u||u.faction!=='player'||!u.citizenId||!alive(u))return quote(false,'Choose a living resident in frontier service.',cost);if(distance(u,home(ctx))>2)return quote(false,'Retreat to the village footpath for treatment.',cost);if(u.hp>=u.maxHp&&u.status!=='wounded')return quote(false,'This person is healthy.',cost);return quote(enough(state,cost),enough(state,cost)?'Restore health and finish recovery at home.':`Needs ${costText(cost)}.`,cost);}
+export function healOffer(state,id,ctx={}) {const u=state.frontier.units.find(u=>u.id===id),cost={food:8,cloth:1};if(!u||u.faction!=='player'||!u.citizenId||!alive(u))return quote(false,'Choose a living resident in frontier service.',cost);if(!atTreatment(state,u,ctx))return quote(false,'Return to barracks for treatment.',cost);if(u.hp>=u.maxHp&&u.status!=='wounded')return quote(false,'This person is healthy.',cost);return quote(enough(state,cost),enough(state,cost)?'Restore health and finish recovery here.':`Needs ${costText(cost)}.`,cost);}
 export function healTroop(state,id,ctx={}) {const offer=healOffer(state,id,ctx);if(!offer.ok)return offer;spend(state,offer.cost);const u=state.frontier.units.find(u=>u.id===id);u.hp=u.maxHp;u.recoveryRemaining=0;u.status='active';u.order={type:isFieldworker(u)||u.kind==='ranger'?'retreat':'hold'};if(isFieldworker(u))u.missionStage='returning';u.path=[];u.targetId=null;return{...offer,unit:u};}
 export function dismissOffer(state,id,ctx={}) {
   const unit=state.frontier.units.find(u=>u.id===id);
-  if(!unit||unit.faction!=='player'||!unit.citizenId||!['spearman','archer'].includes(unit.kind)||!alive(unit))return quote(false,'Choose a recruited resident in your company.');
+  if(!unit||unit.faction!=='player'||!unit.citizenId||!COMPANY_KINDS.includes(unit.kind)||!alive(unit))return quote(false,'Choose a recruited resident in your company.');
   if(unit.status==='wounded')return quote(false,'This resident must recover before returning to civilian work.');
-  if(distance(unit,home(ctx))>2)return quote(false,'Retreat to the village footpath before returning to civilian work.');
+  if(!atTreatment(state,unit,ctx))return quote(false,'Return to barracks before returning to civilian work.');
   return quote(true,unit.status==='training'?'Cancel training and return this resident to civilian work. Supplies already spent are not refunded.':'Return this resident to civilian work. Training supplies and equipment are not refunded.',{}, {refund:{},citizenId:unit.citizenId});
 }
 export function dismissTroop(state,id,ctx={}) {
@@ -288,7 +339,7 @@ function defenseFactor(state,ctx) {const value=typeof ctx.defenseMultiplier==='f
 function towerNear(state,u) {return state.frontier.fortifications.find(f=>f.type==='tower'&&f.faction===u.faction&&f.status==='ready'&&distance(f,u)<1.5);}
 function die(state,u,casualties) {u.hp=0;u.status='dead';u.deathAt=state.frontier.clock;u.path=[];u.targetId=null;if(u.citizenId){casualties.push(u.citizenId);state.frontier.stats.deaths++;state.frontier.stats.deathsThisWave++;log(state,`${u.name} fell in battle.`,'casualty');}else if(u.faction!=='player')state.frontier.stats.enemiesDefeated++;if(u.faction==='raiders'&&state.frontier.raidActive&&state.frontier.raidOutcome)state.frontier.raidOutcome.killed++;}
 function damage(state,target,amount,attacker,ctx,casualties) {
-  if(target.kind){if(!alive(target))return;let armor=target.faction==='player'?1/defenseFactor(state,ctx):1;if(towerNear(state,target))armor*=.65;target.hp=round(Math.max(0,target.hp-amount*armor));target.damageAt=state.frontier.clock;
+  if(target.kind){if(!alive(target)||target.garrisoned)return;let armor=target.faction==='player'?1/defenseFactor(state,ctx):1;if(towerNear(state,target))armor*=.65;target.hp=round(Math.max(0,target.hp-amount*armor));target.damageAt=state.frontier.clock;
     if(target.hp<=EPS){if(target.citizenId&&target.status!=='wounded'){target.status='wounded';if(isFieldworker(target)||target.kind==='ranger')target.missionStage='returning';target.hp=1;target.recoveryRemaining=90;target.wounds++;target.order={type:'retreat'};target.path=[];target.targetId=null;state.frontier.stats.wounded++;log(state,`${target.name} is wounded and is trying to withdraw. Treatment is available at home.`,'wounded');}else if(target.citizenId&&((state.citizens?.length||0)-casualties.length<=6||state.frontier.stats.deathsThisWave>=2)){target.hp=1;target.protectedUntil=state.frontier.clock+20;}else die(state,target,casualties);}
   }else{if(target.status==='ruined')return;target.hp=round(Math.max(0,target.hp-amount));target.damageAt=state.frontier.clock;if(target.hp<=EPS){target.status='ruined';target.open=true;target.escrow={};target.repairing=false;state.frontier.stats.wallsBreached++;log(state,`${target.name} has been breached.`,'breach');if(target.faction!=='player'){const n=state.frontier.neighbors.find(n=>n.id===target.faction);if(n&&!n.defeated){n.hp=0;n.defeated=true;n.status='defeated';n.nextAttackAt=null;state.frontier.stats.conquests++;reward(state,{gold:60,stone:30});log(state,`${n.name}'s stronghold falls. Its attacks end; 60 coin and 30 stone are recovered if stores have room.`,'conquest');for(const u of state.frontier.units)if(u.faction===n.id&&alive(u)){u.status='returning';u.order={type:'retreat',x:n.x,z:n.z};u.path=[];}}}else if(target.regionId){state.frontier.claims=state.frontier.claims.filter(id=>id!==target.regionId);log(state,`${target.regionId} outpost lost. Existing homes remain, but new construction needs a repaired outpost.`,'claim');}}}
 }
@@ -304,7 +355,7 @@ function move(state,u,goal,dt,ctx,{breach=false,speed=1,leash=null}={}) {
   const step=u.path[0];if(!step)return false;const fort=fortAt(state,step.x,step.z);if(fort){if(breach&&hostile(state,u.faction,fort.faction))u.breachId=fort.id;else u.path=[];return false;}
   if(!baseOpen(state,step.x,step.z,ctx)){u.path=[];return false;}
   const final=u.path.length===1,lane=final?0:.18,dx0=step.x-u.x,dz0=step.z-u.z,tx=final?goal.x:step.x+(Math.abs(dz0)>Math.abs(dx0)?-Math.sign(dz0)*lane:0),tz=final?goal.z:step.z+(Math.abs(dx0)>=Math.abs(dz0)?Math.sign(dx0)*lane:0);
-  const dx=tx-u.x,dz=tz-u.z,d=Math.hypot(dx,dz),amount=Math.min(d,TROOPS[u.kind].speed*speed*dt),near=state.frontier.units.filter(t=>t!==u&&alive(t)&&distance(t,u)<1.2),heading=Math.atan2(dz,dx);let chosen=null,best=Infinity;
+  const dx=tx-u.x,dz=tz-u.z,d=Math.hypot(dx,dz),amount=Math.min(d,TROOPS[u.kind].speed*speed*dt),near=state.frontier.units.filter(t=>t!==u&&alive(t)&&!t.garrisoned&&distance(t,u)<1.2),heading=Math.atan2(dz,dx);let chosen=null,best=Infinity;
   for(const angle of [0,.45,-.45,.9,-.9,1.45,-1.45,Math.PI]){const x=u.x+Math.cos(heading+angle)*amount,z=u.z+Math.sin(heading+angle)*amount;if(leash&&distance({x,z},leash)>DEFEND_RADIUS+EPS)continue;if(!clearSegment(state,u,{x,z},ctx))continue;let penalty=0,blocked=false;for(const t of near){const before=distance(u,t),after=Math.hypot(x-t.x,z-t.z);if(after<.29&&after<before-EPS){blocked=true;break;}penalty+=Math.max(0,.4-after)*.5;}if(blocked)continue;const score=Math.hypot(tx-x,tz-z)+penalty+Math.abs(angle)*.012;if(score<best){chosen={x,z};best=score;}}
   if(!chosen)return false;const mx=chosen.x-u.x,mz=chosen.z-u.z;u.x=round(chosen.x);u.z=round(chosen.z);u.yaw=Math.atan2(mx,mz);
   if(Math.hypot(tx-u.x,tz-u.z)<(final?.025:.23)){if(final&&!near.some(t=>Math.hypot(t.x-tx,t.z-tz)<.29)){u.x=tx;u.z=tz;}u.path.shift();}
@@ -387,6 +438,7 @@ function fieldworkTick(state,u,dt,ctx) {
 }
 
 function defendTick(state,u,dt,ctx,casualties) {
+  const assigned=quarters(state,u,ctx);if(assigned&&distance(u.order.anchor,assigned.point)>.1){u.quartersId=assigned.building.id;u.order={type:'defend',...assigned.point,anchor:{...assigned.point}};u.path=[];}
   const anchor=u.order.anchor,rally={x:u.order.x,z:u.order.z};
   // A distant company returns by ordinary legal paths before engaging. Once
   // home, neither path detours nor continuous movement may cross the leash.
@@ -396,35 +448,77 @@ function defendTick(state,u,dt,ctx,casualties) {
   // Permit that origin cell while moving inward; the continuous step still
   // enforces the exact radius. Compose the normal terrain/building fallback.
   const bounded={...ctx,isWalkable:(x,z)=>baseOpen(state,x,z,ctx)&&(distance({x,z},anchor)<=DEFEND_RADIUS+EPS||(x===origin.x&&z===origin.z))};
-  const candidates=state.frontier.units.filter(t=>alive(t)&&t.status!=='training'&&(!t.protectedUntil||t.protectedUntil<=state.frontier.clock)&&hostile(state,u.faction,t.faction)&&distance(t,anchor)<=DEFEND_RADIUS+EPS).sort((a,b)=>distance(u,a)-distance(u,b)||a.id.localeCompare(b.id));
+  const candidates=state.frontier.units.filter(t=>alive(t)&&!t.garrisoned&&t.status!=='training'&&(!t.protectedUntil||t.protectedUntil<=state.frontier.clock)&&hostile(state,u.faction,t.faction)&&distance(t,anchor)<=DEFEND_RADIUS+EPS).sort((a,b)=>distance(u,a)-distance(u,b)||a.id.localeCompare(b.id));
   const range=TROOPS[u.kind].range+(u.kind==='archer'&&towerNear(state,u)?2:0);
   for(const target of candidates){
     if(distance(u,target)<=range&&lineOfSight(state,u,target,ctx)){u.targetId=target.id;attack(state,u,target,ctx,casualties);u.path=[];return;}
     const theta=Math.atan2(u.z-target.z,u.x-target.x),radius=range*.91;
-    const goals=[0,.55,-.55,1.1,-1.1,Math.PI].map(angle=>({x:target.x+Math.cos(theta+angle)*radius,z:target.z+Math.sin(theta+angle)*radius})).filter(p=>distance(p,anchor)<=DEFEND_RADIUS+EPS&&open(state,Math.round(p.x),Math.round(p.z),bounded)&&!state.frontier.units.some(t=>t!==u&&t!==target&&alive(t)&&distance(t,p)<.32));
+    const goals=[0,.55,-.55,1.1,-1.1,Math.PI].map(angle=>({x:target.x+Math.cos(theta+angle)*radius,z:target.z+Math.sin(theta+angle)*radius})).filter(p=>distance(p,anchor)<=DEFEND_RADIUS+EPS&&open(state,Math.round(p.x),Math.round(p.z),bounded)&&!state.frontier.units.some(t=>t!==u&&t!==target&&alive(t)&&!t.garrisoned&&distance(t,p)<.32));
     const goal=goals.find(p=>key(u)===key(p)||frontierPath(state,u,p,bounded).length);
     if(goal){if(u.targetId!==target.id){u.path=[];u.routeAt=-10;}u.targetId=target.id;move(state,u,goal,dt,bounded,{leash:anchor});return;}
   }
   if(u.targetId){u.path=[];u.routeAt=-10;}u.targetId=null;
-  move(state,u,rally,dt,bounded,{leash:anchor});
+  const q=quarters(state,u,ctx);if(q&&distance(u,q.point)<.45){dock(state,u,q);return;}
+  move(state,u,q?.point||rally,dt,bounded,{leash:anchor});
 }
 function combatTick(state,u,dt,ctx,casualties) {
   const spec=TROOPS[u.kind];u.cooldown=Math.max(0,u.cooldown-dt);const h=home(ctx);
   if(u.expiresAt&&state.frontier.clock>=u.expiresAt){u.status='returning';u.order={type:'retreat',...(state.frontier.neighbors.find(n=>n.id===u.allyFrom)||h)};u.path=[];}
-  if(u.status==='returning'||u.order.type==='retreat'){const goal=u.faction==='player'&&!u.allyFrom?(u.order.x!==undefined?u.order:h):nearestOpen(state,u.order.x!==undefined?u.order:state.frontier.neighbors.find(n=>n.id===u.faction)||h,ctx,5);if(goal&&(move(state,u,goal,dt,ctx)||(u.status==='returning'&&distance(u,goal)<1.4))){if(u.status==='returning'){u.status='released';if(u.faction==='raiders'&&state.frontier.raidActive&&state.frontier.raidOutcome)state.frontier.raidOutcome.escaped++;}else u.order={type:'hold'};}return;}
+  if(u.status==='returning'||u.order.type==='retreat'){const goal=u.faction==='player'&&!u.allyFrom?recoveryHome(state,u,ctx):nearestOpen(state,u.order.x!==undefined?u.order:state.frontier.neighbors.find(n=>n.id===u.faction)||h,ctx,5);if(goal&&(move(state,u,goal,dt,ctx)||(u.status==='returning'&&distance(u,goal)<1.4))){if(u.status==='returning'){u.status='released';if(u.faction==='raiders'&&state.frontier.raidActive&&state.frontier.raidOutcome)state.frontier.raidOutcome.escaped++;}else{const q=quarters(state,u,ctx);if(q){dock(state,u,q);u.order={type:'defend',...q.point,anchor:{...q.point}};}else u.order={type:'hold'};}}return;}
   if(u.order.type==='defend'){defendTick(state,u,dt,ctx,casualties);return;}
   const range=spec.range+(u.kind==='archer'&&towerNear(state,u)?2:0);
   const explicit=u.order.type==='attack'&&u.order.targetId?(state.frontier.units.find(t=>t.id===u.order.targetId&&alive(t))||state.frontier.fortifications.find(t=>t.id===u.order.targetId&&t.status!=='ruined')):null;
   if(u.order.type==='attack'&&u.order.targetId&&!explicit){u.order={type:'hold'};u.targetId=null;u.path=[];}
-  const candidates=state.frontier.units.filter(t=>alive(t)&&t.status!=='training'&&(!t.protectedUntil||t.protectedUntil<=state.frontier.clock)&&hostile(state,u.faction,t.faction)&&distance(u,t)<=range+2).sort((a,b)=>distance(u,a)-distance(u,b)||a.id.localeCompare(b.id));
+  const candidates=state.frontier.units.filter(t=>alive(t)&&!t.garrisoned&&t.status!=='training'&&(!t.protectedUntil||t.protectedUntil<=state.frontier.clock)&&hostile(state,u.faction,t.faction)&&distance(u,t)<=range+2).sort((a,b)=>distance(u,a)-distance(u,b)||a.id.localeCompare(b.id));
   let target=explicit&&hostile(state,u.faction,explicit.faction)?explicit:candidates[0];
   if(u.breachId){const fort=state.frontier.fortifications.find(f=>f.id===u.breachId&&f.status!=='ruined');if(fort)target=fort;else u.breachId=null;}
-  if(target){u.targetId=target.id;const d=distance(u,target),stronghold=target.id.startsWith('settlement-'),reach=range+(stronghold?1.15:target.kind?0:.5);if(d<=reach&&lineOfSight(state,u,target,ctx)){attack(state,u,target,ctx,casualties);u.path=[];return;}if(u.order.type!=='hold'){const theta=Math.atan2(u.z-target.z,u.x-target.x),radius=reach*.91,goals=[0,.55,-.55,1.1,-1.1,Math.PI].map(angle=>({x:target.x+Math.cos(theta+angle)*radius,z:target.z+Math.sin(theta+angle)*radius})).filter(p=>baseOpen(state,Math.round(p.x),Math.round(p.z),ctx)&&!fortAt(state,Math.round(p.x),Math.round(p.z))&&!state.frontier.units.some(t=>t!==u&&t!==target&&alive(t)&&distance(t,p)<.32));const goal=goals.find(p=>key(u)===key(p)||frontierPath(state,u,p,ctx,{faction:u.faction,breach:u.faction!=='player'}).length);if(goal)move(state,u,goal,dt,ctx,{breach:u.faction!=='player'});return;}}
+  if(target){u.targetId=target.id;const d=distance(u,target),stronghold=target.id.startsWith('settlement-'),reach=range+(stronghold?1.15:target.kind?0:.5);if(d<=reach&&lineOfSight(state,u,target,ctx)){attack(state,u,target,ctx,casualties);u.path=[];return;}if(u.order.type!=='hold'){const theta=Math.atan2(u.z-target.z,u.x-target.x),radius=reach*.91,goals=[0,.55,-.55,1.1,-1.1,Math.PI].map(angle=>({x:target.x+Math.cos(theta+angle)*radius,z:target.z+Math.sin(theta+angle)*radius})).filter(p=>baseOpen(state,Math.round(p.x),Math.round(p.z),ctx)&&!fortAt(state,Math.round(p.x),Math.round(p.z))&&!state.frontier.units.some(t=>t!==u&&t!==target&&alive(t)&&!t.garrisoned&&distance(t,p)<.32));const goal=goals.find(p=>key(u)===key(p)||frontierPath(state,u,p,ctx,{faction:u.faction,breach:u.faction!=='player'}).length);if(goal)move(state,u,goal,dt,ctx,{breach:u.faction!=='player'});return;}}
   u.targetId=null;if(u.order.type==='hold')return;
   const goal=u.order.x!==undefined?{x:u.order.x,z:u.order.z}:h;
   if(u.faction!=='player'&&distance(u,h)<1.4){const cost={food:Math.min(6,state.resources.food||0),gold:Math.min(4,state.resources.gold||0)};spend(state,cost);const lost=Object.values(cost).reduce((a,b)=>a+b,0);state.frontier.stats.cargoLost+=lost;if(u.faction==='raiders'&&state.frontier.raidActive&&state.frontier.raidOutcome)state.frontier.raidOutcome.cargoLost=round(state.frontier.raidOutcome.cargoLost+lost);u.status='returning';u.order={type:'retreat',...(state.frontier.neighbors.find(n=>n.id===u.faction)||ctx.raiderSpawn||{x:0,z:-25})};u.path=[];log(state,'A raider reached the stores and is withdrawing with up to 6 food and 4 coin.','raid');return;}
   if(move(state,u,goal,dt,ctx,{breach:u.faction!=='player'})&&u.faction==='player')u.order={type:'hold'};
 }
+function medicTick(state,u,dt,ctx) {
+  u.careCooldown=Math.max(0,(u.careCooldown||0)-dt);u.targetId=null;
+  if(u.order.type==='retreat'){combatTick(state,u,dt,ctx,[]);return;}
+  const threats=state.frontier.units.filter(t=>alive(t)&&!t.garrisoned&&hostile(state,'player',t.faction)&&distance(t,u)<3);
+  if(!threats.length&&u.medicalCharges>0){
+    const patients=state.frontier.units.filter(t=>t!==u&&residentSoldier(t)&&!t.garrisoned&&t.status!=='training'&&t.hp<t.maxHp&&distance(u,t)<=4&&(t.damageAt===null||state.frontier.clock-t.damageAt>=3)).sort((a,b)=>a.hp/a.maxHp-b.hp/b.maxHp||a.id.localeCompare(b.id));
+    for(const patient of patients){
+      if(distance(u,patient)<=MEDIC_KIT.range&&lineOfSight(state,u,patient,ctx)){
+        u.targetId=patient.id;u.path=[];u.yaw=Math.atan2(patient.x-u.x,patient.z-u.z);
+        if(!u.careCooldown){patient.hp=round(Math.min(patient.maxHp,patient.hp+MEDIC_KIT.heal));u.medicalCharges--;u.careCooldown=MEDIC_KIT.interval;u.treatedAt=state.frontier.clock;}return;
+      }
+      if(u.order.type==='hold')continue;
+      const p=nearestOpen(state,patient,ctx,2,true);
+      if(p&&distance(p,patient)<=MEDIC_KIT.range&&(key(u)===key(p)||frontierPath(state,u,p,ctx).length)){move(state,u,p,dt,ctx);return;}
+    }
+  }
+  const escorts=(u.escortIds||[]).map(id=>state.frontier.units.find(t=>t.id===id&&residentSoldier(t)&&!t.garrisoned&&t.status==='active')).filter(Boolean);
+  if(escorts.length){
+    const leader=escorts[0],behind={x:leader.x-Math.sin(leader.yaw||0)*2,z:leader.z-Math.cos(leader.yaw||0)*2};
+    const p=nearestOpen(state,behind,ctx,2,true);
+    if(p&&distance(u,p)>.6&&!threats.some(t=>distance(t,p)<2)&&!state.frontier.units.some(t=>alive(t)&&hostile(state,'player',t.faction)&&distance(t,p)<2)){move(state,u,p,dt,ctx);return;}
+    u.path=[];return;
+  }
+  if(u.escortIds?.length){u.escortIds=[];u.order={type:'retreat'};u.path=[];combatTick(state,u,dt,ctx,[]);return;}
+  if(threats.length){const q=quarters(state,u,ctx);if(q)move(state,u,q.point,dt,ctx);return;}
+  if(u.order.type==='defend'){const q=quarters(state,u,ctx);if(q){if(distance(u,q.point)<.45)dock(state,u,q);else move(state,u,q.point,dt,ctx);}return;}
+  if(u.order.type==='move'&&move(state,u,u.order,dt,ctx))u.order={type:'hold'};
+}
+function restingTick(state,u,dt,ctx) {
+  const q=quarters(state,u,ctx);
+  if(q&&distance(u,q.point)>.1){u.garrisoned=false;return false;}
+  if(!q||q.building.id!==u.quartersId){u.garrisoned=false;u.order={type:'retreat'};return false;}
+  if(u.status==='training')return false;
+  if(u.status==='active'&&state.frontier.units.some(t=>alive(t)&&!t.garrisoned&&hostile(state,'player',t.faction)&&distance(t,q.point)<=DEFEND_RADIUS)){
+    if(u.kind==='medic'){const escorts=state.frontier.units.filter(t=>t!==u&&residentSoldier(t)&&t.kind!=='medic'&&!t.garrisoned&&t.status==='active'&&distance(t,q.point)<=DEFEND_RADIUS);if(!escorts.length)return true;u.escortIds=escorts.map(t=>t.id);}
+    if(leaveBarracks(state,u,ctx)){u.order={type:'defend',...q.point,anchor:{...q.point}};return false;}return true;
+  }
+  if(u.status==='active'){u.hp=round(Math.min(u.maxHp,u.hp+u.maxHp*dt/90));if(u.kind==='medic'&&u.medicalCharges===0)resupplyMedic(state,u.id,ctx);}
+  return u.status==='active';
+}
+
 function step(state,dt,ctx,events,casualties) {
   const f=state.frontier;f.clock=round(f.clock+dt);const beforeLog=f.nextLogId;
   // Peaceful contact and expansion no longer start an anonymous raid timer.
@@ -434,10 +528,15 @@ function step(state,dt,ctx,events,casualties) {
   for(const n of f.neighbors){if(n.status==='truce'&&f.clock>=n.truceUntil)n.status='neutral';if(n.status==='war'&&n.nextAttackAt!==null&&f.clock>=n.nextAttackAt){spawnForce(state,n.id,n,3,ctx);n.nextAttackAt=f.clock+DAY*3;f.stats.deathsThisWave=0;log(state,`${n.name}'s attacking column is on the road. Another is expected in 4m 30s at 1× unless peace or conquest ends the war.`,'battle');}}
   for(const p of [...f.projectiles])if(f.clock>=p.hitAt){const target=f.units.find(u=>u.id===p.targetId&&alive(u))||f.fortifications.find(v=>v.id===p.targetId&&v.status!=='ruined');if(target&&hostile(state,p.faction,target.faction)&&distance(target,p.to)<=.8)damage(state,target,p.damage,{faction:p.faction},ctx,casualties);f.projectiles=f.projectiles.filter(v=>v!==p);}
   for(const u of [...f.units]){
-    if(!alive(u))continue;discover(state,u,ctx);
-    if(u.status==='training'){u.trainingRemaining=round(Math.max(0,u.trainingRemaining-dt));if(!u.trainingRemaining){u.status='active';log(state,`${u.name} is ready for orders.`,'training');}continue;}
-    if(u.status==='wounded'){if(distance(u,home(ctx))<1.5){u.recoveryRemaining=round(Math.max(0,u.recoveryRemaining-dt));u.hp=Math.max(1,round(u.maxHp*(1-u.recoveryRemaining/90)));if(!u.recoveryRemaining){u.status='active';u.hp=u.maxHp;u.order={type:isFieldworker(u)||u.kind==='ranger'?'retreat':'hold'};log(state,`${u.name} recovered at home and can return to service.`,'recovery');}}else move(state,u,home(ctx),dt,ctx,{speed:.5});continue;}
-    if(u.kind==='ranger')journeyTick(state,u,dt,ctx);else if(isFieldworker(u))fieldworkTick(state,u,dt,ctx);else if(u.kind==='engineer')engineerTick(state,u,dt,ctx);else if(u.kind==='envoy')envoyTick(state,u,dt,ctx);else combatTick(state,u,dt,ctx,casualties);
+    if(!alive(u))continue;
+    if(u.order.type==='defend'&&u.quartersId&&!barracks(state).some(b=>b.id===u.quartersId)){u.garrisoned=false;u.order={type:'retreat'};u.path=[];}
+    if(u.garrisoned&&restingTick(state,u,dt,ctx))continue;
+    // Old idle troops walk to quarters on their next simulation tick. Explicit field orders stay intact.
+    if(residentSoldier(u)&&!Object.hasOwn(u,'quartersId')){const q=quarters(state,u,ctx);u.quartersId=q?.building.id||null;if(q&&u.order.type==='hold'&&distance(u,home(ctx))<4)u.order={type:'retreat'};}
+    if(!u.garrisoned)discover(state,u,ctx);
+    if(u.status==='training'){u.trainingRemaining=round(Math.max(0,u.trainingRemaining-dt));if(!u.trainingRemaining){u.status='active';const q=quarters(state,u,ctx);if(q){if(u.garrisoned)u.order={type:'defend',...q.point,anchor:{...q.point}};else u.order={type:'retreat'};}log(state,`${u.name} is ready for orders.`,'training');}continue;}
+    if(u.status==='wounded'){const q=quarters(state,u,ctx),goal=q?.point||home(ctx);if(u.garrisoned||distance(u,goal)<(q?.45:1.5)){if(q)dock(state,u,q);u.recoveryRemaining=round(Math.max(0,u.recoveryRemaining-dt));u.hp=Math.max(u.hp,1,round(u.maxHp*(1-u.recoveryRemaining/90)));if(!u.recoveryRemaining){u.status='active';u.hp=u.maxHp;u.order=q?{type:'defend',...q.point,anchor:{...q.point}}:{type:isFieldworker(u)||u.kind==='ranger'?'retreat':'hold'};log(state,`${u.name} recovered${q?' at the barracks':' at home'} and can return to service.`,'recovery');}}else move(state,u,goal,dt,ctx,{speed:.5});continue;}
+    if(u.kind==='medic')medicTick(state,u,dt,ctx);else if(u.kind==='ranger')journeyTick(state,u,dt,ctx);else if(isFieldworker(u))fieldworkTick(state,u,dt,ctx);else if(u.kind==='engineer')engineerTick(state,u,dt,ctx);else if(u.kind==='envoy')envoyTick(state,u,dt,ctx);else combatTick(state,u,dt,ctx,casualties);
   }
   if(f.raidActive&&!f.units.some(u=>u.faction==='raiders'&&alive(u))){f.raidActive=false;f.nextRaidAt=null;const outcome=f.raidOutcome,defeated=outcome&&!outcome.uncertain&&outcome.spawned>0&&outcome.killed===outcome.spawned&&outcome.escaped===0;if(outcome)outcome.completed=true;if(defeated)f.stats.raidsDefeated++;log(state,`${defeated?'The raiding force was defeated.':`The raid ended${outcome?` with ${outcome.escaped} escaped and ${round(outcome.cargoLost)} supplies lost`:''}.`} There is no automatic next raid. Neighbor armies attack only while you are at war.`,'battle');}
   for(const n of f.neighbors){const fort=f.fortifications.find(v=>v.id===`settlement-${n.id}`);if(fort)n.hp=fort.hp;}
@@ -448,7 +547,7 @@ function step(state,dt,ctx,events,casualties) {
 }
 export function tickFrontier(state,dt,ctx={}) {
   if(!finite(dt)||dt<0||dt>3600)throw new Error('Invalid frontier tick duration');if(!state.frontier)state.frontier=createFrontierState(ctx);
-  const events=[],casualties=[],f=state.frontier,signature=()=>JSON.stringify([f.units.map(u=>[u.id,u.x,u.z,u.hp,u.status,u.trainingRemaining,u.recoveryRemaining,u.order,u.attackAt]),f.fortifications.map(v=>[v.id,v.status,v.hp,v.progress,v.open]),f.warning,f.claims,f.discoveredRegions,f.nextLogId,f.projectiles,f.squads]);const before=signature();f.subsecond=round(f.subsecond+dt);let steps=0;
+  const events=[],casualties=[],f=state.frontier,signature=()=>JSON.stringify([f.units.map(u=>[u.id,u.x,u.z,u.hp,u.status,u.trainingRemaining,u.recoveryRemaining,u.order,u.attackAt,u.garrisoned,u.quartersId,u.medicalCharges,u.treatedAt]),f.fortifications.map(v=>[v.id,v.status,v.hp,v.progress,v.open]),f.warning,f.claims,f.discoveredRegions,f.nextLogId,f.projectiles,f.squads]);const before=signature();f.subsecond=round(f.subsecond+dt);let steps=0;
   while(f.subsecond+EPS>=STEP){f.subsecond=round(Math.max(0,f.subsecond-STEP));step(state,STEP,ctx,events,casualties);steps++;}
   return{events,casualties:[...new Set(casualties)],changed:before!==signature(),steps};
 }
@@ -461,7 +560,7 @@ export function normalizeFrontier(state,ctx={}) {
   if(!f||f.version!==1||!finite(f.clock)||f.clock<0||!finite(f.subsecond)||f.subsecond<0||f.subsecond>=STEP||!int(f.nextId,1,100000000)||!int(f.nextLogId,1,100000000)||!Array.isArray(f.units)||f.units.length>MAX_UNITS||!Array.isArray(f.fortifications)||f.fortifications.length>MAX_FORTS||!Array.isArray(f.neighbors)||f.neighbors.length!==definitions(ctx).length)fail();
   const citizenIds=new Set((state.citizens||[]).map(c=>c.id)),ids=new Set(),reserved=new Set(),validFactions=new Set(['player','raiders',...definitions(ctx).map(n=>n.id)]),validRegions=new Set(regions(ctx).map(r=>r.id));let highestId=0;
   const validBag=bag=>bag&&typeof bag==='object'&&!Array.isArray(bag)&&Object.entries(bag).every(([r,n])=>Object.hasOwn(state.resources||{},r)&&finite(n)&&n>=0&&n<=100000);
-  for(const u of f.units){const spec=Object.hasOwn(TROOPS,u?.kind)?TROOPS[u.kind]:null;if(!spec||typeof u.id!=='string'||ids.has(u.id)||!validFactions.has(u.faction)||!validPoint(u)||!finite(u.yaw)||!['training','active','wounded','returning','dead','released'].includes(u.status)||u.maxHp!==spec.maxHp||!finite(u.hp)||u.hp<0||u.hp>u.maxHp||!finite(u.cooldown)||u.cooldown<0||u.cooldown>spec.interval+EPS||!finite(u.trainingRemaining)||u.trainingRemaining<0||u.trainingRemaining>spec.trainingSeconds||!finite(u.recoveryRemaining)||u.recoveryRemaining<0||u.recoveryRemaining>90||!u.order||!['hold','move','attack','retreat','defend','build','envoy','fieldwork','journey','raid'].includes(u.order.type)||!Array.isArray(u.path)||u.path.length>6500||!u.path.every(p=>validPoint(p)&&Number.isInteger(p.x)&&Number.isInteger(p.z)))fail();ids.add(u.id);if(u.citizenId){if(u.faction!=='player'||(alive(u)&&(!citizenIds.has(u.citizenId)||reserved.has(u.citizenId))))fail();if(alive(u))reserved.add(u.citizenId);}if(u.order.x!==undefined&&!validPoint(u.order))fail();if(u.order.type==='defend'&&(u.faction!=='player'||!u.citizenId||u.allyFrom||!['spearman','archer'].includes(u.kind)||!validPoint(u.order.anchor)||u.order.anchor.x!==home(ctx).x||u.order.anchor.z!==home(ctx).z||!validPoint(u.order)||distance(u.order,u.order.anchor)>DEFEND_RADIUS+EPS||u.order.targetId!==undefined))fail();if(u.routeGoal!==null&&u.routeGoal!==undefined&&!validPoint(u.routeGoal))fail();for(const t of ['attackAt','damageAt','deathAt'])if(u[t]!==null&&(!finite(u[t])||u[t]<0||u[t]>f.clock+EPS))fail();if(u.expiresAt!==undefined&&(!finite(u.expiresAt)||u.expiresAt<0))fail();if(u.protectedUntil!==undefined&&(!finite(u.protectedUntil)||u.protectedUntil<0||u.protectedUntil>f.clock+20+EPS))fail();}
+  for(const u of f.units){if(u?.quartersId&&u.order?.type==='defend'&&!barracks(state).some(b=>b.id===u.quartersId)){u.order={type:'retreat'};u.garrisoned=false;u.path=[];}const spec=Object.hasOwn(TROOPS,u?.kind)?TROOPS[u.kind]:null;if(!spec||typeof u.id!=='string'||ids.has(u.id)||!validFactions.has(u.faction)||!validPoint(u)||!finite(u.yaw)||!['training','active','wounded','returning','dead','released'].includes(u.status)||u.maxHp!==spec.maxHp||!finite(u.hp)||u.hp<0||u.hp>u.maxHp||!finite(u.cooldown)||u.cooldown<0||u.cooldown>spec.interval+EPS||!finite(u.trainingRemaining)||u.trainingRemaining<0||u.trainingRemaining>spec.trainingSeconds||!finite(u.recoveryRemaining)||u.recoveryRemaining<0||u.recoveryRemaining>90||!u.order||!['hold','move','attack','retreat','defend','build','envoy','fieldwork','journey','raid'].includes(u.order.type)||!Array.isArray(u.path)||u.path.length>6500||!u.path.every(p=>validPoint(p)&&Number.isInteger(p.x)&&Number.isInteger(p.z)))fail();ids.add(u.id);if(u.citizenId){if(u.faction!=='player'||(alive(u)&&(!citizenIds.has(u.citizenId)||reserved.has(u.citizenId))))fail();if(alive(u))reserved.add(u.citizenId);}if(u.order.x!==undefined&&!validPoint(u.order))fail();if(u.order.type==='defend'&&(u.faction!=='player'||!u.citizenId||u.allyFrom||!COMPANY_KINDS.includes(u.kind)||!validPoint(u.order.anchor)||!([home(ctx),...barracks(state).map(barracksEntrance)].some(p=>p.x===u.order.anchor.x&&p.z===u.order.anchor.z))||!validPoint(u.order)||distance(u.order,u.order.anchor)>DEFEND_RADIUS+EPS||u.order.targetId!==undefined))fail();if(u.routeGoal!==null&&u.routeGoal!==undefined&&!validPoint(u.routeGoal))fail();for(const t of ['attackAt','damageAt','deathAt'])if(u[t]!==null&&(!finite(u[t])||u[t]<0||u[t]>f.clock+EPS))fail();if(u.expiresAt!==undefined&&(!finite(u.expiresAt)||u.expiresAt<0))fail();if(u.protectedUntil!==undefined&&(!finite(u.protectedUntil)||u.protectedUntil<0||u.protectedUntil>f.clock+20+EPS))fail();}
   for(const u of f.units){if(!/^unit-[1-9]\d*$/.test(u.id)||typeof u.name!=='string'||u.name.length>120||!baseOpen(state,Math.round(u.x),Math.round(u.z),ctx))fail();highestId=Math.max(highestId,Number(u.id.slice(5)));if(u.status==='dead'?u.hp!==0:u.hp<=0)fail();if(!finite(u.routeAt)||u.routeAt>f.clock||u.routeAt< -10||!int(u.wounds,0,100000))fail();if(u.faction!=='player'&&u.citizenId)fail();if(u.faction==='player'&&!u.citizenId&&(!definitions(ctx).some(n=>n.id===u.allyFrom)||!finite(u.expiresAt)))fail();if(u.kind==='envoy'&&!definitions(ctx).some(n=>n.id===u.missionNeighborId))fail();if(u.trainingSeconds!==(u.citizenId?TROOPS[u.kind].trainingSeconds:0))fail();let previous={x:Math.round(u.x),z:Math.round(u.z)},blockedCache=false;const bounds=ctx.bounds||FRONTIER_BOUNDS;for(const p of u.path){if(!int(p.x,bounds.minX,bounds.maxX)||!int(p.z,bounds.minZ,bounds.maxZ)||Math.abs(p.x-previous.x)+Math.abs(p.z-previous.z)>1)fail();if(!baseOpen(state,p.x,p.z,ctx))blockedCache=true;previous=p;}if(blockedCache){u.path=[];u.routeAt=-10;}if(u.order.x!==undefined&&(!int(u.order.x,-256,256)||!int(u.order.z,-256,256)))fail();}
   const occupied=new Set();for(const fort of f.fortifications){const spec=Object.hasOwn(FORTIFICATIONS,fort?.type)?FORTIFICATIONS[fort.type]:null,maxHp=fort?.faction==='player'?spec?.maxHp:360;if(!spec||typeof fort.id!=='string'||ids.has(fort.id)||!validFactions.has(fort.faction)||fort.faction==='raiders'||!validPoint(fort)||!Number.isInteger(fort.x)||!Number.isInteger(fort.z)||!int(fort.rotation,0,3)||!['building','ready','ruined'].includes(fort.status)||fort.maxHp!==maxHp||!finite(fort.hp)||fort.hp<0||fort.hp>maxHp||!finite(fort.progress)||fort.progress<0||!finite(fort.work)||fort.work<0||fort.work>90||fort.progress>fort.work+EPS||!validBag(fort.escrow)||typeof fort.open!=='boolean')fail();ids.add(fort.id);if(fort.status!=='ruined'){if(occupied.has(key(fort)))fail();occupied.add(key(fort));}if(fort.regionId!==null&&fort.regionId!==undefined&&!validRegions.has(fort.regionId))fail();if(fort.status==='building'){const cap=fort.regionId==='crownhill'?{...spec.cost,stone:spec.cost.stone+20,gold:spec.cost.gold+25}:spec.cost;for(const[r,n]of Object.entries(fort.escrow))if(n>(cap[r]||0))fail();if(fort.work<=0)fail();}else if(fort.status==='ruined')fort.escrow={};else if(Object.values(fort.escrow).some(n=>n>0))fail();}
   for(const fort of f.fortifications){if(fort.faction==='player'){if(!/^fort-[1-9]\d*$/.test(fort.id)||!baseOpen(state,fort.x,fort.z,ctx)||definitions(ctx).some(n=>distance(fort,n)<2.3))fail();highestId=Math.max(highestId,Number(fort.id.slice(5)));if(fort.completedAt!==null&&(!finite(fort.completedAt)||fort.completedAt<0||fort.completedAt>f.clock))fail();if(typeof fort.repairing!=='boolean')fail();if(fort.repairing&&(!finite(fort.repairStartHp)||fort.repairStartHp<0||fort.repairStartHp>fort.maxHp))fail();}else if(fort.id!==`settlement-${fort.faction}`)fail();if(fort.status==='ruined'&&fort.hp!==0)fail();if(fort.damageAt!==null&&(!finite(fort.damageAt)||fort.damageAt<0||fort.damageAt>f.clock))fail();}
@@ -479,6 +578,12 @@ export function normalizeFrontier(state,ctx={}) {
   for(const n of f.neighbors){const canonical=definitions(ctx).find(v=>v.id===n.id);n.name=canonical.name;n.temper=canonical.temper;}
   for(const u of f.units){const citizen=state.citizens.find(c=>c.id===u.citizenId);if(citizen)u.name=citizen.name;else if(!u.citizenId)u.name=u.allyFrom?`${f.neighbors.find(n=>n.id===u.allyFrom).name} ally`:TROOPS[u.kind].name;}
   for(const fort of f.fortifications)fort.name=fort.faction==='player'?FORTIFICATIONS[fort.type].name:f.neighbors.find(n=>n.id===fort.faction).name;
+  for(const u of f.units){
+    const b=(state.buildings||[]).find(b=>b.id===u.quartersId&&b.type==='barracks');
+    if(residentSoldier(u)&&!Object.hasOwn(u,'quartersId')){const q=quarters(state,u,ctx);u.quartersId=q?.building.id||null;u.garrisoned=false;if(q&&u.order.type==='hold'&&distance(u,home(ctx))<4){u.order={type:'retreat'};u.path=[];}}
+    else if(!residentSoldier(u)||!b){u.quartersId=null;u.garrisoned=false;}else u.garrisoned=u.garrisoned===true&&b.status==='ready'&&!b.paused&&distance(u,barracksEntrance(b))<.1;
+    if(u.kind==='medic'){if(!int(u.medicalCharges,0,MEDIC_KIT.capacity))u.medicalCharges=0;u.careCooldown=finite(u.careCooldown)?clamp(u.careCooldown,0,MEDIC_KIT.interval):0;u.escortIds=Array.isArray(u.escortIds)?[...new Set(u.escortIds)].filter(id=>f.units.some(v=>v.id===id&&v.kind!=='medic'&&residentSoldier(v))).slice(0,MAX_SQUAD_MEMBERS):[];u.treatedAt=finite(u.treatedAt)&&u.treatedAt>=0&&u.treatedAt<=f.clock?u.treatedAt:null;}
+  }
   normalizeSquads(state);
   return f;
 }

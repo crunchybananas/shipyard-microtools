@@ -5,7 +5,7 @@ import { RESOURCES } from './catalog.js';
 import { ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS, terrainAt, regionAt, isLand } from './island.js';
 import { createPressGuard } from './press-guard.js';
 
-export const companySoldiers = units => units.filter(unit => unit.faction === 'player' && unit.citizenId && !unit.allyFrom && ['spearman', 'archer'].includes(unit.kind) && !['dead', 'released'].includes(unit.status));
+export const companySoldiers = units => units.filter(unit => unit.faction === 'player' && unit.citizenId && !unit.allyFrom && frontier.COMPANY_KINDS.includes(unit.kind) && !['dead', 'released'].includes(unit.status));
 
 /** Selection is local UI state. Cancel restores the previous living members;
  * neither changing a selection nor recalling it issues a field order. */
@@ -210,7 +210,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     signature = next;
     const active = content.contains(document.activeElement) ? document.activeElement.dataset.frontierAction : null, scroll = content.scrollTop;
     const disclosures = new Map([...content.querySelectorAll('details[data-frontier-disclosure]')].map(node => [node.dataset.frontierDisclosure, node.open]));
-    title.textContent = selected?.kind === 'troop' ? 'The field company' : selected?.kind === 'fortification' ? 'At the town boundary' : { explore: 'Beyond familiar paths', gardens: 'Seeds & gathering stores', defenses: 'Keep a way home', company: 'The field company', neighbors: 'Along the island' }[tab];
+    title.textContent = selected?.kind === 'troop' ? 'Company' : selected?.kind === 'fortification' ? 'Defenses' : { explore: 'Beyond familiar paths', gardens: 'Seeds & gathering stores', defenses: 'Walls & defenses', company: 'Company', neighbors: 'Along the island' }[tab];
     tabs.querySelectorAll('button').forEach(node => node.setAttribute('aria-pressed', String(node.dataset.frontierAction === `tab-${tab}`)));
     const context = {action,getContext,focus:item=>{close();focus(item);},selectRegion:id=>{selected={kind:'region',id};signature='';update(true);}};
     const nodes = tab === 'explore' ? explorationContent(state,context,selected?.kind==='region'?selected.id:'home') : tab === 'gardens' ? gardensContent(state,context) : tab === 'defenses' ? defensesContent(state) : tab === 'company' ? companyContent(state) : neighborsContent(state);
@@ -238,7 +238,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     return card;
   }
   function defensesContent(state) {
-    const overview = api.frontierOptions(state, getContext()), forts = overview.fortifications.filter(item => item.faction === 'player'), nodes = [intro('Keep a gate in the route home. Walls and closed gates stop passage; towers cover nearby ground. Each project assigns a resident, taking them away from their usual job until it is finished.')];
+    const overview = api.frontierOptions(state, getContext()), forts = overview.fortifications.filter(item => item.faction === 'player'), nodes = [intro('Build walls: under Stone wall, choose Draw a wall line. Tap the start and end of a straight line, review the cost, then choose Build sections.'), intro('Keep a gate in the route home. Walls and closed gates stop passage; towers cover nearby ground. Each project assigns a resident, taking them away from their usual job until it is finished.')];
     const fort = forts.find(item => item.id === selected?.id);
     if (fort) {
       const card = el('div', 'frontier-selection');
@@ -286,11 +286,11 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     const nodes = [], card = el('section', 'frontier-selection company-selection');
     const summary = el('h3', '', `${chosen.length} selected`); summary.tabIndex = -1; summary.dataset.frontierAction = 'selection-summary';
     card.append(summary);
-    const statusName = unit => unit.status === 'training' ? 'Training' : unit.status === 'wounded' ? 'Recovering' : ({ defend: 'Defending town', hold: 'Holding here', move: 'Moving', attack: 'Attacking', retreat: 'Returning home' }[unit.order?.type] || unit.status || 'Ready');
+    const statusName = unit => unit.status === 'training' ? 'Training' : unit.status === 'wounded' ? (unit.garrisoned ? `Recovering inside · ${Math.ceil(unit.recoveryRemaining)}s` : 'Withdrawing for care') : unit.garrisoned ? 'Inside barracks' : unit.kind === 'medic' && unit.escortIds?.length ? 'Accompanying troops' : ({ defend: 'Defending town', hold: 'Holding here', move: 'Moving', attack: 'Attacking', retreat: 'Returning to barracks' }[unit.order?.type] || unit.status || 'Ready');
     const stances = [...new Set(chosen.map(statusName))], readyChosen = chosen.filter(unit => unit.status === 'active').length;
     card.append(el('p', 'company-stance', chosen.length ? `${readyChosen} ready · ${stances.join(' / ')}` : 'Select ready soldiers, then give the group an order.'));
     controls(card, [
-      { label: `Ready soldiers (${ready.length})`, id: 'select-ready', disabled: !ready.length, run: () => { selection.replace(ready.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); } },
+      { label: `Ready company (${ready.length})`, id: 'select-ready', disabled: !ready.length, run: () => { selection.replace(ready.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); } },
       { label: 'Select on island', id: 'select-on-island', disabled: !units.length, run: beginSelection },
     ]);
     const ids = chosen.map(unit => unit.id), unavailable = !chosen.length || readyChosen !== chosen.length || !canMutate();
@@ -299,10 +299,10 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
       { label: 'Hold Here', id: 'hold', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'hold' }, getContext())) },
       { label: 'Move', id: 'move', disabled: unavailable, run: () => begin({ kind: 'move', ids }) },
       { label: 'Attack', id: 'attack', disabled: unavailable, run: () => begin({ kind: 'attack', ids }) },
-      { label: 'Retreat home', id: 'retreat', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'retreat' }, getContext())) },
+      { label: 'Return to barracks', id: 'retreat', disabled: unavailable, run: () => action(() => api.commandTroops(state, ids, { type: 'retreat' }, getContext())) },
     ]);
-    card.append(el('p', 'company-order-help', `Defend Town rallies near home and responds within ${api.DEFEND_RADIUS} tiles. Hold Here keeps each soldier in place, fighting only within weapon range.`));
-    if (chosen.length && readyChosen !== chosen.length) card.append(el('p', 'frontier-reason', 'Training or recovering recruits are selected. Choose Ready soldiers to give orders now.'));
+    card.append(el('p', 'company-order-help', `Defend Town guards within ${api.DEFEND_RADIUS} tiles of the barracks. Troops rest inside when the area is clear. Select a medic with your soldiers before moving or attacking so they travel together.`));
+    if (chosen.length && readyChosen !== chosen.length) card.append(el('p', 'frontier-reason', 'Training or recovering recruits are selected. Choose Ready company to give orders now.'));
     if (selectionNotice) { const notice = el('p', 'frontier-reason', selectionNotice); notice.setAttribute('role', 'status'); card.append(notice); }
     const saveUnavailable = !chosen.length || chosen.length > api.MAX_SQUAD_MEMBERS || squads.length >= api.MAX_SQUADS || !canMutate();
     controls(card, [
@@ -335,27 +335,31 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
       nodes.push(saved);
     }
     const art = el('img', 'company-art'); art.src = './assets/defense-company.jpg'; art.alt = ''; art.loading = 'lazy'; art.decoding = 'async'; art.width = 2172; art.height = 724;
-    nodes.push(art, intro('Recruited residents serve as soldiers in the Company. Watch-house workers provide town security and coastal patrol readiness; they are separate from this field company.'));
+    nodes.push(art, intro('Recruited residents serve as soldiers in the Company. Barracks workers provide town security and coastal patrol readiness; they are separate from this field company.'));
     if (openWatch) nodes.push(button('Coastal patrol & Watch', 'open-town-watch', () => { close(); openWatch(); }));
     const enemy = selected?.kind === 'enemy' ? overview.units.find(unit => unit.id === selected.id) : null;
     if (enemy) {
       const target = el('div', 'frontier-selection'); target.append(el('h3', '', enemy.name), meter(enemy.hp, enemy.maxHp), el('p', '', `${enemy.kind} · ${Math.round(enemy.hp)} / ${enemy.maxHp} health · ${enemy.status}`), el('p', '', 'Select your soldiers, choose Attack, then choose this target on the island.')); nodes.push(target);
     }
     if (units.length) {
-      nodes.push(section('Soldier roster'));
-      const all = el('div'); const picks = [{ label: `All soldiers (${units.length})`, id: 'select-company', run: () => { selection.replace(units.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); content.scrollTop = 0; } }];
+      nodes.push(section('Company roster'));
+      const all = el('div'); const picks = [{ label: `All company members (${units.length})`, id: 'select-company', run: () => { selection.replace(units.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); content.scrollTop = 0; } }];
       if (defenders.length) picks.push({ label: `All defenders (${defenders.length})`, id: 'select-defenders', run: () => { selection.replace(defenders.map(unit => unit.id)); selected = null; selectionNotice = ''; update(true); content.scrollTop = 0; } });
       controls(all, picks); nodes.push(all, intro('Tap names to add or remove soldiers. Shift-click soldiers on the island for the same selection.'));
       for (const unit of units) {
         const item = el('div', 'frontier-unit');
         const pick = button('', `unit-${unit.id}`, () => { selection.toggle(unit.id); selected = { kind: 'troop', id: unit.id }; selectionNotice = ''; update(true); }, { pressed: selection.has(unit.id) });
-        pick.append(el('strong', '', unit.name || unit.citizenName || unit.kind), el('small', '', `${unit.kind} · ${Math.round(unit.hp)} / ${unit.maxHp} health · ${statusName(unit)}${unit.status === 'training' ? ` · ${Math.ceil(unit.trainingRemaining)}s left` : ''}`));
+        pick.append(el('strong', '', unit.name || unit.citizenName || unit.kind), el('small', '', `${api.TROOPS[unit.kind]?.name || unit.kind} · ${Math.round(unit.hp)} / ${unit.maxHp} health · ${statusName(unit)}${unit.status === 'training' ? ` · ${Math.ceil(unit.trainingRemaining)}s left` : ''}`));
+        if(unit.kind==='medic')pick.append(el('small','',`${unit.medicalCharges || 0} / ${api.MEDIC_KIT.capacity} dressings`));
         item.append(pick, button('Find', `find-unit-${unit.id}`, () => { close(); focus({ ...unit, kind: 'troop' }); }, { className: 'frontier-locate' })); nodes.push(item);
       }
-    } else nodes.push(intro('The company has no recruits yet. Complete and unpause a watch-house, then recruit a resident below. Each training quote shows the supplies and other requirements.'));
+    } else nodes.push(intro('The company has no recruits yet. Complete and unpause a barracks, then recruit a resident below. Each training quote shows the supplies and other requirements.'));
+    const quarters=api.barracksRoster(state);
+    if(quarters.length){nodes.push(section('Barracks'));for(const q of quarters){const card=row(`Barracks · ${q.x}, ${q.z}`,`${q.inside} inside · ${q.unitIds.length} assigned`);controls(card,[{label:'Find barracks',id:`find-barracks-${q.id}`,run:()=>{close();focus({...q,kind:'region-point'});}}]);nodes.push(card);}}
     if (chosen.length === 1) {
       const unit = chosen[0], care = row(`${unit.name} · care & civilian work`), offer = api.healOffer(state, unit.id, getContext()); quote(care, offer, 'Recovery');
       controls(care, [{ label: 'Tend wounds', id: `heal-${unit.id}`, disabled: !offer.ok || !canMutate(), reason: offer.reason, run: () => action(() => api.healTroop(state, unit.id, getContext())) }]);
+      if(unit.kind==='medic'){const kit=api.resupplyMedicOffer(state,unit.id,getContext());quote(care,kit,'Medical kit');controls(care,[{label:'Refill medical kit',id:`resupply-${unit.id}`,disabled:!kit.ok||!canMutate(),reason:kit.reason,run:()=>action(()=>api.resupplyMedic(state,unit.id,getContext()))}]);}
       const dismissal = api.dismissOffer(state, unit.id, getContext()); care.append(el('p', dismissal.ok ? 'frontier-cost' : 'frontier-reason', dismissal.reason));
       controls(care, [{ label: unit.status === 'training' ? 'Cancel training' : 'Return to civilian work', id: `dismiss-${unit.id}`, disabled: !dismissal.ok || !canMutate(), reason: dismissal.reason, run: () => action(() => api.dismissTroop(state, unit.id, getContext())) }]); nodes.push(care);
     }
@@ -367,7 +371,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     nodes.push(section('Recruit a resident'));
     for (const option of api.troopOptions(state)) {
       const card = row(option.name); card.append(el('p', '', option.description)); quote(card, option);
-      card.append(el('p', '', `${option.trainingSeconds} seconds to train · ${option.maxHp} health · ${option.damage} base damage · range ${option.range}`));
+      card.append(el('p', '', option.id==='medic'?`${option.trainingSeconds}s training · ${option.maxHp} health · six dressings · 14 health per dressing. Requires a three-second break from damage. Severe wounds still need rest at barracks.`:`${option.trainingSeconds} seconds to train · ${option.maxHp} health · ${option.damage} base damage · range ${option.range}`));
       const candidates = option.availableCitizens || [], label = el('label', 'frontier-choice', 'Resident'), selectResident = el('select');
       if (!candidates.some(candidate => candidate.id === draftResidents.get(option.id))) draftResidents.delete(option.id);
       selectResident.setAttribute('aria-label', `Resident to train as ${option.name}`); selectResident.dataset.frontierAction = `resident-${option.id}`;

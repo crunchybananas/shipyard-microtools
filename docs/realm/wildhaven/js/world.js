@@ -504,10 +504,21 @@ export class VillageWorld {
     root.position.set(f.x*CELL,top,f.z*CELL);root.userData={fortification:f,model,plane,height,scaffold};this.scene.add(root);return root;
   }
   makeTroop(unit){
-    const civil=['engineer','envoy','explorer','restorer','ranger'].includes(unit.kind),type=civil?'villager':unit.kind==='archer'&&unit.faction!=='player'?'enemy_archer':['spearman','archer','raider'].includes(unit.kind)?unit.kind:'raider';
+    const civil=['engineer','envoy','explorer','restorer','ranger','medic'].includes(unit.kind),type=civil?'villager':unit.kind==='archer'&&unit.faction!=='player'?'enemy_archer':['spearman','archer','raider'].includes(unit.kind)?unit.kind:'raider';
     const root=this.clone(type),limbs={},weapons={};root.rotation.order='YXZ';root.position.set(unit.x*CELL,groundHeight(unit.x,unit.z),unit.z*CELL);root.rotation.y=unit.yaw||0;
     root.traverse(o=>{for(const name of['left_arm','right_arm','left_leg','right_leg'])if(o.name===name||o.name.endsWith('_'+name))limbs[name]=o;for(const side of['left','right'])if(o.name.endsWith('_'+side+'_weapon'))weapons[side]=o;if(o.isMesh){o.material=o.material.clone();o.userData.ownsMaterial=true;}});
-    if(civil){this.colorCitizen(root,unit.kind);if(unit.kind==='explorer'||unit.kind==='ranger'){const pack=this.clone('cargo_grain');pack.scale.setScalar(.60);pack.position.set(0,.26,-.16);root.add(pack);}const prop=this.clone(['engineer','restorer'].includes(unit.kind)?'tool_hammer':'tool_book');prop.position.set(.04,-.17,.04);prop.rotation.x=['engineer','restorer'].includes(unit.kind)?Math.PI/2:0;limbs[['engineer','restorer'].includes(unit.kind)?'right_arm':'left_arm']?.add(prop);}
+    if(civil){this.colorCitizen(root,unit.kind);if(unit.kind==='explorer'||unit.kind==='ranger'){const pack=this.clone('cargo_grain');pack.scale.setScalar(.60);pack.position.set(0,.26,-.16);root.add(pack);}const prop=unit.kind==='medic'?null:this.clone(['engineer','restorer'].includes(unit.kind)?'tool_hammer':'tool_book');if(prop){prop.position.set(.04,-.17,.04);prop.rotation.x=['engineer','restorer'].includes(unit.kind)?Math.PI/2:0;limbs[['engineer','restorer'].includes(unit.kind)?'right_arm':'left_arm']?.add(prop);}}
+    if(unit.kind==='medic'){
+      // A cream apron, teal cap and canvas medical bag are visible at game scale.
+      root.traverse(o=>{if(/straw_hat|hat_teal|hat_crown/.test(o.name))o.visible=false;});
+      const apron=new THREE.Mesh(new THREE.BoxGeometry(.18,.22,.035),material('#ece5c9'));apron.position.set(0,.385,.106);
+      const bag=new THREE.Mesh(new THREE.BoxGeometry(.17,.14,.10),material('#547f78'));bag.position.set(.16,.29,-.025);
+      const bandage=new THREE.Mesh(new THREE.BoxGeometry(.115,.025,.106),material('#e8ddba'));bandage.position.copy(bag.position);
+      const cap=new THREE.Mesh(new THREE.SphereGeometry(.116,12,8,0,Math.PI*2,0,Math.PI/2),material('#547f78'));cap.position.set(0,.713,0);cap.scale.y=.55;
+      const roll=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.085,10),material('#ece5c9'));roll.rotation.z=Math.PI/2;roll.position.set(.05,-.175,.05);
+      for(const mesh of [apron,bag,bandage,cap,roll]){mesh.userData.ownsGeometry=true;mesh.userData.ownsMaterial=true;}
+      root.add(apron,bag,bandage,cap);limbs.right_arm?.add(roll);
+    }
     root.userData.unit=unit;this.scene.add(root);return{root,limbs,weapons,unit,phase:0,lastX:root.position.x,lastZ:root.position.z};
   }
   syncFrontier(){
@@ -594,7 +605,7 @@ export class VillageWorld {
     }
     for(const root of this.neighborModels.values()){const fort=root.userData.fortification;root.traverse(o=>{if(o.isMesh&&o.userData.ownsMaterial)o.material.emissive?.setRGB(fort?.damageAt!=null&&time-fort.damageAt<.25?.15:0,0,0);});}
     for(const actor of this.troops.values()){
-      const {root,unit:u,limbs}=actor,p=root.position,dead=u.status==='dead',age=time-(u.deathAt??time);root.visible=!dead||age<4;
+      const {root,unit:u,limbs}=actor,p=root.position,dead=u.status==='dead',age=time-(u.deathAt??time);root.visible=!u.garrisoned&&(!dead||age<4);
       if(!root.visible)continue;
       const tx=u.x*CELL,tz=u.z*CELL,distance=Math.hypot(tx-p.x,tz-p.z),blend=!playing||distance>3?1:Math.min(1,dt*14),oldX=p.x,oldZ=p.z;p.x+=(tx-p.x)*blend;p.z+=(tz-p.z)*blend;const moved=Math.hypot(p.x-oldX,p.z-oldZ);const priorPhase=actor.phase;actor.phase+=moved*10;if(playing&&moved<.8&&Math.floor(priorPhase/Math.PI)!==Math.floor(actor.phase/Math.PI))this.emitSound('step',p,.4);
       let yaw=(u.yaw||0)-root.rotation.y;while(yaw>Math.PI)yaw-=TAU;while(yaw<-Math.PI)yaw+=TAU;root.rotation.y+=yaw*Math.min(1,dt*12);
@@ -602,12 +613,13 @@ export class VillageWorld {
       let right=-gait*.7,left=gait*.7;if(attacking){if(archer){left=-Math.PI/2;right=-1.05+wave*.6;}else if(u.kind==='spearman'){right=-Math.PI/2+wave*.24;left=-.20;}else{right=-2.15+wave*2.1;left=-.23;}}
       if(u.kind==='engineer'&&u.order?.type==='build'&&!u.path?.length){right=-1.1+Math.sin(time*4.5)*.65;left=-.25;}
       if(u.kind==='envoy'||u.kind==='explorer'||u.kind==='ranger')left=-.7;
+      const treating=u.kind==='medic'&&u.treatedAt!=null&&time-u.treatedAt<1.2;if(treating){right=-.95+Math.sin((time-u.treatedAt)*8)*.12;left=-.75;}
       if((isFieldworker(u)||u.kind==='ranger')&&u.missionStage==='working'&&u.status==='active'){right=u.kind==='restorer'?-1.1+Math.sin(time*4.5)*.65:-.9+Math.sin(time*2)*.12;root.rotation.x=.05;}
       if(playing){if(u.attackAt!==null&&u.attackAt!==actor.lastAttack&&time-u.attackAt<.7)this.emitSound(archer?'bow':'impact',p,.9);if(u.damageAt!==null&&u.damageAt!==actor.lastDamage&&time-u.damageAt<.7)this.emitSound('impact',p,.6);const strike=Math.floor((time*4.5-Math.PI/2)/TAU);if(strike!==actor.lastStrike&&((u.kind==='engineer'&&u.order?.type==='build'&&!u.path.length)||(u.kind==='restorer'&&u.missionStage==='working')))this.emitSound('hammer',p,.7);actor.lastStrike=strike;}actor.lastAttack=u.attackAt;actor.lastDamage=u.damageAt;
       if(limbs.right_arm){limbs.right_arm.rotation.x=right;limbs.right_arm.rotation.z=attacking&&archer?-.72:0;}if(limbs.left_arm)limbs.left_arm.rotation.x=left;if(limbs.left_leg)limbs.left_leg.rotation.x=gait;if(limbs.right_leg)limbs.right_leg.rotation.x=-gait;
       if(actor.weapons.left)actor.weapons.left.rotation.x=attacking?-left:0;
       if(actor.weapons.right)actor.weapons.right.rotation.x=attacking?(u.kind==='spearman'?Math.PI/2-right:1.05*wave*wave-right):0;
-      root.rotation.z=dead?Math.min(Math.PI/2,Math.max(0,age)*3):u.status==='wounded'?.13:0;root.rotation.x=attacking&&!archer?.07*wave:0;
+      root.rotation.z=dead?Math.min(Math.PI/2,Math.max(0,age)*3):u.status==='wounded'?.13:0;root.rotation.x=treating?.14:attacking&&!archer?.07*wave:0;
       p.y=groundHeight(p.x/CELL,p.z/CELL)+(dead?.11:moved>.0004?Math.abs(Math.sin(actor.phase))*.016:0);
       root.traverse(o=>{if(o.isMesh&&o.userData.ownsMaterial)o.material.emissive?.setRGB(u.damageAt!=null&&time-u.damageAt<.22?.26:0,0,0);});root.userData.motion={moving:moved>.0004,attacking,attackAge,fieldwork:isFieldworker(u)?u.missionStage:null};
     }

@@ -397,7 +397,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       const plan = disclosure('watch-preparation', 'How to prepare a coastal patrol');
       for (const step of guidance.steps) {
         const item = el('div', 'town-row'); item.append(el('strong', '', `${step.complete ? '✓' : '○'} ${step.label}`), el('p', 'town-meta', step.detail));
-        if (!step.complete && !['wait', 'pressure'].includes(step.kind)) item.append(btn(step.kind === 'research' ? 'View research' : step.kind === 'build' ? 'Plan watch house' : step.kind === 'inspect' ? 'Manage watch house' : step.tab === 'workforce' ? 'Manage people & jobs' : 'View food stores', `watch-plan-${step.id}`, () => takeWatchStep(step)));
+        if (!step.complete && !['wait', 'pressure'].includes(step.kind)) item.append(btn(step.kind === 'research' ? 'View research' : step.kind === 'build' ? 'Plan barracks' : step.kind === 'inspect' ? 'Manage barracks' : step.tab === 'workforce' ? 'Manage people & jobs' : 'View food stores', `watch-plan-${step.id}`, () => takeWatchStep(step)));
         plan.append(item);
       }
       return plan;
@@ -408,13 +408,13 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       if (getPaused()) box.append(pauseCue());
       if (!houses.length) {
         const unlocked = state.research.completed.includes('watchkeeping');
-        box.append(el('p', 'problem', 'No watch house yet.'), btn(unlocked ? 'Build a watch house' : 'Study A standing watch', 'watch-people', () => unlocked ? build('barracks') : revealResearch('watchkeeping'), { className: 'primary' }));
+        box.append(el('p', 'problem', 'No barracks yet.'), btn(unlocked ? 'Build a barracks' : 'Study A standing watch', 'watch-people', () => unlocked ? build('barracks') : revealResearch('watchkeeping'), { className: 'primary' }));
       }
       for (const b of houses) {
         const status = sim.buildingStatus(state, b), spec = getBuildingSpec('barracks', b.level), row = el('div', 'town-row');
-        if (b.status !== 'ready') { row.append(el('strong', '', 'Watch house under construction'), btn('View project', `watch-project-${b.id}`, () => inspect(b))); box.append(row); continue; }
+        if (b.status !== 'ready') { row.append(el('strong', '', 'Barracks under construction'), btn('View project', `watch-project-${b.id}`, () => inspect(b))); box.append(row); continue; }
         const control = el('div', 'town-control'), label = el('div');
-        label.append(el('strong', '', `${status.workers} guards assigned · ${status.desiredWorkers} requested`), el('small', '', `Watch house · level ${b.level}`));
+        label.append(el('strong', '', `${status.workers} guards assigned · ${status.desiredWorkers} requested`), el('small', '', `Barracks · level ${b.level}`));
         const step = stepper(status.desiredWorkers, 0, status.maxWorkers, `watch-staff-${b.id}`, count => action(() => sim.setWorkers(state, b.id, count)));
         step.querySelectorAll('button')[0].setAttribute('aria-label', 'Request one fewer coastal guard'); step.querySelectorAll('button')[1].setAttribute('aria-label', 'Request one more coastal guard');
         control.append(label, step); row.append(control);
@@ -424,8 +424,8 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       if (status.blockedReason) row.append(el('p', 'problem', status.blockedReason));
         if (status.workers < status.desiredWorkers) row.append(el('p', 'problem', 'Requested posts are unfilled. Free residents from other work or raise this workplace’s priority.'));
         const controls = el('div', 'town-row-actions');
-        if (b.paused) controls.append(btn('Resume this watch house', `watch-resume-${b.id}`, () => action(() => sim.pauseBuilding(state, b.id, false))));
-        controls.append(btn(b.priority < 10 ? 'Priority: high' : 'Give guards priority', `watch-priority-${b.id}`, () => action(() => sim.setPriority(state, b.id, b.priority < 10 ? 10 : 0))), btn('View watch house', `watch-find-${b.id}`, () => inspect(b), { className: 'text-button' })); row.append(controls); box.append(row);
+        if (b.paused) controls.append(btn('Resume this barracks', `watch-resume-${b.id}`, () => action(() => sim.pauseBuilding(state, b.id, false))));
+        controls.append(btn(b.priority < 10 ? 'Priority: high' : 'Give guards priority', `watch-priority-${b.id}`, () => action(() => sim.setPriority(state, b.id, b.priority < 10 ? 10 : 0))), btn('View barracks', `watch-find-${b.id}`, () => inspect(b), { className: 'text-button' })); row.append(controls); box.append(row);
       }
       return box;
     }
