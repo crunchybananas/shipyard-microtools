@@ -84,7 +84,7 @@ try{
   await expect(page.locator('#inspect-title')).toHaveText(c.name);await expect(page.locator('#inspect-kind')).toContainText('Woodcutter');await page.locator('#inspect-secondary').click();await expect(page.locator('#inspect-title')).toHaveText('Woodcutter');await page.locator('#close-inspector').click();
  });
  await check('Locked buildings explain their research path and open Council',async()=>{
-  await page.locator('[data-category="harvest"]').click();await page.locator('[data-build="bakery"]').click();await expect(page.locator('#town-book-title')).toHaveText('A direction for the town');await expect(page.locator('#toast')).toContainText('Research Flour and fire first.');await page.locator('#close-town-book').click();
+  await page.locator('[data-category="harvest"]').click();await page.locator('[data-build="bakery"]').click();await expect(page.locator('#town-book-title')).toHaveText('A direction for the town');await expect(page.locator('#toast')).toContainText('Research Milling and baking first.');await page.locator('#close-town-book').click();
  });
  await check('All town panels render, scroll, and stay within the desktop viewport',async()=>{
   for(const tab of ['workforce','construction','stores','council','trade','watch']){await book(page,tab);const box=await page.locator('#town-book').boundingBox();assert.ok(box.x>=0&&box.y>=0&&box.x+box.width<=1440&&box.y+box.height<=1000);await page.locator('#town-book-content').evaluate(el=>el.scrollTop=el.scrollHeight);await page.locator('#close-town-book').click();}

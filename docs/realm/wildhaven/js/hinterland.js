@@ -14,9 +14,9 @@ export const GATHERING = Object.freeze([
 ]);
 export const NEIGHBOR_STORIES = Object.freeze({
  reedbank:{speaker:'Mara, the seed keeper',about:'Reedbank grows food along the river. The spring floods took their seed terraces.',steps:[
-  {title:'Supper before sowing',text:'A shared meal will carry the gardeners through their first planting.',goods:{roots:18,berries:12},supplies:{wood:20},reward:{gold:25},seed:'beans',benefit:'Climbing bean seeds for your gardens.'},
-  {title:'Mend the terraces',text:'Clay-lined channels will keep the river out and the seedlings in.',goods:{clay:28,beans:24},supplies:{stone:30},reward:{gold:45,knowledge:12},benefit:'A permanent 15% bonus to named garden harvests.'},
-  {title:'The riverside table',text:'Raise a kitchen where travelers from both towns can eat.',goods:{roots:36,beans:36,wool:12},supplies:{planks:16},reward:{gold:65,knowledge:20},benefit:'Reedbank joins the shared coastal patrol.'},
+  {title:'Supper before sowing',text:'Reedbank needs carrots, berries and timber for the planting season.',goods:{roots:18,berries:12},supplies:{wood:20},reward:{gold:25},seed:'beans',benefit:'Climbing bean seeds for your gardens.'},
+  {title:'Mend the terraces',text:'Clay-lined channels will keep the river out and the seedlings in.',goods:{clay:28,beans:24},supplies:{stone:30},reward:{gold:45,knowledge:12},benefit:'A permanent 15% bonus to carrot, bean and herb harvests.'},
+  {title:'The riverside kitchen',text:'Raise a kitchen where travelers from both towns can eat.',goods:{roots:36,beans:36,wool:12},supplies:{planks:16},reward:{gold:65,knowledge:20},benefit:'Reedbank joins the shared coastal patrol.'},
  ]},
  stonehaven:{speaker:'Ivo, the quarry keeper',about:'Stonehaven has strong walls and tired hands. Its people need care as much as stone.',steps:[
   {title:'The quarry infirmary',text:'Help the healers stock clean bedding and herb dressings.',goods:{herbs:18,wool:12},supplies:{cloth:8},reward:{iron:12,gold:25},benefit:'Stonehaven shares iron and opens its next project.'},
@@ -24,9 +24,9 @@ export const NEIGHBOR_STORIES = Object.freeze({
   {title:'The lantern watch',text:'Keep lamps and warm meals at the passes so travelers can walk safely.',goods:{beans:36,herbs:24},supplies:{tools:10,planks:16},reward:{gold:80,knowledge:20},benefit:'Stonehaven joins the shared coastal patrol.'},
  ]},
  blackthorn:{speaker:'Nessa, the hill steward',about:'Blackthorn keeps strangers at a distance. A failed harvest explains more than its banners do.',steps:[
-  {title:'An empty winter store',text:'Send a proper supper. Goodwill begins with something useful.',goods:{roots:24,beans:18},supplies:{food:25},reward:{gold:30,tools:5},benefit:'A generous delivery builds trust even before formal diplomacy.'},
-  {title:'Warm roofs',text:'Patch the sleeping houses before the cold winds return.',goods:{wool:30,clay:24},supplies:{planks:18},reward:{iron:18,knowledge:15},benefit:'Blackthorn opens a regular exchange of supplies.'},
-  {title:'A road for everyone',text:'Equip a shared wayhouse so no traveler needs to take provisions by force.',goods:{herbs:24,berries:36},supplies:{tools:12,wood:35},reward:{gold:90,knowledge:25},benefit:'Blackthorn joins the shared coastal patrol.'},
+  {title:'An empty winter store',text:'Blackthorn needs vegetables and food to refill its winter stores.',goods:{roots:24,beans:18},supplies:{food:25},reward:{gold:30,tools:5},benefit:'Improves relations with Blackthorn and unlocks its next project.'},
+  {title:'House repairs',text:'Patch the sleeping houses before the cold winds return.',goods:{wool:30,clay:24},supplies:{planks:18},reward:{iron:18,knowledge:15},benefit:'Blackthorn opens a regular exchange of supplies.'},
+  {title:'The roadside wayhouse',text:'Supply tools and provisions for a wayhouse on the road between your towns.',goods:{herbs:24,berries:36},supplies:{tools:12,wood:35},reward:{gold:90,knowledge:25},benefit:'Blackthorn joins the shared coastal patrol.'},
  ]},
 });
 const int=(n,max=1000000)=>Number.isSafeInteger(n)&&n>=0&&n<=max;
@@ -62,7 +62,7 @@ export function projectSpec(state,id){
  const story=NEIGHBOR_STORIES[id],p=state.hinterland.projects[id];if(!story||!p)return null;
  if(p.step<story.steps.length)return {...story.steps[p.step],id,step:p.step,repeat:false};
  const items=id==='reedbank'?['roots','beans','berries']:id==='stonehaven'?['herbs','wool','clay']:['beans','berries','wool'];
- const good=items[p.deliveries%items.length];return{id,step:p.step,repeat:true,title:'A standing neighbor request',text:`${story.speaker.split(',')[0]} asks for ${PRODUCE[good].name.toLowerCase()} for the shared stores. There is no deadline.`,goods:{[good]:24},supplies:{},reward:{gold:35,knowledge:8},benefit:'Keep the exchange alive. Another request follows in one game day.'};
+ const good=items[p.deliveries%items.length];return{id,step:p.step,repeat:true,title:'A standing neighbor request',text:`${story.speaker.split(',')[0]} asks for ${PRODUCE[good].name.toLowerCase()} for the shared stores. There is no deadline.`,goods:{[good]:24},supplies:{},reward:{gold:35,knowledge:8},benefit:'Another request will be available in one game day.'};
 }
 export function journeyQuote(state,kind,id){
  const h=state.hinterland,f=state.frontier,fail=reason=>({ok:false,reason});let target,work=24,cost={food:6},spec;

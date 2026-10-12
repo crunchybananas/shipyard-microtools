@@ -35,7 +35,7 @@ export function coastalDefenseGuidance(state) {
     staffingAction = { kind: 'build', type: 'barracks' }; staffingDetail = 'The current guard posts are full. Add a watch house or upgrade an existing one for more capacity, then staff and supply it.';
   }
   const steps = [
-    { id: 'common-ground', label: 'Research Common ground', complete: learned.has('civic_order') || hasWatchkeeping,
+    { id: 'common-ground', label: 'Research Community services', complete: learned.has('civic_order') || hasWatchkeeping,
       detail: 'A supplied school studies this prerequisite for A standing watch.', kind: 'research', researchId: 'civic_order' },
     { id: 'standing-watch', label: 'Research A standing watch', complete: hasWatchkeeping,
       detail: `Unlock watch houses. Research costs ${costText(RESEARCH.watchkeeping.cost)}.`, kind: 'research', researchId: 'watchkeeping' },

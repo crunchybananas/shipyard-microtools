@@ -28,7 +28,7 @@ const PURPOSE = Object.freeze({
   barracks: ['Coast · escorts', 'Supplied guards prepare coastal patrols and provide voyage readiness.'],
   warehouse: ['Room for cargo', 'Raises every physical stockpile’s limit and reduces coastal cargo exposure.'],
   bell: ['First milestone', 'Restore the bell after three cottages, two orchards or gardens and ten residents.'],
-  manor: ['Beds · knowledge', 'A civic home adds beds and earns knowledge from coin.'],
+  manor: ['Beds · knowledge', 'The town hall adds beds and earns knowledge from coin.'],
 });
 const SERVICE_NAMES = { water: 'Water', health: 'Health', faith: 'Community', leisure: 'Community', security: 'Watch', civic: 'Civic service' };
 const PRODUCTION_CHAINS = [
@@ -64,22 +64,22 @@ export function nextTownStep(state, ambition, needs) {
   const schools = state.buildings.filter(b => b.type === 'school');
   const school = schools.find(b => b.status === 'ready');
   if (!school) return schools.length
-    ? { title: 'Finish the schoolhouse', description: 'Your builders are opening a place to earn knowledge and study new crafts.', label: 'View the project', tab: 'construction', count: 'School construction in progress' }
+    ? { title: 'Finish the schoolhouse', description: 'Finish construction, then assign scholars to produce knowledge and research new buildings.', label: 'View the project', tab: 'construction', count: 'School construction in progress' }
     : { title: 'Open a schoolhouse', description: 'Two scholars turn food into knowledge and study new crafts.', label: 'Build a schoolhouse', type: 'school', count: 'Build: 18 timber · 12 stone' };
   const productiveSchool = schools.some(b => b.status === 'ready' && !b.paused && b.production?.efficiency > 0);
-  if (!productiveSchool) return { title: 'Give the school its scholars', description: school.production?.blockedReason || 'Assign residents and keep food supplied to earn knowledge and move research forward.', label: 'Staff the schoolhouse', buildingId: school.id, count: `${school.workerIds?.length || 0} scholars assigned · ${Math.round(perMinute(getBuildingSpec('school', school.level).recipe.input.food) * 10) / 10} food/min at full staffing` };
+  if (!productiveSchool) return { title: 'Assign scholars', description: school.production?.blockedReason || 'Assign residents and keep food supplied to earn knowledge and move research forward.', label: 'Staff the schoolhouse', buildingId: school.id, count: `${school.workerIds?.length || 0} scholars assigned · ${Math.round(perMinute(getBuildingSpec('school', school.level).recipe.input.food) * 10) / 10} food/min at full staffing` };
   if (state.research.completed.length < 3) {
     if (state.research.active) {
       const research = RESEARCH[state.research.active.id];
       return { title: `Learning ${research.name.toLowerCase()}`, description: research.unlocks.length ? `Next: ${research.unlocks.map(id => BUILDINGS[id].name.toLowerCase()).join(' + ')}.` : research.description, label: 'View the research', tab: 'council', count: `${Math.floor(state.research.active.progress / research.duration * 100)}% researched`, progress: state.research.active.progress / research.duration };
     }
-    return { title: 'Choose the next craft', description: 'Timber framing opens planks; Fieldcraft opens grain; Fair measures opens market trade.', label: 'Choose research', tab: 'council', count: `${state.research.completed.length} of 3 fields learned` };
+    return { title: 'Choose a research project', description: 'Research Timber framing for a sawmill, Fieldcraft for a grain farm, or Market trading for a market hall.', label: 'Choose research', tab: 'council', count: `${state.research.completed.length} of 3 research projects complete` };
   }
   const well = state.buildings.find(b => b.type === 'well' && b.status === 'ready' && !b.paused) || state.buildings.find(b => b.type === 'well');
   if (!well || well.status !== 'ready') return { title: well ? 'Finish the village well' : 'Bring water to the homes', description: 'Water access supports arrivals as your town grows beyond twenty residents.', label: well ? 'View the project' : 'Place a well', ...(well ? { tab: 'construction' } : { type: 'well' }), count: well ? 'Well construction in progress' : 'Build: 8 timber · 16 stone' };
-  if (well.paused) return { title: 'Open the village well', description: 'This well is resting. Resume it to supply nearby homes.', label: 'View the well', buildingId: well.id, count: 'Water service paused' };
-  if (state.resources.food < 40) return { title: 'Keep forty food in reserve', description: 'Give food workplaces enough hands, or use the landing’s coastal orders to fund supplies.', label: 'Review food and jobs', tab: 'workforce', count: `${Math.floor(state.resources.food)} / 40 food reserved`, progress: state.resources.food / 40 };
-  return { title: 'Welcome twenty neighbors', description: needs.migration.reason, label: needs.housing.have <= state.population ? 'Build a cottage' : 'Review town needs', ...(needs.housing.have <= state.population ? { type: 'cottage' } : { tab: 'stores' }), count: `${state.population} / 20 residents`, progress: state.population / 20 };
+  if (well.paused) return { title: 'Open the village well', description: 'This well is paused. Resume it to supply nearby homes.', label: 'View the well', buildingId: well.id, count: 'Water service paused' };
+  if (state.resources.food < 40) return { title: 'Keep forty food in reserve', description: 'Assign more food workers or buy food through a staffed market.', label: 'Review food and jobs', tab: 'workforce', count: `${Math.floor(state.resources.food)} / 40 food reserved`, progress: state.resources.food / 40 };
+  return { title: 'Reach twenty residents', description: needs.migration.reason, label: needs.housing.have <= state.population ? 'Build a cottage' : 'Review town needs', ...(needs.housing.have <= state.population ? { type: 'cottage' } : { tab: 'stores' }), count: `${state.population} / 20 residents`, progress: state.population / 20 };
 }
 
 export function rankContracts(contracts, resources) {
@@ -92,7 +92,7 @@ export function rankContracts(contracts, resources) {
 export function constructionFeedback(state, queue, { paused = false } = {}) {
   const active = queue.find(site => !site.paused), count = queue.length;
   const prefix = `${count} ${count === 1 ? 'project' : 'projects'}`;
-  if (!count) return { summary: 'Tools at rest', reason: 'Choose a building to begin a project.', ready: 0 };
+  if (!count) return { summary: 'No construction projects', reason: 'Choose a building to begin a project.', ready: 0 };
   if (!active) return { summary: `${prefix} · sites paused`, reason: 'Every project is paused. Resume a site in Projects when you want its crew to return.', ready: 0 };
   if (!state.builderTarget) return { summary: `${prefix} · no crew requested`, reason: 'The construction crew is set to zero. Choose its size in People; idle residents are not assigned automatically.', ready: 0, activeId: active.id };
   if (!active.workers) return { summary: `${prefix} · crew unavailable`, reason: 'No civilian builders can take this project yet. Residents serving in the Company or on fieldwork keep their assignments.', ready: 0, activeId: active.id };

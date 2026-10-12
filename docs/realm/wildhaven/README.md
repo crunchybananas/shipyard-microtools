@@ -141,3 +141,10 @@ Elapsed time and exploration no longer schedule anonymous physical raids. Neighb
 The optional `hinterland` record stays in the v4 save envelope. Existing towns receive empty produce stores, carrot seeds and unstarted neighbor projects; their earned resources, calendars, woodland and frontier history remain intact. No new runtime dependencies or external services were added.
 
 Validation for this increment: 383 Node tests pass, including physical routes to all gathering grounds, all nine shared projects and repeat requests, exact crop clocks, save reloads, cargo retention/refunds, old geography preservation, and trade-driven threat scheduling. Runtime cache token: `20261011-living-neighbors-2`. Browser/deployment evidence is recorded separately after publication.
+
+
+## Player-facing wording (October 11, 2026)
+
+Objectives, building descriptions, research names, help and introductory screens now use direct descriptions of actions and requirements. For example, “A village that can teach” is “Schools and research.” Landmark reports keep their concrete details without closing morals or slogans. Help also describes the current trade-driven cargo demands and peaceful scouting. Runtime cache token: `20261011-plain-language-1`.
+
+Keep future interface text specific: name the action, requirement or result. Use the same resource, building and research names throughout the controls. Put personality in people and places; avoid abstract claims about what a village can become.

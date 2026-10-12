@@ -73,7 +73,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     if (getPaused()) nodes.push(pauseCue());
     const builders = el('div', 'town-control'), intro = el('div'); intro.append(el('strong', '', 'Builders requested'), el('small', '', `${work.builders} assigned / ${work.builderTarget} requested. Builders take priority while work is queued, then return to other jobs.`));
     builders.append(intro, stepper(work.builderTarget, 0, state.population, 'builders', value => action(() => sim.setBuilderTarget(state, value)))); nodes.push(builders);
-    nodes.push(el('h3', 'town-section', 'Put hands where they matter'));
+    nodes.push(el('h3', 'town-section', 'Assign workers'));
     for (const job of work.jobs) {
       const b = state.buildings.find(b => b.id === job.id), status = sim.buildingStatus(state, b);
       const row = el('div', 'town-row'), top = el('div', 'town-row-top'), main = el('div', 'town-row-main'); row.dataset.workplace = b.id;
@@ -82,7 +82,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       row.append(top, el('p', '', job.names.join(', ') || 'No residents assigned'));
       if (b.type === 'lumber') { const grove = sim.woodlandStatus(state, b); row.append(el('p', 'town-meta', `${grove.mature} mature trees · ${grove.saplings} ${grove.saplings === 1 ? 'sapling' : 'saplings'} · ${grove.stumps} ${grove.stumps === 1 ? 'stump' : 'stumps'}. Automatic replanting · 3 in-game days to mature.`)); }
       if (status.blockedReason) row.append(el('p', 'problem', status.blockedReason));
-      const controls = el('div', 'town-row-actions'); controls.append(btn(b.paused ? 'Resume work' : 'Rest workers', `rest-${b.id}`, () => action(() => sim.pauseBuilding(state, b.id, !b.paused))), btn(b.type === 'hearth' ? 'Reserve gatherers' : b.priority < 10 ? 'Priority: high' : 'Raise priority', `priority-${b.id}`, () => action(() => sim.setPriority(state, b.id, b.priority < 10 ? 10 : 0)), { disabled: b.type === 'hearth' }), btn('Find workplace', `find-${b.id}`, () => { close(); inspect(b); }, { className: 'small-button quiet' }));
+      const controls = el('div', 'town-row-actions'); controls.append(btn(b.paused ? 'Resume work' : 'Pause work', `rest-${b.id}`, () => action(() => sim.pauseBuilding(state, b.id, !b.paused))), btn(b.type === 'hearth' ? 'Reserve gatherers' : b.priority < 10 ? 'Priority: high' : 'Raise priority', `priority-${b.id}`, () => action(() => sim.setPriority(state, b.id, b.priority < 10 ? 10 : 0)), { disabled: b.type === 'hearth' }), btn('Find workplace', `find-${b.id}`, () => { close(); inspect(b); }, { className: 'small-button quiet' }));
       row.append(controls); nodes.push(row);
     }
     nodes.push(el('h3', 'town-section', 'Your neighbors'));
@@ -123,7 +123,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       row.append(label, amount, el('span', `stock-rate${rate < 0 ? ' negative' : ''}`, `${rate >= 0 ? '+' : ''}${rateNumber(rate)} / min`), el('span', 'resource-chevron', '›'));
       row.setAttribute('aria-label', `${RESOURCES[key].name}, ${rateNumber(state.resources[key])} stored. View details`); nodes.push(row);
     }
-    nodes.push(el('h3', 'town-section', 'A place to stay'), el('p', 'town-intro', `${needs.housing.required} residents / ${needs.housing.have} beds. ${needs.migration.reason}`));
+    nodes.push(el('h3', 'town-section', 'Housing and arrivals'), el('p', 'town-intro', `${needs.housing.required} residents / ${needs.housing.have} beds. ${needs.migration.reason}`));
     for (const [key, service] of Object.entries(needs.services || {})) {
       const row = el('div', 'stock-row'), label = el('div'); label.append(el('strong', '', `${key[0].toUpperCase()}${key.slice(1)} access`));
       label.append(el('small', 'stock-note', `${Math.round(service.served || 0)} / ${Math.round(service.demand || 0)} beds served`));
@@ -269,7 +269,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       return nodes;
     }
     const paths = el('section', 'town-paths'); paths.dataset.councilSection = 'paths';
-    paths.append(el('h3', 'town-section', 'Choose your town’s path'), el('p', 'path-terms', 'You can build toward a direction now. Charter bonuses begin only after learning The island charter and choosing below. First charter free; switching costs 60 coin + 25 knowledge.'));
+    paths.append(el('h3', 'town-section', 'Choose your town’s path'), el('p', 'path-terms', 'You can build toward a direction now. Charter bonuses begin only after learning Town charter and choosing below. First charter free; switching costs 60 coin + 25 knowledge.'));
     const requirement = pathRequirement(state);
     if (requirement) {
       const next = el('div', 'path-requirement');
@@ -363,7 +363,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     const imports = progression.importOptions(state), exports = progression.exportOptions(state), hasMarket = state.buildings.some(b => b.type === 'market' && b.status === 'ready');
     const market = disclosure('market-trade', hasMarket ? 'Harbor counter · buy & sell' : 'Buy & sell cargo · needs a supplied market', hasMarket); market.dataset.tradeSection = 'market';
     market.append(el('p', 'town-meta', 'Staff and supply a market to exchange cargo for coin. Quotes include your charter; quotas reset every 90 seconds at 1×.'));
-    if (!hasMarket) market.append(btn(state.research.completed.includes('barter') ? 'Build a market hall' : 'Study Fair measures', 'market-unlock', () => state.research.completed.includes('barter') ? build('market') : revealResearch('barter')));
+    if (!hasMarket) market.append(btn(state.research.completed.includes('barter') ? 'Build a market hall' : 'Study Market trading', 'market-unlock', () => state.research.completed.includes('barter') ? build('market') : revealResearch('barter')));
     for (const [label, list, buying] of [['Buy cargo', imports, true], ['Sell a surplus', exports, false]]) {
       const section = tradeHeading(label, buying ? 'imports' : 'exports'); market.append(section);
       for (const offer of list) {
@@ -452,7 +452,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
   }
   function update(force = false) {
     const state = canMutate() ? getState() : structuredClone(getState()), work = sim.workforce(state), queue = sim.constructionQueue(state), narrow = matchMedia('(max-width: 760px)').matches;
-    $('workforce-summary').textContent = narrow ? `${work.idle} free` : `${work.idle} free / ${state.population} hands`;
+    $('workforce-summary').textContent = narrow ? `${work.idle} free` : `${work.idle} free / ${state.population} people`;
     const construction = constructionFeedback(state, queue, { paused: getPaused() });
     $('queue-summary').textContent = narrow ? (queue.length ? `${queue.length} ${queue.length === 1 ? 'project' : 'projects'}` : 'No projects') : construction.summary;
     $('queue-summary').parentElement.title = construction.reason;

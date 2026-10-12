@@ -19,7 +19,7 @@ function sendControl(state,kind,id,label,ctx){
  const q=journeyOptions(state,kind,id,ctx.getContext()),wrap=el('div','island-send');
  wrap.append(button(label,`${kind}-${id}`,()=>ctx.action(()=>sendJourney(state,kind,id,ctx.getContext())),!q.ok),note(q.ok?`Provisions: ${goods(q.cost)}. A resident walks there and back.`:q.reason));return wrap;
 }
-export function mapFigure(){const f=el('figure','island-map-wrap'),c=el('canvas','island-map');c.setAttribute('role','img');c.setAttribute('aria-label','Island map. Surveyed regions are colored; uncharted regions are covered. Choose a region below to scout.');f.append(c,el('figcaption','','Your maps grow when explorers return. Pale routes lead into uncharted land.'));return f;}
+export function mapFigure(){const f=el('figure','island-map-wrap'),c=el('canvas','island-map');c.setAttribute('role','img');c.setAttribute('aria-label','Island map. Surveyed regions are colored; uncharted regions are covered. Choose a region below to scout.');f.append(c,el('figcaption','','Scouted regions appear when your scout returns. Pale routes lead into uncharted land.'));return f;}
 const tiles=listTiles();
 export function paintIslandMap(canvas,state){
  if(!canvas)return;const w=canvas.clientWidth||500,h=canvas.clientHeight||290,dpr=Math.min(2,globalThis.devicePixelRatio||1);canvas.width=w*dpr;canvas.height=h*dpr;
@@ -44,7 +44,7 @@ export function explorationContent(state,ctx,chosen='home'){
  for(const r of ISLAND_REGIONS){const known=regionKnown(state,r.id),reachable=regionReachable(state,r.id),b=button(reachable?r.name:'Uncharted reach',`region-${r.id}`,()=>ctx.selectRegion(r.id),!reachable);b.setAttribute('aria-pressed',String(r.id===chosen));b.dataset.known=String(known);regions.append(b);}header.append(regions);nodes.push(header);
  const region=ISLAND_REGIONS.find(r=>r.id===chosen)||ISLAND_REGIONS[0];
  if(regionReachable(state,region.id)){
-  const known=regionKnown(state,region.id),card=section(region.name,known?'The routes are in your field maps. Gather without claiming this land; an outpost is needed only for new buildings.':'Beyond the last familiar path. Send someone to chart the routes and bring home a report.');
+  const known=regionKnown(state,region.id),card=section(region.name,known?'The routes are in your field maps. Gather without claiming this land; an outpost is needed only for new buildings.':'Send a scout to map this region. The report arrives when they return home.');
   if(!known&&!journeyFor(state,'survey',region.id))card.append(sendControl(state,'survey',region.id,'Send a scout',ctx));
   if(known)card.append(button('Look at this region',`look-region-${region.id}`,()=>ctx.focus({...region,kind:'region'})));
   for(const site of GATHERING.filter(s=>known&&s.region===region.id)){
@@ -55,17 +55,17 @@ export function explorationContent(state,ctx,chosen='home'){
   if(known&&!GATHERING.some(s=>s.region===region.id))card.append(note(region.id==='home'?'Plant a kitchen garden for carrots. Meet Reedbank to exchange your first harvest.':'This region opens routes toward the outer gathering grounds.'));
   nodes.push(card);
  }
- const away=state.frontier.units.filter(u=>u.kind==='ranger'&&!['dead','released'].includes(u.status));if(away.length){nodes.push(el('h3','island-subtitle','People on the paths'));for(const u of away)nodes.push(missionCard(state,u,ctx));}
- const peace=section('Why trouble reaches the shore',`Neighbor armies march only after war is declared. Peaceful scouting and elapsed days never schedule an invasion.`);
+ const away=state.frontier.units.filter(u=>u.kind==='ranger'&&!['dead','released'].includes(u.status));if(away.length){nodes.push(el('h3','island-subtitle','Residents away'));for(const u of away)nodes.push(missionCard(state,u,ctx));}
+ const peace=section('Armies and cargo demands',`Neighbor armies march only after war is declared. Scouting and passing time do not trigger invasions.`);
  const pacts=coastalPacts(state);peace.append(note(pacts===3?'All three shared patrols are established. New cargo demands are prevented while these neighbors remain at peace.':`${cargoExposure(state)} / ${cargoThreshold(state)} exposed export orders and voyages. Reaching this threshold can attract a cargo demand. Complete neighbor projects to raise it; three peaceful coastal pacts protect future trade.`));nodes.push(peace);return nodes;
 }
 export function gardensContent(state,ctx){
- const h=state.hinterland,stocks=section('The gathering stores','Named crops and gathered goods are saved here for neighbor projects. Everyday food stays in the village pantry.'),rack=el('dl','island-stock');
+ const h=state.hinterland,stocks=section('The gathering stores','Carrots, beans, herbs and gathered goods are stored here for neighbor projects. Everyday food stays in the village pantry.'),rack=el('dl','island-stock');
  for(const[k,v]of Object.entries(PRODUCE)){const cell=el('div');cell.style.setProperty('--produce-color',v.color);cell.append(el('dt','',v.name),el('dd','',String(h.stock[k])));rack.append(cell);}stocks.append(rack);
  const nodes=[stocks],gardens=state.buildings.filter(b=>b.type==='garden'&&b.status==='ready');
  if(!gardens.length)nodes.push(note('Build a kitchen garden from the building shelf to start a carrot harvest.'));
  for(const b of gardens){const bed=gardenState(state,b.id),spec=CROPS[bed.crop],card=section(`Kitchen garden · ${b.x}, ${b.z}`,`${spec.name}: ${Math.floor(bed.progress/(spec.days*DAY)*100)}% grown. ${spec.days} game ${spec.days===1?'day':'days'} with a gardener.`);
- const bar=el('progress');bar.max=spec.days*DAY;bar.value=bed.progress;bar.setAttribute('aria-label',`${spec.name} growth`);card.append(bar,note(b.paused?'This workplace is resting. Resume it to grow crops.':!b.workerIds.length?'Assign a gardener in Town → People to grow this crop.':`A harvest brings ${Math.round(spec.yield*(b.level||1)*(h.projects.reedbank.step>=2?1.15:1))} ${PRODUCE[bed.crop].name.toLowerCase()}.`));
+ const bar=el('progress');bar.max=spec.days*DAY;bar.value=bed.progress;bar.setAttribute('aria-label',`${spec.name} growth`);card.append(bar,note(b.paused?'This garden is paused. Resume it to grow crops.':!b.workerIds.length?'Assign a gardener in Town → People to grow this crop.':`A harvest brings ${Math.round(spec.yield*(b.level||1)*(h.projects.reedbank.step>=2?1.15:1))} ${PRODUCE[bed.crop].name.toLowerCase()}.`));
  const choices=el('div','island-actions');for(const[k,crop]of Object.entries(CROPS)){const learned=h.seeds.includes(k),btt=button(crop.name,`crop-${b.id}-${k}`,()=>ctx.action(()=>chooseCrop(state,b.id,k)),!learned);btt.setAttribute('aria-pressed',String(bed.next===k));choices.append(btt);}card.append(choices,note(bed.next!==bed.crop?`Next harvest: ${CROPS[bed.next].name}. The current crop finishes first.`:'Choose what grows after this harvest. Changing a crop keeps its current progress.'),button('Find garden',`garden-find-${b.id}`,()=>ctx.focus(b)));nodes.push(card);}
  if(!h.seeds.includes('beans'))nodes.push(note('Bean seeds: finish Reedbank’s first shared project.'));
  if(!h.seeds.includes('herbs'))nodes.push(note('Herb cuttings: scout Mistfen, then bring home a gathering trip from its herb banks.'));return nodes;

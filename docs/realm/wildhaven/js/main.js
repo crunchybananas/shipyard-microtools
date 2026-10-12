@@ -112,7 +112,7 @@ function updateDock() {
 }
 function setObjectiveExpanded(expanded) {
   $('ambition-body').hidden = !expanded; $('collapse-objective').textContent = expanded ? '−' : '+';
-  $('collapse-objective').setAttribute('aria-expanded', String(expanded)); $('collapse-objective').setAttribute('aria-label', expanded ? 'Collapse ambition' : 'Expand ambition');
+  $('collapse-objective').setAttribute('aria-expanded', String(expanded)); $('collapse-objective').setAttribute('aria-label', expanded ? 'Collapse objective' : 'Expand objective');
 }
 function tabletLayoutChanged() {
   closeBuildDrawer();
@@ -278,7 +278,7 @@ function updateInspector() {
     const citizen = state.citizens.find(c => c.id === selected.id); if (!citizen) { closeInspector(); return; }
     const workplace = state.buildings.find(b => b.id === citizen.workplace), job = JOBS[citizen.job];
     $('inspect-title').textContent = citizen.name; $('inspect-kind').textContent = `${job?.name || 'Available for work'} · arrived day ${calendarDay(state, citizen.arrivalDay)}`;
-    $('inspect-description').textContent = workplace ? `${citizen.name} works at ${BUILDINGS[workplace.type].name.toLowerCase()}. Work assignments follow your staffing requests and workplace priorities.` : `${citizen.name} is available. Open People & jobs to give this neighbor a place to work.`;
+    $('inspect-description').textContent = workplace ? `${citizen.name} works at ${BUILDINGS[workplace.type].name.toLowerCase()}. Work assignments follow your staffing requests and workplace priorities.` : `${citizen.name} is available. Open People & jobs to assign a job.`;
     $('inspect-image').hidden = true; $('inspect-management').replaceChildren();
     const actor=world.actors.find(a=>a.citizen.id===citizen.id),activity=world.citizenCue?.(citizen.id)?.action || (actor?.parcel.visible?`Carrying ${actor.parcel.userData.cargo} to the village stores`:({working:'At the workbench',foraging:'Gathering food',walking:'On the way',unloading:'Delivering goods',watching:'Keeping watch',waiting:'Taking a short break'})[actor?.root.userData.workState]||'Finding the next task');
     $('inspect-description').textContent=(speed === 0 ? 'Time paused · ' : '')+activity+'. '+$('inspect-description').textContent;

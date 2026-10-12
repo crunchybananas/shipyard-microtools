@@ -380,7 +380,7 @@ test('the restored bell starts a longer series of ambitions, and recorded chapte
   const objective = progressionObjective(state);
   assert.equal(objective.step, 5);
   assert.equal(objective.complete, false);
-  assert.ok(objective.description.includes('twenty people'));
+  assert.ok(objective.description.includes('twenty residents'));
   dailyProgression(state);
   assert.ok(state.milestones.includes('chapter_4'));
   state.buildings = state.buildings.filter(building => !['cottage', 'garden', 'orchard'].includes(building.type));

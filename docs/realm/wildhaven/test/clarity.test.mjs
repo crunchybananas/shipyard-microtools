@@ -76,7 +76,7 @@ test('next action accounts for upgraded school upkeep and paused water service',
   state.buildings.push({ id: 'b10', type: 'well', status: 'ready', level: 1, paused: true });
   assert.equal(nextTownStep(state, { step: 5 }, villageNeeds(state)).buildingId, 'b10');
   state.buildings.push({ id: 'b11', type: 'well', status: 'ready', level: 1, paused: false });
-  assert.equal(nextTownStep(state, { step: 5 }, villageNeeds(state)).title, 'Welcome twenty neighbors');
+  assert.equal(nextTownStep(state, { step: 5 }, villageNeeds(state)).title, 'Reach twenty residents');
 });
 
 
