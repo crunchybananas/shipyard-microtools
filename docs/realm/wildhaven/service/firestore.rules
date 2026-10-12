@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function identifier(s) { return s is string && s.matches('^[a-zA-Z0-9_-]{20,128}$'); }
+    function townName(s) { return s is string && s.size() > 0 && s.size() <= 40 && !s.matches('.*[<>].*'); }
+    function member(r) { return signedIn() && (r.owner == uid() || r.guest == uid()); }
+    function bag(b) { return b is map && b.keys().hasOnly(['wood','stone','food']) && b.keys().hasAll(['wood','stone','food'])
+      && b.wood is int && b.wood >= 0 && b.wood <= 60 && b.stone is int && b.stone >= 0 && b.stone <= 40 && b.food is int && b.food >= 0 && b.food <= 40; }
+    function zero(b) { return b == {'wood':0,'stone':0,'food':0}; }
+    function seq(s) { return s is map && s.keys().hasOnly(['owner','guest']) && s.keys().hasAll(['owner','guest'])
+      && s.owner is int && s.owner >= 0 && s.owner <= 10000 && s.guest is int && s.guest >= 0 && s.guest <= 10000; }
+    function full(r) { return r.totals == {'wood':60,'stone':40,'food':40}; }
+    function shape(r) { return r.keys().hasOnly(['version','owner','guest','ownerTown','guestTown','ownerName','guestName','invite','inviteExpires','joinProof','closed','totals','supplied','sequence','completed','revision','lastOperation','lastActor','updatedAt'])
+      && r.version == 1 && identifier(r.owner) && identifier(r.ownerTown) && townName(r.ownerName)
+      && ((r.guest == '' && r.guestTown == '' && r.guestName == '') || (identifier(r.guest) && identifier(r.guestTown) && townName(r.guestName) && r.owner != r.guest))
+      && (r.invite == '' || identifier(r.invite)) && r.inviteExpires is timestamp && (r.joinProof == '' || identifier(r.joinProof))
+      && r.closed is bool && bag(r.totals) && r.supplied.keys().hasOnly(['owner','guest']) && bag(r.supplied.owner) && bag(r.supplied.guest)
+      && seq(r.sequence) && r.completed == full(r) && r.revision is int && r.revision >= 0 && r.revision <= 20000
+      && r.lastOperation is string && r.lastActor is string && r.updatedAt == request.time; }
+    function freePlayer() {
+      let p = /databases/$(database)/documents/players/$(uid());
+      return !exists(p) || get(/databases/$(database)/documents/rooms/$(get(p).data.roomId)).data.closed;
+    }
+    function linkedAfter(roomId, town) {
+      let p = getAfter(/databases/$(database)/documents/players/$(uid())).data;
+      return p.roomId == roomId && p.townId == town;
+    }
+    function accepted(n, used, cap, r) { return r.closed || r.guest == '' ? 0 : (n < cap-used ? n : cap-used); }
+    function delivery(a,b,p) {
+      let seat = a.owner == uid() ? 'owner' : 'guest';
+      let other = seat == 'owner' ? 'guest' : 'owner';
+      let town = seat == 'owner' ? a.ownerTown : a.guestTown;
+      return member(a) && p.keys().hasOnly(['uid','townId','id','requested','accepted','sequence','revision'])
+        && p.uid == uid() && p.townId == town && identifier(p.id) && bag(p.requested) && bag(p.accepted) && !zero(p.requested)
+        && p.accepted.wood == accepted(p.requested.wood,a.totals.wood,60,a)
+        && p.accepted.stone == accepted(p.requested.stone,a.totals.stone,40,a)
+        && p.accepted.food == accepted(p.requested.food,a.totals.food,40,a)
+        && b.diff(a).affectedKeys().hasOnly(['totals','supplied','sequence','completed','revision','lastOperation','lastActor','updatedAt'])
+        && b.totals.wood == a.totals.wood+p.accepted.wood && b.totals.stone == a.totals.stone+p.accepted.stone && b.totals.food == a.totals.food+p.accepted.food
+        && b.supplied[other] == a.supplied[other]
+        && b.supplied[seat].wood == a.supplied[seat].wood+p.accepted.wood && b.supplied[seat].stone == a.supplied[seat].stone+p.accepted.stone && b.supplied[seat].food == a.supplied[seat].food+p.accepted.food
+        && b.sequence[other] == a.sequence[other] && b.sequence[seat] == a.sequence[seat]+1 && p.sequence == b.sequence[seat]
+        && b.revision == a.revision+1 && b.revision <= 20000 && p.revision == b.revision && b.lastOperation == p.id && b.lastActor == uid()
+        && b.completed == full(b) && b.updatedAt == request.time && b.sequence[seat] <= 10000
+        && b.totals.keys() == a.totals.keys() && b.supplied.keys() == a.supplied.keys()
+        && b.supplied[seat].keys() == a.supplied[seat].keys() && b.sequence.keys() == a.sequence.keys();
+    }
+    match /players/{player} {
+      allow get: if signedIn() && player == uid();
+      allow create, update: if signedIn() && player == uid() && request.resource.data.keys().hasOnly(['roomId','townId'])
+        && identifier(request.resource.data.roomId) && identifier(request.resource.data.townId)
+        && freePlayer()
+        && member(getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomId)).data)
+        && ((getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomId)).data.owner == uid()
+          && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomId)).data.ownerTown == request.resource.data.townId)
+          || (getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomId)).data.guest == uid()
+          && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomId)).data.guestTown == request.resource.data.townId));
+    }
+    match /rooms/{roomId} {
+      allow get: if member(resource.data);
+      allow create: if signedIn() && identifier(roomId) && shape(request.resource.data) && freePlayer()
+        && request.resource.data.owner == uid() && request.resource.data.guest == '' && !request.resource.data.closed
+        && identifier(request.resource.data.invite) && request.resource.data.inviteExpires > request.time && request.resource.data.inviteExpires < request.time + duration.value(8,'d')
+        && request.resource.data.joinProof == '' && request.resource.data.revision == 0 && request.resource.data.lastOperation == '' && request.resource.data.lastActor == ''
+        && zero(request.resource.data.totals) && zero(request.resource.data.supplied.owner) && zero(request.resource.data.supplied.guest)
+        && request.resource.data.sequence == {'owner':0,'guest':0} && linkedAfter(roomId, request.resource.data.ownerTown);
+      allow update: if signedIn() && (
+        (member(resource.data) && request.resource.data.revision == resource.data.revision + 1 && request.resource.data.lastActor == uid() && identifier(request.resource.data.lastOperation)
+          && !exists(/databases/$(database)/documents/rooms/$(roomId)/receipts/$(uid()+'_'+request.resource.data.lastOperation))
+          && delivery(resource.data, request.resource.data, getAfter(/databases/$(database)/documents/rooms/$(roomId)/receipts/$(uid()+'_'+request.resource.data.lastOperation)).data))
+        || (shape(request.resource.data) && (
+        // Consume a current invitation, without making rooms readable to strangers.
+        (!resource.data.closed && resource.data.guest == '' && resource.data.owner != uid() && freePlayer()
+          && resource.data.invite != '' && request.time < resource.data.inviteExpires
+          && request.resource.data.joinProof == resource.data.invite && request.resource.data.invite == ''
+          && request.resource.data.guest == uid() && linkedAfter(roomId, request.resource.data.guestTown)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['guest','guestTown','guestName','joinProof','invite','updatedAt']))
+        || (resource.data.owner == uid() && !resource.data.closed && resource.data.guest == ''
+          && request.resource.data.inviteExpires > request.time && request.resource.data.inviteExpires < request.time + duration.value(8,'d')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['invite','inviteExpires','updatedAt']))
+        || (member(resource.data) && request.resource.data.closed && request.resource.data.invite == ''
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['closed','invite','updatedAt']))
+        ))
+      );
+      match /receipts/{receiptId} {
+        // Missing receipts must be distinguishable from network errors after a timeout.
+        allow get: if signedIn() && receiptId.matches('^'+uid()+'_[a-zA-Z0-9_-]{20,128}$');
+        // The room update validates every receipt field. Requiring its revision
+        // to advance in this same atomic write prevents standalone fake receipts.
+        allow create: if signedIn() && receiptId == uid()+'_'+request.resource.data.id
+          && getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.lastActor == uid()
+          && getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.lastOperation == request.resource.data.id
+          && getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.revision == get(/databases/$(database)/documents/rooms/$(roomId)).data.revision + 1;
+      }
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -1,5 +1,7 @@
 # Companion towns: local playable slice
 
+For the separate online two-device feature, see [Online co-op](COOP.md). This document describes the earlier local companion-town mode, which remains accessible inside Play together.
+
 This increment links two separate towns on one device. It does not connect Cory’s and Melissa’s devices, create accounts, invite anyone, upload saves, or claim that another player is present. Town names are editable labels. The second town is explicitly a local draft, starting from its own six founders rather than a copy of the first town’s earned economy.
 
 ## What is playable
