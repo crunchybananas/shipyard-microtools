@@ -21,6 +21,10 @@ import { firstBreadStep } from './bread-guide.js';
 import { buildingPurpose } from './clarity-ui.js';
 import { createCompanionStore } from './companion-store.js';
 import { createCompanionUI } from './companion-ui.js';
+import { createCoop } from './coop.js';
+import { canImportCoop } from './coop-state.js';
+import { createCoopUI } from './coop-ui.js';
+import { COOP_CONFIG } from './coop-config.js';
 
 const $ = id => document.getElementById(id);
 const compactTablet = matchMedia('(min-width:0px)');
@@ -36,7 +40,7 @@ const CATEGORIES = {
 let state = sim.createGame(), saved = null, playing = false, speed = 1, previousSpeed = 1;
 let tool = null, hovered = null, rotation = 0, selected = null, icons = {}, uiClock = 0, saveClock = 0, toastTimer;
 let touchPlacement = false, touchSite = null;
-let soundEnabled = false, storageAvailable = true, victorySeen = false, world, town, frontierUI, fieldbook, companionUI, category = 'beginnings';
+let soundEnabled = false, storageAvailable = true, victorySeen = false, world, town, frontierUI, fieldbook, companionUI, coop, coopUI, inviteOpened = false, category = 'beginnings';
 const keys = new Set();
 const readingClock = createReadingClock();
 function updateReadingPause() {
@@ -50,7 +54,7 @@ function updateReadingPause() {
     pauseHost.insertBefore(pauseNotice, inlinePause ? $('town-tabs') : $('toast'));
     if (focused) $('keep-running').focus({ preventScroll: true });
   }
-  const reading = frontierUI?.selectionMode || ['town-book','fieldbook','frontier-panel','journal','companion-panel'].some(id => { const panel = $(id); return panel && !panel.hidden; });
+  const reading = frontierUI?.selectionMode || ['town-book','fieldbook','frontier-panel','journal','companion-panel','coop-panel'].some(id => { const panel = $(id); return panel && !panel.hidden; });
   const before = speed; speed = readingClock.observe(!!reading);
   const crew = playing && companions.canManage && speed === 0 ? state.buildings.find(site => site.status !== 'ready' && !site.paused && site.workerIds?.length) : null;
   $('reading-pause').hidden = !playing || (!readingClock.held && !crew);
@@ -72,6 +76,7 @@ function preparePanel(destination) {
   if (destination !== 'frontier') frontierUI?.close();
   if (destination !== 'fieldbook') fieldbook?.close();
   if (destination !== 'companion') companionUI?.close();
+  if (destination !== 'coop') coopUI?.close();
   if (destination !== 'journal') closeJournal();
   cancelTool(); closeInspector(); keys.clear();
 }
@@ -158,7 +163,7 @@ function save() {
 }
 function sync() { sim.refreshTown(state); world.sync(state); updateUI(); save(); }
 function mutate(result, cue='build') { if (!companions.canManage) return; if (result?.ok) { sync(); audio.play(cue); } else audio.play('error'); announce(result?.reason, !result?.ok); }
-function newVillage() { if (!companions.canManage) return; saved = null; state = sim.createGame(); victorySeen = false; enter(); announce('Six neighbors, two builders. Give them a roof, then a living.'); }
+function newVillage() { if (!companions.canManage) return; if ((playing ? state : saved)?.coop?.link || (playing ? state : saved)?.coop?.draft || coop?.info().busy) { announce('End and unlink this town’s partnership in Play together before starting a new town.', true); return; } saved = null; state = sim.createGame(); victorySeen = false; enter(); announce('Six neighbors, two builders. Give them a roof, then a living.'); }
 function enter(resuming = false) {
   playing = true; tool = null; selected = null; speed = resuming ? 0 : 1; previousSpeed = 1; readingClock.reset(speed);
   frontierUI?.resetSelection();
@@ -168,6 +173,7 @@ function enter(resuming = false) {
   $('restart-confirm').hidden = true; $('inspector').hidden = true; $('placement').hidden = true; $('placement-info').hidden = true; document.body.classList.remove('placement-active');
   if (!resuming) setObjectiveExpanded(true);
   preparePanel(null); world.select(null); world.selectCitizen?.(null); world.hoverCitizen?.(null); world.showPreview(null); world.home(); world.sync(state); updateUI(); save(); audio.start();
+  if (coopUI?.incoming && !inviteOpened) { inviteOpened = true; coopUI.open(); }
 }
 function useTool(type) {
   if (!playing || !companions.canManage) return;
@@ -410,7 +416,7 @@ function updateUI() {
   $('pause').classList.toggle('active', speed === 0); $('pause').textContent = speed === 0 ? '▶' : 'Ⅱ'; $('pause').setAttribute('aria-label', speed === 0 ? 'Resume' : 'Pause');
   for (const button of document.querySelectorAll('[data-speed]')) button.setAttribute('aria-pressed', String(Number(button.dataset.speed) === speed));
   $('journal-entries').replaceChildren(...state.events.map(event => { const item = document.createElement('li'), label = document.createElement('small'); label.textContent = `Day ${calendarDay(state, event.day)}`; item.append(label, document.createTextNode(event.text)); return item; }));
-  updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); if (tool && hovered) hover(hovered);
+  updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); coopUI?.update(); coop?.tick(); if (tool && hovered) hover(hovered);
 }
 function setSpeed(value) { if (value > 0 && !companions.canManage) { announce(companions.readOnly ? 'This is a paused visit. Take the chair to manage this local town.' : companions.reason, true); return; } speed = readingClock.choose(value); $('reading-pause').hidden = true; if (value > 0) previousSpeed = value; updateUI(); audio.play('select'); }
 function togglePause() { setSpeed(speed === 0 ? previousSpeed : 0); }
@@ -500,7 +506,7 @@ function bind() {
     if (e.target.matches('input,textarea,select') || document.querySelector('dialog[open]') || !playing) return;
     if (!companions.canManage && !['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyQ','KeyE','Home','Escape','KeyP'].includes(e.code)) return;
     if (e.code === 'Space' && e.target.closest('button,summary')) return;
-    if (e.code.startsWith('Arrow') && e.target.closest('#town-book, #inspector, #journal, #frontier-panel, #fieldbook, #companion-panel')) return;
+    if (e.code.startsWith('Arrow') && e.target.closest('#town-book, #inspector, #journal, #frontier-panel, #fieldbook, #companion-panel, #coop-panel')) return;
     if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
     keys.add(e.code); if (e.repeat) return;
     if ((e.metaKey || e.ctrlKey) && e.code === 'KeyZ') { e.preventDefault(); $('undo').click(); return; }
@@ -542,6 +548,13 @@ async function boot() {
     document.querySelector('.controls-hint>div').append($('frontier-toggle'));
     fieldbook=createFieldbook({getState:()=>state,canMutate:()=>companions.canManage,getPaused:()=>speed===0,resume:()=>setSpeed(previousSpeed),getContext:()=>sim.frontierContext(state),getIcons:()=>icons,mutate,beforeOpen:()=>preparePanel('fieldbook'),focus:item=>item.mark?world.focusDiscovery(item.id):world.focusWorld(item.x,item.z,12)});
     companionUI=createCompanionUI({store:companions,getState:()=>state,beforeOpen:()=>preparePanel('companion'),onStateChange:next=>{state=next;victorySeen=state.won;keys.clear();enter(true);},announce});
+    coop=createCoop({ config: COOP_CONFIG, storage: deviceStorage, getState:()=>state,
+      canUse:()=>playing && companions.canManage && companions.activeId==='home', save:next=>companions.save(next),
+      onChange:()=>{sim.refreshTown(state);world.sync(state);updateUI();} });
+    coopUI=createCoopUI({coop,getState:()=>state,beforeOpen:()=>preparePanel('coop'),openLocal:()=>companionUI.open(),cloneModel:type=>world.clone(type),announce,
+      importState:next=>{if(!companions.canManage||companions.activeId!=='home'||coop.info().busy)return{ok:false,reason:'Return home and finish connecting before importing.'};
+        const allowed=canImportCoop(state,next);if(!allowed.ok)return allowed;
+        const result=companions.save(next);if(!result.ok)return result;state=next;victorySeen=state.won;keys.clear();enter(true);return result;} });
     mountTabletControls();
     const shelfObserver=new ResizeObserver(()=>{document.documentElement.style.setProperty('--shelf-edge',`${innerHeight-document.querySelector('footer').getBoundingClientRect().top+12}px`);});shelfObserver.observe(document.querySelector('footer'));
     makeShelf(); bind(); updateAudio(); world.sync(attractVillage()); world.pan.set(innerWidth < 700 ? -2 : -5, 0, 0); world.targetZoom = innerWidth < 700 ? 38 : 29;
