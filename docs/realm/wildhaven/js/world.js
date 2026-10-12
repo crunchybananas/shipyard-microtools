@@ -551,12 +551,13 @@ export class VillageWorld {
   selectFrontier(selection={}){
     this.frontierSelection={unitIds:[...(selection.unitIds||[])],fortId:selection.fortId||null,neighborId:selection.neighborId||null,regionId:selection.regionId||null};
     const chosen=new Set(this.frontierSelection.unitIds),units=(this.state?.frontier?.units||[]).filter(u=>chosen.has(u.id)&&!['dead','released'].includes(u.status));
-    const signature=JSON.stringify([this.frontierSelection,units.map(u=>[u.id,u.order])]);if(this.frontierSelectionGroup?.userData.signature===signature)return;
+    const signature=JSON.stringify([this.frontierSelection,units.map(u=>[u.id,u.order,u.garrisoned])]);if(this.frontierSelectionGroup?.userData.signature===signature)return;
     if(this.frontierSelectionGroup)this.disposePresentation(this.frontierSelectionGroup);
     const group=new THREE.Group();group.userData.signature=signature;
     for(const id of this.frontierSelection.unitIds){const ring=this.frontierGroundRing(.40,'#efda95',.045);ring.userData.unitId=id;group.add(ring);}
     const defended=new Set();
     for(const unit of units){
+      if(unit.garrisoned)continue;
       const order=unit.order;
       if(!['move','retreat','defend'].includes(order?.type)||!Number.isFinite(order.x)||!Number.isFinite(order.z))continue;
       const ring=this.frontierGroundRing(.30,order.type==='defend'?'#9cd3be':'#efda95',.04);
@@ -566,7 +567,7 @@ export class VillageWorld {
       const points=Array.from({length:65},(_,i)=>{const angle=i/64*TAU,x=anchor.x+Math.cos(angle)*DEFEND_RADIUS,z=anchor.z+Math.sin(angle)*DEFEND_RADIUS;return new THREE.Vector3(x*CELL,groundHeight(x,z)+.07,z*CELL);});
       const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:'#9cd3be',transparent:true,opacity:.75,depthWrite:false}));
       line.userData.ownsGeometry=line.userData.ownsMaterial=true;group.add(line);
-      const label=this.makeCueLabel(192,48);if(label){this.setCueLabel(label,['DEFEND TOWN',`${DEFEND_RADIUS}-tile home area`],'#9cd3be');label.position.set(anchor.x*CELL,groundHeight(anchor.x,anchor.z)+.8,anchor.z*CELL);group.add(label);}
+      const label=this.makeCueLabel(192,48);if(label){this.setCueLabel(label,['DEFEND TOWN',`${DEFEND_RADIUS}-tile guard area`],'#9cd3be');label.position.set(anchor.x*CELL,groundHeight(anchor.x,anchor.z)+.8,anchor.z*CELL);group.add(label);}
     }
     const fort=(this.state?.frontier?.fortifications||[]).find(f=>f.id===selection.fortId),neighbor=ISLAND_NEIGHBORS.find(n=>n.id===selection.neighborId),region=ISLAND_REGIONS.find(r=>r.id===selection.regionId);
     for(const[item,radius,color]of[[fort,1.15,'#eadba7'],[neighbor,2.10,'#e0c184']])if(item){const ring=this.frontierGroundRing(radius,color);ring.position.set(item.x*CELL,groundHeight(item.x,item.z)+.055,item.z*CELL);group.add(ring);}
