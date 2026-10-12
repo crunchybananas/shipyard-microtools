@@ -119,7 +119,7 @@ export function pressureOptions(state) {
   const remainingPatrol = Math.max(0, spec.watchRequired - active.watchProgress), patrolRate = Math.min(spec.strength, watch.readiness);
   const patrolSecondsRemaining = remainingPatrol === 0 ? 0 : patrolRate > 0 ? round(remainingPatrol / patrolRate) : null;
   const secondsLeft = round(secondsUntil(state, active.deadline));
-  const defendReason = canDefend ? 'The supplied watch is ready to end this cargo incident.' : watch.readiness + 1e-6 < spec.strength ? `Need ${spec.strength} supplied watch readiness; ${watch.readiness.toFixed(1)} ready. Assign civilian guards to watch houses and keep food supplied. Recruited company troops have a separate job.` : `Patrol ${Math.floor(preparedness * 100)}% complete; ${duration(patrolSecondsRemaining)} of supplied watch work remains at 1×. Keep the guards at their posts.`;
+  const defendReason = canDefend ? 'The supplied watch is ready to end this cargo incident.' : watch.readiness + 1e-6 < spec.strength ? `Need ${spec.strength} supplied watch readiness; ${watch.readiness.toFixed(1)} ready. Assign civilian guards to barrackss and keep food supplied. Recruited company troops have a separate job.` : `Patrol ${Math.floor(preparedness * 100)}% complete; ${duration(patrolSecondsRemaining)} of supplied watch work remains at 1×. Keep the guards at their posts.`;
   result.active = {
     id: active.id, title: spec.title, description: spec.description + ' Repeated unescorted export orders and voyages drew this crew to the landing.', announcedDay: active.announcedDay, deadline: active.deadline,
     daysLeft: round(secondsLeft / DAY_SECONDS), secondsLeft, patrolSecondsRemaining,

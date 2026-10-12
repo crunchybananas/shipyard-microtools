@@ -1,0 +1,58 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#426b63">
+<meta name="description" content="Build an island town, manage its workers, explore and trade with your neighbors.">
+<title>Army playtest · isolated test town</title>
+<link rel="stylesheet" href="./style.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./frontier.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./living.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./clarity.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./companion.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./path-choice.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./research-map.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./tablet.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./compact.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./interaction.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./resource-details.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./seasons.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./defense.css?v=20261011-barracks-medics-1">
+<link rel="stylesheet" href="./island-book.css?v=20261011-barracks-medics-1">
+<script type="importmap">{"imports":{"three":"../vendor/three/three.module.js","./js/bread-guide.js":"./js/bread-guide.js?v=20261011-barracks-medics-1","./js/audio.js":"./js/audio.js?v=20261011-barracks-medics-1","./js/calendar.js":"./js/calendar.js?v=20261011-barracks-medics-1","./js/camera-input.js":"./js/camera-input.js?v=20261011-barracks-medics-1","./js/catalog.js":"./js/catalog.js?v=20261011-barracks-medics-1","./js/citizen-names.js":"./js/citizen-names.js?v=20261011-barracks-medics-1","./js/clarity-ui.js":"./js/clarity-ui.js?v=20261011-barracks-medics-1","./js/clarity.js":"./js/clarity.js?v=20261011-barracks-medics-1","./js/companion-store.js":"./js/companion-store.js?v=20261011-barracks-medics-1","./js/companion-ui.js":"./js/companion-ui.js?v=20261011-barracks-medics-1","./js/discovery.js":"./js/discovery.js?v=20261011-barracks-medics-1","./js/fieldbook-ui.js":"./js/fieldbook-ui.js?v=20261011-barracks-medics-1","./js/frontier-ui.js":"./js/frontier-ui.js?v=20261011-barracks-medics-1","./js/frontier.js":"./js/frontier.js?v=20261011-barracks-medics-1","./js/island.js":"./js/island.js?v=20261011-barracks-medics-1","./js/main.js":"./js/main.js?v=20261011-barracks-medics-1","./js/objective-checklist.js":"./js/objective-checklist.js?v=20261011-barracks-medics-1","./js/path-choice.js":"./js/path-choice.js?v=20261011-barracks-medics-1","./js/placement-layout.js":"./js/placement-layout.js?v=20261011-barracks-medics-1","./js/press-guard.js":"./js/press-guard.js?v=20261011-barracks-medics-1","./js/defense-guidance.js":"./js/defense-guidance.js?v=20261011-barracks-medics-1","./js/pressure.js":"./js/pressure.js?v=20261011-barracks-medics-1","./js/progression.js":"./js/progression.js?v=20261011-barracks-medics-1","./js/reading-clock.js":"./js/reading-clock.js?v=20261011-barracks-medics-1","./js/research-map.js":"./js/research-map.js?v=20261011-barracks-medics-1","./js/sim.js":"./js/sim.js?v=20261011-barracks-medics-1","./js/town-safety.js":"./js/town-safety.js?v=20261011-barracks-medics-1","./js/town-ui.js":"./js/town-ui.js?v=20261011-barracks-medics-1","./js/woodland.js":"./js/woodland.js?v=20261011-barracks-medics-1","./js/world-cues.js":"./js/world-cues.js?v=20261011-barracks-medics-1","./js/world-picking.js":"./js/world-picking.js?v=20261011-barracks-medics-1","./js/world.js":"./js/world.js?v=20261011-barracks-medics-1","./js/seasons.js":"./js/seasons.js?v=20261011-barracks-medics-1","./js/resource-details.js":"./js/resource-details.js?v=20261011-barracks-medics-1","./js/season-palette.js":"./js/season-palette.js?v=20261011-barracks-medics-1","./js/hinterland.js":"./js/hinterland.js?v=20261011-barracks-medics-1","./js/island-book.js":"./js/island-book.js?v=20261011-barracks-medics-1"}}</script>
+
+<style>
+#review-controls{position:fixed;left:12px;top:12px;width:245px;padding:14px;background:#f5f0deed;border:1px solid #bac2aa;border-radius:12px;z-index:45;pointer-events:auto;font:13px system-ui;color:#263f38;max-height:90vh;overflow:auto}#review-controls h1{font:22px Georgia;margin:0 0 6px}#review-controls p{margin:8px 0;line-height:1.4}#review-controls button{font-size:12px;padding:7px;margin:2px}#review-status{display:block;white-space:pre-line;font-size:11px;line-height:1.5}#frontier-toggle{bottom:20px}#frontier-command{bottom:20px}#frontier-panel{bottom:18px}#review-controls details{margin-top:10px}@media(max-width:700px){#review-controls{width:180px;font-size:11px}#review-controls h1{font-size:16px}#frontier-panel{z-index:60}}
+</style></head><body>
+<canvas id="world" tabindex="0" aria-label="Army test town. Drag to pan and scroll to zoom."></canvas><div id="hud"><footer hidden></footer></div>
+<aside id="review-controls"><h1>Army playtest</h1><p>Funded test town. This page never reads or writes your saved village.</p>
+<div><button id="company">Company</button><button id="defenses">Defenses</button><button id="running">Run</button><button id="step">Advance 30s</button></div>
+<div><button id="quarters">Find barracks</button><button id="troops">Find field troops</button><button id="rotate">Turn camera</button><button id="wide">Wide view</button><button id="closeup">Close view</button></div>
+<details><summary>Test controls</summary><button id="injure">Injure field troops</button><button id="wound">Severely wound one soldier</button><button id="reload">Reload in memory</button><button id="close-quarters">Pause barracks</button></details>
+<output id="review-status" role="status">Loading…</output></aside>
+<script type="module">
+import {VillageWorld} from './js/world.js';
+import {createFrontierUI} from './js/frontier-ui.js';
+import * as sim from './js/sim.js';
+import * as army from './js/frontier.js';
+import {RESOURCE_NAMES} from './js/catalog.js';
+const $=id=>document.getElementById(id);let state=sim.createGame(),running=false,ui;
+Object.assign(state.resources,Object.fromEntries(RESOURCE_NAMES.map(k=>[k,500])));state.research.completed.push('watchkeeping');
+const plots=sim.listTiles().filter(t=>sim.canBuild(state,'barracks',t.x,t.z,0).ok).sort((a,b)=>Math.hypot(a.x+4,a.z-3)-Math.hypot(b.x+4,b.z-3));
+const plot=plots[0];if(!plot)throw new Error('No open barracks site');sim.build(state,'barracks',plot.x,plot.z,0);sim.tick(state,120);
+for(const kind of ['spearman','archer']){const r=army.recruitTroop(state,kind,null,sim.frontierContext(state));if(!r.ok)throw new Error(r.reason);}sim.refreshTown(state);sim.tick(state,40);
+const world=new VillageWorld($('world'),{onHover:t=>ui?.hover(t),onTap:(t,p)=>ui?.handleTap(t,p)});await world.load();
+function report(note=''){$('review-status').textContent=(note?note+'\n':'')+Math.round(state.frontier.clock)+' simulation seconds · '+state.resources.food.toFixed(0)+' food · '+state.resources.cloth.toFixed(0)+' cloth\n'+state.frontier.units.filter(u=>u.citizenId).map(u=>u.name+' · '+u.kind+' · '+u.status+'\n'+(u.garrisoned?'Inside barracks':u.x.toFixed(1)+', '+u.z.toFixed(1)+' · '+u.order.type)+' · '+Math.ceil(u.hp)+'/'+u.maxHp+' HP'+(u.kind==='medic'?' · '+u.medicalCharges+' dressings':'')).join('\n');}
+function sync(note=''){sim.refreshTown(state);world.sync(state);ui?.update(true);report(note);}
+ui=createFrontierUI({getState:()=>state,getContext:()=>sim.frontierContext(state),mutate:r=>sync(r.reason),focus:item=>world.focusWorld(item.x,item.z,12),preview:v=>world.showFrontierCommand(v),onSelection:v=>world.selectFrontier(v)});
+sync();world.focusWorld(plot.x,plot.z,16);
+$('company').onclick=()=>ui.open('company');$('defenses').onclick=()=>ui.open('defenses');
+$('running').onclick=()=>{running=!running;$('running').textContent=running?'Pause':'Run';};
+$('step').onclick=()=>{for(let i=0;i<120;i++)sim.tick(state,.25);sync('Advanced thirty simulation seconds.');};
+$('quarters').onclick=()=>world.focusWorld(plot.x,plot.z,12);$('troops').onclick=()=>{const u=state.frontier.units.find(u=>u.citizenId&&!u.garrisoned);if(u)world.focusWorld(u.x,u.z,8);};
+$('rotate').onclick=()=>world.rotate(1);$('wide').onclick=()=>world.targetZoom=24;$('closeup').onclick=()=>world.targetZoom=6;
+$('injure').onclick=()=>{for(const u of state.frontier.units.filter(u=>u.citizenId&&u.kind!=='medic'&&!u.garrisoned)){u.hp=Math.min(u.hp,20);u.damageAt=state.frontier.clock;}sync('Applied test injuries.');};
+$('wound').onclick=()=>{const u=state.frontier.units.find(u=>u.citizenId&&u.kind!=='medic'&&!u.garrisoned);if(u){Object.assign(u,{status:'wounded',hp:1,recoveryRemaining:90,order:{type:'retreat'}});sync('Applied one severe test wound.');}};
+$('reload').onclick=()=>{const restored=sim.restore(sim.serialize(state));if(!restored)throw new Error('Review save did not reload');state=restored;sync('Reloaded simulation snapshot in memory.');};
+$('close-quarters').onclick=()=>{const b=state.buildings.find(b=>b.type==='barracks');b.paused=!b.paused;$('close-quarters').textContent=b.paused?'Reopen barracks':'Pause barracks';sync();};
+let last=performance.now(),elapsed=0;function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;if(!document.hidden){if(running){sim.tick(state,dt);world.sync(state);}world.render(dt,{speed:running?1:0,playing:true,dayTime:.3,won:false});elapsed+=dt;if(elapsed>.5){elapsed=0;ui.update();report();}}requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></body></html>

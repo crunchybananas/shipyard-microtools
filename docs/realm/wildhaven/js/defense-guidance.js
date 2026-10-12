@@ -19,28 +19,28 @@ export function coastalDefenseGuidance(state) {
   const paused = ready.find(b => b.paused), unfinished = houses.find(b => b.status !== 'ready');
   const foodBlocked = working.length > 0 && (!(state.resources?.food > 0) || working.some(b => b.production?.blockedReason === 'Needs food'));
   let staffingAction = inspectWatch;
-  let staffingDetail = 'Assign civilian guards in the watch-house inspector. Recruiting these residents into the company takes them away from the watch.';
+  let staffingDetail = 'Assign civilian guards in the barracks inspector. Recruiting these residents into the company takes them away from the watch.';
   if (foodBlocked) {
     staffingAction = { kind: 'town', tab: 'stores', resource: 'food' };
     staffingDetail = 'Watch guards need more food to stay supplied. Food in storage can still be too low to supply every workplace.';
   } else if (vacant) {
     const requested = vacant.desiredWorkers ?? getBuildingSpec(vacant.type, vacant.level || 1).workers;
     staffingAction = requested > assigned(vacant) ? { kind: 'town', tab: 'workforce' } : { kind: 'inspect', buildingId: vacant.id };
-    staffingDetail = requested > assigned(vacant) ? 'The watch has vacant requested posts. Free civilian workers in People & jobs; builders, other workplaces and the recruited company share those residents.' : 'This watch house has open posts. Increase its requested civilian guards and keep food supplied.';
+    staffingDetail = requested > assigned(vacant) ? 'The watch has vacant requested posts. Free civilian workers in People & jobs; builders, other workplaces and the recruited company share those residents.' : 'This barracks has open posts. Increase its requested civilian guards and keep food supplied.';
   } else if (paused) {
-    staffingAction = { kind: 'inspect', buildingId: paused.id }; staffingDetail = 'Resume this paused watch house to make its guard posts available.';
+    staffingAction = { kind: 'inspect', buildingId: paused.id }; staffingDetail = 'Resume this paused barracks to make its guard posts available.';
   } else if (unfinished) {
-    staffingAction = { kind: 'inspect', buildingId: unfinished.id }; staffingDetail = 'Finish the planned watch house, then staff and supply its new guard posts.';
+    staffingAction = { kind: 'inspect', buildingId: unfinished.id }; staffingDetail = 'Finish the planned barracks, then staff and supply its new guard posts.';
   } else if (ready.length && !enoughWatch) {
-    staffingAction = { kind: 'build', type: 'barracks' }; staffingDetail = 'The current guard posts are full. Add a watch house or upgrade an existing one for more capacity, then staff and supply it.';
+    staffingAction = { kind: 'build', type: 'barracks' }; staffingDetail = 'The current guard posts are full. Add a barracks or upgrade an existing one for more capacity, then staff and supply it.';
   }
   const steps = [
     { id: 'common-ground', label: 'Research Community services', complete: learned.has('civic_order') || hasWatchkeeping,
       detail: 'A supplied school studies this prerequisite for A standing watch.', kind: 'research', researchId: 'civic_order' },
     { id: 'standing-watch', label: 'Research A standing watch', complete: hasWatchkeeping,
-      detail: `Unlock watch houses. Research costs ${costText(RESEARCH.watchkeeping.cost)}.`, kind: 'research', researchId: 'watchkeeping' },
-    { id: 'watch-house', label: ready.length ? 'Finish a watch house' : houses.length ? 'Finish the planned watch house' : 'Build a watch house', complete: ready.length > 0,
-      detail: `A new watch house needs ${costText(BUILDINGS.barracks.cost)}, then builders to finish it.`, ...inspectWatch },
+      detail: `Unlock barrackss. Research costs ${costText(RESEARCH.watchkeeping.cost)}.`, kind: 'research', researchId: 'watchkeeping' },
+    { id: 'barracks', label: ready.length ? 'Finish a barracks' : houses.length ? 'Finish the planned barracks' : 'Build a barracks', complete: ready.length > 0,
+      detail: `A new barracks needs ${costText(BUILDINGS.barracks.cost)}, then builders to finish it.`, ...inspectWatch },
     { id: 'supplied-guards', label: incident ? `${watch.readiness.toFixed(1)} / ${incident.requiredReadiness} supplied watch readiness` : 'Staff and supply civilian watch guards', complete: enoughWatch,
       detail: staffingDetail, ...staffingAction },
   ];
@@ -54,7 +54,7 @@ export function coastalDefenseGuidance(state) {
     : steps.find(step => !step.complete) || null;
   return {
     active: !!incident, title: 'Protect coastal cargo', steps, nextStep,
-    distinction: 'Civilian watch-house guards handle coastal cargo demands. Recruited company soldiers, walls and towers handle physical enemies on the island; their orders do not add watch readiness.',
+    distinction: 'Civilian barracks guards handle coastal cargo demands. Recruited company soldiers, walls and towers handle physical enemies on the island; their orders do not add watch readiness.',
     explanation: 'Paying ends a cargo incident immediately. Shelter reduces possible cargo loss by 40% but does not end the warning. A supplied watch needs both the required readiness and completed patrol work.',
     preparedness: incident?.preparedness ?? null, readiness: watch.readiness, requiredReadiness: incident?.requiredReadiness ?? null,
     secondsLeft: incident?.secondsLeft ?? null, patrolSecondsRemaining: incident?.patrolSecondsRemaining ?? null,

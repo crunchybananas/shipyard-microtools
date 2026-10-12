@@ -308,6 +308,7 @@ function updateInspector() {
       if (home) details.push(['water', 'health', 'community'].map(k => `${k}: ${Math.round((home.coverage[k] || 0) * 100)}%`).join(' · ') + '.');
     }
     if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
+    if (selected.type === 'barracks') {const troops=state.frontier.units.filter(u=>u.quartersId===selected.id&&!['dead','released'].includes(u.status));details.push(`${troops.filter(u=>u.garrisoned).length} troops inside · ${troops.length} assigned. Troops train and recover here.`);$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Manage company';}
     if (selected.type === 'garden') {const bed=gardenState(state,selected.id),crop=CROPS[bed.crop];details.push(`${crop.name} growing for neighbor projects. Choose the next crop in Explore → Gardens.`);$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Choose garden crops';}
     if (selected.type === 'lumber') {
       const grove = sim.woodlandStatus(state, selected);
@@ -445,6 +446,7 @@ function advance(dt) {
 }
 function makeShelf() {
   $('build-categories').replaceChildren(...Object.entries(CATEGORIES).map(([id, item]) => { const button = document.createElement('button'); button.textContent = item.name; button.dataset.category = id; button.setAttribute('aria-pressed', String(category === id)); button.onclick = () => { const drawer = document.body.classList.contains('tablet-build-open'); category = id; cancelTool(); makeShelf(); if (drawer) { document.body.classList.add('tablet-build-open'); $('tablet-build-toggle').setAttribute('aria-expanded', 'true'); } }; return button; }));
+  const defenses=document.createElement('button');defenses.textContent='Defenses';defenses.dataset.category='defenses';defenses.onclick=()=>{cancelTool();document.body.classList.remove('tablet-build-open');$('tablet-build-toggle').setAttribute('aria-expanded','false');frontierUI.open('defenses');};$('build-categories').append(defenses);
   $('build-shelf').replaceChildren(); $('shelf-title').textContent = CATEGORIES[category].name;
   CATEGORIES[category].types.forEach((type, index) => {
     const spec = BUILDINGS[type], facts = buildingFacts(type), button = document.createElement('button'); button.className = 'build-choice'; button.dataset.build = type; button.setAttribute('aria-pressed', 'false'); button.setAttribute('aria-label', `${spec.name}. ${facts.shortFlow}. ${facts.staffing}. ${facts.payoff} Build with ${costText(spec.cost)}.`);
@@ -483,7 +485,7 @@ function bind() {
     if (selected.type === 'bell') { if (selected.restored) { audio.play('bell'); announce('The bell carries all the way across the water.'); } else mutate(sim.build(state, 'bell', 0, -5)); return; }
     const result = sim.demolish(state, selected.id); if (result.ok) closeInspector(); mutate(result);
   };
-  $('inspect-secondary').onclick = () => { if(selected?.type==='garden'){frontierUI.open('gardens');return;} if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
+  $('inspect-secondary').onclick = () => { if(selected?.type==='barracks'){closeInspector();frontierUI.open('company');return;}if(selected?.type==='garden'){frontierUI.open('gardens');return;} if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
   $('landing-button').onclick = () => activateDock('landing');
   $('undo').onclick = () => { if (companions.canManage) mutate(sim.undo(state)); };
   $('find-bell').onclick = () => { const b = state.buildings.find(b => b.type === 'bell'); inspect(b); world.focus(b); };

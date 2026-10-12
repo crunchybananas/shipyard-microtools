@@ -168,8 +168,8 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
     description: 'A keeper opens the doors for ceremonies, remembrance, and a quiet hour together. Larger assembly rooms welcome more neighbors without tying up another worker.', production: '1 food / day · community for 24 beds', service: service('faith', 5, 24), upgrades: serviceUpgrades('faith', { workers: 1, upkeep: 1.3, radius: 6, capacity: 36 }, { workers: 1, upkeep: 1.8, radius: 7, capacity: 54 }),
   },
   barracks: {
-    name: 'Watch house', category: 'security', model: 'barracks', cost: { planks: 20, stone: 20, tools: 6 }, work: 85, workers: 3, job: 'guard', unlock: 'watchkeeping', recipe: recipe({ food: 3 }),
-    description: 'Feeds a standing watch. Guards must patrol during coastal warnings to protect the town’s stores, and escort readiness opens distant trade.', production: '3 food / day · 3 guards at full staffing', service: service('security', 5, 30), upgrades: serviceUpgrades('security', { workers: 4, upkeep: 4 / 3, radius: 6, capacity: 48 }, { workers: 6, upkeep: 2, radius: 7, capacity: 72 }),
+    name: 'Barracks', category: 'security', model: 'barracks', cost: { planks: 20, stone: 20, tools: 6 }, work: 85, workers: 3, job: 'guard', unlock: 'watchkeeping', recipe: recipe({ food: 3 }),
+    description: 'Trains soldiers and field medics, and houses resting or recovering troops. Assigned guards prepare coastal patrols to protect cargo; recruit the field company separately.', production: '3 food / day · 3 guards at full staffing', service: service('security', 5, 30), upgrades: serviceUpgrades('security', { workers: 4, upkeep: 4 / 3, radius: 6, capacity: 48 }, { workers: 6, upkeep: 2, radius: 7, capacity: 72 }),
   },
   warehouse: {
     name: 'Warehouse', category: 'trade', model: 'warehouse', cost: { planks: 20, stone: 16 }, work: 65, storage: 180, unlock: 'logistics',

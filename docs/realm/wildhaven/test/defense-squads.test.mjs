@@ -8,14 +8,14 @@ import { RESOURCE_NAMES } from '../js/catalog.js';
 const copy = value => structuredClone(value), distance = (a,b) => Math.hypot(a.x-b.x,a.z-b.z);
 function context(state, overrides = {}) { return { bounds:f.FRONTIER_BOUNDS, home:{x:0,z:3}, isLand:(x,z)=>x>=-28&&x<=28&&z>=-34&&z<=12, isWalkable:(x,z)=>!state.buildings.some(b=>b.x===x&&b.z===z), regionAt:()=>({id:'home'}), ...overrides }; }
 function fixture(count = 12, overrides = {}) {
-  const state={version:3,day:1,population:count,citizens:Array.from({length:count},(_,i)=>({id:`c${i+1}`,name:`Resident ${i+1}`,job:'idle'})),buildings:[{id:'watch',type:'barracks',status:'ready',x:-9,z:8}],resources:Object.fromEntries(RESOURCE_NAMES.map(r=>[r,1000])),storage:Object.fromEntries(RESOURCE_NAMES.map(r=>[r,5000])),won:false};
+  const state={version:3,day:1,population:count,citizens:Array.from({length:count},(_,i)=>({id:`c${i+1}`,name:`Resident ${i+1}`,job:'idle'})),buildings:[{id:'watch',type:'barracks',status:'ready',x:0,z:4,rotation:2}],resources:Object.fromEntries(RESOURCE_NAMES.map(r=>[r,1000])),storage:Object.fromEntries(RESOURCE_NAMES.map(r=>[r,5000])),won:false};
   const ctx=context(state,overrides);state.frontier=f.createFrontierState(ctx);return{state,ctx};
 }
 function advance(state,seconds,ctx,inspect=()=>{}) { for(let left=seconds;left>1e-7;) { const dt=Math.min(.25,left),result=f.tickFrontier(state,dt,ctx);state.citizens=state.citizens.filter(c=>!result.casualties.includes(c.id));state.population=state.citizens.length;state.day=1+Math.floor(state.frontier.clock/90);left-=dt;inspect(); } }
-function soldiers(state,ctx,count=1) { const units=Array.from({length:count},(_,i)=>{const result=f.recruitTroop(state,i%2?'archer':'spearman',null,ctx);assert.ok(result.ok,result.reason);return result.unit;});advance(state,45,ctx);return units; }
+function soldiers(state,ctx,count=1) { const units=Array.from({length:count},(_,i)=>{const result=f.recruitTroop(state,i%2?'archer':'spearman',null,ctx);assert.ok(result.ok,result.reason);return result.unit;});advance(state,45,ctx);assert.ok(f.commandTroops(state,units.map(u=>u.id),{type:'move',...ctx.home},ctx).ok);advance(state,.25,ctx);assert.ok(f.commandTroops(state,units.map(u=>u.id),{type:'hold'},ctx).ok);return units; }
 function raider(state,x,z) {
   const sample=state.frontier.units[0],spec=f.TROOPS.raider;
-  const unit={...copy(sample),id:`unit-${state.frontier.nextId++}`,name:'Raider',citizenId:null,kind:'raider',faction:'raiders',x,z,hp:spec.maxHp,maxHp:spec.maxHp,status:'active',trainingSeconds:0,trainingRemaining:0,recoveryRemaining:0,cooldown:0,order:{type:'hold'},path:[],targetId:null,attackAt:null,damageAt:null,deathAt:null,routeGoal:null,routeAt:-10};
+  const unit={...copy(sample),id:`unit-${state.frontier.nextId++}`,name:'Raider',citizenId:null,kind:'raider',faction:'raiders',quartersId:null,garrisoned:false,x,z,hp:spec.maxHp,maxHp:spec.maxHp,status:'active',trainingSeconds:0,trainingRemaining:0,recoveryRemaining:0,cooldown:0,order:{type:'hold'},path:[],targetId:null,attackAt:null,damageAt:null,deathAt:null,routeGoal:null,routeAt:-10};
   state.frontier.units.push(unit);return unit;
 }
 function wall(state,x,z,type='wall') { const spec=f.FORTIFICATIONS[type],fort={id:`fort-${state.frontier.nextId++}`,type,name:spec.name,faction:'player',x,z,rotation:0,status:'ready',hp:spec.maxHp,maxHp:spec.maxHp,progress:spec.work,work:spec.work,escrow:{},open:false,damageAt:null,regionId:null,completedAt:state.frontier.clock,repairing:false};state.frontier.fortifications.push(fort);return fort; }
@@ -121,11 +121,11 @@ test('defense orders and squads persist and partition identically through combat
 
 test('civilian and frontier construction protect the saved defensive rally cell',()=>{
   const state=sim.createGame();Object.assign(state.resources,Object.fromEntries(RESOURCE_NAMES.map(r=>[r,1000])));
-  state.buildings.push({id:'fixture-watch',type:'barracks',x:4,z:4,status:'ready',desiredWorkers:0,level:1,workerIds:[],priority:1,builtDay:1,paused:false});
+  state.buildings.push({id:'fixture-watch',type:'barracks',x:0,z:4,rotation:2,status:'ready',desiredWorkers:0,level:1,workerIds:[],priority:1,builtDay:1,paused:false});
   const ctx=sim.frontierContext(state),unit=f.recruitTroop(state,'spearman',null,ctx).unit;assert.ok(unit);f.tickFrontier(state,36,ctx);assert.ok(f.commandTroops(state,[unit.id],{type:'defend'},ctx).ok);
   // Put the actor elsewhere and use a buildable valid home-zone rally to isolate
   // the saved-destination reservation from the separate occupied-cell guard.
-  Object.assign(unit,{x:0,z:3});unit.order.x=2;unit.order.z=2;
+  Object.assign(unit,{x:0,z:3,garrisoned:false});unit.order.x=2;unit.order.z=2;
   const denied=sim.canBuild(state,'cottage',2,2);assert.equal(denied.ok,false);assert.match(denied.reason,/ordered destination/);
   const fort=f.canPlaceFortification(state,'wall',2,2,0,ctx);assert.equal(fort.ok,false);assert.match(fort.reason,/ordered destination/);
 });
