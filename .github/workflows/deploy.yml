@@ -102,6 +102,7 @@ jobs:
             --exclude='tmp/' \
             --exclude='attic/' \
             --exclude='ember/.gitkeep' \
+            --include='/realm/wildhaven/review-army.html' \
             --exclude='/realm/wildhaven/review/' \
             --exclude='/realm/wildhaven/tools/' \
             --exclude='/realm/wildhaven/test/' \

@@ -509,15 +509,18 @@ export class VillageWorld {
     root.traverse(o=>{for(const name of['left_arm','right_arm','left_leg','right_leg'])if(o.name===name||o.name.endsWith('_'+name))limbs[name]=o;for(const side of['left','right'])if(o.name.endsWith('_'+side+'_weapon'))weapons[side]=o;if(o.isMesh){o.material=o.material.clone();o.userData.ownsMaterial=true;}});
     if(civil){this.colorCitizen(root,unit.kind);if(unit.kind==='explorer'||unit.kind==='ranger'){const pack=this.clone('cargo_grain');pack.scale.setScalar(.60);pack.position.set(0,.26,-.16);root.add(pack);}const prop=unit.kind==='medic'?null:this.clone(['engineer','restorer'].includes(unit.kind)?'tool_hammer':'tool_book');if(prop){prop.position.set(.04,-.17,.04);prop.rotation.x=['engineer','restorer'].includes(unit.kind)?Math.PI/2:0;limbs[['engineer','restorer'].includes(unit.kind)?'right_arm':'left_arm']?.add(prop);}}
     if(unit.kind==='medic'){
-      // A cream apron, teal cap and canvas medical bag are visible at game scale.
-      root.traverse(o=>{if(/straw_hat|hat_teal|hat_crown/.test(o.name))o.visible=false;});
+      // A cream apron, teal hat and canvas medical bag distinguish field medics.
+      root.traverse(o=>{if(o.name!=='villager_mesh'||!o.geometry.attributes.color)return;
+        if(!o.userData.ownsGeometry){o.geometry=o.geometry.clone();o.userData.ownsGeometry=true;}
+        const positions=o.geometry.attributes.position,colors=o.geometry.attributes.color,hat=new THREE.Color('#547f78');
+        for(let i=0;i<positions.count;i++)if(positions.getY(i)+o.position.y>.709)colors.setXYZ(i,hat.r,hat.g,hat.b);colors.needsUpdate=true;
+      });
       const apron=new THREE.Mesh(new THREE.BoxGeometry(.18,.22,.035),material('#ece5c9'));apron.position.set(0,.385,.106);
       const bag=new THREE.Mesh(new THREE.BoxGeometry(.17,.14,.10),material('#547f78'));bag.position.set(.16,.29,-.025);
       const bandage=new THREE.Mesh(new THREE.BoxGeometry(.115,.025,.106),material('#e8ddba'));bandage.position.copy(bag.position);
-      const cap=new THREE.Mesh(new THREE.SphereGeometry(.116,12,8,0,Math.PI*2,0,Math.PI/2),material('#547f78'));cap.position.set(0,.713,0);cap.scale.y=.55;
       const roll=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.085,10),material('#ece5c9'));roll.rotation.z=Math.PI/2;roll.position.set(.05,-.175,.05);
-      for(const mesh of [apron,bag,bandage,cap,roll]){mesh.userData.ownsGeometry=true;mesh.userData.ownsMaterial=true;}
-      root.add(apron,bag,bandage,cap);limbs.right_arm?.add(roll);
+      for(const mesh of [apron,bag,bandage,roll]){mesh.userData.ownsGeometry=true;mesh.userData.ownsMaterial=true;}
+      root.add(apron,bag,bandage);limbs.right_arm?.add(roll);
     }
     root.userData.unit=unit;this.scene.add(root);return{root,limbs,weapons,unit,phase:0,lastX:root.position.x,lastZ:root.position.z};
   }
