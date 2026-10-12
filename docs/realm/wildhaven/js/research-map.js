@@ -50,8 +50,8 @@ const STATUS = { learned: '✓ Learned', studying: '◷ Studying', ready: 'Prere
 export function createResearchMap({ state, selectedId = null, onSelect }) {
   const graph = researchGraph(state, { selectedId }), section = el('section', 'research-map');
   section.setAttribute('aria-label', 'Research map');
-  const header = el('div', 'research-map-heading'); header.append(el('h3', '', 'See where a discovery leads'), el('p', '', 'Tap a discovery for its costs and unlocks. All incoming lines are required.'));
-  if (state.guidance?.goal === 'first_bread') header.append(el('p', 'bread-route-note', 'Your bread route: Timber framing + Fieldcraft → Flour and fire. Then build and supply a grain farm, windmill and bakery.'));
+  const header = el('div', 'research-map-heading'); header.append(el('h3', '', 'Research requirements'), el('p', '', 'Tap a discovery for its costs and unlocks. All incoming lines are required.'));
+  if (state.guidance?.goal === 'first_bread') header.append(el('p', 'bread-route-note', 'Your bread route: Timber framing + Fieldcraft → Milling and baking. Then build and supply a grain farm, windmill and bakery.'));
   section.append(header);
   const legend = el('div', 'research-map-legend');
   for (const key of Object.keys(STATUS)) legend.append(el('span', `map-status-${key}`, STATUS[key]));
@@ -69,7 +69,7 @@ export function createResearchMap({ state, selectedId = null, onSelect }) {
   }
   canvas.append(svg);
   graph.columns.forEach((_, column) => {
-    const label = el('span', 'research-map-column', ['First discoveries', 'Connected crafts', 'Town ambitions', 'Farther horizons'][column] || 'Further discoveries');
+    const label = el('span', 'research-map-column', ['Starting research', 'Next projects', 'Advanced projects', 'Navigation'][column] || 'Further discoveries');
     label.style.left = `${16 + column * 210}px`; canvas.append(label);
   });
   for (const node of graph.nodes) {

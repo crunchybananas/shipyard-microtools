@@ -82,7 +82,7 @@ export function objectiveChecklist(state, ambition = objective(state)) {
     case 2: return [working(state, 'lumber'), working(state, 'quarry')];
     case 3: return [completedBuilding(state, 'cottage', 3), row('built-food', 'Finish orchards or kitchen gardens', count(state, 'orchard') + count(state, 'garden'), 2, 'buildings', 'Finished, unpaused buildings count.'), people(10)];
     case 4: return [condition('restore-bell', 'Restore the old bell', (state.buildings || []).some(building => building.type === 'bell' && building.restored && ready(building)))];
-    case 5: return [people(20), stock(state, 'food', 40), working(state, 'school'), completedBuilding(state, 'well'), row('research-count', 'Complete research discoveries', state.research?.completed?.length, 3, 'discoveries', 'Any three completed discoveries count.')];
+    case 5: return [people(20), stock(state, 'food', 40), working(state, 'school'), completedBuilding(state, 'well'), row('research-count', 'Complete research projects', state.research?.completed?.length, 3, 'discoveries', 'Any three completed research projects count.')];
     case 6: return [people(40), stock(state, 'tools', 12), stock(state, 'cloth', 12), working(state, 'market'), working(state, 'clinic'), coverage(state, 'water', .5, 'Water'), coverage(state, 'health', .4, 'Healthcare')];
     case 7: return [row('delivery-orders', 'Complete delivery orders', state.contracts?.completed, 6, 'orders'),
       either('coastal-trade', 'Complete voyages or harbor-counter exports', [row('voyages', 'Voyages', state.routes?.completed, 3, 'voyages'), row('exports', 'Harbor-counter exports', ledger.exportsCompleted, 12, 'shipments')]),
@@ -112,7 +112,7 @@ export function objectiveChecklist(state, ambition = objective(state)) {
 /** One short reason and a real existing destination; this never performs an action. */
 export function objectiveGuidance(state, ambition = objective(state)) {
   if (!ambition || ambition.complete) return null;
-  if(ambition.frontierTab)return {title:ambition.title,why:ambition.description,label:'Open the wider island',frontierTab:ambition.frontierTab};
+  if(ambition.frontierTab)return {title:ambition.title,why:ambition.description,label:'Open Explore',frontierTab:ambition.frontierTab};
   const foodChain = ['Grain farm', 'Windmill', 'Bakery', 'Food'];
   const toolsChain = ['Iron mine', 'Smithy', 'Toolmaker', 'Tools'];
   const clothChain = ['Flax field', 'Weaver', 'Cloth'];
@@ -122,28 +122,28 @@ export function objectiveGuidance(state, ambition = objective(state)) {
   };
   if (!state.won) {
     switch (ambition.step) {
-      case 0: return { title: 'A roof makes room', why: 'New homes provide beds for the neighbors who will work in your village.', ...buildingAction('cottage') };
+      case 0: return { title: 'Build a cottage', why: 'New homes provide beds for the neighbors who will work in your village.', ...buildingAction('cottage') };
       case 1: return { title: 'Give the village a food supply', why: 'Workers harvest food to feed residents and make new arrivals possible.', ...buildingAction((state.buildings || []).find(building => ['orchard', 'garden'].includes(building.type))?.type || 'orchard') };
       case 2: return { title: 'Keep building materials coming', why: 'Woodcutters and stoneworkers replace the supplies used by new buildings.', ...buildingAction(ambition.type || 'lumber') };
       case 3: return { title: 'Prepare for more neighbors', why: 'Spare beds and food make space for a larger workforce.', label: `Plan another ${BUILDINGS[ambition.type || 'cottage'].name.toLowerCase()}`, type: ambition.type || 'cottage' };
-      case 4: return { title: 'Help new neighbors settle', why: 'Arrivals need spare beds, enough food, and a welcoming village.', label: 'Review arrivals and needs', tab: 'stores' };
+      case 4: return { title: 'Help new neighbors settle', why: 'Arrivals need spare beds, enough food, and sufficient morale.', label: 'Review arrivals and needs', tab: 'stores' };
       case 5: return { title: 'Bring the old bell back', why: 'The first ringing leads into research, better services, and coastal trade.', ...buildingAction('bell', 'View the old bell') };
       default: return null;
     }
   }
   switch (ambition.step) {
     case 0: return { title: 'Make room for neighbors', why: 'A finished cottage provides beds; a building site does not.', ...buildingAction('cottage') };
-    case 1: return { title: 'Put hands to the harvest', why: 'Completed food workplaces need assigned workers to fill the pantry.', label: 'Review people and jobs', tab: 'workforce' };
+    case 1: return { title: 'Assign food workers', why: 'Completed food workplaces need assigned workers to fill the pantry.', label: 'Review people and jobs', tab: 'workforce' };
     case 2: return { title: 'Staff the material workplaces', why: 'Builders and workshops share a limited workforce. Requested jobs still need available people.', label: 'Review people and jobs', tab: 'workforce' };
     case 3: return { title: 'Give the village room to grow', why: 'New neighbors need finished homes and a reliable food supply.', label: 'Review arrivals and needs', tab: 'stores' };
-    case 4: return { title: 'Restore the old bell', why: 'Its first ringing marks the start of the village’s next chapter.', ...buildingAction('bell', 'View the old bell') };
+    case 4: return { title: 'Restore the old bell', why: 'Finish the restoration to complete the opening objectives.', ...buildingAction('bell', 'View the old bell') };
     case 5: {
-      const school = { title: 'Let scholars open new crafts', why: 'Supplied scholars earn knowledge and advance the research you choose.', chain: foodChain };
+      const school = { title: 'Research new buildings', why: 'Supplied scholars earn knowledge and advance the research you choose.', chain: foodChain };
       if (!staffed(state, 'school')) return { ...school, ...buildingAction('school') };
       if ((state.research?.completed?.length || 0) < 3) return { ...school, label: 'Review research', tab: 'council' };
       if (!count(state, 'well')) return { title: 'Bring water to the homes', why: 'An open well supplies nearby beds and supports growth beyond twenty residents.', ...buildingAction('well') };
       if (finite(state.resources?.food) < 40) return { title: 'Leave meals in the pantry', why: 'A food reserve feeds residents and gives new arrivals a dependable supper.', label: 'Review food stores', resource: 'food', tab: 'stores' };
-      return { title: 'Welcome the next neighbors', why: 'New arrivals need spare beds, enough food, and a welcoming village.', label: 'Review arrivals and needs', tab: 'stores' };
+      return { title: 'Welcome the next neighbors', why: 'New arrivals need spare beds, enough food, and sufficient morale.', label: 'Review arrivals and needs', tab: 'stores' };
     }
     case 6: {
       if (finite(state.resources?.tools) < 12) return { title: 'Keep tools ready for town work', why: 'Tools support building work and research. Made or imported tools enter stores automatically.', label: 'Find tools', resource: 'tools', tab: 'stores', chain: toolsChain };
@@ -154,7 +154,7 @@ export function objectiveGuidance(state, ambition = objective(state)) {
     case 7: {
       const rows = objectiveChecklist(state, ambition);
       if (rows.filter(item => ['delivery-orders', 'coastal-trade', 'stock-gold'].includes(item.id)).some(item => !item.complete)) return { title: 'Trade for what your village needs', why: 'Orders and exports earn coin, so you can buy goods instead of making every supply locally.', label: 'Review coastal trade', tab: 'trade' };
-      if (!count(state, 'manor')) return { title: 'Give the town a civic home', why: 'A finished town hall adds beds and a place for stewards to keep shared records.', ...buildingAction('manor') };
+      if (!count(state, 'manor')) return { title: 'Build a town hall', why: 'A finished town hall adds beds and a place for stewards to keep shared records.', ...buildingAction('manor') };
       return { title: 'Choose the town’s future', why: 'Food, trading, and craft paths reward different ways of growing the town.', label: 'Review town paths', tab: 'council' };
     }
     case 8: return { title: 'Support the whole town', why: 'Food, service capacity, and a prepared coast let a large community thrive.', label: 'Review stores and housing needs', tab: 'stores', ...(finite(state.foodPotentialBalance, finite(state.foodBalance, -1)) < 0 ? { chain: foodChain } : {}) };

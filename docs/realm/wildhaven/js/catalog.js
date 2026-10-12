@@ -78,17 +78,17 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   hearth: {
     name: 'Founders’ hearth', category: 'civic', model: 'hearth', work: 0,
     workers: 2, job: 'forager', housing: 6, recipe: recipe({}, { wood: 4, stone: 3, food: 10 }),
-    description: 'Two foragers keep the first six islanders fed and bring home usable timber and stone. Its work is real, and the hearth is always a place to recover.',
+    description: 'Houses six residents. Available foragers gather food, timber and stone when other jobs leave them free.',
     production: '2 foragers · 4 timber, 3 stone, 10 food / day',
   },
   cottage: {
     name: 'Cottage', category: 'housing', model: 'cottage', cost: { wood: 16, stone: 8 }, work: 36, housing: 4, shortcut: '1',
-    description: 'Beds, a little hearth, and a reason to stay. A garden or well nearby makes a better neighborhood.', production: '4 beds',
+    description: 'Houses four residents. Upgrades add more beds. Nearby wells provide water, and nearby gardens produce more food.', production: '4 beds',
     upgrades: upgrades({ cost: { planks: 12, stone: 8, cloth: 2 }, work: 50, housing: 7 }, { cost: { planks: 20, stone: 20, tools: 4, cloth: 5 }, work: 80, housing: 10 }),
   },
   orchard: {
     name: 'Orchard', category: 'food', model: 'orchard', cost: { wood: 12, stone: 3 }, work: 28, workers: 2, job: 'farmer', shortcut: '2', recipe: recipe({}, { food: 14 }),
-    description: 'A reliable harvest with no seed cost. Garden neighbors improve the yield; workers still have to pick the fruit.', production: '2 farmers · 14 food / day', upgrades: productionUpgrades(2),
+    description: 'Produces food without using supplies. Needs farmers; nearby gardens increase the harvest.', production: '2 farmers · 14 food / day', upgrades: productionUpgrades(2),
   },
   lumber: {
     name: 'Woodcutter', category: 'materials', model: 'lumber', cost: { wood: 14, stone: 5 }, work: 32, workers: 2, job: 'lumberjack', shortcut: '3', recipe: recipe({}, { wood: 10 }),
@@ -96,35 +96,35 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   quarry: {
     name: 'Stoneworks', category: 'materials', model: 'quarry', cost: { wood: 12, stone: 8 }, work: 38, workers: 2, job: 'quarryworker', shortcut: '4', recipe: recipe({}, { stone: 8 }),
-    description: 'Cuts foundations from island stone. A rocky outcrop nearby saves a great deal of walking.', production: '2 stoneworkers · 8 stone / day before siting bonus', upgrades: productionUpgrades(2),
+    description: 'Produces stone for construction. Place near rocky ground for a higher yield.', production: '2 stoneworkers · 8 stone / day before siting bonus', upgrades: productionUpgrades(2),
   },
   garden: {
     name: 'Kitchen garden', category: 'food', model: 'garden', cost: { wood: 6, stone: 3 }, work: 20, workers: 1, job: 'farmer', shortcut: '5', recipe: recipe({}, { food: 7 }),
-    description: 'Grow carrots, climbing beans or herbs for neighbor projects. Choose the next crop in Explore → Gardens. Everyday food production continues while the named harvest ripens. Nearby homes lend a hand.', production: '1 gardener · 7 food / day before neighbors', upgrades: productionUpgrades(1),
+    description: 'Produces food and a separate crop of carrots, beans or herbs for neighbor projects. Choose crops in Explore → Gardens. Nearby homes increase food production.', production: '1 gardener · 7 food / day before neighbors', upgrades: productionUpgrades(1),
   },
   windmill: {
     name: 'Windmill', category: 'food', model: 'windmill', cost: { wood: 22, stone: 18, planks: 6 }, work: 65, workers: 2, job: 'miller', unlock: 'milling', shortcut: '6', recipe: recipe({ grain: 24 }, { flour: 18 }),
-    description: 'Turns one grain farm’s harvest into flour for a bakery. The blades may turn in the breeze, but only staffed mills fill the flour sacks.', production: '24 grain → 18 flour / day', upgrades: productionUpgrades(2),
+    description: 'Mills grain into flour for a bakery. Needs workers and a steady grain supply.', production: '24 grain → 18 flour / day', upgrades: productionUpgrades(2),
   },
   bell: {
     name: 'Bell tower', category: 'civic', model: 'bell', cost: { wood: 50, stone: 60, food: 20 }, work: 90, shortcut: '7',
-    description: 'Restore the old bell when ten islanders have homes and a dependable supper. Its ringing is the first chapter of the town, with much still to build.', production: 'A landmark and the first village ambition',
+    description: 'Restore the bell after finishing three cottages and two orchards or gardens, and reaching ten residents.', production: 'Restore to complete the opening objectives',
   },
   farm: {
     name: 'Grain farm', category: 'food', model: 'farm', cost: { wood: 18, stone: 6 }, work: 45, workers: 3, job: 'farmer', unlock: 'cultivation', recipe: recipe({}, { grain: 24 }),
-    description: 'Grows grain for bread and ale. Grain is a workshop input, not a ready supper; keep an orchard or garden until your bakery works.', production: '3 farmers · 24 grain / day', upgrades: productionUpgrades(3),
+    description: 'Grows grain for mills and brewhouses. Residents eat food, so keep an orchard or garden running until your bakery produces it.', production: '3 farmers · 24 grain / day', upgrades: productionUpgrades(3),
   },
   bakery: {
     name: 'Bakery', category: 'food', model: 'bakery', cost: { wood: 12, stone: 20, planks: 8 }, work: 60, workers: 2, job: 'baker', unlock: 'milling', recipe: recipe({ flour: 18, wood: 4 }, { food: 84 }),
-    description: 'A complete farm, mill, and bakery makes eighty-four meals with seven workers and four timber for fuel. The payoff is strong; an interrupted grain or flour supply stops the ovens.', production: '18 flour + 4 timber → 84 food / day', upgrades: productionUpgrades(2),
+    description: 'Bakes flour into food using timber for fuel. A farm, mill and bakery need seven workers in total. Production stops when flour or timber runs out.', production: '18 flour + 4 timber → 84 food / day', upgrades: productionUpgrades(2),
   },
   sawmill: {
     name: 'Sawmill', category: 'industry', model: 'sawmill', cost: { wood: 24, stone: 12 }, work: 55, workers: 2, job: 'carpenter', unlock: 'joinery', recipe: recipe({ wood: 12 }, { planks: 8 }),
-    description: 'Seasoned boards open the way to better homes and larger workshops. Keep timber flowing from a staffed woodcutter.', production: '12 timber → 8 planks / day', upgrades: productionUpgrades(2),
+    description: 'Cuts timber into planks for construction and upgrades. Needs a steady supply from woodcutters or trade.', production: '12 timber → 8 planks / day', upgrades: productionUpgrades(2),
   },
   mine: {
     name: 'Iron mine', category: 'materials', model: 'mine', cost: { wood: 20, stone: 18, planks: 10 }, work: 75, workers: 3, job: 'miner', unlock: 'metallurgy', recipe: recipe({}, { ore: 12 }),
-    description: 'Extracts iron ore for the smith. Close rocky ground improves the working day; the ore still needs fuel and a forge.', production: '3 miners · 12 ore / day', upgrades: productionUpgrades(3),
+    description: 'Produces iron ore for a smithy. Nearby rocky ground increases the yield.', production: '3 miners · 12 ore / day', upgrades: productionUpgrades(3),
   },
   smith: {
     name: 'Smithy', category: 'industry', model: 'smith', cost: { stone: 24, planks: 12, gold: 8 }, work: 70, workers: 2, job: 'smith', unlock: 'metallurgy', recipe: recipe({ ore: 8, wood: 4 }, { iron: 6 }),
@@ -136,7 +136,7 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   flaxfield: {
     name: 'Flax field', category: 'materials', model: 'farm', cost: { wood: 12, stone: 4 }, work: 35, workers: 2, job: 'farmer', unlock: 'textiles', recipe: recipe({}, { flax: 12 }),
-    description: 'Blue flowers become strong fiber. A weaver turns the harvest into cloth for bedding, healers, and coastal trade.', production: '2 farmers · 12 flax / day', upgrades: productionUpgrades(2),
+    description: 'Grows flax for weavers, who turn it into cloth.', production: '2 farmers · 12 flax / day', upgrades: productionUpgrades(2),
   },
   weaver: {
     name: 'Weaver', category: 'industry', model: 'market', cost: { wood: 16, planks: 10, stone: 8 }, work: 55, workers: 2, job: 'weaver', unlock: 'textiles', recipe: recipe({ flax: 8 }, { cloth: 5 }),
@@ -152,7 +152,7 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   school: {
     name: 'Schoolhouse', category: 'civic', model: 'school', cost: { wood: 18, stone: 12 }, work: 45, workers: 2, job: 'scholar', recipe: recipe({ food: 2 }, { knowledge: 7 }),
-    description: 'Two scholars turn shared meals and careful study into knowledge. The founding school is available before any research so the town can choose its own path.', production: '2 food → 7 knowledge / day', upgrades: productionUpgrades(2),
+    description: 'Scholars produce knowledge and work on your selected research project. Needs workers and food. Available from the start.', production: '2 food → 7 knowledge / day', upgrades: productionUpgrades(2),
   },
   well: {
     name: 'Village well', category: 'services', model: 'well', cost: { wood: 8, stone: 16 }, work: 35,
@@ -178,7 +178,7 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   manor: {
     name: 'Town hall', category: 'civic', model: 'cottage', cost: { planks: 40, stone: 60, iron: 12, tools: 10, cloth: 10, gold: 50 }, work: 160, workers: 2, job: 'steward', housing: 12, unlock: 'town_charter', recipe: recipe({ gold: 2 }, { knowledge: 5 }),
-    description: 'A civic home for a growing port. Stewards keep records, residents gain rooms, and the island begins to govern its own future.', production: '12 beds · 2 coin → 5 knowledge / day', service: service('civic', 6, 40),
+    description: 'Houses twelve residents and provides civic services to nearby homes. Stewards use coin to produce knowledge.', production: '12 beds · 2 coin → 5 knowledge / day', service: service('civic', 6, 40),
     upgrades: upgrades({ cost: { planks: 45, stone: 45, tools: 12, cloth: 12, gold: 60 }, work: 180, housing: 18, workers: 2, productionMultiplier: 1.6, service: service('civic', 7, 64) }, { cost: { planks: 70, iron: 25, tools: 20, cloth: 20, gold: 120 }, work: 240, housing: 24, workers: 3, productionMultiplier: 2.7, service: service('civic', 8, 96) }),
   },
 }).map(([type, spec]) => [type, define(spec)])));

@@ -2,7 +2,7 @@
 export const DISCOVERIES = Object.freeze([
   { id:'waystone', name:'The mason’s waystone', region:'Hearthvale', x:4,z:-4, mark:'I', tint:'#b98248',
     rumor:'There are measuring marks beneath the lichen. Someone built here long before us.',
-    story:'The scratches are a mason’s lesson: a square, a plumb line, and the same cottage drawn three ways. The smallest drawing has the strongest roof. A town does not need to be grand to be well made.',
+    story:'The scratches are a mason’s lesson: a square, a plumb line, and the same cottage drawn three ways. Notes beside the smallest drawing explain how to brace its roof.',
     restoration:'Set the stone upright', benefit:'Builders complete town projects 10% faster.', cost:{wood:12,stone:18}, work:38, salvage:{stone:24,gold:8},
     note:'The old measurements are copied into every builder’s notebook.', types:[], construction:.10 },
   { id:'spring', name:'The foxglove spring', region:'Pineward', x:-14,z:-9, mark:'II', tint:'#578f83',
@@ -12,12 +12,12 @@ export const DISCOVERIES = Object.freeze([
     note:'Cuttings from the spring thrive in the village’s gardens.', types:['garden','orchard'], production:.15 },
   { id:'kiln', name:'The sleeping kiln', region:'Highmeadow', x:-11,z:-18, mark:'III', tint:'#bb7454',
     rumor:'A round chimney leans into the hill. Its bricks are still warm in the afternoon sun.',
-    story:'Inside the kiln are clay test pieces: a roof tile, a cup, and one very unsuccessful duck. On the wall, a potter recorded the firing temperatures. The useful thing is not the kiln. It is the patient record of trying again.',
+    story:'Inside the kiln are clay test pieces: a roof tile, a cup, and one very unsuccessful duck. On the wall, a potter recorded the firing temperatures. Beside each temperature are notes on cracked tiles and collapsed pots.',
     restoration:'Fire the kiln again', benefit:'Quarries, smithies and toolmakers produce 12% more.', cost:{wood:26,stone:28,planks:6}, work:65, salvage:{stone:30,iron:8,tools:4},
     note:'The potter’s firing notes are shared with the town’s craftspeople.', types:['quarry','smith','toolmaker'], production:.12 },
   { id:'stars', name:'The star garden', region:'Crownhill trail', x:4,z:-23, mark:'IV', tint:'#7a829b',
     rumor:'A brass ring catches the light above the eastern trees. It points at nothing on the ground.',
-    story:'The ring is a map of the night sky. Four names are scratched around its rim, followed by “we waited for the clouds.” In the little garden below, each stone marks the first day of a season. This was a place to notice time together.',
+    story:'The ring is a map of the night sky. Four names are scratched around its rim, followed by “we waited for the clouds.” In the little garden below, each stone marks the first day of a season.',
     restoration:'Raise the sky ring', benefit:'Schools produce 20% more lore.', cost:{wood:18,stone:24,iron:6,gold:20}, work:75, salvage:{knowledge:22,gold:35},
     note:'At dusk, residents learn the names of the stars from the restored ring.', types:['school'], production:.20 },
 ]);

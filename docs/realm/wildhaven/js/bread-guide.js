@@ -12,7 +12,7 @@ export function firstBreadStep(state, { paused = false, daily = {} } = {}) {
   const base = { count: 'Food town · first bread' };
   const step = value => ({ ...base, ...value, count: value.count && !value.finishGoal ? `First bread · ${value.count}` : value.count || base.count });
   const wait = value => step(paused ? { ...value, description: `${value.description} Time is paused.`, label: 'Resume time', resume: true } : value);
-  if (state.guidance.firstBread) return step({ title: 'Your bakery made its first bread', description: `On day ${calendarDay(state, state.guidance.firstBread.day)}, your bakers put food into town stores. Grain → flour → bread now has a real payoff. The Food town charter is a later choice.`, label: 'Return to town goals', finishGoal: true, count: 'First bread made', progress: 1 });
+  if (state.guidance.firstBread) return step({ title: 'Your bakery made its first bread', description: `On day ${calendarDay(state, state.guidance.firstBread.day)}, your bakers put food into town stores. Your farm, mill and bakery are producing food. The Food town charter is a later choice.`, label: 'Return to town goals', finishGoal: true, count: 'First bread made', progress: 1 });
 
   const find = type => {
     const matches = state.buildings.filter(b => b.type === type);
@@ -25,7 +25,7 @@ export function firstBreadStep(state, { paused = false, daily = {} } = {}) {
     if (rate > 0) return wait({ title: `${RESOURCES[key].name} for ${purpose}`, description: `${missing} more ${name} needed. Your town adds ${quantity(perMinute(rate))} per minute at 1×; keep the supply running.`, label: 'View town stores', resource: key, count: `${stock(state.resources[key])} / ${amount} ${name}`, progress: state.resources[key] / amount });
     const producerType = { wood: 'lumber', stone: 'quarry', planks: 'sawmill', grain: 'farm', flour: 'windmill', knowledge: 'school' }[key];
     const producer = producerType && find(producerType);
-    return step({ title: `Supply ${name} for ${purpose}`, description: `${missing} more ${name} needed. ${key === 'gold' ? 'Complete a coastal order to earn coin.' : 'Production is not building a surplus. Check workers and inputs; resting a competing workplace can free people and supplies.'}`, label: key === 'gold' ? 'View coastal orders' : producer ? `Check ${BUILDINGS[producerType].name.toLowerCase()}` : 'Review people & supplies', ...(key === 'gold' ? { tab: 'trade' } : producer ? { buildingId: producer.id } : { tab: 'workforce' }), count: `${stock(state.resources[key])} / ${amount} ${name}` });
+    return step({ title: `Supply ${name} for ${purpose}`, description: `${missing} more ${name} needed. ${key === 'gold' ? 'Complete a coastal order to earn coin.' : 'Production is not building a surplus. Check workers and inputs; pausing a competing workplace can free people and supplies.'}`, label: key === 'gold' ? 'View coastal orders' : producer ? `Check ${BUILDINGS[producerType].name.toLowerCase()}` : 'Review people & supplies', ...(key === 'gold' ? { tab: 'trade' } : producer ? { buildingId: producer.id } : { tab: 'workforce' }), count: `${stock(state.resources[key])} / ${amount} ${name}` });
   }
   function workplace(type, purpose) {
     const name = BUILDINGS[type].name, b = find(type);
@@ -39,8 +39,8 @@ export function firstBreadStep(state, { paused = false, daily = {} } = {}) {
       const value = { title: `Finish the ${name.toLowerCase()}`, description, label: !state.builderTarget ? 'Assign builders' : 'View projects', tab: !state.builderTarget ? 'workforce' : 'construction', progress: b.progress / b.workRequired };
       return b.paused || !state.builderTarget ? step(value) : wait(value);
     }
-    if (b.paused) return step({ title: `Reopen the ${name.toLowerCase()}`, description: 'This workplace is resting. Resume its work to continue your bread chain.', label: 'View workplace', buildingId: b.id });
-    if (!b.workerIds?.length) return step({ title: `Give the ${name.toLowerCase()} its workers`, description: b.desiredWorkers ? 'Workers are requested, but everyone is busy. In People, rest another workplace or raise this one’s priority. Nothing is reassigned automatically.' : 'No workers are requested. Assign people in the workplace controls.', label: b.desiredWorkers ? 'Find available workers' : 'Assign workers', ...(b.desiredWorkers ? { workforceId: b.id } : { buildingId: b.id }) });
+    if (b.paused) return step({ title: `Reopen the ${name.toLowerCase()}`, description: 'This workplace is paused. Resume its work to continue your bread chain.', label: 'View workplace', buildingId: b.id });
+    if (!b.workerIds?.length) return step({ title: `Give the ${name.toLowerCase()} its workers`, description: b.desiredWorkers ? 'Workers are requested, but everyone is busy. In People, pause another workplace or raise this one’s priority. Nothing is reassigned automatically.' : 'No workers are requested. Assign people in the workplace controls.', label: b.desiredWorkers ? 'Find available workers' : 'Assign workers', ...(b.desiredWorkers ? { workforceId: b.id } : { buildingId: b.id }) });
     if (!(b.production?.efficiency > 0)) {
       const reason = b.production?.blockedReason || 'Waiting for supplies';
       if (reason === 'Storage full') return step({ title: `Make room for the ${name.toLowerCase()}`, description: 'Its output store is full. Let the next workshop use the stock, sell a surplus, or expand storage.', label: 'View town stores', tab: 'stores' });
@@ -77,5 +77,5 @@ export function firstBreadStep(state, { paused = false, daily = {} } = {}) {
   if (mill && !(find('windmill')?.production?.blockedReason === 'Storage full')) return mill;
   const bakery = workplace('bakery', 'Bakers use flour from the windmill and timber for their ovens. Bread enters the food store automatically.');
   if (bakery) return bakery;
-  return wait({ title: 'Let the first bread reach town stores', description: 'Your bakery has workers and supplies. Let time run until it adds food; this goal checks actual production.', label: 'Watch your bakery', buildingId: find('bakery').id });
+  return wait({ title: 'Let the first bread reach town stores', description: 'Your bakery has workers and supplies. Resume time until the first food reaches your stores.', label: 'Watch your bakery', buildingId: find('bakery').id });
 }

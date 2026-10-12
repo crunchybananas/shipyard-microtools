@@ -238,7 +238,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
     return card;
   }
   function defensesContent(state) {
-    const overview = api.frontierOptions(state, getContext()), forts = overview.fortifications.filter(item => item.faction === 'player'), nodes = [intro('Keep a gate in the route home. Walls and closed gates stop passage; towers cover nearby ground. One named engineer leaves their usual work to build each project.')];
+    const overview = api.frontierOptions(state, getContext()), forts = overview.fortifications.filter(item => item.faction === 'player'), nodes = [intro('Keep a gate in the route home. Walls and closed gates stop passage; towers cover nearby ground. Each project assigns a resident, taking them away from their usual job until it is finished.')];
     const fort = forts.find(item => item.id === selected?.id);
     if (fort) {
       const card = el('div', 'frontier-selection');
@@ -335,7 +335,7 @@ export function createFrontierUI({ getState, mutate, canMutate = () => true, get
       nodes.push(saved);
     }
     const art = el('img', 'company-art'); art.src = './assets/defense-company.jpg'; art.alt = ''; art.loading = 'lazy'; art.decoding = 'async'; art.width = 2172; art.height = 724;
-    nodes.push(art, intro('Company recruits are named soldiers. Watch-house workers provide town security and coastal patrol readiness; they are separate from this field company.'));
+    nodes.push(art, intro('Recruited residents serve as soldiers in the Company. Watch-house workers provide town security and coastal patrol readiness; they are separate from this field company.'));
     if (openWatch) nodes.push(button('Coastal patrol & Watch', 'open-town-watch', () => { close(); openWatch(); }));
     const enemy = selected?.kind === 'enemy' ? overview.units.find(unit => unit.id === selected.id) : null;
     if (enemy) {

@@ -439,7 +439,7 @@ export function canBuild(state, type, x, z, rotation = 0) {
   if (type === 'bell') {
     const bell = getBuildingAt(state, 0, -5);
     if (x !== 0 || z !== -5) return fail('The old bell stands on the northern hill.');
-    if (bell.restored || bell.status !== 'ready') return fail(bell.restored ? 'The bell is restored; this is the beginning of a growing town.' : 'The bell is already in the construction queue.');
+    if (bell.restored || bell.status !== 'ready') return fail(bell.restored ? 'The bell is already restored.' : 'The bell is already in the construction queue.');
     if (readyCount(state, 'cottage') < 3 || readyCount(state, 'orchard') + readyCount(state, 'garden') < 2 || state.population < 10) return fail('Needs 3 completed cottages, 2 completed orchards or gardens, and 10 citizens.');
   } else {
     const terrain = terrainAt(x, z);
@@ -681,17 +681,17 @@ export function objective(state) {
   const cottages = readyCount(state, 'cottage'), food = readyCount(state, 'orchard') + readyCount(state, 'garden');
   if (!cottages) {
     const site = state.buildings.find(b => b.type === 'cottage');
-    return { title: site ? 'Raise the first roof' : 'Give the builders a beginning', description: site ? 'Builders use real time and labor. Keep two assigned, or choose who can leave another job to help.' : 'Queue a cottage. Materials are reserved now; housing opens when builders finish.', current: site?.progress || 0, total: site?.workRequired || 1, complete: false, step: 0, type: 'cottage' };
+    return { title: site ? 'Finish your first cottage' : 'Build your first cottage', description: site ? 'Assign builders in Town → People. They work through the construction queue in order.' : 'Queue a cottage. Materials are reserved now; housing opens when builders finish.', current: site?.progress || 0, total: site?.workRequired || 1, complete: false, step: 0, type: 'cottage' };
   }
-  if (!food) return { title: 'Give the harvest a pair of hands', description: 'Complete an orchard or garden, then assign citizens. Empty workplaces produce nothing.', current: 0, total: 1, complete: false, step: 1, type: 'orchard' };
+  if (!food) return { title: 'Build an orchard or garden', description: 'Complete an orchard or garden, then assign citizens. Empty workplaces produce nothing.', current: 0, total: 1, complete: false, step: 1, type: 'orchard' };
   const industry = Math.min(1, readyCount(state, 'lumber')) + Math.min(1, readyCount(state, 'quarry'));
-  if (industry < 2) return { title: 'Build a working settlement', description: 'Complete woodcutting and stoneworks. Match the jobs you request to the citizens available.', current: industry, total: 2, complete: false, step: 2, type: readyCount(state, 'lumber') ? 'quarry' : 'lumber' };
-  if (cottages < 3 || food < 2) return { title: 'Make room for the next neighbors', description: `${Math.min(cottages, 3)}/3 finished cottages · ${Math.min(food, 2)}/2 food gardens. Construction and production share the same workers.`, current: Math.min(cottages, 3) + Math.min(food, 2), total: 5, complete: false, step: 3, type: cottages < 3 ? 'cottage' : 'garden' };
-  if (state.population < 10) return { title: 'A town needs people', description: `${state.migration?.reason || 'Keep spare housing and food for newcomers.'} Welcome 10 citizens.`, current: state.population, total: 10, complete: false, step: 4 };
+  if (industry < 2) return { title: 'Build a woodcutter and stoneworks', description: 'Complete woodcutting and stoneworks. Match the jobs you request to the citizens available.', current: industry, total: 2, complete: false, step: 2, type: readyCount(state, 'lumber') ? 'quarry' : 'lumber' };
+  if (cottages < 3 || food < 2) return { title: 'Build more homes and gardens', description: `${Math.min(cottages, 3)}/3 finished cottages · ${Math.min(food, 2)}/2 food gardens. Construction and production share the same workers.`, current: Math.min(cottages, 3) + Math.min(food, 2), total: 5, complete: false, step: 3, type: cottages < 3 ? 'cottage' : 'garden' };
+  if (state.population < 10) return { title: 'Reach ten residents', description: `${state.migration?.reason || 'Keep spare housing and food for newcomers.'} Welcome 10 citizens.`, current: state.population, total: 10, complete: false, step: 4 };
   const bell = state.buildings.find(b => b.type === 'bell');
-  if (bell.status !== 'ready') return { title: 'Raise a sound across the water', description: 'Finish restoring the bell. This first milestone opens the village’s wider future.', current: bell.progress, total: bell.workRequired, complete: false, step: 5, type: 'bell' };
+  if (bell.status !== 'ready') return { title: 'Finish restoring the bell', description: 'Builders are restoring the bell. Keep a crew assigned until the work is complete.', current: bell.progress, total: bell.workRequired, complete: false, step: 5, type: 'bell' };
   const cost = resourceCost(BUILDINGS.bell.cost);
-  return { title: 'Put your village on the map', description: 'Restore the bell, then develop workshops, research, services and trade. The town’s story is just beginning.', current: Object.entries(cost).reduce((sum, [key, value]) => sum + Math.min(value, state.resources[key]), 0), total: Object.values(cost).reduce((sum, value) => sum + value, 0), complete: false, step: 5, type: 'bell' };
+  return { title: 'Restore the old bell', description: 'Gather the required supplies, select the old bell and start restoration.', current: Object.entries(cost).reduce((sum, [key, value]) => sum + Math.min(value, state.resources[key]), 0), total: Object.values(cost).reduce((sum, value) => sum + value, 0), complete: false, step: 5, type: 'bell' };
 }
 /** The v3 envelope is self-contained; ephemeral assignments/rates are reconciled on load. */
 export function serialize(state) {
