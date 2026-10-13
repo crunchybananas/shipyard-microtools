@@ -32,6 +32,7 @@ export const JOBS = freeze({
   envoy: { name: 'Envoy', plural: 'Envoys', color: '#b58d6b' },
   builder: { name: 'Builder', plural: 'Builders', color: '#bd9858' },
   forager: { name: 'Forager', plural: 'Foragers', color: '#8a9e58' },
+  herder: { name: 'Animal keeper', plural: 'Animal keepers', color: '#aa8962' },
   farmer: { name: 'Farmer', plural: 'Farmers', color: '#8aa35c' },
   lumberjack: { name: 'Woodcutter', plural: 'Woodcutters', color: '#9b784d' },
   quarryworker: { name: 'Stoneworker', plural: 'Stoneworkers', color: '#89988e' },
@@ -96,11 +97,25 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   quarry: {
     name: 'Stoneworks', category: 'materials', model: 'quarry', cost: { wood: 12, stone: 8 }, work: 38, workers: 2, job: 'quarryworker', shortcut: '4', recipe: recipe({}, { stone: 8 }),
-    description: 'Produces stone for construction. Place near rocky ground for a higher yield.', production: '2 stoneworkers · 8 stone / day before siting bonus', upgrades: productionUpgrades(2),
+    description: 'Extracts finite stone from up to three nearby deposits. Neighboring stoneworks share the same reserves. Surveying and a level-two upgrade open deeper stone.', production: '2 stoneworkers · 8 stone / day before siting bonus', upgrades: productionUpgrades(2).map((u,i)=>({...u,...(!i?{requires:'prospecting',name:'Deep stone workings'}:{})})),
   },
   garden: {
     name: 'Kitchen garden', category: 'food', model: 'garden', cost: { wood: 6, stone: 3 }, work: 20, workers: 1, job: 'farmer', shortcut: '5', recipe: recipe({}, { food: 7 }),
     description: 'Produces food and a separate crop of carrots, beans or herbs for neighbor projects. Choose crops in Explore → Gardens. Nearby homes increase food production.', production: '1 gardener · 7 food / day before neighbors', upgrades: productionUpgrades(1),
+  },
+  pasture: {
+    name: 'Goat pasture', category: 'food', model: 'pasture', cost: { wood: 24, stone: 8, planks: 6 }, work: 55, workers: 2, job: 'herder', unlock: 'husbandry', recipe: recipe(),
+    description: 'Buy goats, then keep animal keepers and grain available. Milk enters the food store. Two adults can breed; kids mature after two in-game days of care.', production: 'Up to 4 goats · grain into milk',
+    upgrades: upgrades({ cost: { planks: 18, stone: 12, tools: 3 }, requires:'husbandry_care', productionMultiplier:1, work:70 }, { cost: { planks: 30, stone: 24, tools: 6 }, requires:'mastercraft', productionMultiplier:1, work:95 }),
+  },
+  henhouse: {
+    name: 'Henhouse', category: 'food', model: 'henhouse', cost: { wood: 16, stone: 6, planks: 4 }, work: 40, workers: 1, job: 'herder', unlock: 'husbandry', recipe: recipe(),
+    description: 'Keep hens for eggs. Buy the first birds and supply grain. Chicks mature after one in-game day of care. Turn breeding off when you want to keep a small flock.', production: 'Up to 6 hens · grain into eggs',
+    upgrades: upgrades({ cost: { planks: 12, stone: 10, tools: 2 }, requires:'husbandry_care', productionMultiplier:1, work:55 }, { cost: { planks: 22, iron: 4, tools: 4 }, requires:'mastercraft', productionMultiplier:1, work:80 }),
+  },
+  assay: {
+    name: 'Survey workshop', category: 'civic', model: 'assay', cost: { planks: 24, stone: 24, iron: 8, tools: 4 }, work: 85, workers: 2, job: 'scholar', unlock: 'prospecting', recipe: recipe({food:3,ore:2},{knowledge:12}),
+    description: 'Scholars compare rock samples and contribute work to your funded research project. Needs food and ore; produces more knowledge than a schoolhouse.', production: '3 food + 2 ore → 12 knowledge / supply cycle', upgrades: productionUpgrades(2),
   },
   windmill: {
     name: 'Windmill', category: 'food', model: 'windmill', cost: { wood: 22, stone: 18, planks: 6 }, work: 65, workers: 2, job: 'miller', unlock: 'milling', shortcut: '6', recipe: recipe({ grain: 24 }, { flour: 18 }),
@@ -124,7 +139,7 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   mine: {
     name: 'Iron mine', category: 'materials', model: 'mine', cost: { wood: 20, stone: 18, planks: 10 }, work: 75, workers: 3, job: 'miner', unlock: 'metallurgy', recipe: recipe({}, { ore: 12 }),
-    description: 'Produces iron ore for a smithy. Nearby rocky ground increases the yield.', production: '3 miners · 12 ore / day', upgrades: productionUpgrades(3),
+    description: 'Extracts finite iron ore from nearby seams. Mines share deposits; rebuilding never refills them. Surveying and a level-two upgrade open deeper ore.', production: '3 miners · 12 ore / day', upgrades: productionUpgrades(3).map((u,i)=>({...u,...(!i?{requires:'prospecting',name:'Deep mine shaft'}:{})})),
   },
   smith: {
     name: 'Smithy', category: 'industry', model: 'smith', cost: { stone: 24, planks: 12, gold: 8 }, work: 70, workers: 2, job: 'smith', unlock: 'metallurgy', recipe: recipe({ ore: 8, wood: 4 }, { iron: 6 }),

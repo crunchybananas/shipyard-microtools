@@ -126,3 +126,15 @@ test('foreign units cannot keep a forged indoor immunity flag when loading',()=>
   const{state,ctx}=fixture(),u=recruit(state,ctx);Object.assign(u,{faction:'raiders',citizenId:null,trainingSeconds:0,garrisoned:true});
   u.order={type:'hold'};army.normalizeFrontier(state,ctx);assert.equal(u.garrisoned,false);assert.equal(u.quartersId,null);
 });
+
+test('a medic follows through a gate when the rear formation point is inside a wall',()=>{
+ const {state,ctx}=fixture(),soldier=recruit(state,ctx),medic=recruit(state,ctx,'medic');
+ deploy(state,ctx,[soldier,medic],2,8);
+ Object.assign(soldier,{x:2,z:8,yaw:0,order:{type:'hold'}});Object.assign(medic,{x:1,z:5,order:{type:'move'},path:[],routeAt:-10});
+ for(let x=-4;x<=4;x++)state.frontier.fortifications.push({id:`escort-wall-${x}`,type:x===0?'gate':'wall',x,z:6,rotation:0,faction:'player',status:'ready',open:x===0});
+ tick(state,25,ctx);
+ assert.ok(medic.z>6.5,`Medic must join the company beyond the wall: ${medic.x}, ${medic.z}`);
+ assert.ok(distance(medic,soldier)<3);
+ const resting={x:medic.x,z:medic.z};tick(state,10,ctx);assert.deepEqual({x:medic.x,z:medic.z},resting,'A medic does not vacate its own valid waiting place every tick');
+ soldier.hp=15;soldier.damageAt=null;const charges=medic.medicalCharges;tick(state,12,ctx);assert.ok(soldier.hp>15);assert.ok(medic.medicalCharges<charges);
+});

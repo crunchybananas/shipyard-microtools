@@ -1,3 +1,5 @@
+import { createMinerals, restoreMinerals, mineralStatus, extractMinerals } from './minerals.js';
+import { createLivestock, restoreLivestock, herdStatus, tickLivestock } from './livestock.js';
 import { restoreCoop } from './coop-state.js';
 import { createHinterland, normalizeHinterland, tickGardens } from './hinterland.js';
 import { createWoodland, restoreWoodland, woodlandStatus, harvestWood, tickWoodland } from './woodland.js';
@@ -9,7 +11,7 @@ export { seasonInfo, festivalQuote, festivalStatus, effectiveMorale } from './se
 import { createDiscoveryState, normalizeDiscovery, discoveryModifier } from './discovery.js';
 /** Wildhaven v2: named labor, escrowed construction, continuous production and town needs. */
 import { BUILDINGS, RESOURCE_NAMES, getBuildingSpec, getUpgrade } from './catalog.js';
-import { createProgressionState, normalizeProgression, canUnlockBuilding, supplyModifiers, tickProgression, dailyProgression, progressionObjective } from './progression.js';
+import { RESEARCH, createProgressionState, normalizeProgression, canUnlockBuilding, supplyModifiers, tickProgression, dailyProgression, progressionObjective } from './progression.js';
 import { createFrontierState, normalizeFrontier, frontierAssignments, tickFrontier, gateTransition } from './frontier.js';
 import { createPressureState, normalizePressure, tickPressure, dailyPressure, actOnPressure as pressureAction } from './pressure.js';
 export { pressureOptions } from './pressure.js';
@@ -172,7 +174,7 @@ export function createGame() {
     version: VERSION, resources, population: 6, citizens: Array.from({ length: 6 }, (_, i) => ({ ...citizen(i + 1), experience: {} })),
     nextCitizenId: 7, calendarEpoch: 0, day: 1, time: 0, subsecond: 0, elapsed: 0, nextId: 1, nextEventId: 1, nextQueueOrder: 1,
     won: false, undo: null, lastTradeDay: 0, builderTarget: 2, morale: 78, seasons: createSeasonState(), buildings: [hearth, bell], events: [],
-    hinterland: createHinterland(), woodland: createWoodland(), stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
+    hinterland: createHinterland(), woodland: createWoodland(), stats: { built: 0, arrivals: 0, harvests: 0, upgrades: 0 }, ...createProgressionState(), minerals: createMinerals(), livestock: createLivestock(), discovery: createDiscoveryState(), pressure: createPressureState(), frontier: createFrontierState({ regions: ISLAND_REGIONS, neighbors: ISLAND_NEIGHBORS }),
   };
   addEvent(state, 'Six founders share a hearth. Give builders a cottage to raise, then choose who will grow food and gather materials.', 'welcome');
   normalizeProgression(state); reconcileWorkforce(state); refreshProduction(state);
@@ -252,7 +254,8 @@ function adjacency(state, type, x, z) {
   return { multiplier, bonus, boosted };
 }
 function fullRecipe(state, building) {
-  const spec = specFor(building), recipe = spec.recipe || { input: {}, output: {}, perDay: 1 }, site = adjacency(state, building.type, building.x, building.z);
+  const herd=herdStatus(state,building);
+  const spec = specFor(building), recipe = herd?{input:{grain:herd.feed},output:{food:herd.food}}:spec.recipe || { input: {}, output: {}, perDay: 1 }, site = adjacency(state, building.type, building.x, building.z);
   const factor = modifier(state, building.type, 'production') * discoveryModifier(state, building.type), cycles = isFiniteNumber(recipe.perDay) ? recipe.perDay : 1;
   return {
     input: Object.fromEntries(Object.entries(recipe.input || {}).map(([key, value]) => [key, value * cycles])),
@@ -270,6 +273,7 @@ function potentialProduction(state, building) {
   else if (building.type === 'bell' && !building.restored) { efficiency = 0; blockedReason = 'Awaiting restoration'; }
   else if (building.paused) { efficiency = 0; blockedReason = 'Work paused'; }
   else if (required && !workers) { efficiency = 0; blockedReason = building.desiredWorkers ? 'No workers available' : 'No workers requested'; }
+  if(herdStatus(state,building)?.total===0){efficiency=0;blockedReason='No animals yet · buy the first animals in this shelter';}
   const staffingReason = required && workers > 0 && workers < required ? `${workers}/${required} workers` : '';
   return { ...emptyResources(), input: recipe.input, output: recipe.output, efficiency, workers, required, blockedReason, staffingReason, bonus: recipe.bonus, boosted: recipe.boosted };
 }
@@ -282,7 +286,7 @@ function throughput(state, building, dt = 1, mutate = false) {
   }
   const potentialFood = ((potential.output.food || 0) - (potential.input.food || 0)) * efficiency;
   const outputs = Object.entries(potential.output).filter(([, value]) => value > 0), storage = state.storage || storageCapacity(state);
-  if (efficiency > 0 && outputs.length) {
+  if (efficiency > 0 && outputs.length && !herdStatus(state,building)) {
     const room = Math.max(...outputs.map(([key, value]) => Math.max(0, storage[key] - state.resources[key]) / (value * factor)));
     if (room < efficiency) { efficiency = room; reason = 'Storage full'; }
   }
@@ -290,6 +294,7 @@ function throughput(state, building, dt = 1, mutate = false) {
     const available = woodlandStatus(state, building).available / (potential.output.wood * factor);
     if (available < efficiency) { efficiency = available; reason = 'Young woodland growing · workers replant automatically'; }
   }
+  if(['quarry','mine'].includes(building.type)&&efficiency>0){const m=mineralStatus(state,building),available=m.available/((potential.output[m.resource]||1)*factor);if(available<efficiency){efficiency=available;reason=m.sites.length?'Deposit exhausted · survey deeper reserves or work another site':'No deposits within five tiles · choose a rocky site';}}
   const result = { ...potential, input: {}, output: {}, efficiency, potentialFood: round(potentialFood), blockedReason: reason };
   for (const [key, value] of Object.entries(potential.input)) {
     const amount = value * efficiency * factor; result.input[key] = round(amount / factor); result[key] -= result.input[key];
@@ -299,7 +304,7 @@ function throughput(state, building, dt = 1, mutate = false) {
     const amount = Math.min(Math.max(0, storage[key] - state.resources[key]), value * efficiency * factor);
     result.output[key] = round(amount / factor); result[key] += result.output[key];
     if (mutate) {
-      const received = building.type === 'lumber' && key === 'wood' ? harvestWood(state, building, amount) : amount;
+      const received = building.type === 'lumber' && key === 'wood' ? harvestWood(state, building, amount) : ['quarry','mine'].includes(building.type) ? extractMinerals(state,building,amount) : amount;
       state.resources[key] = round(state.resources[key] + received);
     }
   }
@@ -436,6 +441,7 @@ export function canBuild(state, type, x, z, rotation = 0) {
   if (!validInteger(x, ISLAND_BOUNDS.minX, ISLAND_BOUNDS.maxX) || !validInteger(z, ISLAND_BOUNDS.minZ, ISLAND_BOUNDS.maxZ)) return { ok: false, reason: 'Choose a square on the island.' };
   if (!validInteger(rotation, 0, 3)) return { ok: false, reason: 'Choose one of the four building rotations.' };
   const preview = buildingYield(state, type, x, z), base = { bonus: preview.bonus, yield: preview, boosted: preview.boosted };
+  if(['quarry','mine'].includes(type)){const m=mineralStatus(state,{type,x,z,level:1});base.bonus=`${Math.floor(m.surface)} ${m.resource==='ore'?'iron ore':'stone'} in nearby surface deposits · shared with other works`;}
   const fail = reason => ({ ...base, ok: false, reason });
   const unlocked = canUnlockBuilding(state, type); if (!unlocked.ok) return fail(unlocked.reason);
   if (type === 'bell') {
@@ -453,6 +459,7 @@ export function canBuild(state, type, x, z, rotation = 0) {
     const region = regionAt(x, z);
     if (region && !state.frontier?.claims.includes(region.id)) return fail(`Survey ${region.name} with a troop, then complete a claiming outpost in Frontier.`);
     if (!terrain.buildable) return fail('Leave room beside the shore.');
+    if(['quarry','mine'].includes(type)&&!mineralStatus(state,{type,x,z,level:1}).sites.length)return fail('Choose a site within five tiles of a stone or ore deposit.');
     const access = placementAccess(state, x, z, rotation); if (!access.ok) return fail(access.reason); base.entrance = access.entrance;
   }
   const cost = resourceCost(BUILDINGS[type].cost), missing = costMissing(state, cost);
@@ -491,7 +498,7 @@ export function canUpgrade(state, id) {
   if (upgrade.requires || upgrade.unlock) {
     const research = state.research?.completed || [];
     const required = Array.isArray(upgrade.requires || upgrade.unlock) ? (upgrade.requires || upgrade.unlock) : [upgrade.requires || upgrade.unlock];
-    if (!required.every(id => research.includes(id))) return { ok: false, reason: `Research ${required.filter(id => !research.includes(id)).join(', ')} first.`, cost, work, targetLevel };
+    if (!required.every(id => research.includes(id))) return { ok: false, reason: `Research ${required.filter(id => !research.includes(id)).map(id=>RESEARCH[id]?.name||id).join(' and ')} first.`, cost, work, targetLevel };
   }
   const missing = costMissing(state, cost);
   if (missing.length) return { ok: false, reason: `Needs ${missing.map(([key, value]) => `${Math.ceil(value - state.resources[key])} more ${key}`).join(', ')}.`, cost, work, targetLevel };
@@ -530,10 +537,11 @@ export function demolish(state, id) {
   const index = state.buildings.findIndex(b => b.id === id), building = state.buildings[index];
   if (!building) return { ok: false, reason: 'Choose a building to remove.' };
   if (building.status !== 'ready') return cancelConstruction(state, id);
+  if (herdStatus(state,building)?.total) return {ok:false,reason:'Sell the animals before removing their shelter.'};
   if (building.type === 'hearth' || building.type === 'bell') return { ok: false, reason: 'This is part of the island’s story.' };
   if ((specFor(building).housing || 0) > 0 && housing(state) - specFor(building).housing < state.population) return { ok: false, reason: 'Complete replacement housing before removing an occupied home.' };
   const recovered = Object.fromEntries(Object.entries(building.investment).map(([key, value]) => [key, Math.floor(value * 0.75)]));
-  refund(state, recovered); state.buildings.splice(index, 1); state.undo = null;
+  refund(state, recovered); state.buildings.splice(index, 1); delete state.livestock.pens[id]; state.undo = null;
   for (const unit of state.frontier?.units || []) { unit.path = []; unit.routeAt = -10; } reconcileWorkforce(state); refreshProduction(state);
   addEvent(state, `${BUILDINGS[building.type].name} salvaged. Three quarters of its materials are available again.`, 'remove');
   return { ok: true, reason: 'Recovered 75% of invested materials.', refund: recovered, building };
@@ -639,6 +647,7 @@ export function tick(state, dt) {
         result.changed = true;
       }
     }
+    result.changed = tickLivestock(state, 1) || result.changed;
     result.changed = tickGardens(state, 1) || result.changed;
     const pressureResult = tickPressure(state, 1); progressionEvents(state, pressureResult); result.changed ||= pressureResult.changed;
     const beforeResearch = JSON.stringify(state.research); progressionEvents(state, tickProgression(state, 1));
@@ -806,7 +815,7 @@ export function restore(raw) {
   if (input.version >= 3) { if (!Object.hasOwn(input, 'frontier')) return null; state.frontier = structuredClone(input.frontier); }
   if (input.version !== VERSION) state.migratedFromVersion = input.version;
   if (input.version === VERSION) { if (!Object.hasOwn(input, 'discovery')) return null; state.discovery = structuredClone(input.discovery); }
-  try { state.coop = restoreCoop(input.coop); state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); normalizeHinterland(state, input.hinterland); } catch { return null; }
+  try { state.minerals=restoreMinerals(input.minerals);state.livestock=restoreLivestock(input.livestock,state.buildings);state.coop = restoreCoop(input.coop); state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); normalizeHinterland(state, input.hinterland); } catch { return null; }
   restoreJournal(state, input);
   reconcileWorkforce(state); refreshProduction(state); return state;
 }

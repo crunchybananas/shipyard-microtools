@@ -23,8 +23,8 @@ test('research columns follow prerequisite depth, including navigation after oth
   const graph = researchGraph({}), nodes = indexed(graph);
   const expectedColumns = [
     ['cultivation', 'joinery', 'barter', 'civic_order'],
-    ['milling', 'textiles', 'metallurgy', 'logistics', 'watchkeeping'],
-    ['brewing', 'public_health', 'coastal_routes', 'mastercraft', 'town_charter'],
+    ['husbandry', 'milling', 'textiles', 'metallurgy', 'logistics', 'watchkeeping'],
+    ['husbandry_care', 'prospecting', 'brewing', 'public_health', 'coastal_routes', 'mastercraft', 'town_charter'],
     ['navigation'],
   ];
   for (const [column, ids] of expectedColumns.entries()) {
@@ -109,7 +109,7 @@ test('selection marks transitive ancestors and direct next discoveries without u
   ]));
   const logistics = researchGraph({}, { selectedId: 'logistics' });
   assert.deepEqual(sorted(logistics.nodes.filter(node => node.next).map(node => node.id)),
-    ['coastal_routes', 'public_health', 'town_charter']);
+    ['coastal_routes', 'husbandry_care', 'prospecting', 'public_health', 'town_charter']);
   assert.equal(indexed(logistics).navigation.next, false);
 });
 

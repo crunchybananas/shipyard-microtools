@@ -57,10 +57,10 @@ export function firstBreadStep(state, { paused = false, daily = {} } = {}) {
     const actual = state.research.active?.id || id, spec = RESEARCH[actual];
     const school = workplace('school', 'Scholars need food and available residents. They earn knowledge and advance the one project you choose.');
     if (school) return school;
-    if (state.research.active) return wait({ title: `Learning ${spec.name.toLowerCase()}`, description: `${actual === id ? 'This discovery moves your bread chain forward.' : 'Finish your current project first; your bread goal is remembered.'} Supplied scholars advance it.`, label: 'View current research', researchId: actual, progress: state.research.active.progress / spec.duration, count: `${Math.floor(state.research.active.progress / spec.duration * 100)}% learned` });
+    if (state.research.active) return wait({ title: `Learning ${spec.name.toLowerCase()}`, description: `${actual === id ? 'This discovery moves your bread chain forward.' : 'Finish your current project first; your bread goal is remembered.'} Deliver the supplies for each stage, then supplied scholars advance it.`, label: 'View current research', researchId: actual, progress: state.research.active.progress / spec.duration, count: `${Math.floor(state.research.active.progress / spec.duration * 100)}% learned` });
     const missing = Object.entries(spec.cost).find(([key, value]) => state.resources[key] + 0.00001 < value);
     if (missing) return supply(missing[0], missing[1], spec.name.toLowerCase());
-    return step({ title: `Learn ${spec.name.toLowerCase()}`, description: `${spec.description} Open the quote to choose whether to pay and begin.`, label: `View ${spec.name}`, researchId: id });
+    return step({ title: `Learn ${spec.name.toLowerCase()}`, description: `${spec.description} Plan the project, then set aside supplies for each stage.`, label: `View ${spec.name}`, researchId: id });
   }
   const learned = id => state.research.completed.includes(id);
   if (!learned('joinery')) return research('joinery');
