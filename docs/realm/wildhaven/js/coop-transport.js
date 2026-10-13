@@ -3,7 +3,7 @@ import { deliveryChange, newRoom, validId, validTownName } from './coop-state.js
 export class CoopError extends Error {
   constructor(message, code = 'OFFLINE') { super(message); this.code = code; }
 }
-async function request(url, options = {}) {
+export async function request(url, options = {}) {
   let response;
   try { response = await fetch(url, { ...options, signal: AbortSignal.timeout(12000) }); }
   catch { throw new CoopError('Connection interrupted. Reserved supplies will be checked again when you reconnect.'); }
@@ -136,5 +136,5 @@ export function createCoopTransport(config, auth) {
   }
   return { profile, create, join, deliver, invitation, close, room: async id => (await get(`rooms/${id}`))?.data,
     // Kept injectable for transport and adversarial service tests; no admin credential.
-    get, write, commit };
+    get, write, commit, call };
 }

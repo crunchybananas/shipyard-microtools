@@ -138,3 +138,17 @@ test('two guards approaching a shore watch house reserve separate entrance ports
   assert.equal(first.root.userData.workState, 'watching'); assert.equal(second.root.userData.workState, 'watching');
   assert.ok(Math.hypot(first.root.position.x - second.root.position.x, first.root.position.z - second.root.position.z) >= .43);
 });
+
+test('rendered troops freeze mid-stride on pause and resume from the same completed segment',async()=>{
+ const {captureUnitMotion,recordUnitMotion}=await import('../js/unit-motion.js');
+ const world=village(),unit={id:'pause-test',kind:'spearman',x:0,z:3,yaw:0,status:'active',attackAt:null,damageAt:null,order:{type:'move'},path:[]};
+ const root=new THREE.Group(),limbs=Object.fromEntries(['left_arm','right_arm','left_leg','right_leg'].map(k=>[k,new THREE.Group()]));
+ const actor={root,limbs,unit,weapons:{},phase:1};root.position.set(0,groundHeight(0,3),3*CELL);
+ Object.assign(world,{troops:new Map([[unit.id,actor]]),fortifications:new Map(),neighborModels:new Map(),projectileModels:new Map()});
+ const f=world.state.frontier;Object.assign(f,{clock:1,subsecond:.1,projectiles:[]});
+ const previous=captureUnitMotion([unit]);unit.x=.28;unit.yaw=1;recordUnitMotion([unit],previous,1);
+ world.updateFrontier(1/60,true);const before={p:root.position.toArray(),r:root.rotation.toArray(),phase:actor.phase,legs:limbs.left_leg.rotation.toArray()};
+ for(let i=0;i<60;i++)world.updateFrontier(1/60,false);
+ assert.deepEqual({p:root.position.toArray(),r:root.rotation.toArray(),phase:actor.phase,legs:limbs.left_leg.rotation.toArray()},before);
+ f.subsecond+=1/60;world.updateFrontier(1/60,true);assert.ok(root.position.x>before.p[0]);assert.ok(root.position.x<unit.x*CELL);
+});

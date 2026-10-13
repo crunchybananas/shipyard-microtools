@@ -1,3 +1,4 @@
+import { restoreObservedWorld } from './observed-state.js';
 import { restoreCoop } from './coop-state.js';
 import { createHinterland, normalizeHinterland, tickGardens } from './hinterland.js';
 import { createWoodland, restoreWoodland, woodlandStatus, harvestWood, tickWoodland } from './woodland.js';
@@ -806,7 +807,7 @@ export function restore(raw) {
   if (input.version >= 3) { if (!Object.hasOwn(input, 'frontier')) return null; state.frontier = structuredClone(input.frontier); }
   if (input.version !== VERSION) state.migratedFromVersion = input.version;
   if (input.version === VERSION) { if (!Object.hasOwn(input, 'discovery')) return null; state.discovery = structuredClone(input.discovery); }
-  try { state.coop = restoreCoop(input.coop); state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); normalizeHinterland(state, input.hinterland); } catch { return null; }
+  try { state.networkWorld = restoreObservedWorld(input.networkWorld); state.coop = restoreCoop(input.coop); state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); normalizeHinterland(state, input.hinterland); } catch { return null; }
   restoreJournal(state, input);
   reconcileWorkforce(state); refreshProduction(state); return state;
 }

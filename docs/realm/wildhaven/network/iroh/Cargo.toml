@@ -1,0 +1,22 @@
+[package]
+name = "town-peer"
+version = "0.1.0"
+edition = "2024"
+publish = false
+[lib]
+crate-type = ["cdylib"]
+[dependencies]
+iroh = { version = "=1.0.3", default-features = false, features = ["tls-ring"] }
+iroh-tickets = "=1.0.0"
+getrandom = { version = "0.3", features = ["wasm_js"] }
+n0-future = "0.3"
+wasm-bindgen = "=0.2.122"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+console_error_panic_hook = "0.1.7"
+[profile.release]
+codegen-units = 1
+strip = "symbols"
+lto = true
+opt-level = "z"
+panic = "abort"

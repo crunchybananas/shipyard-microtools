@@ -1,0 +1,48 @@
+✔ training uses each rotated barracks doorway and keeps recruits off the roads (73.387834ms)
+✔ a group leaves distinct doorway cells, walks out and returns inside without gathering at town center (353.253334ms)
+✔ severe wounds require the journey back and ninety seconds of indoor recovery (17.230875ms)
+✔ blocked routes cannot grant remote recovery or teleport a wounded resident indoors (9.041167ms)
+✔ garrison metadata and orders survive reload, including closed or removed barracks (5.23425ms)
+✔ legacy idle soldiers near the town center return to quarters while field orders and economy are preserved (188.772292ms)
+✔ a false indoor flag cannot protect a soldier outside the barracks (15.450709ms)
+✔ field medics reserve a resident, accompany their selected troops and spend finite dressings (20.029875ms)
+✔ medical dressings cannot heal through a wall or replenish in the field (77.614417ms)
+✔ empty medics refill at barracks for the quoted food and cloth, without generating free supplies (4.458667ms)
+✔ medics cannot receive an attack without soldiers and invalid orders remain atomic (3.556375ms)
+✔ medic kit counts, cooldowns and escort selections save and resume deterministically (76.357666ms)
+✔ medics and indoors residents retain valid citizen jobs in a complete game save (1496.452458ms)
+✔ an old Defend Town order retargets distant barracks without getting stuck in the town-center leash (86.422ms)
+✔ a medic returns after its escorted soldiers are safely indoors (93.998542ms)
+✔ foreign units cannot keep a forged indoor immunity flag when loading (11.161458ms)
+✔ a medic follows through a gate when the rear formation point is inside a wall (48.435041ms)
+✔ a completed step has constant visual speed at 15, 30, 60 and 144 Hz, independent of game speed (2.053042ms)
+✔ corners follow the two completed segments without cutting diagonally across the inside (0.224542ms)
+✔ pause keeps the same intermediate position and shortest-arc facing (1.0925ms)
+✔ spawn, restore, out-of-band relocation and barracks deployment reset motion without sweeping across the map (0.303583ms)
+✔ stride advances with distance and settles when a walker waits, with no frame-rate dependence (0.277ms)
+✔ real frontier ticks record completed movement, preserve save format and determinism across partitions (67.587084ms)
+✔ interpolated real routes stay out of solid walls and a closed gate (18.031292ms)
+✔ a guard leaves an occupied starting tile without insisting on its center (467.831125ms)
+✔ an already stalled route recovers through real routing and reaches the watch house (639.8235ms)
+✔ opposing guards pass on the real southern shoreline without entering water or overlapping (167.73275ms)
+✔ a changed gate cancels the first approach and isolated residents wait without teleporting (82.563583ms)
+✔ an open gate still blocks sideways station approaches and diagonal corner cutting (0.3015ms)
+✔ new construction and changed workstation models discard stale routes and return to work (631.159208ms)
+✔ an unreachable workplace reports a blocked approach and retries after the fence opens (411.767417ms)
+✔ two guards approaching a shore watch house reserve separate entrance ports (339.234667ms)
+✔ rendered troops freeze mid-stride on pause and resume from the same completed segment (39.258875ms)
+✔ entrance arrows point from the actual reserved lane to the door in all four rotations (36.669375ms)
+✔ replacing previews releases owned materials and keeps shared model geometry intact (2.544584ms)
+✔ touch placement leaves the entrance arrow clear and the footprint owns its visible stroke (2.417666ms)
+✔ service terrain geometry stays on land and refreshes actual capacity without rebuilding reach (526.137959ms)
+✔ removing cue sprites disposes their private texture and material (1.059667ms)
+✔ replacing batched markers releases the instanced matrix buffer as well as their geometry (13.310792ms)
+✔ switching independent town snapshots with reused IDs resets model positions and resident routes (2340.878292ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3795.230625

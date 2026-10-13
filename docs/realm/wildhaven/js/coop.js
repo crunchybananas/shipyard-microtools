@@ -87,7 +87,7 @@ export function createCoop({ config, storage, getState, canUse, save, onChange =
       busy: busy || checking, message, connected, lastChecked, recovery, local: c, available: canUse() };
   }
   return {
-    info, signIn: (email, password, create) => run(async () => { await auth.signIn(email, password, create); await refresh(); }),
+    auth, info, signIn: (email, password, create) => run(async () => { await auth.signIn(email, password, create); await refresh(); }),
     reset: email => run(async () => { await auth.reset(email); message = 'If this email has an account, a password reset link will arrive shortly.'; }),
     signOut: () => run(async () => { if (getState().coop?.pending || getState().coop?.draft) throw new Error('Reconnect and finish the pending action before signing out.'); auth.signOut(); room = null; roomId = null; connected = false; recovery = null; }),
     create: name => run(() => begin('create', name)), join: (name, invitation) => run(() => begin('join', name, invitation)),
