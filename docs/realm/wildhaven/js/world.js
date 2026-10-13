@@ -1,3 +1,6 @@
+import { herdStatus } from './livestock.js';
+import { depositFraction } from './minerals.js';
+import { sampleUnitMotion, stride, angleBetween } from './unit-motion.js';
 import { CROPS, gardenState } from './hinterland.js';
 import { CALENDAR_DAY_SECONDS } from './calendar.js';
 import { visibleSurfaceHit } from './world-picking.js';
@@ -32,14 +35,14 @@ const ownedCueMesh = (geometry, color, opacity = 1, extra = {}) => {
   mesh.userData.ownsGeometry = mesh.userData.ownsMaterial = true; return mesh;
 };
 const cueGeometry = positions => { const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)); return geometry; };
-const JOB_GLYPHS = Object.freeze({builder:'hammer',lumberjack:'axe',quarryworker:'pick',miner:'pick',smith:'hammer',carpenter:'saw',farmer:'leaf',forager:'basket',miller:'grain',baker:'grain',weaver:'cloth',brewer:'mug',trader:'coin',scholar:'book',medic:'cross',chaplain:'star',guard:'spear',steward:'box'});
+const JOB_GLYPHS = Object.freeze({builder:'hammer',lumberjack:'axe',quarryworker:'pick',miner:'pick',smith:'hammer',carpenter:'saw',farmer:'leaf',herder:'basket',forager:'basket',miller:'grain',baker:'grain',weaver:'cloth',brewer:'mug',trader:'coin',scholar:'book',medic:'cross',chaplain:'star',guard:'spear',steward:'box'});
 const buildingPresentation = b => `${b.type}:${b.level}:${b.status}:${b.constructionKind}:${b.restored}:${b.x}:${b.z}:${b.rotation||0}`;
-const JOB_TOOLS = Object.freeze({builder:'tool_hammer',lumberjack:'tool_axe',quarryworker:'tool_pick',miner:'tool_pick',farmer:'tool_hoe',forager:'tool_basket',medic:'tool_basket',scholar:'tool_book',chaplain:'tool_book',steward:'tool_book',guard:'tool_spear',smith:'tool_hammer',carpenter:'tool_hammer',trader:'tool_basket',baker:'tool_basket',weaver:'tool_basket',miller:'tool_basket',brewer:'tool_basket'});
-const DELIVERY_JOBS = new Set(['lumberjack','quarryworker','miner','farmer','smith','carpenter','trader','baker','weaver','miller','brewer']);
+const JOB_TOOLS = Object.freeze({builder:'tool_hammer',lumberjack:'tool_axe',quarryworker:'tool_pick',miner:'tool_pick',farmer:'tool_hoe',herder:'tool_basket',forager:'tool_basket',medic:'tool_basket',scholar:'tool_book',chaplain:'tool_book',steward:'tool_book',guard:'tool_spear',smith:'tool_hammer',carpenter:'tool_hammer',trader:'tool_basket',baker:'tool_basket',weaver:'tool_basket',miller:'tool_basket',brewer:'tool_basket'});
+const DELIVERY_JOBS = new Set(['lumberjack','quarryworker','miner','farmer','herder','smith','carpenter','trader','baker','weaver','miller','brewer']);
 // Feet positions beside the authored work surfaces. The metadata supplies the
 // actual tool/hand target; these small clear spaces supply the worker's stance.
-const WORK_STANCES = Object.freeze({lumber:[-.44,0,1.00],quarry:[.13,0,.94],garden:[-.23,0,.94],orchard:[.35,0,.91],windmill:[.57,0,.97],farm:[.13,0,.94],bakery:[.52,0,1.10],sawmill:[.13,.15,.72],mine:[.13,0,1.05],smith:[.40,.11,.71],market:[.13,.12,.83],school:[-.42,0,1.09],clinic:[.69,0,.98],barracks:[.56,0,1.05],warehouse:[.13,0,1.08],cottage:[-.07,0,1.04],hearth:[.13,0,1.00]});
-const VILLAGE_WORK_TARGETS = Object.freeze({lumber:[-.58,.38,.64],quarry:[0,.34,.44],garden:[-.36,.32,.47],orchard:[.22,.28,.47],windmill:[.44,.40,.26],hearth:[0,.50,.15],cottage:[-.20,.60,.57]});
+const WORK_STANCES = Object.freeze({pasture:[.13,0,.99],henhouse:[.13,0,.99],assay:[-.38,0,.92],lumber:[-.44,0,1.00],quarry:[.13,0,.94],garden:[-.23,0,.94],orchard:[.35,0,.91],windmill:[.57,0,.97],farm:[.13,0,.94],bakery:[.52,0,1.10],sawmill:[.13,.15,.72],mine:[.13,0,1.05],smith:[.40,.11,.71],market:[.13,.12,.83],school:[-.42,0,1.09],clinic:[.69,0,.98],barracks:[.56,0,1.05],warehouse:[.13,0,1.08],cottage:[-.07,0,1.04],hearth:[.13,0,1.00]});
+const VILLAGE_WORK_TARGETS = Object.freeze({pasture:[0,.35,.7],henhouse:[0,.35,.7],assay:[-.3,.62,.12],lumber:[-.58,.38,.64],quarry:[0,.34,.44],garden:[-.36,.32,.47],orchard:[.22,.28,.47],windmill:[.44,.40,.26],hearth:[0,.50,.15],cottage:[-.20,.60,.57]});
 // Alternate access still uses real authored surfaces: chopping block, crop
 // rows, workbench ends, anvil horn, ore cart, and the clinic's herb planters.
 const SIDE_WORK_STATIONS=Object.freeze({
@@ -107,6 +110,8 @@ export class VillageWorld {
     for(const root of frontier.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
     const living=await new GLTFLoader().loadAsync('./assets/living-kit.glb');
     for(const root of living.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
+    const husbandry=await new GLTFLoader().loadAsync('./assets/husbandry-kit.glb');
+    for(const root of husbandry.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
     this.templates.set('garden', this.makeCropGarden());
     this.replaceTrees();
     this.boat = this.clone('boat'); this.boat.position.set(17, -0.1, 22); this.boat.rotation.y = -0.15; this.scene.add(this.boat);
@@ -137,7 +142,7 @@ export class VillageWorld {
       for(const crop of Object.keys(CROPS)){const rows=model.getObjectByName(`crop_${crop}`);if(rows){rows.visible=crop===bed.crop;rows.scale.y=.15+.85*ratio;}}
     }
   }
-  clone(type,level=1) { const name=type==='cottage'&&level>1?'upgrade_cottage':BUILDINGS[type]?.model||type;const template=this.templates.get(name);if(!template)throw new Error(`Missing runtime model: ${name}`);return template.clone(true); }
+  clone(type,level=1) { const name=type==='cottage'&&level>1?'upgrade_cottage':level>1&&['pasture','henhouse','assay'].includes(type)?type+'_upgrade':BUILDINGS[type]?.model||type;const template=this.templates.get(name);if(!template)throw new Error(`Missing runtime model: ${name}`);return template.clone(true); }
   terrain() {
     // Clip a bounded grid against the canonical coastline. Unlike a radial fan,
     // this follows the western and eastern headlands and their concave bays.
@@ -197,7 +202,7 @@ export class VillageWorld {
     rockSites.forEach((t,i)=>{ for(let j=0;j<3;j++) {
       const x=t.x+(rand(t.x,j)-.5)*.7, z=t.z+(rand(j,t.z)-.5)*.7, s=.35+rand(i,j)*.75;
       this.setInstance(rockMesh,i*3+j,x*CELL,groundHeight(x,z)+s*.2,z*CELL,s,s*.75,s*1.25,rand(i,j)*6);
-      const key=`${t.x},${t.z}`; if(!this.decor.has(key)) this.decor.set(key,[]); this.decor.get(key).push({meshes:[rockMesh],index:i*3+j,matrix:matrix.clone()});
+      const key=`${t.x},${t.z}`; if(!this.decor.has(key)) this.decor.set(key,[]); this.decor.get(key).push({depositId:key,meshes:[rockMesh],index:i*3+j,matrix:matrix.clone()});
     }});
     rockMesh.userData.rockSites=rockSites;
     rockMesh.castShadow=true; rockMesh.receiveShadow=true; this.scene.add(rockMesh);
@@ -280,6 +285,40 @@ export class VillageWorld {
     }
     this.treeSites.forEach((site,i)=>{const tree=treeState(this.state,site.id);if(tree.growth!==-1||this.occupiedDecor?.has(`${site.tile.x},${site.tile.z}`))this.stumps.setMatrixAt(i,hidden);else this.setInstance(this.stumps,i,site.x*CELL,groundHeight(site.x,site.z)+.11,site.z*CELL,site.s,site.s,site.s);});
     this.stumps.instanceMatrix.needsUpdate=true;this.stumps.computeBoundingSphere();
+  }
+  syncMinerals(){
+    if(!this.state||!this.decor)return;
+    const signature=JSON.stringify(this.state.minerals?.deposits||{});if(signature===this.mineralSignature)return;this.mineralSignature=signature;
+    const hidden=new THREE.Matrix4().makeScale(0,0,0),shown=new THREE.Matrix4();
+    for(const[key,pieces]of this.decor)for(const p of pieces)if(p.depositId){
+      const fraction=depositFraction(this.state,p.depositId),size=.16+.84*Math.cbrt(fraction);
+      const m=this.occupiedDecor?.has(key)?hidden:shown.copy(p.matrix).scale(new THREE.Vector3(size,size,size));
+      for(const mesh of p.meshes){mesh.setMatrixAt(p.index,m);mesh.instanceMatrix.needsUpdate=true;}
+    }
+  }
+  updateLivestock(dt,speed){
+    if(!this.state)return;
+    this.animalClock=(this.animalClock||0)+Math.min(.1,dt)*speed;
+    for(const b of this.state.buildings){
+      const status=herdStatus(this.state,b),root=this.buildings.get(b.id);if(!status||!root)continue;
+      const animals=root.userData.animals||=new Map(),ids=new Set(status.herd.animals.map(a=>a.id));
+      for(const[id,animal]of animals)if(!ids.has(id)){this.disposePresentation(animal);animals.delete(id);}
+      status.herd.animals.forEach((a,i)=>{
+        let animal=animals.get(a.id);
+        if(!animal){animal=this.clone(status.spec.model);animal.userData.legs=[];animal.traverse(o=>{if(!o.isMesh&&o.name.startsWith(status.spec.name+'_head'))animal.userData.head=o;else if(!o.isMesh&&o.name.startsWith(status.spec.name+'_leg'))animal.userData.legs.push(o);});root.add(animal);animals.set(a.id,animal);}
+        const goat=b.type==='pasture',cols=goat?4:4,row=Math.floor(i/cols),column=i%cols,t=this.animalClock+a.id*2.37,phase=t*.45+i;
+        const small=a.age<status.spec.mature?.58+.42*a.age/status.spec.mature:1;
+        const x=goat?(column-1.5)*.29:[-.49,-.30,.30,.49][column],z=(goat?-.12:.04)+row*(goat?.40:.19);
+        // Each animal stays in its own patch, clear of fences, trough and ramp.
+        const active=!this.reduced&&b.status==='ready',wander=active?Math.sin(phase)*.018:0;
+        animal.scale.setScalar(small);animal.position.set(x+wander,root.userData.model.position.y+.055,z);
+        animal.rotation.y=(goat?0:Math.PI*.12)+(active?Math.sin(phase*.6)*.12:0);
+        const peck=active?Math.pow(Math.max(0,Math.sin(t*(goat?.8:1.7))),4):0;
+        if(animal.userData.head)animal.userData.head.rotation.x=peck*(goat?.55:.9);
+        animal.userData.legs.forEach((leg,k)=>leg.rotation.x=active?Math.cos(phase)*(k%2?1:-1)*.035:0);
+        animal.userData.animalId=a.id;animal.userData.young=small<1;
+      });
+    }
   }
   setInstance(mesh,i,x,y,z,sx,sy,sz,ry=0) { position.set(x,y,z);quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),ry);scale.set(sx,sy,sz);matrix.compose(position,quaternion,scale);mesh.setMatrixAt(i,matrix); }
   dock() {
@@ -465,7 +504,7 @@ export class VillageWorld {
     const corners=[[-.44,-.44],[-.44,.44],[.44,-.44],[.44,.44]].map(([x,z])=>groundHeight(b.x+x,b.z+z));
     const top=Math.max(center,...corners),bottom=Math.min(center,...corners)-.07,depth=top-bottom;
     model.position.y=top-center;
-    if(b.level>1&&b.type!=='cottage')model.scale.y=1+(b.level-1)*.11;
+    if(b.level>1&&!['cottage','pasture','henhouse','assay'].includes(b.type))model.scale.y=1+(b.level-1)*.11;
     root.add(model);
     const active=b.status&&b.status!=='ready';
     const bounds=new THREE.Box3().setFromObject(model),height=bounds.max.y;
@@ -505,7 +544,7 @@ export class VillageWorld {
   }
   makeTroop(unit){
     const civil=['engineer','envoy','explorer','restorer','ranger','medic'].includes(unit.kind),type=civil?'villager':unit.kind==='archer'&&unit.faction!=='player'?'enemy_archer':['spearman','archer','raider'].includes(unit.kind)?unit.kind:'raider';
-    const root=this.clone(type),limbs={},weapons={};root.rotation.order='YXZ';root.position.set(unit.x*CELL,groundHeight(unit.x,unit.z),unit.z*CELL);root.rotation.y=unit.yaw||0;
+    const initial=sampleUnitMotion(unit,this.state?.frontier||{}),root=this.clone(type),limbs={},weapons={};root.rotation.order='YXZ';root.position.set(initial.x*CELL,groundHeight(initial.x,initial.z),initial.z*CELL);root.rotation.y=initial.yaw;
     root.traverse(o=>{for(const name of['left_arm','right_arm','left_leg','right_leg'])if(o.name===name||o.name.endsWith('_'+name))limbs[name]=o;for(const side of['left','right'])if(o.name.endsWith('_'+side+'_weapon'))weapons[side]=o;if(o.isMesh){o.material=o.material.clone();o.userData.ownsMaterial=true;}});
     if(civil){this.colorCitizen(root,unit.kind);if(unit.kind==='explorer'||unit.kind==='ranger'){const pack=this.clone('cargo_grain');pack.scale.setScalar(.60);pack.position.set(0,.26,-.16);root.add(pack);}const prop=unit.kind==='medic'?null:this.clone(['engineer','restorer'].includes(unit.kind)?'tool_hammer':'tool_book');if(prop){prop.position.set(.04,-.17,.04);prop.rotation.x=['engineer','restorer'].includes(unit.kind)?Math.PI/2:0;limbs[['engineer','restorer'].includes(unit.kind)?'right_arm':'left_arm']?.add(prop);}}
     if(unit.kind==='medic'){
@@ -522,7 +561,7 @@ export class VillageWorld {
       for(const mesh of [apron,bag,bandage,roll]){mesh.userData.ownsGeometry=true;mesh.userData.ownsMaterial=true;}
       root.add(apron,bag,bandage);limbs.right_arm?.add(roll);
     }
-    root.userData.unit=unit;this.scene.add(root);return{root,limbs,weapons,unit,phase:0,lastX:root.position.x,lastZ:root.position.z};
+    root.userData.unit=unit;this.scene.add(root);return{root,limbs,weapons,unit,phase:unit.id.split('').reduce((n,c)=>n+c.charCodeAt(0),0)*2.399,walkWeight:0};
   }
   syncFrontier(){
     this.fortifications??=new Map();this.troops??=new Map();this.neighborModels??=new Map();this.projectileModels??=new Map();this.frontierSelection??={unitIds:[]};
@@ -611,9 +650,12 @@ export class VillageWorld {
     for(const actor of this.troops.values()){
       const {root,unit:u,limbs}=actor,p=root.position,dead=u.status==='dead',age=time-(u.deathAt??time);root.visible=!u.garrisoned&&(!dead||age<4);
       if(!root.visible)continue;
-      const tx=u.x*CELL,tz=u.z*CELL,distance=Math.hypot(tx-p.x,tz-p.z),blend=!playing||distance>3?1:Math.min(1,dt*14),oldX=p.x,oldZ=p.z;p.x+=(tx-p.x)*blend;p.z+=(tz-p.z)*blend;const moved=Math.hypot(p.x-oldX,p.z-oldZ);const priorPhase=actor.phase;actor.phase+=moved*10;if(playing&&moved<.8&&Math.floor(priorPhase/Math.PI)!==Math.floor(actor.phase/Math.PI))this.emitSound('step',p,.4);
-      let yaw=(u.yaw||0)-root.rotation.y;while(yaw>Math.PI)yaw-=TAU;while(yaw<-Math.PI)yaw+=TAU;root.rotation.y+=yaw*Math.min(1,dt*12);
-      const gait=moved>.0004?Math.sin(actor.phase)*.51:0,attackAge=u.attackAt==null?Infinity:time-u.attackAt,attacking=!dead&&attackAge>=0&&attackAge<.62,archer=u.kind==='archer',wave=Math.sin(Math.min(1,attackAge/.5)*Math.PI);
+      const pose=sampleUnitMotion(u,frontier),tx=pose.x*CELL,tz=pose.z*CELL,moved=pose.reset?0:Math.hypot(tx-p.x,tz-p.z),priorPhase=actor.phase;
+      p.x=tx;p.z=tz;
+      const gait=stride(actor,moved,playing?dt:0,pose.reset)*.51;
+      if(playing&&moved>0&&moved<.8&&Math.floor(priorPhase/Math.PI)!==Math.floor(actor.phase/Math.PI))this.emitSound('step',p,.4);
+      if(pose.reset)root.rotation.y=pose.yaw;else if(playing)root.rotation.y+=angleBetween(root.rotation.y,pose.yaw)*(1-Math.exp(-dt*16));
+      const attackAge=u.attackAt==null?Infinity:time-u.attackAt,attacking=!dead&&attackAge>=0&&attackAge<.62,archer=u.kind==='archer',wave=Math.sin(Math.min(1,attackAge/.5)*Math.PI);
       let right=-gait*.7,left=gait*.7;if(attacking){if(archer){left=-Math.PI/2;right=-1.05+wave*.6;}else if(u.kind==='spearman'){right=-Math.PI/2+wave*.24;left=-.20;}else{right=-2.15+wave*2.1;left=-.23;}}
       if(u.kind==='engineer'&&u.order?.type==='build'&&!u.path?.length){right=-1.1+Math.sin(time*4.5)*.65;left=-.25;}
       if(u.kind==='envoy'||u.kind==='explorer'||u.kind==='ranger')left=-.7;
@@ -624,7 +666,7 @@ export class VillageWorld {
       if(actor.weapons.left)actor.weapons.left.rotation.x=attacking?-left:0;
       if(actor.weapons.right)actor.weapons.right.rotation.x=attacking?(u.kind==='spearman'?Math.PI/2-right:1.05*wave*wave-right):0;
       root.rotation.z=dead?Math.min(Math.PI/2,Math.max(0,age)*3):u.status==='wounded'?.13:0;root.rotation.x=treating?.14:attacking&&!archer?.07*wave:0;
-      p.y=groundHeight(p.x/CELL,p.z/CELL)+(dead?.11:moved>.0004?Math.abs(Math.sin(actor.phase))*.016:0);
+      p.y=groundHeight(p.x/CELL,p.z/CELL)+(dead?.11:Math.abs(Math.sin(actor.phase))*actor.walkWeight*.016);
       root.traverse(o=>{if(o.isMesh&&o.userData.ownsMaterial)o.material.emissive?.setRGB(u.damageAt!=null&&time-u.damageAt<.22?.26:0,0,0);});root.userData.motion={moving:moved>.0004,attacking,attackAge,fieldwork:isFieldworker(u)?u.missionStage:null};
     }
     if(this.frontierSelectionGroup)for(const ring of this.frontierSelectionGroup.children)if(ring.userData.unitId){const a=this.troops.get(ring.userData.unitId);ring.visible=!!a&&a.root.visible&&a.unit.status!=='dead';if(a)ring.position.set(a.root.position.x,groundHeight(a.root.position.x/CELL,a.root.position.z/CELL)+.047,a.root.position.z);}
@@ -660,11 +702,11 @@ export class VillageWorld {
     }
     if(changed){
       const occupied=woodlandOccupancy(state);
-      this.occupiedDecor=occupied; this.woodlandSignature=null;
+      this.occupiedDecor=occupied; this.woodlandSignature=null;this.mineralSignature=null;
       for(const [key,pieces]of this.decor)for(const p of pieces)if(!p.treeId){const m=occupied.has(key)?new THREE.Matrix4().makeScale(0,0,0):p.matrix;for(const mesh of p.meshes){mesh.setMatrixAt(p.index,m);mesh.instanceMatrix.needsUpdate=true;}}
       this.updatePaths();
     }
-    this.syncWoodland();this.syncSeasonVisuals();
+    this.syncWoodland();this.syncMinerals();this.syncSeasonVisuals();
     const reserved=new Set((state.frontier?.units||[]).filter(u=>!['dead','released'].includes(u.status)&&u.citizenId).map(u=>u.citizenId));
     const citizens=(state.citizens||Array.from({length:state.population},(_,i)=>({id:`preview-${i}`,name:`Islander ${i+1}`,job:'idle',workplace:null}))).filter(c=>!reserved.has(c.id));
     const ids=new Set(citizens.map(c=>c.id));
@@ -692,7 +734,7 @@ export class VillageWorld {
     const originalShirt=new THREE.Color('#de6548'),shirtColor=new THREE.Color(JOBS[job]?.color||'#5b8d9c');
     root.traverse(o=>{if(!o.isMesh||!o.geometry.attributes.color)return;const source=o.geometry.attributes.color;let matches=false;for(let i=0;i<source.count;i++)if(Math.abs(source.getX(i)-originalShirt.r)<.012&&Math.abs(source.getY(i)-originalShirt.g)<.012&&Math.abs(source.getZ(i)-originalShirt.b)<.012){matches=true;break;}if(!matches)return;o.geometry=o.geometry.clone();o.userData.ownsGeometry=true;const colors=o.geometry.attributes.color;for(let i=0;i<colors.count;i++)if(Math.abs(colors.getX(i)-originalShirt.r)<.012&&Math.abs(colors.getY(i)-originalShirt.g)<.012&&Math.abs(colors.getZ(i)-originalShirt.b)<.012)colors.setXYZ(i,shirtColor.r,shirtColor.g,shirtColor.b);colors.needsUpdate=true;});
   }
-  cargoKind(citizen){const type=this.state?.buildings.find(b=>b.id===citizen.workplace)?.type;return ({lumber:'logs',quarry:'stone',mine:'ore',sawmill:'planks',smith:'iron',toolmaker:'tools',bakery:'bread',orchard:'fruit',garden:'vegetables',farm:'grain',windmill:'flour',flaxfield:'flax',weaver:'cloth',brewery:'ale',market:'fruit'})[type]||'grain';}
+  cargoKind(citizen){const type=this.state?.buildings.find(b=>b.id===citizen.workplace)?.type;return ({pasture:'milk',henhouse:'eggs',lumber:'logs',quarry:'stone',mine:'ore',sawmill:'planks',smith:'iron',toolmaker:'tools',bakery:'bread',orchard:'fruit',garden:'vegetables',farm:'grain',windmill:'flour',flaxfield:'flax',weaver:'cloth',brewery:'ale',market:'fruit'})[type]||'grain';}
   jobTool(citizen){const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace);return citizen.job==='farmer'&&workplace?.type==='orchard'?'tool_basket':JOB_TOOLS[citizen.job]||null;}
   addActor(index,citizen={id:`preview-${index}`,name:'Islander',job:'idle',workplace:null}){
     const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace),homes=this.state?.buildings.filter(b=>(getBuildingSpec(b.type,b.level||1)?.housing||0)>0)||[];
@@ -931,7 +973,7 @@ export class VillageWorld {
     }
     return null;
   }
-  turnActor(a,angle,dt){let diff=angle-a.root.rotation.y;while(diff>Math.PI)diff-=TAU;while(diff<-Math.PI)diff+=TAU;a.root.rotation.y+=diff*Math.min(1,dt*9);}
+  turnActor(a,angle,dt){let diff=angle-a.root.rotation.y;while(diff>Math.PI)diff-=TAU;while(diff<-Math.PI)diff+=TAU;a.root.rotation.y+=diff*(1-Math.exp(-dt*9));}
   routeActor(a){
     const hearth=this.state.buildings.find(b=>b.type==='hearth'),workplace=this.state.buildings.find(b=>b.id===a.workplace),job=a.citizen.job;
     const previous=a.station;let choose=workplace||hearth,activity='work',goal=null,station=null,publicSpot=null,dwell=38+rand(a.index,this.clock)*26;
@@ -1052,11 +1094,11 @@ export class VillageWorld {
     if(a.toolType==='tool_book')left=-.75;
     if(working){
       const job=a.citizen.job,rate={builder:4.6,lumberjack:3.6,quarryworker:3.9,miner:3.8,smith:4.4,carpenter:3.4,farmer:2.5,forager:2.1,medic:2.2,scholar:2.3}[job]||2.4;
-      const previous=a.phase;a.phase+=dt*rate;const wave=Math.sin(a.phase);const impactPhase=job==='smith'?0:Math.PI/2;if(Math.floor((previous-impactPhase)/TAU)!==Math.floor((a.phase-impactPhase)/TAU))this.emitSound(({builder:'hammer',lumberjack:'axe',quarryworker:'chisel',miner:'chisel',smith:'anvil',carpenter:'saw',farmer:'rustle',forager:'rustle',weaver:'cloth',baker:'cargo',scholar:'page'})[job],a.root.position,.65);
+      const previous=a.phase;a.phase+=dt*rate;const wave=Math.sin(a.phase);const impactPhase=job==='smith'?0:Math.PI/2;if(Math.floor((previous-impactPhase)/TAU)!==Math.floor((a.phase-impactPhase)/TAU))this.emitSound(({builder:'hammer',lumberjack:'axe',quarryworker:'chisel',miner:'chisel',smith:'anvil',carpenter:'saw',farmer:'rustle',herder:'rustle',forager:'rustle',weaver:'cloth',baker:'cargo',scholar:'page'})[job],a.root.position,.65);
       if(['builder','lumberjack','quarryworker','miner','smith'].includes(job)){right=-1.15+wave*.62;left=-.35;lean=.045+Math.max(0,wave)*.045;}
       else if(job==='carpenter'){right=-1.02+wave*.20;left=-.68+wave*.12;lean=.10;}
       else if(job==='farmer'&&a.toolType==='tool_hoe'){right=.12+wave*.42;left=-.20;lean=.17+wave*.025;}
-      else if(job==='forager'||job==='farmer'){right=-.12+wave*.40;left=-.12;lean=.12+Math.max(0,wave)*.08;}
+      else if(job==='forager'||job==='farmer'||job==='herder'){right=-.12+wave*.40;left=-.12;lean=.12+Math.max(0,wave)*.08;}
       else if(['scholar','chaplain','steward'].includes(job)){left=-.86;right=-1.00+wave*.12;lean=.04;}
       else if(job==='medic'){left=-.16;right=-.77+wave*.22;lean=.09;}
       else if(job==='guard'){right=-.04;left=0;}
@@ -1076,18 +1118,20 @@ export class VillageWorld {
         const tx=n.x*CELL+(n.exact?0:n.laneX),tz=n.z*CELL+(n.exact?0:n.laneZ),dx=tx-p.x,dz=tz-p.z,d=Math.hypot(dx,dz),step=Math.min(d,dt*(.95+(a.index%4)*.05));
         if(n.stationBuilding){n.startY??=p.y;n.startDistance??=Math.max(.001,d);}
         const motion=this.crowdStep(a,dx,dz,step,n),moved=Math.hypot(motion.x,motion.z);
-        if(moved>.001){p.x+=motion.x;p.z+=motion.z;this.turnActor(a,Math.atan2(motion.x,motion.z),dt);const previous=a.phase;a.phase+=moved*10;if(Math.floor(previous/Math.PI)!==Math.floor(a.phase/Math.PI))this.emitSound('step',p,.32);}
+        if(moved>.001){p.x+=motion.x;p.z+=motion.z;this.turnActor(a,Math.atan2(motion.x,motion.z),dt);}
+        const previous=a.phase,gait=stride(a,moved,dt);if(moved>.001&&Math.floor(previous/Math.PI)!==Math.floor(a.phase/Math.PI))this.emitSound('step',p,.32);
         const floor=n.stationBuilding?THREE.MathUtils.lerp(n.startY,n.y??groundHeight(n.x,n.z),1-Math.min(1,Math.max(0,d-step)/n.startDistance)):groundHeight(p.x/CELL,p.z/CELL);
-        p.y=floor+Math.abs(Math.sin(a.phase))*.022;
+        p.y=floor+Math.abs(gait)*.022;
         // Street centers are transit gates, not positions that every citizen
         // must occupy exactly. Two separated bodies must be able to pass the
         // same gate without both stopping just outside its arrival radius.
         const remaining=Math.hypot(tx-p.x,tz-p.z),arrival=n.stationBuilding?.025:n.public?.04:.34;
         if(remaining<arrival){if(n.stationBuilding||n.public){p.x=tx;p.z=tz;}a.lastCell=n;a.path.shift();}
-        for(const [name,limb]of Object.entries(a.limbs)){const sign=name.startsWith('left')?1:-1;limb.rotation.set(Math.sin(a.phase)*.46*sign*(name.includes('arm')?-1:1),0,0);if(name===a.toolArm&&(a.toolType==='tool_basket'||a.toolType==='tool_book'))limb.rotation.x=a.toolType==='tool_book'?-.65:-.10;if(a.parcel.visible&&name.includes('arm'))limb.rotation.x=-.8;}
+        for(const [name,limb]of Object.entries(a.limbs)){const sign=name.startsWith('left')?1:-1;limb.rotation.set(gait*.46*sign*(name.includes('arm')?-1:1),0,0);if(name===a.toolArm&&(a.toolType==='tool_basket'||a.toolType==='tool_book'))limb.rotation.x=a.toolType==='tool_book'?-.65:-.10;if(a.parcel.visible&&name.includes('arm'))limb.rotation.x=-.8;}
         if(a.citizen.job==='smith'&&a.tool)a.tool.rotation.set(Math.PI/2,0,0);
         a.root.rotation.x*=Math.max(0,1-dt*9);a.root.userData.workState='walking';
       }else{
+        a.walkWeight=0;
         a.wait-=dt;if(a.wait<=0){this.routeActor(a);if(a.path.length)continue;}
         const working=(a.activity==='work'&&!!a.station||a.activity==='gather')&&this.actorCanWork(a);
         if(working)a.workTime+=dt;
@@ -1204,13 +1248,13 @@ export class VillageWorld {
       if(b.type==='bell'&&b.restored&&!this.reduced){o.traverse(n=>{if(n.name==='bell_body')n.rotation.x=Math.sin(this.clock*2)*.1;});}
     }
     if(playing&&speed>0)this.updateActors(Math.min(.1,dt)*Math.min(speed,2));
-    this.updateGardenCrops();this.updateWorkerCues();this.updateWorldCues();
+    this.updateLivestock(dt,playing&&speed>0?speed:0);this.updateGardenCrops();this.updateWorkerCues();this.updateWorldCues();
     this.updateFrontier(dt,playing&&speed>0);
     this.updatePressure();
     if(this.boat){const gx=won?5.45:17,gz=won?17.3:22;this.boat.position.x+=(gx-this.boat.position.x)*Math.min(1,dt*.18);this.boat.position.z+=(gz-this.boat.position.z)*Math.min(1,dt*.18);this.boat.position.y=-.10+(this.reduced?0:Math.sin(this.clock*1.2)*.045);this.boat.rotation.z=this.reduced?0:Math.sin(this.clock*.9)*.025;}
     // Daylight stays readable; a gentle late-afternoon warmth replaces a black night.
     const warmth=Math.max(0,Math.sin(dayTime*Math.PI)),sun=this.seasonColors?.sun||[1,.94,.85];this.sun.color.setRGB(sun[0],sun[1]-warmth*.035,sun[2]-warmth*.065);
-    if(this.state && Math.floor(this.clock*2)!==this.lastWoodlandFrame){this.lastWoodlandFrame=Math.floor(this.clock*2);this.syncWoodland();this.syncSeasonVisuals();}
+    if(this.state && Math.floor(this.clock*2)!==this.lastWoodlandFrame){this.lastWoodlandFrame=Math.floor(this.clock*2);this.syncWoodland();this.syncMinerals();this.syncSeasonVisuals();}
     this.renderer.render(this.scene,this.camera);
   }
   diagnostics(){return{drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,actors:this.actors.length,buildings:this.buildings.size,troops:this.troops.size,fortifications:this.fortifications.size,neighbors:this.neighborModels.size,pixelRatio:this.renderer.getPixelRatio(),webgl:this.renderer.capabilities.isWebGL2};}

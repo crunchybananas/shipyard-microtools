@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><title>Isolated town-depth review</title><style>body{font:18px system-ui;background:#eff0df;margin:3rem;max-width:48rem}button{font:inherit;padding:1rem;margin:.5rem}pre{white-space:pre-wrap}</style>
+<h1>Prepared town review</h1><p>This is a disposable test town with supplied resources and unlocked buildings. It is not an earned campaign. Only use this page on its isolated localhost port.</p>
+<button id="install">Install prepared test town</button><button id="supply">Deliver missing test supplies</button><button id="advance">Advance animal care by one calendar day</button><button id="export">Export test save</button><a href="../../?review=town-depth">Open the test town</a><pre id="result"></pre>
+<script type="module">
+import * as sim from '../../js/sim.js';
+document.querySelector('#export').onclick=()=>{if(!local)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([localStorage.getItem('wildhaven.v4')],{type:'application/json'}));a.download='town-depth-browser-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+const local=['127.0.0.1','localhost'].includes(location.hostname);const out=document.querySelector('#result');
+async function install(){if(!local)return;const raw=await fetch('./prepared-save.json').then(r=>r.text());localStorage.setItem('wildhaven.v4',raw);out.textContent='Prepared test town installed on this isolated origin.';}
+document.querySelector('#install').onclick=install;
+document.querySelector('#supply').onclick=()=>{if(!local)return;const s=sim.restore(localStorage.getItem('wildhaven.v4'));s.resources.cloth=60;s.resources.grain=120;localStorage.setItem('wildhaven.v4',sim.serialize(s));out.textContent='Cloth and grain added to the prepared test town. Open it again to deliver them.';};
+document.querySelector('#advance').onclick=()=>{if(!local)return;const s=sim.restore(localStorage.getItem('wildhaven.v4'));for(let i=0;i<360;i++){s.resources.grain=120;s.resources.food=120;sim.tick(s,1);}localStorage.setItem('wildhaven.v4',sim.serialize(s));out.textContent='Advanced 360 seconds with grain and food supplied; this is an accelerated test, not normal play.';};
+</script>

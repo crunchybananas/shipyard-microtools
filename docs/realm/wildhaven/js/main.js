@@ -299,7 +299,7 @@ function updateInspector() {
   $('inspect-description').textContent = ''; $('inspect-purpose').replaceChildren(buildingPurpose(selected.type, selected.level)); $('inspect-image').src = icons[selected.type] || icons.cottage; $('inspect-image').hidden = selected.type === 'hearth';
   const detail = $('inspect-detail'), action = $('inspect-action');
   if (selected.status !== 'ready') {
-    detail.textContent = selected.constructionKind === 'upgrade' ? 'Production rests until the upgrade is complete. Existing residents keep their beds.' : 'Housing and production open when the crew finishes.';
+    detail.textContent = selected.constructionKind === 'upgrade' ? `Production rests until the upgrade is complete.${['pasture','henhouse'].includes(selected.type)?' Your animals stay in their shelter.':getBuildingSpec(selected.type,selected.level).housing?' Existing residents keep their beds.':''}` : 'Housing and production open when the crew finishes.';
     action.textContent = 'Cancel construction';
   } else if (selected.type === 'bell') {
     const verdict = sim.canBuild(state, 'bell', selected.x, selected.z);

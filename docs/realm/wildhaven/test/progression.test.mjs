@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { BUILDINGS, JOBS, RESOURCES, RESOURCE_NAMES, getBuildingSpec, getUpgrade } from '../js/catalog.js';
 import {
   RESEARCH, POLICIES, ROUTES, createProgressionState, normalizeProgression,
-  researchOptions, startResearch, tickProgression, policyOptions, setPolicy,
+  researchOptions, startResearch, fundResearch, tickProgression, policyOptions, setPolicy,
   canUnlockBuilding, supplyModifiers, contractOptions, acceptContract,
   completeContract, routeOptions, dispatchRoute, dailyProgression, progressionObjective, defenseReadiness,
   importOptions, importGoods, exportOptions, exportGoods, IMPORTS, EXPORTS,
@@ -24,7 +24,7 @@ function staff(state, type, workers = BUILDINGS[type].workers, extra = {}) {
 }
 
 test('catalog has meaningful complete chains, valid workforce, and immutable shared data', () => {
-  assert.equal(Object.keys(BUILDINGS).length, 25);
+  assert.equal(Object.keys(BUILDINGS).length, 28);
   assert.equal(RESOURCE_NAMES.length, 14);
   const produced = new Set();
   for (const [type, spec] of Object.entries(BUILDINGS)) {
@@ -116,12 +116,13 @@ test('every research dependency is reachable and every locked building has a rea
   assert.deepEqual([...new Set(Object.values(RESEARCH).map(spec => spec.tier))].sort(), [1, 2, 3]);
 });
 
-test('research charges once, requires prerequisites, and progresses only with staffed scholars', () => {
+test('research reserves each stage once, requires prerequisites, and needs staffed scholars', () => {
   const state = village();
   const knowledge = state.resources.knowledge;
   assert.equal(startResearch(state, 'metallurgy').ok, false);
   assert.equal(startResearch(state, 'cultivation').ok, true);
-  assert.equal(state.resources.knowledge, knowledge - RESEARCH.cultivation.cost.knowledge);
+  assert.equal(state.resources.knowledge, knowledge, 'planning does not spend supplies');
+  assert.ok(fundResearch(state).ok);assert.equal(state.resources.knowledge,knowledge-4);assert.equal(fundResearch(state).ok,false);
   assert.equal(startResearch(state, 'cultivation').ok, false);
   assert.equal(startResearch(state, 'barter').ok, false);
   tickProgression(state, 200);
@@ -134,7 +135,10 @@ test('research charges once, requires prerequisites, and progresses only with st
   school.paused = false; school.production = { blockedReason: 'Needs food' }; tickProgression(state, 40);
   assert.equal(state.research.active.progress, 20);
   delete school.production;
-  const completion = tickProgression(state, 110);
+  tickProgression(state, 10);assert.equal(state.research.active.stage,1);
+  tickProgression(state,200);assert.equal(state.research.active.progress,25,'next stage waits for materials');
+  fundResearch(state);tickProgression(state,50);assert.equal(state.research.active.stage,2);fundResearch(state);
+  const completion = tickProgression(state, 50);
   assert.equal(completion.completed, 'cultivation');
   assert.equal(completion.events.length, 1);
   assert.equal(state.research.active, null);
@@ -147,7 +151,7 @@ test('research charges once, requires prerequisites, and progresses only with st
 
 test('research rejects invalid clocks, preserves progress through restore, and applies measured rate once', () => {
   const state = village(); state.research.completed.push('civic_order');
-  startResearch(state, 'joinery');
+  startResearch(state, 'joinery'); fundResearch(state);
   for (const delta of [0, -1, NaN, Infinity]) tickProgression(state, delta, { researchRate: 1 });
   assert.equal(state.research.active.progress, 0);
   tickProgression(state, 10, { researchRate: 2 });
@@ -158,14 +162,14 @@ test('research rejects invalid clocks, preserves progress through restore, and a
 });
 
 test('actual supplied school efficiency supports partial input shortages and learned skill', () => {
-  const state = village(); startResearch(state, 'joinery');
+  const state = village(); startResearch(state, 'joinery'); fundResearch(state);
   const school = staff(state, 'school', 2);
   school.production = { efficiency: 0.4, blockedReason: 'Needs food' };
   tickProgression(state, 10);
   assert.equal(state.research.active.progress, 4);
   school.production = { efficiency: 1.15, blockedReason: '' };
-  tickProgression(state, 20);
-  assert.equal(state.research.active.progress, 27);
+  tickProgression(state, 10);
+  assert.equal(state.research.active.progress, 15.5);
 });
 
 test('charters are exclusive, genuinely change supply effects, and charge only for switching', () => {

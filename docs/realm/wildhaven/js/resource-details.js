@@ -1,3 +1,4 @@
+import { LIVESTOCK } from './livestock.js';
 import { BUILDINGS, RESOURCES, getBuildingSpec } from './catalog.js';
 import { perMinute, WORK_CYCLE_SECONDS } from './calendar.js';
 import { rates, buildingStatus } from './sim.js';
@@ -8,7 +9,7 @@ export function resourceDetails(state, key) {
   const current = rates(state), sources = [], sinks = [];
   let produced = 0, workplaceUsed = 0;
   for (const building of state.buildings) {
-    const recipe = getBuildingSpec(building.type, building.level).recipe;
+    const recipe = LIVESTOCK[building.type]?{input:{grain:1},output:{food:1}}:getBuildingSpec(building.type, building.level).recipe;
     const production = current.buildings[building.id];
     const output = production.output?.[key] || 0, input = production.input?.[key] || 0;
     produced += output; workplaceUsed += input;
@@ -29,7 +30,7 @@ export function resourceDetails(state, key) {
     storageLimited: sources.some(source => source.storageLimited),
     rates: { produced: perMinute(produced), workplaceUsed: perMinute(workplaceUsed), residentUsed: perMinute(residentUsed), net },
     sources, sinks,
-    producerTypes: Object.keys(BUILDINGS).filter(type => type !== 'hearth' && BUILDINGS[type].recipe.output?.[key] > 0),
+    producerTypes: Object.keys(BUILDINGS).filter(type => type !== 'hearth' && (BUILDINGS[type].recipe.output?.[key] > 0 || key==='food'&&LIVESTOCK[type])),
     meal: key === 'food' ? {
       amount: residentUsed,
       secondsUntil: Math.max(0, WORK_CYCLE_SECONDS - (state.time || 0) - (state.subsecond || 0)),

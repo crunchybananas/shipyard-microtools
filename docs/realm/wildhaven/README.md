@@ -30,9 +30,19 @@ Open [Wildhaven](http://127.0.0.1:4751/wildhaven/). No install, build step, CDN 
 
 A calendar day is six minutes at 1×; the existing 90-second economy cycle is unchanged. Pause freely or use 3×. Building placement explains siting, cost and work; inspection shows staff, inputs, output, shortages and upgrades. The construction book supports reorder, pause and proportional unused-material refunds. Completed buildings salvage 75% of invested materials; occupied housing is protected.
 
+## Research, animals and mineral reserves
+
+Research now uses three material deliveries. Choose a project, reserve available supplies, and let staffed schools or survey workshops complete the stage. Deliveries can be partial. The project waits for missing materials without spending more stock. Pausing keeps the supplies; stopping returns only the current stage's materials. Older, already-paid projects finish under their original terms.
+
+Animal husbandry unlocks goat pastures and henhouses. Buy the first adults, supply grain and assign keepers. Milk and eggs contribute to Food. Two adults breed if there is room and care is adequate; young goats mature after two six-minute calendar days of care, chicks after one. Breeding takes three days for goats or two for hens. Poor care reduces output and suspends growth; feeding continues when the pantry is full. Winter feed and breeding research unlocks larger shelters. Animals survive upgrades and must be sold before demolition.
+
+Stoneworks and iron mines draw from up to three nearby deposits within five tiles. Nearby works share the same ground; demolishing or rebuilding cannot reset extraction. Surveying and deep workings unlocks survey workshops and level-two extraction upgrades, which reach a second finite reserve. The placement preview and inspector show remaining stock. Existing saves start with unworked mineral reserves because earlier extraction was not recorded. Woodland still uses the existing felling, replanting and three-calendar-day sapling system.
+
+The abandoned smallholding and surveyor's camp add two fieldwork expeditions. Restore the smallholding to improve animal food production; restore the survey camp to improve mines and survey workshops. Existing discovered/restored places remain intact when loading older saves.
+
 ## Production, neighborhoods and the coast
 
-The 25 building types use 14 resources and 18 town occupations; spearmen, archers, engineers, envoys, surveyors and restorers add six frontier roles. Every assigned citizen has one workplace and retained job experience. Chains include grain → flour → bread, timber → planks, ore → iron → tools, and flax → cloth. Fuel, food, linen and other inputs are consumed by actual staffed work. Warehouses expand physical storage.
+The 28 building types use 14 resources and 19 town occupations; spearmen, archers, engineers, envoys, surveyors, wayfarers and restorers add seven frontier roles. Every assigned citizen has one workplace and retained job experience. Chains include grain → flour → bread, timber → planks, ore → iron → tools, and flax → cloth. Fuel, food, linen and other inputs are consumed by actual staffed work. Warehouses expand physical storage.
 
 Growth creates neighborhood requirements: beyond 20 residents, wells must cover half the housing; beyond 40, staffed and supplied clinics must cover 40%; beyond 60, a chapel or supplied brewhouse must serve 35%. Service placement and inspection mark reach on the ground and highlight homes. Actual access also depends on supplied service capacity: partially staffed clinics serve fewer beds, and overlapping catchments cannot count the same household twice. Food and morale still matter, and existing residents stay when growth is blocked.
 

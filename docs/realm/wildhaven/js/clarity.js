@@ -4,6 +4,9 @@ import { BUILDINGS, JOBS, RESOURCES, getBuildingSpec } from './catalog.js';
 import { RESEARCH } from './progression.js';
 
 const PURPOSE = Object.freeze({
+  pasture: ['Milk for the pantry', 'Animal keepers feed grain to goats. Kids need two days of care to mature.'],
+  henhouse: ['Eggs for the pantry', 'Keep hens supplied with grain; chicks mature after a day of care.'],
+  assay: ['Research and rock samples', 'Supplied scholars add work to your funded project and earn knowledge.'],
   hearth: ['First supplies', 'Reserve gatherers bring food, timber and stone.'],
   cottage: ['Room to grow', 'Spare beds welcome arrivals when food and town needs are met.'],
   orchard: ['Daily meals', 'Picked fruit goes straight into the town pantry.'],
