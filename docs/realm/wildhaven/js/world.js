@@ -633,6 +633,11 @@ export class VillageWorld {
       root.position.set(THREE.MathUtils.lerp(start.x,end.x,f)*CELL,THREE.MathUtils.lerp(y0,y1,f)+Math.sin(f*Math.PI)*arc,THREE.MathUtils.lerp(start.z,end.z,f)*CELL);root.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3((end.x-start.x)*CELL,y1-y0+Math.cos(f*Math.PI)*Math.PI*arc,(end.z-start.z)*CELL).normalize());root.visible=f<1;
     }
   }
+  setVisitingScouts(positions=[]){
+    this.visitingScouts ||= [];
+    while(this.visitingScouts.length<positions.length){const root=this.clone('villager');this.colorCitizen(root,'explorer');const pack=this.clone('cargo_grain');pack.scale.setScalar(.6);pack.position.set(0,.26,-.16);root.add(pack);this.scene.add(root);this.visitingScouts.push(root);}
+    this.visitingScouts.forEach((root,i)=>{root.visible=i<positions.length;if(root.visible){const p=positions[i],x=p.x*CELL,z=p.z*CELL,dx=x-root.position.x,dz=z-root.position.z;if(Math.hypot(dx,dz)>.01)root.rotation.y=Math.atan2(dx,dz);root.position.set(x,groundHeight(p.x,p.z),z);}});
+  }
   sync(state) {
     if(this.state&&this.state!==state){
       // Separate local towns deliberately reuse citizen/building IDs. A newly
