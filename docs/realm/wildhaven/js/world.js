@@ -1,3 +1,4 @@
+import { sampleUnitMotion, stride, angleBetween } from './unit-motion.js';
 import { CROPS, gardenState } from './hinterland.js';
 import { CALENDAR_DAY_SECONDS } from './calendar.js';
 import { visibleSurfaceHit } from './world-picking.js';
@@ -505,7 +506,7 @@ export class VillageWorld {
   }
   makeTroop(unit){
     const civil=['engineer','envoy','explorer','restorer','ranger','medic'].includes(unit.kind),type=civil?'villager':unit.kind==='archer'&&unit.faction!=='player'?'enemy_archer':['spearman','archer','raider'].includes(unit.kind)?unit.kind:'raider';
-    const root=this.clone(type),limbs={},weapons={};root.rotation.order='YXZ';root.position.set(unit.x*CELL,groundHeight(unit.x,unit.z),unit.z*CELL);root.rotation.y=unit.yaw||0;
+    const initial=sampleUnitMotion(unit,this.state?.frontier||{}),root=this.clone(type),limbs={},weapons={};root.rotation.order='YXZ';root.position.set(initial.x*CELL,groundHeight(initial.x,initial.z),initial.z*CELL);root.rotation.y=initial.yaw;
     root.traverse(o=>{for(const name of['left_arm','right_arm','left_leg','right_leg'])if(o.name===name||o.name.endsWith('_'+name))limbs[name]=o;for(const side of['left','right'])if(o.name.endsWith('_'+side+'_weapon'))weapons[side]=o;if(o.isMesh){o.material=o.material.clone();o.userData.ownsMaterial=true;}});
     if(civil){this.colorCitizen(root,unit.kind);if(unit.kind==='explorer'||unit.kind==='ranger'){const pack=this.clone('cargo_grain');pack.scale.setScalar(.60);pack.position.set(0,.26,-.16);root.add(pack);}const prop=unit.kind==='medic'?null:this.clone(['engineer','restorer'].includes(unit.kind)?'tool_hammer':'tool_book');if(prop){prop.position.set(.04,-.17,.04);prop.rotation.x=['engineer','restorer'].includes(unit.kind)?Math.PI/2:0;limbs[['engineer','restorer'].includes(unit.kind)?'right_arm':'left_arm']?.add(prop);}}
     if(unit.kind==='medic'){
@@ -522,7 +523,7 @@ export class VillageWorld {
       for(const mesh of [apron,bag,bandage,roll]){mesh.userData.ownsGeometry=true;mesh.userData.ownsMaterial=true;}
       root.add(apron,bag,bandage);limbs.right_arm?.add(roll);
     }
-    root.userData.unit=unit;this.scene.add(root);return{root,limbs,weapons,unit,phase:0,lastX:root.position.x,lastZ:root.position.z};
+    root.userData.unit=unit;this.scene.add(root);return{root,limbs,weapons,unit,phase:unit.id.split('').reduce((n,c)=>n+c.charCodeAt(0),0)*2.399,walkWeight:0};
   }
   syncFrontier(){
     this.fortifications??=new Map();this.troops??=new Map();this.neighborModels??=new Map();this.projectileModels??=new Map();this.frontierSelection??={unitIds:[]};
@@ -611,9 +612,12 @@ export class VillageWorld {
     for(const actor of this.troops.values()){
       const {root,unit:u,limbs}=actor,p=root.position,dead=u.status==='dead',age=time-(u.deathAt??time);root.visible=!u.garrisoned&&(!dead||age<4);
       if(!root.visible)continue;
-      const tx=u.x*CELL,tz=u.z*CELL,distance=Math.hypot(tx-p.x,tz-p.z),blend=!playing||distance>3?1:Math.min(1,dt*14),oldX=p.x,oldZ=p.z;p.x+=(tx-p.x)*blend;p.z+=(tz-p.z)*blend;const moved=Math.hypot(p.x-oldX,p.z-oldZ);const priorPhase=actor.phase;actor.phase+=moved*10;if(playing&&moved<.8&&Math.floor(priorPhase/Math.PI)!==Math.floor(actor.phase/Math.PI))this.emitSound('step',p,.4);
-      let yaw=(u.yaw||0)-root.rotation.y;while(yaw>Math.PI)yaw-=TAU;while(yaw<-Math.PI)yaw+=TAU;root.rotation.y+=yaw*Math.min(1,dt*12);
-      const gait=moved>.0004?Math.sin(actor.phase)*.51:0,attackAge=u.attackAt==null?Infinity:time-u.attackAt,attacking=!dead&&attackAge>=0&&attackAge<.62,archer=u.kind==='archer',wave=Math.sin(Math.min(1,attackAge/.5)*Math.PI);
+      const pose=sampleUnitMotion(u,frontier),tx=pose.x*CELL,tz=pose.z*CELL,moved=pose.reset?0:Math.hypot(tx-p.x,tz-p.z),priorPhase=actor.phase;
+      p.x=tx;p.z=tz;
+      const gait=stride(actor,moved,playing?dt:0,pose.reset)*.51;
+      if(playing&&moved>0&&moved<.8&&Math.floor(priorPhase/Math.PI)!==Math.floor(actor.phase/Math.PI))this.emitSound('step',p,.4);
+      if(pose.reset)root.rotation.y=pose.yaw;else if(playing)root.rotation.y+=angleBetween(root.rotation.y,pose.yaw)*(1-Math.exp(-dt*16));
+      const attackAge=u.attackAt==null?Infinity:time-u.attackAt,attacking=!dead&&attackAge>=0&&attackAge<.62,archer=u.kind==='archer',wave=Math.sin(Math.min(1,attackAge/.5)*Math.PI);
       let right=-gait*.7,left=gait*.7;if(attacking){if(archer){left=-Math.PI/2;right=-1.05+wave*.6;}else if(u.kind==='spearman'){right=-Math.PI/2+wave*.24;left=-.20;}else{right=-2.15+wave*2.1;left=-.23;}}
       if(u.kind==='engineer'&&u.order?.type==='build'&&!u.path?.length){right=-1.1+Math.sin(time*4.5)*.65;left=-.25;}
       if(u.kind==='envoy'||u.kind==='explorer'||u.kind==='ranger')left=-.7;
@@ -624,7 +628,7 @@ export class VillageWorld {
       if(actor.weapons.left)actor.weapons.left.rotation.x=attacking?-left:0;
       if(actor.weapons.right)actor.weapons.right.rotation.x=attacking?(u.kind==='spearman'?Math.PI/2-right:1.05*wave*wave-right):0;
       root.rotation.z=dead?Math.min(Math.PI/2,Math.max(0,age)*3):u.status==='wounded'?.13:0;root.rotation.x=treating?.14:attacking&&!archer?.07*wave:0;
-      p.y=groundHeight(p.x/CELL,p.z/CELL)+(dead?.11:moved>.0004?Math.abs(Math.sin(actor.phase))*.016:0);
+      p.y=groundHeight(p.x/CELL,p.z/CELL)+(dead?.11:Math.abs(Math.sin(actor.phase))*actor.walkWeight*.016);
       root.traverse(o=>{if(o.isMesh&&o.userData.ownsMaterial)o.material.emissive?.setRGB(u.damageAt!=null&&time-u.damageAt<.22?.26:0,0,0);});root.userData.motion={moving:moved>.0004,attacking,attackAge,fieldwork:isFieldworker(u)?u.missionStage:null};
     }
     if(this.frontierSelectionGroup)for(const ring of this.frontierSelectionGroup.children)if(ring.userData.unitId){const a=this.troops.get(ring.userData.unitId);ring.visible=!!a&&a.root.visible&&a.unit.status!=='dead';if(a)ring.position.set(a.root.position.x,groundHeight(a.root.position.x/CELL,a.root.position.z/CELL)+.047,a.root.position.z);}
@@ -936,7 +940,7 @@ export class VillageWorld {
     }
     return null;
   }
-  turnActor(a,angle,dt){let diff=angle-a.root.rotation.y;while(diff>Math.PI)diff-=TAU;while(diff<-Math.PI)diff+=TAU;a.root.rotation.y+=diff*Math.min(1,dt*9);}
+  turnActor(a,angle,dt){let diff=angle-a.root.rotation.y;while(diff>Math.PI)diff-=TAU;while(diff<-Math.PI)diff+=TAU;a.root.rotation.y+=diff*(1-Math.exp(-dt*9));}
   routeActor(a){
     const hearth=this.state.buildings.find(b=>b.type==='hearth'),workplace=this.state.buildings.find(b=>b.id===a.workplace),job=a.citizen.job;
     const previous=a.station;let choose=workplace||hearth,activity='work',goal=null,station=null,publicSpot=null,dwell=38+rand(a.index,this.clock)*26;
@@ -1081,18 +1085,20 @@ export class VillageWorld {
         const tx=n.x*CELL+(n.exact?0:n.laneX),tz=n.z*CELL+(n.exact?0:n.laneZ),dx=tx-p.x,dz=tz-p.z,d=Math.hypot(dx,dz),step=Math.min(d,dt*(.95+(a.index%4)*.05));
         if(n.stationBuilding){n.startY??=p.y;n.startDistance??=Math.max(.001,d);}
         const motion=this.crowdStep(a,dx,dz,step,n),moved=Math.hypot(motion.x,motion.z);
-        if(moved>.001){p.x+=motion.x;p.z+=motion.z;this.turnActor(a,Math.atan2(motion.x,motion.z),dt);const previous=a.phase;a.phase+=moved*10;if(Math.floor(previous/Math.PI)!==Math.floor(a.phase/Math.PI))this.emitSound('step',p,.32);}
+        if(moved>.001){p.x+=motion.x;p.z+=motion.z;this.turnActor(a,Math.atan2(motion.x,motion.z),dt);}
+        const previous=a.phase,gait=stride(a,moved,dt);if(moved>.001&&Math.floor(previous/Math.PI)!==Math.floor(a.phase/Math.PI))this.emitSound('step',p,.32);
         const floor=n.stationBuilding?THREE.MathUtils.lerp(n.startY,n.y??groundHeight(n.x,n.z),1-Math.min(1,Math.max(0,d-step)/n.startDistance)):groundHeight(p.x/CELL,p.z/CELL);
-        p.y=floor+Math.abs(Math.sin(a.phase))*.022;
+        p.y=floor+Math.abs(gait)*.022;
         // Street centers are transit gates, not positions that every citizen
         // must occupy exactly. Two separated bodies must be able to pass the
         // same gate without both stopping just outside its arrival radius.
         const remaining=Math.hypot(tx-p.x,tz-p.z),arrival=n.stationBuilding?.025:n.public?.04:.34;
         if(remaining<arrival){if(n.stationBuilding||n.public){p.x=tx;p.z=tz;}a.lastCell=n;a.path.shift();}
-        for(const [name,limb]of Object.entries(a.limbs)){const sign=name.startsWith('left')?1:-1;limb.rotation.set(Math.sin(a.phase)*.46*sign*(name.includes('arm')?-1:1),0,0);if(name===a.toolArm&&(a.toolType==='tool_basket'||a.toolType==='tool_book'))limb.rotation.x=a.toolType==='tool_book'?-.65:-.10;if(a.parcel.visible&&name.includes('arm'))limb.rotation.x=-.8;}
+        for(const [name,limb]of Object.entries(a.limbs)){const sign=name.startsWith('left')?1:-1;limb.rotation.set(gait*.46*sign*(name.includes('arm')?-1:1),0,0);if(name===a.toolArm&&(a.toolType==='tool_basket'||a.toolType==='tool_book'))limb.rotation.x=a.toolType==='tool_book'?-.65:-.10;if(a.parcel.visible&&name.includes('arm'))limb.rotation.x=-.8;}
         if(a.citizen.job==='smith'&&a.tool)a.tool.rotation.set(Math.PI/2,0,0);
         a.root.rotation.x*=Math.max(0,1-dt*9);a.root.userData.workState='walking';
       }else{
+        a.walkWeight=0;
         a.wait-=dt;if(a.wait<=0){this.routeActor(a);if(a.path.length)continue;}
         const working=(a.activity==='work'&&!!a.station||a.activity==='gather')&&this.actorCanWork(a);
         if(working)a.workTime+=dt;

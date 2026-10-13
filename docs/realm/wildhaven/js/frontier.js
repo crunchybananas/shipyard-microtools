@@ -1,3 +1,4 @@
+import { FRONTIER_STEP, captureUnitMotion, recordUnitMotion } from './unit-motion.js';
 import { calendarDay } from './calendar.js';
 import { ISLAND_BOUNDS as FRONTIER_BOUNDS, ISLAND_REGIONS as FRONTIER_REGIONS, ISLAND_NEIGHBORS as FRONTIER_NEIGHBORS } from './island.js';
 import { journeyQuote, completeJourney, GATHERING, projectSpec } from './hinterland.js';
@@ -26,7 +27,7 @@ export const FORTIFICATIONS = Object.freeze({
   tower: { name: 'Watchtower', description: 'A nearby active archer fires farther and receives protection; an empty tower does not shoot.', cost: { stone: 24, planks: 10, tools: 2 }, work: 45, maxHp: 260 },
   outpost: { name: 'Outpost', description: 'Complete an outpost to claim discovered land for homes and industry.', cost: { wood: 30, stone: 16, planks: 8, gold: 25 }, work: 45, maxHp: 220 },
 });
-const STEP = .25, DAY = 90, HOME = { x: 0, z: 3 }, MAX_UNITS = MAX_SQUAD_MEMBERS, MAX_FORTS = 900;
+const STEP = FRONTIER_STEP, DAY = 90, HOME = { x: 0, z: 3 }, MAX_UNITS = MAX_SQUAD_MEMBERS, MAX_FORTS = 900;
 const EPS = 1e-6, finite = n => typeof n === 'number' && Number.isFinite(n), int = (n, a, b) => Number.isInteger(n) && n >= a && n <= b;
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n)), round = n => Math.round(n * 1e6) / 1e6, key = p => `${Math.round(p.x)},${Math.round(p.z)}`, distance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const home = ctx => ctx.home || HOME, regions = ctx => ctx.regions || FRONTIER_REGIONS, definitions = ctx => ctx.neighbors || FRONTIER_NEIGHBORS;
@@ -478,6 +479,20 @@ function combatTick(state,u,dt,ctx,casualties) {
   if(u.faction!=='player'&&distance(u,h)<1.4){const cost={food:Math.min(6,state.resources.food||0),gold:Math.min(4,state.resources.gold||0)};spend(state,cost);const lost=Object.values(cost).reduce((a,b)=>a+b,0);state.frontier.stats.cargoLost+=lost;if(u.faction==='raiders'&&state.frontier.raidActive&&state.frontier.raidOutcome)state.frontier.raidOutcome.cargoLost=round(state.frontier.raidOutcome.cargoLost+lost);u.status='returning';u.order={type:'retreat',...(state.frontier.neighbors.find(n=>n.id===u.faction)||ctx.raiderSpawn||{x:0,z:-25})};u.path=[];log(state,'A raider reached the stores and is withdrawing with up to 6 food and 4 coin.','raid');return;}
   if(move(state,u,goal,dt,ctx,{breach:u.faction!=='player'})&&u.faction==='player')u.order={type:'hold'};
 }
+function medicEscortPoint(state,u,leader,ctx) {
+  const behind={x:leader.x-Math.sin(leader.yaw||0)*2,z:leader.z-Math.cos(leader.yaw||0)*2},candidates=[];
+  const others=state.frontier.units.filter(t=>t!==u&&alive(t)&&!t.garrisoned);
+  // The rear of a formation can be across a wall. Choose a reachable nearby
+  // place with sight of the leader, and do not reject the medic's own spot.
+  for(let dx=-3;dx<=3;dx++)for(let dz=-3;dz<=3;dz++){
+    const p={x:Math.round(leader.x)+dx,z:Math.round(leader.z)+dz},d=distance(p,leader);
+    if(d<.6||d>2.7||!open(state,p.x,p.z,ctx)||!lineOfSight(state,p,leader,ctx))continue;
+    if(others.some(t=>distance(t,p)<(hostile(state,'player',t.faction)?2:.4)))continue;
+    candidates.push(p);
+  }
+  candidates.sort((a,b)=>distance(a,behind)-distance(b,behind)||distance(a,u)-distance(b,u)||a.z-b.z||a.x-b.x);
+  return candidates.find(p=>key(u)===key(p)||frontierPath(state,u,p,ctx).length)||null;
+}
 function medicTick(state,u,dt,ctx) {
   u.careCooldown=Math.max(0,(u.careCooldown||0)-dt);u.targetId=null;
   if(u.order.type==='retreat'){combatTick(state,u,dt,ctx,[]);return;}
@@ -496,8 +511,7 @@ function medicTick(state,u,dt,ctx) {
   }
   const escorts=(u.escortIds||[]).map(id=>state.frontier.units.find(t=>t.id===id&&residentSoldier(t)&&!t.garrisoned&&t.status==='active')).filter(Boolean);
   if(escorts.length){
-    const leader=escorts[0],behind={x:leader.x-Math.sin(leader.yaw||0)*2,z:leader.z-Math.cos(leader.yaw||0)*2};
-    const p=nearestOpen(state,behind,ctx,2,true);
+    const p=medicEscortPoint(state,u,escorts[0],ctx);
     if(p&&distance(u,p)>.6&&!threats.some(t=>distance(t,p)<2)&&!state.frontier.units.some(t=>alive(t)&&hostile(state,'player',t.faction)&&distance(t,p)<2)){move(state,u,p,dt,ctx);return;}
     u.path=[];return;
   }
@@ -548,7 +562,7 @@ function step(state,dt,ctx,events,casualties) {
 export function tickFrontier(state,dt,ctx={}) {
   if(!finite(dt)||dt<0||dt>3600)throw new Error('Invalid frontier tick duration');if(!state.frontier)state.frontier=createFrontierState(ctx);
   const events=[],casualties=[],f=state.frontier,signature=()=>JSON.stringify([f.units.map(u=>[u.id,u.x,u.z,u.hp,u.status,u.trainingRemaining,u.recoveryRemaining,u.order,u.attackAt,u.garrisoned,u.quartersId,u.medicalCharges,u.treatedAt]),f.fortifications.map(v=>[v.id,v.status,v.hp,v.progress,v.open]),f.warning,f.claims,f.discoveredRegions,f.nextLogId,f.projectiles,f.squads]);const before=signature();f.subsecond=round(f.subsecond+dt);let steps=0;
-  while(f.subsecond+EPS>=STEP){f.subsecond=round(Math.max(0,f.subsecond-STEP));step(state,STEP,ctx,events,casualties);steps++;}
+  while(f.subsecond+EPS>=STEP){f.subsecond=round(Math.max(0,f.subsecond-STEP));const beforeMotion=captureUnitMotion(f.units);step(state,STEP,ctx,events,casualties);recordUnitMotion(f.units,beforeMotion,f.clock);steps++;}
   return{events,casualties:[...new Set(casualties)],changed:before!==signature(),steps};
 }
 export function frontierOptions(state,ctx={}) {const f=state.frontier||createFrontierState(ctx);return{...f,reservedCitizens:reservedCitizenIds(state),activeBattles:f.units.filter(u=>alive(u)&&u.faction!=='player'&&hostile(state,'player',u.faction)).length,training:f.units.filter(u=>u.status==='training').length,wounded:f.units.filter(u=>u.status==='wounded').length,readyTroops:f.units.filter(u=>u.faction==='player'&&battleReady(u)).length,claims:[...f.claims],log:[...f.log]};}
