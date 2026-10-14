@@ -1230,7 +1230,7 @@ export class VillageWorld {
     // Normal pointerup already removed this pointer. Unexpected capture loss
     // cancels the entire gesture, so a later release cannot become a build tap.
     c.addEventListener('lostpointercapture',e=>{if(this.pointers.has(e.pointerId))endGesture();});
-    c.addEventListener('pointerleave',e=>{if(!drag)this.onHover?.(null,{pointerType:e.pointerType});});c.addEventListener('contextmenu',e=>e.preventDefault());
+    c.addEventListener('pointerleave',e=>{if(!drag)this.onHover?.(null,{pointerType:e.pointerType,relatedTarget:e.relatedTarget});});c.addEventListener('contextmenu',e=>e.preventDefault());
     c.addEventListener('wheel',e=>{e.preventDefault();this.targetZoom=wheelZoom(this.targetZoom,e.deltaY,e.deltaMode,this.height,10,MAP_ZOOM);this.onCamera?.();},{passive:false});
   }
   render(dt,{speed=1,playing=true,dayTime=.25,won=false}={}){
