@@ -80,8 +80,6 @@
   .controls-hint button{padding:6px 10px!important;white-space:nowrap}
   #town-book-content,.field-content,#frontier-content,#journal{touch-action:pan-y;-webkit-overflow-scrolling:touch}
   #build-shelf,#build-categories{touch-action:pan-x;-webkit-overflow-scrolling:touch}
-  #placement:has(#confirm-building:not([hidden])){display:grid;grid-template-columns:1fr auto auto;gap:7px}
-  #placement:has(#confirm-building:not([hidden]))>div{grid-column:1/-1;min-width:0}
   #confirm-building{background:#315f4c;color:#fff3d5;font-size:12px}
   footer{bottom:max(9px,env(safe-area-inset-bottom));left:max(50%,env(safe-area-inset-left))}
   #inspector{max-height:calc(100dvh - var(--shelf-edge,270px) - 164px)}
