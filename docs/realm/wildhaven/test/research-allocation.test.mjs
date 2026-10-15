@@ -34,8 +34,14 @@ test('old paid and manual projects retain their previous behavior, invalid perce
  assert.equal(setResearchAllocation(project(),-25).ok,false);
 });
 test('HUD distinguishes funding, staffing, paused time, and progress',()=>{
- const s=project();assert.equal(researchHUD(s).status,'supplies');assert.equal(researchHUD(s).detail,'Allocating 25%');
+ const s=project();assert.equal(researchHUD(s,true).status,'time');assert.equal(researchHUD(s,true).detail,'Time paused');assert.equal(researchHUD(s).status,'supplies');assert.equal(researchHUD(s).detail,'Allocating 25%');
  s.resources.knowledge=100;fundResearch(s);assert.equal(researchHUD(s).status,'workers');
  s.buildings.push({type:'school',status:'ready',production:{efficiency:1}});assert.equal(researchHUD(s,true).status,'time');assert.equal(researchHUD(s).status,'working');
  pauseResearch(s,true);assert.equal(researchHUD(s).status,'paused');s.research.active=null;assert.equal(researchHUD(s).status,'idle');
+});
+
+test('HUD stops offering another project after every discovery is learned',()=>{
+ const s=sim.createGame();s.research.completed=Object.keys(RESEARCH);
+ assert.equal(researchHUD(s).status,'complete');assert.equal(researchHUD(s).title,'Research complete');
+ s.research.completed.pop();assert.equal(researchHUD(s).status,'idle');
 });

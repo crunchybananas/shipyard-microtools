@@ -3,10 +3,14 @@ import { researchFunding } from './research-projects.js';
 
 export function researchHUD(state, paused = false) {
   const active = state.research?.active, spec = active && RESEARCH[active.id];
-  if (!spec) return { title: 'Research', detail: 'Choose a project', progress: 0, status: 'idle', id: null };
+  if (!spec) {
+    const complete = Object.keys(RESEARCH).every(id => state.research?.completed?.includes(id));
+    return complete ? { title: 'Research complete', detail: `${Object.keys(RESEARCH).length} discoveries learned`, progress: 1, status: 'complete', id: null }
+      : { title: 'Research', detail: 'Choose a project', progress: 0, status: 'idle', id: null };
+  }
   const funding = researchFunding(state, { id: active.id, ...spec });
   const working = state.buildings.some(b => ['school','assay'].includes(b.type) && b.status === 'ready' && !b.paused && b.production?.efficiency > 0);
-  const status = funding.paused ? 'paused' : !funding.funded ? 'supplies' : !working ? 'workers' : paused ? 'time' : 'working';
+  const status = funding.paused ? 'paused' : paused ? 'time' : !funding.funded ? 'supplies' : !working ? 'workers' : 'working';
   const progress = Math.max(0, Math.min(1, active.progress / active.duration));
   const detail = ({ paused: 'Project paused', supplies: active.allocation ? `Allocating ${active.allocation}%` : 'Needs supplies', workers: 'Needs staffed, supplied scholars', time: 'Time paused', working: `Stage ${funding.stage + 1} of 3` })[status];
   return { title: spec.name, detail, progress, status, id: active.id };

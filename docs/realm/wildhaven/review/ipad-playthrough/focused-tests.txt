@@ -1,0 +1,18 @@
+✔ allocation takes only the selected fraction of new output and caps at stage needs (13.532625ms)
+✔ 100% allocation can fill research when stores are full, other shares respect room for their remainder (2.045583ms)
+✔ pausing stops collection, stage changes keep allocation and unfinished materials refund exactly once (4.474791ms)
+✔ simulation allocates and depletes the same actual output; pause and save partitions are deterministic (171.02475ms)
+✔ old paid and manual projects retain their previous behavior, invalid percentages are rejected (3.969959ms)
+✔ HUD distinguishes funding, staffing, paused time, and progress (0.955ms)
+✔ HUD stops offering another project after every discovery is learned (0.303375ms)
+✔ town panel preserves navigation after removed planning button (2.978292ms)
+✔ town panel preserves navigation after removed funding button (0.299834ms)
+✔ town panel preserves navigation after retained allocation button (0.253917ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 698.187625

@@ -10,6 +10,7 @@ import { researchRequirements, rankContracts, constructionFeedback } from './cla
 import { resourceChips } from './clarity-ui.js';
 import { pathRequirement } from './path-choice.js';
 import { createResearchMap } from './research-map.js';
+import { researchHUD } from './research-hud.js';
 import { createPressGuard } from './press-guard.js';
 import { resourceDetails } from './resource-details.js';
 import { seasonInfo, festivalQuote, festivalStatus, effectiveMorale } from './seasons.js';
@@ -28,8 +29,9 @@ function btn(label, actionId, onClick, { disabled = false, className = 'small-bu
   const node = el('button', className, label); node.dataset.actionId = actionId; node.disabled = disabled; node.title = title; node.onclick = onClick; return node;
 }
 function progressBar(ratio, paused = false) { const bar = el('div', `work-progress${paused ? ' paused' : ''}`); const fill = el('span'); fill.style.width = `${Math.max(0, Math.min(1, ratio || 0)) * 100}%`; bar.append(fill); return bar; }
-function preserveReplace(container, nodes) {
+export function preserveReplace(container, nodes) {
   const active = container.contains(document.activeElement) ? document.activeElement.dataset.actionId : null;
+  const researchFocus = container.contains(document.activeElement) && !!document.activeElement.closest('.research-work');
   const scroll = container.scrollTop;
   const disclosures = new Map([...container.querySelectorAll('details[data-disclosure]')].map(node => [node.dataset.disclosure, node.open]));
   const innerScroll = new Map([...container.querySelectorAll('[data-scroll-region]')].map(node => [node.dataset.scrollRegion, { left: node.scrollLeft, top: node.scrollTop }]));
@@ -37,7 +39,7 @@ function preserveReplace(container, nodes) {
   for (const node of container.querySelectorAll('details[data-disclosure]')) if (disclosures.has(node.dataset.disclosure)) node.open = disclosures.get(node.dataset.disclosure);
   for (const node of container.querySelectorAll('[data-scroll-region]')) { const prior = innerScroll.get(node.dataset.scrollRegion); if (prior) { node.scrollLeft = prior.left; node.scrollTop = prior.top; } }
   container.scrollTop = scroll;
-  if (active) container.querySelector(`[data-action-id="${CSS.escape(active)}"]`)?.focus({ preventScroll: true });
+  if (active) (container.querySelector(`[data-action-id="${CSS.escape(active)}"]`) || (researchFocus ? container.querySelector('[data-action-id="research-heading"]') : null))?.focus({ preventScroll: true });
 }
 function stepper(value, min, max, id, update) {
   const node = el('div', 'stepper');
@@ -307,31 +309,55 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     nodes.push(paths);
     const schools = state.buildings.filter(b => ['school','assay'].includes(b.type) && b.status === 'ready'), workingSchools = schools.filter(b => !b.paused && b.production?.efficiency > 0);
     const summary = el('div', 'research-work'); summary.dataset.councilSection = 'research';
-    summary.append(el('strong', '', active ? `Research project · ${active.name}` : 'Choose what the town learns next'), el('p', 'town-meta', 'Allocate new supplies to research. Staffed schools and survey workshops do the work. Each stage stops collecting when it has enough.'));
+    const allLearned = research.every(item => item.completed);
+    const researchTitle = el('strong', 'research-heading', active ? active.name : allLearned ? 'All discoveries learned' : 'Choose what the town learns next');
+    researchTitle.tabIndex = -1; researchTitle.dataset.actionId = 'research-heading';
+    const top = el('div', 'research-work-heading'); top.append(researchTitle);
+    if (active) top.append(el('span', 'job-tag', `${Math.floor(active.progress * 100)}%`));
+    summary.append(top);
     if (active) {
-      summary.dataset.research=active.id;
-      const funding=active.funding;
-      summary.append(progressBar(active.progress),el('span','job-tag',`${Math.floor(active.progress*100)}% complete`));
-      if(funding.legacy)summary.append(el('p','town-meta','This project was paid for before staged research. Its original funding is retained.'));
-      else {
-        const stages=el('ol','research-stages');funding.plan.forEach((step,i)=>{const li=el('li',i<funding.stage?'done':i===funding.stage?'current':'',step.name);if(i===funding.stage)li.setAttribute('aria-current','step');stages.append(li);});summary.append(stages);
-        const allocation=el('div','research-allocation');allocation.setAttribute('role','group');allocation.setAttribute('aria-label','Share of new supplies for research');
-        allocation.append(el('span','','New supplies'));
-        for(const percent of [0,25,50,100]){const choice=btn(`${percent}%`,`research-allocation-${percent}`,()=>action(()=>progression.setResearchAllocation(state,percent)));choice.setAttribute('aria-pressed',String((state.research.active.allocation||0)===percent));allocation.append(choice);}
-        summary.append(allocation,el('p','town-meta','Only materials needed by this project are allocated. Existing stores stay available to the town. 0% turns automatic funding off.'));
-        const table=el('table','research-supplies'),head=el('thead'),labels=el('tr');for(const name of ['Supply','Delivered','Needed','In stores'])labels.append(el('th','',name));head.append(labels);table.append(head);const body=el('tbody');
-        for(const [key,n]of Object.entries(funding.plan[funding.stage].cost)){const row=el('tr',funding.missing[key]?'missing':'supplied');row.append(el('th','',RESOURCES[key].name),el('td','',String(Math.round((funding.delivered[key]||0)*10)/10)),el('td','',String(Math.round((funding.missing[key]||0)*10)/10)),el('td','',format(state.resources[key])));body.append(row);}table.append(body);summary.append(table);
-        summary.append(el('p',funding.funded?'town-meta':'research-wait',funding.paused?'Project paused. Set-aside supplies are kept here.':funding.funded?'Stage supplied. Scholars can work on it.':state.research.active.allocation?`Collecting ${state.research.active.allocation}% of new supplies. Production must make the missing materials.`:'Automatic funding is off. Choose an allocation or fund this stage from stores.'));
-        const actions=el('div','town-row-actions');
-        if(!funding.funded)actions.append(btn('Fund now from stores','research-contribute',()=>action(()=>progression.fundResearch(state)),{disabled:!Object.keys(funding.contribution).length,className:'primary'}));
-        actions.append(btn(funding.paused?'Resume research':'Pause research','research-pause',()=>action(()=>progression.pauseResearch(state,!funding.paused))));
-        const stop=disclosure('stop-research','Stop this project');stop.append(el('p','town-meta','Returns supplies still set aside for this stage. Completed experiments and their materials are spent; starting again begins at stage one.'),btn('Stop and return unused supplies','research-cancel',()=>action(()=>progression.cancelResearch(state))));summary.append(actions,stop);
+      summary.dataset.research = active.id;
+      const funding = active.funding, status = researchHUD(state, getPaused());
+      summary.append(progressBar(active.progress, funding.paused || getPaused()));
+      if (funding.legacy) summary.append(el('p', 'town-meta', 'Supplies paid. This project keeps its original funding.'));
+      else summary.append(el('p', 'research-current-stage', `Stage ${funding.stage + 1} of 3 · ${funding.name}`));
+      const statusText = status.status === 'supplies' ? `Needs ${resourceText(funding.missing)}.`
+        : status.status === 'working' ? 'Scholars are working.' : status.detail + '.';
+      summary.append(el('p', 'research-work-status', statusText));
+      // Put the next action before the ledger so it stays in reach on tablets.
+      const actions = el('div', 'town-row-actions research-work-actions');
+      if (getPaused()) actions.append(btn('Resume time', 'resume-time', resume, { className: 'primary' }));
+      if (!funding.legacy) {
+        if (!funding.funded) actions.append(btn('Fund now from stores', 'research-contribute', () => action(() => progression.fundResearch(state)), { disabled: !Object.keys(funding.contribution).length, className: getPaused() ? 'small-button' : 'primary', title: `Supply ${resourceText(funding.contribution)}` }));
+        actions.append(btn(funding.paused ? 'Resume research' : 'Pause research', 'research-pause', () => action(() => progression.pauseResearch(state, !funding.paused))));
       }
+      summary.append(actions);
+      if (!funding.legacy) {
+        const allocation = el('div', 'research-allocation'); allocation.setAttribute('role', 'group'); allocation.setAttribute('aria-label', 'Share of new supplies for research');
+        allocation.append(el('span', '', 'New supplies'));
+        for (const percent of [0,25,50,100]) { const choice = btn(`${percent}%`, `research-allocation-${percent}`, () => action(() => progression.setResearchAllocation(state, percent))); choice.setAttribute('aria-pressed', String((state.research.active.allocation || 0) === percent)); allocation.append(choice); }
+        summary.append(allocation);
+        const table = el('table', 'research-supplies'), head = el('thead'), labels = el('tr');
+        for (const name of ['Supply', 'Delivered / required', 'In stores']) { const cell = el('th', '', name); cell.scope = 'col'; labels.append(cell); }
+        head.append(labels); table.append(head); const body = el('tbody');
+        for (const [key, n] of Object.entries(funding.plan[funding.stage].cost)) {
+          const row = el('tr', funding.missing[key] ? 'missing' : 'supplied'), name = el('th', '', RESOURCES[key].name); name.scope = 'row';
+          row.append(name, el('td', '', `${Math.round((funding.delivered[key] || 0) * 10) / 10} / ${n}`), el('td', '', format(state.resources[key]))); body.append(row);
+        }
+        table.append(body); summary.append(table);
+        const details = disclosure('research-plan', 'Stages & funding');
+        const stages = el('ol', 'research-stages'); funding.plan.forEach((step, i) => { const li = el('li', i < funding.stage ? 'done' : i === funding.stage ? 'current' : '', step.name); if (i === funding.stage) li.setAttribute('aria-current', 'step'); stages.append(li); });
+        details.append(stages, el('p', 'town-meta', 'Your allocation takes a share of newly made supplies needed by this stage. The rest goes into stores. Collection stops when the stage is full or research is paused. Choose 0% to fund by hand; Fund now uses supplies already in stores.'));
+        summary.append(details);
+        const stop = disclosure('stop-research', 'Stop this project'); stop.append(el('p', 'town-meta', 'Returns supplies still set aside for this stage. Completed experiments and their materials are spent; starting again begins at stage one.'), btn('Stop and return unused supplies', 'research-cancel', () => action(() => progression.cancelResearch(state)))); summary.append(stop);
+      }
+    } else summary.append(el('p', 'town-meta', allLearned ? 'Schools can keep producing knowledge. Revisit a discovery below to build what it unlocked.' : 'Choose a discovery below. Allocate supplies, then let your scholars work.'));
+    if (!workingSchools.length && !allLearned) {
+      const staffing = el('div', 'research-staffing');
+      staffing.append(el('p', 'problem', schools.length ? 'Research needs workers and food at a schoolhouse or survey workshop.' : 'Build and staff a schoolhouse to advance research.'), btn(schools.length ? 'Check research workers' : 'Build a schoolhouse', 'research-school', () => schools.length ? inspect(schools[0]) : build('school')));
+      const actions = summary.querySelector('.research-work-actions');
+      if (actions) actions.after(staffing); else summary.append(staffing);
     }
-    if (!workingSchools.length) {
-      summary.append(el('p', 'problem', schools.length ? 'Research is waiting for school workers and food.' : 'Build and staff a schoolhouse to advance research.'), btn(schools.length ? 'Staff a schoolhouse' : 'Build a schoolhouse', 'research-school', () => schools.length ? inspect(schools[0]) : build('school')));
-    }
-    if (getPaused()) summary.append(pauseCue());
     nodes.push(summary);
     function researchCard(item) {
       const row = el('section', `research-card${item.completed ? ' completed' : ''}`); row.dataset.research = item.id;
@@ -357,7 +383,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       return row;
     }
     const available = research.filter(item => !item.completed && !item.active && item.prerequisites.every(id => state.research.completed.includes(id)));
-    nodes.push(el('h3', 'town-section', 'Your next discoveries'), ...available.map(researchCard));
+    if (available.length) nodes.push(el('h3', 'town-section', 'Your next discoveries'), ...available.map(researchCard));
     const future = research.filter(item => !item.completed && !item.active && !available.includes(item));
     if (future.length) { const detail = disclosure('future-research', 'Plan the next crafts'); detail.append(...future.map(researchCard)); nodes.push(detail); }
     const completed = research.filter(item => item.completed);
@@ -543,10 +569,12 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     const wasMap = researchMapOpen; researchMapOpen = false;
     if (tab !== 'council') open('council');
     else if (wasMap) update(true);
-    const card = $('town-book-content').querySelector(`[data-research="${CSS.escape(id)}"]`);
+    const card = $('town-book-content').querySelector(id ? `[data-research="${CSS.escape(id)}"]` : '[data-council-section="research"]');
     if (card?.closest('details')) card.closest('details').open = true;
-    card?.scrollIntoView({ block: 'start' }); card?.querySelector('button.primary')?.focus({ preventScroll: true });
+    card?.scrollIntoView({ block: 'start' });
+    (card?.querySelector('[data-action-id="research-heading"]') || card?.querySelector('button.primary'))?.focus({ preventScroll: true });
   }
+
   function revealPaths() {
     const wasMap = researchMapOpen; researchMapOpen = false;
     if (tab !== 'council') open('council');
