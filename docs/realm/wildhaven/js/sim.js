@@ -1,3 +1,4 @@
+import { researchProductionShare, receiveResearchProduction } from './research-projects.js';
 import { createMinerals, restoreMinerals, mineralStatus, extractMinerals } from './minerals.js';
 import { createLivestock, restoreLivestock, herdStatus, tickLivestock } from './livestock.js';
 import { restoreCoop } from './coop-state.js';
@@ -287,7 +288,7 @@ function throughput(state, building, dt = 1, mutate = false) {
   const potentialFood = ((potential.output.food || 0) - (potential.input.food || 0)) * efficiency;
   const outputs = Object.entries(potential.output).filter(([, value]) => value > 0), storage = state.storage || storageCapacity(state);
   if (efficiency > 0 && outputs.length && !herdStatus(state,building)) {
-    const room = Math.max(...outputs.map(([key, value]) => Math.max(0, storage[key] - state.resources[key]) / (value * factor)));
+    const room = Math.max(...outputs.map(([key, value]) => researchProductionShare(state, RESEARCH[state.research?.active?.id], key, Number.MAX_VALUE, Math.max(0, storage[key] - state.resources[key])).produced / (value * factor)));
     if (room < efficiency) { efficiency = room; reason = 'Storage full'; }
   }
   if (building.type === 'lumber' && potential.output.wood > 0 && efficiency > 0) {
@@ -301,11 +302,14 @@ function throughput(state, building, dt = 1, mutate = false) {
     if (mutate) state.resources[key] = round(Math.max(0, state.resources[key] - amount));
   }
   for (const [key, value] of outputs) {
-    const amount = Math.min(Math.max(0, storage[key] - state.resources[key]), value * efficiency * factor);
-    result.output[key] = round(amount / factor); result[key] += result.output[key];
+    const share = researchProductionShare(state, RESEARCH[state.research?.active?.id], key, value * efficiency * factor, Math.max(0, storage[key] - state.resources[key]));
+    const amount = share.produced;
+    result.output[key] = round((amount - share.research) / factor); result[key] += result.output[key];
     if (mutate) {
       const received = building.type === 'lumber' && key === 'wood' ? harvestWood(state, building, amount) : ['quarry','mine'].includes(building.type) ? extractMinerals(state,building,amount) : amount;
-      state.resources[key] = round(state.resources[key] + received);
+      const reserved = amount > 0 ? share.research * received / amount : 0;
+      receiveResearchProduction(state, key, reserved);
+      state.resources[key] = round(state.resources[key] + received - reserved);
     }
   }
   if (mutate && efficiency > 0 && (outputs.length || specFor(building).service)) {

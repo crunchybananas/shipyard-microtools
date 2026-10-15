@@ -307,7 +307,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     nodes.push(paths);
     const schools = state.buildings.filter(b => ['school','assay'].includes(b.type) && b.status === 'ready'), workingSchools = schools.filter(b => !b.paused && b.production?.efficiency > 0);
     const summary = el('div', 'research-work'); summary.dataset.councilSection = 'research';
-    summary.append(el('strong', '', active ? `Research project · ${active.name}` : 'Choose what the town learns next'), el('p', 'town-meta', 'Set aside supplies for each stage. Staffed schools and survey workshops do the research; unfinished deliveries wait without using more stock.'));
+    summary.append(el('strong', '', active ? `Research project · ${active.name}` : 'Choose what the town learns next'), el('p', 'town-meta', 'Allocate new supplies to research. Staffed schools and survey workshops do the work. Each stage stops collecting when it has enough.'));
     if (active) {
       summary.dataset.research=active.id;
       const funding=active.funding;
@@ -315,11 +315,15 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       if(funding.legacy)summary.append(el('p','town-meta','This project was paid for before staged research. Its original funding is retained.'));
       else {
         const stages=el('ol','research-stages');funding.plan.forEach((step,i)=>{const li=el('li',i<funding.stage?'done':i===funding.stage?'current':'',step.name);if(i===funding.stage)li.setAttribute('aria-current','step');stages.append(li);});summary.append(stages);
-        const table=el('table','research-supplies'),head=el('thead'),labels=el('tr');for(const name of ['Supply','Set aside','Still needed','In stores'])labels.append(el('th','',name));head.append(labels);table.append(head);const body=el('tbody');
-        for(const [key,n]of Object.entries(funding.plan[funding.stage].cost)){const row=el('tr',funding.missing[key]?'missing':'supplied');row.append(el('th','',RESOURCES[key].name),el('td','',format(funding.delivered[key]||0)),el('td','',format(funding.missing[key]||0)),el('td','',format(state.resources[key])));body.append(row);}table.append(body);summary.append(table);
-        summary.append(el('p',funding.funded?'town-meta':'research-wait',funding.paused?'Project paused. Set-aside supplies are kept here.':funding.funded?'Stage supplied. Scholars can work on it.':'Waiting for the supplies shown above. Partial deliveries are kept for this stage.'));
+        const allocation=el('div','research-allocation');allocation.setAttribute('role','group');allocation.setAttribute('aria-label','Share of new supplies for research');
+        allocation.append(el('span','','New supplies'));
+        for(const percent of [0,25,50,100]){const choice=btn(`${percent}%`,`research-allocation-${percent}`,()=>action(()=>progression.setResearchAllocation(state,percent)));choice.setAttribute('aria-pressed',String((state.research.active.allocation||0)===percent));allocation.append(choice);}
+        summary.append(allocation,el('p','town-meta','Only materials needed by this project are allocated. Existing stores stay available to the town. 0% turns automatic funding off.'));
+        const table=el('table','research-supplies'),head=el('thead'),labels=el('tr');for(const name of ['Supply','Delivered','Needed','In stores'])labels.append(el('th','',name));head.append(labels);table.append(head);const body=el('tbody');
+        for(const [key,n]of Object.entries(funding.plan[funding.stage].cost)){const row=el('tr',funding.missing[key]?'missing':'supplied');row.append(el('th','',RESOURCES[key].name),el('td','',String(Math.round((funding.delivered[key]||0)*10)/10)),el('td','',String(Math.round((funding.missing[key]||0)*10)/10)),el('td','',format(state.resources[key])));body.append(row);}table.append(body);summary.append(table);
+        summary.append(el('p',funding.funded?'town-meta':'research-wait',funding.paused?'Project paused. Set-aside supplies are kept here.':funding.funded?'Stage supplied. Scholars can work on it.':state.research.active.allocation?`Collecting ${state.research.active.allocation}% of new supplies. Production must make the missing materials.`:'Automatic funding is off. Choose an allocation or fund this stage from stores.'));
         const actions=el('div','town-row-actions');
-        if(!funding.funded)actions.append(btn('Set aside available supplies','research-contribute',()=>action(()=>progression.fundResearch(state)),{disabled:!Object.keys(funding.contribution).length,className:'primary'}));
+        if(!funding.funded)actions.append(btn('Fund now from stores','research-contribute',()=>action(()=>progression.fundResearch(state)),{disabled:!Object.keys(funding.contribution).length,className:'primary'}));
         actions.append(btn(funding.paused?'Resume research':'Pause research','research-pause',()=>action(()=>progression.pauseResearch(state,!funding.paused))));
         const stop=disclosure('stop-research','Stop this project');stop.append(el('p','town-meta','Returns supplies still set aside for this stage. Completed experiments and their materials are spent; starting again begins at stage one.'),btn('Stop and return unused supplies','research-cancel',()=>action(()=>progression.cancelResearch(state))));summary.append(actions,stop);
       }

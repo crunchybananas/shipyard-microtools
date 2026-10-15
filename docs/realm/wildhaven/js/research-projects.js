@@ -15,6 +15,7 @@ const TASKS = {
  prospecting:['Compare rock samples','Test a deeper seam','Map the working faces'],
  husbandry_care:['Test winter rations','Improve the shelters','Write the breeding records'],
 };
+export const RESEARCH_ALLOCATIONS = [0, 25, 50, 100];
 const round=n=>Math.round(n*1e6)/1e6;
 export function researchPlan(id,spec){
  const total={...spec.cost,...MATERIALS[id]},names=TASKS[id]||['Gather materials','Test the method','Prepare the plans'];
@@ -27,10 +28,12 @@ export function restoreResearchProject(active,spec,day){
  if(active.fundingVersion===undefined||active.fundingVersion===0)return {...common,fundingVersion:0};
  if(!Number.isFinite(active.progress)||active.progress<0||active.progress>spec.duration)throw Error('Invalid research work');
  const plan=researchPlan(active.id,spec),stage=active.stage;
+ const allocation=active.allocation??0;
+ if(!RESEARCH_ALLOCATIONS.includes(allocation))throw Error('Invalid research allocation');
  if(active.fundingVersion!==1||!Number.isInteger(stage)||stage<0||stage>2||typeof active.paused!=='boolean'||!active.delivered||typeof active.delivered!=='object'||Array.isArray(active.delivered))throw Error('Invalid research project');
  if(progress+1e-6<stage*spec.duration/3||progress>(stage+1)*spec.duration/3+1e-6)throw Error('Invalid research progress');
  for(const[k,n]of Object.entries(active.delivered))if(!Object.hasOwn(plan[stage].cost,k)||!Number.isFinite(n)||n<0||n>plan[stage].cost[k])throw Error('Invalid research supplies');
- return {...common,fundingVersion:1,stage,paused:active.paused,delivered:{...active.delivered}};
+ return {...common,fundingVersion:1,stage,allocation,paused:active.paused,delivered:{...active.delivered}};
 }
 export function researchFunding(state,spec){
  const a=state.research.active;if(!a||a.id!==spec.id)return null;
@@ -51,4 +54,27 @@ export function cancelResearchProject(state){
  for(const[k,n]of Object.entries(refund))if(RESOURCES[k].physical&&(state.resources[k]||0)+n>(state.storage?.[k]??Infinity))return {ok:false,reason:`Make room for ${n} ${RESOURCES[k].name.toLowerCase()} before returning the supplies.`};
  for(const[k,n]of Object.entries(refund))state.resources[k]=round((state.resources[k]||0)+n);
  state.research.active=null;return {ok:true,reason:'Research stopped. Unused stage supplies returned; finished experiments are spent.',refund};
+}
+
+export function setResearchAllocation(state, percent) {
+ const active=state.research?.active;
+ if(!active || active.fundingVersion!==1)return {ok:false,reason:'Choose a staged research project first.'};
+ if(!RESEARCH_ALLOCATIONS.includes(percent))return {ok:false,reason:'Choose 0%, 25%, 50% or 100%.'};
+ active.allocation=percent;
+ return {ok:true,reason:percent?`${percent}% of newly made research supplies will go to this project.`:'Automatic supplies stopped. Delivered materials are kept.'};
+}
+// Only new production is split. Existing inventory, refunds and trade cargo are
+// never counted as new output. Full stages and paused projects take nothing.
+export function researchProductionShare(state, spec, key, produced, storeRoom) {
+ const active=state.research?.active;
+ if(!active || active.fundingVersion!==1 || active.paused || !active.allocation || !spec)
+  return {produced:Math.min(produced,storeRoom),research:0};
+ const missing=researchFunding(state,{id:active.id,...spec}).missing[key]||0;
+ const fraction=active.allocation/100;
+ const capacity=fraction===1?storeRoom+missing:Math.min(storeRoom/(1-fraction),storeRoom+missing);
+ const total=Math.max(0,Math.min(produced,capacity));
+ return {produced:total,research:Math.min(missing,total*fraction)};
+}
+export function receiveResearchProduction(state, key, amount) {
+ if(amount>0)state.research.active.delivered[key]=round((state.research.active.delivered[key]||0)+amount);
 }

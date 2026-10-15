@@ -132,6 +132,15 @@ export function createCompanionStore({ storage, locks = globalThis.navigator?.lo
     if (record && !blocked) { const check = unchanged(); if (check.ok) mirrorHome(); }
     return record && !blocked ? restore(record.towns.home) : restore(expectedHome) || fallbackState;
   }
+  // The town library restores its selected member after acquiring the shared
+  // writer lease. Loading does not advance time or write either member.
+  function loadTown(id = 'home', { visit = false } = {}) {
+    if (!IDS.includes(id) || (id === 'companion' && !record) || blocked) return null;
+    const state = restore(record?.towns[id] || expectedHome);
+    if (!state) return null;
+    activeId = id; mode = visit ? 'visit' : 'manage';
+    return state;
+  }
   function save(state) {
     if (mode === 'visit') return { ok: true, skipped: true, reason: 'Read-only visit · the town is paused.' };
     const check = unchanged(); if (!check.ok) return check;
@@ -227,7 +236,7 @@ export function createCompanionStore({ storage, locks = globalThis.navigator?.lo
       towns, offers: clone(record?.offers || []), revision: record?.revision || 0 };
   }
   function release() { block('This tab released its save lock. Reload it before changing a town.'); releaseLease?.(); releaseLease = null; }
-  return { loadHome, save, create, switchTown, renameTown, proposeOffer, acceptOffer, closeOffer, info, ready, release,
+  return { loadHome, loadTown, save, create, switchTown, renameTown, proposeOffer, acceptOffer, closeOffer, info, ready, release,
     get activeId() { return activeId; }, get readOnly() { return mode === 'visit'; },
     get canManage() { return mode !== 'visit' && !blocked && !leasePending; },
     get blocked() { return blocked; }, get lockPending() { return leasePending; }, get reason() { return reason || warning; } };

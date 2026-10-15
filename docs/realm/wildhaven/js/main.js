@@ -18,7 +18,9 @@ import { createFrontierUI } from './frontier-ui.js';
 import { buildingFacts, nextTownStep, constructionFeedback } from './clarity.js';
 import { firstBreadStep } from './bread-guide.js';
 import { buildingPurpose } from './clarity-ui.js';
-import { createCompanionStore } from './companion-store.js';
+import { createTownLibrary } from './town-library.js';
+import { createTownLibraryUI } from './town-library-ui.js';
+import { mountResearchHUD } from './research-hud.js';
 import { createCompanionUI } from './companion-ui.js';
 import { createCoop } from './coop.js';
 import { canImportCoop } from './coop-state.js';
@@ -64,11 +66,13 @@ function updateReadingPause() {
   $('keep-running').title = readingClock.held ? 'Keep time running while reading' : 'Resume time so the assigned builders can work';
   if (speed !== before) updateUI();
 }
+let townLibraryUI, researchHUD;
 let lastInspectorSignature = '', currentNextStep = null, soundMix={effects:.8,ambience:.55};
 let objectiveBeforeTablet = !matchMedia('(max-width:760px)').matches;
 function closeBuildDrawer() { document.body.classList.remove('tablet-build-open'); $('tablet-build-toggle')?.setAttribute('aria-expanded', 'false'); }
 function closeJournal() { $('journal').hidden = true; $('journal-button').setAttribute('aria-expanded', 'false'); }
 function preparePanel(destination) {
+  if ($('dock-more')) $('dock-more').open = false;
   // Switch synchronously: the reading clock sees the destination next frame,
   // without briefly resuming time between two open books.
   if (destination !== 'town') town?.close();
@@ -106,6 +110,7 @@ function activateDock(destination) {
   updateDock();
 }
 function updateDock() {
+  if ($('current-town-name')) $('current-town-name').textContent = townLibrary.activeName || 'Your town';
   $('tablet-build-toggle')?.toggleAttribute('disabled', !companions.canManage);
   $('tablet-town-toggle')?.setAttribute('aria-expanded', String(!!town?.activeTab && town.activeTab !== 'trade'));
   $('landing-button').setAttribute('aria-expanded', String(town?.activeTab === 'trade'));
@@ -146,9 +151,25 @@ function mountTabletControls() {
   compactTablet.addEventListener('change', tabletLayoutChanged); tabletLayoutChanged();
 }
 
+function mountCompactDock() {
+  const dock = document.querySelector('.controls-hint>div');
+  const more = document.createElement('details'); more.id = 'dock-more';
+  const summary = document.createElement('summary'); summary.textContent = 'More'; summary.setAttribute('aria-label', 'More town controls');
+  const menu = document.createElement('nav'); menu.className = 'dock-more-menu'; menu.setAttribute('aria-label', 'More town controls');
+  const towns = document.createElement('button'); towns.id = 'towns-toggle'; towns.type = 'button'; towns.textContent = 'Your towns'; towns.onclick = () => townLibraryUI.open();
+  const currentName = document.createElement('span'); currentName.id = 'current-town-name';
+  $('help').textContent = 'How to play'; $('sound-settings').textContent = 'Sound settings';
+  menu.append(currentName, towns, $('landing-button'), $('journal-button'), $('coop-toggle'), $('sound-settings'), $('help'));
+  menu.addEventListener('click', event => { if (event.target.closest('button')) more.open = false; });
+  more.append(summary, menu); dock.append(more);
+  document.addEventListener('click', event => { if (!more.contains(event.target)) more.open = false; });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && more.open) { more.open = false; summary.focus(); } });
+}
+
 try { saved = sim.restore(localStorage.getItem(SAVE_KEY) || localStorage.getItem('wildhaven.v3') || localStorage.getItem('wildhaven.v2') || localStorage.getItem('wildhaven.v1')); const prefs=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');soundEnabled=!!prefs.sound;soundMix={effects:prefs.effects??.8,ambience:prefs.ambience??.55}; } catch { storageAvailable = false; }
 let deviceStorage = null; try { deviceStorage = localStorage; } catch {}
-const companions = createCompanionStore({ storage: deviceStorage });
+const townLibrary = createTownLibrary({ storage: deviceStorage });
+const companions = townLibrary.companions;
 const audio = createAudio({ muted: !soundEnabled, ...soundMix });
 const format = value => Math.floor(value).toLocaleString();
 const rateFormat = value => `${value >= 0 ? '+' : ''}${Math.round(value * 10) / 10}`;
@@ -162,7 +183,7 @@ function save() {
 }
 function sync() { sim.refreshTown(state); world.sync(state); updateUI(); save(); }
 function mutate(result, cue='build') { if (!companions.canManage) return; if (result?.ok) { sync(); audio.play(cue); } else audio.play('error'); announce(result?.reason, !result?.ok); }
-function newVillage() { if (!companions.canManage) return; if ((playing ? state : saved)?.coop?.link || (playing ? state : saved)?.coop?.draft || coop?.info().busy) { announce('End and unlink this town’s partnership in Play together before starting a new town.', true); return; } saved = null; state = sim.createGame(); victorySeen = false; enter(); announce('Six neighbors, two builders. Give them a roof, then a living.'); }
+function newVillage() { townLibraryUI.open({ create: true }); }
 function enter(resuming = false) {
   playing = true; tool = null; selected = null; speed = resuming ? 0 : 1; previousSpeed = 1; readingClock.reset(speed);
   frontierUI?.resetSelection();
@@ -359,6 +380,7 @@ function renderObjectiveChecklist(rows) {
   }));
 }
 function updateUI() {
+  researchHUD?.update();
   if (!companions.canManage) speed = readingClock.choose(0);
   const daily = sim.rates(state), ambition = sim.objective(state), needs = sim.villageNeeds(state);
   for (const key of ['wood','stone','food']) { $(key).textContent = format(state.resources[key]); $(`${key}-rate`).textContent = `${rateFormat(perMinute(daily[key]))}/min`; $(`${key}-rate`).classList.toggle('negative', daily[key] < 0); }
@@ -406,7 +428,8 @@ function updateUI() {
   if ($('tablet-build-toggle')) $('tablet-build-toggle').textContent = projects ? `Build · ${projects}` : 'Build';
   $('find-bell').hidden = state.won || ambition.step < 4; $('undo').disabled = !state.undo;
   $('pause').classList.toggle('active', speed === 0); $('pause').textContent = speed === 0 ? '▶' : 'Ⅱ'; $('pause').setAttribute('aria-label', speed === 0 ? 'Resume' : 'Pause');
-  for (const button of document.querySelectorAll('[data-speed]')) button.setAttribute('aria-pressed', String(Number(button.dataset.speed) === speed));
+  $('speed-toggle').textContent = `${previousSpeed}×`;
+  $('speed-toggle').setAttribute('aria-label', `Speed ${previousSpeed}×. Switch to ${previousSpeed === 1 ? 3 : 1}×.`);
   $('journal-entries').replaceChildren(...state.events.map(event => { const item = document.createElement('li'), label = document.createElement('small'); label.textContent = `Day ${calendarDay(state, event.day)}`; item.append(label, document.createTextNode(event.text)); return item; }));
   updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); coopUI?.update(); coop?.tick(); if (tool && hovered) hover(hovered);
 }
@@ -463,14 +486,15 @@ function attractVillage() {
   demo.citizens.forEach((c,i) => { c.job = i < 2 ? 'builder' : 'farmer'; c.workplace = i < 2 ? 'preview0' : 'preview4'; }); return demo;
 }
 function bind() {
-  $('start').onclick = () => { if (saved) { $('help-dialog').showModal(); $('restart-confirm').hidden = false; } else newVillage(); };
+  $('start').onclick = newVillage;
+  $('intro-towns').onclick = () => townLibraryUI.open();
   $('continue').onclick = () => { state = saved; victorySeen = state.won; enter(true); announce('Welcome home. Time is paused while you find your bearings.'); };
   $('sound-settings').onclick=()=>{$('sound-mixer').showModal();};$('mixer-toggle').onclick=toggleAudio;
   for(const key of ['effects','ambience']){const input=$('mix-'+key);input.value=audio[key+'Level']*100;input.oninput=()=>{audio.setMix({[key]:Number(input.value)/100});try{localStorage.setItem(SETTINGS_KEY,JSON.stringify({sound:soundEnabled,effects:audio.effectsLevel,ambience:audio.ambienceLevel}));}catch{}};}
   $('sound-preview').onclick=async()=>{if(!soundEnabled)toggleAudio();await audio.start();audio.effect('anvil',{gain:.7,pan:-.3});};
   $('sound').onclick = toggleAudio; $('intro-sound').onclick = toggleAudio;
   $('keep-running').onclick = () => setSpeed(previousSpeed);
-  $('pause').onclick = togglePause; for (const b of document.querySelectorAll('[data-speed]')) b.onclick = () => setSpeed(Number(b.dataset.speed));
+  $('pause').onclick = togglePause; $('speed-toggle').onclick = () => setSpeed(previousSpeed === 1 ? 3 : 1);
   $('home').onclick = () => world.home(); $('turn-left').onclick = () => world.rotate(-1); $('turn-right').onclick = () => world.rotate(1); $('zoom-in').onclick = () => world.zoomBy(-3); $('zoom-out').onclick = () => world.zoomBy(3);
   $('cancel-building').onclick = cancelTool; $('rotate-building').onclick = () => { rotation = (rotation + 1) % 4; if (hovered) hover(hovered); };
   $('confirm-building').onclick = () => commitBuilding(touchSite);
@@ -493,7 +517,7 @@ function bind() {
   $('journal-button').onclick = () => activateDock('journal'); $('close-journal').onclick = closeJournal;
   $('help').onclick = () => { $('restart-confirm').hidden = true; $('help-dialog').showModal(); };
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
-  $('restart').onclick = () => { $('restart-confirm').querySelector('p').textContent = companions.activeId === 'home' ? 'This replaces your saved home village. A linked companion town is kept.' : 'This replaces the local companion village. Your home town is kept.'; $('restart-confirm').hidden = false; }; $('cancel-restart').onclick = () => $('restart-confirm').hidden = true; $('confirm-restart').onclick = newVillage;
+  $('restart').onclick = newVillage; $('cancel-restart').onclick = () => $('restart-confirm').hidden = true; $('confirm-restart').onclick = newVillage;
   document.addEventListener('keydown', e => {
     if (e.target.matches('input,textarea,select') || document.querySelector('dialog[open]') || !playing) return;
     if (!companions.canManage && !['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyQ','KeyE','Home','Escape','KeyP'].includes(e.code)) return;
@@ -548,11 +572,19 @@ async function boot() {
         const allowed=canImportCoop(state,next);if(!allowed.ok)return allowed;
         const result=companions.save(next);if(!result.ok)return result;state=next;victorySeen=state.won;keys.clear();enter(true);return result;} });
     mountTabletControls();
+    townLibraryUI = createTownLibraryUI({ library: townLibrary, getState: () => playing ? state : null,
+      beforeOpen: () => { preparePanel(null); closeBuildDrawer(); document.querySelectorAll('dialog[open]').forEach(d => d.close()); keys.clear(); },
+      canSwitch: () => coop.info().busy ? { ok: false, reason: 'Finish the current online action before changing towns.' } : { ok: true },
+      onOpenTown: next => { state = next; saved = next; victorySeen = state.won; keys.clear(); enter(true); announce(`${townLibrary.activeName} opened. Resume when you’re ready.`); coop.reconnect(); }
+    });
+    mountCompactDock();
+    researchHUD = mountResearchHUD({ getState: () => state, isPaused: () => speed === 0,
+      open: id => id ? town.revealResearch(id) : town.open('council') });
     const shelfObserver=new ResizeObserver(()=>{document.documentElement.style.setProperty('--shelf-edge',`${innerHeight-document.querySelector('footer').getBoundingClientRect().top+12}px`);});shelfObserver.observe(document.querySelector('footer'));
     makeShelf(); bind(); updateAudio(); world.sync(attractVillage()); world.pan.set(innerWidth < 700 ? -2 : -5, 0, 0); world.targetZoom = innerWidth < 700 ? 38 : 29;
     $('loading').hidden = true; $('intro').hidden = false;
     if (companions.blocked) { $('intro').querySelector('.intro-copy small').textContent = companions.reason; $('start').disabled = true; }
-    if (saved) { $('continue').hidden = false; $('continue').className = 'primary'; $('start').textContent = 'Start somewhere new'; $('start').className = ''; }
+    if (saved) { $('continue').hidden = false; $('continue').className = 'primary'; $('continue').textContent = `Continue ${townLibrary.activeName || 'town'}`; $('start').textContent = 'New town'; $('start').className = ''; }
     window.Wildhaven = Object.freeze({ getSnapshot: () => JSON.parse(sim.serialize(state)), getDiagnostics: () => ({ ...world.diagnostics(), fps: Number(document.documentElement.dataset.fps || 0) }) });
     if (['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).has('review')) window.__wildhaven = { world, frontierUI, fieldbook, companionUI, audio, companionInfo:()=>companions.info(), frontierContext: () => sim.frontierContext(state), get state() { return state; }, advance, sync, project: (x,z) => world.project(x,z), snapshot: () => JSON.parse(sim.serialize(state)), canBuild: (type,x,z) => sim.canBuild(state,type,x,z) };
   } catch (error) {

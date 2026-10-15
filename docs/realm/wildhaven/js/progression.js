@@ -194,7 +194,7 @@ export function researchOptions(state) {
     else if (active) reason = 'The scholars are working on this.';
     else if (state.research.active) reason = 'Finish the current research first.';
     else if (needed.length) reason = `First research ${needed.map(key => RESEARCH[key].name).join(' and ')}.`;
-    else reason = 'Plan the project, then set aside supplies for each stage.';
+    else reason = 'Choose a project and allocate a share of new supplies.';
     const canStart = !completed && !state.research.active && !needed.length;
     return { id, ...spec, plan: researchPlan(id, spec), funding: active ? researchFunding(state, {id,...spec}) : null, completed, active, canStart, ok: canStart, reason, progress: completed ? 1 : active ? state.research.active.progress / spec.duration : 0 };
   });
@@ -204,8 +204,8 @@ export function startResearch(state, id) {
   const option = researchOptions(state).find(option => option.id === id);
   if (!option) return failure('Choose a known field of research.');
   if (!option.canStart) return failure(option.reason);
-  state.research.active = { id, progress: 0, duration: option.duration, startedDay: dayOf(state), fundingVersion: 1, stage: 0, delivered: {}, paused: false };
-  return { ok: true, reason: `${option.name} planned. Set aside supplies for the first stage.`, research: state.research.active };
+  state.research.active = { id, progress: 0, duration: option.duration, startedDay: dayOf(state), fundingVersion: 1, stage: 0, delivered: {}, paused: false, allocation: 25 };
+  return { ok: true, reason: `${option.name} started. 25% of new research supplies are allocated automatically.`, research: state.research.active };
 }
 
 export function fundResearch(state){
@@ -217,6 +217,7 @@ export function pauseResearch(state,paused){
  a.paused=!!paused;return {ok:true,reason:paused?'Research paused. Its supplies are reserved.':'Research resumed.'};
 }
 export const cancelResearch=cancelResearchProject;
+export { setResearchAllocation } from './research-projects.js';
 
 export function policyOptions(state) {
   normalizeProgression(state);
