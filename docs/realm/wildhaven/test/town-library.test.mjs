@@ -96,4 +96,5 @@ test('a failed or contended writer lock cannot migrate or write; releasing permi
 test('visited town cannot write or overwrite either companion',()=>{
  const {storage}=pair(),l=library(storage),before=l.exportTown('s1','companion'),visit=l.select('s1','companion',null,{visit:true});
  visit.state.resources.wood=999;assert.ok(l.companions.save(visit.state).skipped);assert.equal(l.exportTown('s1','companion'),before);
+ assert.equal(library(storage).companions.activeId,'home','a visit must not become permission to manage on reload');
 });

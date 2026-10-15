@@ -109,11 +109,12 @@ export function createTownLibrary({ storage, locks = globalThis.navigator?.locks
   function select(slotId, townId, currentState = null, { visit = false } = {}) {
     const saved = saveCurrent(currentState); if (!saved.ok) return saved;
     const slot = slotById(slotId);
+    if (visit && slotId !== record.active?.slotId) return fail('Read-only visits stay within the local companion pair.');
     if (!slot || !['home', 'companion'].includes(townId) || (townId === 'companion' && !slot.data[COMPANION_SAVE_KEY])) return fail('That town could not be found.');
     const nextBackend = makeBackend(slotId), state = nextBackend.loadTown(townId, { visit });
     if (!state) return fail('That town could not be read. Your current town is still open.');
     const next = clone(record); next.active = { slotId, townId };
-    const result = commit(next); if (!result.ok) return result;
+    if (!visit) { const result = commit(next); if (!result.ok) return result; }
     backend = nextBackend;
     return { ok: true, state, reason: visit ? 'Visiting this town. Time and building are paused.' : 'Town opened. Time is paused until you resume.' };
   }
@@ -156,7 +157,7 @@ export function createTownLibrary({ storage, locks = globalThis.navigator?.locks
       return (pair ? ['home','companion'] : ['home']).map(townId => {
         const state = JSON.parse(memberRaw(slot, townId));
         return { slotId: slot.id, townId, name: pair ? pair.names[townId] : slot.name, day: calendarDay(state), population: state.population,
-          active: record.active?.slotId === slot.id && record.active?.townId === townId, paired: !!pair, linked: !!state.coop?.link,
+          active: record.active?.slotId === slot.id && backend?.activeId === townId, paired: !!pair, linked: !!state.coop?.link,
           updatedAt: slot.updatedAt, state };
       });
     });

@@ -158,7 +158,9 @@ function mountCompactDock() {
   const menu = document.createElement('nav'); menu.className = 'dock-more-menu'; menu.setAttribute('aria-label', 'More town controls');
   const towns = document.createElement('button'); towns.id = 'towns-toggle'; towns.type = 'button'; towns.textContent = 'Your towns'; towns.onclick = () => townLibraryUI.open();
   const currentName = document.createElement('span'); currentName.id = 'current-town-name';
-  menu.append(currentName, towns, $('landing-button'), $('journal-button'), $('coop-toggle'));
+  $('help').textContent = 'How to play'; $('sound-settings').textContent = 'Sound settings';
+  menu.append(currentName, towns, $('landing-button'), $('journal-button'), $('coop-toggle'), $('sound-settings'), $('help'));
+  menu.addEventListener('click', event => { if (event.target.closest('button')) more.open = false; });
   more.append(summary, menu); dock.append(more);
   document.addEventListener('click', event => { if (!more.contains(event.target)) more.open = false; });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && more.open) { more.open = false; summary.focus(); } });

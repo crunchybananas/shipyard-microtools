@@ -18,3 +18,12 @@ Design: retain the game's paper, fern, and harbor colors (#edf0e3, #345e50, #b7c
 - On a separate test origin, installed a prepared legacy companion pair, migrated both names and saves, set a 100 percent research allocation, funded stage one, resumed work, and observed automatic knowledge delivery in stage two. Duplicated the developed town; browser-audit.json shows equal gameplay state in the copy and `legacyUnchanged: true`.
 - This used prepared fixtures, not a fresh campaign or the user's real saves. No desktop screen control, production account changes, or native simulator use.
 - Found and fixed hidden overflow-menu labels caused by older CSS specificity. Local module-loading resets were resolved by using the repository's high-backlog preview server.
+
+## Integrated release
+
+- Integrated main's placement fix d089eb21 (PR #186), including its bottom placement bar, retained rotation preview and removal of placement-layout.js. Release: 20261014-your-towns-2.
+- 447 integrated tests passed (the placement fix removed five obsolete placement-layout tests). After final read-only-visit handling, the focused companion/library/allocation suite passed all 45 tests. Archive verification passed 2,020 checks, 33 apps, and 9 stories.
+- A read-only companion visit does not become permission to manage that town after reload; the last managed town remains selected.
+- MCP checked the merged placement bar at 1024x768 and 667x375. Help and sound settings moved under More. At 667x375 the overflow menu is bounded from y=24 to y=315 and scrolls to its final action; Help successfully opened.
+- Downloaded the developed experimental copy using its normal Download button and validated it with sim.restore. Download preserves the research allocation and current-stage deliveries, without an online partnership.
+- Browser review is desktop/WebKit with viewport overrides, not a claim of physical iPad or touch-event testing. The prior placement PR separately supplied touch review evidence.

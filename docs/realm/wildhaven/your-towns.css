@@ -86,8 +86,11 @@ body.tablet-build-open #hud footer{width:min(850px,calc(100% - 24px))}
 }
 .research-allocation{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:14px 0 7px;font-size:11px}.research-allocation>span{margin-right:6px;font-weight:650}
 .research-allocation button[aria-pressed=true]{background:#345e50!important;color:#fff9e7!important}
-@media(max-width:520px){
+@media(max-width:520px),(max-height:600px){
  #hud #island-safety-status[data-safety=calm]{display:none}
  #hud header .hud-notifications:has(#island-safety-status[data-safety=calm]):not(:has(#toast:not([hidden]),#reading-pause:not([hidden]))){display:none}
 }
 #hud #current-town-name{display:block;padding:8px 12px 5px;font-size:11px;line-height:1.4;color:#67785b;overflow-wrap:anywhere;border-bottom:1px solid #d7dec9}
+#hud .dock-more-menu{max-height:calc(100dvh - var(--tablet-dock-clearance) - 18px);overflow-y:auto;overscroll-behavior:contain}
+#hud #dock-more .dock-more-menu>button{order:0;flex-shrink:0}
+#hud #current-town-name{flex-shrink:0}
