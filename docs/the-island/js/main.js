@@ -381,6 +381,8 @@ const hemi = new THREE.HemisphereLight(0x9ec7e0, 0x6a6048, 0.55);
 scene.add(hemi);
 
 const LH = new THREE.Vector3(SPOTS.lighthouse.x, 13.5, SPOTS.lighthouse.y);
+// the keeper's quarters (props.js annex: azimuth 15°, baseR + 2.9 out from the tower axis)
+const ANNEX_C = new THREE.Vector2(LH.x + Math.sin(15 * Math.PI / 180) * 8.1, LH.z + Math.cos(15 * Math.PI / 180) * 8.1);
 const studyLight = new THREE.PointLight(0xffb454, 14, 16, 1.8);
 studyLight.position.set(LH.x, LH.y + 3.6, LH.z);
 scene.add(studyLight);
@@ -626,6 +628,7 @@ UI.init({ notebook });
 let MODE = 'title';
 let titleShown = false;   // the curtain lifts once, on the first title frame
 let titleDprDropped = false, titleFrame = 0;
+let titleFogK = 0.48;   // eased fog multiplier: clear while the title holds (applyAtmosphere)
 let intro = null;
 let dive = null;
 let finale = null;
@@ -1414,8 +1417,12 @@ function applyAtmosphere(elapsed, dt) {
   scene.environmentIntensity = lerp(0.38, 0.08, night) * (tableauLights?.hemi ?? 1);
 
   scene.fog.color.copy(g.fog);
+  // the title holds the camera 330 m out at sea, where the dawn fog swallowed the lighthouse
+  // whole; the air clears while the title waits and thickens back over the approach's first
+  // seconds, so Begin has no visible step
+  titleFogK += ((MODE === 'title' ? 0.48 : 1) - titleFogK) * (1 - Math.exp(-dt / 2.2));
   scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1) * (1 + mistCur * 2.4)
-    * (tableauFrame?.fog ?? 1);
+    * (tableauFrame?.fog ?? 1) * titleFogK;
   skyMat.uniforms.uMist.value = mistCur;
 
   // the coat remembers its keeper — one quiet line, up close, once
@@ -1481,7 +1488,7 @@ function applyAtmosphere(elapsed, dt) {
   wu.uSkyCol.value.copy(g.skyHorizon);
   wu.uSkyTop.value.copy(g.skyTop);   // #42: the fresnel sky-mirror grades horizon→zenith with the reflection ray
   wu.uFogColor.value.copy(g.fog);
-  wu.uFogDen.value = g.fogDen;
+  wu.uFogDen.value = g.fogDen * titleFogK;
   wu.uNight.value = night;
 
   // farSea shares the water material's uniform objects — the wu.* writes above drive it
@@ -2564,6 +2571,20 @@ renderer.setAnimationLoop((tMs) => {
         chunk.visible = Math.hypot(c.x - ex, c.z - ez) - c.r < 150;
       }
     }
+  }
+  // THE TURF follows the eye (turf.js). Play, intro and the finale only: the title's sea camera
+  // never reaches land, the dive scales the world under it, and the last winter is bare.
+  if (refs.turf) {
+    // and only when the eye is out on the open ground: inside the tower or the annex, up the
+    // stair or on the gallery, or down in the cellar and the drain, there is no meadow in view
+    // worth its vertices (the study is also where the power ceiling is measured)
+    const cx = camera.position.x, cz = camera.position.z;
+    const aboveGround = camera.position.y - heightAt(cx, cz);
+    const inTower = Math.hypot(cx - LH.x, cz - LH.z) < 5.4 || Math.hypot(cx - ANNEX_C.x, cz - ANNEX_C.z) < 3.0;
+    const outdoors = aboveGround > 0.6 && aboveGround < 5 && !inTower;
+    const showTurf = (MODE === 'play' || MODE === 'intro' || MODE === 'finale') && W.level < 4 && outdoors;
+    refs.turf.visible = showTurf;
+    if (showTurf) refs.turf.userData.follow(camera.position, waterY(), elapsed);
   }
   interact.update();
   interact.tickGlint(dt, elapsed);   // the hover glint eases in and out (see interact.js)

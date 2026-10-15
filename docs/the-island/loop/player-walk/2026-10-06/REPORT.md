@@ -219,3 +219,42 @@ is now firs and spruces. `day2/needle-card-spruce.png`, `day2/after/path-midslop
 island's nine grass chunks were drawn from everywhere. They switch off by distance from
 the eye on the tree-LOD clock (never the model's, which sit a metre away on the table).
 The title's sea view lost a fifth of its triangles; nothing visible changed.
+
+
+## Day three — October 14, 2026
+
+The three things day two left, with frames in `day3/`.
+
+**The meadow.** Between the tall tufts (a four-and-a-half-thousand-tuft scatter over a
+150 m disc, so each stood metres from the next) the ground read as suede, and it is the
+largest surface in the game. More scatter would cost the whole island everywhere, so the
+new turf (`js/turf.js`) is one instanced field that follows the camera: a dense ring of
+five-blade tufts out to 10 m and a thinner, shorter ring of three-blade tufts out to 30 m
+that cross-fades into it. Each square is snapped to its world grid and every tuft is owned
+by a world cell, so the grass never swims as you walk. Height and colour come from the
+terrain grid that `buildTerrain` now publishes (`TERRAIN_GRID`), so the blades stand on
+the real surface in the ground's own meadow tone; density comes from how much of each
+vertex the meadow colour owns, so turf stops where the ground turns to sand or rock. It is
+bare under the conifers' needle litter, thin on the keeper's worn paths, clumped by a slow
+noise, and never below the live waterline. Sparse drifts of sea thrift, tormentil and
+eyebright sit in it, one colour per drift. Hidden on the title, in the dive, at the last
+winter, indoors, up the stair and underground. `day3/before/meadow-low.jpg` →
+`day3/after/meadow-low.jpg`.
+
+**The clouds.** They were soft noise blobs, one grey smudge at every hour. They are
+warped cumulus now, read from the baked noise tile the sea already used (three fetches,
+cheaper than the old 16-hash noise): firm eroded edges, thick middles, one sun-side
+sample for self-shadow so sunward flanks are bright and bellies dark, silver edges near
+the sun, more cover low in the sky. Their light follows the sun: at dusk they dim and
+redden instead of staying white paper on a dark sky. `day3/before/sky-noon.jpg` →
+`day3/after/sky-noon.jpg`, `day3/after/sky-dusk.jpg`.
+
+**The lighthouse on the title.** The title camera sits 330 m out at sea and the dawn fog
+hid the main island entirely. The fog thins to half while the title holds and eases back
+over the approach's first seconds, so the headland and its tower stand behind the islet
+on the title and Begin has no visible step. `day3/before/title.jpg` →
+`day3/after/title.jpg`.
+
+**Gate.** All 25 scripts pass. `vault-outcrop.mjs` now waits for the slab's real ease
+instead of a fixed 4.2 s of wall clock: dt is clamped per frame, so a loaded headless run
+falls behind the clock and the slab was still easing when the test looked.

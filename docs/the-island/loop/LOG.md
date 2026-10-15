@@ -4658,6 +4658,25 @@ test. Cheap, owner-validated, protects every future player.
 
 ---
 
+## 2026-10-14 — the player walk, day three: turf, cumulus, the title's lighthouse
+
+**Shipped:** `js/turf.js` — a camera-following two-ring instanced turf (5-blade tufts to 10 m,
+3-blade to 30 m, world-cell hashed so it never swims) placed and coloured from the new
+`TERRAIN_GRID` export of `buildTerrain` (heights, slopes, meadow tone, meadow weight); density
+from the meadow weight × keep-outs × litter (bare) × paths (thin) × clump noise × waterline;
+flower drifts (thrift/tormentil/eyebright); hidden on title/dive/L4/indoors/aloft/underground.
+Sky clouds rewritten as warped cumulus from the shared baked fbm tile with a sun-side
+self-shadow sample and sun-elevation light. Title fog ×0.48, eased back on Begin.
+vault-outcrop.mjs waits for the slab ease.
+
+**Evidence:** loop/player-walk/2026-10-06/day3/; 25/25 gate scripts; unit 116/116; power
+ceiling 825k peak (turf hidden indoors).
+
+**Debt:** the turf adds a fixed ~111k small triangles outdoors (headless GPU timer too noisy to
+resolve its cost); the far meadow beyond 30 m is still the terrain's suede.
+
+---
+
 ## 2026-10-07 — the player walk, day two: needle cards, the buoy, the cellar
 
 **Shipped:** the four conifer crowns as textured alpha-tested needle cards on the existing

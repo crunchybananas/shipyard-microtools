@@ -449,6 +449,12 @@ export function wallBlocked(x0, z0, x1, z1, fromY) {
 
 // ----------------------------------------------------------------------------
 // Geometry
+// THE TERRAIN GRID, published once by buildTerrain: the 257² vertex heights, baked slopes and
+// the meadow tone each vertex was coloured from. Anything that has to agree with the ground
+// the player sees (the turf layer in props.js) reads this rather than re-deriving it, so a
+// change to the terrain's colour or relief rules can never leave a second copy behind.
+export const TERRAIN_GRID = { N: 0, size: DOMAIN, h: null, slope: null, tone: null, grass: null };
+
 export function buildTerrain() {
   const N = 256; // segments
   let geo = new THREE.PlaneGeometry(DOMAIN, DOMAIN, N, N);
@@ -482,6 +488,7 @@ export function buildTerrain() {
   const cSeabedDeep = new THREE.Color(0x3f4d45);
   const tmp = new THREE.Color();
   const tSand = new THREE.Color(), tGrass = new THREE.Color(), tRock = new THREE.Color();
+  const gridH = new Float32Array(pos.count), gridTone = new Float32Array(pos.count * 3), gridGrass = new Float32Array(pos.count);
 
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), z = pos.getZ(i);
@@ -534,7 +541,10 @@ export function buildTerrain() {
       // fade it out across each of those old cuts instead of snapping
       const wSand = (1 - smoothstep(2.2, 3.0, h)) * (1 - smoothstep(0.38, 0.52, slope));
       tmp.lerp(tSand, wSand);
+      gridTone[i * 3] = tGrass.r; gridTone[i * 3 + 1] = tGrass.g; gridTone[i * 3 + 2] = tGrass.b;
+      gridGrass[i] = (1 - smoothstep(0.54, 0.70, slope)) * (1 - wSand);   // how much of this vertex the meadow colour owns
     }
+    gridH[i] = h;
     // global gentle noise so nothing is flat-colored
     // and a wider per-vertex jitter. At hue +/-0.006 and lightness +/-0.025 this was doing
     // almost nothing; the ground needs grain at the vertex scale as well as the patch
@@ -570,6 +580,7 @@ export function buildTerrain() {
 
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geo.setAttribute('aSlope', new THREE.BufferAttribute(slopes, 1));   // fragment rock-swap key (#36)
+  TERRAIN_GRID.N = N; TERRAIN_GRID.h = gridH; TERRAIN_GRID.slope = slopes; TERRAIN_GRID.tone = gridTone; TERRAIN_GRID.grass = gridGrass;
   geo.computeVertexNormals();
 
   // The uniform grid is intentionally affordable, but its 2.42 m cells become a

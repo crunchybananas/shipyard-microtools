@@ -31,6 +31,9 @@ const GLSL_NOISE = /* glsl */`
 // independent fields — the ripple pair decorrelates even better than two samples of
 // one field) and fetch twice. Octave frequencies are integer cells per tile (4/8/16/32)
 // so it wraps seamlessly; gain 0.5 matches fbm2's amplitude ladder (range ~0..0.9375).
+let _fbmTile = null;   // one baked tile shared by the water and the sky
+function fbmTile() { return _fbmTile || (_fbmTile = makeFbmTexture()); }
+
 function makeFbmTexture(size = 256) {
   const data = new Uint8Array(size * size * 2);
   let seed = 0x9e3779b9;
@@ -93,7 +96,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uNight: { value: 0 },
       uCaustic: { value: getTexture('water_ripple') },   // scrolling dapple for the sunlit shallows
       uFoam: { value: getTexture('foam') },              // lacy structure for the shoreline foam band
-      uFbm: { value: makeFbmTexture() },                 // #31: the baked ripple-noise tile (two fields, RG)
+      uFbm: { value: fbmTile() },                        // #31: the baked ripple-noise tile (two fields, RG)
     },
     vertexShader: /* glsl */`
       uniform float uTime;
@@ -366,6 +369,7 @@ export function makeSkyMaterial() {
         new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(),
         new THREE.Vector3(), new THREE.Vector3()] },
       uConstelGlow: { value: new Float32Array(5) },
+      uFbm: { value: fbmTile() },   // the clouds read the same baked tile as the sea
     },
     vertexShader: /* glsl */`
       varying vec3 vDir;
@@ -389,7 +393,17 @@ export function makeSkyMaterial() {
       uniform float uMist;
       uniform vec3 uConstelDir[5];
       uniform float uConstelGlow[5];
+      uniform sampler2D uFbm;
       varying vec3 vDir;
+      // cloud density at a sky-plane point: a warped broad field for the cloud masses, a finer
+      // field eroding their edges, from the baked tile (three fetches, cheaper than the old
+      // 16-hash fbm). Tile values sit around 0.47 +/- 0.2.
+      float cloudD(vec2 p, float t) {
+        vec2 w = texture2D(uFbm, p * 0.11 + vec2(t * 0.004, t * 0.0017)).rg - 0.47;
+        float base = texture2D(uFbm, p * 0.23 + w * 0.55 + vec2(t * 0.006, t * 0.0025)).r;
+        float fine = texture2D(uFbm, p * 0.97 - w * 0.3 + vec2(t * 0.009, 0.0)).g;
+        return base * 0.78 + fine * 0.30;
+      }
       ${GLSL_NOISE}
 
       void main() {
@@ -473,18 +487,31 @@ export function makeSkyMaterial() {
           }
         }
 
-        // drifting clouds — ONE noise field (power-neutral vs the old cirrus) but SHAPED by density
-        // and sun-lighting so they read as volumetric form: thick lit cores, feathered shadowed edges,
-        // brighter on the sun-facing side. Tint from uHorizon/uSunCol so they warm at dusk and
-        // desaturate with the descent eras; horizon-bunched projection; day only.
-        float cl = fbm2(d.xz / (up + 0.2) * 2.6 + vec2(uTime * 0.005, uTime * 0.002));
-        float cover = smoothstep(0.52, 0.82, cl) * smoothstep(0.015, 0.18, up) * (1.0 - uNight * 0.93);
-        float cdens = smoothstep(0.52, 0.95, cl);                              // thick cores vs feathered edges
-        float clit  = 0.5 + 0.5 * smoothstep(-0.25, 0.65, sunDot);            // sun-facing side brighter
-        vec3 cloudCol = mix(mix(uHorizon, uTop, 0.22) * 0.9, mix(vec3(1.0), uSunCol, 0.5) * 1.12, clit);
-        cloudCol = mix(cloudCol * 0.78, cloudCol, cdens);                      // shadowed undersides in the cores
-        cloudCol *= (1.0 - uNight * 0.62);                                     // clouds darken + thin at night so the starfield reads
-        col = mix(col, cloudCol, cover * (0.4 + 0.5 * cdens));
+        // CLOUDS (player walk, October 2026: they were soft noise blobs, the same grey smudge
+        // in every hour). Fair-weather cumulus over a coastal island: masses with firm, eroded
+        // edges, bright where the sun reaches them and shadowed in their bellies, thinning toward
+        // the zenith and bunching toward the horizon, warm-lit at dawn and dusk. One sun-side
+        // sample gives the self-shadow: a point whose sunward neighbour is denser is in shade.
+        vec2 cp = d.xz / (up + 0.16) * 2.2;
+        float cd = cloudD(cp, uTime);
+        float edge = 0.62 - 0.07 * smoothstep(0.05, 0.4, up);           // a little more cover low in the sky
+        float mass = smoothstep(edge, edge + 0.12, cd);                // firm edges
+        float core = smoothstep(edge + 0.06, edge + 0.28, cd);         // thick middles
+        vec2 sunStep = normalize(uSunDir.xz + 1e-4) * 0.35 * (1.0 - smoothstep(0.2, 0.9, uSunDir.y));
+        float shadowD = cloudD(cp + sunStep, uTime);
+        float lit = clamp(0.62 + (cd - shadowD) * 3.2, 0.0, 1.0);        // sun-facing flanks bright, bellies dark
+        float silver = pow(max(sunDot, 0.0), 5.0) * (1.0 - core) * 0.8; // thin edges near the sun glow
+        float cover = mass * smoothstep(0.012, 0.14, up) * (1.0 - uNight * 0.9);
+        // a cloud is only as bright as the light on it: as the sun sets the lit flanks dim and
+        // redden and the bellies sink toward the sky behind them (at dusk they were white
+        // paper pasted on a dark sky)
+        float dayK = smoothstep(-0.10, 0.22, uSunDir.y);
+        vec3 cloudSun = mix(vec3(1.0), uSunCol, mix(0.85, 0.55, dayK)) * mix(0.42, 1.08, dayK);
+        vec3 cloudShade = mix(uHorizon, uTop, 0.35) * mix(0.62, 0.78, dayK);
+        vec3 cloudCol = mix(cloudShade, cloudSun, lit) + uSunCol * silver;
+        cloudCol = mix(cloudCol, cloudCol * 0.86, core * (1.0 - lit));
+        cloudCol *= (1.0 - uNight * 0.62);
+        col = mix(col, cloudCol, cover * (0.55 + 0.4 * core));
 
         // sea fret: mist lifts a pale band off the horizon, veiling stars
         // and blue alike — the sky finally agrees with the fogged ground

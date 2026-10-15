@@ -1,5 +1,6 @@
 import { createLibraryLettering } from './library-detail.js';
 import { forestCrowns, applyRockCrust } from './working-coast.js';
+import { buildTurf } from './turf.js';
 // props.js — every structure on the island, generated from primitives.
 // Static pieces are baked into merged meshes (a few draw calls); anything
 // that moves or glows is a named object so world.js state can drive it —
@@ -4449,7 +4450,9 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
     errMesh.forEach((im, b) => { im.count = en[b]; if (en[b]) core.add(im); });
   }
 
-
+  // THE TURF (turf.js): dense short grass around the player, on the same keep-outs as every
+  // other scatter plus the hatch pad. Built last, because it reads the litter/path mask.
+  core.add(buildTurf([...KEEPOUT, [SPOTS.hatch.x, SPOTS.hatch.y, 3.4]]));
 }
 
 // =============================================================================
@@ -4462,7 +4465,7 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
 // 'handMarks' is pruned from the 1:240 clone: a ground scuff is ~4 mm there, sub-pixel
 // at every angle, and the clone would double its instance cost for nothing.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs', 'handMarks', 'towerShaft', 'towerStair', 'towerRails', 'vaultRibs', 'archiveFurniture', 'towerLanding', 'towerLog', 'coastalPines', 'archiveTin', 'workingStudy']);
+const MODEL_PRUNE = new Set(['turf', 'drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs', 'handMarks', 'towerShaft', 'towerStair', 'towerRails', 'vaultRibs', 'archiveFurniture', 'towerLanding', 'towerLog', 'coastalPines', 'archiveTin', 'workingStudy']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -4650,6 +4653,7 @@ export const NAMES = [
   'cmTallies', 'cmFormal', 'cmPlain', 'cmUnfinished', 'cmChild',           // #50-B: the climbers' five hands down the descent
   'cgRoof', 'cgCount', 'cgLight',                                          // #50-C the congregation's carved lines (#50-A's papers register via the #69 factory)
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
+  'turf',                          // the camera-following meadow turf (turf.js); driven from main.js
   'trunks', 'canopies', 'grass',   // SEA-STRATA L4 strip (loop #129); 'canopies' is the GROUP of every LOD/silhouette (#6)
 ];
 

@@ -108,6 +108,7 @@ complete mark, tombstone, outbox, and rules contract.
 | `js/landfall.js` | Blender tower, vaults, coast, pines and persistent drying-room tin |
 | `js/working-coast.js` | Blender needle-card conifers, fitted study and live tide instrument |
 | `js/shore-details.js` | sparse working-shore kit, collision and distance detail |
+| `js/turf.js` | camera-following meadow turf and flower drifts, from the terrain grid |
 | `js/island-life.js` | Blender bird rigs, distance skins, expressive poses and open dory |
 | `js/tower-course.js` | Shared staircase layout, tread heights and movement course |
 | `js/props.js` | structures, glyph/instrument/dial atlases, model clone |
@@ -138,7 +139,9 @@ face, the east room a plastered wall and a ceiling, and stopped the lantern gall
 blowing out to white at night. It also measured and rejected a multisampled post chain.
 Its second day rebuilt the conifer crowns as textured needle cards, the drowned channel's
 bell-buoy as a real iron buoy, gave the cellar walls their damp and their staining, and
-made the title screen a window over the live sea.
+made the title screen a window over the live sea. The third day grew a turf around the
+player (`js/turf.js`), turned the clouds into lit cumulus, and cleared the title's fog
+enough to show the lighthouse.
 
 ## Current visual and walking review
 

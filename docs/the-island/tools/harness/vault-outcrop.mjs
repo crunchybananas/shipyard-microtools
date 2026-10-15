@@ -1,4 +1,4 @@
-import {beginPlay,advanceGameplay} from './play-ready.mjs';
+import {beginPlay,advanceGameplay,waitForFrame} from './play-ready.mjs';
 // vault-outcrop.mjs — the lens vault is a sealed outcrop, not a walk-through room.
 //
 // A field report arrived from the centre of the rock at (124,-150): the rendered
@@ -64,6 +64,9 @@ export default async function (h) {
 
   await h.evaluate(`ABYME.game.flag('birdSolved'); 1`);
   await advanceGameplay(h,4.2); // vault ease reaches the slab's authored hidden threshold
+  // ...measured in GAME time: dt is clamped per frame, so a loaded headless run can fall behind
+  // the wall clock. Wait for the production ease itself rather than for a fixed number of seconds.
+  await waitForFrame(h,'!ABYME.refs.vaultDoor.visible','the slab easing out of the niche',600);
 
   const opened = await h.evaluate(`(() => {
     const T=ABYME.terrain,V=T.VAULT_OUTCROP,P=ABYME.player;
