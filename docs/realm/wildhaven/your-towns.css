@@ -94,3 +94,22 @@ body.tablet-build-open #hud footer{width:min(850px,calc(100% - 24px))}
 #hud .dock-more-menu{max-height:calc(100dvh - var(--tablet-dock-clearance) - 18px);overflow-y:auto;overscroll-behavior:contain}
 #hud #dock-more .dock-more-menu>button{order:0;flex-shrink:0}
 #hud #current-town-name{flex-shrink:0}
+/* Keep the current town in view without adding another HUD panel. */
+#hud #tablet-town-toggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+#hud #dock-town-name{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:400 9px/1.2 system-ui,sans-serif;color:#53664e}
+/* The current stage and its next action come first; the full plan can unfold. */
+#town-book .research-work{padding:12px}
+#town-book .research-work-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+#town-book .research-work-heading>.research-heading{font:22px/1.2 Georgia,serif;color:#294c40}
+#town-book .research-work-heading>.job-tag{margin:0;flex-shrink:0}
+#town-book .research-current-stage{font-size:12px;line-height:1.4;font-weight:600;margin:8px 0 3px}
+#town-book .research-work-status{font-size:12px;line-height:1.4;color:#5a654a;margin:3px 0 8px}
+#town-book .research-work-actions{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+#town-book .research-work-actions button,#town-book .research-allocation button{min-height:44px;min-width:44px;padding:7px 10px;font-size:11px}
+#town-book .research-allocation{margin:8px 0;gap:5px}
+#town-book .research-supplies{margin:6px 0 10px;font-size:12px}
+#town-book .research-supplies :is(th,td){padding:6px 3px}
+#town-book .research-work .town-disclosure{margin:4px 0;padding:0;border:0}
+#town-book .research-work .town-disclosure>summary{min-height:44px;display:list-item;align-content:center;padding:10px 4px;font-size:12px;line-height:1.4}
+#town-book .research-work .research-stages{margin:4px 0 8px}
+#your-towns .your-towns-heading{position:sticky;top:0;z-index:2;background:#edf0e3;padding-bottom:8px}

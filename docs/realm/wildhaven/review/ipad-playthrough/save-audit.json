@@ -1,0 +1,123 @@
+{
+  "legacyUnchanged": true,
+  "active": {
+    "slotId": "s1",
+    "townId": "home"
+  },
+  "towns": [
+    {
+      "id": "s1",
+      "name": "Your town",
+      "pair": true,
+      "homeValid": true,
+      "resources": {
+        "wood": 138,
+        "stone": 132,
+        "food": 239.346267,
+        "grain": 0,
+        "flour": 150,
+        "planks": 114,
+        "ore": 133.56435,
+        "iron": 150,
+        "tools": 141,
+        "flax": 150,
+        "cloth": 52,
+        "ale": 150,
+        "gold": 132,
+        "knowledge": 307.351764
+      },
+      "research": {
+        "id": "joinery",
+        "progress": 50,
+        "duration": 75,
+        "startedDay": 17,
+        "fundingVersion": 1,
+        "stage": 2,
+        "allocation": 50,
+        "paused": false,
+        "delivered": {
+          "knowledge": 0.311688
+        }
+      }
+    },
+    {
+      "id": "s2",
+      "name": "Coast experiments",
+      "pair": false,
+      "homeValid": true,
+      "resources": {
+        "wood": 132,
+        "stone": 129,
+        "food": 215.660552,
+        "grain": 0,
+        "flour": 150,
+        "planks": 114,
+        "ore": 130.705574,
+        "iron": 150,
+        "tools": 141,
+        "flax": 150,
+        "cloth": 52,
+        "ale": 150,
+        "gold": 132,
+        "knowledge": 340.827537
+      },
+      "research": null
+    },
+    {
+      "id": "s3",
+      "name": "Pine laboratory",
+      "pair": false,
+      "homeValid": true,
+      "resources": {
+        "wood": 132,
+        "stone": 129,
+        "food": 215.660552,
+        "grain": 0,
+        "flour": 150,
+        "planks": 114,
+        "ore": 130.705574,
+        "iron": 150,
+        "tools": 141,
+        "flax": 150,
+        "cloth": 52,
+        "ale": 150,
+        "gold": 132,
+        "knowledge": 340.827537
+      },
+      "research": null
+    },
+    {
+      "id": "s4",
+      "name": "Willow start",
+      "pair": false,
+      "homeValid": true,
+      "resources": {
+        "wood": 102.091558,
+        "stone": 71.568669,
+        "food": 70.228895,
+        "grain": 0,
+        "flour": 0,
+        "planks": 0,
+        "ore": 0,
+        "iron": 0,
+        "tools": 0,
+        "flax": 0,
+        "cloth": 0,
+        "ale": 0,
+        "gold": 30,
+        "knowledge": 0
+      },
+      "research": {
+        "id": "cultivation",
+        "progress": 0,
+        "duration": 75,
+        "startedDay": 1,
+        "fundingVersion": 1,
+        "stage": 0,
+        "allocation": 25,
+        "paused": false,
+        "delivered": {}
+      }
+    }
+  ]
+}

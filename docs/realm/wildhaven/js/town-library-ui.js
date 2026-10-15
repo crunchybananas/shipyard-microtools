@@ -50,6 +50,8 @@ export function createTownLibraryUI({ library, getState, beforeOpen, canSwitch, 
   function persist() { const result = library.saveCurrent(getState()); if (!result.ok) message(result.reason, true); return result.ok; }
   function openTown(item) {
     if (!guard()) return;
+    // Returning to the open town should not reload it or reset its camera/clock.
+    if (item.active && getState()) { dialog.close(); return; }
     const result = library.select(item.slotId, item.townId, getState());
     if (!result.ok) { message(result.reason, true); return; }
     dialog.close(); onOpenTown(result.state);
@@ -86,7 +88,7 @@ export function createTownLibraryUI({ library, getState, beforeOpen, canSwitch, 
       const tags = [item.active && 'Current town', item.paired && 'Local companion pair', item.linked && 'Online partnership'].filter(Boolean);
       body.append(el('p', 'town-save-tags', tags.join(' · ')));
       const actions = el('div', 'town-save-actions');
-      actions.append(button('Continue', () => openTown(item), 'primary'), button('Duplicate', () => edit('copy', item)));
+      actions.append(button(item.active && getState() ? 'Return to town' : 'Continue', () => openTown(item), 'primary'), button('Duplicate', () => edit('copy', item)));
       const extras = el('div', 'town-save-extras'); extras.append(button('Rename', () => edit('rename', item)), button('Download', () => download(item)));
       for (const node of [...actions.children, ...extras.children]) node.disabled = library.blocked;
       body.append(actions, extras); card.append(preview(item.state), body); list.append(card);

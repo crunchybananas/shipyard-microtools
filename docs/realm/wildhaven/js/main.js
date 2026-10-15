@@ -110,7 +110,8 @@ function activateDock(destination) {
   updateDock();
 }
 function updateDock() {
-  if ($('current-town-name')) $('current-town-name').textContent = townLibrary.activeName || 'Your town';
+  const townName = townLibrary.activeName || 'Your town';
+  for (const id of ['current-town-name', 'dock-town-name']) if ($(id) && $(id).textContent !== townName) $(id).textContent = townName;
   $('tablet-build-toggle')?.toggleAttribute('disabled', !companions.canManage);
   $('tablet-town-toggle')?.setAttribute('aria-expanded', String(!!town?.activeTab && town.activeTab !== 'trade'));
   $('landing-button').setAttribute('aria-expanded', String(town?.activeTab === 'trade'));
@@ -153,6 +154,11 @@ function mountTabletControls() {
 
 function mountCompactDock() {
   const dock = document.querySelector('.controls-hint>div');
+  const townLabel = document.createElement('span'); townLabel.textContent = 'Town';
+  const townName = document.createElement('small'); townName.id = 'dock-town-name';
+  $('tablet-town-toggle').replaceChildren(townLabel, townName);
+  $('tablet-town-toggle').setAttribute('aria-label', 'Town');
+  $('tablet-town-toggle').setAttribute('aria-describedby', 'dock-town-name');
   const more = document.createElement('details'); more.id = 'dock-more';
   const summary = document.createElement('summary'); summary.textContent = 'More'; summary.setAttribute('aria-label', 'More town controls');
   const menu = document.createElement('nav'); menu.className = 'dock-more-menu'; menu.setAttribute('aria-label', 'More town controls');
@@ -422,7 +428,7 @@ function updateUI() {
     const status = $('island-safety-status'), text = [safety.label, safety.secondary].filter(Boolean).join(' · '); if (status.textContent !== text) status.textContent = text;
     status.dataset.safety = safety.level; status.title = safety.description; status.setAttribute('aria-label', `${text}. ${safety.description}`); status.setAttribute('aria-controls', safety.destination === 'frontier' ? 'frontier-panel' : 'town-book');
     townToggle.classList.toggle('threatened', !!state.pressure?.active);
-    townToggle.title = 'People, projects, stores, research, trade and the coastal watch';
+    townToggle.title = `${townLibrary.activeName || 'Your town'}: people, projects, stores, research, trade and the coastal watch`;
   }
   const projects = sim.constructionQueue(state).length;
   if ($('tablet-build-toggle')) $('tablet-build-toggle').textContent = projects ? `Build · ${projects}` : 'Build';
@@ -573,13 +579,13 @@ async function boot() {
         const result=companions.save(next);if(!result.ok)return result;state=next;victorySeen=state.won;keys.clear();enter(true);return result;} });
     mountTabletControls();
     townLibraryUI = createTownLibraryUI({ library: townLibrary, getState: () => playing ? state : null,
-      beforeOpen: () => { preparePanel(null); closeBuildDrawer(); document.querySelectorAll('dialog[open]').forEach(d => d.close()); keys.clear(); },
+      beforeOpen: () => { preparePanel(null); closeBuildDrawer(); document.querySelectorAll('dialog[open]').forEach(d => d.close()); keys.clear(); updateDock(); },
       canSwitch: () => coop.info().busy ? { ok: false, reason: 'Finish the current online action before changing towns.' } : { ok: true },
       onOpenTown: next => { state = next; saved = next; victorySeen = state.won; keys.clear(); enter(true); announce(`${townLibrary.activeName} opened. Resume when you’re ready.`); coop.reconnect(); }
     });
     mountCompactDock();
     researchHUD = mountResearchHUD({ getState: () => state, isPaused: () => speed === 0,
-      open: id => id ? town.revealResearch(id) : town.open('council') });
+      open: id => town.revealResearch(id) });
     const shelfObserver=new ResizeObserver(()=>{document.documentElement.style.setProperty('--shelf-edge',`${innerHeight-document.querySelector('footer').getBoundingClientRect().top+12}px`);});shelfObserver.observe(document.querySelector('footer'));
     makeShelf(); bind(); updateAudio(); world.sync(attractVillage()); world.pan.set(innerWidth < 700 ? -2 : -5, 0, 0); world.targetZoom = innerWidth < 700 ? 38 : 29;
     $('loading').hidden = true; $('intro').hidden = false;
