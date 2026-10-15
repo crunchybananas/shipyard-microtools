@@ -1,6 +1,5 @@
 import { CROPS, gardenState } from './hinterland.js';
 import { objectiveChecklist, objectiveGuidance } from './objective-checklist.js';
-import { placementInfoPosition } from './placement-layout.js';
 import { createReadingClock } from './reading-clock.js';
 import { townSafety } from './town-safety.js';
 import { treeState, SAPLING_SECONDS, saplingTimeRemaining } from './woodland.js';
@@ -188,27 +187,31 @@ function useTool(type) {
   if (touchPlacement) { hovered = null; world.showPreview(null); }
   $('inspector').hidden = true; $('journal').hidden = true; world.select(null); world.selectCitizen?.(null);
   document.body.classList.add('placement-active'); $('placement-info').hidden = false; $('placement').hidden = false; $('placement-title').textContent = `${BUILDINGS[type].name} · ${costText(BUILDINGS[type].cost)}`;
-  $('placement-purpose').replaceChildren(buildingPurpose(type));
-  $('placement-detail').textContent = touchPlacement ? 'Tap a site to inspect the entrance and reach. Build here confirms the plan.' : 'Choose a site. The arrow marks the entrance; keep its approach clear.';
+  $('placement-context').textContent = '';
+  $('placement-detail').textContent = touchPlacement ? 'Tap a site, then choose Build here.' : 'Choose a site on the island. The arrow marks the entrance.';
   $('confirm-building').hidden = !touchPlacement; $('confirm-building').disabled = true;
   $('world').style.cursor = 'crosshair'; if (hovered) hover(hovered); updateShelf(); audio.play('select');
 }
 function cancelTool() { tool = null; touchSite = null; touchPlacement = false; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); world.showPreview(null); world.showServiceArea(null, null); $('placement').hidden = true; $('placement-info').hidden = true; document.body.classList.remove('placement-active'); $('confirm-building').hidden = true; $('world').style.cursor = 'grab'; updateShelf(); }
 function hover(tile, pointer = {}) {
+  // Moving onto the placement controls must retain the site being rotated.
+  if (tool && !tile && pointer.relatedTarget?.closest?.('#placement')) return;
   if (tool && touchPlacement && pointer.pointerType === 'mouse') { touchPlacement = false; touchSite = null; document.body.classList.remove('touch-placement-active'); $('confirm-building').hidden = true; }
   if (tool && touchPlacement && ['touch','pen'].includes(pointer.pointerType)) return;
   hovered = tile; if (!playing) return; world.hoverCitizen?.(!tool ? tile?.citizen?.id || null : null); if (frontierUI?.hover(tile)) return; if (!tool) return;
-  if (!tile) { world.showPreview(null); world.showServiceArea(null, null); $('placement-detail').textContent = 'Choose a site on the island.'; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); return; }
-  const verdict = sim.canBuild(state, tool, tile.x, tile.z, rotation), spec = BUILDINGS[tool];
-  world.showPreview(tool, tile, verdict.ok, rotation, { entranceLabel: !touchPlacement }); const reach = world.showServiceArea(tool, tile, 1, { label: !touchPlacement }); $('placement').classList.toggle('invalid', !verdict.ok); $('placement-info').classList.toggle('invalid', !verdict.ok);
+  if (!tile) { world.showPreview(null); world.showServiceArea(null, null); $('placement-detail').textContent = 'Choose a site on the island.'; $('placement-context').textContent = ''; $('confirm-building').disabled = true; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); return; }
+  const verdict = sim.canBuild(state, tool, tile.x, tile.z, rotation);
+  // Keep only the footprint, entrance arrow and reach ring over the island.
+  world.showPreview(tool, tile, verdict.ok, rotation, { entranceLabel: false }); const reach = world.showServiceArea(tool, tile, 1, { label: false }); $('placement').classList.toggle('invalid', !verdict.ok); $('placement-info').classList.toggle('invalid', !verdict.ok);
   $('confirm-building').disabled = !verdict.ok || !touchSite;
-  $('placement-detail').textContent = verdict.ok ? `${touchPlacement ? 'Entrance clear · ' : ''}${spec.work} person-seconds to build.${verdict.boosted ? ` ${verdict.bonus}` : touchPlacement ? '' : ' Keep the arrow’s approach clear.'}${reach ? ` ${touchPlacement ? `${reach.radius}-space reach · ` : ''}✓ ${reach.inRangeHomes} homes in reach · − ${reach.outsideHomes} outside.${touchPlacement ? '' : ' Staff and supplies determine service.'}` : ''}` : verdict.reason;
+  $('placement-detail').textContent = verdict.ok ? (touchPlacement ? 'Entrance clear. Choose Build here to confirm.' : 'Click to build here. The arrow marks the entrance.') : verdict.reason;
+  $('placement-context').textContent = reach ? `${reach.inRangeHomes} of ${reach.totalHomes} homes in reach · ${reach.radius}-space radius` : verdict.ok && verdict.boosted ? verdict.bonus : '';
 }
 function commitBuilding(tile) {
   if (!tool || !tile || !companions.canManage) return;
   const result = sim.build(state, tool, tile.x, tile.z, rotation);
   if (!result.ok) { announce(result.reason, true); audio.play('error'); hover(tile); return; }
-  audio.play('build'); sync(); world.showPreview(null); hovered = null; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); const feedback = constructionFeedback(state, sim.constructionQueue(state), { paused: speed === 0 }); $('placement-detail').textContent = `Queued. ${feedback.reason}`; announce(`${BUILDINGS[tool].name} queued.${feedback.ready ? '' : ` ${feedback.reason}`}`);
+  audio.play('build'); sync(); world.showPreview(null); world.showServiceArea(null, null); hovered = null; touchSite = null; $('confirm-building').disabled = true; $('placement-context').textContent = ''; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); const feedback = constructionFeedback(state, sim.constructionQueue(state), { paused: speed === 0 }); $('placement-detail').textContent = `Queued. ${feedback.reason}`; announce(`${BUILDINGS[tool].name} queued.${feedback.ready ? '' : ` ${feedback.reason}`}`);
 }
 function tap(tile, pointer = {}) {
   if (!playing || !companions.canManage || document.querySelector('dialog[open]')) return;
@@ -354,17 +357,6 @@ function renderObjectiveChecklist(rows) {
     if (!row.complete && row.notice) { const notice = document.createElement('small'); notice.textContent = row.notice; body.append(notice); }
     item.append(mark, body); return item;
   }));
-}
-function positionPlacementInfo() {
-  if (!tool) return;
-  const card = $('placement-info'); card.hidden = false;
-  const header = document.querySelector('#hud header').getBoundingClientRect(), actions = $('placement').getBoundingClientRect();
-  const viewport = { left: 12, top: header.bottom + 12, right: innerWidth - 12, bottom: actions.top - 12 };
-  const size = { width: card.offsetWidth, height: card.offsetHeight };
-  const obstacles = [document.querySelector('.camera-tools')].filter(node => node && node.getClientRects().length).map(node => node.getBoundingClientRect());
-  const position = placementInfoPosition(world.previewScreenBounds(), size, viewport, obstacles);
-  card.style.visibility = position ? 'visible' : 'hidden';
-  if (position) { card.style.left = `${position.left}px`; card.style.top = `${position.top}px`; card.dataset.side = position.side; }
 }
 function updateUI() {
   if (!companions.canManage) speed = readingClock.choose(0);
@@ -538,7 +530,7 @@ async function boot() {
         if (dx || dz) world.moveCamera(dx * dt * 8, dz * dt * 8); if (speed > 0 && companions.canManage) advance(Math.min(wallDt, .5) * speed);
         uiClock += dt; saveClock += dt; if (uiClock > .5) { updateUI(); uiClock = 0; } if (saveClock > 5) { save(); saveClock = 0; }
       }
-      world.render(dt, { speed: playing ? (companions.canManage ? speed : 0) : 1, playing: !modal, dayTime: calendarFraction(state), won: playing && state.won }); if (tool) positionPlacementInfo(); frames++; total += wallDt;
+      world.render(dt, { speed: playing ? (companions.canManage ? speed : 0) : 1, playing: !modal, dayTime: calendarFraction(state), won: playing && state.won }); frames++; total += wallDt;
       if (total > 2) { document.documentElement.dataset.fps = String(Math.round(frames / total)); frames = 0; total = 0; }
     }
     requestAnimationFrame(frame);
