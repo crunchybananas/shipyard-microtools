@@ -358,7 +358,8 @@ up to a perched bird in the real game and checks that its wings are heard.
 
 **Listening.** `day4-sound/sound-tour.m4a` plays every sheet back to back.
 Each sheet is the real `js/audio.js` rendered offline, lifted by one common +11 dB so
-the balance between sheets matches the game and is audible on a phone speaker.
+the balance between sheets matches the game and is audible on a phone speaker. A −1 dB
+peak limiter catches the few transients (deck steps, wings) that the lift would clip.
 
 **The audio gate** (`tools/harness/audio.mjs`, in `run.sh`). Every other gate runs
 muted, so nothing had proved the game is audible. The harness loads `js/audio.js` into
