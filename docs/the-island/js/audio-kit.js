@@ -14,6 +14,7 @@
 //   creak         rope, hinge and stair timber under load
 //   drawer, glass small handled things
 //   waveBreak     one breaking wave: the curl, the crash, the long wash and its foam fizz
+//   drip          one drop into standing water underground
 
 const _noise = new WeakMap();
 function noiseBuffer(ctx) {
@@ -286,4 +287,22 @@ export function waveBreak(ctx, dest, t = ctx.currentTime, size = 1) {
   fizz.src.stop(t + 0.4 + dur * 0.8 + 0.2);
   // the drag back through the stones: a late scatter of grains as the wash retreats
   grains(ctx, dest, t + dur * 0.45, dur * 0.45, Math.round(18 * size), { lo: 1800, hi: 4500, q: 5, gain: 0.03 * size, early: 0.7 });
+}
+
+// ------------------------------------------------------------ underground --
+// A drop falling into standing water: the tick of the impact, then the air it drives under
+// ringing UP in pitch as the bubble closes (the plink is a rising resonance, not a falling
+// one). A tenth of a second; the room reverb is what makes it a cellar.
+export function drip(ctx, dest, t = ctx.currentTime, { gain = 1 } = {}) {
+  burst(ctx, dest, t, 0.003, { type: 'highpass', freq: 3500, q: 0.7, gain: 0.04 * gain });
+  const at = t + rnd(0.002, 0.007), f0 = rnd(800, 1600);
+  const o = ctx.createOscillator();
+  o.frequency.setValueAtTime(f0, at);
+  o.frequency.exponentialRampToValueAtTime(f0 * rnd(1.6, 2.3), at + rnd(0.03, 0.05));
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(0.5 * gain, at + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + rnd(0.06, 0.11));
+  o.connect(g).connect(dest);
+  o.start(at); o.stop(at + 0.14);
 }

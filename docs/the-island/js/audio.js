@@ -113,6 +113,25 @@ const A = {
     this.wind.gain.gain.value = 0;
     this.wind.out.connect(this.amb);
 
+    // ---- the wind in the trees: air moving through needles is a high, soft roar that swells
+    // with each gust and comes from where the trees stand, so it has its own panner ----
+    this.sough = this._noiseLoop('white', 2600, 'bandpass', 0.5);
+    this.sough.gain.gain.value = 0;
+    this.soughPan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    if (this.soughPan) this.sough.out.connect(this.soughPan).connect(this.amb);
+    else this.sough.out.connect(this.amb);
+
+    // ---- the gallery rail sings in a hard gust: an aeolian tone, wandering in pitch, with a
+    // breath of narrow noise around it (a band of noise alone stays under the wind's own roar) ----
+    this.whistleTone = ctx.createOscillator();
+    this.whistleTone.frequency.value = 1150;
+    this.whistleToneG = ctx.createGain(); this.whistleToneG.gain.value = 0;
+    this.whistleTone.connect(this.whistleToneG).connect(this.amb);
+    this.whistleTone.start();
+    this.whistle = this._noiseLoop('white', 1150, 'bandpass', 18);
+    this.whistle.gain.gain.value = 0;
+    this.whistle.out.connect(this.amb);
+
     // ---- drizzle: a soft patter bed, alive only when the mist is thick ----
     this.rain = this._noiseLoop('white', 2600, 'bandpass', 0.8);
     this.rain.gain.gain.value = 0;
@@ -217,7 +236,9 @@ const A = {
     // walls close in (#67): one shared lowpass over the whole ambient bed swings
     // from wide open outside to ~750Hz inside — smoothly, so crossing the door
     // reads as mass, not a volume knob. The hiss dies; the low swell survives.
-    this.wallFilter.frequency.setTargetAtTime(s.interior ? 750 : 19000, t, 0.35);
+    // (the buried rooms — the drain chamber, the vaults — are as walled as the tower)
+    const enclosed = s.interior || s.underground;
+    this.wallFilter.frequency.setTargetAtTime(enclosed ? 750 : 19000, t, 0.35);
     // surf: swell-locked, pulled away by tide. No interior gain-gate here any
     // more — shoreDist already grows +60 through the door (main.js), and the
     // wall filter does the muffling.
@@ -226,17 +247,45 @@ const A = {
     // (×0.16 → ×0.06: each break now brings its own foam, so the constant fizz can step back —
     // it was masking the player's own footsteps on the shingle)
     this.surfHiss.gain.gain.setTargetAtTime(surfBase * 0.06 * s.wavePhase * s.tideNear, t, k);
-    // wind: altitude raises pitch and volume; walls take most of it (the rest is timbre)
-    const windBase = clamp(0.05 + s.altitude * 0.004, 0.05, 0.17) * (s.interior ? 0.35 : 1);
-    this.wind.gain.gain.setTargetAtTime(windBase * (0.7 + 0.3 * Math.sin(t * 0.31)), t, 0.3);
+    // wind: altitude raises pitch and volume; walls take most of it (the rest is timbre).
+    // GUSTS: main.js owns one wind for the island (`gust`, 0 calm … 1 a hard gust) so the
+    // grass and the crowns lean on the same breath you hear. A gust is louder and brighter:
+    // moving air rises in pitch as it rises in speed.
+    const gust = s.gust ?? 0.35;
+    const windBase = clamp(0.05 + s.altitude * 0.004, 0.05, 0.17) * (enclosed ? 0.35 : 1);
+    this.wind.gain.gain.setTargetAtTime(windBase * (0.45 + 0.95 * gust), t, 0.3);
+    // the grove: its needles hiss with the gust, from the trees' side of you
+    const grove = enclosed ? 0 : (s.trees?.near ?? 0);
+    this.sough.gain.gain.setTargetAtTime(grove * (0.04 + 0.08 * gust * gust), t, 0.35);
+    this.sough.filt.frequency.setTargetAtTime(2100 + 1400 * gust, t, 0.6);
+    if (this.soughPan && s.trees) this.soughPan.pan.setTargetAtTime(this._at(s.trees.x, s.trees.z).pan * 0.7, t, 0.5);
+    // the gallery: the iron rail starts to sing once a gust is more than a breeze
+    const sing = s.aloft && !enclosed ? clamp((gust - 0.4) / 0.6, 0, 1) : 0;
+    const pitch = 1050 + 280 * gust + 30 * Math.sin(t * 0.7) + 12 * Math.sin(t * 2.3);
+    this.whistleToneG.gain.setTargetAtTime(sing * sing * 0.04 * (0.8 + 0.2 * Math.sin(t * 3.1)), t, 0.25);
+    this.whistleTone.frequency.setTargetAtTime(pitch, t, 0.3);
+    this.whistle.gain.gain.setTargetAtTime(sing * sing * 0.12, t, 0.5);
+    this.whistle.filt.frequency.setTargetAtTime(pitch, t, 0.3);
     // drizzle rises with thick mist, muffled under a roof
     const rainBase = (s.mist ?? 0) > 0.45 ? ((s.mist - 0.45) * 0.11) : 0;
     this.rain.gain.gain.setTargetAtTime(rainBase * (s.interior ? 0.3 : 1), t, 1.4);
-    this.wind.filt.frequency.setTargetAtTime(550 + s.altitude * 26, t, 0.5);
+    this.wind.filt.frequency.setTargetAtTime(420 + 520 * gust + s.altitude * 26, t, 0.5);
     // room tone indoors
-    this.room.gain.gain.setTargetAtTime(s.interior ? 0.16 : 0.0, t, 0.25);
+    this.room.gain.gain.setTargetAtTime(enclosed ? 0.16 : 0.0, t, 0.25);
+    // underground: water finding its way down through the rock, a drop at a time, from
+    // somewhere close in the dark. The room reverb carries each one round the stone.
+    if (s.underground) {
+      this._dripT = (this._dripT ?? 0.8) - dt;
+      if (this._dripT <= 0) {
+        this._dripT = 0.6 + Math.random() * 2.8;
+        const a = Math.random() * Math.PI * 2, d = 1.5 + Math.random() * 5;
+        const at = { x: this._px + Math.sin(a) * d, z: this._pz + Math.cos(a) * d, ref: 4 };
+        KIT.drip(ctx, this._out(at, this.fx), t + Math.random() * 0.05, { gain: 0.7 + Math.random() * 0.6 });
+        // a seep gathers and lets go twice, sometimes
+        if (Math.random() < 0.3) KIT.drip(ctx, this._out(at, this.fx), t + 0.35 + Math.random() * 0.3, { gain: 0.4 });
+      }
+    }
     // the space around you: tower stone or open air (the cellar and drain count as stone)
-    const enclosed = s.interior || s.underground;
     this.verbRoomG.gain.setTargetAtTime(enclosed ? 0.55 : 0, t, 0.4);
     this.verbAirG.gain.setTargetAtTime(enclosed ? 0 : 0.32, t, 0.4);
     // WAVES BREAKING. The surf bed is a continuous wash; real surf is a sequence of events.

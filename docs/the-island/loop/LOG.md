@@ -4668,12 +4668,21 @@ two generated convolution reverbs (open air 3.2 s / room 1.6 s) crossfaded indoo
 underground; struck-bell melody notes in the music bed. The surf hiss is narrower and
 quieter, so beach steps are not masked.
 
-**Evidence:** `loop/player-walk/2026-10-06/day4-sound/` (m4a per sheet, a 2:26 tour,
+**Evidence:** `loop/player-walk/2026-10-06/day4-sound/` (m4a per sheet, a 3:26 tour, a calm-vs-gust video,
 spectrograms); new gate `tools/harness/audio.mjs` renders the real audio.js offline, seeded:
 **AUDIO 12 / 12**. It checks that everything is audible and unclipped, surfaces are
 spectrally distinct, shingle steps are +5.4 dB over the surf in band where they land, there
 are at least 3 wave events, the tower has a reverb tail, and both beds play. All 26 gate
 scripts pass (walk 69/69); unit 116/116.
+
+**Then, one wind:** main.js owns a single `gust` that drives the wind sound (louder and
+brighter in a gust), a needle hiss from the grove within 24 m (panned to the trees,
+silent once the last winter strips the crowns), a gallery whistle in hard gusts, and
+the sway of grass, turf and crowns via a shared `uWind` uniform (a gust swings ~1.8×
+wider and leans the stand downwind in world space). Drips underground. Buried rooms now
+close the wall filter. Bug fixed: `player.interior()` was XZ-only, so the open lantern
+gallery counted as inside (room reverb, 750 Hz walls, a third of the wind). New gate
+`surfaces.mjs` runs in the real game: **SURFACES 11 / 11**; audio now **16 / 16**.
 
 **Debt:** the game's sound has only been heard offline, not yet by the owner in a live
 walk. Mix levels are set by measurement, not by ear.

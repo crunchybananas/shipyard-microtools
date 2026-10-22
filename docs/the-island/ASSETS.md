@@ -26,12 +26,17 @@ the game, remove the manifest row, code path, and file together.
   keeper's nonverbal drowned timbre use no downloaded music or speech files.
   Language remains visible text.
 - `js/audio-kit.js` holds the synthesized foley and acoustic space that `js/audio.js`
-  plays. It covers footsteps for seven surfaces, paper, creaks, a drawer, glass and
-  breaking waves, all built from cached noise buffers, filters and oscillators. It
+  plays. It covers footsteps for seven surfaces, paper, creaks, a drawer, glass,
+  breaking waves and underground drips, all built from cached noise buffers, filters
+  and oscillators. It
   also generates the two reverb impulse responses (open air and room). Add a sound
   here as code, never as a sample file. `tools/harness/audio.mjs` renders the real
   mix offline and gates it: everything audible and unclipped, surfaces spectrally
   distinct. With `AUDIO_DIR` set it writes WAVs for listening.
+- The wind is one value, `gust` in `js/main.js`. The wind sound, the grove's needle
+  hiss, the gallery whistle and the sway of the grass, turf and conifer crowns (the
+  `uWind` uniform) all read it. A new swaying material should read `uWind` too, rather
+  than inventing its own wind.
 - `js/world.js` owns exactly four playable strata: the last day, the arrival years,
   the inspection years, and the last winter. Visual grading and the procedural
   arrangement in `js/audio.js` follow those same four states.

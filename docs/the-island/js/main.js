@@ -1612,6 +1612,7 @@ function applyAtmosphere(elapsed, dt) {
       const sh = mat.userData.shader;
       if (sh) {
         sh.uniforms.uTime.value = elapsed;
+        if (sh.uniforms.uWind) sh.uniforms.uWind.value = windSway();
         if (sh.uniforms.uHaze) sh.uniforms.uHaze.value.copy(scene.fog.color);
       }
     }
@@ -1807,6 +1808,36 @@ player.onRescue = () => UI.whisper(T.the_ground_gives_you);
 // material: the study's boards and the tower treads, the iron gallery, the cellar and drain
 // stone, the jetty deck and the ruler bridge, the shallows, the shingle at the landing, sand,
 // and the meadow.
+// THE WIND. One breath for the whole island: the audio's gusts and the sway of the grass, the
+// turf and the conifer crowns all read `gust` (0 calm … 1 a hard gust), so a gust you hear
+// arriving is the meadow you see lean. It builds in about a second and dies over three;
+// between gusts the air idles at a breeze, and now and then a hard one comes through.
+let gust = 0.3, gustTarget = 0.3, gustHold = 0;
+function stepWind(dt) {
+  gustHold -= dt;
+  if (gustHold <= 0) {
+    const hard = Math.random() < 0.22;
+    gustTarget = hard ? 0.7 + Math.random() * 0.3 : 0.1 + Math.random() * 0.38;
+    gustHold = hard ? 2 + Math.random() * 3 : 3 + Math.random() * 6;
+  }
+  gust += (gustTarget - gust) * (1 - Math.exp(-(gustTarget > gust ? 1.1 : 0.33) * dt));
+}
+// how much sway a gust adds: ~1 at the mean breeze, so the calm-air look is unchanged
+const windSway = () => 0.6 + 1.2 * gust;
+// the grove around you: how many crowns stand within earshot, and where their middle is
+// (the needles' hiss comes from the trees' side of you). No crowns, no hiss: the last
+// winter strips them, so this reads the canopy group's own visibility.
+let groveAt = null;
+function sampleGrove(x, z) {
+  const spots = core.userData.treeSpots, crowns = core.getObjectByName('canopies');
+  if (!spots || !crowns?.visible) return null;
+  let w = 0, sx = 0, sz = 0;
+  for (const [tx, , tz] of spots) {
+    const d = Math.hypot(tx - x, tz - z);
+    if (d < 24) { const k = 1 - d / 24; w += k; sx += tx * k; sz += tz * k; }
+  }
+  return w > 0 ? { near: Math.min(1, w / 2.2), x: sx / w, z: sz / w } : null;
+}
 // the nearest open water: rings of bearings outward until one lands below the live sea
 let seaT = 0, seaPt = null;
 function nearestSea(x, z) {
@@ -1960,6 +1991,8 @@ function makeReportThumbnail() {
     upstreamHandState: () => game.upstreamState(),
     ambientDuckOwners: () => A.ambientDuckOwners(),
     audioScore: () => A.scoreState(),
+    // hold the island's wind at a gust level (0 calm … 1 hard) for 30 s, or read it
+    wind: (g) => { if (g != null) { gust = gustTarget = clamp(g, 0, 1); gustHold = 30; } return +gust.toFixed(3); },
     pendingRunTimers: () => runTimers.size,
     recordWriting: (text) => recordWriting(text, player), sanitizeWriting,
     clearStack, syncStack, isShared, localStack: LOCAL_STACK,
@@ -2605,6 +2638,7 @@ renderer.setAnimationLoop((tMs) => {
       }
     }
   }
+  stepWind(dt);
   // THE TURF follows the eye (turf.js). Play, intro and the finale only: the title's sea camera
   // never reaches land, the dive scales the world under it, and the last winter is bare.
   if (refs.turf) {
@@ -2617,7 +2651,7 @@ renderer.setAnimationLoop((tMs) => {
     const outdoors = aboveGround > 0.6 && aboveGround < 5 && !inTower;
     const showTurf = (MODE === 'play' || MODE === 'intro' || MODE === 'finale') && W.level < 4 && outdoors;
     refs.turf.visible = showTurf;
-    if (showTurf) refs.turf.userData.follow(camera.position, waterY(), elapsed);
+    if (showTurf) refs.turf.userData.follow(camera.position, waterY(), elapsed, windSway());
   }
   interact.update();
   interact.tickGlint(dt, elapsed);   // the hover glint eases in and out (see interact.js)
@@ -2628,9 +2662,12 @@ renderer.setAnimationLoop((tMs) => {
   tickFigures(W.reduceMotion?0:elapsed);
 
   seaT -= dt;
-  if (seaT <= 0) { seaT = 0.5; seaPt = nearestSea(player.pos.x, player.pos.z); }
+  if (seaT <= 0) { seaT = 0.5; seaPt = nearestSea(player.pos.x, player.pos.z); groveAt = sampleGrove(player.pos.x, player.pos.z); }
   A.update(dt, {
     sea: seaPt,
+    gust,
+    trees: groveAt,
+    aloft: player.pos.y >= TOWER_TOP - 0.35 && Math.hypot(player.pos.x - TOWER.x, player.pos.z - TOWER.z) < 4.6,
     underground: player.pos.y < heightAt(player.pos.x, player.pos.z) - 1.2,
     wavePhase: clamp(wavePhase(elapsed), 0, 1),
     shoreDist: Math.max(0, heightAt(player.pos.x, player.pos.z)) * 13 + (player.interior() ? 60 : 0),

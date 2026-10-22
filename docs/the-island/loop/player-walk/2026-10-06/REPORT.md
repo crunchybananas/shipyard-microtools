@@ -305,7 +305,34 @@ creak climbing down. `day4-sound/handling.m4a`.
 fast attack, a long decay) instead of plain swells, so the tune reads as notes over
 the drone. `day4-sound/music-surface.m4a`, `music-winter.m4a`.
 
-**Listening.** `day4-sound/sound-tour.m4a` (2:26) plays every sheet back to back.
+**One wind.** The wind used to be a steady filtered hiss swaying on a fixed sine. Now
+`main.js` keeps a single gust value for the whole island (0 is calm, 1 is a hard gust).
+Between gusts it idles at a breeze. About one in five gusts is a hard one, which builds
+in about a second and dies away over three. Everything that moves in the air reads that
+same value:
+- **The wind sound** gets louder and higher in a gust, because faster air sounds higher.
+- **The grove:** within 24 m of the conifers, their needles hiss. The hiss swells with
+  each gust and comes from the trees' side of you. It goes quiet in the last winter,
+  when the crowns are gone.
+- **The gallery rail** sings in a hard gust: a wandering aeolian tone at about 1.1–1.3 kHz.
+- **Sway:** the grass, the turf and the conifer crowns all sway with the gust. A hard
+  gust swings them about 1.8 times wider and leans the whole stand the same way (world
+  +x, converted into each instance's own frame). At the average breeze the sway is about
+  what it was before. `day4-sound/meadow-calm-vs-gust.mp4` shows the same view in calm
+  air (left) and in a hard gust (right).
+
+**Underground.** Water drips in the drain chamber and the vaults. Each drop is a click
+followed by a rising plink, placed close by in the dark and carried round the stone by
+the room reverb. The buried rooms now also close the wall filter over the outdoor beds,
+the way the tower does. Before, the wind and surf played unmuffled underground.
+
+**The gallery was "indoors".** `player.interior()` only checked position on the ground
+plan, so the lantern gallery, which sits over the study's circle, counted as inside.
+The most exposed place on the island got the room reverb, a 750 Hz wall filter and a
+third of the wind. Up there, only the glazed lantern (inside its murette, r 2.1) is a
+room now.
+
+**Listening.** `day4-sound/sound-tour.m4a` plays every sheet back to back.
 Each sheet is the real `js/audio.js` rendered offline, lifted by one common +11 dB so
 the balance between sheets matches the game and is audible on a phone speaker.
 
@@ -324,7 +351,24 @@ the output. It checks 12 things:
 - every handled object is audible;
 - the shore is audible and has at least three discrete wave events;
 - the tower has a reverb tail and stays unclipped indoors;
-- both music beds are audible.
+- both music beds are audible;
+- a gust is more than 5 dB louder than the breeze and over 15% brighter;
+- a grove raises the 4 kHz octave by more than 3 dB in a breeze, and a gust raises it a
+  further 6 dB;
+- the gallery in a gust has a tone standing more than 6 dB out of 0.9–1.6 kHz;
+- underground there are at least four discrete drips, and less 8 kHz energy than an
+  open meadow, even with a grove overhead.
 
-Result: **AUDIO 12 / 12**. Set `AUDIO_DIR` to write each sheet as a WAV. With the
-audio stage added, the full gate passes all 26 scripts, including walk 69/69.
+Result: **AUDIO 16 / 16**. Set `AUDIO_DIR` to write each sheet as a WAV.
+
+**The game asks for the right sound** (`tools/harness/surfaces.mjs`, in `run.sh`). This
+check runs in the real game. It teleports through the island and fires the player's own
+footstep path (`onFootstep` → `surfaceAt` → `A.footstep`), intercepted at the audio
+module. It covers:
+- the landing shingle, the jetty, a beach, the meadow, the shallows and the study floor,
+  each heard as the right surface;
+- the stair as wood, the gallery as iron, and a buried room as stone;
+- the gallery as open air, with the lantern and the study as rooms;
+- a forced gust reaching the crown, grass and turf shaders together.
+
+Result: **SURFACES 11 / 11**. `ABYME.wind(g)` holds the gust at a level for captures.

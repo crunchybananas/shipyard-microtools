@@ -114,7 +114,7 @@ complete mark, tombstone, outbox, and rules contract.
 | `js/props.js` | structures, glyph/instrument/dial atlases, model clone |
 | `js/puzzles.js` | physical interactions and state-to-scene application |
 | `js/audio.js` | the synthesized score, ambient beds, reverb rooms and the sound mix |
-| `js/audio-kit.js` | synthesized foley: footsteps per surface, paper, creaks, breaking waves, impulse responses |
+| `js/audio-kit.js` | synthesized foley: footsteps per surface, paper, creaks, breaking waves, drips, impulse responses |
 | `js/main.js` | boot, crossings, return, ending commit, debug and field reports |
 
 Developer routes and exact debug calls live in [PLAYTHROUGH.md](PLAYTHROUGH.md).
@@ -144,8 +144,9 @@ bell-buoy as a real iron buoy, gave the cellar walls their damp and their staini
 made the title screen a window over the live sea. The third day grew a turf around the
 player (`js/turf.js`), turned the clouds into lit cumulus, and cleared the title's fog
 enough to show the lighthouse. The fourth day gave it sound: footsteps per surface,
-waves that break where the sea is, rooms with their own reverb, handled paper, and an
-offline-rendered audio gate. You can listen in
+waves that break where the sea is, rooms with their own reverb, handled paper, drips
+underground, and one wind that you hear gust and see lean the grass and the trees. It
+also added an offline-rendered audio gate. You can listen in
 [day4-sound](loop/player-walk/2026-10-06/day4-sound/).
 
 ## Current visual and walking review

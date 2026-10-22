@@ -276,6 +276,9 @@ export class Player {
   interior() {
     // inside the lighthouse study (or its annex)
     const dx = this.pos.x - (-85), dz = this.pos.z - (-40);
+    // the lantern gallery stands over the same circle and is the most exposed place on the
+    // island: up there only the glazed lantern itself (inside its murette, r 2.1) is a room
+    if (this.pos.y >= TOWER_TOP - 0.35) return dx * dx + dz * dz < 2.1 * 2.1;
     if (dx * dx + dz * dz < 5.4 * 5.4) return true;
     const ax = this.pos.x - (-85 + Math.sin(0.2618) * 8.1), az = this.pos.z - (-40 + Math.cos(0.2618) * 8.1);
     if (ax * ax + az * az < 2.8 * 2.8) return true;

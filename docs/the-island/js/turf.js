@@ -123,7 +123,7 @@ export function buildTurf(keepOut) {
     const U = {
       uTurfH: { value: heightTex }, uTurfMask: { value: maskTex },
       uOrigin: { value: new THREE.Vector2() }, uCam: { value: new THREE.Vector3() },
-      uTime: { value: 0 }, uWaterY: { value: -100 },
+      uTime: { value: 0 }, uWaterY: { value: -100 }, uWind: { value: 1 },
       uRadius: { value: R.radius }, uInner: { value: R.inner }, uCell: { value: R.cell },
       uDomain: { value: G.size }, uGridN: { value: N1 },
     };
@@ -139,12 +139,13 @@ export function buildTurf(keepOut) {
   }
   group.userData.grownTexels = grown;
   // per frame (main.js): slide each square with the eye; the world grid owns each tuft
-  group.userData.follow = (cam, waterY, time) => {
+  group.userData.follow = (cam, waterY, time, wind = 1) => {
     for (const { U, cell } of all) {
       U.uOrigin.value.set(Math.round(cam.x / cell) * cell, Math.round(cam.z / cell) * cell);
       U.uCam.value.copy(cam);
       U.uWaterY.value = waterY;
       U.uTime.value = time;
+      U.uWind.value = wind;           // the island's one wind (main.js): a gust lays the turf over
     }
   };
   return group;
@@ -158,7 +159,7 @@ function makeMaterial(U) {
     sh.vertexShader = sh.vertexShader
       .replace('void main() {', `attribute vec2 aCell;
         uniform sampler2D uTurfH; uniform sampler2D uTurfMask;
-        uniform vec2 uOrigin; uniform vec3 uCam; uniform float uTime; uniform float uWaterY;
+        uniform vec2 uOrigin; uniform vec3 uCam; uniform float uTime; uniform float uWaterY; uniform float uWind;
         uniform float uRadius; uniform float uInner; uniform float uCell; uniform float uDomain; uniform float uGridN;
         varying vec3 vTurfTone; varying float vTurfT; varying vec4 vTurfFlower;
         float thash(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
@@ -190,7 +191,7 @@ function makeMaterial(U) {
         float ang = r1 * 6.2831853 + r2 * 3.0, ca = cos(ang), sa = sin(ang);
         lxz = vec2(ca * lxz.x - sa * lxz.y, sa * lxz.x + ca * lxz.y);
         float gw = wxz.x * 0.31 + wxz.y * 0.23;
-        lxz += vec2(sin(uTime * 1.5 + gw), 0.6 * cos(uTime * 1.2 + gw * 1.4)) * 0.11 * tip * ht;
+        lxz += (vec2(sin(uTime * 1.5 + gw), 0.6 * cos(uTime * 1.2 + gw * 1.4)) * uWind + vec2(max(uWind - 1.0, 0.0) * 0.8, 0.0)) * 0.11 * tip * ht;
         transformed = vec3(wxz.x + lxz.x * alive, gy - 0.04 + tip * ht * alive, wxz.y + lxz.y * alive);
         vTurfTone = tm.rgb * (0.82 + 0.3 * r4); vTurfT = tip;
         float sp = tnoise(wxz * 0.03 + 11.0);
@@ -205,7 +206,7 @@ function makeMaterial(U) {
         diffuseColor.rgb *= vTurfTone * vec3(0.94, 1.06, 0.86) * mix(0.42, 1.04, vTurfT);
         diffuseColor.rgb = mix(diffuseColor.rgb, vTurfFlower.rgb, vTurfFlower.a * smoothstep(0.5, 0.82, vTurfT));`);
   };
-  mat.customProgramCacheKey = () => 'meadow-turf-v3';
+  mat.customProgramCacheKey = () => 'meadow-turf-v4';
   return mat;
 
 }

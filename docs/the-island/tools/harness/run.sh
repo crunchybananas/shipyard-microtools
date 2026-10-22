@@ -192,10 +192,18 @@ grep -q 'ENCOUNTERS 8 / 8' "$WORK/encounters.out" || { echo "ENCOUNTERS FAILED";
 
 echo "== the sound world =="
 # Every other gate runs muted. This renders the real audio.js offline — footsteps on seven
-# surfaces, handled objects, breaking waves, the tower room, both music beds — and proves
+# surfaces, handled objects, breaking waves, the tower room, gusts, the grove, the gallery,
+# the cellar's drips, both music beds — and proves
 # each is audible, unclipped, and that surfaces sound different from one another.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/audio.mjs" | tee "$WORK/audio.out"
-grep -q 'AUDIO 12 / 12' "$WORK/audio.out" || { echo "AUDIO FAILED"; exit 1; }
+grep -q 'AUDIO 16 / 16' "$WORK/audio.out" || { echo "AUDIO FAILED"; exit 1; }
+
+echo "== what is underfoot =="
+# The game must ASK for the right sound: real teleports through the footstep path pick each
+# surface, the lantern gallery is open air over the study's circle, and the one wind reaches
+# the crowns, the grass and the turf together.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/surfaces.mjs" | tee "$WORK/surfaces.out"
+grep -q 'SURFACES 11 / 11' "$WORK/surfaces.out" || { echo "SURFACES FAILED"; exit 1; }
 
 echo "== the walk =="
 # Every puzzle action goes through its shipped hotspot. Crossing travel uses the public

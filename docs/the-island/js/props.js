@@ -3643,6 +3643,7 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
   spruceMat.color = new THREE.Color(0xf4f6ee);
   const cardPatch = (mat) => (sh) => {
     sh.uniforms.uTime = { value: 0 };
+    sh.uniforms.uWind = { value: 1 };
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
     mat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
@@ -3653,11 +3654,17 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
         // the TIPS move most: a branch is a cantilever, so sway scales with how far out
         // the vertex sits as well as how high. A whole canopy sliding sideways as one
         // rigid lump is what made the old wind read as a wobble rather than a breeze.
+        // uWind is the island's one wind (main.js): ~1 at a breeze; a gust swings the
+        // boughs wider and leans every crown the same way at once.
         float gust = sin(uTime * 1.4 + windSeed) + 0.35 * sin(uTime * 2.7 + windSeed * 1.9);
-        transformed.x += gust * 0.11 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
-        transformed.z += sin(uTime * 1.1 + windSeed * 2.3) * 0.06 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
+        float reach = (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
+        transformed.x += gust * 0.11 * uWind * reach;
+        transformed.z += sin(uTime * 1.1 + windSeed * 2.3) * 0.06 * uWind * reach;
+        // the lean is WORLD +x for every crown: each instance is turned on its own, so take
+        // world x into this instance's frame (row 0 of its rotation)
+        transformed += normalize(vec3(instanceMatrix[0][0], instanceMatrix[1][0], instanceMatrix[2][0])) * max(uWind - 1.0, 0.0) * 0.12 * reach;
       #endif
-    `).replace('void main() {', 'uniform float uTime;\nattribute float aRim;\nvarying float vRim;\nvoid main() {');
+    `).replace('void main() {', 'uniform float uTime;\nuniform float uWind;\nattribute float aRim;\nvarying float vRim;\nvoid main() {');
     sh.fragmentShader = sh.fragmentShader
       .replace('void main() {', `uniform vec3 uHaze;
         varying float vRim;
@@ -3683,13 +3690,14 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
   };
   canopyMat.onBeforeCompile = cardPatch(canopyMat);
   spruceMat.onBeforeCompile = cardPatch(spruceMat);
-  canopyMat.customProgramCacheKey = () => 'needle-card-crown-v1';
-  spruceMat.customProgramCacheKey = () => 'needle-card-crown-v1';
+  canopyMat.customProgramCacheKey = () => 'needle-card-crown-v2';
+  spruceMat.customProgramCacheKey = () => 'needle-card-crown-v2';
 
   const modelCanopyMat = new THREE.MeshStandardMaterial({ flatShading: false, roughness: 0.85, vertexColors: true, side: THREE.DoubleSide });
   modelCanopyMat.color = new THREE.Color(0xe1e6d6);
   modelCanopyMat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = { value: 0 };
+    sh.uniforms.uWind = { value: 1 };
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
     sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs -> object-space sample)
     sh.uniforms.uFolAmt = { value: 0.25 };
@@ -3702,10 +3710,14 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
       #ifdef USE_INSTANCING
         float windSeed = instanceMatrix[3].x * 0.13 + instanceMatrix[3].z * 0.17;
         float gust = sin(uTime * 1.4 + windSeed) + 0.35 * sin(uTime * 2.7 + windSeed * 1.9);
-        transformed.x += gust * 0.11 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
-        transformed.z += sin(uTime * 1.1 + windSeed * 2.3) * 0.06 * (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
+        float reach = (0.35 + aRim) * smoothstep(1.0, 5.5, transformed.y);
+        transformed.x += gust * 0.11 * uWind * reach;
+        transformed.z += sin(uTime * 1.1 + windSeed * 2.3) * 0.06 * uWind * reach;
+        // the lean is WORLD +x for every crown: each instance is turned on its own, so take
+        // world x into this instance's frame (row 0 of its rotation)
+        transformed += normalize(vec3(instanceMatrix[0][0], instanceMatrix[1][0], instanceMatrix[2][0])) * max(uWind - 1.0, 0.0) * 0.12 * reach;
       #endif
-    `).replace('void main() {', 'uniform float uTime;\nattribute float aRim;\nvarying vec3 vLPos;\nvarying float vRim;\nvoid main() {');
+    `).replace('void main() {', 'uniform float uTime;\nuniform float uWind;\nattribute float aRim;\nvarying vec3 vLPos;\nvarying float vRim;\nvoid main() {');
     sh.fragmentShader = sh.fragmentShader
       .replace('void main() {', `uniform vec3 uHaze;
         uniform sampler2D uFoliage; uniform float uFolAmt; uniform float uFolScale;
@@ -3965,6 +3977,7 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
     return group;
   };
   core.userData.treeLod = treePartition;
+  core.userData.treeSpots = spots;                 // main.js: the grove around you (the needles' hiss)
   core.userData.canopyVariants = CANOPY.length;   // so tools/harness/trees.mjs cannot drift from the table
   trunks.castShadow = true;
   // 'canopies' is the GROUP swayMats (main.js) finds — it reads the shared material off the
@@ -4095,6 +4108,7 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
   // second thing to forget to fix.
   const meadowSway = (mat, amp = 1, fray = 0) => (sh) => {
     sh.uniforms.uTime = { value: 0 };
+    sh.uniforms.uWind = { value: 1 };
     mat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
@@ -4102,10 +4116,12 @@ function buildVegetation(core, r, coastKit, boulderKit = null) {
       #ifdef USE_INSTANCING
         float gw = instanceMatrix[3].x * 0.31 + instanceMatrix[3].z * 0.23;
         float gt = pow(max(position.y, 0.0), 1.5);            // tips drift most, roots stay put
-        transformed.x += sin(uTime * 1.5 + gw) * ${(0.32 * amp).toFixed(3)} * gt;   // gentle two-axis wave (not a rigid waggle)
-        transformed.z += cos(uTime * 1.2 + gw * 1.4) * ${(0.18 * amp).toFixed(3)} * gt;
+        transformed.x += sin(uTime * 1.5 + gw) * ${(0.32 * amp).toFixed(3)} * uWind * gt;   // gentle two-axis wave (not a rigid waggle)
+        transformed.z += cos(uTime * 1.2 + gw * 1.4) * ${(0.18 * amp).toFixed(3)} * uWind * gt;
+        // a gust lays the whole meadow over the same way: world +x in this tuft's own frame
+        transformed += normalize(vec3(instanceMatrix[0][0], instanceMatrix[1][0], instanceMatrix[2][0])) * max(uWind - 1.0, 0.0) * ${(0.26 * amp).toFixed(3)} * gt;
       #endif
-    `).replace('void main() {', 'uniform float uTime;\nvarying vec3 vGUp;\nvoid main() {');
+    `).replace('void main() {', 'uniform float uTime;\nuniform float uWind;\nvarying vec3 vGUp;\nvoid main() {');
     // light every blade with the ground's UP normal (the classic grass trick): a thin vertical
     // card's own normal faces the horizon, so the sun/hemi lit it near-black — and DoubleSide
     // back-faces went fully dark. With the meadow-floor normal the tufts take the same light as

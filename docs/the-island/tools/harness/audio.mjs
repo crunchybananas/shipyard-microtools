@@ -10,6 +10,9 @@
 //   handling    book, pages, letter, slate, shelf, drawer, glass, rope, hatch — each audible
 //   shore       outdoor beds + breaking waves         — waves land as discrete events
 //   tower       wood steps and the music box indoors  — the room reverb carries a tail
+//   air         the island's one wind: a gust, a grove's needles hissing
+//   gallery     the iron rail singing in a hard gust
+//   cellar      drips in the dark, the wind and the trees shut out
 //   music       the era bed and its melody, surface and last winter
 import { writeFileSync, mkdirSync } from 'node:fs';
 
@@ -81,8 +84,13 @@ export default async function (h) {
         const re = { length: 0 };
         let num = 0, den = 0, band = 0; for (let k = 1; k < N / 2; k++) { const mag = Math.sqrt(acc[k]); num += mag * k * SR / N; den += mag; const f = k * SR / N; if (f > 1500 && f < 6000) band += acc[k]; }
         const blocks = Math.max(1, Math.floor((i1 - i0 - N) / 1024));
+        // octave bands, and how tonal 0.9-1.6 kHz is (its loudest bin over the band's mean)
+        const oct = {};
+        for (const fc of [250, 500, 1000, 2000, 4000, 8000]) { let e = 0; for (let k = 1; k < N / 2; k++) { const f = k * SR / N; if (f >= fc / Math.SQRT2 && f < fc * Math.SQRT2) e += acc[k]; } oct[fc] = +(10 * Math.log10(e / blocks + 1e-12)).toFixed(1); }
+        let tmx = 0, tsum = 0, tn = 0; for (let k = 1; k < N / 2; k++) { const f = k * SR / N; if (f > 900 && f < 1600) { tmx = Math.max(tmx, acc[k]); tsum += acc[k]; tn++; } }
+        const tonalDb = +(10 * Math.log10(tmx / Math.max(1e-30, tsum / tn))).toFixed(1);
         return { rmsDb: +(10 * Math.log10(e / Math.max(1, i1 - i0) + 1e-12)).toFixed(1), peak: +p.toFixed(3), centroid: Math.round(num / Math.max(den, 1e-9)),
-          bandDb: +(10 * Math.log10(band / blocks + 1e-12)).toFixed(1), bandP90Db: +(10 * Math.log10(p90 + 1e-12)).toFixed(1), ...(keepFrames ? { frames } : {}) };
+          bandDb: +(10 * Math.log10(band / blocks + 1e-12)).toFixed(1), bandP90Db: +(10 * Math.log10(p90 + 1e-12)).toFixed(1), oct, tonalDb, ...(keepFrames ? { frames } : {}) };
       };
       // count wave events: peaks of a 100 ms RMS envelope that rise 6 dB over their surroundings
       const env = []; const hop = Math.floor(SR * 0.1);
@@ -175,6 +183,36 @@ export default async function (h) {
   const tail = tower.segs.find((s) => s.name === 'tail'), box = tower.segs.find((s) => s.name === 'musicbox');
   ok('the tower room carries a reverb tail after the music box stops', tail.rmsDb > box.rmsDb - 40 && tail.rmsDb > -70, { box, tail });
   ok('indoors is audible and unclipped', tower.nan === 0 && tower.peak < 0.95, { peak: tower.peak });
+
+  // ---------------------------------------------------------------- the wind
+  // main.js owns one wind (`gust`); the same value sways the grass and the crowns. A gust
+  // must be HEARD — louder and brighter — and a grove must hiss, more in a gust.
+  const air = await render('air', 32, `
+    const S = (o) => Object.assign({ wavePhase: 0.3, shoreDist: 400, tideNear: 0.5, altitude: 9, interior: false, underground: false, night: 0, dawn: 0,
+      level: 1, px: 0, pz: 0, yaw: 0, mist: 0, gust: 0.15, trees: null, aloft: false }, o);
+    const grove = { near: 1, x: 6, z: 0 };
+    for (let t = 0.05; t < 32; t += 0.05) at(t, () => A.update(0.05, S(t < 8 ? {} : t < 14 ? { gust: 0.95 } : t < 18 ? {} : t < 25 ? { trees: grove } : { trees: grove, gust: 0.95 })));
+    marks.push({ name: 'calm', t0: 3, t1: 7.8 }, { name: 'gust', t0: 9.5, t1: 13.8 }, { name: 'grove', t0: 20, t1: 24.8 }, { name: 'grove-gust', t0: 26.5, t1: 31.5 });`);
+  const AS = Object.fromEntries(air.segs.map((x) => [x.name, x]));
+  ok('a gust is heard arriving: louder and brighter than the breeze', AS.gust.rmsDb - AS.calm.rmsDb > 5 && AS.gust.centroid > AS.calm.centroid * 1.15, { calm: AS.calm, gust: AS.gust });
+  // a breeze through a grove at least doubles the 4 kHz octave (a second source, clearly
+  // there); a gust through it lifts that octave a further 6 dB
+  ok('a grove hisses in the 4 kHz octave, and more in a gust', AS.grove.oct[4000] - AS.calm.oct[4000] > 3 && AS['grove-gust'].oct[4000] - AS.grove.oct[4000] > 6,
+    { calm: AS.calm.oct, grove: AS.grove.oct, groveGust: AS['grove-gust'].oct });
+  const gal = await render('gallery', 12, `
+    const S = (g) => ({ wavePhase: 0.3, shoreDist: 400, tideNear: 0.5, altitude: 34.1, interior: false, underground: false, night: 0, dawn: 0,
+      level: 1, px: -85, pz: -40, yaw: 0, mist: 0, gust: g, trees: null, aloft: true });
+    for (let t = 0.05; t < 12; t += 0.05) at(t, () => A.update(0.05, S(t < 5 ? 0.15 : 0.95)));
+    marks.push({ name: 'calm', t0: 2, t1: 4.8 }, { name: 'gust', t0: 7, t1: 11.8 });`);
+  const GS = Object.fromEntries(gal.segs.map((x) => [x.name, x]));
+  ok('the gallery rail sings in a gust (a tone stands out of 0.9-1.6 kHz)', GS.gust.tonalDb - GS.calm.tonalDb > 6 && gal.peak < 0.95, { calm: GS.calm.tonalDb, gust: GS.gust.tonalDb, peak: gal.peak });
+  const cel = await render('cellar', 12, `
+    const S = { wavePhase: 0.3, shoreDist: 400, tideNear: 0.5, altitude: 5, interior: false, underground: true, night: 0, dawn: 0,
+      level: 1, px: 10, pz: -60, yaw: 0, mist: 0, gust: 0.6, trees: { near: 1, x: 14, z: -60 }, aloft: false };
+    for (let t = 0.05; t < 12; t += 0.05) at(t, () => A.update(0.05, S));
+    marks.push({ name: 'cellar', t0: 1, t1: 12 });`);
+  ok('underground, water drips in the dark and the grove above is shut out', cel.waveEvents >= 4 && cel.nan === 0 && cel.peak < 0.95 && cel.segs[0].oct[8000] < AS.calm.oct[8000],
+    { waveEvents: cel.waveEvents, cellar: cel.segs[0].oct, peak: cel.peak });
 
   // ---------------------------------------------------------------- music
   for (const [name, lv] of [['music-surface', 1], ['music-winter', 4]]) {
