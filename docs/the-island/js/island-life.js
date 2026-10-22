@@ -120,14 +120,50 @@ export function attachCoastalFigures(core,library){
     source.updateWorldMatrix(true,false);
     const geometry=source.geometry.clone().applyMatrix4(source.matrixWorld);
     const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.96,transparent:true,opacity:anchorName==='watcher'?1:.8,emissive:0x102125,emissiveIntensity:.12});
+    // THEY CAME OUT OF THE SEA. At 2 m the figures read as mannequins: one matte finish
+    // (roughness .96 is felt) on a smooth body. Oilskin is waxed cloth — it shines, and it
+    // shines more wet. The coat gets fine vertical creases, a darker soaked band below an
+    // uneven tide line with salt dried pale along it, and slow glossy runnels of water
+    // running down; the skin is wet too. Object space, so it rides the cloth sway.
     material.onBeforeCompile=shader=>{
       shader.uniforms.uFigureTime={value:0};material.userData.shader=shader;
-      shader.vertexShader='uniform float uFigureTime;\n'+shader.vertexShader;
+      shader.vertexShader='uniform float uFigureTime;\nvarying vec3 vFigP;\n'+shader.vertexShader;
       shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
         float cloth=smoothstep(.08,.4,position.y)*(1.0-smoothstep(1.30,1.50,position.y));
-        transformed.z+=sin(uFigureTime*.8+position.y*3.0)*.006*cloth;`);
+        transformed.z+=sin(uFigureTime*.8+position.y*3.0)*.006*cloth;
+        vFigP=position;`);
+      shader.fragmentShader=`uniform float uFigureTime;
+        varying vec3 vFigP;
+        float figH(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
+        float figN(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);
+          return mix(mix(figH(i),figH(i+vec2(1,0)),u.x),mix(figH(i+vec2(0,1)),figH(i+vec2(1,1)),u.x),u.y);}
+        float figWet;float figRun;float figSkin;
+        `+shader.fragmentShader
+        .replace('#include <color_fragment>',`#include <color_fragment>
+          // around the body: the angle about the figure's axis, so creases run down it
+          float ang=atan(vFigP.x,vFigP.z);
+          float crease=figN(vec2(ang*9.0,vFigP.y*2.2))*.65+figN(vec2(ang*23.0,vFigP.y*5.0))*.35;
+          figSkin=smoothstep(.11,.15,vColor.g)*(1.0-smoothstep(.3,.4,vColor.g));
+          float tide=.52+.07*figN(vec2(ang*3.0,1.7))+.03*sin(ang*5.0);
+          figWet=1.0-smoothstep(tide-.035,tide+.035,vFigP.y);
+          figRun=smoothstep(.78,.95,figN(vec2(ang*14.0,vFigP.y*1.4+uFigureTime*.22)))*smoothstep(1.45,1.1,vFigP.y);
+          vec3 c=diffuseColor.rgb*(.8+.4*crease*(1.0-figSkin));
+          c*=mix(1.0,.48,figWet*(1.0-figSkin));
+          // salt dried along the line: a thin, broken, low crust — never a painted trim
+          float salt=(1.0-smoothstep(.0,.022,abs(vFigP.y-tide-.03)))*smoothstep(.45,.75,figN(vec2(ang*11.0,vFigP.y*24.0)))*(1.0-figSkin);
+          diffuseColor.rgb=mix(c,c*1.9+vec3(.035),salt*.6);
+          // the bare head (the hooded one has none): hair, soaked flat over the crown and the
+          // back of the skull in dark strands, a hairline across the brow, the face (+z, under
+          // y 1.655) left clear — a person, not a dome
+          float hairline=1.655+.012*sin(vFigP.x*40.0);
+          float hair=figSkin*smoothstep(1.535,1.575,vFigP.y)*max(1.0-smoothstep(.07,.125,vFigP.z),smoothstep(hairline-.01,hairline+.01,vFigP.y));
+          vec3 strands=vec3(.03,.034,.033)*(.7+.6*figN(vec2(ang*30.0,vFigP.y*8.0)));
+          diffuseColor.rgb=mix(diffuseColor.rgb,strands,hair);
+          figWet=max(figWet,hair);`)
+        .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+          roughnessFactor=mix(.58,.3,max(figWet,figRun))+.1*figSkin*(1.0-figWet);`);
     };
-    material.customProgramCacheKey=()=> 'coastal-figure-cloth-v1';
+    material.customProgramCacheKey=()=> 'coastal-figure-cloth-v5';
     const mesh=new THREE.Mesh(geometry,material);mesh.name=asset;mesh.userData.authoring='Blender island_life.py';anchor.add(mesh);
     anchor.userData.mats=[material];anchor.userData.authoring='Blender island_life.py';materials.push(material);
   }

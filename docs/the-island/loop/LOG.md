@@ -4700,6 +4700,12 @@ was 13–17 dB under the surf at flush distance; now it is +4.5 dB. **AUDIO 19 /
 landed in silence. Each landing now sounds from where it hits the water (`A.dropLands`, a
 heavier `KIT.drip`). **AUDIO 20 / 20**, **SURFACES 13 / 13**.
 
+**And the figures:** the Tide-Figure and the Watcher (shared material in island-life.js)
+are waxed oilskin now: creases, a soaked hem below an uneven tide line with broken salt,
+water runnels, wet boots, and on the bare head dark soaked hair with a hairline. Before,
+the Tide-Figure read as a mannequin at 2 m. Shader only, no geometry.
+`day4-figures/`. Gate green.
+
 **Debt:** the game's sound has only been heard offline, not yet by the owner in a live
 walk. Mix levels are set by measurement, not by ear.
 

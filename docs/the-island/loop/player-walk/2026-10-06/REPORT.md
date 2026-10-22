@@ -410,3 +410,24 @@ module. It covers:
 - in the cellar with the hatch open, the vault's drops heard landing out in the void.
 
 Result: **SURFACES 13 / 13**. `ABYME.wind(g)` holds the gust at a level for captures.
+
+**The figures out of the sea** (`js/island-life.js`, `day4-figures/`). The last "still
+basic" item from the first walk. At 2 m the Tide-Figure read as a shop mannequin: one
+matte finish (roughness .96 is felt) on a smooth body, a bald grey dome for a head. The
+Blender source paints it a dark teal oilskin. It reads pale because it stands at 80%
+opacity over bright sand, and that's by design. What was missing is that oilskin is
+waxed cloth, and these two came out of the sea. The shared figure material now has:
+- a waxed sheen and fine vertical creases around the body;
+- a soaked band, darker and glossier, below an uneven tide line, with a thin broken salt
+  crust where it dried;
+- slow glossy runnels of water running down the coat;
+- on the bare head, dark hair soaked flat over the crown and down the back, with a
+  hairline across the brow and the face left clear;
+- wet boots.
+
+It is all object-space shading on the existing mesh, so it costs no geometry and stays
+inside the power policy. The first try painted the salt line as a hard white zigzag that
+read as decorative trim, and it was replaced with the broken crust.
+`day4-figures/before/tidefig-2.2m.jpg` → `day4-figures/after/tidefig-2.2m.jpg` (and
+`-5m`, and the hooded Watcher, which gains only the sheen and the soaked hem). The full
+gate passes, including encounters 8/8 and cohesion 9/9.
