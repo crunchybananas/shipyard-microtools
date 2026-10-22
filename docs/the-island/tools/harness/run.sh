@@ -196,7 +196,7 @@ echo "== the sound world =="
 # the cellar's drips, both music beds — and proves
 # each is audible, unclipped, and that surfaces sound different from one another.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/audio.mjs" | tee "$WORK/audio.out"
-grep -q 'AUDIO 16 / 16' "$WORK/audio.out" || { echo "AUDIO FAILED"; exit 1; }
+grep -q 'AUDIO 18 / 18' "$WORK/audio.out" || { echo "AUDIO FAILED"; exit 1; }
 
 echo "== what is underfoot =="
 # The game must ASK for the right sound: real teleports through the footstep path pick each

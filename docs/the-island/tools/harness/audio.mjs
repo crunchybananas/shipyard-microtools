@@ -6,7 +6,8 @@
 // exact times, and measures the result. With AUDIO_DIR set it also writes each sheet as a
 // 16-bit WAV for listening.
 //
-//   footsteps   seven surfaces, four steps each       — audible, unclipped, spectrally distinct
+//   footsteps   eight surfaces, four steps each       — audible, unclipped, spectrally distinct;
+//               shingle, deck and grass each over the bed they are walked on
 //   handling    book, pages, letter, slate, shelf, drawer, glass, rope, hatch — each audible
 //   shore       outdoor beds + breaking waves         — waves land as discrete events
 //   tower       wood steps and the music box indoors  — the room reverb carries a tail
@@ -62,7 +63,7 @@ export default async function (h) {
         let e = 0, p = 0; for (let i = i0; i < i1; i++) { const m = (L[i] + Rr[i]) * 0.5; e += m * m; p = Math.max(p, Math.abs(m)); }
         // spectral centroid of the segment's energy-weighted average spectrum (2048-point FFTs
         // every 1024 samples): the whole step, not just its loudest instant (which is the thud)
-        const N = 2048, acc = new Float64Array(N / 2), blockBand = [];
+        const N = 2048, acc = new Float64Array(N / 2), blockBand = [], framesLo = [];
         const fft = (re, im) => {
           for (let i = 1, j = 0; i < N; i++) { let bit = N >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
           for (let len = 2; len <= N; len <<= 1) { const ang = -2 * Math.PI / len; for (let i = 0; i < N; i += len) for (let j = 0; j < len / 2; j++) {
@@ -74,9 +75,9 @@ export default async function (h) {
           const re = new Float64Array(N), im = new Float64Array(N);
           for (let j = 0; j < N; j++) re[j] = (L[b + j] + Rr[b + j]) * 0.5 * (0.5 - 0.5 * Math.cos(2 * Math.PI * j / (N - 1)));
           fft(re, im);
-          let bb = 0;
-          for (let k = 1; k < N / 2; k++) { const pw = re[k] * re[k] + im[k] * im[k]; acc[k] += pw; const f = k * SR / N; if (f > 1500 && f < 6000) bb += pw; }
-          blockBand.push(bb);
+          let bb = 0, lo = 0;
+          for (let k = 1; k < N / 2; k++) { const pw = re[k] * re[k] + im[k] * im[k]; acc[k] += pw; const f = k * SR / N; if (f > 1500 && f < 6000) bb += pw; else if (f > 200 && f <= 1500) lo += pw; }
+          blockBand.push(bb); framesLo.push(lo);
         }
         const frames = blockBand.slice();
         blockBand.sort((a, b) => a - b);
@@ -90,7 +91,7 @@ export default async function (h) {
         let tmx = 0, tsum = 0, tn = 0; for (let k = 1; k < N / 2; k++) { const f = k * SR / N; if (f > 900 && f < 1600) { tmx = Math.max(tmx, acc[k]); tsum += acc[k]; tn++; } }
         const tonalDb = +(10 * Math.log10(tmx / Math.max(1e-30, tsum / tn))).toFixed(1);
         return { rmsDb: +(10 * Math.log10(e / Math.max(1, i1 - i0) + 1e-12)).toFixed(1), peak: +p.toFixed(3), centroid: Math.round(num / Math.max(den, 1e-9)),
-          bandDb: +(10 * Math.log10(band / blocks + 1e-12)).toFixed(1), bandP90Db: +(10 * Math.log10(p90 + 1e-12)).toFixed(1), oct, tonalDb, ...(keepFrames ? { frames } : {}) };
+          bandDb: +(10 * Math.log10(band / blocks + 1e-12)).toFixed(1), bandP90Db: +(10 * Math.log10(p90 + 1e-12)).toFixed(1), oct, tonalDb, ...(keepFrames ? { frames, framesLo } : {}) };
       };
       // count wave events: peaks of a 100 ms RMS envelope that rise 6 dB over their surroundings
       const env = []; const hop = Math.floor(SR * 0.1);
@@ -122,7 +123,7 @@ export default async function (h) {
   };
 
   // ---------------------------------------------------------------- footsteps
-  const SURF = ['pebble', 'sand', 'grass', 'wood', 'stone', 'iron', 'water'];
+  const SURF = ['pebble', 'sand', 'grass', 'wood', 'deck', 'stone', 'iron', 'water'];
   const foot = await render('footsteps', SURF.length * 2.4 + 0.5, `
     const SURF = ${JSON.stringify(SURF)};
     at(0.01, () => A.update(0.016, { wavePhase: 0, shoreDist: 400, tideNear: 0, altitude: 0, interior: false, night: 0, dawn: 0, level: 9, px: 0, pz: 0, yaw: 0, mist: 0 }));
@@ -130,28 +131,44 @@ export default async function (h) {
     SURF.forEach((s, k) => { const t0 = 0.3 + k * 2.4; for (let i = 0; i < 4; i++) at(t0 + i * 0.46, () => A.footstep(s)); marks.push({ name: s, t0, t1: t0 + 2.0 }); });`);
   // and the same steps over the shore's own beds: footsteps must read through the surf. The
   // identical shore is rendered twice, with and without steps, and compared over one window.
-  const shoreSheet = (steps) => `
-    for (let t = 0.05; t < 6; t += 0.05) at(t, () => A.update(0.05, { wavePhase: Math.min(1, Math.max(0, wave(t))), shoreDist: 12, tideNear: 1, altitude: 1.5, interior: false,
-      night: 0, dawn: 0, level: 1, px: 4, pz: -104, yaw: 2.19, mist: 0, sea: null, underground: false }));
-    ${steps ? "for (let i = 0; i < 6; i++) at(2.5 + i * 0.46, () => A.footstep('pebble'));" : ''}
+  // Footsteps must read through the bed they are actually walked over. Seeded renders make a
+  // bed rendered with and without steps identical, so frame by frame (46 ms) the steps' own
+  // energy is the difference. Where a step lands (its loudest sixth of frames — six steps in
+  // the window) it must stand above the bed in its own band (0.2-1.5 or 1.5-6 kHz, whichever
+  // carries it): a signal over its masker in its own region is heard, not guessed at.
+  const shoreBed = `for (let t = 0.05; t < 6; t += 0.05) at(t, () => A.update(0.05, { wavePhase: Math.min(1, Math.max(0, wave(t))), shoreDist: 4, tideNear: 1, altitude: 1.5,
+      interior: false, night: 0, dawn: 0, level: 1, px: 4, pz: -104, yaw: 2.19, mist: 0, sea: null, underground: false, gust: 0.35 }));`;
+  const groveBed = `for (let t = 0.05; t < 6; t += 0.05) at(t, () => A.update(0.05, { wavePhase: 0.3, shoreDist: 400, tideNear: 0.5, altitude: 9, interior: false,
+      night: 0, dawn: 0, level: 1, px: 0, pz: 0, yaw: 0, mist: 0, underground: false, gust: 0.35, trees: { near: 1, x: 6, z: 0 } }));`;
+  const sheet = (bedSrc, kind) => `${bedSrc}
+    ${kind ? `for (let i = 0; i < 6; i++) at(2.5 + i * 0.46, () => A.footstep('${kind}'));` : ''}
     marks.push({ name: 'window', t0: 2.5, t1: 5.3, frames: true });`;
-  const bed = (await render('shore-bed', 6, shoreSheet(false))).segs[0];
-  const both = (await render('footsteps-shore', 6, shoreSheet(true))).segs[0];
-  // Seeded renders make the two beds identical, so frame by frame (46 ms, 1.5-6 kHz) the
-  // steps' own energy is the difference. Where a step lands (its loudest sixth of frames —
-  // six steps in the window), it must stand above the surf in the same band: a signal over
-  // its masker in its own critical region is heard, not guessed at.
-  const stepE = both.frames.map((e, i) => Math.max(0, e - bed.frames[i]));
-  const at = stepE.map((e, i) => i).sort((a, b) => stepE[b] - stepE[a]).slice(0, Math.max(1, Math.round(stepE.length / 6)));
-  const smr = +(10 * Math.log10(at.reduce((a, i) => a + stepE[i], 0) / Math.max(1e-12, at.reduce((a, i) => a + bed.frames[i], 0)))).toFixed(1);
-  delete bed.frames; delete both.frames;
-  console.log(`  steps over the surf: ${smr} dB above the bed in 1.5-6 kHz where they land`);
-  ok('footsteps on shingle stand above the surf where they land (1.5-6 kHz, > +3 dB)', smr > 3, { smr, bed, both });
+  const smrOf = (bed, both) => {
+    const one = (B, S) => {
+      const stepE = S.map((e, i) => Math.max(0, e - B[i]));
+      const top = stepE.map((e, i) => i).sort((a, b) => stepE[b] - stepE[a]).slice(0, Math.max(1, Math.round(stepE.length / 6)));
+      return +(10 * Math.log10(top.reduce((a, i) => a + stepE[i], 0) / Math.max(1e-12, top.reduce((a, i) => a + B[i], 0)))).toFixed(1);
+    };
+    return { hi: one(bed.frames, both.frames), lo: one(bed.framesLo, both.framesLo) };
+  };
+  const strip = (x) => { delete x.frames; delete x.framesLo; return x; };
+  const sBed = (await render('shore-bed', 6, sheet(shoreBed, null))).segs[0];
+  const grBed = (await render('grove-bed', 6, sheet(groveBed, null))).segs[0];
+  const OVER = [['pebble', 'footsteps-shore', sBed, shoreBed, 'shingle on the landing beach'], ['deck', 'deck-shore', sBed, shoreBed, 'the jetty deck over the surf'],
+    ['grass', 'grass-grove', grBed, groveBed, 'grass in a grove in a breeze']];
+  for (const [kind, name, bed, bedSrc, where] of OVER) {
+    const both = (await render(name, 6, sheet(bedSrc, kind))).segs[0];
+    const smr = smrOf(bed, both);
+    console.log(`  ${kind} over its bed: ${smr.lo} dB (0.2-1.5 kHz) / ${smr.hi} dB (1.5-6 kHz) above it where the steps land`);
+    ok(`footsteps on ${where} stand above the bed where they land (> +3 dB in their band)`, Math.max(smr.lo, smr.hi) > 3, { smr, both: strip(both) });
+  }
+  strip(sBed); strip(grBed);
   ok('every surface is audible and unclipped', foot.nan === 0 && foot.peak < 0.95 && foot.segs.every((s) => s.rmsDb > -52), foot.segs);
   const C = Object.fromEntries(foot.segs.map((s) => [s.name, s.centroid]));
   const distinct = (a, b) => Math.abs(C[a] - C[b]) / Math.max(C[a], C[b]) > 0.08;
   ok('shingle, sand and grass sound different from each other', distinct('pebble', 'sand') && distinct('pebble', 'grass') && distinct('sand', 'grass'), C);
-  ok('boards, stone and iron sound different from each other', distinct('wood', 'stone') && distinct('wood', 'iron') && distinct('stone', 'iron'), C);
+  ok('boards, deck, stone and iron sound different from each other', distinct('wood', 'stone') && distinct('wood', 'iron') && distinct('stone', 'iron')
+    && distinct('deck', 'wood') && distinct('deck', 'stone') && distinct('deck', 'iron'), C);
   ok('wading is darker than shingle, and shingle brighter than sand', C.water < C.pebble && C.pebble > C.sand, C);
 
   // ---------------------------------------------------------------- handling
@@ -194,6 +211,7 @@ export default async function (h) {
     for (let t = 0.05; t < 32; t += 0.05) at(t, () => A.update(0.05, S(t < 8 ? {} : t < 14 ? { gust: 0.95 } : t < 18 ? {} : t < 25 ? { trees: grove } : { trees: grove, gust: 0.95 })));
     marks.push({ name: 'calm', t0: 3, t1: 7.8 }, { name: 'gust', t0: 9.5, t1: 13.8 }, { name: 'grove', t0: 20, t1: 24.8 }, { name: 'grove-gust', t0: 26.5, t1: 31.5 });`);
   const AS = Object.fromEntries(air.segs.map((x) => [x.name, x]));
+  console.log(`  4 kHz octave: meadow ${AS.calm.oct[4000]}  grove ${AS.grove.oct[4000]}  grove in a gust ${AS['grove-gust'].oct[4000]} dB`);
   ok('a gust is heard arriving: louder and brighter than the breeze', AS.gust.rmsDb - AS.calm.rmsDb > 5 && AS.gust.centroid > AS.calm.centroid * 1.15, { calm: AS.calm, gust: AS.gust });
   // a breeze through a grove at least doubles the 4 kHz octave (a second source, clearly
   // there); a gust through it lifts that octave a further 6 dB

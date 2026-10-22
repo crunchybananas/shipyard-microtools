@@ -256,7 +256,7 @@ const A = {
     this.wind.gain.gain.setTargetAtTime(windBase * (0.45 + 0.95 * gust), t, 0.3);
     // the grove: its needles hiss with the gust, from the trees' side of you
     const grove = enclosed ? 0 : (s.trees?.near ?? 0);
-    this.sough.gain.gain.setTargetAtTime(grove * (0.04 + 0.08 * gust * gust), t, 0.35);
+    this.sough.gain.gain.setTargetAtTime(grove * (0.034 + 0.085 * gust * gust), t, 0.35);
     this.sough.filt.frequency.setTargetAtTime(2100 + 1400 * gust, t, 0.6);
     if (this.soughPan && s.trees) this.soughPan.pan.setTargetAtTime(this._at(s.trees.x, s.trees.z).pan * 0.7, t, 0.5);
     // the gallery: the iron rail starts to sing once a gust is more than a breeze
@@ -612,7 +612,9 @@ const A = {
       p.connect(this.foley); dest = p;
       setTimeout(() => { try { p.disconnect(); } catch (_) {} }, 1500);
     }
-    KIT.footstep(ctx, dest, kind, { gain: kind === 'water' ? 0.8 : kind === 'pebble' || kind === 'sand' ? 1.45 : 0.75 });
+    // outdoor surfaces sit under the surf and the wind, so they carry more than the quiet rooms' floors
+    const lift = { water: 0.8, pebble: 1.45, sand: 1.45, deck: 1.4, grass: 1.8 }[kind] ?? 0.75;
+    KIT.footstep(ctx, dest, kind, { gain: lift });
   },
 
   // handled things (audio-kit.js) — every reader, hinge, rope and drawer gets a sound

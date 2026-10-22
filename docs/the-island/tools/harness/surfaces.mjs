@@ -42,7 +42,7 @@ export default async function (h) {
   })()`);
   const walk = [
     ['the landing shingle', [4, -104], 'pebble'],
-    ['the jetty deck', [-18, -110.5], 'wood'],
+    ['the jetty deck', [-18, -110.5], 'deck'],
     ['a sand beach', spots.sand, 'sand'],
     ['the meadow', spots.grass, 'grass'],
     ['the shallows', spots.wade, 'water'],

@@ -9,7 +9,7 @@
 //
 //   reverbIR      a generated impulse response: exponential decay, early reflections, and a
 //                 lowpass that closes over the tail so it darkens the way a real room does
-//   footstep      heel and toe on pebble, sand, grass, wood, stone, iron and water
+//   footstep      heel and toe on pebble, sand, grass, wood, deck, stone, iron and water
 //   paper         a book's cover and pages, a letter unfolding, a slate brushed, a page turned
 //   creak         rope, hinge and stair timber under load
 //   drawer, glass small handled things
@@ -105,7 +105,7 @@ export function reverbIR(ctx, { seconds = 2, bright = 7000, dark = 900, early = 
 }
 
 // ----------------------------------------------------------------- footsteps --
-// `surface`: pebble | sand | grass | wood | stone | iron | water. `weight` 0.6..1.2
+// `surface`: pebble | sand | grass | wood | deck | stone | iron | water. `weight` 0.6..1.2
 // (heel vs toe), `dest` already panned and levelled by the caller.
 function footfall(ctx, dest, t, surface, weight) {
   const w = weight;
@@ -122,6 +122,7 @@ function footfall(ctx, dest, t, surface, weight) {
       break;
     case 'grass':
       thud(ctx, dest, t, { freq: rnd(75, 95), dur: 0.07, gain: 0.24 * w, drop: 1.3 });
+      burst(ctx, dest, t, 0.09, { freq: rnd(800, 1100), q: 1.4, gain: 0.16 * w, attack: 0.012 });   // the stems crushed flat
       burst(ctx, dest, t, 0.15, { freq: 2600, q: 0.55, gain: 0.12 * w, attack: 0.045 });
       grains(ctx, dest, t + 0.02, 0.1, Math.round(4 * w), { lo: 4500, hi: 7000, q: 2, gain: 0.04 * w });
       break;
@@ -132,6 +133,22 @@ function footfall(ctx, dest, t, surface, weight) {
       burst(ctx, dest, t, 0.006, { freq: f0 * 2.31, q: 9, gain: 0.5 * w });
       burst(ctx, dest, t, 0.02, { type: 'highpass', freq: 1800, q: 0.7, gain: 0.05 * w });
       if (w > 0.9 && Math.random() < 0.07) creak(ctx, dest, t + 0.03, { base: rnd(420, 560), dur: 0.28, gain: 0.02 });
+      break;
+    }
+    case 'deck': {    // planks over open water: hollower, higher and longer than a floor on joists,
+      // and up above the surf's roar where a floor's knock (165-540 Hz) drowned on the jetty
+      thud(ctx, dest, t, { freq: rnd(90, 110), dur: 0.12, gain: 0.3 * w });
+      burst(ctx, dest, t, 0.014, { type: 'highpass', freq: 2000, q: 0.7, gain: 0.14 * w });
+      const f0 = rnd(480, 640);   // a short plank's note, with its two upper modes
+      for (const [f, a, d] of [[f0, 0.17, 0.11], [f0 * 2.13, 0.11, 0.08], [f0 * 3.4, 0.065, 0.05]]) {
+        const o = ctx.createOscillator(); o.frequency.value = f * rnd(0.98, 1.02);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a * w, t + 0.002);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+        o.connect(g).connect(dest); o.start(t); o.stop(t + d + 0.02);
+      }
+      // a loose board knocks against its neighbour a beat after the foot lands
+      if (w > 0.9 && Math.random() < 0.45) burst(ctx, dest, t + rnd(0.02, 0.04), 0.006, { freq: rnd(700, 1100), q: 6, gain: 0.35 * w });
       break;
     }
     case 'stone':

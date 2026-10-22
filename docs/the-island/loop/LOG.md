@@ -4682,7 +4682,14 @@ the sway of grass, turf and crowns via a shared `uWind` uniform (a gust swings ~
 wider and leans the stand downwind in world space). Drips underground. Buried rooms now
 close the wall filter. Bug fixed: `player.interior()` was XZ-only, so the open lantern
 gallery counted as inside (room reverb, 750 Hz walls, a third of the wind). New gate
-`surfaces.mjs` runs in the real game: **SURFACES 11 / 11**; audio now **16 / 16**.
+`surfaces.mjs` runs in the real game: **SURFACES 11 / 11**.
+
+**Then, listening in the game:** `tools/harness/earwalk.mjs` records the live master bus
+on a scripted walk. The jetty's eight wood steps were completely drowned by the surf, so
+there is a new **deck** surface (a short plank's 480–640 Hz note, its modes, and a loose
+board) and grass gained a stem "crush". The audio gate checks steps over the bed they are
+walked on: shingle +6.4, deck +3.5/+7.0, grass in a breezy grove +3.6 dB. **AUDIO 18 / 18**.
+`day4-sound/in-game-walk.m4a` is the second recording.
 
 **Debt:** the game's sound has only been heard offline, not yet by the owner in a live
 walk. Mix levels are set by measurement, not by ear.

@@ -1804,10 +1804,6 @@ function tickPerched(elapsed, dt) {
 
 // ---------------- footsteps ----------------
 player.onRescue = () => UI.whisper(T.the_ground_gives_you);
-// WHAT IS UNDERFOOT. player.js only knows indoors / low / high; the sound wants the actual
-// material: the study's boards and the tower treads, the iron gallery, the cellar and drain
-// stone, the jetty deck and the ruler bridge, the shallows, the shingle at the landing, sand,
-// and the meadow.
 // THE WIND. One breath for the whole island: the audio's gusts and the sway of the grass, the
 // turf and the conifer crowns all read `gust` (0 calm … 1 a hard gust), so a gust you hear
 // arriving is the meadow you see lean. It builds in about a second and dies over three;
@@ -1854,6 +1850,10 @@ function nearestSea(x, z) {
   return null;
 }
 
+// WHAT IS UNDERFOOT. player.js only knows indoors / low / high; the sound wants the actual
+// material: the study's boards and the tower treads, the iron gallery, the cellar and drain
+// stone, the jetty deck and the ruler bridge (planks over open air: 'deck'), the shallows,
+// the shingle at the landing, sand, and the meadow.
 function surfaceAt(pos) {
   const h = heightAt(pos.x, pos.z), wy = waterY();
   const r = Math.hypot(pos.x - TOWER.x, pos.z - TOWER.z);
@@ -1862,7 +1862,7 @@ function surfaceAt(pos) {
   if (pos.y < h - 1.2) return 'stone';                                            // cellar, drain chamber
   if (player.interior()) return pos.y < TOWER.base - 1 ? 'stone' : 'wood';        // study floor, the quarters
   if (pos.y < wy - 0.05) return 'water';                                          // wading
-  if (pos.y - h > 0.3) return 'wood';                                             // jetty deck, bridge
+  if (pos.y - h > 0.3) return 'deck';                                             // jetty deck, bridge: planks over open air
   if (h < 2.2) return (pos.z < -100.5 && pos.x > -30 && pos.x < 16 && h > -0.5) ? 'pebble' : 'sand';
   return 'grass';
 }

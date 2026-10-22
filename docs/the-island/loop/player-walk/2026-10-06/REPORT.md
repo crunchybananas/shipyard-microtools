@@ -274,14 +274,16 @@ Each step is a heel and then a toe 35–60 ms later. The surfaces:
   shingle band.
 - **sand:** a soft, dark compression.
 - **grass:** a swish.
-- **wood:** a hollow knock with a board resonance and an occasional creak. Used indoors,
-  on the stair, the jetty and the bridges.
+- **wood:** a hollow knock with a board resonance and an occasional creak. Used indoors
+  and on the stair.
+- **deck:** a short plank's ringing note over open water. Used on the jetty and the
+  bridges (see "Listening in the game itself" below).
 - **stone:** a hard click on a low thud. Used in the vaults and cellars.
 - **iron:** a ringing click. Used on the lantern gallery.
 - **water:** a splash that drops in pitch, with bubbles. Used when wading.
 
-Steps alternate slightly left and right. `day4-sound/footsteps.m4a` plays all seven,
-four steps each, in that order. `footsteps-spectrogram.jpg` shows them: tonal lines
+Steps alternate slightly left and right. `day4-sound/footsteps.m4a` plays all eight,
+four steps each (pebble, sand, grass, wood, deck, stone, iron, water). `footsteps-spectrogram.jpg` shows them: tonal lines
 for iron, a low knock for wood, a mid splash for water.
 
 **Waves that break.** The sea already rendered a wave phase. The sound now finds the
@@ -332,6 +334,19 @@ The most exposed place on the island got the room reverb, a 750 Hz wall filter a
 third of the wind. Up there, only the glazed lantern (inside its murette, r 2.1) is a
 room now.
 
+**Listening in the game itself.** The offline sheets prove each voice against a scripted
+bed. `tools/harness/earwalk.mjs` records the game's own master bus during a scripted walk:
+standing at the landing, walking the shingle and then the jetty, a grove in a breeze and
+then a hard gust, the study, and the gallery. In the first recording, eight wood steps
+fired on the jetty and not one of them was visible in the spectrogram. A floor's knock
+(165–540 Hz) is exactly where the surf roars, and its click was no louder than the foam.
+The jetty and the bridges now have their own **deck** surface: a short plank's note
+(480–640 Hz, with modes ×2.13 and ×3.4), a click, and sometimes a loose board knocking a
+beat later. Grass steps gained the mid "crush" of stems pressed flat, because the swish
+alone sat exactly in the grove's needle hiss. The second recording shows every deck step
+clearly. `day4-sound/in-game-walk.m4a` is that recording (54 s): landing 1 s, shingle
+8 s, jetty 14 s, grove 21 s, gust 26 s, grass 32 s, study 37 s, gallery 44 s, gust 48 s.
+
 **Listening.** `day4-sound/sound-tour.m4a` plays every sheet back to back.
 Each sheet is the real `js/audio.js` rendered offline, lifted by one common +11 dB so
 the balance between sheets matches the game and is audible on a phone speaker.
@@ -344,10 +359,13 @@ the output. It checks 12 things:
 - pebble, sand and grass differ by more than 8% in spectral centroid, and so do wood,
   stone and iron;
 - water is darker than pebble, and pebble is brighter than sand;
-- where a shingle step lands on the beach, it stands more than 3 dB above the surf in
-  the 1.5–6 kHz band. Every render is seeded, so the shore rendered with and without
-  steps has an identical bed, and the difference is the steps alone. The first full gate
-  run measured this at +2.1 dB, so beach steps were raised by 3 dB. It is now +5.4 dB;
+- footsteps stand more than 3 dB above the bed they are walked over, where they land,
+  in their own band (0.2–1.5 or 1.5–6 kHz). This covers shingle on the landing beach,
+  the deck over the surf, and grass in a grove in a breeze. Every render is seeded, so a
+  bed rendered with and without steps is identical, and the difference is the steps
+  alone. The first full gate run measured shingle at +2.1 dB, so beach steps were raised
+  by 3 dB. Now shingle is +6.4, the deck +3.5 / +7.0, and grass +3.6 dB;
+- the deck sounds different from boards, stone and iron;
 - every handled object is audible;
 - the shore is audible and has at least three discrete wave events;
 - the tower has a reverb tail and stays unclipped indoors;
@@ -359,7 +377,7 @@ the output. It checks 12 things:
 - underground there are at least four discrete drips, and less 8 kHz energy than an
   open meadow, even with a grove overhead.
 
-Result: **AUDIO 16 / 16**. Set `AUDIO_DIR` to write each sheet as a WAV.
+Result: **AUDIO 18 / 18**. Set `AUDIO_DIR` to write each sheet as a WAV.
 
 **The game asks for the right sound** (`tools/harness/surfaces.mjs`, in `run.sh`). This
 check runs in the real game. It teleports through the island and fires the player's own
