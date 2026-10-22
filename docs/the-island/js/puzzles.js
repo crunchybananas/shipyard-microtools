@@ -976,6 +976,7 @@ export class Game {
       onClick: () => {
         const records = recCarried();
         for (const rid of records) W.recDisp[rid] = 'filed';
+        A.drawer();
         UI.whisper(T.the_drawer_takes_it);
         this._recordEvidence('record.filed');
         save(this.player);
@@ -999,6 +1000,7 @@ export class Game {
       when: () => !W.flags.readGlass,
       onClick: () => {
         this.flag('readGlass');
+        A.glass();
         if (!W.inventory.includes('readglass')) W.inventory.push('readglass');
         UI.whisper(T.a_keeper_s_reading);
         this._recordEvidence('mechanism.reading-glass');

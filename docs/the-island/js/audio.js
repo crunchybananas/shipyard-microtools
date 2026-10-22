@@ -4,6 +4,7 @@
 
 import { STONE_NOTES } from './props.js';
 import { clamp, lerp } from './util.js';
+import * as KIT from './audio-kit.js';
 
 let ctx = null;
 
@@ -74,11 +75,36 @@ const A = {
     this._music = null; this._musicLevel = 0;
     this.fx = ctx.createGain(); this.fx.connect(this.master);
 
+    // ---- space: two generated reverbs, crossfaded by where you stand ----
+    // Nothing on the island had a room around it: the music box, the bells and the bed all
+    // sounded dry, as if recorded in a cupboard. The outdoor tail is long, dark and sparse
+    // (sea air over open ground); the tower is shorter, brighter, with early reflections off
+    // round masonry. The foley, the instruments and the music each send to the pair; the
+    // noise beds do not (a reverberated hiss is still a hiss).
+    this.verbIn = ctx.createGain();
+    this.verbAir = ctx.createConvolver();
+    this.verbAir.buffer = KIT.reverbIR(ctx, { seconds: 3.2, bright: 4200, dark: 650, predelay: 0.03 });
+    this.verbRoom = ctx.createConvolver();
+    this.verbRoom.buffer = KIT.reverbIR(ctx, { seconds: 1.6, bright: 6500, dark: 1100, predelay: 0.008,
+      early: [[11, 0.5], [17, 0.35], [26, 0.28], [37, 0.2], [51, 0.14]] });
+    this.verbAirG = ctx.createGain(); this.verbAirG.gain.value = 0.32;
+    this.verbRoomG = ctx.createGain(); this.verbRoomG.gain.value = 0;
+    this.verbIn.connect(this.verbAir).connect(this.verbAirG).connect(this.master);
+    this.verbIn.connect(this.verbRoom).connect(this.verbRoomG).connect(this.master);
+    const send = (bus, level) => { const g = ctx.createGain(); g.gain.value = level; bus.connect(g).connect(this.verbIn); return g; };
+    this.fxSend = send(this.fx, 0.42);
+    this.musicSend = send(this.music, 0.5);
+    this.bedSend = send(this.musicBed, 0.6);
+    // foley (footsteps, paper, hinges) has its own bus so its level is set in one place
+    this.foley = ctx.createGain(); this.foley.gain.value = 0.9; this.foley.connect(this.fx);
+
     // ---- surf: two filtered noise layers ----
     this.surf = this._noiseLoop('brown', 320);
     this.surf.gain.gain.value = 0;
     this.surf.out.connect(this.amb);
-    this.surfHiss = this._noiseLoop('white', 2400, 'highpass');
+    // foam fizz lives roughly 2-9 kHz; the old highpass ran a flat white hiss to 20 kHz, which
+    // the ear reads as static, not sea
+    this.surfHiss = this._noiseLoop('white', 4300, 'bandpass', 0.55);
     this.surfHiss.gain.gain.value = 0;
     this.surfHiss.out.connect(this.amb);
 
@@ -197,7 +223,9 @@ const A = {
     // wall filter does the muffling.
     const surfBase = clamp(0.34 - s.shoreDist * 0.0022, 0.04, 0.34);
     this.surf.gain.gain.setTargetAtTime(surfBase * (0.55 + 0.45 * s.wavePhase) * s.tideNear, t, k);
-    this.surfHiss.gain.gain.setTargetAtTime(surfBase * 0.16 * s.wavePhase * s.tideNear, t, k);
+    // (×0.16 → ×0.06: each break now brings its own foam, so the constant fizz can step back —
+    // it was masking the player's own footsteps on the shingle)
+    this.surfHiss.gain.gain.setTargetAtTime(surfBase * 0.06 * s.wavePhase * s.tideNear, t, k);
     // wind: altitude raises pitch and volume; walls take most of it (the rest is timbre)
     const windBase = clamp(0.05 + s.altitude * 0.004, 0.05, 0.17) * (s.interior ? 0.35 : 1);
     this.wind.gain.gain.setTargetAtTime(windBase * (0.7 + 0.3 * Math.sin(t * 0.31)), t, 0.3);
@@ -207,6 +235,27 @@ const A = {
     this.wind.filt.frequency.setTargetAtTime(550 + s.altitude * 26, t, 0.5);
     // room tone indoors
     this.room.gain.gain.setTargetAtTime(s.interior ? 0.16 : 0.0, t, 0.25);
+    // the space around you: tower stone or open air (the cellar and drain count as stone)
+    const enclosed = s.interior || s.underground;
+    this.verbRoomG.gain.setTargetAtTime(enclosed ? 0.55 : 0, t, 0.4);
+    this.verbAirG.gain.setTargetAtTime(enclosed ? 0 : 0.32, t, 0.4);
+    // WAVES BREAKING. The surf bed is a continuous wash; real surf is a sequence of events.
+    // Each crest of the same swell the water shader displaces lands as one break, from the
+    // nearest shore's bearing, bigger the nearer you are and the higher the tide.
+    // A break lands on every crest of the swell (a local maximum above the mean), sized by
+    // how high that crest rose; small sets and big sets, never on a metronome.
+    const crest = s.wavePhase ?? 0;
+    const rising = crest > (this._crestPrev ?? crest);
+    if (this._crestRising && !rising && (this._crestPrev ?? 0) > 0.55 && s.sea && !enclosed) {
+      const d = Math.hypot(s.sea.x - this._px, s.sea.z - this._pz);
+      if (d < 140) {
+        const set = clamp((this._crestPrev - 0.55) / 0.4, 0.25, 1);
+        const size = clamp(1.25 - d / 120, 0.3, 1.1) * (0.75 + 0.35 * (s.tideNear ?? 1)) * (0.55 + 0.6 * set);
+        KIT.waveBreak(ctx, this._out({ x: s.sea.x, z: s.sea.z, ref: 26 }, this.amb), t + Math.random() * 0.3, size);
+      }
+    }
+    if (crest !== this._crestPrev) this._crestRising = rising;
+    this._crestPrev = crest;
     // crickets (#64): night, surface only — the drowned levels do not gain new life.
     // Base gain + LFO depth move together so the trill scales with the bed.
     const cricketBase = (s.night ?? 0) * ((s.level ?? 1) <= 1 ? 1 : 0) * (s.interior ? 0.2 : 1) * 0.045;
@@ -503,22 +552,26 @@ const A = {
     }
   },
 
+  // surface-aware footsteps (audio-kit.js): pebble, sand, grass, wood, stone, iron, water.
+  // A slight alternating pan places the left and right foot under the listener.
   footstep(kind) {
     if (!this._running()) return;
-    const t0 = ctx.currentTime;
-    const len = 0.09 * ctx.sampleRate;
-    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
-    const src = ctx.createBufferSource(); src.buffer = buf;
-    const f = ctx.createBiquadFilter();
-    f.type = 'lowpass';
-    f.frequency.value = kind === 'sand' ? 420 : kind === 'stone' ? 1300 : 700;
-    const g = ctx.createGain();
-    g.gain.value = kind === 'stone' ? 0.1 : 0.16;
-    src.connect(f).connect(g).connect(this.fx);
-    src.start(t0);
+    this._foot = !this._foot;
+    let dest = this.foley;
+    if (ctx.createStereoPanner) {
+      const p = ctx.createStereoPanner(); p.pan.value = this._foot ? -0.12 : 0.12;
+      p.connect(this.foley); dest = p;
+      setTimeout(() => { try { p.disconnect(); } catch (_) {} }, 1500);
+    }
+    KIT.footstep(ctx, dest, kind, { gain: kind === 'water' ? 0.8 : kind === 'pebble' || kind === 'sand' ? 1.45 : 0.75 });
   },
+
+  // handled things (audio-kit.js) — every reader, hinge, rope and drawer gets a sound
+  paper(kind) { if (this._running()) KIT.paper(ctx, this.foley, kind, { gain: kind === 'book' || kind === 'shelf' ? 0.8 : 1.4 }); },
+  hatch() { if (this._running()) KIT.hatch(ctx, this.foley); },
+  rope() { if (this._running()) KIT.rope(ctx, this.foley); },
+  drawer() { if (this._running()) KIT.drawer(ctx, this.foley); },
+  glass() { if (this._running()) KIT.glass(ctx, this.foley); },
 
   // ---------------- the score: stems accumulate as you solve ----------------
   // leitmotif on A-minor pentatonic; root A2
@@ -776,6 +829,26 @@ const A = {
     o.connect(g); ov.connect(og).connect(g); g.connect(this._bed.master);
     o.start(t0); o.stop(t0 + dur + 0.1); ov.start(t0); ov.stop(t0 + dur + 0.1);
   },
+  // a struck voice under the pad: the melody needs an onset or the fragments blur into the
+  // drone. Three partials, a soft felt attack, a long decay into the reverb; the deeper the
+  // stratum, the duller the strike (the top partial drops away).
+  _bedStrike(freq, when, vol, depth = 0) {
+    if (!this._running() || vol <= 0) return;
+    const t0 = ctx.currentTime + when;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(vol * 0.35, t0 + 0.5);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 4.2);
+    g.connect(this._bed.master);
+    const parts = [[1, 1], [2.0, 0.32], [3.01, 0.12 * Math.max(0, 1 - depth * 0.45)]];
+    for (const [r, a] of parts) {
+      if (a <= 0.001) continue;
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq * r;
+      const og = ctx.createGain(); og.gain.value = a;
+      o.connect(og).connect(g); o.start(t0); o.stop(t0 + 4.3);
+    }
+  },
   _bedMelody() {
     // a sparse fragment of the leitmotif, transposed into the era key (LEIT is rooted on E;
     // multiplying by root/E2's octave keeps the figure, moves the mode). Depth thins it.
@@ -805,6 +878,7 @@ const A = {
         if (depth) f *= 1 - 0.015 * depth;                   // a shade flat, flatter deeper
       }
       this._bedNote(f, when, 0.10 - depth * 0.012, 5.5 + depth * 0.8);
+      this._bedStrike(f * 2, when, 0.05 - depth * 0.008, depth);
       this._lastTheme.notes.push(idx);
       when += (era.step ?? 1.6) + Math.random() * (era.jitter ?? 1.4) + depth * 0.3;
     }

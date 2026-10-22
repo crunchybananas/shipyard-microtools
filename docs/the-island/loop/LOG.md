@@ -4658,6 +4658,28 @@ test. Cheap, owner-validated, protects every future player.
 
 ---
 
+## 2026-10-21 — the player walk, day four: the sound world
+
+**Shipped:** `js/audio-kit.js`, synthesized foley for seven footstep surfaces (pebble, sand,
+grass, wood, stone, iron, water; heel and toe), chosen by `surfaceAt` in main.js; per-kind
+paper sounds for reading, page turns and closing; drawer, glass, rope and hatch creaks;
+breaking waves timed to the rendered crest at the nearest open water and panned there;
+two generated convolution reverbs (open air 3.2 s / room 1.6 s) crossfaded indoors and
+underground; struck-bell melody notes in the music bed. The surf hiss is narrower and
+quieter, so beach steps are not masked.
+
+**Evidence:** `loop/player-walk/2026-10-06/day4-sound/` (m4a per sheet, a 2:26 tour,
+spectrograms); new gate `tools/harness/audio.mjs` renders the real audio.js offline, seeded:
+**AUDIO 12 / 12**. It checks that everything is audible and unclipped, surfaces are
+spectrally distinct, shingle steps are +5.4 dB over the surf in band where they land, there
+are at least 3 wave events, the tower has a reverb tail, and both beds play. All 26 gate
+scripts pass (walk 69/69); unit 116/116.
+
+**Debt:** the game's sound has only been heard offline, not yet by the owner in a live
+walk. Mix levels are set by measurement, not by ear.
+
+---
+
 ## 2026-10-14 — the player walk, day three: turf, cumulus, the title's lighthouse
 
 **Shipped:** `js/turf.js` — a camera-following two-ring instanced turf (5-blade tufts to 10 m,

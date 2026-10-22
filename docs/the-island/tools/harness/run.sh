@@ -190,6 +190,13 @@ echo "== visible coastal encounters =="
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/encounters.mjs" | tee "$WORK/encounters.out"
 grep -q 'ENCOUNTERS 8 / 8' "$WORK/encounters.out" || { echo "ENCOUNTERS FAILED"; exit 1; }
 
+echo "== the sound world =="
+# Every other gate runs muted. This renders the real audio.js offline — footsteps on seven
+# surfaces, handled objects, breaking waves, the tower room, both music beds — and proves
+# each is audible, unclipped, and that surfaces sound different from one another.
+SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/audio.mjs" | tee "$WORK/audio.out"
+grep -q 'AUDIO 12 / 12' "$WORK/audio.out" || { echo "AUDIO FAILED"; exit 1; }
+
 echo "== the walk =="
 # Every puzzle action goes through its shipped hotspot. Crossing travel uses the public
 # instant transition so local and software-GL runs enforce the same 69 assertions: the

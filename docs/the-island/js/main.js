@@ -1099,6 +1099,7 @@ function startClimb(up) {
   player.yaw = p.yaw + (up ? 0 : Math.PI);
   player.pitch = up ? .06 : -.22;
   player.syncCamera();
+  if (up) A.rope(); else A.hatch();
   UI.whisper(up ? 'The handrail is smooth where people have held it.' : 'The warm room is below.');
 }
 
@@ -1802,8 +1803,40 @@ function tickPerched(elapsed, dt) {
 
 // ---------------- footsteps ----------------
 player.onRescue = () => UI.whisper(T.the_ground_gives_you);
+// WHAT IS UNDERFOOT. player.js only knows indoors / low / high; the sound wants the actual
+// material: the study's boards and the tower treads, the iron gallery, the cellar and drain
+// stone, the jetty deck and the ruler bridge, the shallows, the shingle at the landing, sand,
+// and the meadow.
+// the nearest open water: rings of bearings outward until one lands below the live sea
+let seaT = 0, seaPt = null;
+function nearestSea(x, z) {
+  const wy = waterY() - 0.3;
+  for (const rad of [8, 16, 28, 45, 70, 110]) {
+    let best = null, bestH = Infinity;
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2, px = x + Math.sin(a) * rad, pz = z + Math.cos(a) * rad;
+      const hh = heightAt(px, pz);
+      if (hh < wy && hh < bestH) { bestH = hh; best = { x: px, z: pz }; }
+    }
+    if (best) return best;
+  }
+  return null;
+}
+
+function surfaceAt(pos) {
+  const h = heightAt(pos.x, pos.z), wy = waterY();
+  const r = Math.hypot(pos.x - TOWER.x, pos.z - TOWER.z);
+  if (pos.y >= TOWER_TOP - 0.35 && r < 4.6) return 'iron';                       // the lantern gallery
+  if (r < 4.2 && pos.y > TOWER.base + 0.25) return 'wood';                        // the stair treads
+  if (pos.y < h - 1.2) return 'stone';                                            // cellar, drain chamber
+  if (player.interior()) return pos.y < TOWER.base - 1 ? 'stone' : 'wood';        // study floor, the quarters
+  if (pos.y < wy - 0.05) return 'water';                                          // wading
+  if (pos.y - h > 0.3) return 'wood';                                             // jetty deck, bridge
+  if (h < 2.2) return (pos.z < -100.5 && pos.x > -30 && pos.x < 16 && h > -0.5) ? 'pebble' : 'sand';
+  return 'grass';
+}
 player.onFootstep = (kind, pos) => {
-  A.footstep(kind);
+  A.footstep(surfaceAt(pos));
   // wet seabed sparkles underfoot
   if ((1 - W.tide) > 0.5 && heightAt(pos.x, pos.z) < 0) {
     biolume.material.uniforms.uFlare.value = 9;
@@ -2594,7 +2627,11 @@ renderer.setAnimationLoop((tMs) => {
   tickSongbirds(elapsed);
   tickFigures(W.reduceMotion?0:elapsed);
 
+  seaT -= dt;
+  if (seaT <= 0) { seaT = 0.5; seaPt = nearestSea(player.pos.x, player.pos.z); }
   A.update(dt, {
+    sea: seaPt,
+    underground: player.pos.y < heightAt(player.pos.x, player.pos.z) - 1.2,
     wavePhase: clamp(wavePhase(elapsed), 0, 1),
     shoreDist: Math.max(0, heightAt(player.pos.x, player.pos.z)) * 13 + (player.interior() ? 60 : 0),
     tideNear: lerp(0.45, 1, W.tide),

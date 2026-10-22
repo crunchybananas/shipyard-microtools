@@ -1,0 +1,14 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Audio bench</title>
+<!-- tools/harness/audio.mjs renders the game's real audio module offline from this page.
+     The import map matches index.html so audio.js and its imports resolve identically. -->
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.min.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    }
+  }
+</script>
+<body style="background:#111;color:#ccc;font:14px system-ui">audio bench</body>

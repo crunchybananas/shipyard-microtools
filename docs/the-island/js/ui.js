@@ -148,11 +148,14 @@ export const UI = {
     const pages = deepUnlocked ? lore.pages.concat(lore.deep) : lore.pages.slice();
     this._reader = { id: loreId, lore, page: 0, pages, surfaceLen: lore.pages.length };
     W.reading = true;
+    // the object answers the hand: a book's cover, a letter unfolding, grit off a stone
+    A.paper({ book: 'book', letter: 'letter', inscription: 'inscription', shelf: 'shelf' }[lore.kind] || 'letter');
     this.readerEl.classList.remove('hidden');
     this._renderReader();
   },
   closeReader() {
     if (!W.reading) return;
+    if (this._reader && this._reader.lore.kind !== 'inscription') A.paper('close');
     W.reading = false;
     this.readerEl.classList.add('hidden');
     this._reader = null;
@@ -182,7 +185,9 @@ export const UI = {
   _readerPage(delta) {
     const r = this._reader;
     if (!r) return;
+    const was = r.page;
     r.page = Math.max(0, Math.min(r.pages.length - 1, r.page + delta));
+    if (r.page !== was && r.lore.kind !== 'inscription') A.paper('page');
     this._renderReader();
   },
   _renderReader() {

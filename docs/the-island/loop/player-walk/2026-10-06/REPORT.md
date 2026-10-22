@@ -258,3 +258,73 @@ on the title and Begin has no visible step. `day3/before/title.jpg` →
 **Gate.** All 25 scripts pass. `vault-outcrop.mjs` now waits for the slab's real ease
 instead of a fixed 4.2 s of wall clock: dt is clamped per frame, so a loaded headless run
 falls behind the clock and the slab was still easing when the test looked.
+
+## Day four — October 21, 2026: the sound world
+
+The walk had only looked. Listening to the same route, the island was mostly silent:
+a footstep was one 90 ms puff of filtered noise in three flavours, every room had the
+same dry air, the surf was a steady white hiss with no waves in it, and opening a book
+made no sound at all. Everything below is still synthesized in the browser with Web
+Audio. Nothing is downloaded, so it stays inside the asset contract and the power
+budget: one-shots are a few short-lived nodes, and the two reverbs are fixed convolvers.
+
+**Footsteps per surface** (`js/audio-kit.js`, picked by `surfaceAt` in `js/main.js`).
+Each step is a heel and then a toe 35–60 ms later. The surfaces:
+- **pebble:** a crunch of bright grains on a light thud. Used on the landing beach's
+  shingle band.
+- **sand:** a soft, dark compression.
+- **grass:** a swish.
+- **wood:** a hollow knock with a board resonance and an occasional creak. Used indoors,
+  on the stair, the jetty and the bridges.
+- **stone:** a hard click on a low thud. Used in the vaults and cellars.
+- **iron:** a ringing click. Used on the lantern gallery.
+- **water:** a splash that drops in pitch, with bubbles. Used when wading.
+
+Steps alternate slightly left and right. `day4-sound/footsteps.m4a` plays all seven,
+four steps each, in that order. `footsteps-spectrogram.jpg` shows them: tonal lines
+for iron, a low knock for wood, a mid splash for water.
+
+**Waves that break.** The sea already rendered a wave phase. The sound now finds the
+open water nearest the player (`nearestSea`, refreshed twice a second). Each time the
+crest peaks, a wave breaks there, panned to where it is. The break is a rising roar, a
+foam hiss, then the retreat drawing back over stones. Its size follows distance, tide
+and the swell set. The constant surf hiss is narrower and quieter, so steps on the
+beach are not masked. `day4-sound/shore.m4a`.
+
+**Rooms.** Two generated impulse responses: open air (3.2 s, bright, no early reflections) and a
+room (1.6 s, with early reflections). Effects, music and the music bed all send into
+whichever one fits. The mix crossfades to the room when you go indoors or underground.
+The tower stair and the music box now have a tail. `day4-sound/tower.m4a`.
+
+**Handling.** Distinct paper sounds for a book, a letter, a carved inscription and a
+shelf; a page sound on each page turn; a softer close. Also a drawer in the record
+cabinet, a glass chink at the reading glass, a rope creak climbing up and a hatch
+creak climbing down. `day4-sound/handling.m4a`.
+
+**Music.** The generative bed's melody notes are now struck bells (three partials, a
+fast attack, a long decay) instead of plain swells, so the tune reads as notes over
+the drone. `day4-sound/music-surface.m4a`, `music-winter.m4a`.
+
+**Listening.** `day4-sound/sound-tour.m4a` (2:26) plays every sheet back to back.
+Each sheet is the real `js/audio.js` rendered offline, lifted by one common +11 dB so
+the balance between sheets matches the game and is audible on a phone speaker.
+
+**The audio gate** (`tools/harness/audio.mjs`, in `run.sh`). Every other gate runs
+muted, so nothing had proved the game is audible. The harness loads `js/audio.js` into
+an OfflineAudioContext, plays scripted sheets of events at exact times, and measures
+the output. It checks 12 things:
+- every surface is audible and unclipped;
+- pebble, sand and grass differ by more than 8% in spectral centroid, and so do wood,
+  stone and iron;
+- water is darker than pebble, and pebble is brighter than sand;
+- where a shingle step lands on the beach, it stands more than 3 dB above the surf in
+  the 1.5–6 kHz band. Every render is seeded, so the shore rendered with and without
+  steps has an identical bed, and the difference is the steps alone. The first full gate
+  run measured this at +2.1 dB, so beach steps were raised by 3 dB. It is now +5.4 dB;
+- every handled object is audible;
+- the shore is audible and has at least three discrete wave events;
+- the tower has a reverb tail and stays unclipped indoors;
+- both music beds are audible.
+
+Result: **AUDIO 12 / 12**. Set `AUDIO_DIR` to write each sheet as a WAV. With the
+audio stage added, the full gate passes all 26 scripts, including walk 69/69.

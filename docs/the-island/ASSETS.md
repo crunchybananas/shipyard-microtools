@@ -25,6 +25,13 @@ the game, remove the manifest row, code path, and file together.
   persistent generative bed, puzzle instruments, environmental voices, and the
   keeper's nonverbal drowned timbre use no downloaded music or speech files.
   Language remains visible text.
+- `js/audio-kit.js` holds the synthesized foley and acoustic space that `js/audio.js`
+  plays. It covers footsteps for seven surfaces, paper, creaks, a drawer, glass and
+  breaking waves, all built from cached noise buffers, filters and oscillators. It
+  also generates the two reverb impulse responses (open air and room). Add a sound
+  here as code, never as a sample file. `tools/harness/audio.mjs` renders the real
+  mix offline and gates it: everything audible and unclipped, surfaces spectrally
+  distinct. With `AUDIO_DIR` set it writes WAVs for listening.
 - `js/world.js` owns exactly four playable strata: the last day, the arrival years,
   the inspection years, and the last winter. Visual grading and the procedural
   arrangement in `js/audio.js` follow those same four states.
