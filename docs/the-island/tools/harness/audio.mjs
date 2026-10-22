@@ -8,7 +8,7 @@
 //
 //   footsteps   eight surfaces, four steps each       — audible, unclipped, spectrally distinct;
 //               shingle, deck and grass each over the bed they are walked on
-//   handling    book, pages, letter, slate, shelf, drawer, glass, rope, hatch — each audible
+//   handling    book, pages, letter, slate, shelf, drawer, glass, rope, hatch, wings — each audible
 //   shore       outdoor beds + breaking waves         — waves land as discrete events
 //   tower       wood steps and the music box indoors  — the room reverb carries a tail
 //   air         the island's one wind: a gust, a grove's needles hissing
@@ -141,7 +141,8 @@ export default async function (h) {
   const groveBed = `for (let t = 0.05; t < 6; t += 0.05) at(t, () => A.update(0.05, { wavePhase: 0.3, shoreDist: 400, tideNear: 0.5, altitude: 9, interior: false,
       night: 0, dawn: 0, level: 1, px: 0, pz: 0, yaw: 0, mist: 0, underground: false, gust: 0.35, trees: { near: 1, x: 6, z: 0 } }));`;
   const sheet = (bedSrc, kind) => `${bedSrc}
-    ${kind ? `for (let i = 0; i < 6; i++) at(2.5 + i * 0.46, () => A.footstep('${kind}'));` : ''}
+    ${!kind ? '' : kind === 'wings' ? `at(2.6, () => A.wings({ x: 10, z: -104, ref: 12 }, 'gull'));`
+      : `for (let i = 0; i < 6; i++) at(2.5 + i * 0.46, () => A.footstep('${kind}'));`}
     marks.push({ name: 'window', t0: 2.5, t1: 5.3, frames: true });`;
   const smrOf = (bed, both) => {
     const one = (B, S) => {
@@ -155,12 +156,13 @@ export default async function (h) {
   const sBed = (await render('shore-bed', 6, sheet(shoreBed, null))).segs[0];
   const grBed = (await render('grove-bed', 6, sheet(groveBed, null))).segs[0];
   const OVER = [['pebble', 'footsteps-shore', sBed, shoreBed, 'shingle on the landing beach'], ['deck', 'deck-shore', sBed, shoreBed, 'the jetty deck over the surf'],
-    ['grass', 'grass-grove', grBed, groveBed, 'grass in a grove in a breeze']];
+    ['grass', 'grass-grove', grBed, groveBed, 'grass in a grove in a breeze'], ['wings', 'wings-shore', sBed, shoreBed, 'a gull flushed 6 m away on the shore']];
   for (const [kind, name, bed, bedSrc, where] of OVER) {
     const both = (await render(name, 6, sheet(bedSrc, kind))).segs[0];
     const smr = smrOf(bed, both);
-    console.log(`  ${kind} over its bed: ${smr.lo} dB (0.2-1.5 kHz) / ${smr.hi} dB (1.5-6 kHz) above it where the steps land`);
-    ok(`footsteps on ${where} stand above the bed where they land (> +3 dB in their band)`, Math.max(smr.lo, smr.hi) > 3, { smr, both: strip(both) });
+    console.log(`  ${kind} over its bed: ${smr.lo} dB (0.2-1.5 kHz) / ${smr.hi} dB (1.5-6 kHz) above it where they land`);
+    ok(kind === 'wings' ? `the wings of ${where} stand above the surf (> +3 dB in their band)` : `footsteps on ${where} stand above the bed where they land (> +3 dB in their band)`,
+      Math.max(smr.lo, smr.hi) > 3, { smr, both: strip(both) });
   }
   strip(sBed); strip(grBed);
   ok('every surface is audible and unclipped', foot.nan === 0 && foot.peak < 0.95 && foot.segs.every((s) => s.rmsDb > -52), foot.segs);
@@ -173,12 +175,13 @@ export default async function (h) {
 
   // ---------------------------------------------------------------- handling
   const HANDLE = [['book', 'A.paper("book")'], ['page', 'A.paper("page")'], ['letter', 'A.paper("letter")'], ['inscription', 'A.paper("inscription")'],
-    ['shelf', 'A.paper("shelf")'], ['close', 'A.paper("close")'], ['drawer', 'A.drawer()'], ['glass', 'A.glass()'], ['rope', 'A.rope()'], ['hatch', 'A.hatch()']];
+    ['shelf', 'A.paper("shelf")'], ['close', 'A.paper("close")'], ['drawer', 'A.drawer()'], ['glass', 'A.glass()'], ['rope', 'A.rope()'], ['hatch', 'A.hatch()'],
+    ['gull wings', 'A.wings(null, "gull")'], ['crow wings', 'A.wings(null, "crow")']];
   const hand = await render('handling', HANDLE.length * 1.6 + 0.6, `
     at(0.01, () => A.update(0.016, { wavePhase: 0, shoreDist: 400, tideNear: 0, altitude: 14, interior: true, night: 0, dawn: 0, level: 9, px: 0, pz: 0, yaw: 0, mist: 0 }));
     at(0.02, () => A.amb.gain.setValueAtTime(0.0001, 0));
     ${JSON.stringify(HANDLE)}.forEach(([name, call], k) => { const t0 = 0.3 + k * 1.6; at(t0, () => eval(call)); marks.push({ name, t0, t1: t0 + 1.4 }); });`);
-  ok('every handled object makes an audible sound', hand.nan === 0 && hand.peak < 0.95 && hand.segs.every((s) => s.rmsDb > -55), hand.segs);
+  ok('every handled object, and a flushed bird\'s wings, makes an audible sound', hand.nan === 0 && hand.peak < 0.95 && hand.segs.every((s) => s.rmsDb > -55), hand.segs);
 
   // ---------------------------------------------------------------- shore
   const shore = await render('shore', 26, `

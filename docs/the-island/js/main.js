@@ -1756,6 +1756,7 @@ function tickPerched(elapsed, dt) {
         // #64: the burst-up finally makes a sound — a close startled cry
         u.callUntil=elapsed+.65;
         if (u.species === 'crow') A.crowCaw(0.3, true, { x: u.px, z: u.pz, ref: 20 }); else A.gullCry(0.3, { x: u.px, z: u.pz, ref: 20 });   // #63
+        A.wings({ x: u.px, z: u.pz, ref: 12 }, u.species);   // and the wings: the flurry is half the startle
       }
     } else if (u.flush < BIRD_VISIBLE_FLIGHT_S) {
       // FLUSH: burst clear of the feet, then turn that launch into a long quadratic

@@ -27,7 +27,7 @@ the game, remove the manifest row, code path, and file together.
   Language remains visible text.
 - `js/audio-kit.js` holds the synthesized foley and acoustic space that `js/audio.js`
   plays. It covers footsteps for eight surfaces, paper, creaks, a drawer, glass,
-  breaking waves and underground drips, all built from cached noise buffers, filters
+  breaking waves, underground drips and a flushed bird's wings, all built from cached noise buffers, filters
   and oscillators. It
   also generates the two reverb impulse responses (open air and room). Add a sound
   here as code, never as a sample file. `tools/harness/audio.mjs` renders the real

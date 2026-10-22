@@ -4691,6 +4691,11 @@ board) and grass gained a stem "crush". The audio gate checks steps over the bed
 walked on: shingle +6.4, deck +3.5/+7.0, grass in a breezy grove +3.6 dB. **AUDIO 18 / 18**.
 `day4-sound/in-game-walk.m4a` is the second recording.
 
+**Then, the birds take off:** a flushed gull or crow now beats its wings as well as crying
+(`KIT.wings`). It was rebuilt around the feather rush (1–4 kHz), because the first whump
+was 13–17 dB under the surf at flush distance; now it is +4.5 dB. **AUDIO 19 / 19**;
+`surfaces.mjs` walks up to a perched bird in the real game: **SURFACES 12 / 12**.
+
 **Debt:** the game's sound has only been heard offline, not yet by the owner in a live
 walk. Mix levels are set by measurement, not by ear.
 

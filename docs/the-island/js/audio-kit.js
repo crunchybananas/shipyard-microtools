@@ -15,6 +15,7 @@
 //   drawer, glass small handled things
 //   waveBreak     one breaking wave: the curl, the crash, the long wash and its foam fizz
 //   drip          one drop into standing water underground
+//   wings         a bird's wingbeats as it bursts up and away
 
 const _noise = new WeakMap();
 function noiseBuffer(ctx) {
@@ -322,4 +323,19 @@ export function drip(ctx, dest, t = ctx.currentTime, { gain = 1 } = {}) {
   g.gain.exponentialRampToValueAtTime(0.0001, at + rnd(0.06, 0.11));
   o.connect(g).connect(dest);
   o.start(at); o.stop(at + 0.14);
+}
+
+// -------------------------------------------------------------------- birds --
+// A bird bursting up off the ground: a flurry of wingbeats, quick at the launch and slowing and
+// fading as it climbs away. Each beat is a low whump of pushed air under the RUSH of feathers
+// (1-4 kHz) — the rush is what carries: the whump alone sits under the surf's roar.
+export function wings(ctx, dest, t = ctx.currentTime, { beats = 8, rate = 8.5, size = 1, gain = 1 } = {}) {
+  let at = t;
+  for (let i = 0; i < beats; i++) {
+    const k = (1 - i / beats) * gain;
+    burst(ctx, dest, at, 0.07, { type: 'lowpass', freq: rnd(700, 1000) / size, q: 0.7, gain: 0.3 * k * size, attack: 0.012 });
+    burst(ctx, dest, at + 0.004, 0.06, { freq: rnd(1300, 1900) / size, q: 0.8, gain: 0.22 * k, attack: 0.01 });
+    burst(ctx, dest, at + 0.008, 0.035, { freq: rnd(2800, 4200), q: 1, gain: 0.18 * k, attack: 0.006 });
+    at += (1 / rate) * (1 + i * 0.08);
+  }
 }

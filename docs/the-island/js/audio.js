@@ -623,6 +623,10 @@ const A = {
   rope() { if (this._running()) KIT.rope(ctx, this.foley); },
   drawer() { if (this._running()) KIT.drawer(ctx, this.foley); },
   glass() { if (this._running()) KIT.glass(ctx, this.foley); },
+  // a flushed bird's wings, from where it rose: the crow heavier and slower than the gull
+  wings(at = null, species = 'gull') {
+    if (this._running()) KIT.wings(ctx, this._out(at, this.fx), ctx.currentTime, species === 'crow' ? { beats: 7, rate: 7, size: 1.25, gain: 2.5 } : { beats: 8, rate: 8.5, gain: 2.5 });
+  },
 
   // ---------------- the score: stems accumulate as you solve ----------------
   // leitmotif on A-minor pentatonic; root A2

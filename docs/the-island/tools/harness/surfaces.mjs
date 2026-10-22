@@ -4,9 +4,10 @@ import { beginPlay } from './play-ready.mjs';
 // audio.mjs proves each sound offline; this proves the game asks for the right one. It
 // teleports through the island and fires the player's own footstep path (player.onFootstep →
 // surfaceAt → A.footstep), intercepted at the audio module, so a wrong floor height, a missed
-// deck or a mis-scoped room shows up as the wrong surface. It also checks the two things the
+// deck or a mis-scoped room shows up as the wrong surface. It also checks what the
 // sound world reads from main.js: where "inside" ends (the lantern gallery is open air over
-// the study's circle) and that the island's one wind reaches every swaying shader.
+// the study's circle), that the island's one wind reaches every swaying shader, and that a
+// bird the player flushes is heard taking off.
 
 export default async function (h) {
   const R = { pass: [], fail: [] };
@@ -105,6 +106,22 @@ export default async function (h) {
   })()`);
   const rose = (k) => wind.after[k] != null && wind.before[k] != null && wind.after[k] - wind.before[k] > 0.9;
   ok('a gust reaches the crowns, the grass and the turf together', rose('crowns') && rose('grass') && rose('turf'), wind);
+
+  // a perched bird the player walks up to bursts off with its wings as well as its cry
+  const bird = await h.evaluate(`(async () => {
+    const A = (await import('/the-island/js/audio.js')).default;
+    const heard = []; const o = A.wings.bind(A);
+    A.wings = (at, sp) => { heard.push(sp); return o(at, sp); };
+    let b = null;
+    ABYME.scene.traverse((g) => { if (!b && g.userData && g.userData.species && g.userData.flush === 0 && g.visible) b = g; });
+    if (!b) return { err: 'no perched bird' };
+    const u = b.userData;
+    ABYME.tp(u.px + 1.5, u.pz + 1.5, 0, 0);
+    await new Promise((r) => setTimeout(r, 800));
+    A.wings = o;
+    return { species: u.species, flushed: u.flush > 0, heard };
+  })()`);
+  ok('a perched bird walked up to flushes with its wings', bird.flushed && bird.heard.includes(bird.species), bird);
 
   console.log(`SURFACES ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail, null, 1)); process.exitCode = 1; }

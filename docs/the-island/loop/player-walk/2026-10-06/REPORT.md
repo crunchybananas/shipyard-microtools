@@ -347,6 +347,15 @@ alone sat exactly in the grove's needle hiss. The second recording shows every d
 clearly. `day4-sound/in-game-walk.m4a` is that recording (54 s): landing 1 s, shingle
 8 s, jetty 14 s, grove 21 s, gust 26 s, grass 32 s, study 37 s, gallery 44 s, gust 48 s.
 
+**Birds take off.** A perched gull or crow you walk up to already gave a startled cry,
+but its wings were silent. Now the flush plays a flurry of wingbeats from where the bird
+rose: a low whump of pushed air under a rush of feathers, fast at the launch and fading
+as it climbs. The crow's are heavier and slower. In the first version the wings were
+13–17 dB under the surf at 6 m, the distance a bird flushes at. The low whump sits where
+the surf roars, and only the feather rush (1–4 kHz) carries. Rebuilt around that rush,
+the wings stand 4.5 dB clear of the shore's surf. `surfaces.mjs` also walks the player
+up to a perched bird in the real game and checks that its wings are heard.
+
 **Listening.** `day4-sound/sound-tour.m4a` plays every sheet back to back.
 Each sheet is the real `js/audio.js` rendered offline, lifted by one common +11 dB so
 the balance between sheets matches the game and is audible on a phone speaker.
@@ -364,7 +373,8 @@ the output. It checks 12 things:
   the deck over the surf, and grass in a grove in a breeze. Every render is seeded, so a
   bed rendered with and without steps is identical, and the difference is the steps
   alone. The first full gate run measured shingle at +2.1 dB, so beach steps were raised
-  by 3 dB. Now shingle is +6.4, the deck +3.5 / +7.0, and grass +3.6 dB;
+  by 3 dB. Now shingle is +6.4, the deck +3.5 / +7.0, and grass +3.6 dB. A gull's
+  wings, flushed 6 m away on the shore, are +4.5 dB;
 - the deck sounds different from boards, stone and iron;
 - every handled object is audible;
 - the shore is audible and has at least three discrete wave events;
@@ -377,7 +387,7 @@ the output. It checks 12 things:
 - underground there are at least four discrete drips, and less 8 kHz energy than an
   open meadow, even with a grove overhead.
 
-Result: **AUDIO 18 / 18**. Set `AUDIO_DIR` to write each sheet as a WAV.
+Result: **AUDIO 19 / 19**. Set `AUDIO_DIR` to write each sheet as a WAV.
 
 **The game asks for the right sound** (`tools/harness/surfaces.mjs`, in `run.sh`). This
 check runs in the real game. It teleports through the island and fires the player's own
@@ -387,6 +397,7 @@ module. It covers:
   each heard as the right surface;
 - the stair as wood, the gallery as iron, and a buried room as stone;
 - the gallery as open air, with the lantern and the study as rooms;
-- a forced gust reaching the crown, grass and turf shaders together.
+- a forced gust reaching the crown, grass and turf shaders together;
+- a perched bird, walked up to, flushing with its wings.
 
-Result: **SURFACES 11 / 11**. `ABYME.wind(g)` holds the gust at a level for captures.
+Result: **SURFACES 12 / 12**. `ABYME.wind(g)` holds the gust at a level for captures.
