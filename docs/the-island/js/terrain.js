@@ -7,12 +7,17 @@ import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.j
 // world state collision depends on arrive through GATES, synced once per frame by main
 // (syncGates). Headless probes drive GATES directly; nothing here reads W.
 export const GATES = { atTop: false, bridgeUp: false, hatchOpen: false, annexOpen: false, towerOpen: false };
+// one render fact rides the same sync: the last winter's meadow is bare (the turf hides at
+// level 4, main.js), and the far meadow's blades (buildTerrain) go with it
+const MEADOW_STATE = { bare: false };
+const MEADOW_STEP = 2.5;   // metres the eye walks before the blade lattice takes a fresh pivot
 export function syncGates(W) {
   GATES.atTop = !!W.atTop;
   GATES.towerOpen = !!W.lensPlaced;
   GATES.bridgeUp = !!W.flags.rulerPlaced;
   GATES.hatchOpen = !!W.flags.hatchOpen;
   GATES.annexOpen = true; // The refuge is reachable before the first crossing.
+  MEADOW_STATE.bare = (W.level || 1) >= 4;
 }
 import { getTexture } from './assets.js';
 import { TOWER, TOWER_TOP, stairSurface, stairPose } from './tower-course.js';
@@ -580,6 +585,15 @@ export function buildTerrain() {
 
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geo.setAttribute('aSlope', new THREE.BufferAttribute(slopes, 1));   // fragment rock-swap key (#36)
+  // THE MEADOW KEY. How much of each vertex the meadow owns, on the rule the turf grows by
+  // (turf.js): the meadow colour's own weight, off the beach band, off the steeper banks. THE FAR
+  // MEADOW in the fragment shader lands only where this says grass — never on sand, cliff,
+  // needle litter or seabed. (The turf's 19-21 m ceiling is applied there, from the height.)
+  const meadow = new Float32Array(pos.count);
+  for (let i = 0; i < pos.count; i++) {
+    meadow[i] = smoothstep(0.35, 0.8, gridGrass[i]) * smoothstep(2.4, 3.4, gridH[i]) * (1 - smoothstep(0.45, 0.6, slopes[i]));
+  }
+  geo.setAttribute('aMeadow', new THREE.BufferAttribute(meadow, 1));
   TERRAIN_GRID.N = N; TERRAIN_GRID.h = gridH; TERRAIN_GRID.slope = slopes; TERRAIN_GRID.tone = gridTone; TERRAIN_GRID.grass = gridGrass;
   geo.computeVertexNormals();
 
@@ -628,17 +642,22 @@ export function buildTerrain() {
     sh.uniforms.uPathAmt = { value: 0.0 };   // driven by depth in main.js — see the paths block
     sh.uniforms.uLitterRect = { value: new THREE.Vector3(LITTER.cx, LITTER.cz, LITTER.size || 1) };
     sh.uniforms.uMineral = { value: getTexture('rock_height') };   // the shared granite relief, as cliff-face albedo detail
+    // the far meadow (see THE FAR MEADOW): its blade-lattice pivots, driven by the mesh's onBeforeRender
+    sh.uniforms.uMPivot = { value: new THREE.Vector4() };
+    sh.uniforms.uMPivotKeep = { value: 1 };
+    sh.uniforms.uMeadowOn = { value: 1 };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
     // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. The
     // 3-D world no longer fetches either texture; dunegrass was deleted, while sand.jpg remains solely
     // as the CSS-native shore-writing surface (see ASSETS.md).
     mat.userData.shader = sh; // so main.js can track uHaze to the active grade's fog
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nattribute float aSlope;\nvarying vec2 vLXZ;\nvarying vec3 vWPos;\nvarying float vTerH;\nvarying float vSlope;')
+      .replace('#include <common>', '#include <common>\nattribute float aSlope;\nattribute float aMeadow;\nvarying vec2 vLXZ;\nvarying vec3 vWPos;\nvarying float vTerH;\nvarying float vSlope;\nvarying float vMeadow;')
       .replace('#include <begin_vertex>', `#include <begin_vertex>
         vLXZ = position.xz;
         vTerH = position.y;                                   // baked height (the band key)
         vSlope = aSlope;                                      // baked slope (the rock-swap key, #36)
+        vMeadow = aMeadow;                                    // the meadow's share of this vertex
         vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
@@ -648,10 +667,64 @@ export function buildTerrain() {
         uniform sampler2D uLitter; uniform float uLitterOn; uniform vec3 uLitterRect;
         uniform float uPathAmt;
         uniform sampler2D uMineral;
-        varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
+        uniform vec4 uMPivot; uniform float uMPivotKeep; uniform float uMeadowOn;
+        varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope; varying float vMeadow;
         float gSandLee;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
-        float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
+        float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
+        // ---- the far meadow's blades (see THE FAR MEADOW in color_fragment) ----
+        // A blade standing in the meadow, seen from eye height, projects onto the ground as a short
+        // streak pointing straight away from the eye. So the blades are laid out on a lattice about
+        // a pivot near the eye: columns are radial lines from it, rows are rings spaced by the log
+        // of the distance (a blade's on-screen height falls as 1/distance, as a real one's does).
+        // One blade per cell; the three rings nearest the fragment are tested front to back,
+        // because a blade standing in front hides the ones behind it.
+        // A cell returns x = cover, y = height up the blade, z = the blade's own tone.
+        vec3 meadowCell(float row, float fy, float th, float hb, float wk, float aaU, float aaV, float keep, float side) {
+          float rRow = exp((row + 0.5) * 0.078125);                              // the ring's radius
+          float n = floor(6.2831853 * rRow / (0.24 * max(1.0, rRow / 45.0)));   // blades 0.24 m apart, never under ~4 px
+          float u = th * n;
+          float col = mod(floor(u), n), fx = fract(u);
+          float h1 = hash21(vec2(col, row) * 0.0123 + 0.37);
+          float h2 = fract(h1 * 13.73 + 0.31), h3 = fract(h1 * 71.37 + 0.67);
+          // one cell in seven is a gap; across a hand-over between two pivots each lattice keeps the
+          // blades whose hash falls on its side of keep, so blades trade places one at a time
+          float live = step(h3, 0.85) * clamp(side * (keep - h3 / 0.85) * 12.0 + 0.5, 0.0, 1.0);
+          float y0 = h2;                                                         // rooted anywhere in its ring
+          float hl = hb * (0.6 + 0.4 * h1);
+          float t = clamp((fy - y0) / hl, 0.0, 1.0);
+          float x0 = 0.3 + 0.4 * fract(h1 * 5.31) + (h2 - 0.5) * 0.5 * t;        // and leaning a little
+          float w = (0.07 + 0.22 * (1.0 - t)) * wk;                              // tapering to the tip
+          float inX = 1.0 - smoothstep(w - aaU, w + aaU, abs(fx - x0));
+          float inY = smoothstep(y0 - aaV, y0 + aaV, fy) * (1.0 - smoothstep(y0 + hl - aaV, y0 + hl + aaV, fy));
+          return vec3(live * inX * inY, t, h3 / 0.85);
+        }
+        // One lattice about pivot pv, with its own anti-aliasing: fu and fv are how many cells one
+        // pixel spans across and along the radial lines, and the blades fade before they can shimmer.
+        vec3 meadowLattice(vec2 p, vec2 pv, vec2 dx, vec2 dy, float px, float wk, float keep, float side) {
+          vec2 rel = p - pv;
+          float rr = max(length(rel), 0.5);
+          float fu = (abs(rel.x * dx.y - rel.y * dx.x) + abs(rel.x * dy.y - rel.y * dy.x)) / (rr * 0.24 * max(1.0, rr / 45.0));
+          float fv = 12.8 * (abs(dot(rel, dx)) + abs(dot(rel, dy))) / (rr * rr);
+          // a blade ~0.22 m tall, measured in rings. Seen from well above the sward (the gallery, a
+          // slope dropping away) it is a fraction of a ring, and stretching it to fill one would draw
+          // long spokes radiating from the eye: there the blades fade out instead
+          float hb = 0.22 * fv / px;
+          float amp = (1.0 - smoothstep(0.35, 0.8, fu)) * (1.0 - smoothstep(0.7, 1.3, fv)) * smoothstep(0.2, 0.5, hb);
+          if (amp < 0.01) return vec3(0.0);
+          hb = clamp(hb, 0.9, 2.0);
+          float lv = log(rr) * 12.8;
+          float row = floor(lv), fy = lv - row;
+          float th = atan(rel.y, rel.x) * 0.15915494 + 0.5;
+          float aaU = fu * 0.8, aaV = fv * 0.8;
+          vec3 c = meadowCell(row - 2.0, fy + 2.0, th, hb, wk, aaU, aaV, keep, side);
+          float cov = c.x; vec2 at = c.yz * c.x;
+          c = meadowCell(row - 1.0, fy + 1.0, th, hb, wk, aaU, aaV, keep, side);
+          at += c.yz * c.x * (1.0 - cov); cov += c.x * (1.0 - cov);
+          c = meadowCell(row, fy, th, hb, wk, aaU, aaV, keep, side);
+          at += c.yz * c.x * (1.0 - cov); cov += c.x * (1.0 - cov);
+          return vec3(cov * amp, at / max(cov, 1e-4));
+        }`)
       .replace('#include <clipping_planes_fragment>',
         `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;
          if (uBuriedView > .5 && uBuriedView < 1.5 && vLXZ.x > 79.0 && vLXZ.x < 161.0 && vLXZ.y > -9.0 && vLXZ.y < 47.0) discard;
@@ -755,10 +828,19 @@ export function buildTerrain() {
       // so we recompute here rather than share). -2 texture fetches; +0 draws.
       .replace('#include <color_fragment>', `
         #include <color_fragment>
+        vec3 mBase = diffuseColor.rgb;                        // the vertex colour, before any grain
         float cScl  = (fwidth(vWPos.x) + fwidth(vWPos.z)) / max(fwidth(vLXZ.x) + fwidth(vLXZ.y), 1e-6);
         float cMini = 1.0 - smoothstep(0.05, 0.5, cScl);
         float cLand = smoothstep(0.3, 1.1, vTerH);           // off the seabed / waterline
-        float cGrain = vnoise(vLXZ * 2.6) * 0.62 + vnoise(vLXZ * 6.7 + 5.0) * 0.38;
+        // On the meadow the two sub-metre grain octaves are filtered by the pixel's reach on the
+        // ground: past ~10 m they could only alias (a fizz as the head bobs), the far meadow's blades
+        // below take that job over, and an octave filtered to nothing is not evaluated at all.
+        vec2 mDx = dFdx(vLXZ), mDy = dFdy(vLXZ);
+        float mReach = max(length(mDx), length(mDy));
+        float g1A = 1.0 - vMeadow * smoothstep(0.3, 0.6, mReach * 2.6);
+        float g2A = 1.0 - vMeadow * smoothstep(0.3, 0.6, mReach * 6.7);
+        float cGrain = 0.5 + (g1A > 0.002 ? (vnoise(vLXZ * 2.6) - 0.5) * 0.62 * g1A : 0.0)
+          + (g2A > 0.002 ? (vnoise(vLXZ * 6.7 + 5.0) - 0.5) * 0.38 * g2A : 0.0);
         float macro = vnoise(vLXZ * 0.085 + 2.0);            // big soft swell (~12m), continuous
         float fine  = vnoise(vLXZ * 0.42 + 17.0);            // mid variation (NOT a per-tile grid)
         float deGrid = (0.86 + 0.26 * macro) * (0.93 + 0.14 * fine);
@@ -767,6 +849,74 @@ export function buildTerrain() {
         float cSandW = (1.0 - smoothstep(2.2, 3.4, vTerH))
           * (1.0 - smoothstep(0.38, 0.52, vSlope));
         diffuseColor.rgb *= 1.0 + gSandLee * 0.024 * cSandW * (1.0 - cMini);
+        // the litter/path mask, fetched once: the meadow below thins on it, the litter pass paints it
+        vec2 cLitU = (vLXZ - uLitterRect.xy) / uLitterRect.z + 0.5;
+        vec4 cLit = uLitterOn > 0.5
+          ? texture2D(uLitter, clamp(cLitU, 0.0, 1.0)) * (step(0.0, cLitU.x) * step(cLitU.x, 1.0) * step(0.0, cLitU.y) * step(cLitU.y, 1.0))
+          : vec4(0.0);
+        // THE FAR MEADOW. The turf (turf.js) stands real blades to 30 m; past them the meadow was the
+        // bare terrain and read as suede — a smooth ochre carpet with soft blotches, a visible line
+        // where the blades stopped. Meadow pixels only (vMeadow: the turf's own growing rule), never
+        // on the 1:240 model, never under the live tide, never in the last winter (uMeadowOn).
+        //  * blades: a radial lattice of tapered blades (meadowLattice above) continues the turf's
+        //    tufts out to ~150 m as fine upright strokes — upright because a blade seen from eye
+        //    height projects AWAY from the eye, which no image tiled flat on the ground can do;
+        //  * canopy: past the turf the eye no longer reaches the ground between blades, so the
+        //    ground takes the sward's own darker, greener body (the turf's blade tint);
+        //  * nap: wind-combed swathes, a little lighter where the grass lies away from the eye;
+        //  * sun: backlit at a low sun the blade tips glow; with the sun behind, a faint hotspot.
+        // Thinned on worn paths and bare under needle litter, as the turf is.
+        float mW = vMeadow * cLand * (1.0 - cMini) * smoothstep(0.05, 0.6, vTerH - uWaterY) * uMeadowOn;
+        float mDist = length(vViewPosition);
+        if (mW > 0.002 && mDist > 4.0) {
+          vec3 mV = normalize(cameraPosition - vWPos);
+          vec2 mVh = -mV.xz / max(length(mV.xz), 1e-4);          // the view's heading over the ground
+          // how nearly the eye skims the sward (relative to the ground's own slope)
+          float mGraze = smoothstep(0.8, 0.95, 1.0 - abs(dot(normalize(vNormal), normalize(vViewPosition))));
+          vec3 mTint = vec3(0.94, 1.06, 0.86);                   // the turf's blade tint (turf.js)
+          float sward = (1.0 - smoothstep(0.08, 0.35, cLit.r)) * (1.0 - 0.8 * smoothstep(0.06, 0.5, cLit.g));
+          float mFar = smoothstep(40.0, 110.0, mDist);
+          float mGlow = 0.0, mHot = 0.0;
+          #if NUM_DIR_LIGHTS > 0
+          vec3 mL = normalize((vec4(directionalLights[0].direction, 0.0) * viewMatrix).xyz);
+          float mToward = dot(mVh, mL.xz / max(length(mL.xz), 1e-4));
+          float mLow = 1.0 - smoothstep(0.1, 0.65, mL.y);
+          mGlow = pow(max(mToward, 0.0), 3.0) * mLow * mGraze * uSunUp * smoothstep(15.0, 60.0, mDist);
+          mHot = max(-mToward, 0.0) * mGraze * (1.0 - mLow * 0.5);
+          #endif
+          // the lay of the sward: swathes ~9 m across and 40 m along the wind, filtered by the pixel's
+          // reach like everything here (an unresolvable swathe settles to the plain wind lay)
+          vec2 mWind = vec2(-0.8, -0.6), mCross = vec2(0.6, -0.8);
+          float layN = vnoise(vec2(dot(vLXZ, mCross) * 0.11, dot(vLXZ, mWind) * 0.025) + vec2(3.7, 1.1));
+          float lfx = (abs(dot(mDx, mCross)) + abs(dot(mDy, mCross))) * 0.11;
+          float lfy = (abs(dot(mDx, mWind)) + abs(dot(mDy, mWind))) * 0.025;
+          float layA = (layN - 0.5) * 3.0 * (1.0 - smoothstep(0.3, 0.6, lfx)) * (1.0 - smoothstep(0.3, 0.6, lfy));
+          float napK = 1.0 + dot(mVh, cos(layA) * mWind + sin(layA) * mCross) * 0.07 * mGraze * smoothstep(20.0, 50.0, mDist);
+          float canopy = smoothstep(18.0, 70.0, mDist) * mGraze * sward;
+          vec3 mCol = diffuseColor.rgb * mix(vec3(1.0), mTint * 0.78, canopy * 0.65);
+          mCol *= napK * (1.0 + mGlow * 0.10 + mHot * 0.05);
+          // the blades take over from the turf across its fading ring (13-24 m); where no turf
+          // grows (it stops at the 19-21 m crowns) they reach in as far as the eye skims
+          float turfK = 1.0 - smoothstep(19.0, 21.0, vTerH);
+          float bladeAmp = smoothstep(mix(4.0, 13.0, turfK), mix(10.0, 24.0, turfK), mDist)
+            * sward * (1.0 - smoothstep(140.0, 300.0, mDist));
+          if (bladeAmp > 0.01) {
+            float px = max(length(mDx), 1e-4);                    // metres per pixel across the view
+            float wk = mix(1.0, 1.5, smoothstep(25.0, 100.0, mDist));
+            // two lattices only while the eye is between pivots (see onBeforeRender below)
+            vec3 la = uMPivotKeep > 0.001 ? meadowLattice(vLXZ, uMPivot.xy, mDx, mDy, px, wk, uMPivotKeep, 1.0) : vec3(0.0);
+            vec3 lb = uMPivotKeep < 0.999 ? meadowLattice(vLXZ, uMPivot.zw, mDx, mDy, px, wk, uMPivotKeep, -1.0) : vec3(0.0);
+            float cov = la.x + lb.x * (1.0 - la.x);
+            vec2 at = (la.yz * la.x + lb.yz * lb.x * (1.0 - la.x)) / max(cov, 1e-4);
+            // near: the turf's own blade, dark in the sward and light at the tip; far: light tips
+            // over the darker canopy
+            float tone = mix(mix(0.52, 1.06, at.x) * (0.82 + 0.3 * at.y), mix(0.9, 1.16, at.x) * (0.74 + 0.5 * at.y), mFar);
+            vec3 blade = mBase * mTint * tone * napK * (1.0 + (mGlow * 0.45 + mHot * 0.08) * at.x);
+            mCol = mix(mCol, blade, cov * bladeAmp);
+          }
+          mCol *= mix(vec3(1.0), vec3(0.97, 1.02, 0.92), smoothstep(10.0, 30.0, mDist));
+          diffuseColor.rgb = mix(diffuseColor.rgb, mCol, mW);
+        }
         // rock strata in ALBEDO too (#36): the normal-map beds wash out in the aerial haze
         // at the 170m glyph-puzzle study range — a gentle lightness banding survives it,
         // so the east bluff finally reads as BEDDED rock from the stones, not a blank wall
@@ -825,10 +975,7 @@ export function buildTerrain() {
         // the grain below is what makes it read as needles rather than as a stain, and it
         // is evaluated per fragment so it stays sharp however coarse the mask is.
         if (uLitterOn > 0.5) {
-          vec2 lu = (vLXZ - uLitterRect.xy) / uLitterRect.z + 0.5;
-          vec2 lc = clamp(lu, 0.0, 1.0);
-          float inside = step(0.0, lu.x) * step(lu.x, 1.0) * step(0.0, lu.y) * step(lu.y, 1.0);
-          float lm = texture2D(uLitter, lc).r * inside * cLand;
+          float lm = cLit.r * cLand;
           float lgrain = vnoise(vLXZ * 5.1) * 0.58 + vnoise(vLXZ * 14.3 + 7.0) * 0.42;
           // toward an ACTUAL needle colour, not a multiply of the ground. Scaling a tan
           // meadow by (0.66,0.56,0.42) shifts it barely at all — verified by painting the
@@ -841,7 +988,7 @@ export function buildTerrain() {
           // never a stripe. It takes the same grain as the litter so it breaks up like
           // ground rather than reading as paint, and uPathAmt keeps it deniable until
           // you have been down far enough to know what it is.
-          float pm = texture2D(uLitter, lc).g * inside * cLand;
+          float pm = cLit.g * cLand;
           // A 14% lightening was invisible at eye height, where a path is foreshortened
           // to almost nothing — measured against uPathAmt 0 and the frames were the same
           // picture. Worn turf goes to bare earth, so it shifts HUE as well as value.
@@ -862,6 +1009,23 @@ export function buildTerrain() {
   mesh.name = 'terrain';
   mesh.receiveShadow = true;
   mesh.castShadow = false;
+  // THE FAR MEADOW's blade lattice is laid out about a pivot on the ground near the eye (see
+  // meadowLattice). The pivot is world-fixed, so the blades stand still as you walk past them;
+  // once the eye is MEADOW_STEP from it a fresh pivot is dropped under the eye, and the blades
+  // hand over from the old lattice to the new one in proportion to the distance walked, one blade
+  // at a time — never in a timed fade, and never while you stand still.
+  const piv = { a: new THREE.Vector2(), b: new THREE.Vector2(), init: false };
+  mesh.onBeforeRender = (renderer, scene, camera) => {
+    const u = mat.userData.shader?.uniforms;
+    if (!u || !u.uMPivot) return;
+    const e = camera.matrixWorld.elements, cx = e[12], cz = e[14];
+    let d = Math.hypot(cx - piv.a.x, cz - piv.a.y);
+    if (!piv.init || d > 30) { piv.a.set(cx, cz); piv.b.set(cx, cz); piv.init = true; d = 0; }
+    else if (d >= MEADOW_STEP) { piv.b.copy(piv.a); piv.a.set(cx, cz); d = 0; }
+    u.uMPivot.value.set(piv.a.x, piv.a.y, piv.b.x, piv.b.y);
+    u.uMPivotKeep.value = Math.min(1, d / MEADOW_STEP);
+    u.uMeadowOn.value = MEADOW_STATE.bare ? 0 : 1;
+  };
   return mesh;
 }
 
@@ -884,6 +1048,7 @@ function refineCoastCells(base, N) {
   const bc = base.getAttribute('color');
   const bu = base.getAttribute('uv');
   const bs = base.getAttribute('aSlope');
+  const bm = base.getAttribute('aMeadow');
   const refinement = new Uint8Array(N * N);
   const deepCovered = new Uint8Array(N * N);
   const deepOrigin = new Uint8Array(N * N);
@@ -955,8 +1120,9 @@ function refineCoastCells(base, N) {
   const colors = new Float32Array(vertexCount * 3);
   const uvs = new Float32Array(vertexCount * 2);
   const slopes = new Float32Array(vertexCount);
+  const meadows = new Float32Array(vertexCount);
   positions.set(bp.array); normals.set(bn.array); colors.set(bc.array);
-  uvs.set(bu.array); slopes.set(bs.array);
+  uvs.set(bu.array); slopes.set(bs.array); meadows.set(bm.array);
 
   const ordinaryCells = N * N - refinedCells - deepCells;
   const triangleCount = ordinaryCells * 2 + refinedCells * 2 + addedTriangles + deepFanTriangles;
@@ -1035,6 +1201,7 @@ function refineCoastCells(base, N) {
           normals[p3] /= nl; normals[p3 + 1] /= nl; normals[p3 + 2] /= nl;
           sample(bc, x, z, 3, colors, p3);
           sample(bs, x, z, 1, slopes, p);
+          sample(bm, x, z, 1, meadows, p);
           uvs[p * 2] = x / DOMAIN + 0.5;
           uvs[p * 2 + 1] = z / DOMAIN + 0.5;
         }
@@ -1056,6 +1223,7 @@ function refineCoastCells(base, N) {
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
   geo.setAttribute('aSlope', new THREE.BufferAttribute(slopes, 1));
+  geo.setAttribute('aMeadow', new THREE.BufferAttribute(meadows, 1));
   geo.setIndex(new THREE.BufferAttribute(indices, 1));
   geo.computeBoundingSphere();
   geo.userData.coastRefinement = {

@@ -4658,6 +4658,49 @@ test. Cheap, owner-validated, protects every future player.
 
 ---
 
+## 2026-10-22 — the player walk, day four (graphics): the far meadow is grass, not suede
+
+**Shipped:** `js/terrain.js` only. Past the turf's 30 m ring the meadow was bare terrain
+and read as suede, with a line where the blades stopped. The terrain shader now carries
+the turf on to ~150 m as fine upright blade strokes. A vertical blade seen from eye
+height projects onto the ground as a streak pointing away from the eye, so the blades
+are laid on a lattice of radial columns and log-spaced rings around a pivot near the eye.
+That gives upright strokes whose on-screen height falls as 1/distance, which a texture
+tiled flat on the ground cannot do. The pivot is world-fixed. Every 2.5 m walked, a new
+pivot is dropped and the blades hand over one at a time, in proportion to the distance
+walked. Nothing changes while you stand still or turn. Past the turf the ground also
+takes the sward's darker, greener body. Wind-combed swathes are a little lighter where
+the grass lies away from you, backlit blade tips glow at a low sun, and there is a faint
+hotspot with the sun behind. A new `aMeadow` vertex weight (the turf's own growing rule)
+keeps all of this off sand, cliff, seabed and needle litter. It thins on worn paths, goes
+under the live tide, is off on the 1:240 model, and is off at level 4 like the turf.
+
+**Power:** +0 draws, +0 textures, +0 lights. Everything is behind a meadow-pixel branch
+from 4 m out. The litter/path mask is now fetched once instead of twice. On far meadow
+pixels the two sub-metre grain octaves (which only aliased there) are filtered by the
+pixel footprint and skipped. Blades cost at most two lattices of three hashed cells,
+plus one value noise for the swathes. A synchronous render loop (M4, 1440×900) measured
+2.99 ms with the block off and 2.90 ms with it on, which is within noise.
+
+**Evidence:** `loop/player-walk/2026-10-06/day4-far-meadow/` has ten matched before/after
+poses (meadow, low across the meadow, golden hour both ways, dusk into the sun, bluff,
+beach, a 30° down look, straight down, the bluff plateau) and two 2× crops of the turf
+edge. `rejected-alternatives.jpg` shows the approaches I tried and dropped (2× crops, top
+to bottom): before; isotropic tuft mottling, which foreshortens into soft horizontal
+smears; wind-aligned anisotropic streaks, which only read when you look downwind; and
+the first radial lattice, which came out as a coarse barcode. In a 1-pixel pitch nudge (head-bob) test, the motion-compensated far-band
+difference is the same with and without the blades (1.79 vs 1.82 low, 1.80 vs 1.66
+meadow), so they add no shimmer. A scripted walk and strafe show no spike at the pivot
+hand-over.
+
+**Debt:** past ~150 m (and on flat ground at DPR 1 past ~100 m) the strokes fade and
+the meadow is canopy colour plus swathes: smoother, though no longer suede-flat. The
+plateau and the 19–21 m crowns have no turf (turf.js ceiling), so blades start at ~10 m
+there. The swathes use a fixed wind (−0.8, −0.6) and do not follow main.js's shared
+gust.
+
+---
+
 ## 2026-10-21 — the player walk, day four: the sound world
 
 **Shipped:** `js/audio-kit.js`, synthesized foley for seven footstep surfaces (pebble, sand,

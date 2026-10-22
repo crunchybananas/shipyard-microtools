@@ -146,7 +146,8 @@ player (`js/turf.js`), turned the clouds into lit cumulus, and cleared the title
 enough to show the lighthouse. The fourth day gave it sound: footsteps per surface,
 waves that break where the sea is, rooms with their own reverb, handled paper, drips
 underground, and one wind that you hear gust and see lean the grass and the trees. It
-also added an offline-rendered audio gate. You can listen in
+also added an offline-rendered audio gate, made the Tide-Figure wet oilskin instead of a
+mannequin, and carried the meadow's blades past the turf to ~150 m in the terrain shader. You can listen in
 [day4-sound](loop/player-walk/2026-10-06/day4-sound/).
 
 ## Current visual and walking review

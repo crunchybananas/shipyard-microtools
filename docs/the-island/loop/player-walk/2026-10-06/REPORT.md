@@ -431,3 +431,24 @@ read as decorative trim, and it was replaced with the broken crust.
 `day4-figures/before/tidefig-2.2m.jpg` → `day4-figures/after/tidefig-2.2m.jpg` (and
 `-5m`, and the hooded Watcher, which gains only the sheen and the soaked hem). The full
 gate passes, including encounters 8/8 and cohesion 9/9.
+
+**The far meadow** (`js/terrain.js`, `day4-far-meadow/`; a delegated agent's work,
+reviewed and merged here). Past the turf's 30 m ring the meadow was the bare terrain and
+read as suede, with a visible line where the blades stopped. A blade standing in a
+meadow, seen from eye height, projects onto the ground as a short streak pointing
+straight away from the eye. So the terrain shader now lays blades on a lattice of radial
+columns and log-spaced rings around a pivot near the eye. That gives upright strokes
+whose on-screen height falls as 1/distance, which no texture laid flat on the ground can
+do. They carry the turf on to about 150 m.
+
+The pivot is fixed in the world. Every 2.5 m walked a new pivot is dropped, and the
+blades hand over one at a time, so nothing swims as you walk. Past the turf the ground
+also takes the sward's darker, greener body, with wind-combed swathes and backlit tips
+at a low sun. A new `aMeadow` vertex weight (the turf's own growing rule) keeps all of
+this off sand, cliff, seabed and needle litter.
+
+It costs no draws or textures. The agent measured 2.99 ms with the effect off and
+2.90 ms with it on, within noise, and found no added shimmer in a head-bob test.
+`day4-far-meadow/zoom-meadow-far-hill.jpg` shows the turf edge before and after. Debt:
+past ~150 m the strokes fade to canopy colour and swathes, and the swathes use a fixed
+wind rather than the shared gust.
