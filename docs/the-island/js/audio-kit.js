@@ -311,18 +311,19 @@ export function waveBreak(ctx, dest, t = ctx.currentTime, size = 1) {
 // A drop falling into standing water: the tick of the impact, then the air it drives under
 // ringing UP in pitch as the bubble closes (the plink is a rising resonance, not a falling
 // one). A tenth of a second; the room reverb is what makes it a cellar.
-export function drip(ctx, dest, t = ctx.currentTime, { gain = 1 } = {}) {
-  burst(ctx, dest, t, 0.003, { type: 'highpass', freq: 3500, q: 0.7, gain: 0.04 * gain });
-  const at = t + rnd(0.002, 0.007), f0 = rnd(800, 1600);
+// `size` > 1 is a heavier drop from higher up: lower, longer, more plop than plink.
+export function drip(ctx, dest, t = ctx.currentTime, { gain = 1, size = 1 } = {}) {
+  burst(ctx, dest, t, 0.003 * size, { type: 'highpass', freq: 3500 / size, q: 0.7, gain: 0.04 * gain });
+  const at = t + rnd(0.002, 0.007), f0 = rnd(800, 1600) / size;
   const o = ctx.createOscillator();
   o.frequency.setValueAtTime(f0, at);
   o.frequency.exponentialRampToValueAtTime(f0 * rnd(1.6, 2.3), at + rnd(0.03, 0.05));
   const g = ctx.createGain();
   g.gain.setValueAtTime(0.0001, at);
   g.gain.exponentialRampToValueAtTime(0.5 * gain, at + 0.002);
-  g.gain.exponentialRampToValueAtTime(0.0001, at + rnd(0.06, 0.11));
+  g.gain.exponentialRampToValueAtTime(0.0001, at + rnd(0.06, 0.11) * size);
   o.connect(g).connect(dest);
-  o.start(at); o.stop(at + 0.14);
+  o.start(at); o.stop(at + 0.14 * size);
 }
 
 // -------------------------------------------------------------------- birds --

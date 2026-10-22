@@ -328,6 +328,12 @@ followed by a rising plink, placed close by in the dark and carried round the st
 the room reverb. The buried rooms now also close the wall filter over the outdoor beds,
 the way the tower does. Before, the wind and surf played unmuffled underground.
 
+**The vault's drops land.** Through the cellar's east window you watch eleven glowing
+drops fall 31 m through the vault's void into black water, and none of them made a sound.
+Each landing now plays a heavy drop (lower and longer than a seep's plink) from where
+that drop meets the water, 12–46 m out, carried by the room. That's about four landings
+a second, irregular and distinct, 13 dB over the cellar's room tone in their band.
+
 **The gallery was "indoors".** `player.interior()` only checked position on the ground
 plan, so the lantern gallery, which sits over the study's circle, counted as inside.
 The most exposed place on the island got the room reverb, a 750 Hz wall filter and a
@@ -375,7 +381,8 @@ the output. It checks 12 things:
   bed rendered with and without steps is identical, and the difference is the steps
   alone. The first full gate run measured shingle at +2.1 dB, so beach steps were raised
   by 3 dB. Now shingle is +6.4, the deck +3.5 / +7.0, and grass +3.6 dB. A gull's
-  wings, flushed 6 m away on the shore, are +4.5 dB;
+  wings, flushed 6 m away on the shore, are +4.5 dB, and the vault's drops landing
+  12–46 m off are +13 dB over the cellar;
 - the deck sounds different from boards, stone and iron;
 - every handled object is audible;
 - the shore is audible and has at least three discrete wave events;
@@ -388,7 +395,7 @@ the output. It checks 12 things:
 - underground there are at least four discrete drips, and less 8 kHz energy than an
   open meadow, even with a grove overhead.
 
-Result: **AUDIO 19 / 19**. Set `AUDIO_DIR` to write each sheet as a WAV.
+Result: **AUDIO 20 / 20**. Set `AUDIO_DIR` to write each sheet as a WAV.
 
 **The game asks for the right sound** (`tools/harness/surfaces.mjs`, in `run.sh`). This
 check runs in the real game. It teleports through the island and fires the player's own
@@ -399,6 +406,7 @@ module. It covers:
 - the stair as wood, the gallery as iron, and a buried room as stone;
 - the gallery as open air, with the lantern and the study as rooms;
 - a forced gust reaching the crown, grass and turf shaders together;
-- a perched bird, walked up to, flushing with its wings.
+- a perched bird, walked up to, flushing with its wings;
+- in the cellar with the hatch open, the vault's drops heard landing out in the void.
 
-Result: **SURFACES 12 / 12**. `ABYME.wind(g)` holds the gust at a level for captures.
+Result: **SURFACES 13 / 13**. `ABYME.wind(g)` holds the gust at a level for captures.

@@ -142,6 +142,8 @@ export default async function (h) {
       night: 0, dawn: 0, level: 1, px: 0, pz: 0, yaw: 0, mist: 0, underground: false, gust: 0.35, trees: { near: 1, x: 6, z: 0 } }));`;
   const sheet = (bedSrc, kind) => `${bedSrc}
     ${!kind ? '' : kind === 'wings' ? `at(2.6, () => A.wings({ x: 10, z: -104, ref: 12 }, 'gull'));`
+      : kind === 'vault' ? `for (let i = 0; i < 11; i++) { const sp = 0.34 + 0.16 * ((i * 0.618) % 1), x = 109 + 34 * ((i * 0.381) % 1);
+          for (let t = 2.5 + ((i * 0.27) % 1) / sp; t < 5.3; t += 1 / sp) at(t, () => A.dropLands({ x, z: 25 })); }`
       : `for (let i = 0; i < 6; i++) at(2.5 + i * 0.46, () => A.footstep('${kind}'));`}
     marks.push({ name: 'window', t0: 2.5, t1: 5.3, frames: true });`;
   const smrOf = (bed, both) => {
@@ -153,18 +155,25 @@ export default async function (h) {
     return { hi: one(bed.frames, both.frames), lo: one(bed.framesLo, both.framesLo) };
   };
   const strip = (x) => { delete x.frames; delete x.framesLo; return x; };
+  // the cellar with the hatch open: a room, the vault's void through its east window
+  const cellarBed = `for (let t = 0.05; t < 6; t += 0.05) at(t, () => A.update(0.05, { wavePhase: 0.3, shoreDist: 400, tideNear: 0.5, altitude: 19, interior: true,
+      night: 0, dawn: 0, level: 1, px: 97, pz: 25, yaw: -Math.PI / 2, mist: 0, underground: false, gust: 0.35 }));`;
   const sBed = (await render('shore-bed', 6, sheet(shoreBed, null))).segs[0];
+  const cBed = (await render('cellar-bed', 6, sheet(cellarBed, null))).segs[0];
   const grBed = (await render('grove-bed', 6, sheet(groveBed, null))).segs[0];
   const OVER = [['pebble', 'footsteps-shore', sBed, shoreBed, 'shingle on the landing beach'], ['deck', 'deck-shore', sBed, shoreBed, 'the jetty deck over the surf'],
-    ['grass', 'grass-grove', grBed, groveBed, 'grass in a grove in a breeze'], ['wings', 'wings-shore', sBed, shoreBed, 'a gull flushed 6 m away on the shore']];
+    ['grass', 'grass-grove', grBed, groveBed, 'grass in a grove in a breeze'], ['wings', 'wings-shore', sBed, shoreBed, 'a gull flushed 6 m away on the shore'],
+    ['vault', 'vault-drops', cBed, cellarBed, 'the drops landing 12-46 m off in the vault']];
   for (const [kind, name, bed, bedSrc, where] of OVER) {
     const both = (await render(name, 6, sheet(bedSrc, kind))).segs[0];
     const smr = smrOf(bed, both);
     console.log(`  ${kind} over its bed: ${smr.lo} dB (0.2-1.5 kHz) / ${smr.hi} dB (1.5-6 kHz) above it where they land`);
-    ok(kind === 'wings' ? `the wings of ${where} stand above the surf (> +3 dB in their band)` : `footsteps on ${where} stand above the bed where they land (> +3 dB in their band)`,
+    ok(kind === 'wings' ? `the wings of ${where} stand above the surf (> +3 dB in their band)`
+      : kind === 'vault' ? `${where} are heard over the cellar (> +3 dB in their band)`
+      : `footsteps on ${where} stand above the bed where they land (> +3 dB in their band)`,
       Math.max(smr.lo, smr.hi) > 3, { smr, both: strip(both) });
   }
-  strip(sBed); strip(grBed);
+  strip(sBed); strip(grBed); strip(cBed);
   ok('every surface is audible and unclipped', foot.nan === 0 && foot.peak < 0.95 && foot.segs.every((s) => s.rmsDb > -52), foot.segs);
   const C = Object.fromEntries(foot.segs.map((s) => [s.name, s.centroid]));
   const distinct = (a, b) => Math.abs(C[a] - C[b]) / Math.max(C[a], C[b]) > 0.08;

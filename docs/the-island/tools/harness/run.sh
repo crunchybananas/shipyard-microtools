@@ -196,14 +196,15 @@ echo "== the sound world =="
 # the cellar's drips, both music beds — and proves
 # each is audible, unclipped, and that surfaces sound different from one another.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/audio.mjs" | tee "$WORK/audio.out"
-grep -q 'AUDIO 19 / 19' "$WORK/audio.out" || { echo "AUDIO FAILED"; exit 1; }
+grep -q 'AUDIO 20 / 20' "$WORK/audio.out" || { echo "AUDIO FAILED"; exit 1; }
 
 echo "== what is underfoot =="
 # The game must ASK for the right sound: real teleports through the footstep path pick each
 # surface, the lantern gallery is open air over the study's circle, and the one wind reaches
-# the crowns, the grass and the turf together, and a flushed bird is heard taking off.
+# the crowns, the grass and the turf together, a flushed bird is heard taking off, and the
+# vault's falling drops are heard landing.
 SERVE_PORT="$SERVE_PORT" CDP_PORT="$CDP_PORT" node "$HERE/cdp.mjs" "$HERE/surfaces.mjs" | tee "$WORK/surfaces.out"
-grep -q 'SURFACES 12 / 12' "$WORK/surfaces.out" || { echo "SURFACES FAILED"; exit 1; }
+grep -q 'SURFACES 13 / 13' "$WORK/surfaces.out" || { echo "SURFACES FAILED"; exit 1; }
 
 echo "== the walk =="
 # Every puzzle action goes through its shipped hotspot. Crossing travel uses the public

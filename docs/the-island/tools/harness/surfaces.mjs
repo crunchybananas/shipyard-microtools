@@ -6,8 +6,8 @@ import { beginPlay } from './play-ready.mjs';
 // surfaceAt → A.footstep), intercepted at the audio module, so a wrong floor height, a missed
 // deck or a mis-scoped room shows up as the wrong surface. It also checks what the
 // sound world reads from main.js: where "inside" ends (the lantern gallery is open air over
-// the study's circle), that the island's one wind reaches every swaying shader, and that a
-// bird the player flushes is heard taking off.
+// the study's circle), that the island's one wind reaches every swaying shader, that a bird
+// the player flushes is heard taking off, and that the vault's falling drops are heard landing.
 
 export default async function (h) {
   const R = { pass: [], fail: [] };
@@ -122,6 +122,22 @@ export default async function (h) {
     return { species: u.species, flushed: u.flush > 0, heard };
   })()`);
   ok('a perched bird walked up to flushes with its wings', bird.flushed && bird.heard.includes(bird.species), bird);
+
+  // down in the cellar with the hatch open, the drops you watch fall through the vault's void
+  // are heard landing, from out in the void (x 109-143), not from beside you. Polled, not
+  // timed: a loaded headless frame clamps dt, so the drops' clock can run slow.
+  const vault = await h.evaluate(`(async () => {
+    const A = (await import('/the-island/js/audio.js')).default;
+    const heard = []; const o = A.dropLands.bind(A);
+    A.dropLands = (at) => { heard.push(Math.round(at.x)); return o(at); };
+    ABYME.W.flags.hatchOpen = true;
+    ABYME.player.pos.set(97, 19.5, 24);
+    for (let i = 0; i < 60 && heard.length < 2; i++) await new Promise((r) => setTimeout(r, 250));
+    A.dropLands = o;
+    const drips = ABYME.scene.getObjectByName('vaultDrips');
+    return { heard, visible: !!drips?.visible, y: +ABYME.player.pos.y.toFixed(2) };
+  })()`);
+  ok('in the cellar, the vault\'s falling drops are heard landing out in the void', vault.visible && vault.heard.length >= 2 && vault.heard.every((x) => x > 105), vault);
 
   console.log(`SURFACES ${R.pass.length} / ${R.pass.length + R.fail.length}`);
   if (R.fail.length) { console.log('FAILURES: ' + JSON.stringify(R.fail, null, 1)); process.exitCode = 1; }

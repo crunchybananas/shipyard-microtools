@@ -623,6 +623,11 @@ const A = {
   rope() { if (this._running()) KIT.rope(ctx, this.foley); },
   drawer() { if (this._running()) KIT.drawer(ctx, this.foley); },
   glass() { if (this._running()) KIT.glass(ctx, this.foley); },
+  // one of the vault's falling drops reaching the black water, from where it lands: 31 m of
+  // fall makes it a heavier plop than a seep's plink, and the void carries it
+  dropLands(at) {
+    if (this._running()) KIT.drip(ctx, this._out({ x: at.x, z: at.z, ref: 10 }, this.fx), ctx.currentTime, { gain: 0.7, size: 1.7 });
+  },
   // a flushed bird's wings, from where it rose: the crow heavier and slower than the gull
   wings(at = null, species = 'gull') {
     if (this._running()) KIT.wings(ctx, this._out(at, this.fx), ctx.currentTime, species === 'crow' ? { beats: 7, rate: 7, size: 1.25, gain: 2.5 } : { beats: 8, rate: 8.5, gain: 2.5 });

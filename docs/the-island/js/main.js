@@ -1536,7 +1536,9 @@ function applyAtmosphere(elapsed, dt) {
     vaultDrips.visible = W.flags.hatchOpen && MODE !== 'finale' && inCellar;
     if (W.flags.hatchOpen) for (const d of vaultDrips.children) {
       const u = d.userData;
+      const was = u.phase;
       u.phase = (u.phase + dt * u.speed) % 1;
+      if (u.phase < was && vaultDrips.visible) A.dropLands(u);   // the drop you watched fall is heard landing
       d.position.y = lerp(45, 13.9, u.phase);
       d.scale.setScalar(clamp(Math.min(u.phase / 0.07, (1 - u.phase) / 0.07), 0, 1));
     }

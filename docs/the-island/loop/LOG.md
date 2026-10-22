@@ -4696,6 +4696,10 @@ walked on: shingle +6.4, deck +3.5/+7.0, grass in a breezy grove +3.6 dB. **AUDI
 was 13–17 dB under the surf at flush distance; now it is +4.5 dB. **AUDIO 19 / 19**;
 `surfaces.mjs` walks up to a perched bird in the real game: **SURFACES 12 / 12**.
 
+**Then, the vault:** the eleven glowing drops seen falling through the cellar's east window
+landed in silence. Each landing now sounds from where it hits the water (`A.dropLands`, a
+heavier `KIT.drip`). **AUDIO 20 / 20**, **SURFACES 13 / 13**.
+
 **Debt:** the game's sound has only been heard offline, not yet by the owner in a live
 walk. Mix levels are set by measurement, not by ear.
 
