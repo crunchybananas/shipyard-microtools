@@ -23,6 +23,7 @@ import {
 import { RELIEF, loadModel } from './assets.js';
 import { attachHarborRooms } from './harbor.js';   // relief asked-vs-applied, for tools/harness/relief.mjs
 import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
+import { updateSandTracks, clearSandTracks } from './sand-tracks.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
@@ -1996,6 +1997,7 @@ player.onFootstep = (kind, pos) => {
 // reset. Storage policy stays with the caller: a new run forgets its save first,
 // while resetFlags replaces it in place and deliberately preserves THE STACK.
 function resetRunState({ persist = true } = {}) {
+  clearSandTracks();
   UI.closeReader();
   UI.closeJournal();
   UI.closeSandWriter(false);
@@ -2693,6 +2695,7 @@ renderer.setAnimationLoop((tMs) => {
   if (MODE === 'ascend' && ascent) tickAscent(dt);
 
   if (!W.reading && !W.notesOpen && !W.writing) player.update(dt); // reading surfaces hold the player's hand still
+  updateSandTracks(dt, player.pos, MODE === 'play' && !player.locked && !W.reading && !W.notesOpen && !W.writing, heightAt, waterY());
   game.tick(dt, elapsed);
   harbor.tick(W, dt, elapsed);
   landfall.tick();

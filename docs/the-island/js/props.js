@@ -2165,15 +2165,10 @@ export function buildWorld(coastKit) {
         ap.setY(v, heightAt(wx, wz) + 0.04);                      // drape on the shore
       }
       ag.computeVertexNormals();
-      const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: true });
+      const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: false, transparent: true, depthWrite: false });
       applyRelief(apronMat, 'pebble', { normalScale: 0.5, strength: 2.0 });
-      // DE-TILE the pebbles + GRADIENT-BLEND the shingle into the sand (no hard line anywhere).
-      //  - de-tile: warp the albedo sample coord with low-freq value-noise so the [53,12] column
-      //    lattice dissolves. Compile-safe: sample a warped LOCAL, never mutate the read-only vMapUv.
-      //  - blend: pebble DENSITY is full at the waterline and thins to nothing up the beach over a
-      //    ~6.5m band, gated by a per-pebble value-noise threshold so the thinning SCATTERS (stray
-      //    pebbles strand out on the de-tiled sand beneath) rather than ending on a boundary. The
-      //    seaward lip + x-ends are softened too. Early discard, +0 texture fetches (pure ALU noise).
+      // Feather the bed into sand rather than cutting metre-wide noise holes.
+      // Separate, partly buried stones below carry the last scattered fringe.
       apronMat.onBeforeCompile = (sh) => {
         // carry world XZ to the fragment stage (geometry positions are baked world coords)
         sh.vertexShader = sh.vertexShader
@@ -2192,7 +2187,16 @@ export function buildWorld(coastKit) {
             '  float apDens = 1.0 - smoothstep(-104.5, -99.0, vApW.y);            // full at the water, ->0 up the beach\n' +
             '  apDens *= smoothstep(-106.5, -105.3, vApW.y);                      // soften the seaward lip into the water\n' +
             '  apDens *= smoothstep(-32.0, -29.5, vApW.x) * smoothstep(16.0, 13.5, vApW.x);  // soften the two ends\n' +
-            '  if (apDens < apVN(vApW * 1.3)) discard;                            // noisy threshold -> scattered thinning\n')
+            '  float apEdge = (apVN(vApW * 0.65) - 0.5) * 0.22;\n' +
+            '  diffuseColor.a *= smoothstep(0.02, 0.62, apDens + apEdge);\n' +
+            '  if (diffuseColor.a < 0.005) discard;\n')
+          .replace('#include <normal_fragment_maps>', `
+            #ifdef USE_NORMALMAP_TANGENTSPACE
+              vec2 apNormalWarp = (vec2(apVN(vNormalMapUv * 0.4), apVN(vNormalMapUv * 0.4 + 19.7)) - 0.5) * 0.7;
+              vec3 apN = texture2D(normalMap, vNormalMapUv + apNormalWarp).xyz * 2.0 - 1.0;
+              apN.xy *= normalScale;
+              normal = normalize(tbn * apN);
+            #endif`)
           .replace('#include <map_fragment>',
             '#ifdef USE_MAP\n' +
             '  vec2 apWarp = (vec2(apVN(vMapUv * 0.4), apVN(vMapUv * 0.4 + 19.7)) - 0.5) * 0.7;\n' +
@@ -2206,6 +2210,42 @@ export function buildWorld(coastKit) {
       apron.receiveShadow = false;   // flat open-shore pebbles barely catch shadows; skipping the PCF
                                      // sample per fragment cuts the deep strip's grazing-angle GPU cost
       core.add(apron);
+
+      // Grain-scale transition: rounded stones remain whole as density falls.
+      // One instanced draw, seeded independently of other scenery; no colliders.
+      const fringe = [], rng = mulberry32(SEED ^ 0xbed5a);
+      for (let i = 0; i < 3200; i++) {
+        const x = -32 + rng()*48, z = -103.5 + rng()*7.5;
+        const density = (1-smoothstep(-102.5,-96.5,z))
+          * smoothstep(-32,-29,x) * (1-smoothstep(13,16,x));
+        if (rng() > density*.65) continue;
+        const y = heightAt(x,z);
+        const sx = (heightAt(x+.1,z)-heightAt(x-.1,z))/.2;
+        const sz = (heightAt(x,z+.1)-heightAt(x,z-.1))/.2;
+        if (y < -.5 || y > 2.2 || Math.hypot(sx,sz) > .5) continue;
+        const size = .035+rng()*.05;
+        fringe.push({x,z,y,size,turn:rng()*TAU,wide:.65+rng()*.4,shade:rng()});
+      }
+      const pebbleGeo = new THREE.IcosahedronGeometry(1,2);
+      const pebbleMat = new THREE.MeshStandardMaterial({roughness:.92});
+      const scatter = new THREE.InstancedMesh(pebbleGeo,pebbleMat,fringe.length);
+      scatter.name = 'pebbleFringe';
+      const pose = new THREE.Object3D(), colour = new THREE.Color();
+      const axis = new THREE.Vector3(0,1,0), up = new THREE.Vector3();
+      fringe.forEach((p,i)=>{
+        up.set(-(heightAt(p.x+.1,p.z)-heightAt(p.x-.1,p.z))/.2,1,
+          -(heightAt(p.x,p.z+.1)-heightAt(p.x,p.z-.1))/.2).normalize();
+        pose.position.set(p.x,p.y+.012,p.z);
+        pose.quaternion.setFromUnitVectors(axis,up);
+        pose.rotateY(p.turn);
+        pose.scale.set(p.size*p.wide,p.size*.38,p.size);
+        pose.updateMatrix(); scatter.setMatrixAt(i,pose.matrix);
+        colour.setHex([0x77766b,0xa39b85,0x827e71,0xb1aa94][Math.min(3,Math.floor(p.shade*4))]);
+        scatter.setColorAt(i,colour);
+      });
+      scatter.instanceMatrix.needsUpdate = true;
+      scatter.computeBoundingSphere();
+      core.add(scatter);
     }
   }
 
