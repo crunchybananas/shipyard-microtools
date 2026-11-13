@@ -15,3 +15,11 @@ const valid = { ...fresh, collected: INGREDIENTS.map(i=>i.id), mixture: RECIPE, 
 assert.deepEqual(validateSave(valid), valid);
 const copy = validateSave(valid); copy.mixture.pop(); assert.equal(valid.mixture.length,3);
 console.log('PASS Heartwood model: recipe, errors, schema, uniqueness and defensive copying');
+
+const {advance,newJourney,HOME,LIGHT}=await import('../docs/creature-field-notes/exploration.mjs');
+const route=[35,28,21,14,7,0,1,2,1,0,7,14,15,16,23,24,25,26,19,12,5,12,19,26,33,40,47,46,45,44,43,42];
+let journey=newJourney();for(const cell of route)journey=advance(journey,cell).state;
+assert.equal(journey.complete,true);assert.equal(journey.moves,32);assert.equal(journey.rescues,0);assert.equal(journey.position,HOME);assert.equal(journey.light,LIGHT);
+const first=newJourney();assert.deepEqual(advance(first,0).state,first);assert.deepEqual(advance(first,41).state,first);
+let dim=newJourney();for(let i=0;i<12;i++)dim=advance(dim,i%2===0?35:28).state;assert.equal(dim.light,0);assert.equal(advance(dim,35).state.moves,12);
+assert.deepEqual(first.collected,[]);console.log('PASS exploration: 32-step win, invalid/wrapped movement, light exhaustion, immutable state');

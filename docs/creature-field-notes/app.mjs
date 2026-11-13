@@ -1,3 +1,4 @@
+import { initExploration } from './exploration.mjs';
 import { INGREDIENTS, freshSave, validateSave, evaluate } from './model.mjs';
 import { openStore, readSave, writeSave } from './storage.mjs';
 import { initAnimation, syncAnimation, animateIngredient, celebrate } from './animation.mjs';
@@ -9,6 +10,8 @@ let replaying = false;
 let audio;
 let confirmAction = null;
 let importing = false;
+let expedition;
+let expeditionReady = false;
 const ingredientButtons = new Map();
 for (const image of document.querySelectorAll('img')) {
   image.addEventListener('error', () => { image.hidden = true; $('#art-status').hidden = false; });
@@ -48,8 +51,9 @@ function render() {
     const collected = save.collected.includes(ingredient.id), selected = save.mixture.includes(ingredient.id);
     button.classList.toggle('selected', selected);
     button.setAttribute('aria-pressed', String(selected));
-    button.setAttribute('aria-label', `${ingredient.name}. ${ingredient.clue} ${selected ? 'In the pot. Tap to remove.' : collected ? 'Gathered. Tap to add to the pot.' : 'Tap to gather.'}`);
-    button.querySelector('.ingredient-state').textContent = selected ? 'In the pot' : collected ? 'Add to pot' : 'Gather';
+    button.setAttribute('aria-label', `${ingredient.name}. ${ingredient.clue} ${selected ? 'Already in the pot.' : collected ? 'Tap once to add to the pot.' : 'Find this on the pond trail.'}`);
+    button.querySelector('.ingredient-state').textContent = selected ? 'In the pot ✓' : collected ? 'Add to pot' : 'Find on trail';
+    button.disabled = !collected || selected;
   }
   $('#mixture').replaceChildren(...Array.from({ length: 3 }, (_, index) => {
     const li = document.createElement('li'), id = save.mixture[index];
@@ -65,7 +69,7 @@ function render() {
   }));
   $('.pot').dataset.level = String(save.mixture.length);
   $('.living-plate').dataset.level = String(save.mixture.length);
-  $('#brew').disabled = save.mixture.length !== 3;
+  $('#brew').disabled = save.mixture.length !== 3 || !expeditionReady;
   $('#clear').disabled = save.mixture.length === 0;
   $('#reward').hidden = !save.completed || replaying;
   $('#journal-count').textContent = save.completed ? '1/1' : '0/1';
@@ -80,17 +84,15 @@ function render() {
 }
 function gather(id) {
   const ingredient = INGREDIENTS.find(item => item.id === id);
-  if (!save.collected.includes(id)) {
-    save.collected.push(id); say(`${ingredient.name} gathered. ${ingredient.clue} Tap it again to add it.`);
-  } else if (save.mixture.includes(id)) {
-    save.mixture = save.mixture.filter(value => value !== id); say(`${ingredient.name} returned to your basket.`);
-  } else if (save.mixture.length < 3) {
+  if (!save.collected.includes(id) || save.mixture.includes(id)) return;
+  if (save.mixture.length < 3) {
     save.mixture.push(id); animateIngredient(ingredientButtons.get(id), ingredient.shape, ingredient.color); say(`${ingredient.name} added in position ${save.mixture.length}.`);
   } else { say('The pot has three ingredients. Tap one in the pot to remove it, or empty the pot.'); return; }
   tone(); render(); persist();
 }
 for (const ingredient of INGREDIENTS) {
   const button = document.createElement('button');
+  button.hidden = ['berry','acorn'].includes(ingredient.id);
   button.type = 'button'; button.className = 'ingredient'; button.dataset.ingredient = ingredient.id;
   button.style.setProperty('--ingredient-color', ingredient.color);
   const symbol = document.createElement('span'); symbol.className = 'ingredient-symbol'; symbol.textContent = ingredient.shape; symbol.setAttribute('aria-hidden', 'true');
@@ -121,11 +123,12 @@ window.addEventListener('hashchange', () => {
 });
 $('#clear').addEventListener('click', () => { save.mixture = []; render(); persist(); say('A clean pot. All your ingredients are still in the basket.'); });
 $('#brew').addEventListener('click', () => {
+  if (!expeditionReady) return;
   const result = evaluate(save.mixture); say(result.message);
   if (result.success) { celebrate(); save.completed = true; replaying = false; render(); persist(); tone(true); $('#reward').scrollIntoView({ block: 'nearest', behavior: 'instant' }); }
   else tone();
 });
-$('#replay').addEventListener('click', () => { replaying = true; save.mixture = []; render(); persist(); say('Your field note is safe. Make another remedy whenever you like.'); ingredientButtons.get('moonflower').focus(); });
+$('#replay').addEventListener('click', () => { replaying = true; save.mixture = []; expeditionReady = false; $('#brewing-stage').hidden = true; expedition?.reset(); render(); persist(); $('#exploration').scrollIntoView({block:'start'}); });
 $('#sound').addEventListener('click', () => { save.sound = !save.sound; render(); tone(); persist(); });
 $('#export').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([JSON.stringify(save, null, 2)], { type: 'application/json' }));
@@ -139,7 +142,7 @@ function confirmChange({ title, text, accept, action }) {
 $('#cancel-confirm').addEventListener('click', () => $('#confirm-dialog').close());
 $('#confirm-dialog').addEventListener('close', () => { confirmAction = null; });
 $('#accept-confirm').addEventListener('click', () => { const action = confirmAction; confirmAction = null; $('#confirm-dialog').close(); action?.(); });
-$('#reset').addEventListener('click', () => confirmChange({ title: 'Start a fresh journal?', text: 'This clears only your Heartwood Trail progress in this browser. Export a copy first if you’d like to keep it.', accept: 'Start fresh', action: () => { save = freshSave(); replaying = false; render(); persist(); say('A new visit to the pond.'); } }));
+$('#reset').addEventListener('click', () => confirmChange({ title: 'Start a fresh journal?', text: 'This clears only your Heartwood Trail progress in this browser. Export a copy first if you’d like to keep it.', accept: 'Start fresh', action: () => { save = freshSave(); replaying = false; expeditionReady = false; $('#brewing-stage').hidden = true; expedition?.reset(); render(); persist(); say('A new visit to the pond.'); } }));
 $('#import').addEventListener('click', () => $('#import-file').click());
 $('#import-file').addEventListener('change', async event => {
   const file = event.target.files[0]; event.target.value = '';
@@ -149,7 +152,7 @@ $('#import-file').addEventListener('change', async event => {
   try {
     if (file.size > 100000) throw Error('This file is too large to be a Heartwood journal.');
     const imported = validateSave(JSON.parse(await file.text()));
-    confirmChange({ title: 'Replace this journal?', text: 'This will replace your Heartwood Trail progress with the imported journal. Other games are not affected.', accept: 'Use imported journal', action: () => { save = imported; replaying = false; render(); persist(); say('Your imported journal is ready.'); } });
+    confirmChange({ title: 'Replace this journal?', text: 'This will replace your Heartwood Trail progress with the imported journal. Other games are not affected.', accept: 'Use imported journal', action: () => { save = imported; replaying = false; expedition?.reset(); render(); persist(); say('Your imported journal is ready.'); } });
   } catch (error) { $('#import-status').textContent = `Could not import. ${error instanceof SyntaxError ? 'Choose a valid journal JSON file.' : error.message} Your current journal is unchanged.`; }
   finally { importing = false; }
 });
@@ -160,6 +163,12 @@ try { db = await openStore(); save = await readSave(db); $('#save-status').textC
 catch { $('#save-status').textContent = 'Local progress could not be loaded. You can still play and export your journal.'; }
 controls.forEach(button => button.disabled = false);
 render(); route(); initAnimation();
+expedition = initExploration({
+  onReset() { expeditionReady = false; $('#brewing-stage').hidden = true; save.mixture = []; render(); persist(); },
+  onCollect(id) { if (!save.collected.includes(id)) save.collected.push(id); render(); persist(); tone(); },
+  onComplete() { expeditionReady = true; $('#brewing-stage').hidden = false; render(); say('The lantern trail is safe. Now use the riddle to mix the remedy. One tap adds an ingredient; remove it using its named slot.'); celebrate(); },
+});
+
 const neighbors = [
  ['frog-alchemist', 'Frog Alchemist', true], ['woodland-robot', 'Woodland Robot', false],
  ['blue-ridge-night-creature', 'Blue Ridge Night Creature', false],

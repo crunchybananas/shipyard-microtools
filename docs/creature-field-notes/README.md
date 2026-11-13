@@ -1,6 +1,6 @@
 # Creature Field Notes: The Heartwood Trail
 
-First playable slice: the Frog Alchemist's lantern remedy. Plain HTML, CSS and native JavaScript modules. No runtime dependencies, build step, framework, analytics or external requests.
+Playable chapter: explore the Frog Alchemist's pond, restore its lantern path, then solve the lantern-remedy riddle. Plain HTML, CSS and native JavaScript modules. No runtime dependencies, build step, framework, analytics or external requests.
 
 Serve `docs/` with any static server, then visit `/creature-field-notes/`. For example:
 
@@ -28,3 +28,7 @@ Canvas fireflies, native Web Animations ingredient flights, bubbling potion/hear
 ## Deliberate scope
 
 No service worker yet, no cloud sync, no checkout, and no other four puzzles. Local journal export/import is supported. A static HTTP origin is required for ES modules; opening `index.html` directly as a `file:` URL is not supported.
+
+## Exploration update
+
+A 7×7 turn-based path game adds route planning: collect three ingredients, kindle three refill lanterns, and return home before brewing. Each move spends light. A safe return preserves discoveries and records an assist; a 32-step, zero-return route is possible. Map feedback sits above the board, ingredient buttons only add once, and removal has separate named controls. Touch tiles, directional buttons, and board-scoped keyboard movement are supported. There is no timer. Route state resets on page reload; collected ingredients and the earned journal remain saved.

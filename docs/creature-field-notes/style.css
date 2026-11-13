@@ -44,3 +44,26 @@
 .plate-picture { position:relative; }.character-magic { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; mix-blend-mode:screen; }.heart-light,.potion-light,.star-light { opacity:0; }.living-plate[data-level="1"] .potion-light { opacity:.3; }.living-plate[data-level="2"] .potion-light { opacity:.6; }.living-plate[data-level="3"] .potion-light { opacity:.95; }.lantern-lit .heart-light,.lantern-lit .star-light { opacity:.8; }.motion-on .lantern-lit .heart-light { animation:heart-beat 3.8s ease-in-out infinite; }.motion-on .lantern-lit .star-light { animation:lantern-breathe 4s ease-in-out infinite; }.potion-aura { left:73%; top:24%; width:10%; height:10%; }
 @keyframes heart-beat { 0%,100% { opacity:.25; } 35% { opacity:.9; } 50% { opacity:.4; } 65% { opacity:.8; } }
 @media(prefers-reduced-motion:reduce) { .motion-on .lantern-lit .heart-light,.motion-on .lantern-lit .star-light { animation:none; } }
+/* Play before exposition: controls and consequences share the phone viewport. */
+#pond { padding-top:1rem; }
+#pond .encounter-intro { margin-bottom:1rem; }
+#pond .encounter-intro h1 { font-size:clamp(1.6rem,3vw,2.7rem); }
+#pond .encounter-intro h1 br { display:none; }
+#pond .encounter-intro .chapter { margin-bottom:.25rem; }
+#brewing-stage { margin-top:2rem; }
+#ingredients button { touch-action:manipulation; }
+#feedback { position:sticky; top:0; z-index:4; background:#fff8d9; border:1px solid #c4b67d; padding:.65rem; font-size:.9rem; }
+@media(max-width:700px) {
+  #pond { padding:.6rem .5rem 2rem; }
+  #pond .encounter-intro { margin-bottom:.5rem; }
+  #pond .encounter-intro .chapter,#pond .encounter-intro>p:last-child { display:none; }
+  #pond .encounter-intro h1 { font-size:1.45rem; text-align:center; }
+  body:has(#pond:not([hidden])) .masthead { padding:.35rem .6rem; gap:.1rem .5rem; }
+  body:has(#pond:not([hidden])) .brand { font-size:.65rem; }
+  body:has(#pond:not([hidden])) .brand-seal { display:none; }
+  body:has(#pond:not([hidden])) .masthead nav { gap:1.5rem; }
+  body:has(#pond:not([hidden])) .masthead nav a { padding:.4rem .1rem; }
+  #brewing-stage .character-panel { max-width:180px; padding:.5rem; }
+  #brewing-stage .character-panel figcaption { font-size:1rem; }
+  #brewing-stage .character-panel figcaption span,#brewing-stage .art-note { display:none; }
+}
