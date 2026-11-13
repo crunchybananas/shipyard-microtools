@@ -2,7 +2,9 @@
 
 ## Creature Field Notes: The Heartwood Trail
 
-**Status:** Frog Alchemist first playable prototype implemented in `docs/creature-field-notes/`. Added November 13, 2026 at Cory’s request; implementation requested later that day. First playable release prepared for main at Cory’s request.
+**Status:** The playable 3D Frog Alchemist island is implemented in `docs/heartwood-island/`. Cory approved Three.js, moving development to the mini, publishing the 3D release, and removing the earlier 2D implementation. The original illustrations remain unchanged.
+
+**Latest technical direction:** Three.js is explicitly permitted for rendering; retain native HTML/CSS/JavaScript and no UI framework. The older concept brief below remains product inspiration, not a requirement to retain the 2D implementation.
 
 A small, beautiful browser game and character website that gives the original
 Creature Field Notes tile characters a world to live in. Players explore a
@@ -90,7 +92,7 @@ the Frog Alchemist puzzle, the heart-clasp artwork, one journal entry and saved
 progress. Test the feel on iPhone/iPad Safari and desktop Safari/Chrome. Then
 reuse the common journal/navigation/input pieces for the other four encounters.
 
-Suggested future home: `docs/creature-field-notes/`. Add it to the hub only when
+Current home: `docs/heartwood-island/`. Add it to the hub only when
 there is something playable. Keep source art provenance, final tile references
 and any future animation derivatives separate so the web and physical designs
 stay visually consistent.

@@ -106,7 +106,7 @@
     },
     {
       "slug": "demo-hub",
-      "title": "The demo hub — Useful little worlds",
+      "title": "The demo hub \u2014 Useful little worlds",
       "appSlug": null,
       "surfaceSlug": "demo-hub",
       "kind": "surface",
@@ -170,13 +170,6 @@
       "story": null
     },
     {
-      "slug": "creature-field-notes",
-      "title": "Creature Field Notes: The Heartwood Trail",
-      "category": "Games",
-      "status": "queued",
-      "story": null
-    },
-    {
       "slug": "cron-parser",
       "title": "Cron Parser",
       "category": "Build tools",
@@ -228,6 +221,13 @@
     {
       "slug": "harbor-master",
       "title": "Harbor Master",
+      "category": "Games",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "heartwood-island",
+      "title": "Heartwood Island",
       "category": "Games",
       "status": "queued",
       "story": null

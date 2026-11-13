@@ -9,7 +9,8 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const archiveRoot = resolve(repoRoot, 'docs/before-after');
 const manifestPath = resolve(archiveRoot, 'manifest.json');
 
-const EXCLUDED_DEMO_DIRECTORIES = new Set(['before-after', 'ember', 'morphogen']);
+// creature-field-notes is a retired route redirecting to Heartwood Island.
+const EXCLUDED_DEMO_DIRECTORIES = new Set(['before-after', 'ember', 'morphogen', 'creature-field-notes']);
 const APP_STATUSES = new Set(['published', 'in-revision', 'queued', 'separate-workstream']);
 const SURFACE_STATUSES = new Set(['published', 'in-revision', 'queued']);
 const STORY_STATUSES = new Set(['published', 'in-revision']);
