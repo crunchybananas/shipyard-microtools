@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { freshSave, validateSave, evaluate, RECIPE, INGREDIENTS } from '../docs/creature-field-notes/model.mjs';
+const fresh = freshSave();
+assert.deepEqual(validateSave(fresh), fresh);
+assert.equal(evaluate([]).success, false);
+assert.equal(evaluate(RECIPE).success, true);
+assert.equal(evaluate([...RECIPE].reverse()).success, false);
+assert.equal(evaluate(['berry','acorn','dew']).success, false);
+assert.throws(() => validateSave({ ...fresh, version: 2 }));
+assert.throws(() => validateSave({ ...fresh, collected: ['bad'] }));
+assert.throws(() => validateSave({ ...fresh, collected: ['dew','dew'] }));
+assert.throws(() => validateSave({ ...fresh, mixture: ['dew'] }));
+assert.throws(() => validateSave({ ...fresh, collected: ['dew'], mixture: ['dew','dew'] }));
+const valid = { ...fresh, collected: INGREDIENTS.map(i=>i.id), mixture: RECIPE, completed: true };
+assert.deepEqual(validateSave(valid), valid);
+const copy = validateSave(valid); copy.mixture.pop(); assert.equal(valid.mixture.length,3);
+console.log('PASS Heartwood model: recipe, errors, schema, uniqueness and defensive copying');

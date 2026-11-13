@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Thirty-two small browser tools, games, and experiments, built by a swarm of AI agents."
+      content="Thirty-four small browser tools, games, and experiments, built by a swarm of AI agents."
     />
     <meta name="theme-color" content="#0b1020" />
     <title>Waggle — Crunchy Bananas</title>
@@ -1493,6 +1493,20 @@
     <script>
       const DEMOS = [
         {
+          slug: "creature-field-notes",
+          title: "The Heartwood Trail",
+          category: "Games",
+          description: "Meet the Frog Alchemist. Gather a little dawn, bring the lantern back to life, and keep a woodland field journal.",
+          tags: ["Cozy", "Puzzles", "Original characters"],
+          layout: "prominent",
+          tone: "lime",
+          preview: {
+            src: "./creature-field-notes/assets/frog-alchemist.svg",
+            position: "50% 50%",
+            loading: "eager",
+          },
+        },
+        {
           slug: "elsewhen",
           title: "Elsewhen",
           category: "Creative",
@@ -1970,8 +1984,8 @@
         ["starlight-orchestra", "Starlight Orchestra"],
       ];
 
-      if (DEMOS.length !== 33) {
-        throw new Error(`Gallery registry must contain 33 demos; found ${DEMOS.length}.`);
+      if (DEMOS.length !== 34) {
+        throw new Error(`Gallery registry must contain 34 demos; found ${DEMOS.length}.`);
       }
 
       const grid = document.querySelector("#demo-grid");

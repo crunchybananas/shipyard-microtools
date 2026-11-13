@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-06T23:23:41-04:00",
+  "updatedAt": "2026-11-13T00:00:00Z",
   "site": {
     "title": "Waggle Before / After",
     "description": "A public record of how the Waggle micro apps change, what we learned, and what still needs work.",
@@ -166,6 +166,13 @@
       "slug": "cosmos",
       "title": "Cosmos",
       "category": "Explore",
+      "status": "queued",
+      "story": null
+    },
+    {
+      "slug": "creature-field-notes",
+      "title": "Creature Field Notes: The Heartwood Trail",
+      "category": "Games",
       "status": "queued",
       "story": null
     },
