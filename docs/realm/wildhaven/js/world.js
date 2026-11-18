@@ -11,7 +11,8 @@ import { DISCOVERIES, isFieldworker } from './discovery.js';
 import * as THREE from 'three';
 import { GLTFLoader } from '../../vendor/three/GLTFLoader.js';
 import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js';
-import { buildingEntrance } from './sim.js';
+import { fisherPosition, pierPoint, pierOrientations } from './fishing.js';
+import { buildingEntrance, canBuild } from './sim.js';
 import { groundHeight, terrainAt, isLand, listTiles, hasNaturalObstacle, isNeighborCompoundCell, coastDistance, ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS } from './island.js';
 import { blocksFortification, frontierPath, gateTransition, DEFEND_RADIUS } from './frontier.js';
 import { BUILDINGS, JOBS, getBuildingSpec } from './catalog.js';
@@ -340,9 +341,14 @@ export class VillageWorld {
   }
   setInstance(mesh,i,x,y,z,sx,sy,sz,ry=0) { position.set(x,y,z);quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),ry);scale.set(sx,sy,sz);matrix.compose(position,quaternion,scale);mesh.setMatrixAt(i,matrix); }
   async loadHarbor() {
-    const harbor = await new GLTFLoader().loadAsync('./assets/saltwick-harbor.glb');
+    const harbor = await new GLTFLoader().loadAsync('./assets/saltwick-harbor.glb?v=20261117-fishing-2');
     const quay = harbor.scene.getObjectByName('Fish_quay');
     const lugger = harbor.scene.getObjectByName('Ochre_lugger');
+    for(const name of ['fishingpier','tool_fishingrod','cargo_fish']) {
+      const model=harbor.scene.getObjectByName(name);
+      model.traverse(o=>{if(o.isMesh)o.castShadow=o.receiveShadow=true;});
+      this.templates.set(name,model);
+    }
     quay.position.set(3.6, .03, 15.6);
     lugger.position.set(2.0, -.08, 18.15);
     lugger.rotation.y = -.14;
@@ -359,6 +365,19 @@ export class VillageWorld {
     shadow.receiveShadow = true;
     this.scene.add(shadow);
     this.lugger = lugger;
+  }
+  showPierSites(show) {
+    if(this.pierMarkers){this.disposePresentation(this.pierMarkers);this.pierMarkers=null;}
+    if(!show || !this.state) return;
+    const sites=listTiles().filter(t=>this.state.frontier.claims.includes(t.regionId) &&
+      pierOrientations(t.x,t.z).length && canBuild(this.state,'fishingpier',t.x,t.z).entrance);
+    if(!sites.length)return;
+    const ring=new THREE.RingGeometry(.28,.44,24);
+    ring.rotateX(-Math.PI/2);
+    const markers=new THREE.InstancedMesh(ring,new THREE.MeshBasicMaterial({color:'#317568',depthTest:false}),sites.length);
+    sites.forEach((p,i)=>this.setInstance(markers,i,p.x*CELL,groundHeight(p.x,p.z)+.05,p.z*CELL,1,1,1));
+    markers.renderOrder=9;markers.userData={ownsMaterial:true,ownsGeometry:true};
+    this.scene.add(markers);this.pierMarkers=markers;
   }
   createPreview() {
     this.highlight=new THREE.Group();
@@ -473,7 +492,7 @@ export class VillageWorld {
     const capacity=c.isPreview?`${Math.round(c.potentialCapacity)} beds when ready`:`${Math.round(c.allocatedBeds||0)} / ${Math.round(c.capacity)} supplied beds used`;
     this.setCueLabel(data.label,[`${c.kind.toUpperCase()} · ${c.radius}-SPACE REACH`,`${c.inRangeHomes} homes in reach · ${c.outsideHomes} outside`,capacity],data.tint);
   }
-  selectCitizen(id){this.selectedCitizenId=id||null;if(id){this.selectedId=null;this.selectedBuilding=null;this.selectionRing.visible=false;this.showEntrance(null);}this.updateWorkerCues();}
+  selectCitizen(id){if(this.followingFisher!==id)this.followingFisher=null;this.selectedCitizenId=id||null;if(id){this.selectedId=null;this.selectedBuilding=null;this.selectionRing.visible=false;this.showEntrance(null);}this.updateWorkerCues();}
   hoverCitizen(id){this.hoveredCitizenId=id||null;}
   citizenCue(id){return residentCue(this.actors.find(actor=>actor.citizen.id===id),this.state,this.cuesPaused!==false);}
   syncWorkerBadges(){
@@ -488,7 +507,10 @@ export class VillageWorld {
     const actor=this.actors.find(a=>a.citizen.id===this.hoveredCitizenId)||this.actors.find(a=>a.citizen.id===this.selectedCitizenId);
     if(actor&&!this.workerLabel){this.workerLabel=this.makeCueLabel(252,69);if(this.workerLabel){this.workerLabel.userData.titleColor='#fff0cc';this.scene.add(this.workerLabel);}this.workerRing=this.frontierGroundRing(.35,'#fff0a5',.055);this.workerRing.material.depthTest=false;this.workerRing.renderOrder=14;this.scene.add(this.workerRing);}
     if(this.workerLabel){this.workerLabel.visible=!!actor;if(actor){const cue=this.citizenCue(actor.citizen.id);this.setCueLabel(this.workerLabel,[`${cue.name} · ${cue.job}`,cue.action,cue.paused?'PAUSED · resume time to continue':cue.workplace||'A neighbor of your village'],cue.color);this.workerLabel.position.copy(actor.root.position);this.workerLabel.position.y+=1.03;}}
-    if(this.workerRing){this.workerRing.visible=!!actor;if(actor)this.workerRing.position.set(actor.root.position.x,groundHeight(actor.root.position.x/CELL,actor.root.position.z/CELL)+.07,actor.root.position.z);}
+    if(this.workerRing){
+      this.workerRing.visible=!!actor;
+      if(actor){this.workerRing.position.copy(actor.root.position);this.workerRing.position.y+=.035;}
+    }
     if(!this.workerBadges)return;
     this.workerBadges.visible=this.zoom<=38&&!this.highlight?.visible&&!this.serviceArea?.visible;
     if(!this.workerBadges.visible)return;
@@ -534,7 +556,7 @@ export class VillageWorld {
   makeBuilding(b){
     const root=new THREE.Group(),model=this.clone(b.type,b.level||1),center=groundHeight(b.x,b.z);
     const corners=[[-.44,-.44],[-.44,.44],[.44,-.44],[.44,.44]].map(([x,z])=>groundHeight(b.x+x,b.z+z));
-    const top=Math.max(center,...corners),bottom=Math.min(center,...corners)-.07,depth=top-bottom;
+    const top=b.type==='fishingpier'?center+.16:Math.max(center,...corners),bottom=Math.min(center,...corners)-.07,depth=top-bottom;
     model.position.y=top-center;
     if(b.level>1&&!['cottage','pasture','henhouse','assay'].includes(b.type))model.scale.y=1+(b.level-1)*.11;
     root.add(model);
@@ -545,7 +567,7 @@ export class VillageWorld {
     if(b.type==='bell'&&!b.restored)model.traverse(o=>{if(o.isMesh){if(!o.userData.ownsMaterial)o.material=o.material.clone();o.material.color.lerp(new THREE.Color('#7e8573'),.45);o.userData.ownsMaterial=true;}});
     let scaffold;
     if(active){scaffold=this.clone('construction');scaffold.position.y=top-center;root.add(scaffold);}
-    if((depth>.1||active)&&b.type!=='hearth'){
+    if((depth>.1||active)&&b.type!=='hearth'&&b.type!=='fishingpier'){
       const foundation=new THREE.Mesh(new THREE.BoxGeometry(1.51,Math.max(.1,depth),1.49),material('#a8aa8d'));
       foundation.position.y=(top+bottom)/2-center;foundation.castShadow=true;foundation.receiveShadow=true;foundation.userData.ownsGeometry=true;foundation.userData.ownsMaterial=true;root.add(foundation);
     }
@@ -711,6 +733,7 @@ export class VillageWorld {
     if(this.state&&this.state!==state){
       // Separate local towns deliberately reuse citizen/building IDs. A newly
       // restored snapshot must never inherit another town's visual routes.
+      this.followingFisher=null;this.showPierSites(false);
       for(const actor of this.actors)this.disposePresentation(actor.root);
       this.actors=[];this.layoutSignature=null;this.publicSpots=null;
       this.selectedId=this.selectedBuilding=this.selectedCitizenId=this.hoveredCitizenId=null;
@@ -766,8 +789,8 @@ export class VillageWorld {
     const originalShirt=new THREE.Color('#de6548'),shirtColor=new THREE.Color(JOBS[job]?.color||'#5b8d9c');
     root.traverse(o=>{if(!o.isMesh||!o.geometry.attributes.color)return;const source=o.geometry.attributes.color;let matches=false;for(let i=0;i<source.count;i++)if(Math.abs(source.getX(i)-originalShirt.r)<.012&&Math.abs(source.getY(i)-originalShirt.g)<.012&&Math.abs(source.getZ(i)-originalShirt.b)<.012){matches=true;break;}if(!matches)return;o.geometry=o.geometry.clone();o.userData.ownsGeometry=true;const colors=o.geometry.attributes.color;for(let i=0;i<colors.count;i++)if(Math.abs(colors.getX(i)-originalShirt.r)<.012&&Math.abs(colors.getY(i)-originalShirt.g)<.012&&Math.abs(colors.getZ(i)-originalShirt.b)<.012)colors.setXYZ(i,shirtColor.r,shirtColor.g,shirtColor.b);colors.needsUpdate=true;});
   }
-  cargoKind(citizen){const type=this.state?.buildings.find(b=>b.id===citizen.workplace)?.type;return ({pasture:'milk',henhouse:'eggs',lumber:'logs',quarry:'stone',mine:'ore',sawmill:'planks',smith:'iron',toolmaker:'tools',bakery:'bread',orchard:'fruit',garden:'vegetables',farm:'grain',windmill:'flour',flaxfield:'flax',weaver:'cloth',brewery:'ale',market:'fruit'})[type]||'grain';}
-  jobTool(citizen){const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace);return citizen.job==='farmer'&&workplace?.type==='orchard'?'tool_basket':JOB_TOOLS[citizen.job]||null;}
+  cargoKind(citizen){const type=this.state?.buildings.find(b=>b.id===citizen.workplace)?.type;return ({fishingpier:'fish',pasture:'milk',henhouse:'eggs',lumber:'logs',quarry:'stone',mine:'ore',sawmill:'planks',smith:'iron',toolmaker:'tools',bakery:'bread',orchard:'fruit',garden:'vegetables',farm:'grain',windmill:'flour',flaxfield:'flax',weaver:'cloth',brewery:'ale',market:'fruit'})[type]||'grain';}
+  jobTool(citizen){if(citizen.job==='fisher')return 'tool_fishingrod';const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace);return citizen.job==='farmer'&&workplace?.type==='orchard'?'tool_basket':JOB_TOOLS[citizen.job]||null;}
   addActor(index,citizen={id:`preview-${index}`,name:'Islander',job:'idle',workplace:null}){
     const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace),homes=this.state?.buildings.filter(b=>(getBuildingSpec(b.type,b.level||1)?.housing||0)>0)||[];
     const anchor=workplace||homes[index%Math.max(1,homes.length)]||{x:1,z:2},angle=(anchor.rotation||0)*Math.PI/2;
@@ -779,7 +802,9 @@ export class VillageWorld {
     root.rotation.order='YXZ';
     this.colorCitizen(root,citizen.job);
     const toolType=this.jobTool(citizen),supportTool=toolType==='tool_basket'||toolType==='tool_book',toolArm=supportTool?'left_arm':'right_arm';
-    let tool;if(toolType&&limbs[toolArm]){tool=this.clone(toolType);tool.position.set(supportTool?-.04:.04,-.17,.04);if(!supportTool&&toolType!=='tool_spear')tool.rotation.x=Math.PI/2;if(toolType==='tool_axe')tool.rotation.y=-Math.PI/2;limbs[toolArm].add(tool);}
+    let tool;if(toolType&&limbs[toolArm]){tool=this.clone(toolType);tool.position.set(supportTool?-.04:.04,-.17,.04);if(!supportTool&&toolType!=='tool_spear')tool.rotation.x=Math.PI/2;if(toolType==='tool_axe')tool.rotation.y=-Math.PI/2;if(toolType==='tool_fishingrod'){
+        tool.position.set(.115,.43,.14);tool.rotation.set(0,0,0);root.add(tool);
+      }else limbs[toolArm].add(tool);}
     const cargo=this.cargoKind(citizen);const parcel=this.clone('cargo_'+cargo);parcel.position.set(0,.27,.25);parcel.visible=false;parcel.userData.cargo=cargo;root.add(parcel);
     root.userData.citizen={...citizen};this.scene.add(root);
     const actor={root,limbs,parcel,tool,toolType,toolArm,path:[],index,wait:index*.2,phase:index*2,goal:null,station:null,activity:null,workTime:0,lastCell:start,citizen:{...citizen},workplace:citizen.workplace};this.actors.push(actor);return actor;
@@ -1141,8 +1166,37 @@ export class VillageWorld {
     a.root.rotation.x+=(lean-a.root.rotation.x)*Math.min(1,dt*7);
     if(a.citizen.job==='smith'&&a.tool){if(working&&a.station)this.smithPose(a);else a.tool.rotation.set(Math.PI/2,0,0);}
   }
+  followFisher(id) { this.followingFisher=id;this.targetZoom=11; }
+  updateFishers(dt) {
+    for(const a of this.actors){
+      if(a.citizen.job!=='fisher')continue;
+      const pier=this.state.buildings.find(b=>b.id===a.workplace);
+      if(!pier)continue;
+      const trip=pier.trip, pos=fisherPosition(pier,this.state.subsecond);
+      const door=pierPoint(pier,1), tip=pierPoint(pier,-1);
+      const dx=door.x-pier.x,dz=door.z-pier.z;
+      const along=(pos.x-pier.x)*dx+(pos.z-pier.z)*dz;
+      const across=(pos.x-pier.x)*dz-(pos.z-pier.z)*dx;
+      const toward=Math.abs(across)<.01 && along>=-1 ? THREE.MathUtils.clamp(1-along,0,1) : 0;
+      const height=groundHeight(pos.x,pos.z)*(1-toward)+(groundHeight(pier.x,pier.z)+.29)*toward;
+      a.root.position.set(pos.x*CELL,height,pos.z*CELL);
+      const fishing=trip?.stage==='casting',loaded=trip && ['returning','unloading'].includes(trip.stage);
+      const heading=trip?.next?Math.atan2(trip.next.x-trip.x,trip.next.z-trip.z):fishing?Math.atan2(tip.x-pier.x,tip.z-pier.z):a.root.rotation.y;
+      if(dt>0)this.turnActor(a,heading,dt);else a.root.rotation.y=heading;
+      const phase=(this.state.time+this.state.subsecond)*5, gait=trip?.next?Math.sin(phase)*.45:0;
+      for(const [name,limb] of Object.entries(a.limbs)){
+        const arm=name.includes('arm'),sign=name.startsWith('left')?1:-1;
+        limb.rotation.set(arm&&loaded?-.78:arm&&fishing?-.68+Math.sin(phase*.56)*.08:gait*sign*(arm?-1:1),0,0);
+      }
+      a.parcel.visible=!!loaded;
+      if(a.tool){a.tool.visible=fishing;a.tool.rotation.x=-.05+.09*Math.sin(phase*.56);}
+      a.root.userData.workState=fishing?'fishing':loaded?'returning':'walking';
+      if(this.followingFisher===a.citizen.id)this.pan.set(pos.x*CELL,0,pos.z*CELL);
+    }
+  }
   updateActors(dt){
     for(const a of this.actors){const p=a.root.position;
+      if(a.citizen.job==='fisher')continue;
       if(a.station&&!a.station.invalidated&&a.station.signature!==this.buildings.get(a.station.buildingId)?.userData.signature){this.resetActorRoute(a);a.station.invalidated=true;}
       if(a.path.length){
         const n=a.path[0];if(!this.actorWaypointValid(n)){this.resetActorRoute(a);continue;}
@@ -1198,9 +1252,9 @@ export class VillageWorld {
   updateCamera(dt){const a=1-Math.exp(-dt*9);this.azimuth+=(this.targetAzimuth-this.azimuth)*a;this.zoom+=(this.targetZoom-this.zoom)*(1-Math.exp(-dt*14));this.target.lerp(new THREE.Vector3(this.pan.x,Math.max(.65,groundHeight(this.pan.x/CELL,this.pan.z/CELL)),this.pan.z),a);const radius=Math.max(43,this.zoom*1.1);this.camera.position.set(this.target.x+Math.sin(this.azimuth)*radius,this.target.y+radius*36/43,this.target.z+Math.cos(this.azimuth)*radius);this.sun.position.set(this.target.x-23,this.target.y+34,this.target.z+15);this.sun.target.position.copy(this.target);const shadowSpan=Math.max(29,Math.min(78,this.zoom*.72));Object.assign(this.sun.shadow.camera,{left:-shadowSpan,right:shadowSpan,top:shadowSpan,bottom:-shadowSpan,far:180});this.sun.shadow.camera.updateProjectionMatrix();this.camera.lookAt(this.target);const aspect=this.width/this.height;this.camera.left=-this.zoom*aspect/2;this.camera.right=this.zoom*aspect/2;this.camera.top=this.zoom/2;this.camera.bottom=-this.zoom/2;this.camera.updateProjectionMatrix();}
   rotate(amount){this.targetAzimuth+=amount*Math.PI/4;this.onCamera?.();}
   zoomBy(amount){this.targetZoom=THREE.MathUtils.clamp(this.targetZoom+amount,10,MAP_ZOOM);this.onCamera?.();}
-  home(){this.pan.set(0,0,0);this.targetZoom=this.width<700?43:32;this.targetAzimuth=Math.PI/4;}
+  home(){this.followingFisher=null;this.pan.set(0,0,0);this.targetZoom=this.width<700?43:32;this.targetAzimuth=Math.PI/4;}
   focus(b){this.pan.set(b.x*CELL,0,b.z*CELL);this.targetZoom=16;}
-  moveCamera(dx,dz){const angle=this.azimuth;this.pan.x+=dx*Math.cos(angle)+dz*Math.sin(angle);this.pan.z+=-dx*Math.sin(angle)+dz*Math.cos(angle);this.pan.x=THREE.MathUtils.clamp(this.pan.x,ISLAND_BOUNDS.minX*CELL,ISLAND_BOUNDS.maxX*CELL);this.pan.z=THREE.MathUtils.clamp(this.pan.z,ISLAND_BOUNDS.minZ*CELL,ISLAND_BOUNDS.maxZ*CELL);}
+  moveCamera(dx,dz){this.followingFisher=null;const angle=this.azimuth;this.pan.x+=dx*Math.cos(angle)+dz*Math.sin(angle);this.pan.z+=-dx*Math.sin(angle)+dz*Math.cos(angle);this.pan.x=THREE.MathUtils.clamp(this.pan.x,ISLAND_BOUNDS.minX*CELL,ISLAND_BOUNDS.maxX*CELL);this.pan.z=THREE.MathUtils.clamp(this.pan.z,ISLAND_BOUNDS.minZ*CELL,ISLAND_BOUNDS.maxZ*CELL);}
   pick(clientX,clientY){
     const rect=this.canvas.getBoundingClientRect();this.pointer.set((clientX-rect.left)/rect.width*2-1,-(clientY-rect.top)/rect.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);
     const objects=[...this.actors.map(a=>a.root),...this.buildings.values(),...this.landmarks,...this.discoveryModels.values(),...this.fortifications.values(),...this.troops.values()].map(o=>o.root||o);
@@ -1280,6 +1334,7 @@ export class VillageWorld {
       if(b.type==='bell'&&b.restored&&!this.reduced){o.traverse(n=>{if(n.name==='bell_body')n.rotation.x=Math.sin(this.clock*2)*.1;});}
     }
     if(playing&&speed>0)this.updateActors(Math.min(.1,dt)*Math.min(speed,2));
+    this.updateFishers(playing && speed>0?dt:0);
     this.updateLivestock(dt,playing&&speed>0?speed:0);this.updateGardenCrops();this.updateWorkerCues();this.updateWorldCues();
     this.updateFrontier(dt,playing&&speed>0);
     this.updatePressure();

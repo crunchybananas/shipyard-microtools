@@ -1,4 +1,5 @@
 /** Read-only presentation facts shared by the world overlays and their checks. */
+import { fishingActivity } from './fishing.js';
 import { BUILDINGS, JOBS, getBuildingSpec } from './catalog.js';
 import { villageNeeds } from './sim.js';
 
@@ -36,7 +37,8 @@ export function residentCue(actor, state, paused = false) {
   const workState = actor.root?.userData.workState;
   const reason = workplace?.production?.efficiency <= 0 && citizen.job !== 'builder' ? workplace.production.blockedReason : null;
   let action;
-  if (actor.parcel?.visible) action = `${actor.path?.length ? 'Carrying' : 'Delivering'} ${actor.parcel.userData.cargo}`;
+  if (citizen.job==='fisher' && workplace) action=fishingActivity(workplace);
+  else if (actor.parcel?.visible) action = `${actor.path?.length ? 'Carrying' : 'Delivering'} ${actor.parcel.userData.cargo}`;
   else if (workplace?.paused) action = 'Workplace paused';
   else if (reason) action = reason;
   else if (workState === 'working') action = workplace?.type === 'orchard' ? 'Picking fruit' : workplace?.type === 'toolmaker' ? 'Forging tools' : WORK_ACTIONS[citizen.job] || 'Working';

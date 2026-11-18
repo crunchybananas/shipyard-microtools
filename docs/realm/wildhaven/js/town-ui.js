@@ -200,7 +200,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     }
     section.append(resourceWorkplaces(data.sources, 'Where it comes from', '+'), resourceWorkplaces(data.sinks, 'Where it goes', '−'));
     const chains = {
-      food: 'Orchards and kitchen gardens make food directly. Bread: Grain farm → Windmill → Bakery → Food. The bakery also burns timber; staff and supply every workplace.',
+      food: 'Fishers carry their catch to the hearth. Orchards and kitchen gardens also supply food. Bread: Grain farm → Windmill → Bakery → Food. The bakery also burns timber; staff and supply every workplace.',
       grain: 'Grain farm → Windmill → Flour → Bakery → Food. A brewery also uses grain to make ale.',
       flour: 'Grain farm → Windmill → Flour. A staffed bakery turns flour and timber into food.',
       wood: 'Woodcutters harvest and replant woodland. Timber supplies construction, sawmills and bakeries.',
@@ -533,6 +533,11 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       if (building.paused && !status.maxWorkers) nodes.push(btn('Resume this building', `inspect-rest-${building.id}`, () => action(() => sim.pauseBuilding(state, building.id, false))));
       if (status.maxWorkers) {
         const box = el('div', 'inspect-staffing'), row = el('div', 'town-control'); row.append(el('strong', '', `${status.workers} / ${status.desiredWorkers} working`), stepper(status.desiredWorkers, 0, status.maxWorkers, `inspect-staff-${building.id}`, count => action(() => sim.setWorkers(state, building.id, count))));
+        if(building.type==='fishingpier'){
+          const person=state.citizens.find(c=>c.id===building.workerIds[0]);
+          row.replaceChildren(el('strong','',person?.name || (building.desiredWorkers?'Waiting for a resident':'No fisher assigned')),
+            btn(building.desiredWorkers?'Release fisher':'Assign fisher',`inspect-fisher-${building.id}`,()=>action(()=>sim.setWorkers(state,building.id,building.desiredWorkers?0:1))));
+        }
         box.append(row, el('p', 'town-meta', `${JOBS[BUILDINGS[building.type].job]?.plural || 'Workers'} · ${Math.round(status.efficiency * 100)}% output`));
         box.append(btn(building.paused ? 'Resume work' : 'Rest this workplace', `inspect-rest-${building.id}`, () => action(() => sim.pauseBuilding(state, building.id, !building.paused)))); if (status.workers < status.desiredWorkers) box.append(btn('Find available workers', `inspect-people-${building.id}`, () => revealWorkplace(building.id)), el('p', 'town-meta', 'Requested workers share the same residents. Rest another workplace or raise this one’s priority in People.'));
         nodes.push(box);

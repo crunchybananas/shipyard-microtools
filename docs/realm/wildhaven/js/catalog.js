@@ -33,6 +33,7 @@ export const JOBS = freeze({
   builder: { name: 'Builder', plural: 'Builders', color: '#bd9858' },
   forager: { name: 'Forager', plural: 'Foragers', color: '#8a9e58' },
   herder: { name: 'Animal keeper', plural: 'Animal keepers', color: '#aa8962' },
+  fisher: { name: 'Fisher', plural: 'Fishers', color: '#518c91' },
   farmer: { name: 'Farmer', plural: 'Farmers', color: '#8aa35c' },
   lumberjack: { name: 'Woodcutter', plural: 'Woodcutters', color: '#9b784d' },
   quarryworker: { name: 'Stoneworker', plural: 'Stoneworkers', color: '#89988e' },
@@ -87,6 +88,10 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
     description: 'Houses four residents. Upgrades add more beds. Nearby wells provide water, and nearby gardens produce more food.', production: '4 beds',
     upgrades: upgrades({ cost: { planks: 12, stone: 8, cloth: 2 }, work: 50, housing: 7 }, { cost: { planks: 20, stone: 20, tools: 4, cloth: 5 }, work: 80, housing: 10 }),
   },
+  fishingpier: {
+    name: 'Fishing pier', category: 'food', model: 'fishingpier', cost: { wood: 16, stone: 4 }, work: 28, workers: 1, job: 'fisher', recipe: recipe({}, { food: 6 }),
+    description: 'Build on the shore and assign a fisher. Each basket goes to the town hearth. Shorter walks mean more trips.', production: '1 fisher · 6 food per catch',
+  },
   orchard: {
     name: 'Orchard', category: 'food', model: 'orchard', cost: { wood: 12, stone: 3 }, work: 28, workers: 2, job: 'farmer', shortcut: '2', recipe: recipe({}, { food: 14 }),
     description: 'Produces food without using supplies. Needs farmers; nearby gardens increase the harvest.', production: '2 farmers · 14 food / day', upgrades: productionUpgrades(2),
@@ -123,7 +128,7 @@ export const BUILDINGS = freeze(Object.fromEntries(Object.entries({
   },
   bell: {
     name: 'Bell tower', category: 'civic', model: 'bell', cost: { wood: 50, stone: 60, food: 20 }, work: 90, shortcut: '7',
-    description: 'Restore the bell after finishing three cottages and two orchards or gardens, and reaching ten residents.', production: 'Restore to complete the opening objectives',
+    description: 'Restore the bell after finishing three cottages and two food workplaces (orchards, gardens or fishing piers), and reaching ten residents.', production: 'Restore to complete the opening objectives',
   },
   farm: {
     name: 'Grain farm', category: 'food', model: 'farm', cost: { wood: 18, stone: 6 }, work: 45, workers: 3, job: 'farmer', unlock: 'cultivation', recipe: recipe({}, { grain: 24 }),

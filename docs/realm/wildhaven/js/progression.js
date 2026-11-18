@@ -459,7 +459,7 @@ function chapters(state) {
   const residents = population(state), stock = state.resources || {};
   const progress = (value, target) => Math.min(target, Math.max(0, number(value)));
   const goal = (id, title, description, values, extra = {}) => ({ id, title, description, current: values.reduce((sum, [value, target]) => sum + progress(value, target), 0), total: values.reduce((sum, [, target]) => sum + target, 0), ...extra });
-  const foodPlaces = count(state, 'orchard') + count(state, 'garden');
+  const foodPlaces = count(state, 'orchard') + count(state, 'garden') + count(state, 'fishingpier');
   const bell = (state.buildings || []).some(building => building.type === 'bell' && building.restored && ready(building));
   const coverage = state.serviceCoverage || {}, ledger = state.imports || {}, sold = ledger.exported || {};
   const peacefulCoasts = (state.pressure?.defended || 0) + (state.pressure?.paid || 0) + peacefulProjects(state);
@@ -479,10 +479,10 @@ function chapters(state) {
   }
   return [
     goal('chapter_0', 'Build your first cottage', 'Finish a cottage to add four beds.', [[count(state, 'cottage'), 1]], { type: 'cottage' }),
-    goal('chapter_1', 'Start growing food', 'Finish an orchard or kitchen garden, then assign workers to produce food.', [[staffedService(state, 'orchard') + staffedService(state, 'garden'), 1]], { type: 'orchard' }),
+    goal('chapter_1', 'Feed the village', 'Finish an orchard, garden or fishing pier, then assign workers to produce food.', [[staffedService(state, 'orchard') + staffedService(state, 'garden') + staffedService(state, 'fishingpier'), 1]], { type: 'orchard' }),
     goal('chapter_2', 'Timber and stone', 'Staff a woodcutter and stoneworks. Builders, farmers, and material workers share the same small population.', [[staffedService(state, 'lumber'), 1], [staffedService(state, 'quarry'), 1]], { type: count(state, 'lumber') ? 'quarry' : 'lumber' }),
-    goal('chapter_3', 'More homes and food', 'Finish three cottages and two orchards or kitchen gardens, and reach ten residents.', [[count(state, 'cottage'), 3], [foodPlaces, 2], [residents, 10]], { type: count(state, 'cottage') < 3 ? 'cottage' : 'garden' }),
-    goal('chapter_4', 'Restore the bell', 'Restore the old bell once you have three cottages, two orchards or gardens, and ten residents.', [[bell ? 1 : 0, 1]], { type: 'bell' }),
+    goal('chapter_3', 'More homes and food', 'Finish three cottages and two food workplaces (orchards, gardens or fishing piers), and reach ten residents.', [[count(state, 'cottage'), 3], [foodPlaces, 2], [residents, 10]], { type: count(state, 'cottage') < 3 ? 'cottage' : 'garden' }),
+    goal('chapter_4', 'Restore the bell', 'Restore the old bell once you have three cottages, two food workplaces (orchards, gardens or fishing piers), and ten residents.', [[bell ? 1 : 0, 1]], { type: 'bell' }),
     goal('chapter_5', 'Schools and research', 'Reach twenty residents, keep forty food in stock, staff a schoolhouse, build a well, and complete three research projects.', [[residents, 20], [stock.food, 40], [staffedService(state, 'school'), 1], [count(state, 'well'), 1], [state.research?.completed.length, 3]], { type: 'school' }),
     goal('chapter_6', 'Healthcare and supplies', 'Grow to forty people. Have twelve tools and twelve cloth in stock; made or imported goods enter stores automatically. Staff a market and clinic, and provide water to half the town’s housing and healthcare to 40%.', [[residents, 40], [stock.tools, 12], [stock.cloth, 12], [staffedService(state, 'market'), 1], [staffedService(state, 'clinic'), 1], [coverage.water, .5], [coverage.health, .4]], { type: 'clinic' }),
     goal('chapter_7', 'Coastal trade', 'Complete six delivery orders and either three voyages or twelve harbor-counter exports. Have 200 coin in stock, finish a town hall, and choose a town path.', [[state.contracts?.completed, 6], [Math.max(number(state.routes?.completed), number(ledger.exportsCompleted) / 4), 3], [stock.gold, 200], [count(state, 'manor'), 1], [state.policies?.charter ? 1 : 0, 1]], { type: 'manor' }),

@@ -1,3 +1,4 @@
+import { CATCH_SIZE, pierOrientations, pierPoint, fishingRate, tickPier, restoreFishingTrip } from './fishing.js';
 import { researchProductionShare, receiveResearchProduction } from './research-projects.js';
 import { createMinerals, restoreMinerals, mineralStatus, extractMinerals } from './minerals.js';
 import { createLivestock, restoreLivestock, herdStatus, tickLivestock } from './livestock.js';
@@ -260,7 +261,7 @@ function fullRecipe(state, building) {
   const factor = modifier(state, building.type, 'production') * discoveryModifier(state, building.type), cycles = isFiniteNumber(recipe.perDay) ? recipe.perDay : 1;
   return {
     input: Object.fromEntries(Object.entries(recipe.input || {}).map(([key, value]) => [key, value * cycles])),
-    output: Object.fromEntries(Object.entries(recipe.output || {}).map(([key, value]) => [key, value * cycles * factor * site.multiplier])),
+    output: building.type==='fishingpier' ? { food: fishingRate(building)*factor } : Object.fromEntries(Object.entries(recipe.output || {}).map(([key, value]) => [key, value * cycles * factor * site.multiplier])),
     ...site,
   };
 }
@@ -305,7 +306,7 @@ function throughput(state, building, dt = 1, mutate = false) {
     const share = researchProductionShare(state, RESEARCH[state.research?.active?.id], key, value * efficiency * factor, Math.max(0, storage[key] - state.resources[key]));
     const amount = share.produced;
     result.output[key] = round((amount - share.research) / factor); result[key] += result.output[key];
-    if (mutate) {
+    if (mutate && building.type !== 'fishingpier') {
       const received = building.type === 'lumber' && key === 'wood' ? harvestWood(state, building, amount) : ['quarry','mine'].includes(building.type) ? extractMinerals(state,building,amount) : amount;
       const reserved = amount > 0 ? share.research * received / amount : 0;
       receiveResearchProduction(state, key, reserved);
@@ -452,7 +453,7 @@ export function canBuild(state, type, x, z, rotation = 0) {
     const bell = getBuildingAt(state, 0, -5);
     if (x !== 0 || z !== -5) return fail('The old bell stands on the northern hill.');
     if (bell.restored || bell.status !== 'ready') return fail(bell.restored ? 'The bell is already restored.' : 'The bell is already in the construction queue.');
-    if (readyCount(state, 'cottage') < 3 || readyCount(state, 'orchard') + readyCount(state, 'garden') < 2 || state.population < 10) return fail('Needs 3 completed cottages, 2 completed orchards or gardens, and 10 citizens.');
+    if (readyCount(state, 'cottage') < 3 || readyCount(state, 'orchard') + readyCount(state, 'garden') + readyCount(state, 'fishingpier') < 2 || state.population < 10) return fail('Needs 3 completed cottages, 2 completed food workplaces (orchards, gardens or fishing piers), and 10 citizens.');
   } else {
     const terrain = terrainAt(x, z);
     if (getBuildingAt(state, x, z)) return fail('There is already a building or construction site here.');
@@ -462,9 +463,23 @@ export function canBuild(state, type, x, z, rotation = 0) {
     if (state.frontier?.fortifications.some(f => f.x === x && f.z === z)) return fail('A defense or its remains occupies this square.');
     const region = regionAt(x, z);
     if (region && !state.frontier?.claims.includes(region.id)) return fail(`Survey ${region.name} with a troop, then complete a claiming outpost in Frontier.`);
-    if (!terrain.buildable) return fail('Leave room beside the shore.');
+    if (type === 'fishingpier') {
+      if (state.buildings.some(b=>b.type==='fishingpier' && Math.hypot(x-b.x,z-b.z)<2)) return fail('Leave space between fishing decks.');
+      const facing = pierOrientations(x,z);
+      if (!facing.length) return fail('Choose an open bank with water immediately beside it.');
+      const door = facing.find(r=>placementAccess(state,x,z,r).ok);
+      if (door===undefined) return fail('The pier needs a clear path from its shore entrance to the hearth.');
+      rotation = door; base.rotation = door;
+      const end=pierPoint({x,z,rotation},-1);
+      if (state.buildings.some(b=>b.type==='fishingpier' && Math.hypot(end.x-pierPoint(b,-1).x,end.z-pierPoint(b,-1).z)<1.1)) return fail('Another fishing deck occupies that water.');
+      base.entrance=buildingEntrance({x,z,rotation});
+    } else if (!terrain.buildable) return fail('Leave room beside the shore.');
     if(['quarry','mine'].includes(type)&&!mineralStatus(state,{type,x,z,level:1}).sites.length)return fail('Choose a site within five tiles of a stone or ore deposit.');
-    const access = placementAccess(state, x, z, rotation); if (!access.ok) return fail(access.reason); base.entrance = access.entrance;
+    if (!base.entrance) {
+      const access = placementAccess(state, x, z, rotation);
+      if (!access.ok) return fail(access.reason);
+      base.entrance = access.entrance;
+    }
   }
   const cost = resourceCost(BUILDINGS[type].cost), missing = costMissing(state, cost);
   if (missing.length) return fail(`Needs ${missing.map(([key, value]) => `${Math.ceil(value - state.resources[key])} more ${key}`).join(', ')}.`);
@@ -482,7 +497,7 @@ export function build(state, type, x, z, rotation = 0) {
   if (type === 'bell') building = getBuildingAt(state, 0, -5);
   else {
     building = baseBuilding(type, `b${state.nextId++}`, x, z, state.day);
-    building.rotation = validInteger(rotation, 0, 3) ? rotation : 0; building.investment = emptyResources();
+    building.rotation = permission.rotation ?? rotation; building.investment = emptyResources();
     state.buildings.push(building);
   }
   queueWork(state, building, 'build', 1, permission.cost, permission.work);
@@ -572,7 +587,7 @@ export function setPriority(state, id, value) {
 function completeConstruction(state, b) {
   const upgrading = b.constructionKind === 'upgrade'; b.level = b.targetLevel; b.status = 'ready'; b.constructionKind = null;
   for (const [key, value] of Object.entries(b.escrow)) b.investment[key] = (b.investment[key] || 0) + value;
-  b.escrow = {}; b.progress = b.workRequired; b.desiredWorkers = specFor(b).workers || 0;
+  b.escrow = {}; b.progress = b.workRequired; b.desiredWorkers = b.type==='fishingpier' ? 0 : specFor(b).workers || 0;
   if (state.undo?.id === b.id) state.undo = null;
   if (b.type === 'bell' && !b.restored) {
     b.restored = true; b.restoredDay = state.day; state.won = true; state.wonDay = state.day;
@@ -643,6 +658,16 @@ export function tick(state, dt) {
     result.completed += construct(state, 1); reconcileWorkforce(state);
     result.changed = tickWoodland(state, 1) || result.changed;
     for (const b of state.buildings) {
+      if (b.type==='fishingpier' && b.status==='ready' && !b.paused && b.workerIds.length) {
+        const person=state.citizens.find(c=>c.id===b.workerIds[0]);
+        const amount=Math.max(1,Math.round(CATCH_SIZE*citizenSkill(person,'fisher')*modifier(state,b.type,'production')));
+        tickPier(state,b,frontierContext(state),amount,basket=>{
+          const share=researchProductionShare(state,RESEARCH[state.research?.active?.id],'food',basket,Math.max(0,state.storage.food-state.resources.food));
+          receiveResearchProduction(state,'food',share.research);
+          state.resources.food=round(state.resources.food+share.produced-share.research);
+          return share.produced;
+        });
+      }
       const foodBefore = state.resources.food;
       b.production = throughput(state, b, 1, true);
       if (b.type === 'bakery' && !state.guidance.firstBread && state.resources.food > foodBefore) {
@@ -693,15 +718,15 @@ export function actOnPressure(state, action) {
 }
 export function objective(state) {
   if (state.won) return progressionObjective(state);
-  const cottages = readyCount(state, 'cottage'), food = readyCount(state, 'orchard') + readyCount(state, 'garden');
+  const cottages = readyCount(state, 'cottage'), food = readyCount(state, 'orchard') + readyCount(state, 'garden') + readyCount(state, 'fishingpier');
   if (!cottages) {
     const site = state.buildings.find(b => b.type === 'cottage');
     return { title: site ? 'Finish your first cottage' : 'Build your first cottage', description: site ? 'Assign builders in Town → People. They work through the construction queue in order.' : 'Queue a cottage. Materials are reserved now; housing opens when builders finish.', current: site?.progress || 0, total: site?.workRequired || 1, complete: false, step: 0, type: 'cottage' };
   }
-  if (!food) return { title: 'Build an orchard or garden', description: 'Complete an orchard or garden, then assign citizens. Empty workplaces produce nothing.', current: 0, total: 1, complete: false, step: 1, type: 'orchard' };
+  if (!food) return { title: 'Start a food supply', description: 'Build an orchard, kitchen garden or fishing pier and assign a resident.', current: 0, total: 1, complete: false, step: 1, type: 'orchard' };
   const industry = Math.min(1, readyCount(state, 'lumber')) + Math.min(1, readyCount(state, 'quarry'));
   if (industry < 2) return { title: 'Build a woodcutter and stoneworks', description: 'Complete woodcutting and stoneworks. Match the jobs you request to the citizens available.', current: industry, total: 2, complete: false, step: 2, type: readyCount(state, 'lumber') ? 'quarry' : 'lumber' };
-  if (cottages < 3 || food < 2) return { title: 'Build more homes and gardens', description: `${Math.min(cottages, 3)}/3 finished cottages · ${Math.min(food, 2)}/2 food gardens. Construction and production share the same workers.`, current: Math.min(cottages, 3) + Math.min(food, 2), total: 5, complete: false, step: 3, type: cottages < 3 ? 'cottage' : 'garden' };
+  if (cottages < 3 || food < 2) return { title: 'Build homes and food workplaces', description: `${Math.min(cottages, 3)}/3 finished cottages · ${Math.min(food, 2)}/2 food workplaces. Construction and production share the same workers.`, current: Math.min(cottages, 3) + Math.min(food, 2), total: 5, complete: false, step: 3, type: cottages < 3 ? 'cottage' : 'garden' };
   if (state.population < 10) return { title: 'Reach ten residents', description: `${state.migration?.reason || 'Keep spare housing and food for newcomers.'} Welcome 10 citizens.`, current: state.population, total: 10, complete: false, step: 4 };
   const bell = state.buildings.find(b => b.type === 'bell');
   if (bell.status !== 'ready') return { title: 'Finish restoring the bell', description: 'Builders are restoring the bell. Keep a crew assigned until the work is complete.', current: bell.progress, total: bell.workRequired, complete: false, step: 5, type: 'bell' };
@@ -722,8 +747,12 @@ function readBasicBuilding(value, day, ids, cells) {
   if (!validInteger(value.x, ISLAND_BOUNDS.minX, ISLAND_BOUNDS.maxX) || !validInteger(value.z, ISLAND_BOUNDS.minZ, ISLAND_BOUNDS.maxZ) || !validInteger(value.rotation, 0, 3) || !validInteger(value.builtDay, 1, day)) return null;
   const cell = `${value.x},${value.z}`; if (cells.has(cell)) return null;
   const fixed = FIXED[value.type];
-  if (fixed ? value.id !== fixed.id || value.x !== fixed.x || value.z !== fixed.z : !/^b[1-9]/.test(value.id) || !terrainAt(value.x, value.z).buildable) return null;
+  const validSite=value.type==='fishingpier' ? pierOrientations(value.x,value.z).includes(value.rotation) : terrainAt(value.x,value.z).buildable;
+  if (fixed ? value.id !== fixed.id || value.x !== fixed.x || value.z !== fixed.z : !/^b[1-9]/.test(value.id) || !validSite) return null;
   const b = baseBuilding(value.type, value.id, value.x, value.z, value.builtDay); b.rotation = value.rotation;
+  if (value.type==='fishingpier') {
+    try { b.trip=restoreFishingTrip(value.trip); } catch { return null; }
+  }
   if (value.type === 'bell') {
     if (typeof value.restored !== 'boolean') return null; b.restored = value.restored;
     if (value.restored) { if (!validInteger(value.restoredDay, 1, day)) return null; b.restoredDay = value.restoredDay; }

@@ -1,3 +1,4 @@
+import { fishingActivity } from './fishing.js';
 import { CROPS, gardenState } from './hinterland.js';
 import { objectiveChecklist, objectiveGuidance } from './objective-checklist.js';
 import { createReadingClock } from './reading-clock.js';
@@ -32,8 +33,8 @@ const compactTablet = matchMedia('(min-width:0px)');
 const shortReadingLayout = matchMedia('(min-width:521px) and (max-height:600px)');
 const SAVE_KEY = 'wildhaven.v4', SETTINGS_KEY = 'wildhaven.preferences.v1';
 const CATEGORIES = {
-  beginnings: { name: 'Foundations', types: ['cottage','orchard','lumber','quarry','garden','well','school','bell'] },
-  harvest: { name: 'Food & fields', types: ['garden','orchard','farm','windmill','bakery','brewery'] },
+  beginnings: { name: 'Foundations', types: ['cottage','orchard','fishingpier','lumber','quarry','garden','well','school','bell'] },
+  harvest: { name: 'Food & fields', types: ['garden','orchard','fishingpier','farm','windmill','bakery','brewery'] },
   craft: { name: 'Craft & industry', types: ['lumber','quarry','sawmill','mine','smith','toolmaker','flaxfield','weaver'] },
   town: { name: 'Town life', types: ['cottage','well','school','clinic','chapel','manor'] },
   coast: { name: 'Trade & watch', types: ['market','warehouse','barracks','bell'] },
@@ -215,29 +216,35 @@ function useTool(type) {
   $('inspector').hidden = true; $('journal').hidden = true; world.select(null); world.selectCitizen?.(null);
   document.body.classList.add('placement-active'); $('placement-info').hidden = false; $('placement').hidden = false; $('placement-title').textContent = `${BUILDINGS[type].name} · ${costText(BUILDINGS[type].cost)}`;
   $('placement-context').textContent = '';
-  $('placement-detail').textContent = touchPlacement ? 'Tap a site, then choose Build here.' : 'Choose a site on the island. The arrow marks the entrance.';
+  $('rotate-building').hidden = type==='fishingpier';
+  world.showPierSites(type==='fishingpier');
+  $('placement-detail').textContent = type==='fishingpier' ? 'Choose a marked spot on the shore. The deck turns toward the water.' : touchPlacement ? 'Tap a site, then choose Build here.' : 'Choose a site on the island. The arrow marks the entrance.';
   $('confirm-building').hidden = !touchPlacement; $('confirm-building').disabled = true;
   $('world').style.cursor = 'crosshair'; if (hovered) hover(hovered); updateShelf(); audio.play('select');
 }
-function cancelTool() { tool = null; touchSite = null; touchPlacement = false; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); world.showPreview(null); world.showServiceArea(null, null); $('placement').hidden = true; $('placement-info').hidden = true; document.body.classList.remove('placement-active'); $('confirm-building').hidden = true; $('world').style.cursor = 'grab'; updateShelf(); }
+function cancelTool() { world.showPierSites(false); tool = null; touchSite = null; touchPlacement = false; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); world.showPreview(null); world.showServiceArea(null, null); $('placement').hidden = true; $('placement-info').hidden = true; document.body.classList.remove('placement-active'); $('confirm-building').hidden = true; $('world').style.cursor = 'grab'; updateShelf(); }
 function hover(tile, pointer = {}) {
   // Moving onto the placement controls must retain the site being rotated.
   if (tool && !tile && pointer.relatedTarget?.closest?.('#placement')) return;
   if (tool && touchPlacement && pointer.pointerType === 'mouse') { touchPlacement = false; touchSite = null; document.body.classList.remove('touch-placement-active'); $('confirm-building').hidden = true; }
   if (tool && touchPlacement && ['touch','pen'].includes(pointer.pointerType)) return;
   hovered = tile; if (!playing) return; world.hoverCitizen?.(!tool ? tile?.citizen?.id || null : null); if (frontierUI?.hover(tile)) return; if (!tool) return;
-  if (!tile) { world.showPreview(null); world.showServiceArea(null, null); $('placement-detail').textContent = 'Choose a site on the island.'; $('placement-context').textContent = ''; $('confirm-building').disabled = true; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); return; }
+  if (!tile) { world.showPreview(null); world.showServiceArea(null, null); $('placement-detail').textContent = tool==='fishingpier'?'Choose a marked spot on the shore.':'Choose a site on the island.'; $('placement-context').textContent = ''; $('confirm-building').disabled = true; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); return; }
   const verdict = sim.canBuild(state, tool, tile.x, tile.z, rotation);
   // Keep only the footprint, entrance arrow and reach ring over the island.
-  world.showPreview(tool, tile, verdict.ok, rotation, { entranceLabel: false }); const reach = world.showServiceArea(tool, tile, 1, { label: false }); $('placement').classList.toggle('invalid', !verdict.ok); $('placement-info').classList.toggle('invalid', !verdict.ok);
+  world.showPreview(tool, tile, verdict.ok, verdict.rotation ?? rotation, { entranceLabel: false }); const reach = world.showServiceArea(tool, tile, 1, { label: false }); $('placement').classList.toggle('invalid', !verdict.ok); $('placement-info').classList.toggle('invalid', !verdict.ok);
   $('confirm-building').disabled = !verdict.ok || !touchSite;
   $('placement-detail').textContent = verdict.ok ? (touchPlacement ? 'Entrance clear. Choose Build here to confirm.' : 'Click to build here. The arrow marks the entrance.') : verdict.reason;
+  if(tool==='fishingpier' && verdict.ok) $('placement-detail').textContent=touchPlacement?'Deck faces the water. Choose Build here.':'Click to build a fishing pier here.';
   $('placement-context').textContent = reach ? `${reach.inRangeHomes} of ${reach.totalHomes} homes in reach · ${reach.radius}-space radius` : verdict.ok && verdict.boosted ? verdict.bonus : '';
 }
 function commitBuilding(tile) {
   if (!tool || !tile || !companions.canManage) return;
   const result = sim.build(state, tool, tile.x, tile.z, rotation);
   if (!result.ok) { announce(result.reason, true); audio.play('error'); hover(tile); return; }
+  if(tool==='fishingpier'){
+    audio.play('build');sync();inspect(result.building);announce('Fishing pier queued. Assign a fisher when the deck is ready.');return;
+  }
   audio.play('build'); sync(); world.showPreview(null); world.showServiceArea(null, null); hovered = null; touchSite = null; $('confirm-building').disabled = true; $('placement-context').textContent = ''; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); const feedback = constructionFeedback(state, sim.constructionQueue(state), { paused: speed === 0 }); $('placement-detail').textContent = `Queued. ${feedback.reason}`; announce(`${BUILDINGS[tool].name} queued.${feedback.ready ? '' : ` ${feedback.reason}`}`);
 }
 function tap(tile, pointer = {}) {
@@ -291,6 +298,7 @@ function updateInspector() {
   const signature = JSON.stringify([selected.id, selected.type, state.day, state.population, speed === 0, state.woodland,
     state.buildings.map(b => [b.id, b.level, b.status, b.progress, b.workerIds, b.desiredWorkers, b.paused, b.restored, Math.round((b.production?.efficiency || 0) * 100), b.production?.blockedReason]),
     Object.values(state.resources).map(Math.floor), state.research.completed,
+    selected.type==='fishingpier' ? [selected.trip?.stage,selected.trip?.landed,selected.trip?.worker] : null,
     selected.type === 'citizen' ? [state.citizens.find(c => c.id === selected.id),world.actors.find(a=>a.citizen.id===selected.id)?.root.userData.workState,world.actors.find(a=>a.citizen.id===selected.id)?.parcel.visible] : null]);
   if (signature === lastInspectorSignature) return;
   lastInspectorSignature = signature;
@@ -319,6 +327,10 @@ function updateInspector() {
     const actor=world.actors.find(a=>a.citizen.id===citizen.id),activity=world.citizenCue?.(citizen.id)?.action || (actor?.parcel.visible?`Carrying ${actor.parcel.userData.cargo} to the village stores`:({working:'At the workbench',foraging:'Gathering food',walking:'On the way',unloading:'Delivering goods',watching:'Keeping watch',waiting:'Taking a short break'})[actor?.root.userData.workState]||'Finding the next task');
     $('inspect-description').textContent=(speed === 0 ? 'Time paused · ' : '')+activity+'. '+$('inspect-description').textContent;
     $('inspect-detail').textContent = `Practice: +${Math.round((sim.citizenSkill(citizen, citizen.job) - 1) * 100)}% output in this job. Experience stays with the person when work changes.`;
+    if(citizen.job==='fisher' && workplace){
+      $('inspect-description').textContent=(speed===0?'Time paused · ':'')+fishingActivity(workplace)+'.';
+      $('inspect-detail').textContent=workplace.trip?.landed ? Math.round(workplace.trip.landed)+' food delivered from this pier.' : 'The catch goes into stores when the basket reaches the hearth.';
+    }
     $('inspect-action').textContent = 'Manage people & jobs'; $('inspect-focus').hidden = true;
     if (workplace) { $('inspect-secondary').hidden = false; $('inspect-secondary').textContent = 'Find their workplace'; } return;
   }
@@ -343,7 +355,12 @@ function updateInspector() {
       const home = sim.villageNeeds(state).homes?.find(h => h.id === selected.id);
       if (home) details.push(['water', 'health', 'community'].map(k => `${k}: ${Math.round((home.coverage[k] || 0) * 100)}%`).join(' · ') + '.');
     }
-    if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
+    if (selected.type==='fishingpier') {
+      details.push(fishingActivity(selected)+'.');
+      if(selected.trip?.landed) details.push(Math.round(selected.trip.landed)+' food delivered to town.');
+      if(selected.workerIds.length){$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Watch '+state.citizens.find(c=>c.id===selected.workerIds[0]).name;}
+    }
+    else if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
     if (selected.type === 'barracks') {const troops=state.frontier.units.filter(u=>u.quartersId===selected.id&&!['dead','released'].includes(u.status));details.push(`${troops.filter(u=>u.garrisoned).length} troops inside · ${troops.length} assigned. Troops train and recover here.`);$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Manage company';}
     if (selected.type === 'garden') {const bed=gardenState(state,selected.id),crop=CROPS[bed.crop];details.push(`${crop.name} growing for neighbor projects. Choose the next crop in Explore → Gardens.`);$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Choose garden crops';}
     if (selected.type === 'lumber') {
@@ -513,7 +530,7 @@ function bind() {
     if (selected.type === 'bell') { if (selected.restored) { audio.play('bell'); announce('The bell carries all the way across the water.'); } else mutate(sim.build(state, 'bell', 0, -5)); return; }
     const result = sim.demolish(state, selected.id); if (result.ok) closeInspector(); mutate(result);
   };
-  $('inspect-secondary').onclick = () => { if(selected?.type==='barracks'){closeInspector();frontierUI.open('company');return;}if(selected?.type==='garden'){frontierUI.open('gardens');return;} if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
+  $('inspect-secondary').onclick = () => { if(selected?.type==='fishingpier'){const person=state.citizens.find(c=>c.id===selected.workerIds[0]);if(person){focusCitizen(person);world.followFisher(person.id);}return;}if(selected?.type==='barracks'){closeInspector();frontierUI.open('company');return;}if(selected?.type==='garden'){frontierUI.open('gardens');return;} if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
   $('landing-button').onclick = () => activateDock('landing');
   $('undo').onclick = () => { if (companions.canManage) mutate(sim.undo(state)); };
   $('find-bell').onclick = () => { const b = state.buildings.find(b => b.type === 'bell'); inspect(b); world.focus(b); };

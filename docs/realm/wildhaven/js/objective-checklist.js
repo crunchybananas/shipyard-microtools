@@ -47,9 +47,9 @@ function openingChecklist(state, ambition) {
         ? [construction(cottage, 'first-cottage', 'Finish the first cottage')]
         : [completedBuilding(state, 'cottage', 1, finished)];
     }
-    case 1: return [row('built-food', 'Finish an orchard or kitchen garden', count(state, 'orchard', finished) + count(state, 'garden', finished), 1, 'buildings')];
+    case 1: return [row('built-food', 'Finish an orchard, garden or fishing pier', count(state, 'orchard', finished) + count(state, 'garden', finished) + count(state, 'fishingpier', finished), 1, 'buildings')];
     case 2: return [completedBuilding(state, 'lumber', 1, finished), completedBuilding(state, 'quarry', 1, finished)];
-    case 3: return [completedBuilding(state, 'cottage', 3, finished), row('built-food', 'Finish orchards or kitchen gardens', count(state, 'orchard', finished) + count(state, 'garden', finished), 2, 'buildings')];
+    case 3: return [completedBuilding(state, 'cottage', 3, finished), row('built-food', 'Finish orchards, gardens or fishing piers', count(state, 'orchard', finished) + count(state, 'garden', finished) + count(state, 'fishingpier', finished), 2, 'buildings')];
     case 4: return [row('residents', 'Welcome residents', state.population, 10, 'residents')];
     case 5: {
       const bell = buildings.find(building => building.type === 'bell');
@@ -78,9 +78,9 @@ export function objectiveChecklist(state, ambition = objective(state)) {
   const ledger = state.imports || {}, sold = ledger.exported || {};
   switch (ambition.step) {
     case 0: return [completedBuilding(state, 'cottage')];
-    case 1: return [row('working-food', 'Staff an orchard or kitchen garden', staffed(state, 'orchard') + staffed(state, 'garden'), 1, 'buildings', 'Assigned workers must be able to produce food.')];
+    case 1: return [row('working-food', 'Staff an orchard, garden or fishing pier', staffed(state, 'orchard') + staffed(state, 'garden') + staffed(state, 'fishingpier'), 1, 'buildings', 'Assigned workers must be able to produce food.')];
     case 2: return [working(state, 'lumber'), working(state, 'quarry')];
-    case 3: return [completedBuilding(state, 'cottage', 3), row('built-food', 'Finish orchards or kitchen gardens', count(state, 'orchard') + count(state, 'garden'), 2, 'buildings', 'Finished, unpaused buildings count.'), people(10)];
+    case 3: return [completedBuilding(state, 'cottage', 3), row('built-food', 'Finish orchards, gardens or fishing piers', count(state, 'orchard') + count(state, 'garden') + count(state, 'fishingpier'), 2, 'buildings', 'Finished, unpaused buildings count.'), people(10)];
     case 4: return [condition('restore-bell', 'Restore the old bell', (state.buildings || []).some(building => building.type === 'bell' && building.restored && ready(building)))];
     case 5: return [people(20), stock(state, 'food', 40), working(state, 'school'), completedBuilding(state, 'well'), row('research-count', 'Complete research projects', state.research?.completed?.length, 3, 'discoveries', 'Any three completed research projects count.')];
     case 6: return [people(40), stock(state, 'tools', 12), stock(state, 'cloth', 12), working(state, 'market'), working(state, 'clinic'), coverage(state, 'water', .5, 'Water'), coverage(state, 'health', .4, 'Healthcare')];
@@ -123,7 +123,7 @@ export function objectiveGuidance(state, ambition = objective(state)) {
   if (!state.won) {
     switch (ambition.step) {
       case 0: return { title: 'Build a cottage', why: 'New homes provide beds for the neighbors who will work in your village.', ...buildingAction('cottage') };
-      case 1: return { title: 'Give the village a food supply', why: 'Workers harvest food to feed residents and make new arrivals possible.', ...buildingAction((state.buildings || []).find(building => ['orchard', 'garden'].includes(building.type))?.type || 'orchard') };
+      case 1: return { title: 'Give the village a food supply', why: 'Workers harvest food to feed residents and make new arrivals possible.', ...buildingAction((state.buildings || []).find(building => ['orchard', 'garden', 'fishingpier'].includes(building.type))?.type || 'orchard') };
       case 2: return { title: 'Keep building materials coming', why: 'Woodcutters and stoneworkers replace the supplies used by new buildings.', ...buildingAction(ambition.type || 'lumber') };
       case 3: return { title: 'Prepare for more neighbors', why: 'Spare beds and food make space for a larger workforce.', label: `Plan another ${BUILDINGS[ambition.type || 'cottage'].name.toLowerCase()}`, type: ambition.type || 'cottage' };
       case 4: return { title: 'Help new neighbors settle', why: 'Arrivals need spare beds, enough food, and sufficient morale.', label: 'Review arrivals and needs', tab: 'stores' };
