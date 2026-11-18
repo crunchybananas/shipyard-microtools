@@ -9,6 +9,7 @@ const PURPOSE = Object.freeze({
   assay: ['Research and rock samples', 'Supplied scholars add work to your funded project and earn knowledge.'],
   hearth: ['First supplies', 'Reserve gatherers bring food, timber and stone.'],
   cottage: ['Room to grow', 'Spare beds welcome arrivals when food and town needs are met.'],
+  fishingpier: ['Fish for the pantry', 'The fisher brings a basket to the hearth. A short walking route means more deliveries.'],
   orchard: ['Daily meals', 'Picked fruit goes straight into the town pantry.'],
   garden: ['Daily meals', 'Vegetables feed residents; nearby homes improve the harvest.'],
   lumber: ['Build · sawmill', 'Timber builds homes, feeds sawmills and fuels ovens and smithies.'],
@@ -30,7 +31,7 @@ const PURPOSE = Object.freeze({
   chapel: ['Community', 'Served homes gain community access needed for growth beyond sixty.'],
   barracks: ['Coast · escorts', 'Supplied guards prepare coastal patrols and provide voyage readiness.'],
   warehouse: ['Room for cargo', 'Raises every physical stockpile’s limit and reduces coastal cargo exposure.'],
-  bell: ['First milestone', 'Restore the bell after three cottages, two orchards or gardens and ten residents.'],
+  bell: ['First milestone', 'Restore the bell after three cottages, two food workplaces (orchards, gardens or fishing piers) and ten residents.'],
   manor: ['Beds · knowledge', 'The town hall adds beds and earns knowledge from coin.'],
 });
 const SERVICE_NAMES = { water: 'Water', health: 'Health', faith: 'Community', leisure: 'Community', security: 'Watch', civic: 'Civic service' };

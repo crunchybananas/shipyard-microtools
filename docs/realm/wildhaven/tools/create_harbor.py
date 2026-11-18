@@ -116,4 +116,57 @@ for end in [-1.88,1.82]:
     boat.spar((0,3.25,-.53),(0,.71,end),.015,'665944',5)
 boat.face([(0,3.05,-.53),(0,3.36,-.53),(.09,3.22,-1.14)],'dfaa47')
 boat.finish("Ochre lugger")
+# A narrow shore approach opens onto a deck broad enough to cast from.
+# +Z is the landward entrance, matching the building placement convention.
+pier=Model()
+for i in range(12):
+    z=.78-i*.28
+    width=1.06 if i<5 else 1.65
+    pier.box(0,.065,z,width,.13,.26,['af8356','b99062','a98156','b48a60'][i%4])
+for z,width in [(.65,.45),(-.52,.46),(-1.28,.72),(-2.18,.72)]:
+    for side in (-1,1):
+        x=side*width
+        pier.spar((x,-1.05,z),(x,.30,z),.085,'78543a')
+        pier.spar((x,.25,z),(x,.32,z),.092,'d5b887')
+for side in (-1,1):
+    pier.spar((side*.45,-.07,.8),(side*.45,-.07,-2.35),.082,'77583d')
+# A drying rack with drooping ropes, cork floats and a woven green net.
+for z in [-.40,-1.43]:
+    pier.spar((-.52,.12,z),(-.52,1.12,z),.045,'6b543c')
+pier.spar((-.52,1.05,-.28),(-.52,1.05,-1.55),.052,'be996a')
+def net(u,v):
+    return (-.52-.11*math.sin(math.pi*u)*v,1.02-.09*math.sin(math.pi*u)-v*(.49+.15*math.sin(math.pi*u)),-.40-1.02*u)
+for i in range(7):
+    u=i/6
+    pier.spar(net(u,0),net(u,1),.011,'456c60',4)
+    if i%2==0:
+        x,y,z=net(u,0)
+        pier.spar((x,y-.075,z),(x,y+.035,z),.055,'c66a46',7)
+for j in range(4):
+    for i in range(6):
+        pier.spar(net(i/6,j/3),net((i+1)/6,j/3),.012,'527769',4)
+barrel(pier,.53,.13,-1.12,.19)
+pier.finish('fishingpier')
+
+rod=Model()
+points=[(0,0,0),(.015,.22,.30),(.018,.39,.64),(.016,.45,.96),(.02,.42,1.25)]
+for i,(a,b) in enumerate(zip(points,points[1:])):
+    rod.spar(a,b,.026-.004*i,'785334' if i<2 else 'b89760',6)
+rod.spar(points[-1],(.025,-.46,1.33),.007,'a1b9ae',4)
+rod.spar((.025,-.49,1.33),(.025,-.41,1.33),.035,'e0ab58',7)
+rod.finish('tool_fishingrod')
+
+basket=Model()
+basket.box(0,0,0,.35,.07,.27,'9d7046')
+for x in [-.17,.17]: basket.box(x,.07,0,.035,.14,.28,'ac7e51')
+for z in [-.13,.13]: basket.box(0,.07,z,.35,.14,.03,'c19965')
+# Three silver fish with darker backs, forked tails and visible eyes.
+for i,z in enumerate([-.08,0,.08]):
+    y=.155+.012*(i%2)
+    for sign in [-1,1]:
+        points=[(-.115,y,z),(-.022,y+.046,z+sign*.025),(.13,y+.015,z),(.016,y-.012,z+sign*.026)]
+        basket.face(points if sign>0 else points[::-1],'87afad' if sign>0 else 'b4c9bb')
+    basket.face([(-.09,y,z),(-.155,y+.044,z),(-.142,y+.002,z),(-.16,y-.018,z)],'527e80')
+    basket.spar((.075,y+.024,z-.024),(.075,y+.024,z+.024),.011,'304f50',6)
+basket.finish('cargo_fish')
 bpy.ops.export_scene.gltf(filepath=str(OUT/"saltwick-harbor.glb"),export_format="GLB",export_yup=True,export_texcoords=False)

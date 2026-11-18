@@ -24,7 +24,7 @@ function staff(state, type, workers = BUILDINGS[type].workers, extra = {}) {
 }
 
 test('catalog has meaningful complete chains, valid workforce, and immutable shared data', () => {
-  assert.equal(Object.keys(BUILDINGS).length, 28);
+  assert.equal(Object.keys(BUILDINGS).length, 29);
   assert.equal(RESOURCE_NAMES.length, 14);
   const produced = new Set();
   for (const [type, spec] of Object.entries(BUILDINGS)) {
