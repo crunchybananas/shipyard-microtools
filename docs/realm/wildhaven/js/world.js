@@ -1,3 +1,4 @@
+import { createSeaMaterial, groundTint, quarryStoneGeometry, meadowTuftGeometry } from './coastal-landscape.js';
 import { herdStatus } from './livestock.js';
 import { depositFraction } from './minerals.js';
 import { sampleUnitMotion, stride, angleBetween } from './unit-motion.js';
@@ -75,7 +76,7 @@ export class VillageWorld {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.22;
+    this.renderer.toneMappingExposure = 1.02;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#75acac');
     this.camera = new THREE.OrthographicCamera(-20, 20, 15, -15, 0.1, 420);
@@ -86,13 +87,13 @@ export class VillageWorld {
     this.buildings = new Map(); this.templates = new Map(); this.actors = []; this.decor = new Map();
     this.fortifications=new Map();this.troops=new Map();this.neighborModels=new Map();this.projectileModels=new Map();this.frontierSelection={unitIds:[]};
     this.clock = 0; this.wind = []; this.birds = []; this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    this.skyLight=new THREE.HemisphereLight('#dbe9d4', '#7a8060', 2.35);this.scene.add(this.skyLight);
-    this.sun = new THREE.DirectionalLight('#fff0cf', 3.7);
+    this.skyLight=new THREE.HemisphereLight('#dbe9d4', '#7a8060', 1.91);this.scene.add(this.skyLight);
+    this.sun = new THREE.DirectionalLight('#fff0cf', 3.15);
     this.sun.position.set(-23, 34, 15); this.sun.castShadow = true;
     Object.assign(this.sun.shadow.camera, { left: -29, right: 29, top: 29, bottom: -29, near: 1, far: 85 });
     this.sun.shadow.mapSize.set(2048, 2048); this.sun.shadow.normalBias = 0.04; this.sun.shadow.bias = -0.00015;
     this.scene.add(this.sun,this.sun.target);
-    this.landmarks=[]; this.terrain(); this.nature(); this.dock(); this.createPreview(); this.bindInput(); this.resize();
+    this.landmarks=[]; this.terrain(); this.nature(); this.createPreview(); this.bindInput(); this.resize();
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(canvas);
   }
   async load() {
@@ -103,7 +104,14 @@ export class VillageWorld {
       root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       this.templates.set(name, root);
     }
-    const [town,townMetadata]=await Promise.all([new GLTFLoader().loadAsync('./assets/town-kit.glb'),fetch('./assets/town-kit.json').then(response=>{if(!response.ok)throw new Error('Town workstation metadata could not be loaded.');return response.json();})]);
+    const [town,townMetadata] = await Promise.all([
+      new GLTFLoader().loadAsync('./assets/town-kit.glb'),
+      fetch('./assets/town-kit.json').then(response=>{
+        if(!response.ok)throw new Error('Town workstation metadata could not be loaded.');
+        return response.json();
+      }),
+      this.loadHarbor(),
+    ]);
     this.assetMetadata=townMetadata.assets;
     for(const root of town.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
     const frontier=await new GLTFLoader().loadAsync('./assets/frontier-kit.glb');
@@ -149,7 +157,12 @@ export class VillageWorld {
     const vertices=[],colors=[],shore=[],step=.30,grass=new THREE.Color('#91aa61'),sand=new THREE.Color('#d4c291'),darkGrass=new THREE.Color('#779458');
     const vertex=(x,z)=>({x,z,land:isLand(x,z)});
     const cross=(a,b)=>{let lo=a.land?a:b,hi=a.land?b:a;for(let n=0;n<13;n++){const m=vertex((lo.x+hi.x)/2,(lo.z+hi.z)/2);if(m.land)lo=m;else hi=m;}return{...lo,shore:true};};
-    const emit=p=>{vertices.push(p.x*CELL,groundHeight(p.x,p.z),p.z*CELL);const c=grass.clone().lerp(darkGrass,Math.max(0,Math.sin(p.x*.4+p.z*.7))*.35);c.lerp(sand,THREE.MathUtils.clamp((1.02-coastDistance(p.x,p.z))/.78,0,1));c.multiplyScalar(.97+rand(p.x,p.z)*.055);colors.push(c.r,c.g,c.b);};
+    const groundColor = new THREE.Color();
+    const emit = p => {
+      vertices.push(p.x*CELL, groundHeight(p.x,p.z), p.z*CELL);
+      groundTint(groundColor,p.x,p.z,grass,darkGrass,sand);
+      colors.push(groundColor.r,groundColor.g,groundColor.b);
+    };
     const triangle=points=>{const clipped=[];for(let i=0;i<3;i++){const a=points[i],b=points[(i+1)%3];if(a.land)clipped.push(a);if(a.land!==b.land)clipped.push(cross(a,b));}if(clipped.length<3)return;for(let i=1;i<clipped.length-1;i++)[clipped[0],clipped[i],clipped[i+1]].forEach(emit);const edge=clipped.filter(p=>p.shore);if(edge.length===2)shore.push(edge);};
     const columns=Math.ceil((ISLAND_BOUNDS.maxX-ISLAND_BOUNDS.minX)/step),rows=Math.ceil((ISLAND_BOUNDS.maxZ-ISLAND_BOUNDS.minZ)/step),grid=[];
     for(let z=0;z<=rows;z++){const row=[];for(let x=0;x<=columns;x++)row.push(vertex(ISLAND_BOUNDS.minX+x/columns*(ISLAND_BOUNDS.maxX-ISLAND_BOUNDS.minX),ISLAND_BOUNDS.minZ+z/rows*(ISLAND_BOUNDS.maxZ-ISLAND_BOUNDS.minZ)));grid.push(row);}
@@ -159,10 +172,10 @@ export class VillageWorld {
     const beachPositions=[];
     for(const edge of shore){const pairs=edge.map(p=>{const dx=coastDistance(p.x+.01,p.z)-coastDistance(p.x-.01,p.z),dz=coastDistance(p.x,p.z+.01)-coastDistance(p.x,p.z-.01),length=Math.hypot(dx,dz)||1;return[[p.x*CELL,groundHeight(p.x,p.z)-.008,p.z*CELL],[(p.x-dx/length*.20)*CELL,-.14,(p.z-dz/length*.20)*CELL]];});const[a,b]=pairs;for(const v of[a[0],a[1],b[0],b[0],a[1],b[1]])beachPositions.push(...v);}
     const beachGeo=new THREE.BufferGeometry();beachGeo.setAttribute('position',new THREE.Float32BufferAttribute(beachPositions,3));beachGeo.computeVertexNormals();this.scene.add(new THREE.Mesh(beachGeo,material('#c7bd8c',{side:THREE.DoubleSide})));
-    const waterMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 } }, vertexShader: `varying vec3 p; void main(){ p=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`, fragmentShader: `varying vec3 p; uniform float uTime; void main(){ float r=length(p.xy/vec2(1.15,1.0)); float wave=sin(p.x*1.6+p.y*.8+uTime*.55)*sin(p.y*2.4-p.x*.35-uTime*.3); float streak=smoothstep(.88,1.0,wave)*.018; vec3 shallow=vec3(.09,.37,.34); vec3 deep=vec3(.045,.22,.24); vec3 c=mix(shallow,deep,smoothstep(16.,40.,r)); c+=streak; gl_FragColor=vec4(c,1.); #include <tonemapping_fragment> #include <colorspace_fragment> }`.replace(/ #include/g, '\n#include') });
+    const waterMat = createSeaMaterial(CELL);
     this.water = new THREE.Mesh(new THREE.PlaneGeometry(MAP_ZOOM*4, MAP_ZOOM*4), waterMat); this.water.rotation.x = -Math.PI / 2; this.water.position.y = -.075; this.scene.add(this.water);
     // The old footpath leads from the landing to the bell, and anchors the new village.
-    this.pathMaterial = material('#c7b98a');
+    this.pathMaterial = material('#b8a27b');
     const stones = [];
     const pathPoints = [[0,-5],[0,6],[2,6],[2,8.1]];
     for (let segment = 0; segment < pathPoints.length - 1; segment++) {
@@ -198,19 +211,25 @@ export class VillageWorld {
     this.oldTreeMeshes=[trunks,canopies];
     for (const mesh of [trunks,canopies]) { mesh.castShadow = true; mesh.receiveShadow = true; this.scene.add(mesh); }
     const rockSites = listTiles().filter(t => t.kind === 'rock'&&hasNaturalObstacle(t.x,t.z));
-    const rockMesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.6,0),material('#86938a'),rockSites.length * 3);
+    const rockMesh = new THREE.InstancedMesh(quarryStoneGeometry(),material('#ffffff',{vertexColors:true}),rockSites.length * 3);
     rockSites.forEach((t,i)=>{ for(let j=0;j<3;j++) {
-      const x=t.x+(rand(t.x,j)-.5)*.7, z=t.z+(rand(j,t.z)-.5)*.7, s=.35+rand(i,j)*.75;
-      this.setInstance(rockMesh,i*3+j,x*CELL,groundHeight(x,z)+s*.2,z*CELL,s,s*.75,s*1.25,rand(i,j)*6);
+      const x=t.x+(rand(t.x,t.z,3*j+1)-.5)*.83, z=t.z+(rand(t.x,t.z,3*j+2)-.5)*.83, s=.39+rand(t.x,t.z,3*j+3)*.79;
+      this.setInstance(rockMesh,i*3+j,x*CELL,groundHeight(x,z)+s*.13,z*CELL,s,s*(.82+.36*rand(i,j,16)),s*1.20,rand(i,j,18)*TAU);
       const key=`${t.x},${t.z}`; if(!this.decor.has(key)) this.decor.set(key,[]); this.decor.get(key).push({depositId:key,meshes:[rockMesh],index:i*3+j,matrix:matrix.clone()});
     }});
     rockMesh.userData.rockSites=rockSites;
     rockMesh.castShadow=true; rockMesh.receiveShadow=true; this.scene.add(rockMesh);
     const flowerSites=[];
     for(let i=0;i<3200;i++) { const x=ISLAND_BOUNDS.minX+rand(i,0)*(ISLAND_BOUNDS.maxX-ISLAND_BOUNDS.minX),z=ISLAND_BOUNDS.minZ+rand(i,1)*(ISLAND_BOUNDS.maxZ-ISLAND_BOUNDS.minZ); if(terrainAt(x,z).kind==='grass'&&Math.abs(x)>.9&&isLand(x+.7,z+.7)&&isLand(x-.7,z-.7)) flowerSites.push({x,z}); }
-    const flowerGeo=new THREE.ConeGeometry(.045,.14,4); flowerGeo.rotateX(.12);
-    const flowers=new THREE.InstancedMesh(flowerGeo,material('#d8d99b'),flowerSites.length);
-    flowerSites.forEach((p,i)=>{this.setInstance(flowers,i,p.x*CELL,groundHeight(p.x,p.z)+.06,p.z*CELL,1,1,1,rand(i,5)*6);flowers.setColorAt(i,new THREE.Color(['#e8d89b','#c5cc7a','#d6bca4','#749558'][i%4]));}); this.scene.add(flowers);this.flowers=flowers;this.flowerCount=flowerSites.length;
+    const flowers = new THREE.InstancedMesh(meadowTuftGeometry(),
+      material('#ffffff',{vertexColors:true,side:THREE.DoubleSide}),flowerSites.length);
+    const springFlowers=seasonPalette('spring').flowers.map(hex=>new THREE.Color(hex));
+    flowerSites.forEach((p,i)=>{
+      const size=.68+.59*rand(i,5);
+      this.setInstance(flowers,i,p.x*CELL,groundHeight(p.x,p.z)-.008,p.z*CELL,size,size,size,rand(i,6)*TAU);
+      flowers.setColorAt(i,springFlowers[i%springFlowers.length]);
+    });
+    this.scene.add(flowers);this.flowers=flowers;this.flowerCount=flowerSites.length;
     // A few distant birds belong to the world; nothing floats over the interface.
     const wingGeo = new THREE.BufferGeometry(); wingGeo.setAttribute('position',new THREE.Float32BufferAttribute([-.24,0,.02,0,.04,0,0,.04,0,.24,0,.02],3));
     for(let i=0;i<3;i++) { const bird=new THREE.LineSegments(wingGeo,new THREE.LineBasicMaterial({color:'#f2e7ce'})); this.scene.add(bird);this.birds.push(bird); }
@@ -240,8 +259,7 @@ export class VillageWorld {
       const {position, color:colors}=this.land.geometry.attributes;
       for(let i=0;i<position.count;i++){
         const x=position.getX(i)/CELL,z=position.getZ(i)/CELL;
-        color.copy(grass).lerp(shade,Math.max(0,Math.sin(x*.4+z*.7))*.35);
-        color.lerp(sand,THREE.MathUtils.clamp((1.02-coastDistance(x,z))/.78,0,1)).multiplyScalar(.97+rand(x,z)*.055);
+        groundTint(color,x,z,grass,shade,sand);
         colors.setXYZ(i,color.r,color.g,color.b);
       }
       colors.needsUpdate=true;
@@ -321,12 +339,26 @@ export class VillageWorld {
     }
   }
   setInstance(mesh,i,x,y,z,sx,sy,sz,ry=0) { position.set(x,y,z);quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),ry);scale.set(sx,sy,sz);matrix.compose(position,quaternion,scale);mesh.setMatrixAt(i,matrix); }
-  dock() {
-    const pieces=[],posts=[],wood=material('#927852'),postMat=material('#655b44');
-    for(let i=0;i<16;i++){const z=13.5+i*.28,y=Math.max(.20,groundHeight(2,z/CELL)+.09);const g=new THREE.BoxGeometry(1.9,.11,.25);g.translate(3.6,y,z);pieces.push(g);}
-    for(let i=0;i<4;i++)for(const side of [-1,1]){const g=new THREE.CylinderGeometry(.075,.1,.95,7);g.translate(3.6+side*.83,-.03,13.7+i*1.25);posts.push(g);}
-    for(const [geos,mat] of [[pieces,wood],[posts,postMat]]){const m=new THREE.Mesh(mergeGeometries(geos),mat);m.castShadow=true;m.receiveShadow=true;m.userData.landmark='landing';this.landmarks.push(m);this.scene.add(m);}
-    const crates=new THREE.Group();const crate=new THREE.Mesh(new THREE.BoxGeometry(.48,.38,.44),material('#aa8250'));crate.position.set(4.12,.44,16.9);crate.castShadow=true;crates.add(crate);for(const x of[-.18,.18]){const strap=new THREE.Mesh(new THREE.BoxGeometry(.045,.4,.46),material('#6e6749'));strap.position.set(4.12+x,.44,16.9);crates.add(strap);}crates.userData.landmark='landing';this.landmarks.push(crates);this.scene.add(crates);
+  async loadHarbor() {
+    const harbor = await new GLTFLoader().loadAsync('./assets/saltwick-harbor.glb');
+    const quay = harbor.scene.getObjectByName('Fish_quay');
+    const lugger = harbor.scene.getObjectByName('Ochre_lugger');
+    quay.position.set(3.6, .03, 15.6);
+    lugger.position.set(2.0, -.08, 18.15);
+    lugger.rotation.y = -.14;
+    for (const model of [quay, lugger]) {
+      model.userData.landmark = 'landing';
+      model.traverse(part => { if (part.isMesh) part.castShadow = part.receiveShadow = true; });
+      this.landmarks.push(model);
+      this.scene.add(model);
+    }
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(14,14),
+      new THREE.ShadowMaterial({color:'#163f40',opacity:.32,depthWrite:false}));
+    shadow.rotation.x = -Math.PI/2;
+    shadow.position.set(quay.position.x,this.water.position.y+.003,quay.position.z);
+    shadow.receiveShadow = true;
+    this.scene.add(shadow);
+    this.lugger = lugger;
   }
   createPreview() {
     this.highlight=new THREE.Group();
@@ -1251,6 +1283,10 @@ export class VillageWorld {
     this.updateLivestock(dt,playing&&speed>0?speed:0);this.updateGardenCrops();this.updateWorkerCues();this.updateWorldCues();
     this.updateFrontier(dt,playing&&speed>0);
     this.updatePressure();
+    if (this.lugger && !this.reduced) {
+      this.lugger.position.y = -.08 + .025 * Math.sin(this.clock * .9);
+      this.lugger.rotation.z = .014 * Math.sin(this.clock * .72);
+    }
     if(this.boat){const gx=won?5.45:17,gz=won?17.3:22;this.boat.position.x+=(gx-this.boat.position.x)*Math.min(1,dt*.18);this.boat.position.z+=(gz-this.boat.position.z)*Math.min(1,dt*.18);this.boat.position.y=-.10+(this.reduced?0:Math.sin(this.clock*1.2)*.045);this.boat.rotation.z=this.reduced?0:Math.sin(this.clock*.9)*.025;}
     // Daylight stays readable; a gentle late-afternoon warmth replaces a black night.
     const warmth=Math.max(0,Math.sin(dayTime*Math.PI)),sun=this.seasonColors?.sun||[1,.94,.85];this.sun.color.setRGB(sun[0],sun[1]-warmth*.035,sun[2]-warmth*.065);
