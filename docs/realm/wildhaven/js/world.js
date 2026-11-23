@@ -1,3 +1,6 @@
+import { createSeaMaterial, groundTint, quarryStoneGeometry, meadowTuftGeometry } from './coastal-landscape.js';
+import { herdStatus } from './livestock.js';
+import { depositFraction } from './minerals.js';
 import { sampleUnitMotion, stride, angleBetween } from './unit-motion.js';
 import { CROPS, gardenState } from './hinterland.js';
 import { CALENDAR_DAY_SECONDS } from './calendar.js';
@@ -8,7 +11,8 @@ import { DISCOVERIES, isFieldworker } from './discovery.js';
 import * as THREE from 'three';
 import { GLTFLoader } from '../../vendor/three/GLTFLoader.js';
 import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js';
-import { buildingEntrance } from './sim.js';
+import { fisherPosition, pierPoint, pierOrientations } from './fishing.js';
+import { buildingEntrance, canBuild } from './sim.js';
 import { groundHeight, terrainAt, isLand, listTiles, hasNaturalObstacle, isNeighborCompoundCell, coastDistance, ISLAND_BOUNDS, ISLAND_REGIONS, ISLAND_NEIGHBORS } from './island.js';
 import { blocksFortification, frontierPath, gateTransition, DEFEND_RADIUS } from './frontier.js';
 import { BUILDINGS, JOBS, getBuildingSpec } from './catalog.js';
@@ -33,14 +37,14 @@ const ownedCueMesh = (geometry, color, opacity = 1, extra = {}) => {
   mesh.userData.ownsGeometry = mesh.userData.ownsMaterial = true; return mesh;
 };
 const cueGeometry = positions => { const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)); return geometry; };
-const JOB_GLYPHS = Object.freeze({builder:'hammer',lumberjack:'axe',quarryworker:'pick',miner:'pick',smith:'hammer',carpenter:'saw',farmer:'leaf',forager:'basket',miller:'grain',baker:'grain',weaver:'cloth',brewer:'mug',trader:'coin',scholar:'book',medic:'cross',chaplain:'star',guard:'spear',steward:'box'});
+const JOB_GLYPHS = Object.freeze({builder:'hammer',lumberjack:'axe',quarryworker:'pick',miner:'pick',smith:'hammer',carpenter:'saw',farmer:'leaf',herder:'basket',forager:'basket',miller:'grain',baker:'grain',weaver:'cloth',brewer:'mug',trader:'coin',scholar:'book',medic:'cross',chaplain:'star',guard:'spear',steward:'box'});
 const buildingPresentation = b => `${b.type}:${b.level}:${b.status}:${b.constructionKind}:${b.restored}:${b.x}:${b.z}:${b.rotation||0}`;
-const JOB_TOOLS = Object.freeze({builder:'tool_hammer',lumberjack:'tool_axe',quarryworker:'tool_pick',miner:'tool_pick',farmer:'tool_hoe',forager:'tool_basket',medic:'tool_basket',scholar:'tool_book',chaplain:'tool_book',steward:'tool_book',guard:'tool_spear',smith:'tool_hammer',carpenter:'tool_hammer',trader:'tool_basket',baker:'tool_basket',weaver:'tool_basket',miller:'tool_basket',brewer:'tool_basket'});
-const DELIVERY_JOBS = new Set(['lumberjack','quarryworker','miner','farmer','smith','carpenter','trader','baker','weaver','miller','brewer']);
+const JOB_TOOLS = Object.freeze({builder:'tool_hammer',lumberjack:'tool_axe',quarryworker:'tool_pick',miner:'tool_pick',farmer:'tool_hoe',herder:'tool_basket',forager:'tool_basket',medic:'tool_basket',scholar:'tool_book',chaplain:'tool_book',steward:'tool_book',guard:'tool_spear',smith:'tool_hammer',carpenter:'tool_hammer',trader:'tool_basket',baker:'tool_basket',weaver:'tool_basket',miller:'tool_basket',brewer:'tool_basket'});
+const DELIVERY_JOBS = new Set(['lumberjack','quarryworker','miner','farmer','herder','smith','carpenter','trader','baker','weaver','miller','brewer']);
 // Feet positions beside the authored work surfaces. The metadata supplies the
 // actual tool/hand target; these small clear spaces supply the worker's stance.
-const WORK_STANCES = Object.freeze({lumber:[-.44,0,1.00],quarry:[.13,0,.94],garden:[-.23,0,.94],orchard:[.35,0,.91],windmill:[.57,0,.97],farm:[.13,0,.94],bakery:[.52,0,1.10],sawmill:[.13,.15,.72],mine:[.13,0,1.05],smith:[.40,.11,.71],market:[.13,.12,.83],school:[-.42,0,1.09],clinic:[.69,0,.98],barracks:[.56,0,1.05],warehouse:[.13,0,1.08],cottage:[-.07,0,1.04],hearth:[.13,0,1.00]});
-const VILLAGE_WORK_TARGETS = Object.freeze({lumber:[-.58,.38,.64],quarry:[0,.34,.44],garden:[-.36,.32,.47],orchard:[.22,.28,.47],windmill:[.44,.40,.26],hearth:[0,.50,.15],cottage:[-.20,.60,.57]});
+const WORK_STANCES = Object.freeze({pasture:[.13,0,.99],henhouse:[.13,0,.99],assay:[-.38,0,.92],lumber:[-.44,0,1.00],quarry:[.13,0,.94],garden:[-.23,0,.94],orchard:[.35,0,.91],windmill:[.57,0,.97],farm:[.13,0,.94],bakery:[.52,0,1.10],sawmill:[.13,.15,.72],mine:[.13,0,1.05],smith:[.40,.11,.71],market:[.13,.12,.83],school:[-.42,0,1.09],clinic:[.69,0,.98],barracks:[.56,0,1.05],warehouse:[.13,0,1.08],cottage:[-.07,0,1.04],hearth:[.13,0,1.00]});
+const VILLAGE_WORK_TARGETS = Object.freeze({pasture:[0,.35,.7],henhouse:[0,.35,.7],assay:[-.3,.62,.12],lumber:[-.58,.38,.64],quarry:[0,.34,.44],garden:[-.36,.32,.47],orchard:[.22,.28,.47],windmill:[.44,.40,.26],hearth:[0,.50,.15],cottage:[-.20,.60,.57]});
 // Alternate access still uses real authored surfaces: chopping block, crop
 // rows, workbench ends, anvil horn, ore cart, and the clinic's herb planters.
 const SIDE_WORK_STATIONS=Object.freeze({
@@ -73,7 +77,7 @@ export class VillageWorld {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.22;
+    this.renderer.toneMappingExposure = 1.02;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#75acac');
     this.camera = new THREE.OrthographicCamera(-20, 20, 15, -15, 0.1, 420);
@@ -84,13 +88,13 @@ export class VillageWorld {
     this.buildings = new Map(); this.templates = new Map(); this.actors = []; this.decor = new Map();
     this.fortifications=new Map();this.troops=new Map();this.neighborModels=new Map();this.projectileModels=new Map();this.frontierSelection={unitIds:[]};
     this.clock = 0; this.wind = []; this.birds = []; this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    this.skyLight=new THREE.HemisphereLight('#dbe9d4', '#7a8060', 2.35);this.scene.add(this.skyLight);
-    this.sun = new THREE.DirectionalLight('#fff0cf', 3.7);
+    this.skyLight=new THREE.HemisphereLight('#dbe9d4', '#7a8060', 1.91);this.scene.add(this.skyLight);
+    this.sun = new THREE.DirectionalLight('#fff0cf', 3.15);
     this.sun.position.set(-23, 34, 15); this.sun.castShadow = true;
     Object.assign(this.sun.shadow.camera, { left: -29, right: 29, top: 29, bottom: -29, near: 1, far: 85 });
     this.sun.shadow.mapSize.set(2048, 2048); this.sun.shadow.normalBias = 0.04; this.sun.shadow.bias = -0.00015;
     this.scene.add(this.sun,this.sun.target);
-    this.landmarks=[]; this.terrain(); this.nature(); this.dock(); this.createPreview(); this.bindInput(); this.resize();
+    this.landmarks=[]; this.terrain(); this.nature(); this.createPreview(); this.bindInput(); this.resize();
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(canvas);
   }
   async load() {
@@ -101,13 +105,22 @@ export class VillageWorld {
       root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       this.templates.set(name, root);
     }
-    const [town,townMetadata]=await Promise.all([new GLTFLoader().loadAsync('./assets/town-kit.glb'),fetch('./assets/town-kit.json').then(response=>{if(!response.ok)throw new Error('Town workstation metadata could not be loaded.');return response.json();})]);
+    const [town,townMetadata] = await Promise.all([
+      new GLTFLoader().loadAsync('./assets/town-kit.glb'),
+      fetch('./assets/town-kit.json').then(response=>{
+        if(!response.ok)throw new Error('Town workstation metadata could not be loaded.');
+        return response.json();
+      }),
+      this.loadHarbor(),
+    ]);
     this.assetMetadata=townMetadata.assets;
     for(const root of town.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
     const frontier=await new GLTFLoader().loadAsync('./assets/frontier-kit.glb');
     for(const root of frontier.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
     const living=await new GLTFLoader().loadAsync('./assets/living-kit.glb');
     for(const root of living.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
+    const husbandry=await new GLTFLoader().loadAsync('./assets/husbandry-kit.glb');
+    for(const root of husbandry.scene.children){root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});this.templates.set(root.name,root);}
     this.templates.set('garden', this.makeCropGarden());
     this.replaceTrees();
     this.boat = this.clone('boat'); this.boat.position.set(17, -0.1, 22); this.boat.rotation.y = -0.15; this.scene.add(this.boat);
@@ -138,14 +151,19 @@ export class VillageWorld {
       for(const crop of Object.keys(CROPS)){const rows=model.getObjectByName(`crop_${crop}`);if(rows){rows.visible=crop===bed.crop;rows.scale.y=.15+.85*ratio;}}
     }
   }
-  clone(type,level=1) { const name=type==='cottage'&&level>1?'upgrade_cottage':BUILDINGS[type]?.model||type;const template=this.templates.get(name);if(!template)throw new Error(`Missing runtime model: ${name}`);return template.clone(true); }
+  clone(type,level=1) { const name=type==='cottage'&&level>1?'upgrade_cottage':level>1&&['pasture','henhouse','assay'].includes(type)?type+'_upgrade':BUILDINGS[type]?.model||type;const template=this.templates.get(name);if(!template)throw new Error(`Missing runtime model: ${name}`);return template.clone(true); }
   terrain() {
     // Clip a bounded grid against the canonical coastline. Unlike a radial fan,
     // this follows the western and eastern headlands and their concave bays.
     const vertices=[],colors=[],shore=[],step=.30,grass=new THREE.Color('#91aa61'),sand=new THREE.Color('#d4c291'),darkGrass=new THREE.Color('#779458');
     const vertex=(x,z)=>({x,z,land:isLand(x,z)});
     const cross=(a,b)=>{let lo=a.land?a:b,hi=a.land?b:a;for(let n=0;n<13;n++){const m=vertex((lo.x+hi.x)/2,(lo.z+hi.z)/2);if(m.land)lo=m;else hi=m;}return{...lo,shore:true};};
-    const emit=p=>{vertices.push(p.x*CELL,groundHeight(p.x,p.z),p.z*CELL);const c=grass.clone().lerp(darkGrass,Math.max(0,Math.sin(p.x*.4+p.z*.7))*.35);c.lerp(sand,THREE.MathUtils.clamp((1.02-coastDistance(p.x,p.z))/.78,0,1));c.multiplyScalar(.97+rand(p.x,p.z)*.055);colors.push(c.r,c.g,c.b);};
+    const groundColor = new THREE.Color();
+    const emit = p => {
+      vertices.push(p.x*CELL, groundHeight(p.x,p.z), p.z*CELL);
+      groundTint(groundColor,p.x,p.z,grass,darkGrass,sand);
+      colors.push(groundColor.r,groundColor.g,groundColor.b);
+    };
     const triangle=points=>{const clipped=[];for(let i=0;i<3;i++){const a=points[i],b=points[(i+1)%3];if(a.land)clipped.push(a);if(a.land!==b.land)clipped.push(cross(a,b));}if(clipped.length<3)return;for(let i=1;i<clipped.length-1;i++)[clipped[0],clipped[i],clipped[i+1]].forEach(emit);const edge=clipped.filter(p=>p.shore);if(edge.length===2)shore.push(edge);};
     const columns=Math.ceil((ISLAND_BOUNDS.maxX-ISLAND_BOUNDS.minX)/step),rows=Math.ceil((ISLAND_BOUNDS.maxZ-ISLAND_BOUNDS.minZ)/step),grid=[];
     for(let z=0;z<=rows;z++){const row=[];for(let x=0;x<=columns;x++)row.push(vertex(ISLAND_BOUNDS.minX+x/columns*(ISLAND_BOUNDS.maxX-ISLAND_BOUNDS.minX),ISLAND_BOUNDS.minZ+z/rows*(ISLAND_BOUNDS.maxZ-ISLAND_BOUNDS.minZ)));grid.push(row);}
@@ -155,10 +173,10 @@ export class VillageWorld {
     const beachPositions=[];
     for(const edge of shore){const pairs=edge.map(p=>{const dx=coastDistance(p.x+.01,p.z)-coastDistance(p.x-.01,p.z),dz=coastDistance(p.x,p.z+.01)-coastDistance(p.x,p.z-.01),length=Math.hypot(dx,dz)||1;return[[p.x*CELL,groundHeight(p.x,p.z)-.008,p.z*CELL],[(p.x-dx/length*.20)*CELL,-.14,(p.z-dz/length*.20)*CELL]];});const[a,b]=pairs;for(const v of[a[0],a[1],b[0],b[0],a[1],b[1]])beachPositions.push(...v);}
     const beachGeo=new THREE.BufferGeometry();beachGeo.setAttribute('position',new THREE.Float32BufferAttribute(beachPositions,3));beachGeo.computeVertexNormals();this.scene.add(new THREE.Mesh(beachGeo,material('#c7bd8c',{side:THREE.DoubleSide})));
-    const waterMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 } }, vertexShader: `varying vec3 p; void main(){ p=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`, fragmentShader: `varying vec3 p; uniform float uTime; void main(){ float r=length(p.xy/vec2(1.15,1.0)); float wave=sin(p.x*1.6+p.y*.8+uTime*.55)*sin(p.y*2.4-p.x*.35-uTime*.3); float streak=smoothstep(.88,1.0,wave)*.018; vec3 shallow=vec3(.09,.37,.34); vec3 deep=vec3(.045,.22,.24); vec3 c=mix(shallow,deep,smoothstep(16.,40.,r)); c+=streak; gl_FragColor=vec4(c,1.); #include <tonemapping_fragment> #include <colorspace_fragment> }`.replace(/ #include/g, '\n#include') });
+    const waterMat = createSeaMaterial(CELL);
     this.water = new THREE.Mesh(new THREE.PlaneGeometry(MAP_ZOOM*4, MAP_ZOOM*4), waterMat); this.water.rotation.x = -Math.PI / 2; this.water.position.y = -.075; this.scene.add(this.water);
     // The old footpath leads from the landing to the bell, and anchors the new village.
-    this.pathMaterial = material('#c7b98a');
+    this.pathMaterial = material('#b8a27b');
     const stones = [];
     const pathPoints = [[0,-5],[0,6],[2,6],[2,8.1]];
     for (let segment = 0; segment < pathPoints.length - 1; segment++) {
@@ -194,19 +212,25 @@ export class VillageWorld {
     this.oldTreeMeshes=[trunks,canopies];
     for (const mesh of [trunks,canopies]) { mesh.castShadow = true; mesh.receiveShadow = true; this.scene.add(mesh); }
     const rockSites = listTiles().filter(t => t.kind === 'rock'&&hasNaturalObstacle(t.x,t.z));
-    const rockMesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.6,0),material('#86938a'),rockSites.length * 3);
+    const rockMesh = new THREE.InstancedMesh(quarryStoneGeometry(),material('#ffffff',{vertexColors:true}),rockSites.length * 3);
     rockSites.forEach((t,i)=>{ for(let j=0;j<3;j++) {
-      const x=t.x+(rand(t.x,j)-.5)*.7, z=t.z+(rand(j,t.z)-.5)*.7, s=.35+rand(i,j)*.75;
-      this.setInstance(rockMesh,i*3+j,x*CELL,groundHeight(x,z)+s*.2,z*CELL,s,s*.75,s*1.25,rand(i,j)*6);
-      const key=`${t.x},${t.z}`; if(!this.decor.has(key)) this.decor.set(key,[]); this.decor.get(key).push({meshes:[rockMesh],index:i*3+j,matrix:matrix.clone()});
+      const x=t.x+(rand(t.x,t.z,3*j+1)-.5)*.83, z=t.z+(rand(t.x,t.z,3*j+2)-.5)*.83, s=.39+rand(t.x,t.z,3*j+3)*.79;
+      this.setInstance(rockMesh,i*3+j,x*CELL,groundHeight(x,z)+s*.13,z*CELL,s,s*(.82+.36*rand(i,j,16)),s*1.20,rand(i,j,18)*TAU);
+      const key=`${t.x},${t.z}`; if(!this.decor.has(key)) this.decor.set(key,[]); this.decor.get(key).push({depositId:key,meshes:[rockMesh],index:i*3+j,matrix:matrix.clone()});
     }});
     rockMesh.userData.rockSites=rockSites;
     rockMesh.castShadow=true; rockMesh.receiveShadow=true; this.scene.add(rockMesh);
     const flowerSites=[];
     for(let i=0;i<3200;i++) { const x=ISLAND_BOUNDS.minX+rand(i,0)*(ISLAND_BOUNDS.maxX-ISLAND_BOUNDS.minX),z=ISLAND_BOUNDS.minZ+rand(i,1)*(ISLAND_BOUNDS.maxZ-ISLAND_BOUNDS.minZ); if(terrainAt(x,z).kind==='grass'&&Math.abs(x)>.9&&isLand(x+.7,z+.7)&&isLand(x-.7,z-.7)) flowerSites.push({x,z}); }
-    const flowerGeo=new THREE.ConeGeometry(.045,.14,4); flowerGeo.rotateX(.12);
-    const flowers=new THREE.InstancedMesh(flowerGeo,material('#d8d99b'),flowerSites.length);
-    flowerSites.forEach((p,i)=>{this.setInstance(flowers,i,p.x*CELL,groundHeight(p.x,p.z)+.06,p.z*CELL,1,1,1,rand(i,5)*6);flowers.setColorAt(i,new THREE.Color(['#e8d89b','#c5cc7a','#d6bca4','#749558'][i%4]));}); this.scene.add(flowers);this.flowers=flowers;this.flowerCount=flowerSites.length;
+    const flowers = new THREE.InstancedMesh(meadowTuftGeometry(),
+      material('#ffffff',{vertexColors:true,side:THREE.DoubleSide}),flowerSites.length);
+    const springFlowers=seasonPalette('spring').flowers.map(hex=>new THREE.Color(hex));
+    flowerSites.forEach((p,i)=>{
+      const size=.68+.59*rand(i,5);
+      this.setInstance(flowers,i,p.x*CELL,groundHeight(p.x,p.z)-.008,p.z*CELL,size,size,size,rand(i,6)*TAU);
+      flowers.setColorAt(i,springFlowers[i%springFlowers.length]);
+    });
+    this.scene.add(flowers);this.flowers=flowers;this.flowerCount=flowerSites.length;
     // A few distant birds belong to the world; nothing floats over the interface.
     const wingGeo = new THREE.BufferGeometry(); wingGeo.setAttribute('position',new THREE.Float32BufferAttribute([-.24,0,.02,0,.04,0,0,.04,0,.24,0,.02],3));
     for(let i=0;i<3;i++) { const bird=new THREE.LineSegments(wingGeo,new THREE.LineBasicMaterial({color:'#f2e7ce'})); this.scene.add(bird);this.birds.push(bird); }
@@ -236,8 +260,7 @@ export class VillageWorld {
       const {position, color:colors}=this.land.geometry.attributes;
       for(let i=0;i<position.count;i++){
         const x=position.getX(i)/CELL,z=position.getZ(i)/CELL;
-        color.copy(grass).lerp(shade,Math.max(0,Math.sin(x*.4+z*.7))*.35);
-        color.lerp(sand,THREE.MathUtils.clamp((1.02-coastDistance(x,z))/.78,0,1)).multiplyScalar(.97+rand(x,z)*.055);
+        groundTint(color,x,z,grass,shade,sand);
         colors.setXYZ(i,color.r,color.g,color.b);
       }
       colors.needsUpdate=true;
@@ -282,13 +305,79 @@ export class VillageWorld {
     this.treeSites.forEach((site,i)=>{const tree=treeState(this.state,site.id);if(tree.growth!==-1||this.occupiedDecor?.has(`${site.tile.x},${site.tile.z}`))this.stumps.setMatrixAt(i,hidden);else this.setInstance(this.stumps,i,site.x*CELL,groundHeight(site.x,site.z)+.11,site.z*CELL,site.s,site.s,site.s);});
     this.stumps.instanceMatrix.needsUpdate=true;this.stumps.computeBoundingSphere();
   }
+  syncMinerals(){
+    if(!this.state||!this.decor)return;
+    const signature=JSON.stringify(this.state.minerals?.deposits||{});if(signature===this.mineralSignature)return;this.mineralSignature=signature;
+    const hidden=new THREE.Matrix4().makeScale(0,0,0),shown=new THREE.Matrix4();
+    for(const[key,pieces]of this.decor)for(const p of pieces)if(p.depositId){
+      const fraction=depositFraction(this.state,p.depositId),size=.16+.84*Math.cbrt(fraction);
+      const m=this.occupiedDecor?.has(key)?hidden:shown.copy(p.matrix).scale(new THREE.Vector3(size,size,size));
+      for(const mesh of p.meshes){mesh.setMatrixAt(p.index,m);mesh.instanceMatrix.needsUpdate=true;}
+    }
+  }
+  updateLivestock(dt,speed){
+    if(!this.state)return;
+    this.animalClock=(this.animalClock||0)+Math.min(.1,dt)*speed;
+    for(const b of this.state.buildings){
+      const status=herdStatus(this.state,b),root=this.buildings.get(b.id);if(!status||!root)continue;
+      const animals=root.userData.animals||=new Map(),ids=new Set(status.herd.animals.map(a=>a.id));
+      for(const[id,animal]of animals)if(!ids.has(id)){this.disposePresentation(animal);animals.delete(id);}
+      status.herd.animals.forEach((a,i)=>{
+        let animal=animals.get(a.id);
+        if(!animal){animal=this.clone(status.spec.model);animal.userData.legs=[];animal.traverse(o=>{if(!o.isMesh&&o.name.startsWith(status.spec.name+'_head'))animal.userData.head=o;else if(!o.isMesh&&o.name.startsWith(status.spec.name+'_leg'))animal.userData.legs.push(o);});root.add(animal);animals.set(a.id,animal);}
+        const goat=b.type==='pasture',cols=goat?4:4,row=Math.floor(i/cols),column=i%cols,t=this.animalClock+a.id*2.37,phase=t*.45+i;
+        const small=a.age<status.spec.mature?.58+.42*a.age/status.spec.mature:1;
+        const x=goat?(column-1.5)*.29:[-.49,-.30,.30,.49][column],z=(goat?-.12:.04)+row*(goat?.40:.19);
+        // Each animal stays in its own patch, clear of fences, trough and ramp.
+        const active=!this.reduced&&b.status==='ready',wander=active?Math.sin(phase)*.018:0;
+        animal.scale.setScalar(small);animal.position.set(x+wander,root.userData.model.position.y+.055,z);
+        animal.rotation.y=(goat?0:Math.PI*.12)+(active?Math.sin(phase*.6)*.12:0);
+        const peck=active?Math.pow(Math.max(0,Math.sin(t*(goat?.8:1.7))),4):0;
+        if(animal.userData.head)animal.userData.head.rotation.x=peck*(goat?.55:.9);
+        animal.userData.legs.forEach((leg,k)=>leg.rotation.x=active?Math.cos(phase)*(k%2?1:-1)*.035:0);
+        animal.userData.animalId=a.id;animal.userData.young=small<1;
+      });
+    }
+  }
   setInstance(mesh,i,x,y,z,sx,sy,sz,ry=0) { position.set(x,y,z);quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),ry);scale.set(sx,sy,sz);matrix.compose(position,quaternion,scale);mesh.setMatrixAt(i,matrix); }
-  dock() {
-    const pieces=[],posts=[],wood=material('#927852'),postMat=material('#655b44');
-    for(let i=0;i<16;i++){const z=13.5+i*.28,y=Math.max(.20,groundHeight(2,z/CELL)+.09);const g=new THREE.BoxGeometry(1.9,.11,.25);g.translate(3.6,y,z);pieces.push(g);}
-    for(let i=0;i<4;i++)for(const side of [-1,1]){const g=new THREE.CylinderGeometry(.075,.1,.95,7);g.translate(3.6+side*.83,-.03,13.7+i*1.25);posts.push(g);}
-    for(const [geos,mat] of [[pieces,wood],[posts,postMat]]){const m=new THREE.Mesh(mergeGeometries(geos),mat);m.castShadow=true;m.receiveShadow=true;m.userData.landmark='landing';this.landmarks.push(m);this.scene.add(m);}
-    const crates=new THREE.Group();const crate=new THREE.Mesh(new THREE.BoxGeometry(.48,.38,.44),material('#aa8250'));crate.position.set(4.12,.44,16.9);crate.castShadow=true;crates.add(crate);for(const x of[-.18,.18]){const strap=new THREE.Mesh(new THREE.BoxGeometry(.045,.4,.46),material('#6e6749'));strap.position.set(4.12+x,.44,16.9);crates.add(strap);}crates.userData.landmark='landing';this.landmarks.push(crates);this.scene.add(crates);
+  async loadHarbor() {
+    const harbor = await new GLTFLoader().loadAsync('./assets/saltwick-harbor.glb?v=20261117-fishing-2');
+    const quay = harbor.scene.getObjectByName('Fish_quay');
+    const lugger = harbor.scene.getObjectByName('Ochre_lugger');
+    for(const name of ['fishingpier','tool_fishingrod','cargo_fish']) {
+      const model=harbor.scene.getObjectByName(name);
+      model.traverse(o=>{if(o.isMesh)o.castShadow=o.receiveShadow=true;});
+      this.templates.set(name,model);
+    }
+    quay.position.set(3.6, .03, 15.6);
+    lugger.position.set(2.0, -.08, 18.15);
+    lugger.rotation.y = -.14;
+    for (const model of [quay, lugger]) {
+      model.userData.landmark = 'landing';
+      model.traverse(part => { if (part.isMesh) part.castShadow = part.receiveShadow = true; });
+      this.landmarks.push(model);
+      this.scene.add(model);
+    }
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(14,14),
+      new THREE.ShadowMaterial({color:'#163f40',opacity:.32,depthWrite:false}));
+    shadow.rotation.x = -Math.PI/2;
+    shadow.position.set(quay.position.x,this.water.position.y+.003,quay.position.z);
+    shadow.receiveShadow = true;
+    this.scene.add(shadow);
+    this.lugger = lugger;
+  }
+  showPierSites(show) {
+    if(this.pierMarkers){this.disposePresentation(this.pierMarkers);this.pierMarkers=null;}
+    if(!show || !this.state) return;
+    const sites=listTiles().filter(t=>this.state.frontier.claims.includes(t.regionId) &&
+      pierOrientations(t.x,t.z).length && canBuild(this.state,'fishingpier',t.x,t.z).entrance);
+    if(!sites.length)return;
+    const ring=new THREE.RingGeometry(.28,.44,24);
+    ring.rotateX(-Math.PI/2);
+    const markers=new THREE.InstancedMesh(ring,new THREE.MeshBasicMaterial({color:'#317568',depthTest:false}),sites.length);
+    sites.forEach((p,i)=>this.setInstance(markers,i,p.x*CELL,groundHeight(p.x,p.z)+.05,p.z*CELL,1,1,1));
+    markers.renderOrder=9;markers.userData={ownsMaterial:true,ownsGeometry:true};
+    this.scene.add(markers);this.pierMarkers=markers;
   }
   createPreview() {
     this.highlight=new THREE.Group();
@@ -403,7 +492,7 @@ export class VillageWorld {
     const capacity=c.isPreview?`${Math.round(c.potentialCapacity)} beds when ready`:`${Math.round(c.allocatedBeds||0)} / ${Math.round(c.capacity)} supplied beds used`;
     this.setCueLabel(data.label,[`${c.kind.toUpperCase()} · ${c.radius}-SPACE REACH`,`${c.inRangeHomes} homes in reach · ${c.outsideHomes} outside`,capacity],data.tint);
   }
-  selectCitizen(id){this.selectedCitizenId=id||null;if(id){this.selectedId=null;this.selectedBuilding=null;this.selectionRing.visible=false;this.showEntrance(null);}this.updateWorkerCues();}
+  selectCitizen(id){if(this.followingFisher!==id)this.followingFisher=null;this.selectedCitizenId=id||null;if(id){this.selectedId=null;this.selectedBuilding=null;this.selectionRing.visible=false;this.showEntrance(null);}this.updateWorkerCues();}
   hoverCitizen(id){this.hoveredCitizenId=id||null;}
   citizenCue(id){return residentCue(this.actors.find(actor=>actor.citizen.id===id),this.state,this.cuesPaused!==false);}
   syncWorkerBadges(){
@@ -418,7 +507,10 @@ export class VillageWorld {
     const actor=this.actors.find(a=>a.citizen.id===this.hoveredCitizenId)||this.actors.find(a=>a.citizen.id===this.selectedCitizenId);
     if(actor&&!this.workerLabel){this.workerLabel=this.makeCueLabel(252,69);if(this.workerLabel){this.workerLabel.userData.titleColor='#fff0cc';this.scene.add(this.workerLabel);}this.workerRing=this.frontierGroundRing(.35,'#fff0a5',.055);this.workerRing.material.depthTest=false;this.workerRing.renderOrder=14;this.scene.add(this.workerRing);}
     if(this.workerLabel){this.workerLabel.visible=!!actor;if(actor){const cue=this.citizenCue(actor.citizen.id);this.setCueLabel(this.workerLabel,[`${cue.name} · ${cue.job}`,cue.action,cue.paused?'PAUSED · resume time to continue':cue.workplace||'A neighbor of your village'],cue.color);this.workerLabel.position.copy(actor.root.position);this.workerLabel.position.y+=1.03;}}
-    if(this.workerRing){this.workerRing.visible=!!actor;if(actor)this.workerRing.position.set(actor.root.position.x,groundHeight(actor.root.position.x/CELL,actor.root.position.z/CELL)+.07,actor.root.position.z);}
+    if(this.workerRing){
+      this.workerRing.visible=!!actor;
+      if(actor){this.workerRing.position.copy(actor.root.position);this.workerRing.position.y+=.035;}
+    }
     if(!this.workerBadges)return;
     this.workerBadges.visible=this.zoom<=38&&!this.highlight?.visible&&!this.serviceArea?.visible;
     if(!this.workerBadges.visible)return;
@@ -464,9 +556,9 @@ export class VillageWorld {
   makeBuilding(b){
     const root=new THREE.Group(),model=this.clone(b.type,b.level||1),center=groundHeight(b.x,b.z);
     const corners=[[-.44,-.44],[-.44,.44],[.44,-.44],[.44,.44]].map(([x,z])=>groundHeight(b.x+x,b.z+z));
-    const top=Math.max(center,...corners),bottom=Math.min(center,...corners)-.07,depth=top-bottom;
+    const top=b.type==='fishingpier'?center+.16:Math.max(center,...corners),bottom=Math.min(center,...corners)-.07,depth=top-bottom;
     model.position.y=top-center;
-    if(b.level>1&&b.type!=='cottage')model.scale.y=1+(b.level-1)*.11;
+    if(b.level>1&&!['cottage','pasture','henhouse','assay'].includes(b.type))model.scale.y=1+(b.level-1)*.11;
     root.add(model);
     const active=b.status&&b.status!=='ready';
     const bounds=new THREE.Box3().setFromObject(model),height=bounds.max.y;
@@ -475,7 +567,7 @@ export class VillageWorld {
     if(b.type==='bell'&&!b.restored)model.traverse(o=>{if(o.isMesh){if(!o.userData.ownsMaterial)o.material=o.material.clone();o.material.color.lerp(new THREE.Color('#7e8573'),.45);o.userData.ownsMaterial=true;}});
     let scaffold;
     if(active){scaffold=this.clone('construction');scaffold.position.y=top-center;root.add(scaffold);}
-    if((depth>.1||active)&&b.type!=='hearth'){
+    if((depth>.1||active)&&b.type!=='hearth'&&b.type!=='fishingpier'){
       const foundation=new THREE.Mesh(new THREE.BoxGeometry(1.51,Math.max(.1,depth),1.49),material('#a8aa8d'));
       foundation.position.y=(top+bottom)/2-center;foundation.castShadow=true;foundation.receiveShadow=true;foundation.userData.ownsGeometry=true;foundation.userData.ownsMaterial=true;root.add(foundation);
     }
@@ -646,6 +738,7 @@ export class VillageWorld {
     if(this.state&&this.state!==state){
       // Separate local towns deliberately reuse citizen/building IDs. A newly
       // restored snapshot must never inherit another town's visual routes.
+      this.followingFisher=null;this.showPierSites(false);
       for(const actor of this.actors)this.disposePresentation(actor.root);
       this.actors=[];this.layoutSignature=null;this.publicSpots=null;
       this.selectedId=this.selectedBuilding=this.selectedCitizenId=this.hoveredCitizenId=null;
@@ -669,11 +762,11 @@ export class VillageWorld {
     }
     if(changed){
       const occupied=woodlandOccupancy(state);
-      this.occupiedDecor=occupied; this.woodlandSignature=null;
+      this.occupiedDecor=occupied; this.woodlandSignature=null;this.mineralSignature=null;
       for(const [key,pieces]of this.decor)for(const p of pieces)if(!p.treeId){const m=occupied.has(key)?new THREE.Matrix4().makeScale(0,0,0):p.matrix;for(const mesh of p.meshes){mesh.setMatrixAt(p.index,m);mesh.instanceMatrix.needsUpdate=true;}}
       this.updatePaths();
     }
-    this.syncWoodland();this.syncSeasonVisuals();
+    this.syncWoodland();this.syncMinerals();this.syncSeasonVisuals();
     const reserved=new Set((state.frontier?.units||[]).filter(u=>!['dead','released'].includes(u.status)&&u.citizenId).map(u=>u.citizenId));
     const citizens=(state.citizens||Array.from({length:state.population},(_,i)=>({id:`preview-${i}`,name:`Islander ${i+1}`,job:'idle',workplace:null}))).filter(c=>!reserved.has(c.id));
     const ids=new Set(citizens.map(c=>c.id));
@@ -701,8 +794,8 @@ export class VillageWorld {
     const originalShirt=new THREE.Color('#de6548'),shirtColor=new THREE.Color(JOBS[job]?.color||'#5b8d9c');
     root.traverse(o=>{if(!o.isMesh||!o.geometry.attributes.color)return;const source=o.geometry.attributes.color;let matches=false;for(let i=0;i<source.count;i++)if(Math.abs(source.getX(i)-originalShirt.r)<.012&&Math.abs(source.getY(i)-originalShirt.g)<.012&&Math.abs(source.getZ(i)-originalShirt.b)<.012){matches=true;break;}if(!matches)return;o.geometry=o.geometry.clone();o.userData.ownsGeometry=true;const colors=o.geometry.attributes.color;for(let i=0;i<colors.count;i++)if(Math.abs(colors.getX(i)-originalShirt.r)<.012&&Math.abs(colors.getY(i)-originalShirt.g)<.012&&Math.abs(colors.getZ(i)-originalShirt.b)<.012)colors.setXYZ(i,shirtColor.r,shirtColor.g,shirtColor.b);colors.needsUpdate=true;});
   }
-  cargoKind(citizen){const type=this.state?.buildings.find(b=>b.id===citizen.workplace)?.type;return ({lumber:'logs',quarry:'stone',mine:'ore',sawmill:'planks',smith:'iron',toolmaker:'tools',bakery:'bread',orchard:'fruit',garden:'vegetables',farm:'grain',windmill:'flour',flaxfield:'flax',weaver:'cloth',brewery:'ale',market:'fruit'})[type]||'grain';}
-  jobTool(citizen){const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace);return citizen.job==='farmer'&&workplace?.type==='orchard'?'tool_basket':JOB_TOOLS[citizen.job]||null;}
+  cargoKind(citizen){const type=this.state?.buildings.find(b=>b.id===citizen.workplace)?.type;return ({fishingpier:'fish',pasture:'milk',henhouse:'eggs',lumber:'logs',quarry:'stone',mine:'ore',sawmill:'planks',smith:'iron',toolmaker:'tools',bakery:'bread',orchard:'fruit',garden:'vegetables',farm:'grain',windmill:'flour',flaxfield:'flax',weaver:'cloth',brewery:'ale',market:'fruit'})[type]||'grain';}
+  jobTool(citizen){if(citizen.job==='fisher')return 'tool_fishingrod';const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace);return citizen.job==='farmer'&&workplace?.type==='orchard'?'tool_basket':JOB_TOOLS[citizen.job]||null;}
   addActor(index,citizen={id:`preview-${index}`,name:'Islander',job:'idle',workplace:null}){
     const workplace=this.state?.buildings.find(b=>b.id===citizen.workplace),homes=this.state?.buildings.filter(b=>(getBuildingSpec(b.type,b.level||1)?.housing||0)>0)||[];
     const anchor=workplace||homes[index%Math.max(1,homes.length)]||{x:1,z:2},angle=(anchor.rotation||0)*Math.PI/2;
@@ -714,7 +807,9 @@ export class VillageWorld {
     root.rotation.order='YXZ';
     this.colorCitizen(root,citizen.job);
     const toolType=this.jobTool(citizen),supportTool=toolType==='tool_basket'||toolType==='tool_book',toolArm=supportTool?'left_arm':'right_arm';
-    let tool;if(toolType&&limbs[toolArm]){tool=this.clone(toolType);tool.position.set(supportTool?-.04:.04,-.17,.04);if(!supportTool&&toolType!=='tool_spear')tool.rotation.x=Math.PI/2;if(toolType==='tool_axe')tool.rotation.y=-Math.PI/2;limbs[toolArm].add(tool);}
+    let tool;if(toolType&&limbs[toolArm]){tool=this.clone(toolType);tool.position.set(supportTool?-.04:.04,-.17,.04);if(!supportTool&&toolType!=='tool_spear')tool.rotation.x=Math.PI/2;if(toolType==='tool_axe')tool.rotation.y=-Math.PI/2;if(toolType==='tool_fishingrod'){
+        tool.position.set(.115,.43,.14);tool.rotation.set(0,0,0);root.add(tool);
+      }else limbs[toolArm].add(tool);}
     const cargo=this.cargoKind(citizen);const parcel=this.clone('cargo_'+cargo);parcel.position.set(0,.27,.25);parcel.visible=false;parcel.userData.cargo=cargo;root.add(parcel);
     root.userData.citizen={...citizen};this.scene.add(root);
     const actor={root,limbs,parcel,tool,toolType,toolArm,path:[],index,wait:index*.2,phase:index*2,goal:null,station:null,activity:null,workTime:0,lastCell:start,citizen:{...citizen},workplace:citizen.workplace};this.actors.push(actor);return actor;
@@ -1061,11 +1156,11 @@ export class VillageWorld {
     if(a.toolType==='tool_book')left=-.75;
     if(working){
       const job=a.citizen.job,rate={builder:4.6,lumberjack:3.6,quarryworker:3.9,miner:3.8,smith:4.4,carpenter:3.4,farmer:2.5,forager:2.1,medic:2.2,scholar:2.3}[job]||2.4;
-      const previous=a.phase;a.phase+=dt*rate;const wave=Math.sin(a.phase);const impactPhase=job==='smith'?0:Math.PI/2;if(Math.floor((previous-impactPhase)/TAU)!==Math.floor((a.phase-impactPhase)/TAU))this.emitSound(({builder:'hammer',lumberjack:'axe',quarryworker:'chisel',miner:'chisel',smith:'anvil',carpenter:'saw',farmer:'rustle',forager:'rustle',weaver:'cloth',baker:'cargo',scholar:'page'})[job],a.root.position,.65);
+      const previous=a.phase;a.phase+=dt*rate;const wave=Math.sin(a.phase);const impactPhase=job==='smith'?0:Math.PI/2;if(Math.floor((previous-impactPhase)/TAU)!==Math.floor((a.phase-impactPhase)/TAU))this.emitSound(({builder:'hammer',lumberjack:'axe',quarryworker:'chisel',miner:'chisel',smith:'anvil',carpenter:'saw',farmer:'rustle',herder:'rustle',forager:'rustle',weaver:'cloth',baker:'cargo',scholar:'page'})[job],a.root.position,.65);
       if(['builder','lumberjack','quarryworker','miner','smith'].includes(job)){right=-1.15+wave*.62;left=-.35;lean=.045+Math.max(0,wave)*.045;}
       else if(job==='carpenter'){right=-1.02+wave*.20;left=-.68+wave*.12;lean=.10;}
       else if(job==='farmer'&&a.toolType==='tool_hoe'){right=.12+wave*.42;left=-.20;lean=.17+wave*.025;}
-      else if(job==='forager'||job==='farmer'){right=-.12+wave*.40;left=-.12;lean=.12+Math.max(0,wave)*.08;}
+      else if(job==='forager'||job==='farmer'||job==='herder'){right=-.12+wave*.40;left=-.12;lean=.12+Math.max(0,wave)*.08;}
       else if(['scholar','chaplain','steward'].includes(job)){left=-.86;right=-1.00+wave*.12;lean=.04;}
       else if(job==='medic'){left=-.16;right=-.77+wave*.22;lean=.09;}
       else if(job==='guard'){right=-.04;left=0;}
@@ -1076,8 +1171,37 @@ export class VillageWorld {
     a.root.rotation.x+=(lean-a.root.rotation.x)*Math.min(1,dt*7);
     if(a.citizen.job==='smith'&&a.tool){if(working&&a.station)this.smithPose(a);else a.tool.rotation.set(Math.PI/2,0,0);}
   }
+  followFisher(id) { this.followingFisher=id;this.targetZoom=11; }
+  updateFishers(dt) {
+    for(const a of this.actors){
+      if(a.citizen.job!=='fisher')continue;
+      const pier=this.state.buildings.find(b=>b.id===a.workplace);
+      if(!pier)continue;
+      const trip=pier.trip, pos=fisherPosition(pier,this.state.subsecond);
+      const door=pierPoint(pier,1), tip=pierPoint(pier,-1);
+      const dx=door.x-pier.x,dz=door.z-pier.z;
+      const along=(pos.x-pier.x)*dx+(pos.z-pier.z)*dz;
+      const across=(pos.x-pier.x)*dz-(pos.z-pier.z)*dx;
+      const toward=Math.abs(across)<.01 && along>=-1 ? THREE.MathUtils.clamp(1-along,0,1) : 0;
+      const height=groundHeight(pos.x,pos.z)*(1-toward)+(groundHeight(pier.x,pier.z)+.29)*toward;
+      a.root.position.set(pos.x*CELL,height,pos.z*CELL);
+      const fishing=trip?.stage==='casting',loaded=trip && ['returning','unloading'].includes(trip.stage);
+      const heading=trip?.next?Math.atan2(trip.next.x-trip.x,trip.next.z-trip.z):fishing?Math.atan2(tip.x-pier.x,tip.z-pier.z):a.root.rotation.y;
+      if(dt>0)this.turnActor(a,heading,dt);else a.root.rotation.y=heading;
+      const phase=(this.state.time+this.state.subsecond)*5, gait=trip?.next?Math.sin(phase)*.45:0;
+      for(const [name,limb] of Object.entries(a.limbs)){
+        const arm=name.includes('arm'),sign=name.startsWith('left')?1:-1;
+        limb.rotation.set(arm&&loaded?-.78:arm&&fishing?-.68+Math.sin(phase*.56)*.08:gait*sign*(arm?-1:1),0,0);
+      }
+      a.parcel.visible=!!loaded;
+      if(a.tool){a.tool.visible=fishing;a.tool.rotation.x=-.05+.09*Math.sin(phase*.56);}
+      a.root.userData.workState=fishing?'fishing':loaded?'returning':'walking';
+      if(this.followingFisher===a.citizen.id)this.pan.set(pos.x*CELL,0,pos.z*CELL);
+    }
+  }
   updateActors(dt){
     for(const a of this.actors){const p=a.root.position;
+      if(a.citizen.job==='fisher')continue;
       if(a.station&&!a.station.invalidated&&a.station.signature!==this.buildings.get(a.station.buildingId)?.userData.signature){this.resetActorRoute(a);a.station.invalidated=true;}
       if(a.path.length){
         const n=a.path[0];if(!this.actorWaypointValid(n)){this.resetActorRoute(a);continue;}
@@ -1133,9 +1257,9 @@ export class VillageWorld {
   updateCamera(dt){const a=1-Math.exp(-dt*9);this.azimuth+=(this.targetAzimuth-this.azimuth)*a;this.zoom+=(this.targetZoom-this.zoom)*(1-Math.exp(-dt*14));this.target.lerp(new THREE.Vector3(this.pan.x,Math.max(.65,groundHeight(this.pan.x/CELL,this.pan.z/CELL)),this.pan.z),a);const radius=Math.max(43,this.zoom*1.1);this.camera.position.set(this.target.x+Math.sin(this.azimuth)*radius,this.target.y+radius*36/43,this.target.z+Math.cos(this.azimuth)*radius);this.sun.position.set(this.target.x-23,this.target.y+34,this.target.z+15);this.sun.target.position.copy(this.target);const shadowSpan=Math.max(29,Math.min(78,this.zoom*.72));Object.assign(this.sun.shadow.camera,{left:-shadowSpan,right:shadowSpan,top:shadowSpan,bottom:-shadowSpan,far:180});this.sun.shadow.camera.updateProjectionMatrix();this.camera.lookAt(this.target);const aspect=this.width/this.height;this.camera.left=-this.zoom*aspect/2;this.camera.right=this.zoom*aspect/2;this.camera.top=this.zoom/2;this.camera.bottom=-this.zoom/2;this.camera.updateProjectionMatrix();}
   rotate(amount){this.targetAzimuth+=amount*Math.PI/4;this.onCamera?.();}
   zoomBy(amount){this.targetZoom=THREE.MathUtils.clamp(this.targetZoom+amount,10,MAP_ZOOM);this.onCamera?.();}
-  home(){this.pan.set(0,0,0);this.targetZoom=this.width<700?43:32;this.targetAzimuth=Math.PI/4;}
+  home(){this.followingFisher=null;this.pan.set(0,0,0);this.targetZoom=this.width<700?43:32;this.targetAzimuth=Math.PI/4;}
   focus(b){this.pan.set(b.x*CELL,0,b.z*CELL);this.targetZoom=16;}
-  moveCamera(dx,dz){const angle=this.azimuth;this.pan.x+=dx*Math.cos(angle)+dz*Math.sin(angle);this.pan.z+=-dx*Math.sin(angle)+dz*Math.cos(angle);this.pan.x=THREE.MathUtils.clamp(this.pan.x,ISLAND_BOUNDS.minX*CELL,ISLAND_BOUNDS.maxX*CELL);this.pan.z=THREE.MathUtils.clamp(this.pan.z,ISLAND_BOUNDS.minZ*CELL,ISLAND_BOUNDS.maxZ*CELL);}
+  moveCamera(dx,dz){this.followingFisher=null;const angle=this.azimuth;this.pan.x+=dx*Math.cos(angle)+dz*Math.sin(angle);this.pan.z+=-dx*Math.sin(angle)+dz*Math.cos(angle);this.pan.x=THREE.MathUtils.clamp(this.pan.x,ISLAND_BOUNDS.minX*CELL,ISLAND_BOUNDS.maxX*CELL);this.pan.z=THREE.MathUtils.clamp(this.pan.z,ISLAND_BOUNDS.minZ*CELL,ISLAND_BOUNDS.maxZ*CELL);}
   pick(clientX,clientY){
     const rect=this.canvas.getBoundingClientRect();this.pointer.set((clientX-rect.left)/rect.width*2-1,-(clientY-rect.top)/rect.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);
     const objects=[...this.actors.map(a=>a.root),...this.buildings.values(),...this.landmarks,...this.discoveryModels.values(),...this.fortifications.values(),...this.troops.values()].map(o=>o.root||o);
@@ -1197,7 +1321,7 @@ export class VillageWorld {
     // Normal pointerup already removed this pointer. Unexpected capture loss
     // cancels the entire gesture, so a later release cannot become a build tap.
     c.addEventListener('lostpointercapture',e=>{if(this.pointers.has(e.pointerId))endGesture();});
-    c.addEventListener('pointerleave',e=>{if(!drag)this.onHover?.(null,{pointerType:e.pointerType});});c.addEventListener('contextmenu',e=>e.preventDefault());
+    c.addEventListener('pointerleave',e=>{if(!drag)this.onHover?.(null,{pointerType:e.pointerType,relatedTarget:e.relatedTarget});});c.addEventListener('contextmenu',e=>e.preventDefault());
     c.addEventListener('wheel',e=>{e.preventDefault();this.targetZoom=wheelZoom(this.targetZoom,e.deltaY,e.deltaMode,this.height,10,MAP_ZOOM);this.onCamera?.();},{passive:false});
   }
   render(dt,{speed=1,playing=true,dayTime=.25,won=false}={}){
@@ -1215,13 +1339,18 @@ export class VillageWorld {
       if(b.type==='bell'&&b.restored&&!this.reduced){o.traverse(n=>{if(n.name==='bell_body')n.rotation.x=Math.sin(this.clock*2)*.1;});}
     }
     if(playing&&speed>0)this.updateActors(Math.min(.1,dt)*Math.min(speed,2));
-    this.updateGardenCrops();this.updateWorkerCues();this.updateWorldCues();
+    this.updateFishers(playing && speed>0?dt:0);
+    this.updateLivestock(dt,playing&&speed>0?speed:0);this.updateGardenCrops();this.updateWorkerCues();this.updateWorldCues();
     this.updateFrontier(dt,playing&&speed>0);
     this.updatePressure();
+    if (this.lugger && !this.reduced) {
+      this.lugger.position.y = -.08 + .025 * Math.sin(this.clock * .9);
+      this.lugger.rotation.z = .014 * Math.sin(this.clock * .72);
+    }
     if(this.boat){const gx=won?5.45:17,gz=won?17.3:22;this.boat.position.x+=(gx-this.boat.position.x)*Math.min(1,dt*.18);this.boat.position.z+=(gz-this.boat.position.z)*Math.min(1,dt*.18);this.boat.position.y=-.10+(this.reduced?0:Math.sin(this.clock*1.2)*.045);this.boat.rotation.z=this.reduced?0:Math.sin(this.clock*.9)*.025;}
     // Daylight stays readable; a gentle late-afternoon warmth replaces a black night.
     const warmth=Math.max(0,Math.sin(dayTime*Math.PI)),sun=this.seasonColors?.sun||[1,.94,.85];this.sun.color.setRGB(sun[0],sun[1]-warmth*.035,sun[2]-warmth*.065);
-    if(this.state && Math.floor(this.clock*2)!==this.lastWoodlandFrame){this.lastWoodlandFrame=Math.floor(this.clock*2);this.syncWoodland();this.syncSeasonVisuals();}
+    if(this.state && Math.floor(this.clock*2)!==this.lastWoodlandFrame){this.lastWoodlandFrame=Math.floor(this.clock*2);this.syncWoodland();this.syncMinerals();this.syncSeasonVisuals();}
     this.renderer.render(this.scene,this.camera);
   }
   diagnostics(){return{drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,actors:this.actors.length,buildings:this.buildings.size,troops:this.troops.size,fortifications:this.fortifications.size,neighbors:this.neighborModels.size,pixelRatio:this.renderer.getPixelRatio(),webgl:this.renderer.capabilities.isWebGL2};}

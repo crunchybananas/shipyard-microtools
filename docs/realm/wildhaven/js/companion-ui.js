@@ -120,7 +120,7 @@ export function createCompanionUI({ store, getState, onStateChange, beforeOpen, 
       }
       row.append(card);
     }
-    content.append(row, el('p', 'companion-fine', 'Towns wait while you’re away. Reloading always brings you home.'));
+    content.append(row, el('p', 'companion-fine', 'Towns wait while you’re away. Reloading returns to the last town you managed.'));
   }
   function cargoField(labelText, key, defaultResource, optional = false) {
     const label = el('label', 'companion-field', labelText), row = el('div', 'companion-cargo-field'), select = el('select'), amount = el('input');

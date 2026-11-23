@@ -119,3 +119,23 @@ route, four endings, before/after views and every readable page. The exporter is
 encounter fixtures explicitly. The Blender source is
 [tools/blender/harbor-rooms.blend](tools/blender/harbor-rooms.blend), reproducible
 with the Python generator beside it.
+
+### Arrival-beach sand prototype
+
+Sand retains its continuous analytic wind relief, with filtered mineral colour at
+close range and a smoother wet swash band. A session-only 16 m patch around
+`(4, -104)` records alternating heel/sole impressions while walking on dry, gentle
+sand. The terrain shader reads one 1024² mask for shallow depression lighting;
+there are no extra meshes or collision changes. Up to 64 marks fade over 90 seconds,
+wash away when reached by the tide, and clear on a new run. Marks are excluded from
+the miniature and fade with viewing distance. Nothing is written to saves or the
+shared ledger. Walk along the upper arrival beach, then look back and down to review.
+
+Run the focused browser checks with
+`tools/harness/one.sh sand-tracks.mjs terrain-finish.mjs`.
+
+The pebble apron now feathers into the sand instead of using a hard noise cutout.
+Its warped colour and normal samples stay aligned. A seeded fringe of small,
+partly buried stones extends beyond the bed with decreasing density, using one
+instanced draw and no collision. Run `tools/harness/one.sh pebble-transition.mjs`
+for the focused rendering and placement check.

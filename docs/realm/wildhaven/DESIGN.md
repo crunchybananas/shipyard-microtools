@@ -12,6 +12,12 @@ The world fills the window. A small village sign anchors the upper left; supplie
 
 Build a cottage, secure food, establish timber and stone production, and bring people home. Siting buildings near natural resources increases production. Food and housing govern arrivals. Restore the old bell when the village is established; the arrival of the ferry is the first ending, with continued building afterward. Placement previews explain constraints before spending. Undo and salvage make experiments forgiving.
 
+## Coastal construction
+
+The fishing pier can be built on a marked stretch of accessible shore. Its entrance faces dry land and the deck extends over water. Once builders finish the pier, assign a resident to fish from the deck. They carry each basket along the village paths and deliver it to the hearth.
+
+A cargo wharf could follow Market trading. Give it a loading berth that serves the existing coastal orders and voyages. Keep the starting landing available so established towns can build along the coast at their own pace.
+
 ## Technology
 
 One existing dependency: vendored Three.js, needed for a real 3D renderer and glTF models. Plain browser modules, HTML, CSS, Web Audio and localStorage. No framework, bundler, physics engine, UI library, external CDN or account. Original Blender source accompanies the exported models.

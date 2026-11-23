@@ -34,7 +34,7 @@ export function createObservedUI({network,beforeOpen,openAccount,cloneModel}) {
     const info=network.info();if(panel.hidden)return;
     status.textContent=info.busy?'Connecting…':info.message||(info.visit?.phase==='observing'?`Visiting ${info.visit.target.name}`:'')||(info.online?'Your town is open to scouts.':'Your town is offline.');
     const linked=info.link?.phase==='ready'&&info.user?.uid===info.link.uid;
-    const signature=JSON.stringify([info.user?.uid,info.link?.phase,info.online,info.busy]);if(signature!==lastLayout){lastLayout=signature;lastList='';sidebar.replaceChildren();list=null;if(linked)renderWorld(info);else renderSetup(info);}
+    const signature=JSON.stringify([info.user?.uid,info.link?.worldId,info.link?.townId,info.link?.name,info.link?.phase,info.online,info.busy]);if(signature!==lastLayout){lastLayout=signature;lastList='';sidebar.replaceChildren();list=null;if(linked)renderWorld(info);else renderSetup(info);}
     if(list&&linked){
       const c=info.center||info.link,nearby=info.claims.filter(t=>Math.abs(t.gx-c.gx)<=3&&Math.abs(t.gz-c.gz)<=3).sort((a,b)=>Math.hypot(a.gx-c.gx,a.gz-c.gz)-Math.hypot(b.gx-c.gx,b.gz-c.gz));
       const listKey=JSON.stringify(nearby.map(t=>[t.uid,t.name,isPresent(info.presences.get(t.uid)),t.uid===info.visit?.target.uid,info.notes[t.uid]?.seenAt]));

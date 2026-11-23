@@ -1,0 +1,61 @@
+{
+  "source": "tools/create_husbandry_assets.py",
+  "assets": {
+    "pasture": {
+      "vertices": 1986,
+      "meshes": 1
+    },
+    "henhouse": {
+      "vertices": 2202,
+      "meshes": 1
+    },
+    "assay": {
+      "vertices": 972,
+      "meshes": 1
+    },
+    "pasture_upgrade": {
+      "vertices": 2190,
+      "meshes": 1
+    },
+    "henhouse_upgrade": {
+      "vertices": 2286,
+      "meshes": 1
+    },
+    "assay_upgrade": {
+      "vertices": 1152,
+      "meshes": 1
+    },
+    "goat": {
+      "vertices": 480,
+      "meshes": 6
+    },
+    "hen": {
+      "vertices": 348,
+      "meshes": 4
+    },
+    "discovery_croft": {
+      "vertices": 264,
+      "meshes": 1
+    },
+    "discovery_survey": {
+      "vertices": 420,
+      "meshes": 1
+    },
+    "discovery_croft_restored": {
+      "vertices": 1470,
+      "meshes": 1
+    },
+    "discovery_survey_restored": {
+      "vertices": 510,
+      "meshes": 1
+    },
+    "cargo_milk": {
+      "vertices": 360,
+      "meshes": 1
+    },
+    "cargo_eggs": {
+      "vertices": 300,
+      "meshes": 1
+    }
+  }
+}

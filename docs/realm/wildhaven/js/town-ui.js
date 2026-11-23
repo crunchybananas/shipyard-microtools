@@ -1,6 +1,8 @@
-import { calendarDay, perMinute, perMinuteGoods, until, duration } from './calendar.js';
+import { mineralStatus } from './minerals.js';
+import { herdStatus, buyLivestock, sellLivestock, setBreeding } from './livestock.js';
+import { CALENDAR_DAY_SECONDS, calendarDay, perMinute, perMinuteGoods, until, duration } from './calendar.js';
 import * as sim from './sim.js';
-import { BUILDINGS, RESOURCES, RESOURCE_NAMES, JOBS, getBuildingSpec } from './catalog.js';
+import { BUILDINGS, RESOURCES, RESOURCE_NAMES, JOBS, getBuildingSpec, getUpgrade } from './catalog.js';
 import * as progression from './progression.js';
 import { pressureOptions } from './pressure.js';
 import { coastalDefenseGuidance } from './defense-guidance.js';
@@ -8,6 +10,7 @@ import { researchRequirements, rankContracts, constructionFeedback } from './cla
 import { resourceChips } from './clarity-ui.js';
 import { pathRequirement } from './path-choice.js';
 import { createResearchMap } from './research-map.js';
+import { researchHUD } from './research-hud.js';
 import { createPressGuard } from './press-guard.js';
 import { resourceDetails } from './resource-details.js';
 import { seasonInfo, festivalQuote, festivalStatus, effectiveMorale } from './seasons.js';
@@ -26,8 +29,9 @@ function btn(label, actionId, onClick, { disabled = false, className = 'small-bu
   const node = el('button', className, label); node.dataset.actionId = actionId; node.disabled = disabled; node.title = title; node.onclick = onClick; return node;
 }
 function progressBar(ratio, paused = false) { const bar = el('div', `work-progress${paused ? ' paused' : ''}`); const fill = el('span'); fill.style.width = `${Math.max(0, Math.min(1, ratio || 0)) * 100}%`; bar.append(fill); return bar; }
-function preserveReplace(container, nodes) {
+export function preserveReplace(container, nodes) {
   const active = container.contains(document.activeElement) ? document.activeElement.dataset.actionId : null;
+  const researchFocus = container.contains(document.activeElement) && !!document.activeElement.closest('.research-work');
   const scroll = container.scrollTop;
   const disclosures = new Map([...container.querySelectorAll('details[data-disclosure]')].map(node => [node.dataset.disclosure, node.open]));
   const innerScroll = new Map([...container.querySelectorAll('[data-scroll-region]')].map(node => [node.dataset.scrollRegion, { left: node.scrollLeft, top: node.scrollTop }]));
@@ -35,7 +39,7 @@ function preserveReplace(container, nodes) {
   for (const node of container.querySelectorAll('details[data-disclosure]')) if (disclosures.has(node.dataset.disclosure)) node.open = disclosures.get(node.dataset.disclosure);
   for (const node of container.querySelectorAll('[data-scroll-region]')) { const prior = innerScroll.get(node.dataset.scrollRegion); if (prior) { node.scrollLeft = prior.left; node.scrollTop = prior.top; } }
   container.scrollTop = scroll;
-  if (active) container.querySelector(`[data-action-id="${CSS.escape(active)}"]`)?.focus({ preventScroll: true });
+  if (active) (container.querySelector(`[data-action-id="${CSS.escape(active)}"]`) || (researchFocus ? container.querySelector('[data-action-id="research-heading"]') : null))?.focus({ preventScroll: true });
 }
 function stepper(value, min, max, id, update) {
   const node = el('div', 'stepper');
@@ -196,7 +200,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     }
     section.append(resourceWorkplaces(data.sources, 'Where it comes from', '+'), resourceWorkplaces(data.sinks, 'Where it goes', '−'));
     const chains = {
-      food: 'Orchards and kitchen gardens make food directly. Bread: Grain farm → Windmill → Bakery → Food. The bakery also burns timber; staff and supply every workplace.',
+      food: 'Fishers carry their catch to the hearth. Orchards and kitchen gardens also supply food. Bread: Grain farm → Windmill → Bakery → Food. The bakery also burns timber; staff and supply every workplace.',
       grain: 'Grain farm → Windmill → Flour → Bakery → Food. A brewery also uses grain to make ale.',
       flour: 'Grain farm → Windmill → Flour. A staffed bakery turns flour and timber into food.',
       wood: 'Woodcutters harvest and replant woodland. Timber supplies construction, sawmills and bakeries.',
@@ -303,14 +307,57 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       paths.append(row);
     }
     nodes.push(paths);
-    const schools = state.buildings.filter(b => b.type === 'school' && b.status === 'ready'), workingSchools = schools.filter(b => !b.paused && b.production?.efficiency > 0);
+    const schools = state.buildings.filter(b => ['school','assay'].includes(b.type) && b.status === 'ready'), workingSchools = schools.filter(b => !b.paused && b.production?.efficiency > 0);
     const summary = el('div', 'research-work'); summary.dataset.councilSection = 'research';
-    summary.append(el('strong', '', active ? `Studying ${active.name}` : 'Choose what the town learns next'), el('p', 'town-meta', 'Pay once to begin. Supplied scholars earn knowledge and advance one selected project.'));
-    if (active) summary.append(progressBar(active.progress), el('span', 'job-tag', `${Math.floor(active.progress * 100)}% learned`));
-    if (!workingSchools.length) {
-      summary.append(el('p', 'problem', schools.length ? 'Research is waiting for school workers and food.' : 'Build and staff a schoolhouse to advance research.'), btn(schools.length ? 'Staff a schoolhouse' : 'Build a schoolhouse', 'research-school', () => schools.length ? inspect(schools[0]) : build('school')));
+    const allLearned = research.every(item => item.completed);
+    const researchTitle = el('strong', 'research-heading', active ? active.name : allLearned ? 'All discoveries learned' : 'Choose what the town learns next');
+    researchTitle.tabIndex = -1; researchTitle.dataset.actionId = 'research-heading';
+    const top = el('div', 'research-work-heading'); top.append(researchTitle);
+    if (active) top.append(el('span', 'job-tag', `${Math.floor(active.progress * 100)}%`));
+    summary.append(top);
+    if (active) {
+      summary.dataset.research = active.id;
+      const funding = active.funding, status = researchHUD(state, getPaused());
+      summary.append(progressBar(active.progress, funding.paused || getPaused()));
+      if (funding.legacy) summary.append(el('p', 'town-meta', 'Supplies paid. This project keeps its original funding.'));
+      else summary.append(el('p', 'research-current-stage', `Stage ${funding.stage + 1} of 3 · ${funding.name}`));
+      const statusText = status.status === 'supplies' ? `Needs ${resourceText(funding.missing)}.`
+        : status.status === 'working' ? 'Scholars are working.' : status.detail + '.';
+      summary.append(el('p', 'research-work-status', statusText));
+      // Put the next action before the ledger so it stays in reach on tablets.
+      const actions = el('div', 'town-row-actions research-work-actions');
+      if (getPaused()) actions.append(btn('Resume time', 'resume-time', resume, { className: 'primary' }));
+      if (!funding.legacy) {
+        if (!funding.funded) actions.append(btn('Fund now from stores', 'research-contribute', () => action(() => progression.fundResearch(state)), { disabled: !Object.keys(funding.contribution).length, className: getPaused() ? 'small-button' : 'primary', title: `Supply ${resourceText(funding.contribution)}` }));
+        actions.append(btn(funding.paused ? 'Resume research' : 'Pause research', 'research-pause', () => action(() => progression.pauseResearch(state, !funding.paused))));
+      }
+      summary.append(actions);
+      if (!funding.legacy) {
+        const allocation = el('div', 'research-allocation'); allocation.setAttribute('role', 'group'); allocation.setAttribute('aria-label', 'Share of new supplies for research');
+        allocation.append(el('span', '', 'New supplies'));
+        for (const percent of [0,25,50,100]) { const choice = btn(`${percent}%`, `research-allocation-${percent}`, () => action(() => progression.setResearchAllocation(state, percent))); choice.setAttribute('aria-pressed', String((state.research.active.allocation || 0) === percent)); allocation.append(choice); }
+        summary.append(allocation);
+        const table = el('table', 'research-supplies'), head = el('thead'), labels = el('tr');
+        for (const name of ['Supply', 'Delivered / required', 'In stores']) { const cell = el('th', '', name); cell.scope = 'col'; labels.append(cell); }
+        head.append(labels); table.append(head); const body = el('tbody');
+        for (const [key, n] of Object.entries(funding.plan[funding.stage].cost)) {
+          const row = el('tr', funding.missing[key] ? 'missing' : 'supplied'), name = el('th', '', RESOURCES[key].name); name.scope = 'row';
+          row.append(name, el('td', '', `${Math.round((funding.delivered[key] || 0) * 10) / 10} / ${n}`), el('td', '', format(state.resources[key]))); body.append(row);
+        }
+        table.append(body); summary.append(table);
+        const details = disclosure('research-plan', 'Stages & funding');
+        const stages = el('ol', 'research-stages'); funding.plan.forEach((step, i) => { const li = el('li', i < funding.stage ? 'done' : i === funding.stage ? 'current' : '', step.name); if (i === funding.stage) li.setAttribute('aria-current', 'step'); stages.append(li); });
+        details.append(stages, el('p', 'town-meta', 'Your allocation takes a share of newly made supplies needed by this stage. The rest goes into stores. Collection stops when the stage is full or research is paused. Choose 0% to fund by hand; Fund now uses supplies already in stores.'));
+        summary.append(details);
+        const stop = disclosure('stop-research', 'Stop this project'); stop.append(el('p', 'town-meta', 'Returns supplies still set aside for this stage. Completed experiments and their materials are spent; starting again begins at stage one.'), btn('Stop and return unused supplies', 'research-cancel', () => action(() => progression.cancelResearch(state)))); summary.append(stop);
+      }
+    } else summary.append(el('p', 'town-meta', allLearned ? 'Schools can keep producing knowledge. Revisit a discovery below to build what it unlocked.' : 'Choose a discovery below. Allocate supplies, then let your scholars work.'));
+    if (!workingSchools.length && !allLearned) {
+      const staffing = el('div', 'research-staffing');
+      staffing.append(el('p', 'problem', schools.length ? 'Research needs workers and food at a schoolhouse or survey workshop.' : 'Build and staff a schoolhouse to advance research.'), btn(schools.length ? 'Check research workers' : 'Build a schoolhouse', 'research-school', () => schools.length ? inspect(schools[0]) : build('school')));
+      const actions = summary.querySelector('.research-work-actions');
+      if (actions) actions.after(staffing); else summary.append(staffing);
     }
-    if (getPaused()) summary.append(pauseCue());
     nodes.push(summary);
     function researchCard(item) {
       const row = el('section', `research-card${item.completed ? ' completed' : ''}`); row.dataset.research = item.id;
@@ -329,14 +376,15 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       const requirements = researchRequirements(state, item), prerequisites = el('div', 'research-requires');
       for (const prerequisite of requirements) prerequisites.append(btn(`${prerequisite.met ? '✓' : '○'} ${prerequisite.name}`, `requires-${item.id}-${prerequisite.id}`, () => revealResearch(prerequisite.id), { className: prerequisite.met ? 'requirement met' : 'requirement missing' }));
       if (requirements.length) row.append(el('small', 'requirement-label', 'Learn first'), prerequisites);
-      row.append(resourceChips(item.cost, { state, cost: true }), el('p', 'town-meta', `${item.duration} base seconds with one fully supplied school. Staffing, experience and research bonuses change the time.`));
-      row.append(btn(item.active ? 'Research in progress' : `Study ${item.name}`, `research-${item.id}`, () => action(() => progression.startResearch(state, item.id)), { disabled: !item.canStart, className: 'primary' }));
+      const total={};for(const stage of item.plan)for(const[k,n]of Object.entries(stage.cost))total[k]=(total[k]||0)+n;
+      row.append(el('small','requirement-label','Supplies across three stages'),resourceChips(total, { state, cost: true }), el('p', 'town-meta', `${item.duration} seconds of research with one fully staffed, supplied school, plus time to make and deliver materials.`));
+      row.append(btn(item.active ? 'Research in progress' : `Plan ${item.name}`, `research-${item.id}`, () => {action(() => progression.startResearch(state, item.id));revealResearch(item.id);}, { disabled: !item.canStart, className: 'primary' }));
       if (!item.canStart && !item.active) row.append(el('p', 'town-meta', item.reason));
       return row;
     }
-    const available = research.filter(item => !item.completed && item.prerequisites.every(id => state.research.completed.includes(id)));
-    nodes.push(el('h3', 'town-section', 'Your next discoveries'), ...available.map(researchCard));
-    const future = research.filter(item => !item.completed && !available.includes(item));
+    const available = research.filter(item => !item.completed && !item.active && item.prerequisites.every(id => state.research.completed.includes(id)));
+    if (available.length) nodes.push(el('h3', 'town-section', 'Your next discoveries'), ...available.map(researchCard));
+    const future = research.filter(item => !item.completed && !item.active && !available.includes(item));
     if (future.length) { const detail = disclosure('future-research', 'Plan the next crafts'); detail.append(...future.map(researchCard)); nodes.push(detail); }
     const completed = research.filter(item => item.completed);
     if (completed.length) { const detail = disclosure('learned-research', `${completed.length} fields already learned`); detail.append(...completed.map(researchCard)); nodes.push(detail); }
@@ -465,7 +513,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     document.querySelectorAll('[data-town-tab]').forEach(button => button.setAttribute('aria-pressed', String(tab === button.dataset.townTab)));
     if (!tab || !force && townPress.held) return;
     if (researchMapOpen && (mapGesture || performance.now() < mapScrollUntil) && !force) return;
-    const signature = JSON.stringify([tab, selectedResource, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), effectiveMorale(state), state.seasons, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.policies, state.guidance, state.contracts, state.routes, state.imports, state.pressure, !!state.frontier?.warning, !!state.frontier?.raidActive, state.citizens.map(c => [c.id, c.job, c.workplace])]);
+    const signature = JSON.stringify([tab, selectedResource, state.day, Math.floor(state.time), getPaused(), Object.values(state.resources).map(Math.floor), effectiveMorale(state), state.seasons, state.builderTarget, state.buildings.map(b => [b.id, b.level, b.status, b.desiredWorkers, b.workerIds, b.priority, b.paused, Math.floor(b.progress), Math.round((b.production?.efficiency || 0)*100), b.production?.blockedReason]), state.research, state.minerals, state.livestock, state.policies, state.guidance, state.contracts, state.routes, state.imports, state.pressure, !!state.frontier?.warning, !!state.frontier?.raidActive, state.citizens.map(c => [c.id, c.job, c.workplace])]);
     if (!force && signature === lastSignature) return; lastSignature = signature;
     $('town-book-title').textContent = tab === 'council' && researchMapOpen ? 'Research map' : tab === 'stores' && selectedResource ? RESOURCES[selectedResource].name : titleFor[tab];
     $('town-book-kicker').textContent = `${seasonInfo(state).label} · ${state.population} residents · ${Math.round(effectiveMorale(state))}% morale`;
@@ -485,15 +533,31 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
       if (building.paused && !status.maxWorkers) nodes.push(btn('Resume this building', `inspect-rest-${building.id}`, () => action(() => sim.pauseBuilding(state, building.id, false))));
       if (status.maxWorkers) {
         const box = el('div', 'inspect-staffing'), row = el('div', 'town-control'); row.append(el('strong', '', `${status.workers} / ${status.desiredWorkers} working`), stepper(status.desiredWorkers, 0, status.maxWorkers, `inspect-staff-${building.id}`, count => action(() => sim.setWorkers(state, building.id, count))));
+        if(building.type==='fishingpier'){
+          const person=state.citizens.find(c=>c.id===building.workerIds[0]);
+          row.replaceChildren(el('strong','',person?.name || (building.desiredWorkers?'Waiting for a resident':'No fisher assigned')),
+            btn(building.desiredWorkers?'Release fisher':'Assign fisher',`inspect-fisher-${building.id}`,()=>action(()=>sim.setWorkers(state,building.id,building.desiredWorkers?0:1))));
+        }
         box.append(row, el('p', 'town-meta', `${JOBS[BUILDINGS[building.type].job]?.plural || 'Workers'} · ${Math.round(status.efficiency * 100)}% output`));
         box.append(btn(building.paused ? 'Resume work' : 'Rest this workplace', `inspect-rest-${building.id}`, () => action(() => sim.pauseBuilding(state, building.id, !building.paused)))); if (status.workers < status.desiredWorkers) box.append(btn('Find available workers', `inspect-people-${building.id}`, () => revealWorkplace(building.id)), el('p', 'town-meta', 'Requested workers share the same residents. Rest another workplace or raise this one’s priority in People.'));
         nodes.push(box);
+      }
+      if(['quarry','mine'].includes(building.type)){
+        const deposit=mineralStatus(state,building),box=el('section','inspect-deposit');box.append(el('strong','',`${Math.floor(deposit.available)} ${deposit.resource==='ore'?'ore':'stone'} left in reach`),progressBar(deposit.fraction),el('p','town-meta',`${deposit.sites.length} shared deposits within five tiles. Rebuilding does not refill them.`));
+        if(!deposit.deep)box.append(el('p','town-meta',`${Math.floor(deposit.below)} more below the surface. Research Surveying and deep workings, then upgrade to level two.`));
+        if(!state.research.completed.includes('prospecting'))box.append(btn('View surveying research',`deposit-research-${building.id}`,()=>revealResearch('prospecting')));nodes.push(box);
+      }
+      const animals=herdStatus(state,building);
+      if(animals){
+        const box=el('section','inspect-herd');box.append(el('strong','',`${animals.total} / ${animals.capacity} ${animals.spec.plural}`),el('p','',`${animals.adults} adults · ${animals.young} young · ${Math.round(animals.herd.condition*100)}% condition`),el('p','town-meta',`${(perMinute(animals.feed)).toFixed(1)} grain/min at full care. ${animals.adults<2?'Buy two adults to start breeding.':!animals.herd.breeding?'Breeding is paused.':animals.total>=animals.capacity?'The shelter is full; breeding waits for more room.':`Next birth after about ${Math.ceil((animals.spec.birth-animals.herd.birthProgress)/CALENDAR_DAY_SECONDS*10)/10} in-game days of full care.`} Full food stores do not stop feeding.`));
+        const actions=el('div','town-row-actions');actions.append(btn(`Buy ${animals.spec.name} · ${animals.spec.price} coin`,`animal-buy-${building.id}`,()=>action(()=>buyLivestock(state,building)),{disabled:animals.total>=animals.capacity||state.resources.gold<animals.spec.price}),btn(`Sell one ${animals.spec.name}`,`animal-sell-${building.id}`,()=>action(()=>sellLivestock(state,building)),{disabled:!animals.total}),btn(animals.herd.breeding?'Pause breeding':'Allow breeding',`animal-breed-${building.id}`,()=>action(()=>setBreeding(state,building,!animals.herd.breeding))));box.append(actions,el('p','town-meta','Sell the animals before removing their shelter. Animals stay when upgrading.'));nodes.push(box);
       }
       const upgrade = sim.canUpgrade(state, building.id);
       if (getBuildingSpec(building.type).upgrades?.length && building.level < 3) {
         const box = el('div', 'inspect-upgrade'), next = getBuildingSpec(building.type, building.level + 1);
         const current = getBuildingSpec(building.type, building.level);
-        box.append(el('strong', '', `Improve to level ${building.level + 1}`));
+        box.append(el('strong', '', next.name&&next.name!==current.name?next.name:`Improve to level ${building.level + 1}`));
+        if(animals)box.append(el('p','',`Animal capacity: ${animals.capacity} → ${animals.spec.capacity[building.level]}.`));
         if (next.housing) box.append(el('p', '', `Housing: ${current.housing} → ${next.housing} beds.`));
         if (next.workers) box.append(el('p', '', `Staff for full output: ${current.workers} → ${next.workers}.`));
         if (Object.values(next.recipe.output).some(n => n > 0)) box.append(el('p', '', `Full output/min: ${resourceText(perMinuteGoods(current.recipe.output))} → ${resourceText(perMinuteGoods(next.recipe.output))}.`));
@@ -501,7 +565,7 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
         if (next.service) box.append(el('p', '', `Service reach: ${current.service.radius} → ${next.service.radius} spaces. Full capacity: ${Math.round((current.service.capacity || 0) * (current.service.strength || 1))} → ${Math.round((next.service.capacity || 0) * (next.service.strength || 1))} beds.`));
         if (next.storage) box.append(el('p', '', `Extra storage: ${current.storage} → ${next.storage} of every physical good.`));
         box.append(el('p', 'upgrade-cost', `Build with ${resourceText(upgrade.cost || {})}.`));
-        box.append(btn('Queue the upgrade', `upgrade-${building.id}`, () => action(() => sim.queueUpgrade(state, building.id)), { disabled: !upgrade.ok, title: upgrade.reason, className: 'primary' })); if (!upgrade.ok) box.append(el('p', 'town-meta', upgrade.reason)); nodes.push(box);
+        box.append(btn('Queue the upgrade', `upgrade-${building.id}`, () => action(() => sim.queueUpgrade(state, building.id)), { disabled: !upgrade.ok, title: upgrade.reason, className: 'primary' })); if (!upgrade.ok) {box.append(el('p', 'town-meta', upgrade.reason));const gate=getUpgrade(building.type,building.level)?.requires;const ids=Array.isArray(gate)?gate:[gate];const missing=ids.find(id=>id&& !state.research.completed.includes(id));if(missing)box.append(btn(`View ${progression.RESEARCH[missing].name}`,`upgrade-research-${building.id}`,()=>revealResearch(missing)));} nodes.push(box);
       }
     }
     preserveReplace($('inspect-management'), nodes);
@@ -510,10 +574,12 @@ export function createTownUI({ getState, mutate, canMutate = () => true, inspect
     const wasMap = researchMapOpen; researchMapOpen = false;
     if (tab !== 'council') open('council');
     else if (wasMap) update(true);
-    const card = $('town-book-content').querySelector(`[data-research="${CSS.escape(id)}"]`);
+    const card = $('town-book-content').querySelector(id ? `[data-research="${CSS.escape(id)}"]` : '[data-council-section="research"]');
     if (card?.closest('details')) card.closest('details').open = true;
-    card?.scrollIntoView({ block: 'nearest' }); card?.querySelector('button.primary')?.focus({ preventScroll: true });
+    card?.scrollIntoView({ block: 'start' });
+    (card?.querySelector('[data-action-id="research-heading"]') || card?.querySelector('button.primary'))?.focus({ preventScroll: true });
   }
+
   function revealPaths() {
     const wasMap = researchMapOpen; researchMapOpen = false;
     if (tab !== 'council') open('council');

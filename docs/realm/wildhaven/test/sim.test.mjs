@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BUILDINGS, RESOURCE_NAMES, DAY_LENGTH, VERSION, createGame, terrainAt, isLand, groundHeight, listTiles, canBuild, build, demolish, undo, tick, serialize, restore, objective, rates, workforce, constructionQueue, cancelConstruction, reorderConstruction, queueUpgrade, canUpgrade, buildingStatus, setWorkers, setBuilderTarget, pauseBuilding, setPriority, citizenSkill, storageCapacity, villageNeeds, trade, tradeOffer } from '../js/sim.js';
 import { getBuildingSpec } from '../js/catalog.js';
-import { startResearch } from '../js/progression.js';
+import { startResearch, fundResearch } from '../js/progression.js';
 
 const fund = state => { for (const key of RESOURCE_NAMES) state.resources[key] = 2000; };
 const unlock = (state, ...ids) => { state.research.completed.push(...ids.filter(id => !state.research.completed.includes(id))); };
@@ -102,7 +102,7 @@ test('upgrades reserve inputs, close production, retain housing and require rese
   assert.equal(queueUpgrade(state, cottage.id).ok, true); assert.equal(rates(state).capacity, beds); assert.equal(cottage.level, 1); assert.equal(cottage.constructionKind, 'upgrade');
   tick(state, 2); const cancellation = cancelConstruction(state, cottage.id); assert.equal(cancellation.ok, true); assert.equal(cottage.level, 1); assert.equal(cottage.status, 'ready');
   assert.equal(queueUpgrade(state, cottage.id).ok, true); finish(state); assert.equal(cottage.level, 2); assert.equal(rates(state).capacity, 6 + getBuildingSpec('cottage', 2).housing);
-  assert.equal(canUpgrade(state, cottage.id).ok, false); assert.match(canUpgrade(state, cottage.id).reason, /mastercraft/);
+  assert.equal(canUpgrade(state, cottage.id).ok, false); assert.match(canUpgrade(state, cottage.id).reason, /Master workshops/);
   unlock(state, 'mastercraft'); assert.equal(queueUpgrade(state, cottage.id).ok, true); finish(state); assert.equal(cottage.level, 3); assert.equal(canUpgrade(state, cottage.id).ok, false);
   const orchard = completed(state, 'orchard', 2, 0); state.resources.food = 100; assert.equal(queueUpgrade(state, orchard.id).ok, true); assert.equal(buildingStatus(state, orchard).efficiency, 0); assert.match(buildingStatus(state, orchard).reason, /builders|Waiting/);
 });
@@ -192,7 +192,7 @@ test('invalid mutations and invalid deltas are inert', () => {
 test('supplied schools make real research progress; one scholar works at half strength', () => {
   const state = createGame(); fund(state); const school = completed(state, 'school', 2, 0);
   setPriority(state, school.id, 0); setWorkers(state, school.id, 1); pauseBuilding(state, 'hearth', true);
-  assert.equal(startResearch(state, 'joinery').ok, true); tick(state, 10);
+  assert.equal(startResearch(state, 'joinery').ok, true); fundResearch(state); tick(state, 10);
   assert.ok(state.research.active.progress >= 5 && state.research.active.progress < 5.1);
   const progress = state.research.active.progress; state.resources.food = 0; tick(state, 5);
   assert.equal(state.research.active.progress, progress); assert.match(school.production.blockedReason, /food/);

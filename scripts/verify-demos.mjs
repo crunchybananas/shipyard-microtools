@@ -12,12 +12,14 @@ import { chromium } from '@playwright/test';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const docsRoot = resolve(repoRoot, 'docs');
 
-const EXPECTED_DEMO_COUNT = 32;
+const EXPECTED_DEMO_COUNT = 33;
 // `the-island` is being developed independently. `before-after` is a support
 // page crawled separately; `ember` and `morphogen` are generated/ignored build
 // output, not canonical source demos.
-const EXCLUDED_DEMO_DIRECTORIES = new Set(['before-after', 'ember', 'morphogen', 'the-island']);
+const EXCLUDED_DEMO_DIRECTORIES = new Set(['before-after', 'ember', 'morphogen', 'the-island', 'creature-field-notes']);
+// The retired 2D route remains only as a tested redirect.
 const SUPPORT_PAGES = [
+  { name: 'heartwood-legacy-redirect', path: '/creature-field-notes/index.html' },
   { name: 'before-after', path: '/before-after/index.html' },
   { name: 'before-after-orbital-strike', path: '/before-after/orbital-strike/index.html' },
   { name: 'before-after-realm', path: '/before-after/realm/index.html' },
@@ -68,7 +70,7 @@ const MIME_TYPES = new Map([
 function discoverDemoNames() {
   const trackedIndexes = execFileSync(
     'git',
-    ['ls-files', '--', 'docs/*/index.html'],
+    ['ls-files', '--', ':(glob)docs/*/index.html'],
     { cwd: repoRoot, encoding: 'utf8' },
   )
     .split(/\r?\n/)

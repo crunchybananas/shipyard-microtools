@@ -6,7 +6,7 @@ The GLB exports twelve named roots at the origin: cottage, lumber, quarry, orcha
 
 Models use meters, Y-up in the exported GLB and +Z as the front. Terrain grid cells are 1.8 meters. The windmill rotor turns about local Z; the bell swings about local X; arms and legs swing about local X. Villager tunic variants replace only the original tunic vertex color. Trees are instanced from their Blender meshes, not duplicated objects with individual draw calls.
 
-The generated kit contains 18 mesh nodes and 19 material primitives, with 94,974 triangles across all twelve source models. Its 9,004,100-byte GLB is loaded once. Runtime counts depend on buildings and residents; the current town renderer presents every citizen. Ground, shoreline, footpaths, dock and resource rocks are procedural world geometry.
+The generated kit contains 18 mesh nodes and 19 material primitives, with 94,974 triangles across all twelve source models. Its 9,004,100-byte GLB is loaded once. Runtime counts depend on buildings and residents; the current town renderer presents every citizen. Ground, shoreline, footpaths, meadow tufts and quarry stone are procedural world geometry. The harbor kit includes a timber quay, moored lugger, buildable fishing pier, fishing rod and basket of silver fish. Regenerate `assets/saltwick-harbor.glb` with `blender -b -P tools/create_harbor.py`.
 
 Editable model sources accompany the export. The three reference renders are `village-kit-contact.png`, `villager-pose-review.png`, and `nature-review.png`. These show art and articulation; gameplay screenshots and navigation reports provide separate runtime evidence.
 

@@ -83,6 +83,6 @@ export function createResearchMap({ state, selectedId = null, onSelect }) {
     button.onclick = () => onSelect?.(node.id); canvas.append(button);
   }
   viewport.append(canvas); section.append(viewport);
-  const note = el('p', 'research-map-note', 'Pay the quoted cost to begin one project at a time. Supplied scholars advance it.'); section.append(note);
+  const note = el('p', 'research-map-note', 'Plan one project, deliver its supplies in three stages, and staff schools to carry out the work.'); section.append(note);
   return section;
 }

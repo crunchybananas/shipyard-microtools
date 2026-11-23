@@ -20,12 +20,12 @@ export function buildingPurpose(type, level = 1) {
   if (facts.input.length) {
     flow.append(resourceChips(Object.fromEntries(facts.input.map(r => [r.id, perMinute(r.amount)]))), el('b', 'flow-arrow', '→'));
   }
-  if (facts.output.length) flow.append(resourceChips(Object.fromEntries(facts.output.map(r => [r.id, perMinute(r.amount)]))));
+  if (facts.output.length) flow.append(resourceChips(Object.fromEntries(facts.output.map(r => [r.id, type==='fishingpier'?r.amount:perMinute(r.amount)]))));
   if (!facts.output.length || facts.housing) {
-    const output = facts.housing ? `${facts.housing} beds` : facts.storage ? `+${facts.storage} storage / good` : facts.service ? `${facts.service.name} for ${facts.service.capacity} beds` : 'First town milestone';
+    const output = type==='pasture'?'Grain → milk for the pantry':type==='henhouse'?'Grain → eggs for the pantry':facts.housing ? `${facts.housing} beds` : facts.storage ? `+${facts.storage} storage / good` : facts.service ? `${facts.service.name} for ${facts.service.capacity} beds` : 'First town milestone';
     flow.append(el('span', 'purpose-benefit', output));
   }
-  card.append(flow, el('small', 'purpose-staff', `${facts.staffing}${facts.input.length || facts.output.length ? ' · base / minute when supplied' : ''}`), el('span', 'purpose-short-use', facts.next), el('span', 'purpose-next', facts.payoff));
+  card.append(flow, el('small', 'purpose-staff', `${facts.staffing}${type==='fishingpier'?' · per basket':facts.input.length || facts.output.length ? ' · base / minute when supplied' : ''}`), el('span', 'purpose-short-use', facts.next), el('span', 'purpose-next', facts.payoff));
   if (facts.chain) card.append(el('span', 'purpose-chain', facts.chain));
   return card;
 }

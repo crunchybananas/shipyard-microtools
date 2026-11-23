@@ -1,9 +1,9 @@
 import { createObservedWorld } from './observed-world.js';
 import { canImportObservedWorld } from './observed-state.js';
 import { createObservedUI } from './observed-ui.js';
+import { fishingActivity } from './fishing.js';
 import { CROPS, gardenState } from './hinterland.js';
 import { objectiveChecklist, objectiveGuidance } from './objective-checklist.js';
-import { placementInfoPosition } from './placement-layout.js';
 import { createReadingClock } from './reading-clock.js';
 import { townSafety } from './town-safety.js';
 import { treeState, SAPLING_SECONDS, saplingTimeRemaining } from './woodland.js';
@@ -22,7 +22,9 @@ import { createFrontierUI } from './frontier-ui.js';
 import { buildingFacts, nextTownStep, constructionFeedback } from './clarity.js';
 import { firstBreadStep } from './bread-guide.js';
 import { buildingPurpose } from './clarity-ui.js';
-import { createCompanionStore } from './companion-store.js';
+import { createTownLibrary } from './town-library.js';
+import { createTownLibraryUI } from './town-library-ui.js';
+import { mountResearchHUD } from './research-hud.js';
 import { createCompanionUI } from './companion-ui.js';
 import { createCoop } from './coop.js';
 import { canImportCoop } from './coop-state.js';
@@ -34,8 +36,8 @@ const compactTablet = matchMedia('(min-width:0px)');
 const shortReadingLayout = matchMedia('(min-width:521px) and (max-height:600px)');
 const SAVE_KEY = 'wildhaven.v4', SETTINGS_KEY = 'wildhaven.preferences.v1';
 const CATEGORIES = {
-  beginnings: { name: 'Foundations', types: ['cottage','orchard','lumber','quarry','garden','well','school','bell'] },
-  harvest: { name: 'Food & fields', types: ['garden','orchard','farm','windmill','bakery','brewery'] },
+  beginnings: { name: 'Foundations', types: ['cottage','orchard','fishingpier','lumber','quarry','garden','well','school','bell'] },
+  harvest: { name: 'Food & fields', types: ['garden','orchard','fishingpier','farm','windmill','bakery','brewery'] },
   craft: { name: 'Craft & industry', types: ['lumber','quarry','sawmill','mine','smith','toolmaker','flaxfield','weaver'] },
   town: { name: 'Town life', types: ['cottage','well','school','clinic','chapel','manor'] },
   coast: { name: 'Trade & watch', types: ['market','warehouse','barracks','bell'] },
@@ -68,11 +70,13 @@ function updateReadingPause() {
   $('keep-running').title = readingClock.held ? 'Keep time running while reading' : 'Resume time so the assigned builders can work';
   if (speed !== before) updateUI();
 }
+let townLibraryUI, researchHUD;
 let lastInspectorSignature = '', currentNextStep = null, soundMix={effects:.8,ambience:.55};
 let objectiveBeforeTablet = !matchMedia('(max-width:760px)').matches;
 function closeBuildDrawer() { document.body.classList.remove('tablet-build-open'); $('tablet-build-toggle')?.setAttribute('aria-expanded', 'false'); }
 function closeJournal() { $('journal').hidden = true; $('journal-button').setAttribute('aria-expanded', 'false'); }
 function preparePanel(destination) {
+  if ($('dock-more')) $('dock-more').open = false;
   // Switch synchronously: the reading clock sees the destination next frame,
   // without briefly resuming time between two open books.
   if (destination !== 'town') town?.close();
@@ -111,6 +115,8 @@ function activateDock(destination) {
   updateDock();
 }
 function updateDock() {
+  const townName = townLibrary.activeName || 'Your town';
+  for (const id of ['current-town-name', 'dock-town-name']) if ($(id) && $(id).textContent !== townName) $(id).textContent = townName;
   $('tablet-build-toggle')?.toggleAttribute('disabled', !companions.canManage);
   $('tablet-town-toggle')?.setAttribute('aria-expanded', String(!!town?.activeTab && town.activeTab !== 'trade'));
   $('landing-button').setAttribute('aria-expanded', String(town?.activeTab === 'trade'));
@@ -151,9 +157,30 @@ function mountTabletControls() {
   compactTablet.addEventListener('change', tabletLayoutChanged); tabletLayoutChanged();
 }
 
+function mountCompactDock() {
+  const dock = document.querySelector('.controls-hint>div');
+  const townLabel = document.createElement('span'); townLabel.textContent = 'Town';
+  const townName = document.createElement('small'); townName.id = 'dock-town-name';
+  $('tablet-town-toggle').replaceChildren(townLabel, townName);
+  $('tablet-town-toggle').setAttribute('aria-label', 'Town');
+  $('tablet-town-toggle').setAttribute('aria-describedby', 'dock-town-name');
+  const more = document.createElement('details'); more.id = 'dock-more';
+  const summary = document.createElement('summary'); summary.textContent = 'More'; summary.setAttribute('aria-label', 'More town controls');
+  const menu = document.createElement('nav'); menu.className = 'dock-more-menu'; menu.setAttribute('aria-label', 'More town controls');
+  const towns = document.createElement('button'); towns.id = 'towns-toggle'; towns.type = 'button'; towns.textContent = 'Your towns'; towns.onclick = () => townLibraryUI.open();
+  const currentName = document.createElement('span'); currentName.id = 'current-town-name';
+  $('help').textContent = 'How to play'; $('sound-settings').textContent = 'Sound settings';
+  menu.append(currentName, towns, $('landing-button'), $('journal-button'), $('coop-toggle'), $('observed-toggle'), $('sound-settings'), $('help'));
+  menu.addEventListener('click', event => { if (event.target.closest('button')) more.open = false; });
+  more.append(summary, menu); dock.append(more);
+  document.addEventListener('click', event => { if (!more.contains(event.target)) more.open = false; });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && more.open) { more.open = false; summary.focus(); } });
+}
+
 try { saved = sim.restore(localStorage.getItem(SAVE_KEY) || localStorage.getItem('wildhaven.v3') || localStorage.getItem('wildhaven.v2') || localStorage.getItem('wildhaven.v1')); const prefs=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');soundEnabled=!!prefs.sound;soundMix={effects:prefs.effects??.8,ambience:prefs.ambience??.55}; } catch { storageAvailable = false; }
 let deviceStorage = null; try { deviceStorage = localStorage; } catch {}
-const companions = createCompanionStore({ storage: deviceStorage });
+const townLibrary = createTownLibrary({ storage: deviceStorage });
+const companions = townLibrary.companions;
 const audio = createAudio({ muted: !soundEnabled, ...soundMix });
 const format = value => Math.floor(value).toLocaleString();
 const rateFormat = value => `${value >= 0 ? '+' : ''}${Math.round(value * 10) / 10}`;
@@ -167,8 +194,9 @@ function save() {
 }
 function sync() { sim.refreshTown(state); world.sync(state); updateUI(); save(); }
 function mutate(result, cue='build') { if (!companions.canManage) return; if (result?.ok) { sync(); audio.play(cue); } else audio.play('error'); announce(result?.reason, !result?.ok); }
-function newVillage() { if (!companions.canManage) return; if ((playing ? state : saved)?.networkWorld || (playing ? state : saved)?.coop?.link || (playing ? state : saved)?.coop?.draft || coop?.info().busy) { announce('This town is linked to online play. Keep its backup; start a separate town on another browser profile.', true); return; } saved = null; state = sim.createGame(); victorySeen = false; enter(); announce('Six neighbors, two builders. Give them a roof, then a living.'); }
+function newVillage() { townLibraryUI.open({ create: true }); }
 function enter(resuming = false) {
+  observed?.syncTown();
   playing = true; tool = null; selected = null; speed = resuming ? 0 : 1; previousSpeed = 1; readingClock.reset(speed);
   frontierUI?.resetSelection();
   touchPlacement = false; touchSite = null; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); $('confirm-building').hidden = true;
@@ -193,27 +221,37 @@ function useTool(type) {
   if (touchPlacement) { hovered = null; world.showPreview(null); }
   $('inspector').hidden = true; $('journal').hidden = true; world.select(null); world.selectCitizen?.(null);
   document.body.classList.add('placement-active'); $('placement-info').hidden = false; $('placement').hidden = false; $('placement-title').textContent = `${BUILDINGS[type].name} · ${costText(BUILDINGS[type].cost)}`;
-  $('placement-purpose').replaceChildren(buildingPurpose(type));
-  $('placement-detail').textContent = touchPlacement ? 'Tap a site to inspect the entrance and reach. Build here confirms the plan.' : 'Choose a site. The arrow marks the entrance; keep its approach clear.';
+  $('placement-context').textContent = '';
+  $('rotate-building').hidden = type==='fishingpier';
+  world.showPierSites(type==='fishingpier');
+  $('placement-detail').textContent = type==='fishingpier' ? 'Choose a marked spot on the shore. The deck turns toward the water.' : touchPlacement ? 'Tap a site, then choose Build here.' : 'Choose a site on the island. The arrow marks the entrance.';
   $('confirm-building').hidden = !touchPlacement; $('confirm-building').disabled = true;
   $('world').style.cursor = 'crosshair'; if (hovered) hover(hovered); updateShelf(); audio.play('select');
 }
-function cancelTool() { tool = null; touchSite = null; touchPlacement = false; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); world.showPreview(null); world.showServiceArea(null, null); $('placement').hidden = true; $('placement-info').hidden = true; document.body.classList.remove('placement-active'); $('confirm-building').hidden = true; $('world').style.cursor = 'grab'; updateShelf(); }
+function cancelTool() { world.showPierSites(false); tool = null; touchSite = null; touchPlacement = false; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); world.showPreview(null); world.showServiceArea(null, null); $('placement').hidden = true; $('placement-info').hidden = true; document.body.classList.remove('placement-active'); $('confirm-building').hidden = true; $('world').style.cursor = 'grab'; updateShelf(); }
 function hover(tile, pointer = {}) {
+  // Moving onto the placement controls must retain the site being rotated.
+  if (tool && !tile && pointer.relatedTarget?.closest?.('#placement')) return;
   if (tool && touchPlacement && pointer.pointerType === 'mouse') { touchPlacement = false; touchSite = null; document.body.classList.remove('touch-placement-active'); $('confirm-building').hidden = true; }
   if (tool && touchPlacement && ['touch','pen'].includes(pointer.pointerType)) return;
   hovered = tile; if (!playing) return; world.hoverCitizen?.(!tool ? tile?.citizen?.id || null : null); if (frontierUI?.hover(tile)) return; if (!tool) return;
-  if (!tile) { world.showPreview(null); world.showServiceArea(null, null); $('placement-detail').textContent = 'Choose a site on the island.'; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); return; }
-  const verdict = sim.canBuild(state, tool, tile.x, tile.z, rotation), spec = BUILDINGS[tool];
-  world.showPreview(tool, tile, verdict.ok, rotation, { entranceLabel: !touchPlacement }); const reach = world.showServiceArea(tool, tile, 1, { label: !touchPlacement }); $('placement').classList.toggle('invalid', !verdict.ok); $('placement-info').classList.toggle('invalid', !verdict.ok);
+  if (!tile) { world.showPreview(null); world.showServiceArea(null, null); $('placement-detail').textContent = tool==='fishingpier'?'Choose a marked spot on the shore.':'Choose a site on the island.'; $('placement-context').textContent = ''; $('confirm-building').disabled = true; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); return; }
+  const verdict = sim.canBuild(state, tool, tile.x, tile.z, rotation);
+  // Keep only the footprint, entrance arrow and reach ring over the island.
+  world.showPreview(tool, tile, verdict.ok, verdict.rotation ?? rotation, { entranceLabel: false }); const reach = world.showServiceArea(tool, tile, 1, { label: false }); $('placement').classList.toggle('invalid', !verdict.ok); $('placement-info').classList.toggle('invalid', !verdict.ok);
   $('confirm-building').disabled = !verdict.ok || !touchSite;
-  $('placement-detail').textContent = verdict.ok ? `${touchPlacement ? 'Entrance clear · ' : ''}${spec.work} person-seconds to build.${verdict.boosted ? ` ${verdict.bonus}` : touchPlacement ? '' : ' Keep the arrow’s approach clear.'}${reach ? ` ${touchPlacement ? `${reach.radius}-space reach · ` : ''}✓ ${reach.inRangeHomes} homes in reach · − ${reach.outsideHomes} outside.${touchPlacement ? '' : ' Staff and supplies determine service.'}` : ''}` : verdict.reason;
+  $('placement-detail').textContent = verdict.ok ? (touchPlacement ? 'Entrance clear. Choose Build here to confirm.' : 'Click to build here. The arrow marks the entrance.') : verdict.reason;
+  if(tool==='fishingpier' && verdict.ok) $('placement-detail').textContent=touchPlacement?'Deck faces the water. Choose Build here.':'Click to build a fishing pier here.';
+  $('placement-context').textContent = reach ? `${reach.inRangeHomes} of ${reach.totalHomes} homes in reach · ${reach.radius}-space radius` : verdict.ok && verdict.boosted ? verdict.bonus : '';
 }
 function commitBuilding(tile) {
   if (!tool || !tile || !companions.canManage) return;
   const result = sim.build(state, tool, tile.x, tile.z, rotation);
   if (!result.ok) { announce(result.reason, true); audio.play('error'); hover(tile); return; }
-  audio.play('build'); sync(); world.showPreview(null); hovered = null; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); const feedback = constructionFeedback(state, sim.constructionQueue(state), { paused: speed === 0 }); $('placement-detail').textContent = `Queued. ${feedback.reason}`; announce(`${BUILDINGS[tool].name} queued.${feedback.ready ? '' : ` ${feedback.reason}`}`);
+  if(tool==='fishingpier'){
+    audio.play('build');sync();inspect(result.building);announce('Fishing pier queued. Assign a fisher when the deck is ready.');return;
+  }
+  audio.play('build'); sync(); world.showPreview(null); world.showServiceArea(null, null); hovered = null; touchSite = null; $('confirm-building').disabled = true; $('placement-context').textContent = ''; $('placement').classList.remove('invalid'); $('placement-info').classList.remove('invalid'); const feedback = constructionFeedback(state, sim.constructionQueue(state), { paused: speed === 0 }); $('placement-detail').textContent = `Queued. ${feedback.reason}`; announce(`${BUILDINGS[tool].name} queued.${feedback.ready ? '' : ` ${feedback.reason}`}`);
 }
 function tap(tile, pointer = {}) {
   if (!playing || !companions.canManage || document.querySelector('dialog[open]')) return;
@@ -266,6 +304,7 @@ function updateInspector() {
   const signature = JSON.stringify([selected.id, selected.type, state.day, state.population, speed === 0, state.woodland,
     state.buildings.map(b => [b.id, b.level, b.status, b.progress, b.workerIds, b.desiredWorkers, b.paused, b.restored, Math.round((b.production?.efficiency || 0) * 100), b.production?.blockedReason]),
     Object.values(state.resources).map(Math.floor), state.research.completed,
+    selected.type==='fishingpier' ? [selected.trip?.stage,selected.trip?.landed,selected.trip?.worker] : null,
     selected.type === 'citizen' ? [state.citizens.find(c => c.id === selected.id),world.actors.find(a=>a.citizen.id===selected.id)?.root.userData.workState,world.actors.find(a=>a.citizen.id===selected.id)?.parcel.visible] : null]);
   if (signature === lastInspectorSignature) return;
   lastInspectorSignature = signature;
@@ -294,6 +333,10 @@ function updateInspector() {
     const actor=world.actors.find(a=>a.citizen.id===citizen.id),activity=world.citizenCue?.(citizen.id)?.action || (actor?.parcel.visible?`Carrying ${actor.parcel.userData.cargo} to the village stores`:({working:'At the workbench',foraging:'Gathering food',walking:'On the way',unloading:'Delivering goods',watching:'Keeping watch',waiting:'Taking a short break'})[actor?.root.userData.workState]||'Finding the next task');
     $('inspect-description').textContent=(speed === 0 ? 'Time paused · ' : '')+activity+'. '+$('inspect-description').textContent;
     $('inspect-detail').textContent = `Practice: +${Math.round((sim.citizenSkill(citizen, citizen.job) - 1) * 100)}% output in this job. Experience stays with the person when work changes.`;
+    if(citizen.job==='fisher' && workplace){
+      $('inspect-description').textContent=(speed===0?'Time paused · ':'')+fishingActivity(workplace)+'.';
+      $('inspect-detail').textContent=workplace.trip?.landed ? Math.round(workplace.trip.landed)+' food delivered from this pier.' : 'The catch goes into stores when the basket reaches the hearth.';
+    }
     $('inspect-action').textContent = 'Manage people & jobs'; $('inspect-focus').hidden = true;
     if (workplace) { $('inspect-secondary').hidden = false; $('inspect-secondary').textContent = 'Find their workplace'; } return;
   }
@@ -304,7 +347,7 @@ function updateInspector() {
   $('inspect-description').textContent = ''; $('inspect-purpose').replaceChildren(buildingPurpose(selected.type, selected.level)); $('inspect-image').src = icons[selected.type] || icons.cottage; $('inspect-image').hidden = selected.type === 'hearth';
   const detail = $('inspect-detail'), action = $('inspect-action');
   if (selected.status !== 'ready') {
-    detail.textContent = selected.constructionKind === 'upgrade' ? 'Production rests until the upgrade is complete. Existing residents keep their beds.' : 'Housing and production open when the crew finishes.';
+    detail.textContent = selected.constructionKind === 'upgrade' ? `Production rests until the upgrade is complete.${['pasture','henhouse'].includes(selected.type)?' Your animals stay in their shelter.':getBuildingSpec(selected.type,selected.level).housing?' Existing residents keep their beds.':''}` : 'Housing and production open when the crew finishes.';
     action.textContent = 'Cancel construction';
   } else if (selected.type === 'bell') {
     const verdict = sim.canBuild(state, 'bell', selected.x, selected.z);
@@ -318,7 +361,12 @@ function updateInspector() {
       const home = sim.villageNeeds(state).homes?.find(h => h.id === selected.id);
       if (home) details.push(['water', 'health', 'community'].map(k => `${k}: ${Math.round((home.coverage[k] || 0) * 100)}%`).join(' · ') + '.');
     }
-    if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
+    if (selected.type==='fishingpier') {
+      details.push(fishingActivity(selected)+'.');
+      if(selected.trip?.landed) details.push(Math.round(selected.trip.landed)+' food delivered to town.');
+      if(selected.workerIds.length){$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Watch '+state.citizens.find(c=>c.id===selected.workerIds[0]).name;}
+    }
+    else if (status.maxWorkers) details.push(`${status.blockedReason || 'Working'}${production && Object.values(production.output || {}).some(n => n > 0) ? ` · ${resourceText(perMinuteGoods(production.output))} per minute` : ''}${production && Object.values(production.input || {}).some(n => n > 0) ? ` · uses ${resourceText(perMinuteGoods(production.input))} per minute` : ''}.`);
     if (selected.type === 'barracks') {const troops=state.frontier.units.filter(u=>u.quartersId===selected.id&&!['dead','released'].includes(u.status));details.push(`${troops.filter(u=>u.garrisoned).length} troops inside · ${troops.length} assigned. Troops train and recover here.`);$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Manage company';}
     if (selected.type === 'garden') {const bed=gardenState(state,selected.id),crop=CROPS[bed.crop];details.push(`${crop.name} growing for neighbor projects. Choose the next crop in Explore → Gardens.`);$('inspect-secondary').hidden=false;$('inspect-secondary').textContent='Choose garden crops';}
     if (selected.type === 'lumber') {
@@ -360,18 +408,8 @@ function renderObjectiveChecklist(rows) {
     item.append(mark, body); return item;
   }));
 }
-function positionPlacementInfo() {
-  if (!tool) return;
-  const card = $('placement-info'); card.hidden = false;
-  const header = document.querySelector('#hud header').getBoundingClientRect(), actions = $('placement').getBoundingClientRect();
-  const viewport = { left: 12, top: header.bottom + 12, right: innerWidth - 12, bottom: actions.top - 12 };
-  const size = { width: card.offsetWidth, height: card.offsetHeight };
-  const obstacles = [document.querySelector('.camera-tools')].filter(node => node && node.getClientRects().length).map(node => node.getBoundingClientRect());
-  const position = placementInfoPosition(world.previewScreenBounds(), size, viewport, obstacles);
-  card.style.visibility = position ? 'visible' : 'hidden';
-  if (position) { card.style.left = `${position.left}px`; card.style.top = `${position.top}px`; card.dataset.side = position.side; }
-}
 function updateUI() {
+  researchHUD?.update();
   if (!companions.canManage) speed = readingClock.choose(0);
   const daily = sim.rates(state), ambition = sim.objective(state), needs = sim.villageNeeds(state);
   for (const key of ['wood','stone','food']) { $(key).textContent = format(state.resources[key]); $(`${key}-rate`).textContent = `${rateFormat(perMinute(daily[key]))}/min`; $(`${key}-rate`).classList.toggle('negative', daily[key] < 0); }
@@ -413,13 +451,14 @@ function updateUI() {
     const status = $('island-safety-status'), text = [safety.label, safety.secondary].filter(Boolean).join(' · '); if (status.textContent !== text) status.textContent = text;
     status.dataset.safety = safety.level; status.title = safety.description; status.setAttribute('aria-label', `${text}. ${safety.description}`); status.setAttribute('aria-controls', safety.destination === 'frontier' ? 'frontier-panel' : 'town-book');
     townToggle.classList.toggle('threatened', !!state.pressure?.active);
-    townToggle.title = 'People, projects, stores, research, trade and the coastal watch';
+    townToggle.title = `${townLibrary.activeName || 'Your town'}: people, projects, stores, research, trade and the coastal watch`;
   }
   const projects = sim.constructionQueue(state).length;
   if ($('tablet-build-toggle')) $('tablet-build-toggle').textContent = projects ? `Build · ${projects}` : 'Build';
   $('find-bell').hidden = state.won || ambition.step < 4; $('undo').disabled = !state.undo;
   $('pause').classList.toggle('active', speed === 0); $('pause').textContent = speed === 0 ? '▶' : 'Ⅱ'; $('pause').setAttribute('aria-label', speed === 0 ? 'Resume' : 'Pause');
-  for (const button of document.querySelectorAll('[data-speed]')) button.setAttribute('aria-pressed', String(Number(button.dataset.speed) === speed));
+  $('speed-toggle').textContent = `${previousSpeed}×`;
+  $('speed-toggle').setAttribute('aria-label', `Speed ${previousSpeed}×. Switch to ${previousSpeed === 1 ? 3 : 1}×.`);
   $('journal-entries').replaceChildren(...state.events.map(event => { const item = document.createElement('li'), label = document.createElement('small'); label.textContent = `Day ${calendarDay(state, event.day)}`; item.append(label, document.createTextNode(event.text)); return item; }));
   updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); coopUI?.update(); coop?.tick(); observedUI?.update(); observed?.tick(); if (tool && hovered) hover(hovered);
 }
@@ -476,14 +515,15 @@ function attractVillage() {
   demo.citizens.forEach((c,i) => { c.job = i < 2 ? 'builder' : 'farmer'; c.workplace = i < 2 ? 'preview0' : 'preview4'; }); return demo;
 }
 function bind() {
-  $('start').onclick = () => { if (saved) { $('help-dialog').showModal(); $('restart-confirm').hidden = false; } else newVillage(); };
+  $('start').onclick = newVillage;
+  $('intro-towns').onclick = () => townLibraryUI.open();
   $('continue').onclick = () => { state = saved; victorySeen = state.won; enter(true); announce('Welcome home. Time is paused while you find your bearings.'); };
   $('sound-settings').onclick=()=>{$('sound-mixer').showModal();};$('mixer-toggle').onclick=toggleAudio;
   for(const key of ['effects','ambience']){const input=$('mix-'+key);input.value=audio[key+'Level']*100;input.oninput=()=>{audio.setMix({[key]:Number(input.value)/100});try{localStorage.setItem(SETTINGS_KEY,JSON.stringify({sound:soundEnabled,effects:audio.effectsLevel,ambience:audio.ambienceLevel}));}catch{}};}
   $('sound-preview').onclick=async()=>{if(!soundEnabled)toggleAudio();await audio.start();audio.effect('anvil',{gain:.7,pan:-.3});};
   $('sound').onclick = toggleAudio; $('intro-sound').onclick = toggleAudio;
   $('keep-running').onclick = () => setSpeed(previousSpeed);
-  $('pause').onclick = togglePause; for (const b of document.querySelectorAll('[data-speed]')) b.onclick = () => setSpeed(Number(b.dataset.speed));
+  $('pause').onclick = togglePause; $('speed-toggle').onclick = () => setSpeed(previousSpeed === 1 ? 3 : 1);
   $('home').onclick = () => world.home(); $('turn-left').onclick = () => world.rotate(-1); $('turn-right').onclick = () => world.rotate(1); $('zoom-in').onclick = () => world.zoomBy(-3); $('zoom-out').onclick = () => world.zoomBy(3);
   $('cancel-building').onclick = cancelTool; $('rotate-building').onclick = () => { rotation = (rotation + 1) % 4; if (hovered) hover(hovered); };
   $('confirm-building').onclick = () => commitBuilding(touchSite);
@@ -496,7 +536,7 @@ function bind() {
     if (selected.type === 'bell') { if (selected.restored) { audio.play('bell'); announce('The bell carries all the way across the water.'); } else mutate(sim.build(state, 'bell', 0, -5)); return; }
     const result = sim.demolish(state, selected.id); if (result.ok) closeInspector(); mutate(result);
   };
-  $('inspect-secondary').onclick = () => { if(selected?.type==='barracks'){closeInspector();frontierUI.open('company');return;}if(selected?.type==='garden'){frontierUI.open('gardens');return;} if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
+  $('inspect-secondary').onclick = () => { if(selected?.type==='fishingpier'){const person=state.citizens.find(c=>c.id===selected.workerIds[0]);if(person){focusCitizen(person);world.followFisher(person.id);}return;}if(selected?.type==='barracks'){closeInspector();frontierUI.open('company');return;}if(selected?.type==='garden'){frontierUI.open('gardens');return;} if (selected?.type === 'lumber') { const grove = sim.woodlandStatus(state, selected), site = grove.youngTarget || grove.target; if (site) { inspectTree(site); world.focusWorld(site.x, site.z, 10); } return; } const citizen = state.citizens.find(c => c.id === selected?.id), workplace = state.buildings.find(b => b.id === citizen?.workplace); if (workplace) { inspect(workplace); world.focus(workplace); } };
   $('landing-button').onclick = () => activateDock('landing');
   $('undo').onclick = () => { if (companions.canManage) mutate(sim.undo(state)); };
   $('find-bell').onclick = () => { const b = state.buildings.find(b => b.type === 'bell'); inspect(b); world.focus(b); };
@@ -506,7 +546,7 @@ function bind() {
   $('journal-button').onclick = () => activateDock('journal'); $('close-journal').onclick = closeJournal;
   $('help').onclick = () => { $('restart-confirm').hidden = true; $('help-dialog').showModal(); };
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
-  $('restart').onclick = () => { $('restart-confirm').querySelector('p').textContent = companions.activeId === 'home' ? 'This replaces your saved home village. A linked companion town is kept.' : 'This replaces the local companion village. Your home town is kept.'; $('restart-confirm').hidden = false; }; $('cancel-restart').onclick = () => $('restart-confirm').hidden = true; $('confirm-restart').onclick = newVillage;
+  $('restart').onclick = newVillage; $('cancel-restart').onclick = () => $('restart-confirm').hidden = true; $('confirm-restart').onclick = newVillage;
   document.addEventListener('keydown', e => {
     if (e.target.matches('input,textarea,select') || e.target.closest('#observed-panel') || document.querySelector('dialog[open]') || !playing) return;
     if (!companions.canManage && !['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyQ','KeyE','Home','Escape','KeyP'].includes(e.code)) return;
@@ -544,7 +584,7 @@ async function boot() {
         uiClock += dt; saveClock += dt; if (uiClock > .5) { updateUI(); uiClock = 0; } if (saveClock > 5) { save(); saveClock = 0; }
       }
       if(playing&&observed)world.setVisitingScouts(observed.info().scouts);
-      world.render(dt, { speed: playing ? (companions.canManage ? speed : 0) : 1, playing: !modal, dayTime: calendarFraction(state), won: playing && state.won }); if (tool) positionPlacementInfo(); frames++; total += wallDt;
+      world.render(dt, { speed: playing ? (companions.canManage ? speed : 0) : 1, playing: !modal, dayTime: calendarFraction(state), won: playing && state.won }); frames++; total += wallDt;
       if (total > 2) { document.documentElement.dataset.fps = String(Math.round(frames / total)); frames = 0; total = 0; }
     }
     requestAnimationFrame(frame);
@@ -558,7 +598,7 @@ async function boot() {
       canUse:()=>playing && companions.canManage && companions.activeId==='home', save:next=>companions.save(next),
       onChange:()=>{sim.refreshTown(state);world.sync(state);updateUI();} });
     coopUI=createCoopUI({coop,getState:()=>state,beforeOpen:()=>preparePanel('coop'),openLocal:()=>companionUI.open(),cloneModel:type=>world.clone(type),announce,
-      importState:next=>{if(observed?.info().online)return{ok:false,reason:'Go offline in World before importing a backup.'};if(!companions.canManage||companions.activeId!=='home'||coop.info().busy)return{ok:false,reason:'Return home and finish connecting before importing.'};
+      importState:next=>{if((observed?.info().online || observed?.info().busy))return{ok:false,reason:'Go offline in World before importing a backup.'};if(!companions.canManage||companions.activeId!=='home'||coop.info().busy)return{ok:false,reason:'Return home and finish connecting before importing.'};
         const worldAllowed=canImportObservedWorld(state,next);if(!worldAllowed.ok)return worldAllowed;
         const allowed=canImportCoop(state,next);if(!allowed.ok)return allowed;
         const result=companions.save(next);if(!result.ok)return result;state=next;victorySeen=state.won;keys.clear();enter(true);return result;} });
@@ -568,11 +608,19 @@ async function boot() {
       onChange:()=>observedUI?.update()});
     observedUI=createObservedUI({network:observed,beforeOpen:()=>preparePanel('observed'),openAccount:()=>coopUI.open(),cloneModel:(type,level)=>world.clone(type,level)});
     mountTabletControls();
+    townLibraryUI = createTownLibraryUI({ library: townLibrary, getState: () => playing ? state : null,
+      beforeOpen: () => { preparePanel(null); closeBuildDrawer(); document.querySelectorAll('dialog[open]').forEach(d => d.close()); keys.clear(); updateDock(); },
+      canSwitch: () => (coop.info().busy || observed.info().busy) ? { ok: false, reason: 'Finish the current online action before changing towns.' } : { ok: true },
+      onOpenTown: next => { state = next; saved = next; victorySeen = state.won; keys.clear(); enter(true); announce(`${townLibrary.activeName} opened. Resume when you’re ready.`); coop.reconnect(); }
+    });
+    mountCompactDock();
+    researchHUD = mountResearchHUD({ getState: () => state, isPaused: () => speed === 0,
+      open: id => town.revealResearch(id) });
     const shelfObserver=new ResizeObserver(()=>{document.documentElement.style.setProperty('--shelf-edge',`${innerHeight-document.querySelector('footer').getBoundingClientRect().top+12}px`);});shelfObserver.observe(document.querySelector('footer'));
     makeShelf(); bind(); updateAudio(); world.sync(attractVillage()); world.pan.set(innerWidth < 700 ? -2 : -5, 0, 0); world.targetZoom = innerWidth < 700 ? 38 : 29;
     $('loading').hidden = true; $('intro').hidden = false;
     if (companions.blocked) { $('intro').querySelector('.intro-copy small').textContent = companions.reason; $('start').disabled = true; }
-    if (saved) { $('continue').hidden = false; $('continue').className = 'primary'; $('start').textContent = 'Start somewhere new'; $('start').className = ''; }
+    if (saved) { $('continue').hidden = false; $('continue').className = 'primary'; $('continue').textContent = `Continue ${townLibrary.activeName || 'town'}`; $('start').textContent = 'New town'; $('start').className = ''; }
     window.Wildhaven = Object.freeze({ getSnapshot: () => JSON.parse(sim.serialize(state)), getDiagnostics: () => ({ ...world.diagnostics(), fps: Number(document.documentElement.dataset.fps || 0) }) });
     if (['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).has('review')) window.__wildhaven = { world, frontierUI, fieldbook, companionUI, audio, companionInfo:()=>companions.info(), frontierContext: () => sim.frontierContext(state), get state() { return state; }, advance, sync, project: (x,z) => world.project(x,z), snapshot: () => JSON.parse(sim.serialize(state)), canBuild: (type,x,z) => sim.canBuild(state,type,x,z) };
   } catch (error) {

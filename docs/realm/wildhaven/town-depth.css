@@ -1,0 +1,16 @@
+/* A research workbench: one live project, its three experiments, and its stores. */
+.research-work{padding:16px;border-left:4px solid #567968;background:#e1e9da}
+.research-stages{display:flex;gap:8px;padding:0;list-style:none;margin:16px 0}
+.research-stages li{flex:1;padding:8px 10px;border-top:3px solid #a5b6a0;font-size:.82rem;line-height:1.35;color:#576857}
+.research-stages li.current{border-color:#345e50;color:#243f36;font-weight:750;background:#f5f6eb}
+.research-stages li.done{border-color:#567968}.research-stages li.done::before{content:'✓ ';color:#315b47}
+.research-supplies{width:100%;border-collapse:collapse;font-size:.86rem;font-variant-numeric:tabular-nums;margin:10px 0}
+.research-supplies th{text-align:left;font-weight:600}.research-supplies th,.research-supplies td{padding:8px 4px;border-bottom:1px solid #b9c8ad}
+.research-supplies td{text-align:right}.research-supplies thead th:not(:first-child){text-align:right}.research-supplies .supplied{color:#49624e}
+.research-wait{font-weight:600;color:#715536;font-size:.88rem;line-height:1.5}
+.inspect-deposit,.inspect-herd{padding:12px 0;border-top:1px solid #b9c8ad}.inspect-herd .town-row-actions{flex-wrap:wrap}
+@media(max-width:520px){.research-work{padding:12px}.research-stages{gap:4px}.research-stages li{padding:7px 5px;font-size:.76rem}.research-supplies{font-size:.8rem}}
+
+.research-work .small-button,.inspect-herd .small-button,.inspect-deposit .small-button{background:#d3dec5;color:#294e3e;border-radius:4px;min-height:36px;padding:8px 11px;font-family:inherit;font-weight:600;font-size:11px;line-height:1.4}
+.research-work .primary{min-height:36px}.research-work .town-meta{color:#586d50;font-size:12px}.research-work .job-tag{display:inline-block;margin:4px 0}
+.research-work .small-button:hover,.inspect-herd .small-button:hover{background:#c4d3b3}.research-work button:disabled{opacity:.5;cursor:default}

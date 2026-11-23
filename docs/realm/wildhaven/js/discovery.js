@@ -20,10 +20,20 @@ export const DISCOVERIES = Object.freeze([
     story:'The ring is a map of the night sky. Four names are scratched around its rim, followed by “we waited for the clouds.” In the little garden below, each stone marks the first day of a season.',
     restoration:'Raise the sky ring', benefit:'Schools produce 20% more lore.', cost:{wood:18,stone:24,iron:6,gold:20}, work:75, salvage:{knowledge:22,gold:35},
     note:'At dusk, residents learn the names of the stars from the restored ring.', types:['school'], production:.20 },
+  { id:'croft', name:'The abandoned smallholding', region:'Pineward', x:-17,z:-10, mark:'V', tint:'#8e9c60',
+    rumor:'A stone trough sits beneath an apple tree. The grass inside the fence is still unusually thick.',
+    story:'The crofter kept careful records of feed, births and winter shelter. A raised floor kept the hens dry, and a split paddock gave the goats fresh ground each season.',
+    restoration:'Repair the crofter’s shelter', benefit:'Goat pastures and henhouses produce 15% more food.', cost:{planks:20,stone:18,grain:24}, work:85, salvage:{wood:30,grain:24,gold:12},
+    note:'The town’s animal keepers use the crofter’s feeding and shelter plans.', types:['pasture','henhouse'], production:.15 },
+  { id:'survey', name:'The surveyor’s camp', region:'Highmeadow ridge', x:-11,z:-24, mark:'VI', tint:'#8a8497',
+    rumor:'An old measuring frame stands beside the rock face. Ore samples lie in a divided wooden tray.',
+    story:'The surveyor marked the direction of each seam and tested samples from different depths. The notes distinguish useful ore from rock that merely shines.',
+    restoration:'Repair the sampling bench', benefit:'Mines and survey workshops produce 12% more.', cost:{planks:18,iron:8,tools:6}, work:95, salvage:{ore:36,iron:10,knowledge:12},
+    note:'The surveyor’s maps help miners follow the seams with less wasted effort.', types:['mine','assay'], production:.12 },
 ]);
 export const discoverySpec=id=>DISCOVERIES.find(s=>s.id===id);
 export const isFieldworker=u=>['explorer','restorer'].includes(u.kind);
-export function createDiscoveryState(){return {version:1,sites:DISCOVERIES.map(d=>({id:d.id,status:'rumor',surveyProgress:0,project:null,progress:0,reportedBy:null,reportedDay:null,finishedBy:null,finishedDay:null,received:{}}))};}
+export function createDiscoveryState(){return {version:2,sites:DISCOVERIES.map(d=>({id:d.id,status:'rumor',surveyProgress:0,project:null,progress:0,reportedBy:null,reportedDay:null,finishedBy:null,finishedDay:null,received:{}}))};}
 export function discoveryModifier(state,type,kind='production'){
   let bonus=0;for(const site of state.discovery?.sites||[]){if(site.status!=='restored')continue;const spec=discoverySpec(site.id);if(kind==='construction')bonus+=spec.construction||0;else if(spec.types.includes(type))bonus+=spec.production||0;}return 1+bonus;
 }
@@ -31,7 +41,9 @@ export const fieldworkDuration=(site,mode)=>mode==='survey'?22:mode==='salvage'?
 export function fieldworkerFor(state,id){return state.frontier?.units.find(u=>isFieldworker(u)&&u.missionSiteId===id&&!['dead','released'].includes(u.status));}
 export function normalizeDiscovery(state){
   const fail=()=>{throw new Error('Invalid fieldbook save');},d=state.discovery;
-  if(!d||d.version!==1||!Array.isArray(d.sites)||d.sites.length!==DISCOVERIES.length)fail();
+  if(!d||![1,2].includes(d.version)||!Array.isArray(d.sites))fail();
+  if(d.version===1){if(d.sites.length!==4||!['waystone','spring','kiln','stars'].every(id=>d.sites.some(s=>s?.id===id)))fail();d.sites.push(...createDiscoveryState().sites.slice(4));d.version=2;}
+  if(d.sites.length!==DISCOVERIES.length)fail();
   const seen=new Set();for(const s of d.sites){const spec=discoverySpec(s?.id);if(!spec||seen.has(s.id)||!['rumor','surveyed','restored','salvaged'].includes(s.status)||![null,'restore','salvage'].includes(s.project))fail();seen.add(s.id);
     if(!Number.isFinite(s.surveyProgress)||s.surveyProgress<0||s.surveyProgress>22||!Number.isFinite(s.progress)||s.progress<0||s.progress>(s.project==='restore'?spec.work:s.project==='salvage'?25:0))fail();
     for(const [name,day] of [['reportedBy','reportedDay'],['finishedBy','finishedDay']])if(s[name]!==null&&(typeof s[name]!=='string'||!s[name].trim()||s[name].length>60||/[<>\x00-\x1f]/.test(s[name])||!Number.isInteger(s[day])||s[day]<1||s[day]>state.day)||s[name]===null&&s[day]!==null)fail();

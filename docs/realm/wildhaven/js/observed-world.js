@@ -5,13 +5,14 @@ import { createScoutHost, scoutRoute, restoreObservedWorld, parseWorldInvite, is
 async function openPeer(handler) { const module=await import('../vendor/iroh/town_peer.js');await module.default();const peer=await module.TownPeer.open(handler);try{await peer.ready();return peer;}catch(e){await peer.close();throw e;} }
 export function createObservedWorld({config,auth,getState,canUse,save,actors,storage=globalThis.localStorage,onChange=()=>{},directory=createWorldDirectory(config,auth),makePeer=openPeer,now=()=>Date.now()}) {
   let peer=null,session=null,online=false,busy=false,message='',claims=[],presences=new Map(),view=null,visit=null,center=null,networkTask=false,polling=false,lastDirectory=0,lastBeat=0,lastView=0,generation=0,linkState=null,connecting=false;
+  let townState=getState();
   let watching=false;let autoTried=null;let notesKey=null,notes={},lastNote=0;const admitted=new Map(),pending=new Set();
   const host=createScoutHost({getState,actors,now,canObserve:()=>online&&canUse()&&getState()===linkState});
   const changed=()=>onChange();
   const link=()=>getState().networkWorld;
   function persist(next) {const s=getState(),before=s.networkWorld;s.networkWorld=restoreObservedWorld(next);const result=save(s);if(!result.ok){s.networkWorld=before;throw new Error(result.reason);}changed();}
   function loadNotes(){const current=link();if(!current)return;const key=`island-town.scout-notes.v1:${current.worldId}:${current.uid}`;if(key===notesKey)return;notesKey=key;notes={};try{const saved=JSON.parse(storage?.getItem(key)||'{}');for(const [uid,n]of Object.entries(saved).slice(-64))if(validId(uid)&&Number.isFinite(n.seenAt)&&Number.isInteger(n.buildings)&&Number.isInteger(n.trees)&&n.buildings>=0&&n.buildings<=256&&n.trees>=0&&n.trees<=1024)notes[uid]={seenAt:n.seenAt,buildings:n.buildings,trees:n.trees};}catch{}}
-  function keepNote(){if(!visit?.seenAt||!view)return;loadNotes();notes[visit.target.uid]={seenAt:visit.seenAt,buildings:view.buildings.length,trees:view.trees.length};notes=Object.fromEntries(Object.entries(notes).sort((a,b)=>a[1].seenAt-b[1].seenAt).slice(-64));try{storage?.setItem(notesKey,JSON.stringify(notes));}catch{}lastNote=now();}
+  function keepNote(){if(getState()!==linkState||!visit?.seenAt||!view)return;loadNotes();notes[visit.target.uid]={seenAt:visit.seenAt,buildings:view.buildings.length,trees:view.trees.length};notes=Object.fromEntries(Object.entries(notes).sort((a,b)=>a[1].seenAt-b[1].seenAt).slice(-64));try{storage?.setItem(notesKey,JSON.stringify(notes));}catch{}lastNote=now();}
   async function action(fn){if(busy)return;busy=true;message='';changed();try{await fn();}catch(e){message=e.code==='OFFLINE'?'The world connection was interrupted. Your town remains saved on this device.':e.message||'The world could not connect. Try again.';}finally{busy=false;changed();}}
   function incoming(endpoint,raw) {
     try {
@@ -43,23 +44,34 @@ export function createObservedWorld({config,auth,getState,canUse,save,actors,sto
     if(gen!==generation)return;lastDirectory=now();changed();
   }
   async function connect() {
+    syncTown();
     if(online||connecting)return;
     const current=link();if(!current||!auth.user||auth.user.uid!==current.uid||!canUse())throw new Error('Open your home town and sign in with its account first.');
-    connecting=true;const gen=++generation;let candidate;
+    connecting=true;const gen=++generation,ownerState=getState();let candidate,connectedLink=current;
+    const valid=()=>gen===generation&&getState()===ownerState&&canUse()&&auth.user?.uid===current.uid;
     try{
-      if(current.phase!=='ready'){const next=await directory.enlist(current);if(gen!==generation)return;persist(next);}
-      candidate=await makePeer(incoming);if(gen!==generation){await candidate.close();return;}
-      const leaseKey=`island-town.world-session.v1:${current.worldId}`;let nextSession=storage?.getItem(leaseKey);if(!validId(nextSession)){nextSession=coopId();storage?.setItem(leaseKey,nextSession);}await directory.heartbeat(link(),candidate,nextSession);
-      if(gen!==generation){await directory.withdraw(current,nextSession,candidate.id()).catch(()=>{});await candidate.close();return;}
+      if(current.phase!=='ready'){const next=await directory.enlist(current);if(!valid())return;persist(next);connectedLink=link();}
+      candidate=await makePeer(incoming);if(!valid()){await candidate.close();return;}
+      const leaseKey=`island-town.world-session.v1:${current.worldId}`;let nextSession=storage?.getItem(leaseKey);if(!validId(nextSession)){nextSession=coopId();storage?.setItem(leaseKey,nextSession);}await directory.heartbeat(connectedLink,candidate,nextSession);
+      if(!valid()){await directory.withdraw(connectedLink,nextSession,candidate.id()).catch(()=>{});await candidate.close();return;}
       peer=candidate;session=nextSession;linkState=getState();online=true;lastBeat=now();center={gx:current.gx,gz:current.gz};message='Your town is open to scouts.';await refreshDirectory();
     }catch(e){if(candidate&&candidate!==peer)await candidate.close().catch(()=>{});throw e;}finally{connecting=false;changed();}
   }
-  async function disconnect() {
+  async function disconnect({forget=false}={}) {
     keepNote();const previous=peer,oldSession=session,current=linkState?.networkWorld||link();++generation;online=false;peer=null;session=null;view=null;admitted.clear();host.clear();pending.clear();
-    if(visit)visit={...visit,phase:'fog',reason:'Your town is offline. Reconnect to send the scout again.'};changed();
+    linkState=null;
+    if(forget){visit=null;claims=[];presences.clear();center=null;notesKey=null;notes={};autoTried=null;message='';lastDirectory=lastBeat=lastView=lastNote=0;}
+    else if(visit)visit={...visit,phase:'fog',reason:'Your town is offline. Reconnect to send the scout again.'};changed();
     await Promise.allSettled([previous?.close(),current&&oldSession&&directory.withdraw(current,oldSession,previous?.id())]);
   }
+  function syncTown() {
+    if(townState===getState())return;
+    townState=getState();
+    // Invalidate the old endpoint immediately, including any in-flight enlist or view.
+    void disconnect({forget:true});
+  }
   async function begin(name,invitation) {
+    syncTown();
     if(!canUse()||!auth.user)throw new Error('Sign in through Play together, then return to World.');
     if(!validTownName(name))throw new Error('Give your town a name with 1–40 characters.');
     if(link())throw new Error('This town already belongs to a world.');
@@ -102,7 +114,8 @@ export function createObservedWorld({config,auth,getState,canUse,save,actors,sto
     finally{polling=false;changed();}
   }
   async function tick() {
-    if(!canUse()||(link()&&auth.user?.uid!==link().uid)){if(online)await disconnect();return;}
+    syncTown();
+    if(!canUse()||(link()&&auth.user?.uid!==link().uid)){if(online||connecting)await disconnect();return;}
     const current=link();if(!current)return;loadNotes();
     if(!online&&!busy&&!connecting&&autoTried!==current.worldId&&auth.user?.uid===current.uid){autoTried=current.worldId;await action(connect);}
     if(!online)return;
@@ -115,7 +128,7 @@ export function createObservedWorld({config,auth,getState,canUse,save,actors,sto
     }
     if(visit&&now()-lastView>(visit.phase==='fog'?3000:500))void observe();
   }
-  return {tick,info:()=>({link:link(),online,busy:busy||connecting,message,claims,presences,view,visit,center,visitors:host.count,scouts:host.positions(),notes,user:auth.user}),
+  return {tick,syncTown,info:()=>({link:link(),online,busy:busy||connecting,message,claims,presences,view,visit,center,visitors:host.count,scouts:host.positions(),notes,user:auth.user}),
     begin:(name,invitation)=>action(()=>begin(name,invitation)),connect:()=>action(connect),disconnect:()=>action(async()=>{autoTried=link()?.worldId;await disconnect();message='Your town is offline. Its border stays on the map.';}),
     scout,recall,moveScout:(x,z)=>{if(visit?.phase==='observing')visit.command={x,z};},
     watch:value=>{watching=value;if(value&&link()?.phase==='ready')void action(refreshDirectory);},refresh:()=>action(refreshDirectory),pan:(dx,dz)=>action(async()=>{const c=center||link();center={gx:Math.max(-1024,Math.min(1023,c.gx+dx)),gz:Math.max(-1024,Math.min(1023,c.gz+dz))};await refreshDirectory();}),

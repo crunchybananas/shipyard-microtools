@@ -1,0 +1,79 @@
+{
+  "legacyUnchanged": true,
+  "active": {
+    "slotId": "s1",
+    "townId": "home"
+  },
+  "towns": [
+    {
+      "id": "s1",
+      "name": "Your town",
+      "pair": true,
+      "homeValid": true,
+      "resources": {
+        "wood": 144,
+        "stone": 135,
+        "food": 240.143159,
+        "grain": 0,
+        "flour": 150,
+        "planks": 114,
+        "ore": 133.792033,
+        "iron": 150,
+        "tools": 141,
+        "flax": 150,
+        "cloth": 52,
+        "ale": 150,
+        "gold": 132,
+        "knowledge": 304.703567
+      },
+      "research": {
+        "id": "joinery",
+        "progress": 25,
+        "duration": 75,
+        "startedDay": 17,
+        "fundingVersion": 1,
+        "stage": 1,
+        "allocation": 100,
+        "paused": false,
+        "delivered": {
+          "knowledge": 4
+        }
+      }
+    },
+    {
+      "id": "s2",
+      "name": "Coast experiments",
+      "pair": false,
+      "homeValid": true,
+      "resources": {
+        "wood": 144,
+        "stone": 135,
+        "food": 240.143159,
+        "grain": 0,
+        "flour": 150,
+        "planks": 114,
+        "ore": 133.792033,
+        "iron": 150,
+        "tools": 141,
+        "flax": 150,
+        "cloth": 52,
+        "ale": 150,
+        "gold": 132,
+        "knowledge": 304.703567
+      },
+      "research": {
+        "id": "joinery",
+        "progress": 25,
+        "duration": 75,
+        "startedDay": 17,
+        "fundingVersion": 1,
+        "stage": 1,
+        "allocation": 100,
+        "paused": false,
+        "delivered": {
+          "knowledge": 4
+        }
+      }
+    }
+  ]
+}

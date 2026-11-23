@@ -2,6 +2,7 @@
 // Geometry, player collision, water depth and foam all read the same math.
 
 import * as THREE from 'three';
+import { sandTrackTexture, TRACK_PATCH } from './sand-tracks.js';
 import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
 // #77: terrain is a DETERMINISTIC LEAF again — no live world import. The four pieces of
 // world state collision depends on arrive through GATES, synced once per frame by main
@@ -595,6 +596,8 @@ export function buildTerrain() {
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
     sh.uniforms.uBuriedView = { value: 0 };
+    sh.uniforms.uFootprints = { value: sandTrackTexture() };
+    sh.uniforms.uTrackRect = { value: new THREE.Vector3(TRACK_PATCH.x, TRACK_PATCH.z, TRACK_PATCH.size) };
     sh.uniforms.uTexAmt = { value: 0.7 };   // strength of the procedural sand-grain luminance detail
     // waterline pass (#47/#38): the tide line, in OBJECT space so the 1:240 clone inherits it
     sh.uniforms.uWaterY = { value: 0 };
@@ -627,7 +630,13 @@ export function buildTerrain() {
         uniform sampler2D uLitter; uniform float uLitterOn; uniform vec3 uLitterRect;
         uniform float uPathAmt;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
-        float gSandLee;
+        float gSandLee; float gFoot; float gSandWet;
+        uniform sampler2D uFootprints; uniform vec3 uTrackRect;
+        float footDepth(vec2 p) {
+          vec2 uv = (p-uTrackRect.xy)/uTrackRect.z + 0.5;
+          if (min(uv.x,uv.y) < 0.0 || max(uv.x,uv.y) > 1.0) return 0.0;
+          return texture2D(uFootprints,uv).r;
+        }
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
       .replace('#include <clipping_planes_fragment>',
@@ -695,6 +704,10 @@ export function buildTerrain() {
           vec2 sandWind = normalize(mix(sandDA, sandDB, sandTurn));
           gSandLee = clamp(dot(sandSlope, sandWind) / 0.17, -1.0, 1.0);
         }
+        // Sample derivatives before material branches; the mask follows the same mesh.
+        diffuseColor.rgb *= 1.0 + gSandLee * 0.024 * sandW
+          * (1.0-smoothstep(0.38,0.52,vSlope)) * (1.0-mini);
+        float footprintH = -gFoot * 0.028;
         float Hb = roll * 0.42;
         // The old authored 512² image repeated its complete shape every 6.25 m. The
         // analytic carriers above have no common period within the 620 m island.
@@ -716,7 +729,8 @@ export function buildTerrain() {
         float Hr     = strata * 0.55 * bDistR + chip * 0.5 * bDist;
         float Hmix   = mix(Hb, Hr, rockW);
         float bAmt  = 0.20 * land0 * mix(bDist, 1.0, rockW) * (1.0 - mini);
-        vec2 dHdxy  = vec2(dFdx(Hmix), dFdy(Hmix)) * bAmt;
+        vec2 dHdxy  = vec2(dFdx(Hmix), dFdy(Hmix)) * bAmt
+          + vec2(dFdx(footprintH), dFdy(footprintH));
         vec3 bSx = dFdx(-vViewPosition), bSy = dFdy(-vViewPosition);
         vec3 bR1 = cross(bSy, normal), bR2 = cross(normal, bSx);
         float bDet = dot(bSx, bR1);
@@ -731,6 +745,9 @@ export function buildTerrain() {
       // grain (no tile → no grid → no smear) multiplied as luminance so the vertex-coloured bands
       // keep their hue. Self-contained (the <normal_fragment_begin> block is a separate GLSL scope,
       // so we recompute here rather than share). -2 texture fetches; +0 draws.
+      .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+        roughnessFactor = mix(roughnessFactor, 0.56, gSandWet);
+        roughnessFactor = mix(roughnessFactor, 0.88, gFoot * 0.35);`)
       .replace('#include <color_fragment>', `
         #include <color_fragment>
         float cScl  = (fwidth(vWPos.x) + fwidth(vWPos.z)) / max(fwidth(vLXZ.x) + fwidth(vLXZ.y), 1e-6);
@@ -744,7 +761,15 @@ export function buildTerrain() {
         diffuseColor.rgb *= mix(1.0, detail, uTexAmt * cLand * (1.0 - cMini * 0.85));
         float cSandW = (1.0 - smoothstep(2.2, 3.4, vTerH))
           * (1.0 - smoothstep(0.38, 0.52, vSlope));
-        diffuseColor.rgb *= 1.0 + gSandLee * 0.024 * cSandW * (1.0 - cMini);
+        // Filter mineral flecks by their projected footprint to avoid distant shimmer.
+        float mineralFade = 1.0-smoothstep(0.018,0.065,max(fwidth(vLXZ.x),fwidth(vLXZ.y)));
+        float mineral = vnoise(vLXZ*48.7+vec2(9.3,2.1));
+        float mineralW = cSandW*(1.0-cMini)*mineralFade;
+        diffuseColor.rgb *= mix(vec3(1.0), mix(vec3(.88,.86,.82),vec3(1.08,1.065,1.035),mineral),mineralW*.55);
+        gFoot = footDepth(vLXZ)*cSandW*(1.0-cMini)*cLand
+          * smoothstep(0.02,0.16,vTerH-uWaterY)
+          * (1.0-smoothstep(18.0,40.0,length(vViewPosition)));
+        diffuseColor.rgb *= 1.0-gFoot*.16;
         // rock strata in ALBEDO too (#36): the normal-map beds wash out in the aerial haze
         // at the 170m glyph-puzzle study range — a gentle lightness banding survives it,
         // so the east bluff finally reads as BEDDED rock from the stones, not a blank wall
@@ -762,6 +787,7 @@ export function buildTerrain() {
         // wet swash band (#47): the metre above the line reads soaked — darker, cooler
         float wet = smoothstep(0.9, 0.12, -wDepth) * (1.0 - smoothstep(0.05, 0.5, wDepth));
         wet *= 1.0 - cMini * 0.4;
+        gSandWet = wet*cSandW*(1.0-cMini);
         diffuseColor.rgb *= mix(1.0, 0.64, wet);
         diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.93, 0.99, 1.05), wet);
         // submerged shift (#38): light dies warm-first — the drowned floor cools with depth

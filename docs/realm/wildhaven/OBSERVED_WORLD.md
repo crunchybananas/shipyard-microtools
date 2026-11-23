@@ -5,10 +5,12 @@ This feature keeps a town's simulation and complete save on its owner's device. 
 ## Play
 
 1. Sign in through **Play together**. The same account works with both features; a storehouse partnership is not required.
-2. Open **World**, name the town, and **Start a world**. Share the link under **Invite a neighbor**.
+2. Open **More → World**, name the town, and **Start a world**. Share the link under **Invite a neighbor**.
 3. A friend opens **World** in their own town, pastes the invitation, and chooses **Join world**.
 4. Choose **Send scout** beside a neighboring town. The scout crosses the wilderness, then contacts the owner at the border. Move by tapping ground, the directional buttons, or arrow keys with the map focused. Zoom with the buttons or mouse wheel.
 5. **Go offline** closes the town immediately. The visitor's scene disappears on failure or after at most five seconds without a valid view. **Open town to scouts** reconnects. Returning to the ordinary town screen recalls your scout but leaves your town open to visitors.
+
+Your towns keeps each save separate. Switching towns closes the previous town’s world connection; a duplicate keeps progress but receives a fresh online identity with no world claim.
 
 Town saves and backups remain local. Importing an older or different backup cannot erase an existing world claim. Each signed-in account can claim one plot per world. A town keeps its original island within a rectangular plot; adding a world does not relocate existing buildings or reset trees. Offline plots remain claimed. There is no offline simulation, combat between player towns, or transfer of ownership. A scout is an independent visitor and does not remove a citizen from either town.
 

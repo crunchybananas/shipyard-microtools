@@ -1,3 +1,4 @@
+import { researchPlan, restoreResearchProject, researchFunding, contributeResearch, cancelResearchProject } from './research-projects.js';
 import { peacefulProjects, coastalPacts } from './hinterland.js';
 import { until } from './calendar.js';
 /** Research, charters, orders and voyages. Pure game data; no simulation cycle. */
@@ -35,6 +36,9 @@ const event = (text, type = 'progress') => ({ text, type });
 const failure = reason => ({ ok: false, reason });
 
 export const RESEARCH = Object.freeze({
+  husbandry: { name: 'Animal husbandry', branch: 'agrarian', tier: 2, cost: { knowledge: 24, gold: 12 }, duration: 180, prerequisites: ['cultivation', 'joinery'], unlocks: ['pasture', 'henhouse'], description: 'Raise goats for milk and hens for eggs. Herds need animal keepers, grain and room for their young.', effects: {} },
+  prospecting: { name: 'Surveying and deep workings', branch: 'industry', tier: 3, cost: { knowledge: 48, tools: 6, gold: 18 }, duration: 240, prerequisites: ['metallurgy', 'logistics'], unlocks: ['assay'], description: 'Build a survey workshop and upgrade stoneworks and mines to reach finite deeper reserves. Nearby works still share each deposit.', effects: {} },
+  husbandry_care: { name: 'Winter feed and breeding', branch: 'agrarian', tier: 3, cost: { knowledge: 48, tools: 6, gold: 18 }, duration: 240, prerequisites: ['husbandry', 'logistics'], unlocks: [], description: 'Expand pastures and henhouses with more shelter and room for animals. Young animals still need time and regular care to mature.', effects: {} },
   cultivation: { name: 'Fieldcraft', branch: 'agrarian', tier: 1, cost: { knowledge: 12 }, duration: 75, prerequisites: [], unlocks: ['farm'], description: 'Grow grain, and improve the yield of grain farms and kitchen gardens by 10%.', effects: { foodFarming: 1.1 } },
   joinery: { name: 'Timber framing', branch: 'industry', tier: 1, cost: { knowledge: 12 }, duration: 75, prerequisites: [], unlocks: ['sawmill'], description: 'Season timber into planks. Builders complete their work 10% faster.', effects: { construction: 1.1 } },
   barter: { name: 'Market trading', branch: 'mercantile', tier: 1, cost: { knowledge: 10 }, duration: 60, prerequisites: [], unlocks: ['market'], description: 'Open a market hall. Improve contract and voyage coin by 5%; the landing also offers better terms as trade bonuses grow.', effects: { tradeReward: 1.05 } },
@@ -138,7 +142,7 @@ export function normalizeProgression(state) {
   state.research.completed = [...new Set((Array.isArray(state.research.completed) ? state.research.completed : []).filter(id => typeof id === 'string' && own(RESEARCH, id)))];
   const active = state.research.active;
   state.research.active = active && own(RESEARCH, active.id) && !researched(state, active.id)
-    ? { id: active.id, progress: Math.max(0, Math.min(RESEARCH[active.id].duration, number(active.progress))), duration: RESEARCH[active.id].duration, startedDay: Math.max(1, integer(active.startedDay, dayOf(state))) }
+    ? restoreResearchProject(active, RESEARCH[active.id], dayOf(state))
     : null;
   state.policies = state.policies && typeof state.policies === 'object' ? state.policies : defaults.policies;
   state.policies.charter = own(POLICIES, state.policies.charter) ? state.policies.charter : null;
@@ -190,9 +194,9 @@ export function researchOptions(state) {
     else if (active) reason = 'The scholars are working on this.';
     else if (state.research.active) reason = 'Finish the current research first.';
     else if (needed.length) reason = `First research ${needed.map(key => RESEARCH[key].name).join(' and ')}.`;
-    else if (!afford(state, spec.cost)) reason = `Research costs ${costText(spec.cost)}.`;
-    const canStart = !completed && !state.research.active && !needed.length && afford(state, spec.cost);
-    return { id, ...spec, completed, active, canStart, ok: canStart, reason, progress: completed ? 1 : active ? state.research.active.progress / spec.duration : 0 };
+    else reason = 'Choose a project and allocate a share of new supplies.';
+    const canStart = !completed && !state.research.active && !needed.length;
+    return { id, ...spec, plan: researchPlan(id, spec), funding: active ? researchFunding(state, {id,...spec}) : null, completed, active, canStart, ok: canStart, reason, progress: completed ? 1 : active ? state.research.active.progress / spec.duration : 0 };
   });
 }
 
@@ -200,10 +204,20 @@ export function startResearch(state, id) {
   const option = researchOptions(state).find(option => option.id === id);
   if (!option) return failure('Choose a known field of research.');
   if (!option.canStart) return failure(option.reason);
-  spend(state, option.cost);
-  state.research.active = { id, progress: 0, duration: option.duration, startedDay: dayOf(state) };
-  return { ok: true, reason: `${option.name} begun. Assigned scholars will carry it forward.`, research: state.research.active };
+  state.research.active = { id, progress: 0, duration: option.duration, startedDay: dayOf(state), fundingVersion: 1, stage: 0, delivered: {}, paused: false, allocation: 25 };
+  return { ok: true, reason: `${option.name} started. 25% of new research supplies are allocated automatically.`, research: state.research.active };
 }
+
+export function fundResearch(state){
+ const id=state.research?.active?.id;
+ return id&&own(RESEARCH,id)?contributeResearch(state,{id,...RESEARCH[id]}):failure('Choose a research project first.');
+}
+export function pauseResearch(state,paused){
+ const a=state.research?.active;if(!a||a.fundingVersion!==1)return failure('This project cannot be paused separately.');
+ a.paused=!!paused;return {ok:true,reason:paused?'Research paused. Its supplies are reserved.':'Research resumed.'};
+}
+export const cancelResearch=cancelResearchProject;
+export { setResearchAllocation } from './research-projects.js';
 
 export function policyOptions(state) {
   normalizeProgression(state);
@@ -263,10 +277,10 @@ export function supplyModifiers(state, type) {
 }
 
 function staffedSchoolRate(state) {
-  return buildings(state, 'school').reduce((sum, building) => {
+  return [...buildings(state, 'school'), ...buildings(state, 'assay')].reduce((sum, building) => {
     if (Number.isFinite(building.production?.efficiency)) return sum + Math.max(0, building.production.efficiency);
     if (building.production?.blockedReason) return sum;
-    const spec = getBuildingSpec('school', building.level || 1);
+    const spec = getBuildingSpec(building.type, building.level || 1);
     const workers = building.workerIds?.length ?? (state.citizens || []).filter(citizen => citizen.workplace === building.id && citizen.job === 'scholar').length;
     return sum + Math.min(1, workers / spec.workers);
   }, 0);
@@ -277,9 +291,12 @@ export function tickProgression(state, dt, services = {}) {
   if (!Number.isFinite(dt) || dt <= 0) return result;
   const active = state.research?.active;
   if (!active || !own(RESEARCH, active.id)) return result;
+  if(active.fundingVersion===1&&(active.paused||!researchFunding(state,{id:active.id,...RESEARCH[active.id]}).funded))return result;
   const rawRate = Number.isFinite(services.researchRate) ? services.researchRate : staffedSchoolRate(state);
   const rate = Math.max(0, rawRate) * supplyModifiers(state, 'school').research;
-  active.progress = Math.min(active.duration, active.progress + dt * rate);
+  const limit=active.fundingVersion===1?(active.stage+1)*active.duration/3:active.duration;
+  active.progress = Math.min(limit, active.progress + dt * rate);
+  if(active.fundingVersion===1&&active.progress>=limit&&active.stage<2){active.stage++;active.delivered={};result.events.push(event(`${RESEARCH[active.id].name}: ${researchPlan(active.id,RESEARCH[active.id])[active.stage].name.toLowerCase()} is ready for supplies.`, 'research'));return result;}
   if (active.progress >= active.duration) {
     const id = active.id;
     if (!state.research.completed.includes(id)) state.research.completed.push(id);
@@ -442,7 +459,7 @@ function chapters(state) {
   const residents = population(state), stock = state.resources || {};
   const progress = (value, target) => Math.min(target, Math.max(0, number(value)));
   const goal = (id, title, description, values, extra = {}) => ({ id, title, description, current: values.reduce((sum, [value, target]) => sum + progress(value, target), 0), total: values.reduce((sum, [, target]) => sum + target, 0), ...extra });
-  const foodPlaces = count(state, 'orchard') + count(state, 'garden');
+  const foodPlaces = count(state, 'orchard') + count(state, 'garden') + count(state, 'fishingpier');
   const bell = (state.buildings || []).some(building => building.type === 'bell' && building.restored && ready(building));
   const coverage = state.serviceCoverage || {}, ledger = state.imports || {}, sold = ledger.exported || {};
   const peacefulCoasts = (state.pressure?.defended || 0) + (state.pressure?.paid || 0) + peacefulProjects(state);
@@ -462,10 +479,10 @@ function chapters(state) {
   }
   return [
     goal('chapter_0', 'Build your first cottage', 'Finish a cottage to add four beds.', [[count(state, 'cottage'), 1]], { type: 'cottage' }),
-    goal('chapter_1', 'Start growing food', 'Finish an orchard or kitchen garden, then assign workers to produce food.', [[staffedService(state, 'orchard') + staffedService(state, 'garden'), 1]], { type: 'orchard' }),
+    goal('chapter_1', 'Feed the village', 'Finish an orchard, garden or fishing pier, then assign workers to produce food.', [[staffedService(state, 'orchard') + staffedService(state, 'garden') + staffedService(state, 'fishingpier'), 1]], { type: 'orchard' }),
     goal('chapter_2', 'Timber and stone', 'Staff a woodcutter and stoneworks. Builders, farmers, and material workers share the same small population.', [[staffedService(state, 'lumber'), 1], [staffedService(state, 'quarry'), 1]], { type: count(state, 'lumber') ? 'quarry' : 'lumber' }),
-    goal('chapter_3', 'More homes and food', 'Finish three cottages and two orchards or kitchen gardens, and reach ten residents.', [[count(state, 'cottage'), 3], [foodPlaces, 2], [residents, 10]], { type: count(state, 'cottage') < 3 ? 'cottage' : 'garden' }),
-    goal('chapter_4', 'Restore the bell', 'Restore the old bell once you have three cottages, two orchards or gardens, and ten residents.', [[bell ? 1 : 0, 1]], { type: 'bell' }),
+    goal('chapter_3', 'More homes and food', 'Finish three cottages and two food workplaces (orchards, gardens or fishing piers), and reach ten residents.', [[count(state, 'cottage'), 3], [foodPlaces, 2], [residents, 10]], { type: count(state, 'cottage') < 3 ? 'cottage' : 'garden' }),
+    goal('chapter_4', 'Restore the bell', 'Restore the old bell once you have three cottages, two food workplaces (orchards, gardens or fishing piers), and ten residents.', [[bell ? 1 : 0, 1]], { type: 'bell' }),
     goal('chapter_5', 'Schools and research', 'Reach twenty residents, keep forty food in stock, staff a schoolhouse, build a well, and complete three research projects.', [[residents, 20], [stock.food, 40], [staffedService(state, 'school'), 1], [count(state, 'well'), 1], [state.research?.completed.length, 3]], { type: 'school' }),
     goal('chapter_6', 'Healthcare and supplies', 'Grow to forty people. Have twelve tools and twelve cloth in stock; made or imported goods enter stores automatically. Staff a market and clinic, and provide water to half the town’s housing and healthcare to 40%.', [[residents, 40], [stock.tools, 12], [stock.cloth, 12], [staffedService(state, 'market'), 1], [staffedService(state, 'clinic'), 1], [coverage.water, .5], [coverage.health, .4]], { type: 'clinic' }),
     goal('chapter_7', 'Coastal trade', 'Complete six delivery orders and either three voyages or twelve harbor-counter exports. Have 200 coin in stock, finish a town hall, and choose a town path.', [[state.contracts?.completed, 6], [Math.max(number(state.routes?.completed), number(ledger.exportsCompleted) / 4), 3], [stock.gold, 200], [count(state, 'manor'), 1], [state.policies?.charter ? 1 : 0, 1]], { type: 'manor' }),

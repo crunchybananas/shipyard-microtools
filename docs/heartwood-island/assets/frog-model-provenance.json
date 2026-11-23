@@ -1,0 +1,20 @@
+{
+  "triangles": 29378,
+  "mesh_count": 54,
+  "height": 1.5,
+  "forward": "+Z (glTF)",
+  "ground": "Y=0 (glTF)",
+  "palette": "Sage ceramic frog, midnight teal felt hat, blackberry wine cape, coral-and-gold heart clasp. Colors interpret monochrome approved art.",
+  "pose": "Reference: thinking finger at chin, flask presented in opposite hand.",
+  "animations": "No skeletal clips. Named nodes Body, Head, Hat, Cape, Flask allow parent procedural motion; root hop recommended.",
+  "source": "docs/heartwood-island/assets/plates/frog-alchemist.svg",
+  "dimensions_gltf_xyz": [
+    1.2437604665756226,
+    1.5,
+    0.901001900434494
+  ],
+  "minimum_y": 0,
+  "bytes": 658176,
+  "sha256": "3867e9930846b61de7d35e420063e217bff7035d639cff8640212fe8827fe158",
+  "source_sha256": "9b93f8b792f4e9672de5508aa9e92db5bf1182e8432afa56fcb2f39b579feb30"
+}

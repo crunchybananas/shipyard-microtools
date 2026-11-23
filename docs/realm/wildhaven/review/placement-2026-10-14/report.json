@@ -1,0 +1,145 @@
+{
+  "scope": "Isolated local browser contexts. Prepared five-cottage village for visual layout; actual pointer/touch placement controls. No Safari profile or user save accessed.",
+  "checks": [
+    {
+      "name": "desktop",
+      "box": {
+        "x": 340,
+        "y": 739.734375,
+        "width": 760,
+        "height": 82.265625
+      },
+      "info": {
+        "x": 357,
+        "y": 750.734375,
+        "width": 558,
+        "height": 60.265625
+      },
+      "preview": {
+        "left": 605.2589649899359,
+        "top": 334.7556579893329,
+        "right": 665.2213495866575,
+        "bottom": 416.07973792605384
+      },
+      "instruction": "Click to build here. The arrow marks the entrance.",
+      "coverage": "4 of 6 homes in reach \u00b7 4-space radius"
+    },
+    {
+      "name": "tablet",
+      "box": {
+        "x": 132,
+        "y": 607.734375,
+        "width": 760,
+        "height": 82.265625
+      },
+      "info": {
+        "x": 149,
+        "y": 618.734375,
+        "width": 461.1875,
+        "height": 60.265625
+      },
+      "preview": {
+        "left": 414.08765012474527,
+        "top": 285.65816148423073,
+        "right": 465.2555516472811,
+        "bottom": 355.0547096968993
+      },
+      "instruction": "Entrance clear. Choose Build here to confirm.",
+      "coverage": "4 of 6 homes in reach \u00b7 4-space radius"
+    },
+    {
+      "name": "phone",
+      "box": {
+        "x": 12,
+        "y": 633.734375,
+        "width": 366,
+        "height": 132.265625
+      },
+      "info": {
+        "x": 28,
+        "y": 643.734375,
+        "width": 338,
+        "height": 60.265625
+      },
+      "preview": {
+        "left": 127.1849487231029,
+        "top": 286.3812146976794,
+        "right": 183.41634050047304,
+        "bottom": 362.64512966056
+      },
+      "instruction": "Entrance clear. Choose Build here to confirm.",
+      "coverage": "4 of 6 homes in reach \u00b7 4-space radius"
+    },
+    {
+      "name": "landscape",
+      "box": {
+        "x": 12,
+        "y": 235.734375,
+        "width": 756,
+        "height": 76.265625
+      },
+      "info": {
+        "x": 26,
+        "y": 243.734375,
+        "width": 475.1875,
+        "height": 60.265625
+      },
+      "preview": {
+        "left": 409.0484374506727,
+        "top": 178.52351911918512,
+        "right": 435.0321374425854,
+        "bottom": 213.76395375843086
+      },
+      "instruction": "Entrance clear. Choose Build here to confirm.",
+      "coverage": "4 of 6 homes in reach \u00b7 4-space radius"
+    },
+    {
+      "name": "small-landscape",
+      "box": {
+        "x": 12,
+        "y": 220.734375,
+        "width": 579,
+        "height": 76.265625
+      },
+      "info": {
+        "x": 26,
+        "y": 228.734375,
+        "width": 298.1875,
+        "height": 60.265625
+      },
+      "preview": {
+        "left": 321.0465744718006,
+        "top": 171.6572299222934,
+        "right": 346.0309013871014,
+        "bottom": 205.54226322926044
+      },
+      "instruction": "Entrance clear. Choose Build here to confirm.",
+      "coverage": "4 of 6 homes in reach \u00b7 4-space radius"
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "validation": {
+    "nodeTests": {
+      "passed": 429,
+      "failed": 0
+    },
+    "archiveChecks": 2020,
+    "browser": "Installed Chrome, headless; touch emulation for tablet and phones",
+    "limits": "No live Safari or physical-device acceptance claimed."
+  },
+  "sourceHashes": {
+    "index.html": "8955513cc489a658efc6c254a4545164d712724bad4130e203f08c599668b64c",
+    "clarity.css": "091891580c61addb0847db5fe5ddf9a347ca9e40c646ef6722a051e7dd5b51c6",
+    "interaction.css": "08ba5a70db83f0dfaae9518c00bfff3e2dd3700371e4c712a82a9ecf2c885039",
+    "js/main.js": "08a1f049b6e93e51f50fceca9120650c16cd5706c6ccea2469692c7454350559",
+    "js/world.js": "b14fafdf6b0a4d5dfe354cd6465f012a21a607f2a0d8b87acd2f7e88a55d011e"
+  },
+  "screenshots": [
+    "desktop.png",
+    "tablet.png",
+    "phone.png",
+    "landscape.png",
+    "small-landscape.png"
+  ]
+}
