@@ -1,0 +1,23 @@
+✔ vendored browser Wasm has no unresolved native imports and exposes the town peer (119.025417ms)
+✔ visit becomes fog on connection loss and reconnect never changes the home town (92.455041ms)
+✔ a replacement host starts a fresh observation sequence (36.898542ms)
+✔ signing out closes the endpoint and removes the current remote view (20.031375ms)
+✔ recalling a scout ignores an in-flight response (2.653458ms)
+✔ a valid snapshot from a different town is rejected (20.965542ms)
+✔ sign-out rejects incoming requests before the next simulation tick (3.747334ms)
+✔ shared wilderness is deterministic and never regenerates any claimed town (12.381375ms)
+✔ town changes inside the border are observed from the owner and never expose private state (25.316667ms)
+✔ the host owns scout speed, sight and expiry; offline views reveal nothing (20.518416ms)
+✔ the directory link survives backup without connection credentials or remote town data (669.749959ms)
+✔ reject observations with distant objects, invalid models and nonfinite values (6.19875ms)
+✔ scouts cross wilderness corridors without entering intervening offline plots (31.9775ms)
+✔ scouts see actual walls and gate state without bypassing a closed gate (13.642291ms)
+✔ backup import cannot erase or replace an existing world claim (3.744292ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2411.537125

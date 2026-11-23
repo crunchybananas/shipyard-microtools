@@ -1,6 +1,6 @@
 # Company movement — October 12, 2026
 
-Original review branch: `codex/observed-world`. The movement-only increment is also included in the town-depth release for main; the networking feature remains separate. Original asset release: `20261012-company-motion-1`.
+Original review branch: `codex/observed-world`. Original asset release: `20261012-company-motion-1`. This movement increment is included in main and preserved by the shared-world integration.
 
 ## Changes
 

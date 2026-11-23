@@ -1,0 +1,14 @@
+✔ private pair, atomic progress, concurrency, revocation and closed-room recovery (1428.879958ms)
+✔ forged receipts, malformed deliveries and membership bypasses are rejected (861.713375ms)
+✔ a lost commit response can be recovered from a reloaded town without charging twice (535.807625ms)
+✔ worlds have private bounded membership, immutable disjoint plots, and no town payload storage (771.885125ms)
+✔ simultaneous claims cannot overlap and joining can recover after a committed response is lost (344.414167ms)
+✔ presence is owner-only, bounded, recoverable, and cannot be stolen by another live session (357.272708ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2966.339167

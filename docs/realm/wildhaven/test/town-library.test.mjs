@@ -44,10 +44,12 @@ test('new games and duplicates do not replace the current town; changes and sele
 });
 test('a duplicate keeps all town progress but gets a fresh online identity without link, escrow, or companion offers',()=>{
  const {storage}=pair(),l=library(storage),state=l.companions.loadHome(),c=ensureCoop(state);
+ state.networkWorld={version:1,worldId:'w'.repeat(24),uid:'u'.repeat(24),townId:c.townId,name:'Cory',gx:0,gz:0,seed:3,phase:'ready'};
  c.link={roomId:'r'.repeat(24),uid:'u'.repeat(24),name:'Cory'};c.storehouse=true;
  c.pending={id:'p'.repeat(24),sequence:1,requested:{wood:10,stone:0,food:0}};
  const result=l.duplicate('s1','home','Test branch',state);assert.ok(result.ok,result.reason);
  const copied=restore(l.exportTown(result.id,'home'));
+ assert.equal(copied.networkWorld,null);assert.deepEqual(restore(l.exportTown('s1','home')).networkWorld,state.networkWorld);
  assert.notEqual(copied.coop.townId,c.townId);assert.equal(copied.coop.link,null);assert.equal(copied.coop.pending,null);assert.equal(copied.coop.draft,null);assert.equal(copied.coop.storehouse,true);
  assert.deepEqual(copied.resources,state.resources);assert.deepEqual(copied.research,state.research);assert.deepEqual(copied.woodland,state.woodland);assert.deepEqual(copied.minerals,state.minerals);
  assert.equal(l.list().filter(t=>t.slotId===result.id).length,1);assert.equal(JSON.parse(l.exportTown('s1','home')).coop.link.roomId,c.link.roomId);

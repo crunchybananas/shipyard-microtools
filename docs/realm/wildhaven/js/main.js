@@ -1,3 +1,6 @@
+import { createObservedWorld } from './observed-world.js';
+import { canImportObservedWorld } from './observed-state.js';
+import { createObservedUI } from './observed-ui.js';
 import { fishingActivity } from './fishing.js';
 import { CROPS, gardenState } from './hinterland.js';
 import { objectiveChecklist, objectiveGuidance } from './objective-checklist.js';
@@ -42,7 +45,7 @@ const CATEGORIES = {
 let state = sim.createGame(), saved = null, playing = false, speed = 1, previousSpeed = 1;
 let tool = null, hovered = null, rotation = 0, selected = null, icons = {}, uiClock = 0, saveClock = 0, toastTimer;
 let touchPlacement = false, touchSite = null;
-let soundEnabled = false, storageAvailable = true, victorySeen = false, world, town, frontierUI, fieldbook, companionUI, coop, coopUI, inviteOpened = false, category = 'beginnings';
+let soundEnabled = false, storageAvailable = true, victorySeen = false, world, town, frontierUI, fieldbook, companionUI, coop, coopUI, observed, observedUI, inviteOpened = false, category = 'beginnings';
 const keys = new Set();
 const readingClock = createReadingClock();
 function updateReadingPause() {
@@ -81,6 +84,7 @@ function preparePanel(destination) {
   if (destination !== 'fieldbook') fieldbook?.close();
   if (destination !== 'companion') companionUI?.close();
   if (destination !== 'coop') coopUI?.close();
+  if (destination !== 'observed') observedUI?.close();
   if (destination !== 'journal') closeJournal();
   cancelTool(); closeInspector(); keys.clear();
 }
@@ -166,7 +170,7 @@ function mountCompactDock() {
   const towns = document.createElement('button'); towns.id = 'towns-toggle'; towns.type = 'button'; towns.textContent = 'Your towns'; towns.onclick = () => townLibraryUI.open();
   const currentName = document.createElement('span'); currentName.id = 'current-town-name';
   $('help').textContent = 'How to play'; $('sound-settings').textContent = 'Sound settings';
-  menu.append(currentName, towns, $('landing-button'), $('journal-button'), $('coop-toggle'), $('sound-settings'), $('help'));
+  menu.append(currentName, towns, $('landing-button'), $('journal-button'), $('coop-toggle'), $('observed-toggle'), $('sound-settings'), $('help'));
   menu.addEventListener('click', event => { if (event.target.closest('button')) more.open = false; });
   more.append(summary, menu); dock.append(more);
   document.addEventListener('click', event => { if (!more.contains(event.target)) more.open = false; });
@@ -192,6 +196,7 @@ function sync() { sim.refreshTown(state); world.sync(state); updateUI(); save();
 function mutate(result, cue='build') { if (!companions.canManage) return; if (result?.ok) { sync(); audio.play(cue); } else audio.play('error'); announce(result?.reason, !result?.ok); }
 function newVillage() { townLibraryUI.open({ create: true }); }
 function enter(resuming = false) {
+  observed?.syncTown();
   playing = true; tool = null; selected = null; speed = resuming ? 0 : 1; previousSpeed = 1; readingClock.reset(speed);
   frontierUI?.resetSelection();
   touchPlacement = false; touchSite = null; closeBuildDrawer(); document.body.classList.remove('touch-placement-active'); $('confirm-building').hidden = true;
@@ -201,6 +206,7 @@ function enter(resuming = false) {
   if (!resuming) setObjectiveExpanded(true);
   preparePanel(null); world.select(null); world.selectCitizen?.(null); world.hoverCitizen?.(null); world.showPreview(null); world.home(); world.sync(state); updateUI(); save(); audio.start();
   if (coopUI?.incoming && !inviteOpened) { inviteOpened = true; coopUI.open(); }
+  else if (observedUI?.incoming && !inviteOpened) { inviteOpened = true; observedUI.open(); }
 }
 function useTool(type) {
   if (!playing || !companions.canManage) return;
@@ -454,7 +460,7 @@ function updateUI() {
   $('speed-toggle').textContent = `${previousSpeed}×`;
   $('speed-toggle').setAttribute('aria-label', `Speed ${previousSpeed}×. Switch to ${previousSpeed === 1 ? 3 : 1}×.`);
   $('journal-entries').replaceChildren(...state.events.map(event => { const item = document.createElement('li'), label = document.createElement('small'); label.textContent = `Day ${calendarDay(state, event.day)}`; item.append(label, document.createTextNode(event.text)); return item; }));
-  updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); coopUI?.update(); coop?.tick(); if (tool && hovered) hover(hovered);
+  updateShelf(); updateInspector(); town?.update(); frontierUI?.update(); fieldbook?.update(); companionUI?.update(); coopUI?.update(); coop?.tick(); observedUI?.update(); observed?.tick(); if (tool && hovered) hover(hovered);
 }
 function setSpeed(value) { if (value > 0 && !companions.canManage) { announce(companions.readOnly ? 'This is a paused visit. Take the chair to manage this local town.' : companions.reason, true); return; } speed = readingClock.choose(value); $('reading-pause').hidden = true; if (value > 0) previousSpeed = value; updateUI(); audio.play('select'); }
 function togglePause() { setSpeed(speed === 0 ? previousSpeed : 0); }
@@ -542,7 +548,7 @@ function bind() {
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
   $('restart').onclick = newVillage; $('cancel-restart').onclick = () => $('restart-confirm').hidden = true; $('confirm-restart').onclick = newVillage;
   document.addEventListener('keydown', e => {
-    if (e.target.matches('input,textarea,select') || document.querySelector('dialog[open]') || !playing) return;
+    if (e.target.matches('input,textarea,select') || e.target.closest('#observed-panel') || document.querySelector('dialog[open]') || !playing) return;
     if (!companions.canManage && !['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyQ','KeyE','Home','Escape','KeyP'].includes(e.code)) return;
     if (e.code === 'Space' && e.target.closest('button,summary')) return;
     if (e.code.startsWith('Arrow') && e.target.closest('#town-book, #inspector, #journal, #frontier-panel, #fieldbook, #companion-panel, #coop-panel')) return;
@@ -574,9 +580,10 @@ async function boot() {
       const modal = !!document.querySelector('dialog[open]');
       if (playing && !modal) {
         let dx = 0, dz = 0; if (keys.has('KeyA') || keys.has('ArrowLeft')) dx -= 1; if (keys.has('KeyD') || keys.has('ArrowRight')) dx += 1; if (keys.has('KeyW') || keys.has('ArrowUp')) dz -= 1; if (keys.has('KeyS') || keys.has('ArrowDown')) dz += 1;
-        if (dx || dz) world.moveCamera(dx * dt * 8, dz * dt * 8); if (speed > 0 && companions.canManage) advance(Math.min(wallDt, .5) * speed);
+        if (!observedUI?.active && (dx || dz)) world.moveCamera(dx * dt * 8, dz * dt * 8); if (speed > 0 && companions.canManage) advance(Math.min(wallDt, .5) * speed);
         uiClock += dt; saveClock += dt; if (uiClock > .5) { updateUI(); uiClock = 0; } if (saveClock > 5) { save(); saveClock = 0; }
       }
+      if(playing&&observed)world.setVisitingScouts(observed.info().scouts);
       world.render(dt, { speed: playing ? (companions.canManage ? speed : 0) : 1, playing: !modal, dayTime: calendarFraction(state), won: playing && state.won }); frames++; total += wallDt;
       if (total > 2) { document.documentElement.dataset.fps = String(Math.round(frames / total)); frames = 0; total = 0; }
     }
@@ -591,13 +598,19 @@ async function boot() {
       canUse:()=>playing && companions.canManage && companions.activeId==='home', save:next=>companions.save(next),
       onChange:()=>{sim.refreshTown(state);world.sync(state);updateUI();} });
     coopUI=createCoopUI({coop,getState:()=>state,beforeOpen:()=>preparePanel('coop'),openLocal:()=>companionUI.open(),cloneModel:type=>world.clone(type),announce,
-      importState:next=>{if(!companions.canManage||companions.activeId!=='home'||coop.info().busy)return{ok:false,reason:'Return home and finish connecting before importing.'};
+      importState:next=>{if((observed?.info().online || observed?.info().busy))return{ok:false,reason:'Go offline in World before importing a backup.'};if(!companions.canManage||companions.activeId!=='home'||coop.info().busy)return{ok:false,reason:'Return home and finish connecting before importing.'};
+        const worldAllowed=canImportObservedWorld(state,next);if(!worldAllowed.ok)return worldAllowed;
         const allowed=canImportCoop(state,next);if(!allowed.ok)return allowed;
         const result=companions.save(next);if(!result.ok)return result;state=next;victorySeen=state.won;keys.clear();enter(true);return result;} });
+    observed=createObservedWorld({config:COOP_CONFIG,auth:coop.auth,getState:()=>state,
+      canUse:()=>playing&&companions.canManage&&companions.activeId==='home',save:next=>companions.save(next),
+      actors:()=>world.actors.filter(a=>a.root.visible).map(a=>({id:a.citizen.id,x:a.root.position.x/1.8,z:a.root.position.z/1.8,heading:a.root.rotation.y,working:a.root.userData.workState==='working',job:a.citizen.job,pose:['left_arm','right_arm','left_leg','right_leg'].map(k=>{const r=a.limbs?.[k]?.rotation;return r?[r.x,r.y,r.z]:[0,0,0];})})),
+      onChange:()=>observedUI?.update()});
+    observedUI=createObservedUI({network:observed,beforeOpen:()=>preparePanel('observed'),openAccount:()=>coopUI.open(),cloneModel:(type,level)=>world.clone(type,level)});
     mountTabletControls();
     townLibraryUI = createTownLibraryUI({ library: townLibrary, getState: () => playing ? state : null,
       beforeOpen: () => { preparePanel(null); closeBuildDrawer(); document.querySelectorAll('dialog[open]').forEach(d => d.close()); keys.clear(); updateDock(); },
-      canSwitch: () => coop.info().busy ? { ok: false, reason: 'Finish the current online action before changing towns.' } : { ok: true },
+      canSwitch: () => (coop.info().busy || observed.info().busy) ? { ok: false, reason: 'Finish the current online action before changing towns.' } : { ok: true },
       onOpenTown: next => { state = next; saved = next; victorySeen = state.won; keys.clear(); enter(true); announce(`${townLibrary.activeName} opened. Resume when you’re ready.`); coop.reconnect(); }
     });
     mountCompactDock();

@@ -137,6 +137,7 @@ export function createTownLibrary({ storage, locks = globalThis.navigator?.locks
     const slot = slotById(slotId); if (!slot || !['home', 'companion'].includes(townId) || (townId === 'companion' && !slot.data[COMPANION_SAVE_KEY])) return fail('That town could not be found.');
     const copy = restore(memberRaw(slot, townId)); if (!copy) return fail('That town could not be copied.');
     const storehouse = !!copy.coop?.storehouse;
+    delete copy.networkWorld;
     delete copy.coop; ensureCoop(copy).storehouse = storehouse;
     return add(name, copy, null);
   }

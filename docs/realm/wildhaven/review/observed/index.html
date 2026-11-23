@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><title>Isolated world playtest</title>
+<style>body{font:17px system-ui;max-width:620px;margin:50px auto;background:#edf0df;color:#263f38}button{padding:14px;margin:10px 0}p{line-height:1.5}</style>
+<h1>Isolated world playtest</h1><p>This prepares a disposable town on this test origin and a synthetic emulator account. It refuses to replace an existing town. Only works on localhost with the test server.</p><button id="prepare">Prepare test town</button><p id="status"></p><a href="../../?review=world">Open game</a>
+<script type="module">
+import {createGame,build,tick,serialize} from '../../js/sim.js';
+import {COOP_CONFIG} from '../../js/coop-config.js';
+import {coopId} from '../../js/coop-state.js';
+const prepare=document.getElementById('prepare'),result=document.getElementById('status');
+const allowed=['localhost','127.0.0.1'].includes(location.hostname)&&COOP_CONFIG.projectId==='demo-island-coop';
+prepare.disabled=!allowed;
+prepare.onclick=()=>{if(!allowed||localStorage.getItem('wildhaven.v4')){result.textContent='An existing town is present. Use another test port.';return;}
+ const uid=coopId(),token=btoa(JSON.stringify({alg:'none',typ:'JWT'}))+'.'+btoa(JSON.stringify({iss:'https://securetoken.google.com/demo-island-coop',aud:'demo-island-coop',sub:uid,user_id:uid,iat:0,exp:9999999999,firebase:{sign_in_provider:'password',identities:{}}}))+'.';
+ localStorage.setItem('island-town.coop.account.v1',JSON.stringify({uid,email:'playtest@example.invalid',idToken:token,refreshToken:'emulator-only',expiresAt:Date.now()+86400000}));
+ const s=createGame();build(s,'cottage',-2,3);build(s,'lumber',-4,0);for(let n=0;n<180;n++)tick(s,1);localStorage.setItem('wildhaven.v4',serialize(s));result.textContent='Test town ready. Open the game and continue.';
+};
+</script>

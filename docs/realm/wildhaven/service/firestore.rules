@@ -95,6 +95,49 @@ service cloud.firestore {
           && getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.revision == get(/databases/$(database)/documents/rooms/$(roomId)).data.revision + 1;
       }
     }
+    // World membership stores no buildings, trees, inventories, or observations.
+    // A random world ID is an invitation capability. Worlds cannot be enumerated.
+    function worldMember(w) { return signedIn() && exists(/databases/$(database)/documents/worlds/$(w)/members/$(uid())); }
+    function grid(n) { return n is int && n >= -1024 && n <= 1023; }
+    function claimSlot(d) { return string(d.gx)+'_'+string(d.gz); }
+    function claimShape(d) { return d.keys().hasOnly(['uid','townId','name','gx','gz','sector'])
+      && d.uid == uid() && identifier(d.townId) && townName(d.name) && grid(d.gx) && grid(d.gz)
+      && d.sector == string(int(math.floor(d.gx / 8.0)))+'_'+string(int(math.floor(d.gz / 8.0))); }
+    match /worlds/{world} {
+      allow get: if signedIn() && identifier(world);
+      allow create: if signedIn() && identifier(world) && request.resource.data.keys().hasOnly(['version','owner','seed'])
+        && request.resource.data.version == 1 && request.resource.data.owner == uid()
+        && request.resource.data.seed is int && request.resource.data.seed >= 0 && request.resource.data.seed <= 4294967295
+        && existsAfter(/databases/$(database)/documents/worlds/$(world)/members/$(uid()));
+      match /members/{player} {
+        allow get: if signedIn() && (player == uid() || worldMember(world));
+        allow create: if signedIn() && player == uid() && existsAfter(/databases/$(database)/documents/worlds/$(world))
+          && request.resource.data.keys().hasOnly(['townId','name','gx','gz','sector'])
+          && grid(request.resource.data.gx) && grid(request.resource.data.gz)
+          && getAfter(/databases/$(database)/documents/worlds/$(world)/claims/$(claimSlot(request.resource.data))).data
+            == {'uid':uid(),'townId':request.resource.data.townId,'name':request.resource.data.name,'gx':request.resource.data.gx,'gz':request.resource.data.gz,'sector':request.resource.data.sector};
+      }
+      match /claims/{slot} {
+        allow get: if signedIn() && identifier(world);
+        allow list: if worldMember(world) && request.query.limit <= 64;
+        allow create: if signedIn() && claimShape(request.resource.data) && slot == claimSlot(request.resource.data)
+          && existsAfter(/databases/$(database)/documents/worlds/$(world))
+          && getAfter(/databases/$(database)/documents/worlds/$(world)/members/$(uid())).data
+            == {'townId':request.resource.data.townId,'name':request.resource.data.name,'gx':request.resource.data.gx,'gz':request.resource.data.gz,'sector':request.resource.data.sector};
+      }
+      match /presence/{player} {
+        allow get: if worldMember(world);
+        allow create, update: if worldMember(world) && player == uid()
+          && request.resource.data.keys().hasOnly(['townId','endpoint','ticket','session','expiresAt','updatedAt'])
+          && request.resource.data.townId == get(/databases/$(database)/documents/worlds/$(world)/members/$(uid())).data.townId
+          && request.resource.data.endpoint is string && request.resource.data.endpoint.matches('^[a-f0-9]{64}$')
+          && request.resource.data.ticket is string && request.resource.data.ticket.size() > 10 && request.resource.data.ticket.size() < 4096
+          && identifier(request.resource.data.session) && request.resource.data.updatedAt == request.time
+          && request.resource.data.expiresAt > request.time && request.resource.data.expiresAt < request.time + duration.value(120,'s')
+          && (!exists(/databases/$(database)/documents/worlds/$(world)/presence/$(player)) || resource.data.session == request.resource.data.session || resource.data.expiresAt <= request.time);
+        allow delete: if signedIn() && player == uid();
+      }
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }

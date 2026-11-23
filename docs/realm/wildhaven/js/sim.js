@@ -1,3 +1,4 @@
+import { restoreObservedWorld } from './observed-state.js';
 import { CATCH_SIZE, pierOrientations, pierPoint, fishingRate, tickPier, restoreFishingTrip } from './fishing.js';
 import { researchProductionShare, receiveResearchProduction } from './research-projects.js';
 import { createMinerals, restoreMinerals, mineralStatus, extractMinerals } from './minerals.js';
@@ -848,7 +849,7 @@ export function restore(raw) {
   if (input.version >= 3) { if (!Object.hasOwn(input, 'frontier')) return null; state.frontier = structuredClone(input.frontier); }
   if (input.version !== VERSION) state.migratedFromVersion = input.version;
   if (input.version === VERSION) { if (!Object.hasOwn(input, 'discovery')) return null; state.discovery = structuredClone(input.discovery); }
-  try { state.minerals=restoreMinerals(input.minerals);state.livestock=restoreLivestock(input.livestock,state.buildings);state.coop = restoreCoop(input.coop); state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); normalizeHinterland(state, input.hinterland); } catch { return null; }
+  try { state.networkWorld=restoreObservedWorld(input.networkWorld);state.minerals=restoreMinerals(input.minerals);state.livestock=restoreLivestock(input.livestock,state.buildings);state.coop = restoreCoop(input.coop); state.woodland = restoreWoodland(input.woodland); normalizeProgression(state); normalizePressure(state); normalizeFrontier(state, frontierContext(state)); normalizeDiscovery(state); normalizeHinterland(state, input.hinterland); } catch { return null; }
   restoreJournal(state, input);
   reconcileWorkforce(state); refreshProduction(state); return state;
 }
